@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+import {
+  Github,
+  Globe,
+  Hash,
+  Linkedin,
+  Mail,
+  MessageCircle,
+  Send,
+  Twitter,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/lib/site";
 
@@ -8,32 +18,67 @@ export const metadata: Metadata = {
   description: "Get in touch with Fronk Kunanon Jarat — email and social links.",
 };
 
-const channels = [
+interface Channel {
+  label: string;
+  sub: string;
+  href?: string;
+  copy?: string;
+  icon: LucideIcon;
+}
+
+const channels: readonly Channel[] = [
   {
     label: "Email",
-    sub: "fronk.kunanon@gmail.com",
+    sub: siteConfig.email,
     href: `mailto:${siteConfig.email}`,
     icon: Mail,
   },
   {
     label: "X / Twitter",
-    sub: "Long-form threads on building",
+    sub: "@fkj98",
     href: siteConfig.socials.x,
     icon: Twitter,
   },
   {
     label: "LinkedIn",
-    sub: "Professional history and updates",
+    sub: "/in/kunanonj",
     href: siteConfig.socials.linkedin,
     icon: Linkedin,
   },
   {
+    label: "Telegram",
+    sub: "@fkj98",
+    href: siteConfig.socials.telegram,
+    icon: Send,
+  },
+  {
+    label: "Discord",
+    sub: siteConfig.discordHandle,
+    copy: siteConfig.discordHandle,
+    icon: MessageCircle,
+  },
+  {
     label: "GitHub",
-    sub: "Open-source contributions and side projects",
+    sub: "@KunanonJ",
     href: siteConfig.socials.github,
     icon: Github,
   },
-] as const;
+  {
+    label: "Farcaster",
+    sub: "@fronk98",
+    href: siteConfig.socials.farcaster,
+    icon: Hash,
+  },
+  {
+    label: "Website",
+    sub: "gogocash.co",
+    href: siteConfig.socials.website,
+    icon: Globe,
+  },
+];
+
+const cardClasses =
+  "flex items-start gap-4 rounded-xl border border-border bg-subtle/30 p-5 transition-colors hover:border-fg/30 hover:bg-subtle/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 export default function ContactPage() {
   return (
@@ -50,23 +95,41 @@ export default function ContactPage() {
         </p>
       </header>
 
-      <ul className="grid gap-3 sm:grid-cols-2">
-        {channels.map((c) => (
-          <li key={c.label}>
-            <a
-              href={c.href}
-              target={c.href.startsWith("http") ? "_blank" : undefined}
-              rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
-              className="flex items-start gap-4 rounded-xl border border-border bg-subtle/30 p-5 transition-colors hover:border-fg/30 hover:bg-subtle/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-            >
-              <c.icon className="mt-0.5 h-5 w-5 text-muted" aria-hidden />
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+        {channels.map((c) => {
+          const Icon = c.icon;
+          const inner = (
+            <>
+              <Icon className="mt-0.5 h-5 w-5 text-muted" aria-hidden />
               <div>
                 <p className="font-medium">{c.label}</p>
                 <p className="mt-0.5 text-sm text-muted">{c.sub}</p>
               </div>
-            </a>
-          </li>
-        ))}
+            </>
+          );
+
+          if (c.href) {
+            const isExternal = c.href.startsWith("http");
+            return (
+              <li key={c.label}>
+                <a
+                  href={c.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  className={cardClasses}
+                >
+                  {inner}
+                </a>
+              </li>
+            );
+          }
+
+          return (
+            <li key={c.label} className={cardClasses}>
+              {inner}
+            </li>
+          );
+        })}
       </ul>
     </Container>
   );

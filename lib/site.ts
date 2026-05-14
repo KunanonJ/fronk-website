@@ -8,10 +8,14 @@ export const siteConfig = {
   ogImage: "/og-default.png",
   email: "fronk.kunanon@gmail.com",
   socials: {
-    x: "https://x.com/REPLACE",
-    linkedin: "https://www.linkedin.com/in/REPLACE",
-    github: "https://github.com/REPLACE",
+    x: "https://x.com/fkj98",
+    linkedin: "https://www.linkedin.com/in/kunanonj",
+    github: "https://github.com/KunanonJ",
+    telegram: "https://t.me/fkj98",
+    farcaster: "https://farcaster.xyz/fronk98",
+    website: "https://gogocash.co",
   },
+  discordHandle: "fronk98",
 } as const;
 
 export type SiteConfig = typeof siteConfig;

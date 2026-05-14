@@ -1,7 +1,31 @@
 import Link from "next/link";
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+import {
+  Github,
+  Globe,
+  Hash,
+  Linkedin,
+  Mail,
+  Send,
+  Twitter,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/lib/site";
+
+interface SocialLink {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const socialLinks: readonly SocialLink[] = [
+  { href: siteConfig.socials.x, label: "X", icon: Twitter },
+  { href: siteConfig.socials.linkedin, label: "LinkedIn", icon: Linkedin },
+  { href: siteConfig.socials.github, label: "GitHub", icon: Github },
+  { href: siteConfig.socials.telegram, label: "Telegram", icon: Send },
+  { href: siteConfig.socials.farcaster, label: "Farcaster", icon: Hash },
+  { href: siteConfig.socials.website, label: "Website", icon: Globe },
+];
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -14,7 +38,7 @@ export function Footer() {
             © {year} {siteConfig.name}. All rights reserved.
           </p>
 
-          <ul className="flex items-center gap-4">
+          <ul className="flex flex-wrap items-center gap-4">
             <li>
               <Link
                 href={`mailto:${siteConfig.email}`}
@@ -22,45 +46,22 @@ export function Footer() {
                 aria-label="Email"
               >
                 <Mail className="h-4 w-4" />
-                <span className="hidden sm:inline">Email</span>
               </Link>
             </li>
-            <li>
-              <a
-                href={siteConfig.socials.x}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-fg"
-                aria-label="X (Twitter)"
-              >
-                <Twitter className="h-4 w-4" />
-                <span className="hidden sm:inline">X</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={siteConfig.socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-fg"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="h-4 w-4" />
-                <span className="hidden sm:inline">LinkedIn</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href={siteConfig.socials.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 hover:text-fg"
-                aria-label="GitHub"
-              >
-                <Github className="h-4 w-4" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
-            </li>
+            {socialLinks.map(({ href, label, icon: Icon }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 hover:text-fg"
+                  aria-label={label}
+                  title={label}
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </Container>
