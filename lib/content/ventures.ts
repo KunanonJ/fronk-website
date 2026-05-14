@@ -22,7 +22,7 @@ const VENTURES: readonly Venture[] = [
     tagline: "Healthcare benefits, reimagined for modern teams.",
     year: 2025,
     role: "Founder",
-    status: "active",
+    status: "paused",
     stack: ["TypeScript", "Next.js", "Healthcare APIs"],
     summary:
       "Building accessible healthcare benefits infrastructure — making employer-sponsored care simpler for both companies and the people they cover.",
