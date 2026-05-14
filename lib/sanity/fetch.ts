@@ -46,7 +46,11 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
 export async function fetchAllPostSlugs(): Promise<readonly string[]> {
   if (!sanityClient || !isSanityConfigured()) return [];
   try {
-    const result = await sanityClient.fetch<string[]>(POST_SLUGS_QUERY);
+    const result = await sanityClient.fetch<string[]>(
+      POST_SLUGS_QUERY,
+      {},
+      { next: { tags: [POSTS_TAG] } },
+    );
     return result ?? [];
   } catch {
     return [];

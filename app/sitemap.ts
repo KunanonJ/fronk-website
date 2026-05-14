@@ -3,6 +3,8 @@ import { siteConfig } from "@/lib/site";
 import { getAllVentureSlugs } from "@/lib/content/ventures";
 import { fetchAllPostSlugs } from "@/lib/sanity/fetch";
 
+export const revalidate = 3600;
+
 const STATIC_ROUTES = ["", "/about", "/ventures", "/writing", "/resume", "/contact"] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
