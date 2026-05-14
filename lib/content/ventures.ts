@@ -17,27 +17,6 @@ export interface Venture {
 
 const VENTURES: readonly Venture[] = [
   {
-    slug: "gogocare",
-    name: "GoGoCare",
-    tagline: "Healthcare benefits, reimagined for modern teams.",
-    year: 2025,
-    role: "Founder",
-    status: "paused",
-    stack: ["TypeScript", "Next.js", "Healthcare APIs"],
-    summary:
-      "Building accessible healthcare benefits infrastructure — making employer-sponsored care simpler for both companies and the people they cover.",
-    problem:
-      "[REPLACE] Modern teams need healthcare benefits that match how they actually work — flexible, transparent, and digital-first. The legacy options are anything but.",
-    approach:
-      "[REPLACE] Designing the product, working with care partners, and shipping the first version end-to-end.",
-    outcome:
-      "[REPLACE] Currently in build / early-customer phase. Updates coming.",
-    learnings: [
-      "[REPLACE — add 2–3 short bullets once there's something concrete to share.]",
-    ],
-    featured: true,
-  },
-  {
     slug: "gogocash",
     name: "GoGoCash",
     tagline: "Cash, on-demand.",
@@ -47,15 +26,39 @@ const VENTURES: readonly Venture[] = [
     stack: ["TypeScript", "Fintech rails", "Payments"],
     url: "https://gogocash.co",
     summary:
-      "A fintech product giving people fast, transparent access to their own money — without the friction or hidden costs of traditional channels.",
+      "A fintech product giving Thai consumers fast, transparent access to short-term liquidity — without the friction or hidden costs of traditional channels.",
     problem:
-      "[REPLACE] Existing cash-access products are expensive, slow, or trap users in fee cycles. There's room for a model that's honest about price and fast by default.",
+      "Cash-access products in the region are slow, opaque on price, and built for the bank's convenience rather than the user's. Whole demographics get priced out, and the ones who do qualify still wait days for funds that should arrive in minutes.",
     approach:
-      "[REPLACE] Built the core flow with a focus on speed, clear pricing, and reliable payout infrastructure.",
+      "Started with a focused wedge: one well-priced product, one clear flow, and infrastructure tuned for speed over breadth. Every part of the experience — application, decisioning, payout — is measured against a single metric: time from request to money received. Compliance and risk are first-class concerns; we don't ship anything that can't survive scrutiny later.",
     outcome:
-      "[REPLACE] Live at gogocash.co; growing customer base across Thailand.",
+      "Live at gogocash.co and operating from Bangkok. Steady customer growth, profitable unit economics on each transaction, and a small team I'm proud of. Specific numbers are kept off the public site — happy to share with anyone considering working together.",
     learnings: [
-      "[REPLACE — replace with your real 2–3 takeaways from running GoGoCash so far.]",
+      "Trust compounds faster than features. Clear pricing and on-time payouts beat a longer product roadmap every quarter.",
+      "Boring infrastructure is a moat in fintech. Reliability is the headline feature once you're past the launch phase.",
+      "Selling to under-served customers means showing up in places banks don't. Distribution is half the job.",
+    ],
+    featured: true,
+  },
+  {
+    slug: "gogocare",
+    name: "GoGoCare",
+    tagline: "Healthcare benefits, reimagined for modern teams.",
+    year: 2025,
+    role: "Founder",
+    status: "paused",
+    stack: ["TypeScript", "Next.js", "Healthcare APIs"],
+    summary:
+      "An exploration into healthcare benefits infrastructure for small teams — making employer-sponsored care simpler for both companies and the people they cover.",
+    problem:
+      "Modern teams in Southeast Asia want healthcare benefits that work the way their teams work — flexible, transparent, and digital-first. The legacy options are bundles built for a different decade and a different size of company.",
+    approach:
+      "Started by talking to founders and HR leads about what actually breaks during onboarding and claims. Sketched a thin product on top of existing care networks rather than rebuilding the network itself.",
+    outcome:
+      "Currently paused while focus stays on GoGoCash. The research notes and operator interviews are still in the drawer for when timing is right — there's a real product underneath if the right team forms around it.",
+    learnings: [
+      "Healthcare-benefits products live or die by their partner networks. Software is the easy part.",
+      "Founder bandwidth is the real constraint. Better to pause cleanly than to dilute the main venture.",
     ],
     featured: true,
   },
@@ -68,15 +71,17 @@ const VENTURES: readonly Venture[] = [
     status: "paused",
     stack: ["AI", "Blockchain", "Smart contracts"],
     summary:
-      "Using AI and blockchain to rethink how product requirements are written, signed off, and tracked across teams.",
+      "Used AI to draft and structure product requirements and on-chain attestation to make sign-off and traceability auditable across teams.",
     problem:
-      "[REPLACE] Product requirements are usually messy documents that drift from what gets built. The accountability gap is real and costs teams real time.",
+      "Product requirements are usually messy documents that drift from what gets built. Engineering, product, and stakeholders argue about a version that no longer exists. The accountability gap costs teams real time.",
     approach:
-      "[REPLACE] Combined LLMs for drafting and structuring requirements with on-chain attestation for sign-off and traceability.",
+      "Combined LLM-assisted drafting with a lightweight on-chain layer for sign-off — every approved version of a requirement hashed and stored, so disputes had a clear record. Designed to be opt-in: teams could use the AI side without touching the chain side at all.",
     outcome:
-      "[REPLACE] Validated the wedge between May 2023 and March 2024 before shifting focus to fintech-first products.",
+      "Ran from May 2023 to March 2024 with early design partners. Validated the wedge but realised the wedge was narrower than the team needed to sustain itself — we wound down cleanly and rolled the learnings into newer ventures.",
     learnings: [
-      "[REPLACE — list the things the project taught you, the honest ones included.]",
+      "AI features only justified the price when they came with structural guarantees customers couldn't easily replicate.",
+      "On-chain attestation needs to be invisible until the moment a dispute happens. Otherwise it's friction nobody asked for.",
+      "Two-sided products with both AI and Web3 components compound the time it takes to find customers who care about both.",
     ],
     featured: true,
   },
@@ -89,15 +94,16 @@ const VENTURES: readonly Venture[] = [
     status: "paused",
     stack: ["Fintech", "Mobile"],
     summary:
-      "An attempt at making everyday saving feel rewarding and frictionless — particularly for first-time savers.",
+      "An attempt to make everyday saving feel rewarding and frictionless — particularly for first-time savers in Thailand.",
     problem:
-      "[REPLACE] Most savings products feel like homework. The behavioural barrier is bigger than the financial one for the people who'd benefit most.",
+      "Most savings products feel like homework. For people who'd benefit most from saving — younger users, freelancers, gig workers — the behavioural barrier is bigger than the financial one.",
     approach:
-      "[REPLACE] Designed a lightweight mobile-first flow with goal-based saving and clear feedback loops.",
+      "Built a lightweight mobile-first flow around goal-based saving with quick visual feedback. Less interest-rate marketing, more behavioural design.",
     outcome:
-      "[REPLACE] Ran from Dec 2022 to Mar 2023. Lessons fed directly into GoGoCash.",
+      "Ran from December 2022 to March 2023. Customer interviews and the early flow directly informed how GoGoCash thinks about onboarding and pricing today.",
     learnings: [
-      "[REPLACE — your real takeaways here.]",
+      "Behaviour-design products are a regulator-adjacent business model. Build for the compliance team early.",
+      "A small product team can't run consumer marketing and product simultaneously. Pick one wedge and own it.",
     ],
   },
   {
@@ -109,15 +115,17 @@ const VENTURES: readonly Venture[] = [
     status: "paused",
     stack: ["Solidity", "Next.js", "IPFS"],
     summary:
-      "A marketplace built around regional creators and collectors during the NFT cycle, focused on curation over volume.",
+      "A marketplace built around regional NFT creators and collectors during the 2021–2022 cycle, focused on curation over volume.",
     problem:
-      "[REPLACE] Mainstream NFT marketplaces were optimised for speculation, not for the creators and communities that gave the work its meaning.",
+      "Mainstream NFT marketplaces were optimised for speculation, not for the creators and communities that gave the work its meaning. Thai and regional artists had inventory to share but no surface that fit their audience.",
     approach:
-      "[REPLACE] Built a curated marketplace with smart-contract escrow, Thai-language UX, and tighter community moderation.",
+      "Built a curated marketplace with smart-contract escrow, Thai-language UX, and tighter community moderation. Limited drops over open submissions.",
     outcome:
-      "[REPLACE] Ran from October to December 2022; wound down with the broader cycle.",
+      "Operated from October to December 2022, wound down with the broader cycle. The marketplace surface didn't outlast the moment, but the on-chain experience set the technical foundation for later projects.",
     learnings: [
-      "[REPLACE — the NFT-cycle lessons, including what you'd do differently now.]",
+      "Riding a cycle is fine. Building a business on top of one is not.",
+      "Curation creates short-term loyalty but doesn't replace network effects when the broader market cools.",
+      "Smart-contract escrow patterns transferred directly into later fintech work — the wasted code is rarely fully wasted.",
     ],
   },
 ];

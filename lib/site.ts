@@ -5,7 +5,8 @@ export const siteConfig = {
   description:
     "Personal site of Fronk Kunanon Jarat — founder, builder, and writer. Notes on ventures, technology, and the work of starting things.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://fronk.example.com",
-  ogImage: "/og-default.png",
+  // OG image is generated dynamically by app/opengraph-image.tsx — no static
+  // asset needed.
   email: "fronk.kunanon@gmail.com",
   socials: {
     x: "https://x.com/fkj98",
