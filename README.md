@@ -124,6 +124,25 @@ The blog is sourced from Sanity. To start using it:
 Publishing a post in Studio will now revalidate `/writing` and the affected
 post page within seconds.
 
+## Analytics (Umami)
+
+Optional. `<Analytics />` in `app/layout.tsx` injects the Umami tracker
+when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set **and** `NODE_ENV === "production"`.
+Localhost / preview traffic is never tracked.
+
+To turn it on:
+
+1. Create a website in Umami → copy its **Website ID** (UUID).
+2. Add to Railway:
+   - `NEXT_PUBLIC_UMAMI_WEBSITE_ID` — the UUID
+   - `NEXT_PUBLIC_UMAMI_HOST` — defaults to `https://cloud.umami.is`; override
+     if self-hosted.
+3. Redeploy. The script now loads with `defer` + `lazyOnload`, so it never
+   blocks first paint.
+
+The `UMAMI_API_KEY` env var is separately reserved for *reading* analytics
+data (REST API) — not used by the tracker itself.
+
 ## Project structure
 
 ```

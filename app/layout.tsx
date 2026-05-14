@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { Analytics } from "@/components/Analytics";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -138,6 +139,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
           <SiteShell>{children}</SiteShell>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
