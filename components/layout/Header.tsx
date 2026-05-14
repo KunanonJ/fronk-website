@@ -1,0 +1,39 @@
+import Link from "next/link";
+import { Container } from "@/components/ui/Container";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { nav, siteConfig } from "@/lib/site";
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/60">
+      <Container size="xl">
+        <div className="flex h-14 items-center justify-between gap-6">
+          <Link
+            href="/"
+            className="font-semibold tracking-tight hover:text-accent"
+            aria-label={`${siteConfig.shortName} — home`}
+          >
+            {siteConfig.shortName}
+            <span className="text-accent">.</span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+            {nav.slice(1).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:bg-subtle hover:text-fg"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+          </div>
+        </div>
+      </Container>
+    </header>
+  );
+}
