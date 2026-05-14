@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Download } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { CompanyLogo } from "@/components/CompanyLogo";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -13,6 +14,12 @@ export const metadata: Metadata = {
 interface TimelineItem {
   title: string;
   org: string;
+  /** Used by <CompanyLogo> to fetch a logo from the Clearbit CDN. */
+  logoDomain?: string;
+  /** Optional local override path, e.g. "/logos/binary-holdings.svg". */
+  logoSrc?: string;
+  /** Name passed to the logo component (defaults to `org` without metadata). */
+  logoName?: string;
   period: string;
   href?: string;
   bullets?: readonly string[];
@@ -22,6 +29,8 @@ const currently: readonly TimelineItem[] = [
   {
     title: "IT Manager",
     org: "The Binary Holdings · Full-time · On-site, Bangkok",
+    logoName: "The Binary Holdings",
+    logoDomain: "thebinaryholdings.com",
     period: "Nov 2025 — Present",
     bullets: [
       "Owning IT infrastructure and operations across the group.",
@@ -30,6 +39,8 @@ const currently: readonly TimelineItem[] = [
   {
     title: "Founder",
     org: "GoGoCash · Remote, Bangkok",
+    logoName: "GoGoCash",
+    logoDomain: "gogocash.co",
     period: "May 2023 — Present",
     href: "/ventures/gogocash",
     bullets: [
@@ -43,6 +54,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "AI Project Manager",
     org: "Aiden Labs · Full-time · Hybrid",
+    logoName: "Aiden Labs",
+    logoDomain: "aidenlabs.ai",
     period: "Jan 2025 — Oct 2025",
     bullets: [
       "Turned product ideas into shippable roadmaps and public-sale launches.",
@@ -53,6 +66,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Strategic Advisor",
     org: "Aiden Labs · Part-time · Remote",
+    logoName: "Aiden Labs",
+    logoDomain: "aidenlabs.ai",
     period: "Nov 2024 — Jan 2025",
     bullets: [
       "Strategic planning support; engagement converted into a full-time PM role.",
@@ -61,6 +76,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Technical Project Manager",
     org: "The Binary Holdings · Full-time · On-site, Bangkok",
+    logoName: "The Binary Holdings",
+    logoDomain: "thebinaryholdings.com",
     period: "Sep 2024 — Dec 2024",
     bullets: [
       "Led project planning and execution across internal teams and vendors.",
@@ -71,6 +88,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Project Manager",
     org: "Playbux · Full-time · On-site, Bangkok",
+    logoName: "Playbux",
+    logoDomain: "playbux.co",
     period: "Nov 2023 — Sep 2024",
     bullets: [
       "Defined and executed product strategy aligned with company goals.",
@@ -81,6 +100,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Project Manager",
     org: "VaporFund · Full-time · Remote",
+    logoName: "VaporFund",
+    logoDomain: "vaporfund.com",
     period: "Nov 2023 — Sep 2024",
     bullets: [
       "Parallel PM role alongside Playbux during the same period.",
@@ -89,6 +110,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "IT Project Manager",
     org: "Coins.co.th · Full-time · Remote",
+    logoName: "Coins.co.th",
+    logoDomain: "coins.co.th",
     period: "Apr 2023 — Sep 2023",
     bullets: [
       "Led cross-functional teams to deliver projects on time.",
@@ -98,6 +121,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Business Development",
     org: "The Monk Studios · Full-time · Hybrid, Bangkok",
+    logoName: "The Monk Studios",
+    logoDomain: "themonkstudios.com",
     period: "Feb 2023 — Apr 2023",
     bullets: [
       "Built market-expansion and client-acquisition strategy for the game-metaverse industry.",
@@ -107,6 +132,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Business System Analyst",
     org: "FICO Corporation Thailand · Full-time · On-site, Bangkok",
+    logoName: "FICO",
+    logoDomain: "fico.com",
     period: "Mar 2022 — Feb 2023",
     bullets: [
       "Gathered and validated business requirements; authored functional specs.",
@@ -116,6 +143,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Blockchain Developer",
     org: "FICO Corporation Thailand",
+    logoName: "FICO",
+    logoDomain: "fico.com",
     period: "Feb 2022 — Apr 2022",
     bullets: [
       "Architected end-to-end systems in React, Node.js, and MySQL.",
@@ -125,6 +154,8 @@ const experience: readonly TimelineItem[] = [
   {
     title: "Smart Contract (Intern)",
     org: "Bitkub · Internship · Bangkok",
+    logoName: "Bitkub",
+    logoDomain: "bitkub.com",
     period: "Nov 2021 — Jan 2022",
     bullets: [
       "Worked with external partners to safeguard contract / DeFi / NFT projects.",
@@ -137,6 +168,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "Event Manager",
     org: "KU Startup · Full-time · Bangkok",
+    logoName: "KU Startup",
+    logoDomain: "ku.ac.th",
     period: "Jul 2020 — Jan 2021",
     bullets: [
       "Owned client liaison, proposals, event logistics, supplier coordination, and staffing.",
@@ -145,6 +178,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "President & Co-Producer",
     org: "TEDxKasetsartU · Full-time · Bangkok",
+    logoName: "TEDx",
+    logoDomain: "ted.com",
     period: "Jan 2020 — Dec 2020",
     bullets: [
       "Led all production and day-of planning: content, stage, technology, and video.",
@@ -153,6 +188,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "Event Manager",
     org: "TEDxKasetsartU",
+    logoName: "TEDx",
+    logoDomain: "ted.com",
     period: "Mar 2019 — Dec 2019",
     bullets: [
       "Managed day-of logistics, venue staff, ticketing, and registration.",
@@ -161,6 +198,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "Telecommunications Engineer (Intern)",
     org: "CAT Telecom · Bangkok",
+    logoName: "CAT Telecom",
+    logoDomain: "cattelecom.com",
     period: "Aug 2020 — Nov 2020",
     bullets: [
       "Worked on core network deployment in Thailand.",
@@ -169,6 +208,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "Research Assistant (Contract)",
     org: "NECTEC · Pathum Thani",
+    logoName: "NECTEC",
+    logoDomain: "nectec.or.th",
     period: "Jul 2020 — Oct 2020",
     bullets: [
       "Helped develop Bluetooth tag technology for NSTDA activities.",
@@ -177,6 +218,8 @@ const earlyRoles: readonly TimelineItem[] = [
   {
     title: "Application Developer (Intern)",
     org: "Triple T Broadband · Bangkok",
+    logoName: "Triple T Broadband",
+    logoDomain: "3bb.co.th",
     period: "Jun 2020 — Jul 2020",
     bullets: [
       "Built a Bluetooth beacon detection application.",
@@ -188,6 +231,8 @@ const education: readonly TimelineItem[] = [
   {
     title: "B.Eng. Electrical Engineering",
     org: "Kasetsart University · Bangkok",
+    logoName: "Kasetsart University",
+    logoDomain: "ku.ac.th",
     period: "Aug 2017 — Apr 2021",
     bullets: [
       "Teaching assistant — Innovative thinking (2021) and Knowledge of the land (2020).",
@@ -201,11 +246,15 @@ const affiliations: readonly TimelineItem[] = [
   {
     title: "Cohort 2025",
     org: "Protocol Camp",
+    logoName: "Protocol Camp",
+    logoDomain: "protocol.camp",
     period: "Sep 2025 — Jan 2026",
   },
   {
     title: "Member",
     org: "Bangkok Startup Association",
+    logoName: "Bangkok Startup",
+    logoDomain: "bsa.or.th",
     period: "Feb 2025 — Present",
   },
 ];
@@ -214,31 +263,43 @@ const certifications: readonly TimelineItem[] = [
   {
     title: "Ethereum Smart Contract Security",
     org: "Moralis Academy",
+    logoName: "Moralis",
+    logoDomain: "moralis.io",
     period: "Dec 2021",
   },
   {
     title: "Ethereum Smart Contract Programming 101",
     org: "Moralis Academy",
+    logoName: "Moralis",
+    logoDomain: "moralis.io",
     period: "Dec 2021",
   },
   {
     title: "Ethereum 101",
     org: "Moralis Academy",
+    logoName: "Moralis",
+    logoDomain: "moralis.io",
     period: "Dec 2021",
   },
   {
     title: "Blockchain & Bitcoin 101",
     org: "Moralis Academy",
+    logoName: "Moralis",
+    logoDomain: "moralis.io",
     period: "Dec 2021",
   },
   {
     title: "Smart Contract",
     org: "University at Buffalo",
+    logoName: "U at Buffalo",
+    logoDomain: "buffalo.edu",
     period: "Oct 2021",
   },
   {
     title: "PMP Certification Exam Prep",
     org: "Udemy",
+    logoName: "Udemy",
+    logoDomain: "udemy.com",
     period: "—",
   },
 ];
@@ -317,30 +378,39 @@ function TimelineSection({
       <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
         {title}
       </h2>
-      <div className="space-y-8 border-l border-border pl-6">
+      <div className="space-y-6">
         {items.map((item) => (
-          <article key={`${item.title}-${item.org}-${item.period}`} className="relative">
-            <span className="absolute -left-[27px] top-2 h-2 w-2 rounded-full bg-accent" />
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className="font-medium">
-                {item.href ? (
-                  <Link href={item.href} className="hover:text-accent">
-                    {item.title}
-                  </Link>
-                ) : (
-                  item.title
-                )}{" "}
-                <span className="text-muted">— {item.org}</span>
-              </h3>
-              <span className="text-sm text-muted">{item.period}</span>
+          <article
+            key={`${item.title}-${item.org}-${item.period}`}
+            className="flex gap-4"
+          >
+            <CompanyLogo
+              name={item.logoName ?? item.org}
+              domain={item.logoDomain}
+              src={item.logoSrc}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="font-medium">
+                  {item.href ? (
+                    <Link href={item.href} className="hover:text-accent">
+                      {item.title}
+                    </Link>
+                  ) : (
+                    item.title
+                  )}{" "}
+                  <span className="text-muted">— {item.org}</span>
+                </h3>
+                <span className="text-sm text-muted">{item.period}</span>
+              </div>
+              {item.bullets && item.bullets.length > 0 && (
+                <ul className="mt-2 space-y-1 text-sm text-muted">
+                  {item.bullets.map((bullet) => (
+                    <li key={bullet}>— {bullet}</li>
+                  ))}
+                </ul>
+              )}
             </div>
-            {item.bullets && item.bullets.length > 0 && (
-              <ul className="mt-2 space-y-1 text-sm text-muted">
-                {item.bullets.map((bullet) => (
-                  <li key={bullet}>— {bullet}</li>
-                ))}
-              </ul>
-            )}
           </article>
         ))}
       </div>
