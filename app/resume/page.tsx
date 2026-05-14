@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "Resume",
-  description: "Kunanon Jarat (Fronk) — experience, projects, education, and certifications.",
+  description:
+    "Kunanon Jarat (Fronk) — Founder, IT manager, and project leader across fintech, AI, and Web3.",
 };
 
 interface TimelineItem {
@@ -14,82 +15,198 @@ interface TimelineItem {
   org: string;
   period: string;
   href?: string;
-  bullets: readonly string[];
+  bullets?: readonly string[];
 }
 
-const experience: readonly TimelineItem[] = [
+const currently: readonly TimelineItem[] = [
+  {
+    title: "IT Manager",
+    org: "The Binary Holdings · Full-time · On-site, Bangkok",
+    period: "Nov 2025 — Present",
+    bullets: [
+      "Owning IT infrastructure and operations across the group.",
+    ],
+  },
   {
     title: "Founder",
-    org: "The Binary Holdings",
-    period: "2024 — Present · Bangkok",
+    org: "GoGoCash · Remote, Bangkok",
+    period: "May 2023 — Present",
+    href: "/ventures/gogocash",
     bullets: [
-      "Operating company behind GoGoCash, GoGoCare, and earlier ventures.",
-      "Focus areas: fintech rails, AI-assisted product development, on-chain infrastructure.",
-      "Wear product, engineering, and GTM hats across the portfolio.",
+      "Founded and lead the company; drive growth and product direction.",
+      "Live at gogocash.co.",
     ],
   },
 ];
 
-const projects: readonly TimelineItem[] = [
+const experience: readonly TimelineItem[] = [
   {
-    title: "GoGoCare",
-    org: "Founder · Healthcare benefits",
-    period: "Jun 2025 — Present",
-    href: "/ventures/gogocare",
+    title: "AI Project Manager",
+    org: "Aiden Labs · Full-time · Hybrid",
+    period: "Jan 2025 — Oct 2025",
     bullets: [
-      "Building accessible healthcare benefits infrastructure for modern teams.",
+      "Turned product ideas into shippable roadmaps and public-sale launches.",
+      "Designed ICO process strategy and refined tokenomics allocation.",
+      "Coordinated operational support across the team.",
     ],
   },
   {
-    title: "GoGoCash",
-    org: "Founder · Fintech",
-    period: "Nov 2024 — Present",
-    href: "/ventures/gogocash",
+    title: "Strategic Advisor",
+    org: "Aiden Labs · Part-time · Remote",
+    period: "Nov 2024 — Jan 2025",
     bullets: [
-      "On-demand cash-access product with transparent pricing.",
-      "Live at gogocash.co.",
+      "Strategic planning support; engagement converted into a full-time PM role.",
     ],
   },
   {
-    title: "Talent Wizard",
-    org: "Co-founder · AI + Blockchain",
-    period: "May 2023 — Mar 2024",
-    href: "/ventures/talent-wizard",
+    title: "Technical Project Manager",
+    org: "The Binary Holdings · Full-time · On-site, Bangkok",
+    period: "Sep 2024 — Dec 2024",
     bullets: [
-      "AI and blockchain technologies applied to product requirements — drafting, sign-off, and traceability.",
+      "Led project planning and execution across internal teams and vendors.",
+      "Built detailed plans, tracked performance, managed scope and cost.",
+      "Owned vendor relationships and project documentation end-to-end.",
     ],
   },
   {
-    title: "Saving Plus",
-    org: "Founder · Fintech",
-    period: "Dec 2022 — Mar 2023",
-    href: "/ventures/saving-plus",
+    title: "Project Manager",
+    org: "Playbux · Full-time · On-site, Bangkok",
+    period: "Nov 2023 — Sep 2024",
     bullets: [
-      "Mobile-first savings product aimed at first-time savers.",
+      "Defined and executed product strategy aligned with company goals.",
+      "Prioritised features against customer needs; ran market research.",
+      "Liaised between engineering, stakeholders, and business units.",
     ],
   },
   {
-    title: "Nicha NFT Marketplace",
-    org: "Co-founder · Web3",
-    period: "Oct — Dec 2022",
-    href: "/ventures/nicha",
+    title: "Project Manager",
+    org: "VaporFund · Full-time · Remote",
+    period: "Nov 2023 — Sep 2024",
     bullets: [
-      "Curated NFT marketplace for Southeast Asian creators.",
+      "Parallel PM role alongside Playbux during the same period.",
+    ],
+  },
+  {
+    title: "IT Project Manager",
+    org: "Coins.co.th · Full-time · Remote",
+    period: "Apr 2023 — Sep 2023",
+    bullets: [
+      "Led cross-functional teams to deliver projects on time.",
+      "Collaborated with tech teams and external vendors; reported progress to stakeholders.",
+    ],
+  },
+  {
+    title: "Business Development",
+    org: "The Monk Studios · Full-time · Hybrid, Bangkok",
+    period: "Feb 2023 — Apr 2023",
+    bullets: [
+      "Built market-expansion and client-acquisition strategy for the game-metaverse industry.",
+      "Prepared sales reports, analysed trends, ran investor meetings.",
+    ],
+  },
+  {
+    title: "Business System Analyst",
+    org: "FICO Corporation Thailand · Full-time · On-site, Bangkok",
+    period: "Mar 2022 — Feb 2023",
+    bullets: [
+      "Gathered and validated business requirements; authored functional specs.",
+      "Analysed commercial data and oversaw outsourcing to hit project timelines.",
+    ],
+  },
+  {
+    title: "Blockchain Developer",
+    org: "FICO Corporation Thailand",
+    period: "Feb 2022 — Apr 2022",
+    bullets: [
+      "Architected end-to-end systems in React, Node.js, and MySQL.",
+      "Built reliable APIs alongside cross-functional teams.",
+    ],
+  },
+  {
+    title: "Smart Contract (Intern)",
+    org: "Bitkub · Internship · Bangkok",
+    period: "Nov 2021 — Jan 2022",
+    bullets: [
+      "Worked with external partners to safeguard contract / DeFi / NFT projects.",
+      "Conducted hands-on audits and contributed to security education.",
+    ],
+  },
+];
+
+const earlyRoles: readonly TimelineItem[] = [
+  {
+    title: "Event Manager",
+    org: "KU Startup · Full-time · Bangkok",
+    period: "Jul 2020 — Jan 2021",
+    bullets: [
+      "Owned client liaison, proposals, event logistics, supplier coordination, and staffing.",
+    ],
+  },
+  {
+    title: "President & Co-Producer",
+    org: "TEDxKasetsartU · Full-time · Bangkok",
+    period: "Jan 2020 — Dec 2020",
+    bullets: [
+      "Led all production and day-of planning: content, stage, technology, and video.",
+    ],
+  },
+  {
+    title: "Event Manager",
+    org: "TEDxKasetsartU",
+    period: "Mar 2019 — Dec 2019",
+    bullets: [
+      "Managed day-of logistics, venue staff, ticketing, and registration.",
+    ],
+  },
+  {
+    title: "Telecommunications Engineer (Intern)",
+    org: "CAT Telecom · Bangkok",
+    period: "Aug 2020 — Nov 2020",
+    bullets: [
+      "Worked on core network deployment in Thailand.",
+    ],
+  },
+  {
+    title: "Research Assistant (Contract)",
+    org: "NECTEC · Pathum Thani",
+    period: "Jul 2020 — Oct 2020",
+    bullets: [
+      "Helped develop Bluetooth tag technology for NSTDA activities.",
+    ],
+  },
+  {
+    title: "Application Developer (Intern)",
+    org: "Triple T Broadband · Bangkok",
+    period: "Jun 2020 — Jul 2020",
+    bullets: [
+      "Built a Bluetooth beacon detection application.",
     ],
   },
 ];
 
 const education: readonly TimelineItem[] = [
   {
-    title: "Kasetsart University",
-    org: "[degree — fill in major]",
-    period: "2017 — 2021 · Bangkok",
+    title: "B.Eng. Electrical Engineering",
+    org: "Kasetsart University · Bangkok",
+    period: "Aug 2017 — Apr 2021",
     bullets: [
-      "Founder & President — TEDxKasetsartU.",
-      "Vice President — KU Startup.",
-      "CMO — KU Moresheet.",
-      "Research assistant — LoRa wireless technology.",
+      "Teaching assistant — Innovative thinking (2021) and Knowledge of the land (2020).",
+      "Working Student Program — LoRa wireless research (2020).",
+      "Project Lead Developer (2019).",
     ],
+  },
+];
+
+const affiliations: readonly TimelineItem[] = [
+  {
+    title: "Cohort 2025",
+    org: "Protocol Camp",
+    period: "Sep 2025 — Jan 2026",
+  },
+  {
+    title: "Member",
+    org: "Bangkok Startup Association",
+    period: "Feb 2025 — Present",
   },
 ];
 
@@ -98,51 +215,47 @@ const certifications: readonly TimelineItem[] = [
     title: "Ethereum Smart Contract Security",
     org: "Moralis Academy",
     period: "Dec 2021",
-    bullets: [],
   },
   {
     title: "Ethereum Smart Contract Programming 101",
     org: "Moralis Academy",
     period: "Dec 2021",
-    bullets: [],
   },
   {
     title: "Ethereum 101",
     org: "Moralis Academy",
     period: "Dec 2021",
-    bullets: [],
   },
   {
     title: "Blockchain & Bitcoin 101",
     org: "Moralis Academy",
     period: "Dec 2021",
-    bullets: [],
   },
   {
     title: "Smart Contract",
     org: "University at Buffalo",
     period: "Oct 2021",
-    bullets: [],
   },
   {
     title: "PMP Certification Exam Prep",
     org: "Udemy",
     period: "—",
-    bullets: [],
   },
 ];
 
 const skills = [
-  "Founder operations",
+  "Project management (PMP-trained)",
   "Product strategy",
+  "ICO / tokenomics design",
   "Fintech / payments",
-  "Web3 / smart contracts",
+  "Web3 · DeFi · NFT",
+  "Smart contracts · Solidity",
   "AI / LLM integration",
   "Full-stack TypeScript",
-  "Next.js · React",
-  "Solidity · Ethereum",
-  "GTM for early-stage products",
-  "Project management (PMP-trained)",
+  "React · Next.js · Node.js",
+  "Business analysis",
+  "Cross-functional team lead",
+  "Vendor & stakeholder management",
 ] as const;
 
 export default function ResumePage() {
@@ -155,7 +268,7 @@ export default function ResumePage() {
             Kunanon Jarat
           </h1>
           <p className="mt-2 text-muted">
-            Founder. Based in Bangkok.
+            Founder. IT Manager. Based in Bangkok.
           </p>
         </div>
         <Button href="/resume.pdf" variant="secondary">
@@ -165,9 +278,11 @@ export default function ResumePage() {
       </header>
 
       <section className="space-y-12">
+        <TimelineSection title="Currently" items={currently} />
         <TimelineSection title="Experience" items={experience} />
-        <TimelineSection title="Selected projects" items={projects} />
+        <TimelineSection title="University-era" items={earlyRoles} />
         <TimelineSection title="Education" items={education} />
+        <TimelineSection title="Affiliations" items={affiliations} />
         <TimelineSection title="Certifications" items={certifications} />
 
         <div>
@@ -204,7 +319,7 @@ function TimelineSection({
       </h2>
       <div className="space-y-8 border-l border-border pl-6">
         {items.map((item) => (
-          <article key={`${item.title}-${item.org}`} className="relative">
+          <article key={`${item.title}-${item.org}-${item.period}`} className="relative">
             <span className="absolute -left-[27px] top-2 h-2 w-2 rounded-full bg-accent" />
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="font-medium">
@@ -219,7 +334,7 @@ function TimelineSection({
               </h3>
               <span className="text-sm text-muted">{item.period}</span>
             </div>
-            {item.bullets.length > 0 && (
+            {item.bullets && item.bullets.length > 0 && (
               <ul className="mt-2 space-y-1 text-sm text-muted">
                 {item.bullets.map((bullet) => (
                   <li key={bullet}>— {bullet}</li>

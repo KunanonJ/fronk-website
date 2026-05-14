@@ -41,7 +41,7 @@ const VENTURES: readonly Venture[] = [
     slug: "gogocash",
     name: "GoGoCash",
     tagline: "Cash, on-demand.",
-    year: 2024,
+    year: 2023,
     role: "Founder",
     status: "active",
     stack: ["TypeScript", "Fintech rails", "Payments"],
