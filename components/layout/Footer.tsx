@@ -31,7 +31,10 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-24 border-t border-border/60 py-10 text-sm text-muted">
+    <footer
+      data-site-chrome
+      className="mt-24 border-t border-border/60 py-10 text-sm text-muted"
+    >
       <Container size="xl">
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <p>

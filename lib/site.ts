@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
   shortName: "Fronk",
-  tagline: "Founder building from zero.",
+  tagline: "Building fintech for Southeast Asia.",
   description:
-    "Personal site of Fronk Kunanon Jarat — founder, builder, and writer. Notes on ventures, technology, and the work of starting things.",
+    "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://fronk.example.com",
   // OG image is generated dynamically by app/opengraph-image.tsx — no static
   // asset needed.

@@ -6,7 +6,10 @@ import { nav, siteConfig } from "@/lib/site";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/60">
+    <header
+      data-site-chrome
+      className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/60"
+    >
       <Container size="xl">
         <div className="flex h-14 items-center justify-between gap-6">
           <Link

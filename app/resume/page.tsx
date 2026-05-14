@@ -332,10 +332,12 @@ export default function ResumePage() {
             Founder. IT Manager. Based in Bangkok.
           </p>
         </div>
-        <Button href="/resume.pdf" variant="secondary">
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
+        <div data-print-hide>
+          <Button href="/resume.pdf" variant="secondary">
+            <Download className="h-4 w-4" />
+            Download PDF
+          </Button>
+        </div>
       </header>
 
       <section className="space-y-12">

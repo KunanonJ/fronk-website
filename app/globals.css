@@ -124,6 +124,66 @@ a {
   animation-delay: calc(var(--i, 0) * 60ms);
 }
 
+/* ─── Print (used by `pnpm pdf` to render /resume to public/resume.pdf) ─── */
+
+@media print {
+  /* Beat the .dark class specificity by re-declaring the variables on
+   * every selector that might be holding them. */
+  :root,
+  .dark,
+  html,
+  html.dark {
+    --bg: #ffffff !important;
+    --fg: #18181b !important;
+    --muted: #52525b !important;
+    --subtle: #f4f4f5 !important;
+    --border: #d4d4d8 !important;
+    --accent: #b45309 !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #18181b !important;
+  }
+
+  /* Site chrome — kill the sticky header, footer, and any element opted
+   * out with [data-print-hide]. We target the site's Header/Footer
+   * specifically by `data-site-chrome` so the resume page's own
+   * <header> (with name + role) stays visible. */
+  [data-site-chrome],
+  [data-print-hide],
+  [data-print-hide] * {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Stop entrance animations from playing in the PDF render. */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  article {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  a {
+    color: #18181b !important;
+    text-decoration: none !important;
+  }
+
+  img {
+    background: white !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
