@@ -6,7 +6,7 @@ export function BlogCard({ post }: { post: PostSummary }) {
   return (
     <Link
       href={`/writing/${post.slug}`}
-      className="group block border-b border-border py-8 transition-colors first:pt-0 last:border-b-0 hover:opacity-90 focus-visible:opacity-90 focus-visible:outline-none"
+      className="group block border-b border-border py-8 transition-[opacity,transform] duration-300 ease-out first:pt-0 last:border-b-0 hover:-translate-y-0.5 hover:opacity-90 focus-visible:opacity-90 focus-visible:outline-none"
     >
       <article>
         <div className="flex items-baseline gap-3 text-sm text-muted">
@@ -18,7 +18,7 @@ export function BlogCard({ post }: { post: PostSummary }) {
             </>
           )}
         </div>
-        <h3 className="mt-2 text-2xl font-semibold tracking-tight group-hover:text-accent">
+        <h3 className="mt-2 text-2xl font-semibold tracking-tight transition-colors duration-200 group-hover:text-accent">
           {post.title}
         </h3>
         {post.excerpt && (

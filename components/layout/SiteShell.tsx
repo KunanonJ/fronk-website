@@ -21,7 +21,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <Header />
-      <main id="main" className="flex-1">
+      <main key={pathname} id="main" className="flex-1 animate-fade-up">
         {children}
       </main>
       <Footer />

@@ -20,7 +20,7 @@ export function VentureCard({ venture }: { venture: Venture }) {
   return (
     <Link
       href={`/ventures/${venture.slug}`}
-      className="group block rounded-xl border border-border bg-subtle/30 p-6 transition-colors hover:border-fg/30 hover:bg-subtle/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+      className="group block rounded-xl border border-border bg-subtle/30 p-6 transition-[transform,colors,box-shadow,border-color] duration-300 ease-out will-change-transform hover:-translate-y-0.5 hover:border-fg/30 hover:bg-subtle/60 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">

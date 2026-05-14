@@ -26,8 +26,14 @@ export default function VenturesPage() {
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ventures.map((venture) => (
-          <VentureCard key={venture.slug} venture={venture} />
+        {ventures.map((venture, i) => (
+          <div
+            key={venture.slug}
+            className="animate-fade-up stagger"
+            style={{ ["--i" as string]: i }}
+          >
+            <VentureCard venture={venture} />
+          </div>
         ))}
       </div>
     </Container>

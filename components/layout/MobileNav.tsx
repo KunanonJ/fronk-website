@@ -51,14 +51,14 @@ export function MobileNav() {
             aria-label="Close menu"
             tabIndex={-1}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 top-14 z-40 cursor-default bg-bg/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 top-14 z-40 cursor-default bg-bg/60 backdrop-blur-sm animate-fade-in md:hidden"
           />
           <div
             id="mobile-nav-panel"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
-            className="fixed inset-x-0 top-14 z-50 border-b border-border bg-bg shadow-xl md:hidden"
+            className="fixed inset-x-0 top-14 z-50 border-b border-border bg-bg shadow-xl animate-slide-down md:hidden"
           >
             <nav className="flex flex-col py-2" aria-label="Mobile primary">
               {nav.map((item) => {

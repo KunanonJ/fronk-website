@@ -96,7 +96,7 @@ export default function ContactPage() {
       </header>
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
-        {channels.map((c) => {
+        {channels.map((c, i) => {
           const Icon = c.icon;
           const inner = (
             <>
@@ -108,10 +108,16 @@ export default function ContactPage() {
             </>
           );
 
+          const animationStyle = { ["--i" as string]: i };
+
           if (c.href) {
             const isExternal = c.href.startsWith("http");
             return (
-              <li key={c.label}>
+              <li
+                key={c.label}
+                className="animate-fade-up stagger"
+                style={animationStyle}
+              >
                 <a
                   href={c.href}
                   target={isExternal ? "_blank" : undefined}
@@ -125,7 +131,11 @@ export default function ContactPage() {
           }
 
           return (
-            <li key={c.label} className={cardClasses}>
+            <li
+              key={c.label}
+              className={`${cardClasses} animate-fade-up stagger`}
+              style={animationStyle}
+            >
               {inner}
             </li>
           );
