@@ -5,6 +5,58 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
+// Build the schema.org Person JSON-LD payload. Typed as a record of unknown
+// values so the structure is type-checked without leaking `any`. Stringified
+// once at module load — no runtime cost per render.
+function buildPersonJsonLd(): string {
+  const sameAs: readonly string[] = [
+    siteConfig.socials.x,
+    siteConfig.socials.linkedin,
+    siteConfig.socials.github,
+    siteConfig.socials.telegram,
+    siteConfig.socials.farcaster,
+    siteConfig.socials.website,
+  ];
+
+  const person: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: siteConfig.name,
+    alternateName: siteConfig.shortName,
+    url: siteConfig.url,
+    email: siteConfig.email,
+    image: `${siteConfig.url}/profile.jpg`,
+    jobTitle: "Founder",
+    worksFor: {
+      "@type": "Organization",
+      name: "GoGoCash",
+      url: "https://gogocash.co",
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Bangkok",
+      addressCountry: "TH",
+    },
+    sameAs,
+    description: siteConfig.description,
+  };
+
+  return JSON.stringify(person);
+}
+
+const personJsonLd: string = buildPersonJsonLd();
+
+// Identity URLs used for IndieWeb / Mastodon `rel="me"` verification.
+const identityLinks: readonly string[] = [
+  `mailto:${siteConfig.email}`,
+  siteConfig.socials.x,
+  siteConfig.socials.linkedin,
+  siteConfig.socials.github,
+  siteConfig.socials.telegram,
+  siteConfig.socials.farcaster,
+  siteConfig.socials.website,
+];
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -66,6 +118,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-bg text-fg">
+        {/* schema.org Person — helps Google build a knowledge-graph card.
+            Content is fully developer-controlled (siteConfig constants run
+            through JSON.stringify), so no XSS surface. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: personJsonLd }}
+        />
+        {/* IndieWeb / Mastodon identity verification links. React 19 hoists
+            <link> elements out of <body> into <head> automatically. */}
+        {identityLinks.map((href) => (
+          <link key={href} rel="me" href={href} />
+        ))}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

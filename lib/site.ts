@@ -24,6 +24,7 @@ export type SiteConfig = typeof siteConfig;
 export const nav = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/now", label: "Now" },
   { href: "/ventures", label: "Ventures" },
   { href: "/writing", label: "Writing" },
   { href: "/resume", label: "Resume" },

@@ -11,8 +11,45 @@ import {
   fetchPostBySlug,
 } from "@/lib/sanity/fetch";
 import { urlFor } from "@/lib/sanity/client";
+import type { Post } from "@/lib/sanity/types";
+import { siteConfig } from "@/lib/site";
 import { formatDate } from "@/lib/utils/formatDate";
 import { readingTimeFromBlocks } from "@/lib/utils/readingTime";
+
+// Build a schema.org BlogPosting JSON-LD payload for a single post. Author and
+// publisher both resolve to the same Person identity used in the root layout.
+function buildBlogPostingJsonLd(post: Post): string {
+  const author: Record<string, unknown> = {
+    "@type": "Person",
+    name: siteConfig.name,
+    url: siteConfig.url,
+  };
+
+  const payload: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    datePublished: post.publishedAt,
+    dateModified: post.publishedAt,
+    author,
+    publisher: author,
+    mainEntityOfPage: `${siteConfig.url}/writing/${post.slug}`,
+  };
+
+  if (post.excerpt) {
+    payload.description = post.excerpt;
+  }
+
+  if (post.coverImage) {
+    payload.image = urlFor(post.coverImage)
+      .width(1200)
+      .height(630)
+      .fit("crop")
+      .url();
+  }
+
+  return JSON.stringify(payload);
+}
 
 export const revalidate = 60;
 
@@ -50,9 +87,16 @@ export default async function PostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const { minutes } = readingTimeFromBlocks(post.body);
+  const blogPostingJsonLd: string = buildBlogPostingJsonLd(post);
 
   return (
     <Container size="lg" className="py-20">
+      {/* schema.org BlogPosting. Content built from trusted Sanity data
+          serialized through JSON.stringify — no XSS surface. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: blogPostingJsonLd }}
+      />
       <Link
         href="/writing"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
