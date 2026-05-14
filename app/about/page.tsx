@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Prose } from "@/components/ui/Prose";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About",
@@ -12,11 +14,23 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <Container size="lg" className="py-20">
-      <header className="mb-12">
-        <p className="text-sm uppercase tracking-widest text-muted">About</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Founder, builder, operator.
-        </h1>
+      <header className="mb-12 flex items-end gap-6">
+        <div className="relative hidden h-24 w-24 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border sm:block">
+          <Image
+            src="/profile.jpg"
+            alt={`${siteConfig.name} — headshot`}
+            width={400}
+            height={400}
+            sizes="96px"
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div>
+          <p className="text-sm uppercase tracking-widest text-muted">About</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+            Founder, builder, operator.
+          </h1>
+        </div>
       </header>
 
       <Prose>
