@@ -32,7 +32,9 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
     const result = await sanityClient.fetch<Post | null>(
       POST_QUERY,
       { slug },
-      { next: { tags: [POSTS_TAG, `post:${slug}`] } },
+      // Only the `posts` tag is wired into the webhook revalidation. A
+      // per-slug tag is dead until per-post invalidation is implemented.
+      { next: { tags: [POSTS_TAG] } },
     );
     return result ?? null;
   } catch (error: unknown) {
@@ -52,7 +54,10 @@ export async function fetchAllPostSlugs(): Promise<readonly string[]> {
       { next: { tags: [POSTS_TAG] } },
     );
     return result ?? [];
-  } catch {
+  } catch (error: unknown) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[sanity] fetchAllPostSlugs failed:", error);
+    }
     return [];
   }
 }

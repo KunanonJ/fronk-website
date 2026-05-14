@@ -67,7 +67,7 @@ describe("POST /api/revalidate", () => {
 
     const res = await callRoute({ _type: "post", slug: { current: "hello" } }, "ok");
     expect(res.status).toBe(200);
-    expect(revalidateTagMock).toHaveBeenCalledWith("posts", { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith("posts", "max");
   });
 
   it("returns 500 when the secret env var is missing", async () => {

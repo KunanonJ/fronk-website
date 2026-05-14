@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { Hero } from "@/components/Hero";
 import { VentureCard } from "@/components/VentureCard";
 import { getFeaturedVentures } from "@/lib/content/ventures";
+import { cssVar } from "@/lib/utils/cssVar";
 
 export default function HomePage() {
   const featured = getFeaturedVentures(3);
@@ -35,7 +36,7 @@ export default function HomePage() {
             <div
               key={venture.slug}
               className="animate-fade-up stagger"
-              style={{ ["--i" as string]: i }}
+              style={cssVar("--i", i)}
             >
               <VentureCard venture={venture} />
             </div>

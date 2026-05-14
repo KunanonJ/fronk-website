@@ -12,6 +12,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/lib/site";
+import { cssVar } from "@/lib/utils/cssVar";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -108,7 +109,7 @@ export default function ContactPage() {
             </>
           );
 
-          const animationStyle = { ["--i" as string]: i };
+          const animationStyle = cssVar("--i", i);
 
           if (c.href) {
             const isExternal = c.href.startsWith("http");

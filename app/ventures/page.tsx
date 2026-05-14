@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { VentureCard } from "@/components/VentureCard";
 import { getAllVentures } from "@/lib/content/ventures";
+import { cssVar } from "@/lib/utils/cssVar";
 
 export const metadata: Metadata = {
   title: "Ventures",
@@ -30,7 +31,7 @@ export default function VenturesPage() {
           <div
             key={venture.slug}
             className="animate-fade-up stagger"
-            style={{ ["--i" as string]: i }}
+            style={cssVar("--i", i)}
           >
             <VentureCard venture={venture} />
           </div>

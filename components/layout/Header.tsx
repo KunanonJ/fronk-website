@@ -26,7 +26,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:bg-subtle hover:text-fg"
+                className="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:bg-subtle hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
               >
                 {item.label}
               </Link>

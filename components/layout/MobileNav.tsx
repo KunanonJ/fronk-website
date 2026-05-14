@@ -46,10 +46,11 @@ export function MobileNav() {
 
       {open && (
         <>
-          <button
-            type="button"
-            aria-label="Close menu"
-            tabIndex={-1}
+          {/* Visual backdrop. role="presentation" + aria-hidden keep it out of
+              the accessibility tree — the panel itself is the dialog. */}
+          <div
+            role="presentation"
+            aria-hidden="true"
             onClick={() => setOpen(false)}
             className="fixed inset-0 top-14 z-40 cursor-default bg-bg/60 backdrop-blur-sm animate-fade-in md:hidden"
           />

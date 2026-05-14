@@ -5,7 +5,15 @@ import { fetchAllPostSlugs } from "@/lib/sanity/fetch";
 
 export const revalidate = 3600;
 
-const STATIC_ROUTES = ["", "/about", "/ventures", "/writing", "/resume", "/contact"] as const;
+const STATIC_ROUTES = [
+  "",
+  "/about",
+  "/now",
+  "/ventures",
+  "/writing",
+  "/resume",
+  "/contact",
+] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");

@@ -53,6 +53,10 @@ const components: PortableTextComponents = {
   marks: {
     link: ({ value, children }) => {
       const href = (value?.href ?? "") as string;
+      // Sanity Portable Text can carry a link mark with an empty href when
+      // the editor's URL field was left blank. Render the text inline rather
+      // than emitting a broken <a href="">.
+      if (!href) return <>{children}</>;
       const isExternal = /^https?:\/\//.test(href);
       if (isExternal) {
         return (
