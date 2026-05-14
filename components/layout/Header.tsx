@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileNav } from "@/components/layout/MobileNav";
 import { nav, siteConfig } from "@/lib/site";
 
 export function Header() {
@@ -31,6 +32,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <MobileNav />
           </div>
         </div>
       </Container>
