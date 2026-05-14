@@ -17,75 +17,108 @@ export interface Venture {
 
 const VENTURES: readonly Venture[] = [
   {
-    slug: "atlas",
-    name: "Atlas",
-    tagline: "Infrastructure for small teams to ship faster.",
-    year: 2024,
-    role: "Founder & CEO",
-    status: "active",
-    stack: ["TypeScript", "Next.js", "Postgres", "Cloudflare"],
-    url: "https://example.com/atlas",
-    summary:
-      "A platform that compresses a week of DevOps onboarding into an afternoon for two-to-twenty person teams.",
-    problem:
-      "Early-stage teams burn weeks on infrastructure that doesn't move the product forward. The tooling exists but the assembly is the work.",
-    approach:
-      "We built an opinionated runtime with sensible defaults: preview environments, secrets management, observability, and rollbacks — all wired up on first commit. No yak-shaving.",
-    outcome:
-      "Reached design-partner traction with a handful of teams across fintech, devtools, and consumer. P50 onboarding is now 22 minutes from signup to first deploy.",
-    learnings: [
-      "Opinionation beats configurability for the first 90 days of a customer relationship.",
-      "Onboarding time is the single best leading indicator of activation.",
-      "Founders trust founders — sales-led GTM beat product-led for our ICP.",
-    ],
-    featured: true,
-  },
-  {
-    slug: "lumen",
-    name: "Lumen",
-    tagline: "Privacy-first analytics for solo builders.",
-    year: 2023,
+    slug: "gogocare",
+    name: "GoGoCare",
+    tagline: "Healthcare benefits, reimagined for modern teams.",
+    year: 2025,
     role: "Founder",
     status: "active",
-    stack: ["Rust", "ClickHouse", "Astro"],
-    url: "https://example.com/lumen",
+    stack: ["TypeScript", "Next.js", "Healthcare APIs"],
     summary:
-      "A lightweight analytics product for independent makers who want signal without surveillance.",
+      "Building accessible healthcare benefits infrastructure — making employer-sponsored care simpler for both companies and the people they cover.",
     problem:
-      "Mainstream analytics tools optimize for ad-network-grade tracking. Indie builders want to know what's working — not who their visitors are.",
+      "[REPLACE] Modern teams need healthcare benefits that match how they actually work — flexible, transparent, and digital-first. The legacy options are anything but.",
     approach:
-      "Built a Rust ingestion layer that drops PII at the edge, with a simple Astro dashboard. No cookies, no fingerprints, GDPR-clean by default.",
+      "[REPLACE] Designing the product, working with care partners, and shipping the first version end-to-end.",
     outcome:
-      "Crossed 1,200 paying customers on a flat $9/mo plan. Profitable from month four with two contractors.",
+      "[REPLACE] Currently in build / early-customer phase. Updates coming.",
     learnings: [
-      "Boring infrastructure is a feature when the buyer cares about reliability over novelty.",
-      "Pricing simplicity (one plan, one number) removed 80% of the sales conversation.",
-      "A small wedge in a clear niche compounds faster than a broad wedge in a crowded market.",
+      "[REPLACE — add 2–3 short bullets once there's something concrete to share.]",
     ],
     featured: true,
   },
   {
-    slug: "tessera",
-    name: "Tessera",
-    tagline: "Marketplace for verified open-source maintainers.",
-    year: 2022,
-    role: "Co-founder",
-    status: "shut-down",
-    stack: ["Python", "Django", "Stripe Connect"],
+    slug: "gogocash",
+    name: "GoGoCash",
+    tagline: "Cash, on-demand.",
+    year: 2024,
+    role: "Founder",
+    status: "active",
+    stack: ["TypeScript", "Fintech rails", "Payments"],
+    url: "https://gogocash.co",
     summary:
-      "Connected companies depending on open-source libraries with the maintainers behind them, for paid support and roadmap influence.",
+      "A fintech product giving people fast, transparent access to their own money — without the friction or hidden costs of traditional channels.",
     problem:
-      "Companies relied on open-source software they couldn't get a support contract for. Maintainers wanted income from their work.",
+      "[REPLACE] Existing cash-access products are expensive, slow, or trap users in fee cycles. There's room for a model that's honest about price and fast by default.",
     approach:
-      "Built a two-sided marketplace with KYC, scoped support tiers, and a billing layer that handled the messy tax/escrow plumbing for solo maintainers.",
+      "[REPLACE] Built the core flow with a focus on speed, clear pricing, and reliable payout infrastructure.",
     outcome:
-      "Reached a small but real GMV before realizing the friction between buyers (procurement-heavy) and sellers (allergic to procurement) was structural. Shut down after 14 months and returned remaining funds.",
+      "[REPLACE] Live at gogocash.co; growing customer base across Thailand.",
     learnings: [
-      "Two-sided marketplaces with structurally mismatched workflows don't survive without huge subsidies.",
-      "Founder honesty about the shut-down decision compounded into the next venture's fundraise.",
-      "Open-source as a market is enormous; open-source-as-a-product is brutal.",
+      "[REPLACE — replace with your real 2–3 takeaways from running GoGoCash so far.]",
     ],
     featured: true,
+  },
+  {
+    slug: "talent-wizard",
+    name: "Talent Wizard",
+    tagline: "AI + blockchain for product requirements.",
+    year: 2024,
+    role: "Co-founder",
+    status: "paused",
+    stack: ["AI", "Blockchain", "Smart contracts"],
+    summary:
+      "Using AI and blockchain to rethink how product requirements are written, signed off, and tracked across teams.",
+    problem:
+      "[REPLACE] Product requirements are usually messy documents that drift from what gets built. The accountability gap is real and costs teams real time.",
+    approach:
+      "[REPLACE] Combined LLMs for drafting and structuring requirements with on-chain attestation for sign-off and traceability.",
+    outcome:
+      "[REPLACE] Validated the wedge between May 2023 and March 2024 before shifting focus to fintech-first products.",
+    learnings: [
+      "[REPLACE — list the things the project taught you, the honest ones included.]",
+    ],
+    featured: true,
+  },
+  {
+    slug: "saving-plus",
+    name: "Saving Plus",
+    tagline: "A faster on-ramp to saving.",
+    year: 2023,
+    role: "Founder",
+    status: "paused",
+    stack: ["Fintech", "Mobile"],
+    summary:
+      "An attempt at making everyday saving feel rewarding and frictionless — particularly for first-time savers.",
+    problem:
+      "[REPLACE] Most savings products feel like homework. The behavioural barrier is bigger than the financial one for the people who'd benefit most.",
+    approach:
+      "[REPLACE] Designed a lightweight mobile-first flow with goal-based saving and clear feedback loops.",
+    outcome:
+      "[REPLACE] Ran from Dec 2022 to Mar 2023. Lessons fed directly into GoGoCash.",
+    learnings: [
+      "[REPLACE — your real takeaways here.]",
+    ],
+  },
+  {
+    slug: "nicha",
+    name: "Nicha NFT Marketplace",
+    tagline: "A curated marketplace for Southeast Asian creators.",
+    year: 2022,
+    role: "Co-founder",
+    status: "paused",
+    stack: ["Solidity", "Next.js", "IPFS"],
+    summary:
+      "A marketplace built around regional creators and collectors during the NFT cycle, focused on curation over volume.",
+    problem:
+      "[REPLACE] Mainstream NFT marketplaces were optimised for speculation, not for the creators and communities that gave the work its meaning.",
+    approach:
+      "[REPLACE] Built a curated marketplace with smart-contract escrow, Thai-language UX, and tighter community moderation.",
+    outcome:
+      "[REPLACE] Ran from October to December 2022; wound down with the broader cycle.",
+    learnings: [
+      "[REPLACE — the NFT-cycle lessons, including what you'd do differently now.]",
+    ],
   },
 ];
 
