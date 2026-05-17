@@ -42,10 +42,22 @@ const currently: readonly TimelineItem[] = [
     logoName: "GoGoCash",
     logoDomain: "gogocash.co",
     period: "May 2023 — Present",
-    href: "/ventures/gogocash",
+    href: "https://gogocash.co",
     bullets: [
       "Founded and lead the company; drive growth and product direction.",
       "Live at gogocash.co.",
+    ],
+  },
+  {
+    title: "Founder",
+    org: "Manut AI · Remote, Bangkok",
+    logoName: "Manut AI",
+    logoDomain: "manut.xyz",
+    period: "2025 — Present",
+    href: "https://manut.xyz",
+    bullets: [
+      "Building an AI-augmented, self-hosted knowledge workspace.",
+      "Live at manut.xyz.",
     ],
   },
 ];
@@ -368,6 +380,10 @@ export default function ResumePage() {
   );
 }
 
+function isExternalHref(href: string): boolean {
+  return /^https?:\/\//.test(href);
+}
+
 function TimelineSection({
   title,
   items,
@@ -395,9 +411,20 @@ function TimelineSection({
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="font-medium">
                   {item.href ? (
-                    <Link href={item.href} className="hover:text-accent">
-                      {item.title}
-                    </Link>
+                    isExternalHref(item.href) ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-accent"
+                      >
+                        {item.title}
+                      </a>
+                    ) : (
+                      <Link href={item.href} className="hover:text-accent">
+                        {item.title}
+                      </Link>
+                    )
                   ) : (
                     item.title
                   )}{" "}

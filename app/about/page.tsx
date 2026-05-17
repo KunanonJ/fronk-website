@@ -37,8 +37,18 @@ export default function AboutPage() {
         <p>
           I'm Kunanon Jarat — most people call me Fronk. I'm a founder based in
           Bangkok. Day-to-day, I split my time between{" "}
-          <Link href="/ventures/gogocash">GoGoCash</Link>, the company I founded
-          in 2023, and IT operations at{" "}
+          <a
+            href="https://gogocash.co"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GoGoCash
+          </a>
+          , the fintech I founded in 2023,{" "}
+          <a href="https://manut.xyz" target="_blank" rel="noopener noreferrer">
+            Manut AI
+          </a>
+          , and IT operations at{" "}
           <a
             href="https://thebinaryholdings.com"
             target="_blank"
@@ -99,9 +109,20 @@ export default function AboutPage() {
 
         <h2>What I&apos;m doing now</h2>
         <p>
-          Building <Link href="/ventures/gogocash">GoGoCash</Link> as my main
-          focus. Helping the broader Binary Holdings group run smoother as IT
-          Manager. Participating in{" "}
+          Building{" "}
+          <a
+            href="https://gogocash.co"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GoGoCash
+          </a>{" "}
+          as my main focus, with{" "}
+          <a href="https://manut.xyz" target="_blank" rel="noopener noreferrer">
+            Manut AI
+          </a>{" "}
+          as a parallel build. Helping the broader Binary Holdings group run
+          smoother as IT Manager. Participating in{" "}
           <a
             href="https://protocol.camp"
             target="_blank"

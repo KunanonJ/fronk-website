@@ -25,11 +25,26 @@ export default function NowPage() {
       <Prose>
         <h2>Building</h2>
         <p>
-          <Link href="/ventures/gogocash">GoGoCash</Link> is the main thing. We
-          ship something every week and most of my product time goes into
-          tightening the loop between application and payout — the metric I care
-          about. Compliance and risk work runs alongside the product work, not
-          after it.
+          <a
+            href="https://gogocash.co"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GoGoCash
+          </a>{" "}
+          is the main thing. We ship something every week and most of my
+          product time goes into tightening the loop between application and
+          payout — the metric I care about. Compliance and risk work runs
+          alongside the product work, not after it.
+        </p>
+        <p>
+          In parallel I&apos;m building{" "}
+          <a href="https://manut.xyz" target="_blank" rel="noopener noreferrer">
+            Manut AI
+          </a>{" "}
+          — a self-hosted AI knowledge workspace. Smaller surface, faster
+          iteration, mostly stress-testing AI workflows that GoGoCash can
+          eventually borrow from.
         </p>
 
         <h2>Day job</h2>
@@ -76,8 +91,7 @@ export default function NowPage() {
           regulation that&apos;s still being written. How small fintech teams in
           Southeast Asia compound trust faster than they compound features.
           When to pause a venture cleanly versus let it drift — something I
-          worked through with{" "}
-          <Link href="/ventures/gogocare">GoGoCare</Link> recently.
+          worked through earlier this year.
         </p>
 
         <h2>Travel</h2>

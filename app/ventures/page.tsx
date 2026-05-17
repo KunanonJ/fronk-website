@@ -18,11 +18,12 @@ export default function VenturesPage() {
       <header className="mb-12 max-w-2xl">
         <p className="text-sm uppercase tracking-widest text-muted">Ventures</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Things I've started.
+          What I'm building.
         </h1>
         <p className="mt-4 text-lg text-muted">
-          A running list of companies and products I've founded or co-founded.
-          Includes the ones that didn't work — those are the more useful pages.
+          Two active ventures, both grounded in Bangkok. One is a fintech, the
+          other is an AI knowledge workspace. The links go straight to the
+          products.
         </p>
       </header>
 

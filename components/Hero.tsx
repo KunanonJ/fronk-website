@@ -26,9 +26,26 @@ export function Hero() {
             </h1>
 
             <p className="max-w-2xl text-lg text-muted">
-              Founder of <a className="text-fg hover:text-accent" href="https://gogocash.co" target="_blank" rel="noopener noreferrer">GoGoCash</a>.
-              Building fintech and adjacent infrastructure from Bangkok, with
-              roots in smart contracts, AI, and Web3.
+              Founder of{" "}
+              <a
+                className="text-fg hover:text-accent"
+                href="https://gogocash.co"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GoGoCash
+              </a>{" "}
+              and{" "}
+              <a
+                className="text-fg hover:text-accent"
+                href="https://manut.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Manut AI
+              </a>
+              . Building fintech and AI infrastructure from Bangkok, with roots
+              in smart contracts, payments, and product-led ops.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
