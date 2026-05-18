@@ -37,8 +37,18 @@ export function Footer() {
     >
       <Container size="xl">
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <p>
-            © {year} {siteConfig.name}. All rights reserved.
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span>
+              © {year} {siteConfig.name}
+            </span>
+            <span aria-hidden className="text-border">
+              ✦
+            </span>
+            <span>Built in Bangkok</span>
+            <span aria-hidden className="text-border">
+              ✦
+            </span>
+            <span>Always shipping</span>
           </p>
 
           <ul className="flex flex-wrap items-center gap-4">

@@ -16,18 +16,18 @@ export default function HomePage() {
       <Container size="xl" as="section" className="py-20">
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Selected ventures
-            </h2>
-            <p className="mt-2 text-muted">
-              Companies and products I've started or led.
+            <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">
+              ✦ Currently shipping
             </p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+              Two bets. Both live.
+            </h2>
           </div>
           <Link
             href="/ventures"
             className="hidden items-center gap-1 text-sm text-muted hover:text-fg sm:inline-flex"
           >
-            All ventures <ArrowRight className="h-4 w-4" />
+            See both <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 

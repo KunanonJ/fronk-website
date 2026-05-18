@@ -71,6 +71,28 @@ body {
   color: var(--accent-fg);
 }
 
+/* Subtle grain texture overlay — fixed, behind all content. Adds the
+ * tactile feel of risograph / film without affecting legibility. The SVG is
+ * a tiny inline turbulence filter (~250 bytes) so no extra network request.
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body::before {
+    /* Keep grain crisp — no extra paint work needed; the filter result is static. */
+    will-change: auto;
+  }
+}
+
 a {
   text-underline-offset: 3px;
 }
