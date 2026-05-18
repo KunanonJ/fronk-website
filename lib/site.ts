@@ -27,6 +27,7 @@ export const nav = [
   { href: "/now", label: "Now" },
   { href: "/ventures", label: "Ventures" },
   { href: "/writing", label: "Writing" },
-  { href: "/resume", label: "Resume" },
+  // /resume is intentionally hidden from primary nav for now. The route
+  // still works at /resume and the PDF at /resume.pdf for direct sharing.
   { href: "/contact", label: "Contact" },
 ] as const;

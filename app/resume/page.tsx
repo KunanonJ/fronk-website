@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "Resume",
   description:
     "Kunanon Jarat (Fronk) — Founder, IT manager, and project leader across fintech, AI, and Web3.",
+  // Resume is hidden from the primary nav and sitemap. Tell search engines
+  // not to index it either — keeps the page direct-link-only.
+  robots: { index: false, follow: false },
 };
 
 interface TimelineItem {

@@ -10,7 +10,9 @@ const STATIC_ROUTES = [
   "/now",
   "/ventures",
   "/writing",
-  "/resume",
+  // /resume is hidden — not in the sitemap so it's not surfaced to crawlers.
+  // Still reachable via direct link if you want to share the URL with
+  // someone specific.
   "/contact",
 ] as const;
 
