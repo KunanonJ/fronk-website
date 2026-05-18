@@ -19,13 +19,13 @@ const VENTURES: readonly Venture[] = [
   {
     slug: "gogocash",
     name: "GoGoCash",
-    tagline: "Cash, on-demand.",
+    tagline: "Shopping-to-earn cashback.",
     description:
-      "A fintech product giving people in Thailand fast, transparent access to short-term liquidity — built for speed, honest pricing, and reliable payouts.",
+      "A shopping-to-earn cashback platform. 1,000+ users earning up to 30% back across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
     year: 2023,
     role: "Founder",
     status: "active",
-    stack: ["Fintech rails", "Payments", "TypeScript"],
+    stack: ["Cashback", "E-commerce", "Affiliate"],
     url: "https://gogocash.co",
     urlLabel: "gogocash.co",
     featured: true,

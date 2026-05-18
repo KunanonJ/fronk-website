@@ -32,10 +32,11 @@ export default function NowPage() {
           >
             GoGoCash
           </a>{" "}
-          is the main thing. We ship something every week and most of my
-          product time goes into tightening the loop between application and
-          payout — the metric I care about. Compliance and risk work runs
-          alongside the product work, not after it.
+          is the main thing — a shopping-to-earn cashback platform with 1,000+
+          users earning up to 30% back across 220+ merchants like Apple,
+          Samsung, Lazada, Shopee, TikTok Shop, and Temu. Most of my product
+          time goes into expanding the merchant network, sharpening attribution,
+          and making the cashback flow feel instant.
         </p>
         <p>
           In parallel I&apos;m building{" "}
@@ -87,11 +88,11 @@ export default function NowPage() {
 
         <h2>Reading &amp; thinking about</h2>
         <p>
-          How unit economics in lending businesses survive contact with
-          regulation that&apos;s still being written. How small fintech teams in
-          Southeast Asia compound trust faster than they compound features.
-          When to pause a venture cleanly versus let it drift — something I
-          worked through earlier this year.
+          How cashback and rewards programs actually compound versus how they
+          look on a pitch deck. How small fintech teams in Southeast Asia
+          compound trust faster than they compound features. When to pause a
+          venture cleanly versus let it drift — something I worked through
+          earlier this year.
         </p>
 
         <h2>Travel</h2>
