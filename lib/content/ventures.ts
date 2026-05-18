@@ -33,13 +33,13 @@ const VENTURES: readonly Venture[] = [
   {
     slug: "manut",
     name: "Manut AI",
-    tagline: "AI-augmented knowledge workspace.",
+    tagline: "Notion on steroids, for solo entrepreneurs.",
     description:
-      "A self-hosted knowledge platform with AI built in — for planning, sorting, and creating in one place, without the silo problem of stacking five SaaS tools.",
+      "An all-in-one workspace for solo entrepreneurs. Connects MongoDB, Meta, AI agents, and multiple AI models into a single platform — so you run your whole operation in one place instead of stitching together a dozen SaaS tools.",
     year: 2025,
     role: "Founder",
     status: "active",
-    stack: ["AI", "AFFiNE", "Self-hosted"],
+    stack: ["AI agents", "MongoDB", "Self-hosted"],
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
     featured: true,

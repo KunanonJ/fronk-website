@@ -43,8 +43,9 @@ export default function NowPage() {
           <a href="https://manut.xyz" target="_blank" rel="noopener noreferrer">
             Manut AI
           </a>{" "}
-          — a self-hosted AI knowledge workspace. Smaller surface, faster
-          iteration, mostly stress-testing AI workflows that GoGoCash can
+          — Notion on steroids for solo entrepreneurs, plugging MongoDB, Meta,
+          AI agents, and multi-model AI into one workspace. Smaller surface,
+          faster iteration, and a useful lab for AI workflows that GoGoCash can
           eventually borrow from.
         </p>
 
