@@ -25,6 +25,7 @@
   --animate-fade-in: fade-in 300ms ease-out both;
   --animate-slide-down: slide-down 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-scale-in: scale-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-resource-gradient: resource-gradient 6s linear infinite;
 }
 
 :root {
@@ -141,9 +142,40 @@ a {
   }
 }
 
+@keyframes resource-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* Stagger helper — set `--i: <index>` on each child for cascading entrance. */
 @utility stagger {
   animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@utility moving-border-gradient {
+  background-image: linear-gradient(
+    90deg,
+    oklch(0.92 0.05 30),
+    oklch(0.74 0.18 50),
+    oklch(0.82 0.12 350),
+    oklch(0.50 0.20 260),
+    oklch(0.85 0.10 5),
+    oklch(0.92 0.07 145),
+    oklch(0.74 0.18 50),
+    oklch(0.88 0.18 95),
+    oklch(0.62 0.22 25),
+    oklch(0.74 0.18 45),
+    oklch(0.82 0.12 350),
+    oklch(0.92 0.05 30)
+  );
+  background-size: 200% 200%;
 }
 
 /* ─── Print (used by `pnpm pdf` to render /resume to public/resume.pdf) ─── */

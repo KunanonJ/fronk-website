@@ -3,10 +3,13 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
+import { HeroCanvas } from "@/components/ui/HeroCanvas";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60 py-24 sm:py-32">
+      {/* Interactive background mesh grid inspired by aihero.dev */}
+      <HeroCanvas />
       <Container size="xl">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_auto] md:gap-16">
           <div className="space-y-6">
