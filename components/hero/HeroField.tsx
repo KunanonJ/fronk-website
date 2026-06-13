@@ -21,11 +21,23 @@ interface Block {
   baseY: number;
 }
 
-function readThemeColors(): { fg: THREE.Color; accent: THREE.Color } {
-  const styles = getComputedStyle(document.documentElement);
+function readTheme(): { fg: THREE.Color; accent: THREE.Color; isLight: boolean } {
+  const root = document.documentElement;
+  const styles = getComputedStyle(root);
   const fg = styles.getPropertyValue("--fg").trim() || "#ededed";
   const accent = styles.getPropertyValue("--accent").trim() || "#34d399";
-  return { fg: new THREE.Color(fg), accent: new THREE.Color(accent) };
+  return {
+    fg: new THREE.Color(fg),
+    accent: new THREE.Color(accent),
+    isLight: root.classList.contains("light"),
+  };
+}
+
+// Wireframes need more presence on paper than on black: dark `--fg` lines at
+// 0.22 read as faint clutter on the light theme, so lift their opacity there.
+function lineOpacity(isAccent: boolean, isLight: boolean): number {
+  if (isAccent) return isLight ? 0.6 : 0.5;
+  return isLight ? 0.34 : 0.22;
 }
 
 const GEOMETRIES = [
@@ -66,7 +78,10 @@ export function HeroField() {
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
 
-    let { fg, accent } = readThemeColors();
+    const theme0 = readTheme();
+    let fg = theme0.fg;
+    let accent = theme0.accent;
+    const isLight = theme0.isLight;
 
     const group = new THREE.Group();
     scene.add(group);
@@ -83,7 +98,7 @@ export function HeroField() {
       const material = new THREE.LineBasicMaterial({
         color: isAccent ? accent : fg,
         transparent: true,
-        opacity: isAccent ? 0.5 : 0.22,
+        opacity: lineOpacity(isAccent, isLight),
       });
       sharedMaterials.push(material);
       const mesh = new THREE.LineSegments(edges, material);
@@ -91,13 +106,21 @@ export function HeroField() {
       // Scatter across a wide, deep volume; smaller/fainter further back.
       const depth = -8 - Math.random() * 14;
       const spread = 9 + Math.abs(depth) * 0.6;
-      mesh.position.set(
-        (Math.random() - 0.5) * spread * 2,
-        (Math.random() - 0.5) * spread,
-        depth,
-      );
       const scale = 0.5 + Math.random() * 1.6;
       mesh.scale.setScalar(scale);
+      const y = (Math.random() - 0.5) * spread;
+      let x = (Math.random() - 0.5) * spread * 2;
+      // Keep the field out of the centred content column so shapes never drift
+      // onto the headline / CTAs. The keep-out includes the shape's own radius
+      // (`+ scale`) so large shapes don't reach in edge-first; shapes well above
+      // or below the content band may still cross the centre — they read as
+      // behind the text, not over it.
+      const corridorHalf = spread * 0.42 + scale;
+      if (Math.abs(y) < spread * 0.62 && Math.abs(x) < corridorHalf) {
+        const side = x < 0 ? -1 : 1;
+        x = side * (corridorHalf + Math.random() * spread * 0.6);
+      }
+      mesh.position.set(x, y, depth);
       mesh.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
       group.add(mesh);
 
@@ -125,11 +148,13 @@ export function HeroField() {
 
     // Re-tint on theme toggle (next-themes flips the html class).
     const themeObserver = new MutationObserver(() => {
-      const next = readThemeColors();
+      const next = readTheme();
       fg = next.fg;
       accent = next.accent;
       sharedMaterials.forEach((m, i) => {
-        m.color.copy(i % 7 === 3 ? accent : fg);
+        const accented = i % 7 === 3;
+        m.color.copy(accented ? accent : fg);
+        m.opacity = lineOpacity(accented, next.isLight);
       });
     });
     themeObserver.observe(document.documentElement, {
