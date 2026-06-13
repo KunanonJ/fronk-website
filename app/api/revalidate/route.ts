@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { parseBody } from "next-sanity/webhook";
 import { NextResponse, type NextRequest } from "next/server";
+import { getRevalidationTagsForType } from "@/lib/sanity/revalidation";
 
 export const runtime = "nodejs";
 
@@ -32,15 +33,15 @@ export async function POST(req: Request | NextRequest): Promise<Response> {
       return NextResponse.json({ message: "Empty body" }, { status: 400 });
     }
 
-    // "max" is the documented cache-life profile name for immediate
-    // revalidation in Next.js 16. Passing a `{ expire: 0 }` object also
-    // type-checks but is not a documented profile shape — the webhook used
-    // to silently no-op tag invalidation despite responding 200.
-    revalidateTag("posts", "max");
+    const tags = getRevalidationTagsForType(body._type);
+    for (const tag of tags) {
+      revalidateTag(tag, "max");
+    }
 
     return NextResponse.json({
       status: 200,
       revalidated: true,
+      tags: [...tags],
       now: Date.now(),
       body,
     });

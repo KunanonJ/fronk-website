@@ -14,7 +14,7 @@ export default function Icon() {
           alignItems: "center",
           justifyContent: "center",
           background: "#09090b",
-          color: "#fbbf24",
+          color: "#34d399",
           fontSize: 44,
           fontWeight: 700,
           letterSpacing: "-0.04em",
@@ -22,7 +22,7 @@ export default function Icon() {
         }}
       >
         K
-        <span style={{ color: "#fbbf24" }}>.</span>
+        <span style={{ color: "#34d399" }}>.</span>
       </div>
     ),
     { ...size },

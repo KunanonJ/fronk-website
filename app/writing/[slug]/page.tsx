@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { DraftBanner } from "@/components/DraftBanner";
+import { PostAuthor } from "@/components/PostAuthor";
 import { Prose } from "@/components/ui/Prose";
 import { PortableText } from "@/components/PortableText";
+import { resolvePostMetadata } from "@/lib/content/postMetadata";
 import {
   fetchAllPostSlugs,
   fetchPostBySlug,
@@ -16,14 +20,15 @@ import { siteConfig } from "@/lib/site";
 import { formatDate } from "@/lib/utils/formatDate";
 import { readingTimeFromBlocks } from "@/lib/utils/readingTime";
 
-// Build a schema.org BlogPosting JSON-LD payload for a single post. Author and
-// publisher both resolve to the same Person identity used in the root layout.
 function buildBlogPostingJsonLd(post: Post): string {
+  const authorName = post.author?.name ?? siteConfig.name;
   const author: Record<string, unknown> = {
     "@type": "Person",
-    name: siteConfig.name,
+    name: authorName,
     url: siteConfig.url,
   };
+
+  const metadata = resolvePostMetadata(post);
 
   const payload: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -36,8 +41,8 @@ function buildBlogPostingJsonLd(post: Post): string {
     mainEntityOfPage: `${siteConfig.url}/writing/${post.slug}`,
   };
 
-  if (post.excerpt) {
-    payload.description = post.excerpt;
+  if (metadata.description) {
+    payload.description = metadata.description;
   }
 
   if (post.coverImage) {
@@ -64,14 +69,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await fetchPostBySlug(slug);
+  const { isEnabled: preview } = await draftMode();
+  const post = await fetchPostBySlug(slug, { preview });
   if (!post) return { title: "Not found" };
+
+  const metadata = resolvePostMetadata(post);
+
   return {
-    title: post.title,
-    description: post.excerpt ?? undefined,
+    title: metadata.title,
+    description: metadata.description,
     openGraph: {
-      title: post.title,
-      description: post.excerpt ?? undefined,
+      title: metadata.title,
+      description: metadata.description,
       type: "article",
       publishedTime: post.publishedAt,
       images: post.coverImage
@@ -83,62 +92,71 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await fetchPostBySlug(slug);
+  const { isEnabled: preview } = await draftMode();
+  const post = await fetchPostBySlug(slug, { preview });
   if (!post) notFound();
 
   const { minutes } = readingTimeFromBlocks(post.body);
   const blogPostingJsonLd: string = buildBlogPostingJsonLd(post);
+  const exitPath = `/writing/${slug}`;
 
   return (
-    <Container size="lg" className="py-20">
-      {/* schema.org BlogPosting. Content built from trusted Sanity data
-          serialized through JSON.stringify — no XSS surface. */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: blogPostingJsonLd }}
-      />
-      <Link
-        href="/writing"
-        className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
-      >
-        <ArrowLeft className="h-4 w-4" /> All writing
-      </Link>
-
-      <header className="mt-8 mb-12">
-        <div className="flex flex-wrap items-baseline gap-3 text-sm text-muted">
-          <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-          <span>•</span>
-          <span>{minutes} min read</span>
-          {post.tags && post.tags.length > 0 && (
-            <>
-              <span>•</span>
-              <span>{post.tags.join(", ")}</span>
-            </>
-          )}
-        </div>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {post.title}
-        </h1>
-        {post.excerpt && (
-          <p className="mt-4 text-lg text-muted">{post.excerpt}</p>
-        )}
-      </header>
-
-      {post.coverImage && (
-        <Image
-          src={urlFor(post.coverImage).width(1600).fit("max").auto("format").url()}
-          alt={post.coverImage.alt ?? post.title}
-          width={1600}
-          height={900}
-          priority
-          className="mb-12 h-auto w-full rounded-xl border border-border"
-          sizes="(min-width: 768px) 720px, 100vw"
+    <>
+      {preview && <DraftBanner exitPath={exitPath} />}
+      <Container size="lg" className="py-20">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: blogPostingJsonLd }}
         />
-      )}
+        <Link
+          href="/writing"
+          className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
+        >
+          <ArrowLeft className="h-4 w-4" /> All writing
+        </Link>
 
-      <Prose>
-        <PortableText value={post.body} />
-      </Prose>
-    </Container>
+        <header className="mt-8 mb-12">
+          <div className="flex flex-wrap items-baseline gap-3 text-sm text-muted">
+            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+            <span>•</span>
+            <span>{minutes} min read</span>
+            {post.tags && post.tags.length > 0 && (
+              <>
+                <span>•</span>
+                <span>{post.tags.join(", ")}</span>
+              </>
+            )}
+          </div>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+            {post.title}
+          </h1>
+          {post.excerpt ? (
+            <p className="mt-4 text-lg text-muted">{post.excerpt}</p>
+          ) : null}
+        </header>
+
+        {post.author ? (
+          <div className="mb-12">
+            <PostAuthor author={post.author} />
+          </div>
+        ) : null}
+
+        {post.coverImage ? (
+          <Image
+            src={urlFor(post.coverImage).width(1600).fit("max").auto("format").url()}
+            alt={post.coverImage.alt ?? post.title}
+            width={1600}
+            height={900}
+            priority
+            className="mb-12 h-auto w-full rounded-xl border border-border"
+            sizes="(min-width: 768px) 720px, 100vw"
+          />
+        ) : null}
+
+        <Prose>
+          <PortableText value={post.body} />
+        </Prose>
+      </Container>
+    </>
   );
 }

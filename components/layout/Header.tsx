@@ -2,9 +2,15 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/layout/MobileNav";
-import { nav, siteConfig } from "@/lib/site";
+import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 
-export function Header() {
+interface HeaderProps {
+  site: ResolvedSiteSettings;
+}
+
+export function Header({ site }: HeaderProps) {
+  const navItems = site.navigation.slice(1);
+
   return (
     <header
       data-site-chrome
@@ -15,14 +21,14 @@ export function Header() {
           <Link
             href="/"
             className="font-semibold tracking-tight hover:text-accent"
-            aria-label={`${siteConfig.shortName} — home`}
+            aria-label={`${site.shortName} — home`}
           >
-            {siteConfig.shortName}
+            {site.shortName}
             <span className="text-accent">.</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-            {nav.slice(1).map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -35,7 +41,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <MobileNav />
+            <MobileNav items={site.navigation} />
           </div>
         </div>
       </Container>

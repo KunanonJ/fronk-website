@@ -20,7 +20,7 @@ export default function OpenGraphImage() {
           color: "#fafafa",
           fontFamily: "system-ui, sans-serif",
           backgroundImage:
-            "radial-gradient(circle at 90% 10%, rgba(251, 191, 36, 0.12) 0%, transparent 45%), radial-gradient(circle at 0% 100%, rgba(251, 191, 36, 0.06) 0%, transparent 40%)",
+            "radial-gradient(circle at 90% 10%, rgba(52, 211, 153, 0.12) 0%, transparent 45%), radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.06) 0%, transparent 40%)",
         }}
       >
         <div
@@ -34,7 +34,7 @@ export default function OpenGraphImage() {
           }}
         >
           <span style={{ color: "#fafafa" }}>{siteConfig.shortName}</span>
-          <span style={{ color: "#fbbf24" }}>.</span>
+          <span style={{ color: "#34d399" }}>.</span>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -84,7 +84,7 @@ export default function OpenGraphImage() {
           }}
         >
           <span>fintech · ai · web3 · bangkok</span>
-          <span style={{ color: "#fbbf24" }}>{siteConfig.url.replace(/^https?:\/\//, "")}</span>
+          <span style={{ color: "#34d399" }}>{siteConfig.url.replace(/^https?:\/\//, "")}</span>
         </div>
       </div>
     ),

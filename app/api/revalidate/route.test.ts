@@ -59,7 +59,7 @@ describe("POST /api/revalidate", () => {
     expect(revalidateTagMock).not.toHaveBeenCalled();
   });
 
-  it("revalidates the posts tag for valid signed payloads", async () => {
+  it("revalidates the posts tag for valid signed post payloads", async () => {
     parseBodyMock.mockResolvedValueOnce({
       isValidSignature: true,
       body: { _type: "post", slug: { current: "hello" } },
@@ -68,6 +68,34 @@ describe("POST /api/revalidate", () => {
     const res = await callRoute({ _type: "post", slug: { current: "hello" } }, "ok");
     expect(res.status).toBe(200);
     expect(revalidateTagMock).toHaveBeenCalledWith("posts", "max");
+  });
+
+  it("revalidates page and site tags for standard page payloads", async () => {
+    parseBodyMock.mockResolvedValueOnce({
+      isValidSignature: true,
+      body: { _type: "standardPage", slug: { current: "about" } },
+    });
+
+    const res = await callRoute(
+      { _type: "standardPage", slug: { current: "about" } },
+      "ok",
+    );
+
+    expect(res.status).toBe(200);
+    expect(revalidateTagMock).toHaveBeenCalledWith("pages", "max");
+    expect(revalidateTagMock).toHaveBeenCalledWith("site", "max");
+  });
+
+  it("returns the revalidated tags in the response body", async () => {
+    parseBodyMock.mockResolvedValueOnce({
+      isValidSignature: true,
+      body: { _type: "venture" },
+    });
+
+    const res = await callRoute({ _type: "venture" }, "ok");
+    const payload = await res.json();
+
+    expect(payload.tags).toEqual(["ventures", "home"]);
   });
 
   it("returns 500 when the secret env var is missing", async () => {

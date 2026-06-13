@@ -1,16 +1,30 @@
 import { createClient, type SanityClient } from "next-sanity";
 import imageUrlBuilder from "@sanity/image-url";
 import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
-import { apiVersion, dataset, isSanityConfigured, projectId } from "@/sanity/env";
+import {
+  apiVersion,
+  dataset,
+  isSanityConfigured,
+  projectId,
+  sanityReadToken,
+} from "@/sanity/env";
 
-function buildClient(): SanityClient | null {
+interface BuildClientOptions {
+  preview?: boolean;
+}
+
+export function buildClient(options: BuildClientOptions = {}): SanityClient | null {
   if (!isSanityConfigured()) return null;
+  const preview = options.preview === true;
+  if (preview && !sanityReadToken) return null;
+
   return createClient({
     projectId,
     dataset,
     apiVersion,
-    useCdn: process.env.NODE_ENV === "production",
-    perspective: "published",
+    useCdn: !preview && process.env.NODE_ENV === "production",
+    perspective: preview ? "previewDrafts" : "published",
+    token: preview ? sanityReadToken : undefined,
   });
 }
 

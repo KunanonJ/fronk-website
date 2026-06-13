@@ -2,7 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@/components/Analytics";
+import { resolveSiteSettings } from "@/lib/content/siteSettings";
+import { fetchSiteSettings } from "@/lib/sanity/fetch";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -111,11 +115,15 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const cmsSettings = await fetchSiteSettings();
+  const site = resolveSiteSettings(cmsSettings);
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col bg-bg text-fg">
@@ -137,7 +145,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <SiteShell>{children}</SiteShell>
+          <SiteShell
+            header={<Header site={site} />}
+            footer={<Footer site={site} />}
+          >
+            {children}
+          </SiteShell>
         </ThemeProvider>
         <Analytics />
       </body>

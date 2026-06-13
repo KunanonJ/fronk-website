@@ -1,10 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
 
-export function SiteShell({ children }: { children: React.ReactNode }) {
+interface SiteShellProps {
+  children: React.ReactNode;
+  header: React.ReactNode;
+  footer: React.ReactNode;
+}
+
+export function SiteShell({ children, header, footer }: SiteShellProps) {
   const pathname = usePathname();
   const isStudio = pathname?.startsWith("/studio") ?? false;
 
@@ -20,11 +24,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       >
         Skip to content
       </a>
-      <Header />
+      {header}
       <main key={pathname} id="main" className="flex-1 animate-fade-up">
         {children}
       </main>
-      <Footer />
+      {footer}
     </>
   );
 }

@@ -23,7 +23,7 @@ export default function AppleIcon() {
         }}
       >
         K
-        <span style={{ color: "#fbbf24" }}>.</span>
+        <span style={{ color: "#34d399" }}>.</span>
       </div>
     ),
     { ...size },

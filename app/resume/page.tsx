@@ -4,6 +4,8 @@ import { Download } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { CompanyLogo } from "@/components/CompanyLogo";
+import { resolveResumeProfile } from "@/lib/content/resumeProfile";
+import { fetchResumeProfile } from "@/lib/sanity/fetch";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -334,18 +336,24 @@ const skills = [
   "Vendor & stakeholder management",
 ] as const;
 
-export default function ResumePage() {
+export const revalidate = 60;
+
+export default async function ResumePage() {
+  const cms = await fetchResumeProfile();
+  const profile = resolveResumeProfile(cms);
+
   return (
     <Container size="lg" className="py-20">
       <header className="mb-12 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
         <div>
           <p className="text-sm uppercase tracking-widest text-muted">Resume</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Kunanon Jarat
+            {profile.name}
           </h1>
-          <p className="mt-2 text-muted">
-            Founder. IT Manager. Based in Bangkok.
-          </p>
+          <p className="mt-2 text-muted">{profile.headline}</p>
+          {profile.summary ? (
+            <p className="mt-4 max-w-2xl text-muted">{profile.summary}</p>
+          ) : null}
         </div>
         <div data-print-hide>
           <Button href="/resume.pdf" variant="secondary">

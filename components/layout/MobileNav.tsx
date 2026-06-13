@@ -4,10 +4,18 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { nav } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
 
-export function MobileNav() {
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface MobileNavProps {
+  items: readonly NavItem[];
+}
+
+export function MobileNav({ items }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -62,7 +70,7 @@ export function MobileNav() {
             className="fixed inset-x-0 top-14 z-50 border-b border-border bg-bg shadow-xl animate-slide-down md:hidden"
           >
             <nav className="flex flex-col py-2" aria-label="Mobile primary">
-              {nav.map((item) => {
+              {items.map((item) => {
                 const active = pathname === item.href;
                 return (
                   <Link

@@ -10,14 +10,28 @@ import {
   Twitter,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
-import { siteConfig } from "@/lib/site";
+import { PortableText } from "@/components/PortableText";
+import { Prose } from "@/components/ui/Prose";
+import { resolveSiteSettings } from "@/lib/content/siteSettings";
+import { resolveStandardPage } from "@/lib/content/standardPage";
+import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
 import { cssVar } from "@/lib/utils/cssVar";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with Fronk Kunanon Jarat — email and social links.",
-};
+export const revalidate = 60;
+
+const DEFAULT_CONTACT_INTRO =
+  "Email is the highest-signal channel. I read everything; I try to reply within a week. If you're a founder, builder, or operator with an interesting problem, please don't hesitate.";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await fetchStandardPage("contact");
+  const page = resolveStandardPage("contact", cms);
+  return {
+    title: page.metadata.title,
+    description: page.metadata.description,
+  };
+}
 
 interface Channel {
   label: string;
@@ -27,74 +41,88 @@ interface Channel {
   icon: LucideIcon;
 }
 
-const channels: readonly Channel[] = [
-  {
-    label: "Email",
-    sub: siteConfig.email,
-    href: `mailto:${siteConfig.email}`,
-    icon: Mail,
-  },
-  {
-    label: "X / Twitter",
-    sub: "@fkj98",
-    href: siteConfig.socials.x,
-    icon: Twitter,
-  },
-  {
-    label: "LinkedIn",
-    sub: "/in/kunanonj",
-    href: siteConfig.socials.linkedin,
-    icon: Linkedin,
-  },
-  {
-    label: "Telegram",
-    sub: "@fkj98",
-    href: siteConfig.socials.telegram,
-    icon: Send,
-  },
-  {
-    label: "Discord",
-    sub: siteConfig.discordHandle,
-    copy: siteConfig.discordHandle,
-    icon: MessageCircle,
-  },
-  {
-    label: "GitHub",
-    sub: "@KunanonJ",
-    href: siteConfig.socials.github,
-    icon: Github,
-  },
-  {
-    label: "Farcaster",
-    sub: "@fronk98",
-    href: siteConfig.socials.farcaster,
-    icon: Hash,
-  },
-  {
-    label: "Website",
-    sub: "gogocash.co",
-    href: siteConfig.socials.website,
-    icon: Globe,
-  },
-];
-
 const cardClasses =
   "flex items-start gap-4 rounded-xl border border-border bg-subtle/30 p-5 transition-colors hover:border-fg/30 hover:bg-subtle/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { isEnabled: preview } = await draftMode();
+  const [cms, settingsCms] = await Promise.all([
+    fetchStandardPage("contact", { preview }),
+    fetchSiteSettings({ preview }),
+  ]);
+  const page = resolveStandardPage("contact", cms);
+  const site = resolveSiteSettings(settingsCms);
+
+  const channels: readonly Channel[] = [
+    {
+      label: "Email",
+      sub: site.email,
+      href: `mailto:${site.email}`,
+      icon: Mail,
+    },
+    {
+      label: "X / Twitter",
+      sub: "@fkj98",
+      href: site.socials.x,
+      icon: Twitter,
+    },
+    {
+      label: "LinkedIn",
+      sub: "/in/kunanonj",
+      href: site.socials.linkedin,
+      icon: Linkedin,
+    },
+    {
+      label: "Telegram",
+      sub: "@fkj98",
+      href: site.socials.telegram,
+      icon: Send,
+    },
+    {
+      label: "Discord",
+      sub: site.discordHandle,
+      copy: site.discordHandle,
+      icon: MessageCircle,
+    },
+    {
+      label: "GitHub",
+      sub: "@KunanonJ",
+      href: site.socials.github,
+      icon: Github,
+    },
+    {
+      label: "Farcaster",
+      sub: "@fronk98",
+      href: site.socials.farcaster,
+      icon: Hash,
+    },
+    {
+      label: "Website",
+      sub: "gogocash.co",
+      href: site.socials.website,
+      icon: Globe,
+    },
+  ];
+
   return (
     <Container size="lg" className="py-20">
       <header className="mb-12 max-w-2xl">
-        <p className="text-sm uppercase tracking-widest text-muted">Contact</p>
+        <p className="text-sm uppercase tracking-widest text-muted">
+          {page.eyebrow}
+        </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Say hello.
+          {page.heading}
         </h1>
         <p className="mt-4 text-lg text-muted">
-          Email is the highest-signal channel. I read everything; I try to reply
-          within a week. If you're a founder, builder, or operator with an
-          interesting problem, please don't hesitate.
+          {page.description || DEFAULT_CONTACT_INTRO}
         </p>
       </header>
+
+      {cms?.body && cms.body.length > 0 ? (
+        <Prose className="mb-12">
+          <PortableText value={cms.body} />
+        </Prose>
+      ) : null}
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
         {channels.map((c, i) => {

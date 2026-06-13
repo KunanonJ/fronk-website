@@ -3,24 +3,48 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Hero } from "@/components/Hero";
 import { VentureCard } from "@/components/VentureCard";
-import { getFeaturedVentures } from "@/lib/content/ventures";
+import { resolveHomePage } from "@/lib/content/homePage";
+import {
+  getFeaturedVentures,
+  resolveFeaturedVentures,
+} from "@/lib/content/ventures";
+import { resolveSiteSettings } from "@/lib/content/siteSettings";
+import {
+  fetchFeaturedVentures,
+  fetchHomePage,
+  fetchSiteSettings,
+} from "@/lib/sanity/fetch";
 import { cssVar } from "@/lib/utils/cssVar";
 
-export default function HomePage() {
-  const featured = getFeaturedVentures(3);
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const [homeCms, venturesCms, settingsCms] = await Promise.all([
+    fetchHomePage(),
+    fetchFeaturedVentures(6),
+    fetchSiteSettings(),
+  ]);
+
+  const content = resolveHomePage(homeCms);
+  const site = resolveSiteSettings(settingsCms);
+  const featured = resolveFeaturedVentures(
+    venturesCms,
+    getFeaturedVentures(content.featuredLimit),
+    content.featuredLimit,
+  );
 
   return (
     <>
-      <Hero />
+      <Hero content={content} personName={site.name} />
 
       <Container size="xl" as="section" className="py-20">
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">
-              ✦ Currently shipping
+              {content.featuredSectionKicker}
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Two bets. Both live.
+              {content.featuredSectionTitle}
             </h2>
           </div>
           <Link
@@ -47,18 +71,15 @@ export default function HomePage() {
       <Container size="xl" as="section" className="py-20">
         <div className="rounded-2xl border border-border bg-subtle/30 p-8 sm:p-12">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Currently writing
+            {content.writingTitle}
           </h2>
-          <p className="mt-2 max-w-xl text-muted">
-            Long-form notes on building from zero — fundraising, hiring,
-            shipping, and the daily reality of running early-stage companies.
-          </p>
+          <p className="mt-2 max-w-xl text-muted">{content.writingDescription}</p>
           <div className="mt-6">
             <Link
-              href="/writing"
+              href={content.writingCta.href}
               className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
             >
-              Read the journal <ArrowRight className="h-4 w-4" />
+              {content.writingCta.label} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

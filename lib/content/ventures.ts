@@ -62,3 +62,21 @@ export function getVentureBySlug(slug: string): Venture | null {
 export function getAllVentureSlugs(): readonly string[] {
   return VENTURES.map((v) => v.slug);
 }
+
+export function resolveVentures(
+  cmsVentures: readonly Venture[] | null | undefined,
+  fallback: readonly Venture[] = VENTURES,
+): readonly Venture[] {
+  if (!cmsVentures || cmsVentures.length === 0) return fallback;
+  return cmsVentures;
+}
+
+export function resolveFeaturedVentures(
+  cmsVentures: readonly Venture[] | null | undefined,
+  fallback: readonly Venture[] = VENTURES,
+  limit?: number,
+): readonly Venture[] {
+  const source = resolveVentures(cmsVentures, fallback);
+  const featured = source.filter((venture) => venture.featured);
+  return typeof limit === "number" ? featured.slice(0, limit) : featured;
+}

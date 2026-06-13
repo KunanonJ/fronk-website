@@ -3,6 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { codeInput } from "@sanity/code-input";
 import { schemaTypes } from "./sanity/schemas";
+import { structure } from "./sanity/structure";
 import { apiVersion, dataset, projectId, studioUrl } from "./sanity/env";
 
 export default defineConfig({
@@ -12,5 +13,9 @@ export default defineConfig({
   projectId,
   dataset,
   schema: { types: schemaTypes },
-  plugins: [structureTool(), visionTool({ defaultApiVersion: apiVersion }), codeInput()],
+  plugins: [
+    structureTool({ structure }),
+    visionTool({ defaultApiVersion: apiVersion }),
+    codeInput(),
+  ],
 });
