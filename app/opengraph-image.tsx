@@ -54,7 +54,7 @@ export default function OpenGraphImage() {
             color: "rgba(255,255,255,0.05)",
           }}
         >
-          FRONK
+          fronk
         </div>
 
         {/* Top row: wordmark + mono eyebrow */}
@@ -66,9 +66,24 @@ export default function OpenGraphImage() {
             alignItems: "center",
           }}
         >
-          <div style={{ display: "flex", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em" }}>
-            Fronk
-            <span style={{ color: "#34d399" }}>.</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: 28,
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            fronk
+            <span
+              style={{
+                marginLeft: 6,
+                width: 11,
+                height: 23,
+                background: "#34d399",
+              }}
+            />
           </div>
           <div
             style={{
