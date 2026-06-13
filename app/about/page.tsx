@@ -8,6 +8,7 @@ import { AboutFallback } from "@/components/content/AboutFallback";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { resolveStandardPage } from "@/lib/content/standardPage";
+import { buildProfilePageJsonLd } from "@/lib/seo/jsonLd";
 import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
 
 export const revalidate = 60;
@@ -18,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page.metadata.title,
     description: page.metadata.description,
+    alternates: { canonical: "/about" },
   };
 }
 
@@ -31,7 +33,14 @@ export default async function AboutPage() {
   const site = resolveSiteSettings(settingsCms);
 
   return (
-    <Container size="lg" className="py-24 sm:py-32">
+    <Container size="lg" className="py-16 sm:py-24 lg:py-32">
+      {/* ProfilePage schema bound to the site graph's Person (developer-controlled). */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(buildProfilePageJsonLd()),
+        }}
+      />
       <div className="mb-16 flex flex-col gap-8 sm:flex-row sm:items-start">
         <div className="relative hidden h-28 w-28 flex-shrink-0 overflow-hidden border border-border bg-surface sm:block">
           <Image

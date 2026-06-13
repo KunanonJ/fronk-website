@@ -77,6 +77,12 @@ describe("VentureCaseRow > metrics panel is honest", () => {
     expect(scoped.getByText("Uptime")).toBeInTheDocument();
   });
 
+  it("wakes the instrument panel on hover (panel-live)", () => {
+    const { container } = render(<VentureCaseRow venture={WITH_METRICS} index={0} />);
+    const panel = container.querySelector("[data-panel]") as HTMLElement;
+    expect(panel.className).toContain("panel-live");
+  });
+
   it("invents no figures when a venture has no metrics, but keeps its tagline", () => {
     render(<VentureCaseRow venture={NO_METRICS} index={0} />);
     expect(screen.queryByText("1,000+")).toBeNull();

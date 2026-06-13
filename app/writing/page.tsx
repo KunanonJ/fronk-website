@@ -18,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: content.metadata.title,
     description: content.metadata.description,
+    alternates: { canonical: "/writing" },
   };
 }
 
@@ -33,7 +34,7 @@ export default async function WritingPage() {
   return (
     <>
       {preview && <DraftBanner exitPath="/writing" />}
-      <Container size="lg" className="py-20">
+      <Container size="lg" className="py-14 sm:py-20 lg:py-24">
         <PageHeader
           eyebrow={content.eyebrow}
           title={content.heading}

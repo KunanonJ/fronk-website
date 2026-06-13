@@ -79,7 +79,7 @@ export function MobileNav({ items }: MobileNavProps) {
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex h-10 w-10 items-center justify-center border border-border bg-surface text-fg transition-colors hover:border-border-strong hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center border border-border bg-surface text-fg transition-[color,background-color,border-color,transform] hover:border-border-strong hover:bg-surface-2 active:scale-95 active:bg-surface-2 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg md:hidden"
       >
         {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </button>

@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page.metadata.title,
     description: page.metadata.description,
+    alternates: { canonical: "/ventures" },
   };
 }
 
@@ -29,7 +30,7 @@ export default async function VenturesPage() {
   const ventures = resolveVentures(cmsVentures, getAllVentures());
 
   return (
-    <Container size="xl" className="py-20">
+    <Container size="xl" className="py-14 sm:py-20 lg:py-24">
       <PageHeader
         eyebrow={page.eyebrow}
         title={page.heading}

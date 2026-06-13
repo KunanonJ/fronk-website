@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { MetricCountUp } from "@/components/home/MetricCountUp";
 import { cn } from "@/lib/utils/cn";
 import type { Venture } from "@/lib/content/ventures";
 
@@ -60,7 +61,7 @@ export function VentureCaseRow({ venture, index }: VentureCaseRowProps) {
       <div
         data-panel
         className={cn(
-          "panel relative flex flex-col gap-6 p-8 sm:p-10",
+          "panel panel-live relative flex flex-col gap-6 p-6 sm:p-8 lg:p-10",
           reversed && "lg:order-1",
         )}
       >
@@ -74,11 +75,11 @@ export function VentureCaseRow({ venture, index }: VentureCaseRowProps) {
         <p className="text-sm text-muted">{venture.tagline}</p>
 
         {hasMetrics ? (
-          <dl className="grid grid-cols-3 gap-4 rule-hud pt-6">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-5 rule-hud pt-6 sm:grid-cols-3 sm:gap-4">
             {venture.metrics!.map((metric) => (
-              <div key={metric.label} className="space-y-1">
+              <div key={metric.label} className="min-w-0 space-y-1">
                 <dd className="font-display text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl">
-                  {metric.value}
+                  <MetricCountUp value={metric.value} />
                 </dd>
                 <dt className="label-mono text-subtle">{metric.label}</dt>
               </div>

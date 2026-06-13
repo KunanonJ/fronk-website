@@ -30,6 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page.metadata.title,
     description: page.metadata.description,
+    alternates: { canonical: "/contact" },
   };
 }
 
@@ -102,7 +103,7 @@ export default async function ContactPage() {
   ];
 
   return (
-    <Container size="lg" className="py-20">
+    <Container size="lg" className="py-14 sm:py-20 lg:py-24">
       <PageHeader
         eyebrow={page.eyebrow}
         title={page.heading}
@@ -134,7 +135,7 @@ export default async function ContactPage() {
                 href={c.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:decoration-accent"
+                className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:decoration-accent after:absolute after:inset-0 active:text-accent active:decoration-accent"
               >
                 {c.sub}
               </a>
@@ -145,13 +146,15 @@ export default async function ContactPage() {
             return (
               <li
                 key={c.label}
-                className="flex items-center justify-between gap-4 rule-hud px-5 py-4"
+                className="relative flex items-center justify-between gap-4 rule-hud px-5 py-4"
               >
-                <span className="label-mono inline-flex items-center gap-3 text-fg">
+                <span className="label-mono inline-flex flex-shrink-0 items-center gap-3 text-fg">
                   <Icon className="h-4 w-4 text-muted" aria-hidden />
                   {c.label}
                 </span>
-                <span className="font-mono text-sm">{value}</span>
+                <span className="min-w-0 break-words [overflow-wrap:anywhere] text-right font-mono text-sm">
+                  {value}
+                </span>
               </li>
             );
           })}

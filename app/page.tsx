@@ -31,7 +31,7 @@ export default async function HomePage() {
     <>
       <Hero content={content} />
 
-      <Container size="lg" as="section" className="py-24 sm:py-32">
+      <Container size="lg" as="section" className="py-16 sm:py-24 lg:py-32">
         <Reveal>
           <SpecializationStatement
             eyebrow={content.specializationEyebrow}
@@ -42,7 +42,7 @@ export default async function HomePage() {
         </Reveal>
       </Container>
 
-      <Container size="xl" as="section" className="pb-24 sm:pb-32">
+      <Container size="xl" as="section" className="pb-16 sm:pb-24 lg:pb-32">
         <Reveal>
           <SectionHeader
             kicker={content.featuredSectionKicker}
@@ -58,7 +58,7 @@ export default async function HomePage() {
         </div>
       </Container>
 
-      <Container size="xl" as="section" className="pb-24 sm:pb-32">
+      <Container size="xl" as="section" className="pb-16 sm:pb-24 lg:pb-32">
         <Reveal>
           <WritingCallout
             eyebrow="Journal"

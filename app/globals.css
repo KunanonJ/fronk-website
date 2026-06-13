@@ -59,6 +59,7 @@
   --animate-scale-in: scale-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
   /* Status ticker marquee — track is 2× content, shifts one full copy. */
   --animate-ticker: ticker 42s linear infinite;
+  --animate-hud-pulse: hud-pulse 2.4s ease-in-out infinite;
 }
 
 /* ─── Light terminal (paper / schematic) ──────────────────────────────────── */
@@ -288,6 +289,42 @@ a {
   }
 }
 
+/* ─── Micro-interactions (dopamine) — all transform/opacity, reduced-motion-safe
+   via the global prefers-reduced-motion block below. ─── */
+
+/* HUD ✦ "live feed" pulse — opacity only, slow + atmospheric. */
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Tick "lock-on": the button's corner crop-marks splay outward on hover, like a
+   targeting reticle arming on the element you're about to activate. */
+.tick-armed {
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .tick-armed {
+  transform: scale(1.08);
+}
+
+/* "Instrument waking up" — a hairline panel brightens + lifts a hair on hover. */
+@utility panel-live {
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover {
+    border-color: var(--border-strong);
+    background-color: var(--surface-2);
+    transform: translateY(-2px);
+  }
+}
+
 /* ─── Scroll-reveal (components/ui/Reveal) ─── */
 /* Default `.reveal` is fully visible. Only when JS arms a below-fold element
    (data-reveal) does the transition apply; the "hidden" start state uses
@@ -382,6 +419,11 @@ a {
 
   .reveal[data-reveal] {
     opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .panel-live:hover,
+  .group:hover .tick-armed {
     transform: none !important;
   }
 }
