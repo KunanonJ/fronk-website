@@ -187,26 +187,56 @@ Exit preview: `/api/draft/disable?slug=/writing/hello-world` (or use the banner 
 
 Requires `SANITY_API_READ_TOKEN` and `SANITY_PREVIEW_SECRET` on Railway.
 
-### 5. Scheduled revalidation (optional)
+### 5. Scheduled revalidation (cron service)
 
-Webhook revalidation runs on publish. For a safety net (e.g. missed webhooks),
-call `GET /api/cron/revalidate` on a schedule.
+Webhook revalidation runs on publish. The cron service is a **second Railway
+service** in the same project that pings `/api/cron/revalidate` on a schedule.
 
-**Option A — second Railway service (recommended)**
+#### 5a. Web service — add `CRON_SECRET`
 
-1. In the same Railway project, **Add service → GitHub repo** (same repo).
-2. **Settings → Deploy → Custom start command:** `pnpm cron:revalidate`
-3. **Settings → Cron schedule:** `0 * * * *` (hourly, UTC) or `*/15 * * * *`
-4. Variables (only these are needed on the cron service):
+On **fronk-website** (the main app), add:
+
+```bash
+openssl rand -hex 32   # paste into CRON_SECRET
+```
+
+Redeploy the web service so `/api/cron/revalidate` accepts the secret.
+
+#### 5b. Create the cron service
+
+1. Same Railway project → **Add service → GitHub repo** → select this repo.
+2. Rename the service to `cron-revalidate` (optional).
+3. **Settings → Config-as-code → Config file path:** `railway.cron.toml`
+4. **Settings → Cron schedule:** `0 * * * *` (hourly, UTC) or `*/15 * * * *`
+5. **Do not** add a public domain or healthcheck to this service.
+6. **Variables** on the cron service only:
 
    | Variable | Value |
    |---|---|
-   | `CRON_SECRET` | same as web service |
-   | `CRON_ENDPOINT_URL` | `https://<domain>/api/cron/revalidate` |
+   | `NIXPACKS_CONFIG_FILE` | `nixpacks.cron.toml` |
+   | `CRON_SECRET` | same value as the web service |
+   | `CRON_ENDPOINT_URL` | `https://<your-domain>/api/cron/revalidate` |
 
-The cron service runs `scripts/cron-revalidate.mjs`, exits, and Railway starts
-it again on the next schedule. Do **not** put a cron schedule on the main web
-service — that would restart your site instead of pinging an endpoint.
+7. Deploy. Each run should log `cron-revalidate: 200 {"revalidated":true,...}` and exit.
+
+Repo files used by the cron service:
+
+| File | Purpose |
+|---|---|
+| `railway.cron.toml` | Start command, no healthcheck |
+| `nixpacks.cron.toml` | Skips `pnpm build` (fast cron-only deploys) |
+| `scripts/cron-revalidate.mjs` | Calls the web app and exits |
+
+**Do not** put a Cron schedule on **fronk-website** — that would restart the
+site instead of calling the API.
+
+#### 5c. Verify cron manually
+
+```bash
+curl -sS -H "Authorization: Bearer <CRON_SECRET>" \
+  "https://<your-domain>/api/cron/revalidate"
+# → {"revalidated":true,"tags":["posts","writing","pages","ventures"],...}
+```
 
 **Option B — external cron**
 
@@ -280,8 +310,10 @@ sanity/
   env.ts                 # Env var validation
   schemas/               # post, author
 sanity.config.ts         # Studio config
-nixpacks.toml            # Railway build config
-railway.toml             # Railway deploy config
+nixpacks.toml            # Railway web service build
+nixpacks.cron.toml       # Railway cron service build (no Next build)
+railway.toml             # Railway web service deploy
+railway.cron.toml        # Railway cron service deploy
 ```
 
 ## Testing
