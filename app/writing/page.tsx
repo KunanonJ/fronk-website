@@ -3,6 +3,7 @@ import Link from "next/link";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { DraftBanner } from "@/components/DraftBanner";
+import { NewsletterSignup } from "@/components/writing/NewsletterSignup";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveWritingPageContent } from "@/lib/content/writingPage";
 import { fetchAllPosts, fetchWritingPage } from "@/lib/sanity/fetch";
@@ -115,6 +116,8 @@ export default async function WritingPage() {
             )}
           </div>
         )}
+
+        <NewsletterSignup />
       </Container>
     </>
   );
