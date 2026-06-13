@@ -1,18 +1,15 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Hero } from "@/components/Hero";
-import { VentureCard } from "@/components/VentureCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { SpecializationStatement } from "@/components/home/SpecializationStatement";
+import { VentureCaseRow } from "@/components/home/VentureCaseRow";
+import { WritingCallout } from "@/components/home/WritingCallout";
 import { resolveHomePage } from "@/lib/content/homePage";
 import {
   getFeaturedVentures,
   resolveFeaturedVentures,
 } from "@/lib/content/ventures";
 import { fetchFeaturedVentures, fetchHomePage } from "@/lib/sanity/fetch";
-import { cssVar } from "@/lib/utils/cssVar";
 
 export const revalidate = 60;
 
@@ -33,46 +30,34 @@ export default async function HomePage() {
     <>
       <Hero content={content} />
 
-      <Container size="xl" as="section" className="py-20">
+      <Container size="lg" as="section" className="py-24 sm:py-32">
+        <SpecializationStatement
+          eyebrow={content.specializationEyebrow}
+          statement={content.specializationStatement}
+          primaryCta={content.primaryCta}
+          secondaryCta={content.secondaryCta}
+        />
+      </Container>
+
+      <Container size="xl" as="section" className="pb-24 sm:pb-32">
         <SectionHeader
           kicker={content.featuredSectionKicker}
           title={content.featuredSectionTitle}
-          action={
-            <Link
-              href="/ventures"
-              className="hidden items-center gap-1 text-sm text-muted underline decoration-transparent underline-offset-4 hover:text-fg hover:decoration-accent sm:inline-flex"
-            >
-              See both <ArrowRight className="h-4 w-4" />
-            </Link>
-          }
         />
-
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-20 sm:space-y-28">
           {featured.map((venture, i) => (
-            <div
-              key={venture.slug}
-              className="animate-fade-up stagger"
-              style={cssVar("--i", i)}
-            >
-              <VentureCard venture={venture} />
-            </div>
+            <VentureCaseRow key={venture.slug} venture={venture} index={i} />
           ))}
         </div>
       </Container>
 
-      <Container size="xl" as="section" className="pb-20">
-        <Card className="p-8 sm:p-12">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            {content.writingTitle}
-          </h2>
-          <p className="mt-3 max-w-xl text-muted">{content.writingDescription}</p>
-          <div className="mt-6">
-            <Button href={content.writingCta.href} variant="secondary">
-              {content.writingCta.label}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </Card>
+      <Container size="xl" as="section" className="pb-24 sm:pb-32">
+        <WritingCallout
+          eyebrow="Journal"
+          title={content.writingTitle}
+          description={content.writingDescription}
+          cta={content.writingCta}
+        />
       </Container>
     </>
   );
