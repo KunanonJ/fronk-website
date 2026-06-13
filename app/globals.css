@@ -57,6 +57,8 @@
   --animate-fade-in: fade-in 150ms ease-out both;
   --animate-slide-down: slide-down 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-scale-in: scale-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Status ticker marquee — track is 2× content, shifts one full copy. */
+  --animate-ticker: ticker 42s linear infinite;
 }
 
 /* ─── Light terminal (paper / schematic) ──────────────────────────────────── */
@@ -274,6 +276,15 @@ a {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 

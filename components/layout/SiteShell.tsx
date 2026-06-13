@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { AppFrame } from "@/components/layout/AppFrame";
+import { TelemetryHUD } from "@/components/hud/TelemetryHUD";
 
 interface SiteShellProps {
   children: React.ReactNode;
@@ -31,6 +32,7 @@ export function SiteShell({ children, header, footer }: SiteShellProps) {
         {children}
       </main>
       {footer}
+      <TelemetryHUD />
     </>
   );
 }
