@@ -56,9 +56,18 @@ describe("VentureCaseRow > renders the venture's content", () => {
     ).toBeInTheDocument();
   });
 
-  it("links out to the venture url safely", () => {
+  it("links out to the venture url safely from the Visit button", () => {
     render(<VentureCaseRow venture={WITH_METRICS} index={0} />);
-    const link = screen.getByRole("link", { name: /demo\.example/i });
+    const link = screen.getByRole("link", { name: /visit demo\.example/i });
+    expect(link).toHaveAttribute("href", "https://demo.example");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+  });
+
+  it("also makes the panel's url label a link to the venture site", () => {
+    const { container } = render(<VentureCaseRow venture={WITH_METRICS} index={0} />);
+    const panel = container.querySelector("[data-panel]") as HTMLElement;
+    const link = within(panel).getByRole("link", { name: /demo\.example/i });
     expect(link).toHaveAttribute("href", "https://demo.example");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
