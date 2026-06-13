@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/site";
+import { ogFonts } from "@/lib/og/fonts";
 
 export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = { width: 1200, height: 630 };
@@ -24,7 +25,7 @@ export default function OpenGraphImage() {
           padding: 72,
           background: "#000000",
           color: "#ededed",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "Geist",
         }}
       >
         {/* Hairline window frame (the instrument bezel) */}
@@ -87,8 +88,9 @@ export default function OpenGraphImage() {
           </div>
           <div
             style={{
-              fontSize: 17,
-              letterSpacing: "0.24em",
+              fontFamily: "Space Mono",
+              fontSize: 16,
+              letterSpacing: "0.22em",
               textTransform: "uppercase",
               color: "#8a8a8a",
             }}
@@ -124,8 +126,9 @@ export default function OpenGraphImage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            fontSize: 18,
-            letterSpacing: "0.14em",
+            fontFamily: "Space Mono",
+            fontSize: 17,
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "#8a8a8a",
           }}
@@ -135,6 +138,6 @@ export default function OpenGraphImage() {
         </div>
       </div>
     ),
-    { ...size },
+    { ...size, fonts: ogFonts },
   );
 }

@@ -107,11 +107,12 @@ export function Footer({ site }: FooterProps) {
           appear to emerge. Decorative; clipped at the viewport edges. */}
       <div
         aria-hidden
-        className="mt-12 select-none overflow-hidden px-2 leading-none"
+        className="mt-12 flex select-none items-center justify-center gap-[0.04em] overflow-hidden px-2 text-wordmark leading-none"
       >
-        <span className="block bg-gradient-to-t from-fg/[0.22] to-fg/[0.04] bg-clip-text text-center font-display text-wordmark font-bold uppercase tracking-tighter text-transparent">
-          {site.shortName}
+        <span className="bg-gradient-to-t from-fg/[0.22] to-fg/[0.04] bg-clip-text font-display font-bold tracking-tighter text-transparent">
+          fronk
         </span>
+        <span className="h-[0.72em] w-[0.12em] translate-y-[0.04em] bg-gradient-to-t from-accent/35 to-accent/[0.06]" />
       </div>
     </footer>
   );
