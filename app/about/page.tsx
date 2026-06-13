@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Prose } from "@/components/ui/Prose";
 import { PortableText } from "@/components/PortableText";
 import { AboutFallback } from "@/components/content/AboutFallback";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
@@ -31,8 +32,8 @@ export default async function AboutPage() {
 
   return (
     <Container size="lg" className="py-20">
-      <header className="mb-12 flex items-end gap-6">
-        <div className="relative hidden h-24 w-24 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border sm:block">
+      <div className="mb-12 flex flex-col gap-8 sm:flex-row sm:items-start">
+        <div className="relative hidden h-28 w-28 flex-shrink-0 overflow-hidden border-brutal bg-surface shadow-brutal sm:block">
           <Image
             src="/profile.jpg"
             alt={`${site.name} — headshot`}
@@ -40,19 +41,12 @@ export default async function AboutPage() {
             height={400}
             priority
             loading="eager"
-            sizes="96px"
+            sizes="112px"
             className="h-full w-full object-cover"
           />
         </div>
-        <div>
-          <p className="text-sm uppercase tracking-widest text-muted">
-            {page.eyebrow}
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            {page.heading}
-          </h1>
-        </div>
-      </header>
+        <PageHeader eyebrow={page.eyebrow} title={page.heading} className="mb-0" />
+      </div>
 
       {cms?.body && cms.body.length > 0 ? (
         <Prose>

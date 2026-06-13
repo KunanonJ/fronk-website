@@ -1,4 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import type { Venture } from "@/lib/content/ventures";
 
 const STATUS_LABEL: Record<Venture["status"], string> = {
@@ -8,37 +10,22 @@ const STATUS_LABEL: Record<Venture["status"], string> = {
   paused: "Paused",
 };
 
-const STATUS_TONE: Record<Venture["status"], string> = {
-  active: "text-emerald-600 dark:text-emerald-400",
-  acquired: "text-sky-600 dark:text-sky-400",
-  "shut-down": "text-muted",
-  paused: "text-amber-600 dark:text-amber-400",
-};
-
 export function VentureCard({ venture }: { venture: Venture }) {
   return (
-    <div className="group relative rounded-xl p-[1px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
-      {/* Animated gradient container - normally invisible, shifts to opacity-100 on hover */}
-      <div 
-        className="moving-border-gradient animate-resource-gradient pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-60 dark:group-hover:opacity-40" 
-        aria-hidden="true"
-      />
-      
+    <Card hover className="h-full">
       <a
         href={venture.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block rounded-xl border border-border bg-bg/95 p-6 transition-[colors,box-shadow,border-color] duration-300 ease-out hover:border-transparent hover:bg-subtle/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+        className="group block p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
       >
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-baseline gap-3 text-sm text-muted">
-              <span>{venture.year}</span>
-              <span className={STATUS_TONE[venture.status]}>
-                {STATUS_LABEL[venture.status]}
-              </span>
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+              <span className="font-mono">{venture.year}</span>
+              <Badge variant="outline">{STATUS_LABEL[venture.status]}</Badge>
             </div>
-            <h3 className="text-2xl font-semibold tracking-tight group-hover:text-accent">
+            <h3 className="font-display text-2xl font-bold tracking-tight group-hover:text-accent">
               {venture.name}
             </h3>
             <p className="text-sm text-muted">{venture.tagline}</p>
@@ -48,22 +35,19 @@ export function VentureCard({ venture }: { venture: Venture }) {
 
         <p className="mt-4 text-muted">{venture.description}</p>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
           {venture.stack.map((tech) => (
-            <span
-              key={tech}
-              className="rounded-full border border-border px-2 py-0.5 text-xs text-muted"
-            >
+            <Badge key={tech} variant="outline" className="normal-case tracking-normal">
               {tech}
-            </span>
+            </Badge>
           ))}
         </div>
 
-        <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+        <div className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium underline decoration-accent decoration-2 underline-offset-4">
           Visit {venture.urlLabel}
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          <ArrowUpRight className="h-4 w-4" />
         </div>
       </a>
-    </div>
+    </Card>
   );
 }

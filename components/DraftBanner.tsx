@@ -1,3 +1,5 @@
+import { Badge } from "@/components/ui/Badge";
+
 interface DraftBannerProps {
   exitPath: string;
 }
@@ -8,10 +10,13 @@ export function DraftBanner({ exitPath }: DraftBannerProps) {
   return (
     <div
       role="status"
-      className="border-b border-accent/30 bg-accent/10 px-4 py-2 text-center text-sm text-fg"
+      className="border-b-2 border-border bg-accent px-4 py-2 text-center text-sm text-accent-fg"
     >
-      Preview mode — viewing unpublished or scheduled content.{" "}
-      <a href={href} className="font-medium text-accent hover:underline">
+      <Badge variant="inverted" className="mr-2">
+        Preview
+      </Badge>
+      Viewing unpublished or scheduled content.{" "}
+      <a href={href} className="font-medium underline decoration-2 underline-offset-2">
         Exit preview
       </a>
     </div>

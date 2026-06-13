@@ -43,7 +43,7 @@ export function CompanyLogo({
         aria-hidden="true"
         style={{ width: size, height: size }}
         className={cn(
-          "flex flex-shrink-0 items-center justify-center rounded-lg border border-border bg-subtle text-xs font-semibold text-muted",
+          "flex flex-shrink-0 items-center justify-center border-brutal bg-subtle text-xs font-semibold text-muted",
           className,
         )}
       >
@@ -70,7 +70,7 @@ export function CompanyLogo({
       }}
       style={{ width: size, height: size }}
       className={cn(
-        "flex-shrink-0 rounded-lg border border-border bg-white object-contain p-1",
+        "flex-shrink-0 border-brutal bg-white object-contain p-1",
         className,
       )}
     />

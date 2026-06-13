@@ -4,6 +4,8 @@ import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { BlogCard } from "@/components/BlogCard";
 import { DraftBanner } from "@/components/DraftBanner";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
 import { resolveWritingPageContent } from "@/lib/content/writingPage";
 import { fetchAllPosts, fetchWritingPage } from "@/lib/sanity/fetch";
 import { isSanityConfigured } from "@/sanity/env";
@@ -33,15 +35,11 @@ export default async function WritingPage() {
     <>
       {preview && <DraftBanner exitPath="/writing" />}
       <Container size="lg" className="py-20">
-        <header className="mb-12 max-w-2xl">
-          <p className="text-sm uppercase tracking-widest text-muted">
-            {content.eyebrow}
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            {content.heading}
-          </h1>
-          <p className="mt-4 text-lg text-muted">{content.description}</p>
-        </header>
+        <PageHeader
+          eyebrow={content.eyebrow}
+          title={content.heading}
+          description={content.description}
+        />
 
         {posts.length > 0 ? (
           <div>
@@ -50,38 +48,41 @@ export default async function WritingPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted">
+          <Card className="border-dashed p-8 text-center text-muted">
             {configured ? (
               <p>
                 No posts yet. Open the{" "}
-                <Link href="/studio" className="text-accent hover:underline">
+                <Link
+                  href="/studio"
+                  className="text-fg underline decoration-accent decoration-2 underline-offset-4"
+                >
                   Studio
                 </Link>{" "}
                 to publish the first one.
               </p>
             ) : (
               <div className="space-y-2">
-                <p className="font-medium text-fg">
+                <p className="font-display font-bold text-fg">
                   Sanity is not configured yet.
                 </p>
                 <p className="text-sm">
                   Set{" "}
-                  <code className="rounded bg-subtle px-1.5 py-0.5 text-xs">
+                  <code className="border border-border bg-subtle px-1.5 py-0.5 font-mono text-xs">
                     NEXT_PUBLIC_SANITY_PROJECT_ID
                   </code>{" "}
                   and{" "}
-                  <code className="rounded bg-subtle px-1.5 py-0.5 text-xs">
+                  <code className="border border-border bg-subtle px-1.5 py-0.5 font-mono text-xs">
                     NEXT_PUBLIC_SANITY_DATASET
                   </code>{" "}
                   in{" "}
-                  <code className="rounded bg-subtle px-1.5 py-0.5 text-xs">
+                  <code className="border border-border bg-subtle px-1.5 py-0.5 font-mono text-xs">
                     .env.local
                   </code>
                   . See the README for full setup instructions.
                 </p>
               </div>
             )}
-          </div>
+          </Card>
         )}
       </Container>
     </>

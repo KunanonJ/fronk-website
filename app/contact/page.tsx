@@ -14,6 +14,8 @@ import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { PortableText } from "@/components/PortableText";
 import { Prose } from "@/components/ui/Prose";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Card } from "@/components/ui/Card";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
@@ -40,9 +42,6 @@ interface Channel {
   copy?: string;
   icon: LucideIcon;
 }
-
-const cardClasses =
-  "flex items-start gap-4 rounded-xl border border-border bg-subtle/30 p-5 transition-colors hover:border-fg/30 hover:bg-subtle/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
 export default async function ContactPage() {
   const { isEnabled: preview } = await draftMode();
@@ -106,17 +105,11 @@ export default async function ContactPage() {
 
   return (
     <Container size="lg" className="py-20">
-      <header className="mb-12 max-w-2xl">
-        <p className="text-sm uppercase tracking-widest text-muted">
-          {page.eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {page.heading}
-        </h1>
-        <p className="mt-4 text-lg text-muted">
-          {page.description || DEFAULT_CONTACT_INTRO}
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={page.eyebrow}
+        title={page.heading}
+        description={page.description || DEFAULT_CONTACT_INTRO}
+      />
 
       {cms?.body && cms.body.length > 0 ? (
         <Prose className="mb-12">
@@ -124,17 +117,17 @@ export default async function ContactPage() {
         </Prose>
       ) : null}
 
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+      <ul className="grid gap-4 sm:grid-cols-2">
         {channels.map((c, i) => {
           const Icon = c.icon;
           const inner = (
-            <>
+            <div className="flex items-start gap-4">
               <Icon className="mt-0.5 h-5 w-5 text-muted" aria-hidden />
               <div>
                 <p className="font-medium">{c.label}</p>
                 <p className="mt-0.5 text-sm text-muted">{c.sub}</p>
               </div>
-            </>
+            </div>
           );
 
           const animationStyle = cssVar("--i", i);
@@ -147,14 +140,16 @@ export default async function ContactPage() {
                 className="animate-fade-up stagger"
                 style={animationStyle}
               >
-                <a
+                <Card
+                  hover
+                  as="a"
                   href={c.href}
+                  className="block p-5"
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
-                  className={cardClasses}
                 >
                   {inner}
-                </a>
+                </Card>
               </li>
             );
           }
@@ -162,10 +157,10 @@ export default async function ContactPage() {
           return (
             <li
               key={c.label}
-              className={`${cardClasses} animate-fade-up stagger`}
+              className="animate-fade-up stagger"
               style={animationStyle}
             >
-              {inner}
+                <Card className="flex items-start gap-4 p-5">{inner}</Card>
             </li>
           );
         })}

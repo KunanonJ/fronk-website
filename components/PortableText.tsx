@@ -20,7 +20,7 @@ const components: PortableTextComponents = {
             alt={value.alt ?? ""}
             width={1600}
             height={900}
-            className="h-auto w-full rounded-lg border border-border"
+            className="h-auto w-full border-brutal bg-surface"
             sizes="(min-width: 768px) 720px, 100vw"
           />
           {value.alt && (
@@ -36,9 +36,9 @@ const components: PortableTextComponents = {
     }: {
       value: { code: string; language?: string; filename?: string };
     }) => (
-      <div className="my-6 overflow-hidden rounded-lg border border-border">
+      <div className="my-6 overflow-hidden border-brutal bg-surface">
         {value.filename && (
-          <div className="border-b border-border bg-subtle px-4 py-2 font-mono text-xs text-muted">
+          <div className="border-b-2 border-border bg-subtle px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted">
             {value.filename}
           </div>
         )}
@@ -53,25 +53,19 @@ const components: PortableTextComponents = {
   marks: {
     link: ({ value, children }) => {
       const href = (value?.href ?? "") as string;
-      // Sanity Portable Text can carry a link mark with an empty href when
-      // the editor's URL field was left blank. Render the text inline rather
-      // than emitting a broken <a href="">.
       if (!href) return <>{children}</>;
       const isExternal = /^https?:\/\//.test(href);
+      const className =
+        "text-fg underline decoration-accent decoration-2 underline-offset-4 hover:text-accent";
       if (isExternal) {
         return (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline"
-          >
+          <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
             {children}
           </a>
         );
       }
       return (
-        <Link href={href} className="text-accent hover:underline">
+        <Link href={href} className={className}>
           {children}
         </Link>
       );

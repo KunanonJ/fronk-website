@@ -13,16 +13,16 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#09090b",
+          background: "#0a0a0a",
           color: "#34d399",
-          fontSize: 44,
-          fontWeight: 700,
+          fontSize: 40,
+          fontWeight: 800,
           letterSpacing: "-0.04em",
           fontFamily: "system-ui, sans-serif",
+          border: "4px solid #f5f5f0",
         }}
       >
-        K
-        <span style={{ color: "#34d399" }}>.</span>
+        F<span style={{ color: "#34d399" }}>.</span>
       </div>
     ),
     { ...size },

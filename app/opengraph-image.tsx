@@ -15,58 +15,56 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: 80,
-          background: "#09090b",
-          color: "#fafafa",
+          padding: 64,
+          background: "#f5f5f0",
+          color: "#0a0a0a",
           fontFamily: "system-ui, sans-serif",
-          backgroundImage:
-            "radial-gradient(circle at 90% 10%, rgba(52, 211, 153, 0.12) 0%, transparent 45%), radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.06) 0%, transparent 40%)",
+          border: "8px solid #0a0a0a",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 16,
-            fontSize: 28,
-            fontWeight: 600,
-            letterSpacing: "-0.02em",
+            gap: 12,
+            fontSize: 24,
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
           }}
         >
-          <span style={{ color: "#fafafa" }}>{siteConfig.shortName}</span>
-          <span style={{ color: "#34d399" }}>.</span>
+          <span>{siteConfig.shortName}</span>
+          <span style={{ color: "#10b981" }}>.</span>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div
             style={{
-              fontSize: 22,
-              color: "#a1a1aa",
+              fontSize: 18,
+              fontWeight: 600,
               textTransform: "uppercase",
-              letterSpacing: "0.18em",
+              letterSpacing: "0.2em",
+              color: "#525252",
             }}
           >
-            Founder · GoGoCash
+            Founder · Bangkok
           </div>
           <div
             style={{
-              fontSize: 92,
-              lineHeight: 1.05,
-              fontWeight: 600,
+              fontSize: 88,
+              lineHeight: 0.95,
+              fontWeight: 800,
               letterSpacing: "-0.04em",
               maxWidth: 1000,
-              color: "#fafafa",
             }}
           >
             {siteConfig.name}
           </div>
           <div
             style={{
-              fontSize: 38,
-              lineHeight: 1.25,
-              color: "#a1a1aa",
-              letterSpacing: "-0.01em",
-              maxWidth: 950,
+              fontSize: 34,
+              lineHeight: 1.2,
+              color: "#525252",
+              maxWidth: 900,
             }}
           >
             {siteConfig.tagline}
@@ -78,13 +76,15 @@ export default function OpenGraphImage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            fontSize: 22,
-            color: "#a1a1aa",
-            letterSpacing: "-0.01em",
+            fontSize: 20,
+            fontWeight: 600,
+            color: "#525252",
           }}
         >
-          <span>fintech · ai · web3 · bangkok</span>
-          <span style={{ color: "#34d399" }}>{siteConfig.url.replace(/^https?:\/\//, "")}</span>
+          <span>fintech · ai · web3</span>
+          <span style={{ color: "#10b981" }}>
+            {siteConfig.url.replace(/^https?:\/\//, "")}
+          </span>
         </div>
       </div>
     ),

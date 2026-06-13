@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { Badge } from "@/components/ui/Badge";
 import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 
 interface SocialLink {
@@ -37,28 +38,29 @@ export function Footer({ site }: FooterProps) {
   return (
     <footer
       data-site-chrome
-      className="mt-32 border-t border-border/60 py-16 text-sm text-muted bg-subtle/10"
+      className="mt-32 border-t-2 border-border py-16 text-sm text-muted"
     >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-10 pb-16 sm:grid-cols-2 md:grid-cols-4 border-b border-border/40">
+        <div className="grid grid-cols-1 gap-10 border-b-2 border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-4">
-            <span className="text-fg font-sans font-semibold tracking-tight text-lg">
+            <span className="font-display text-2xl font-bold tracking-tight text-fg">
               {site.shortName}
               <span className="text-accent">.</span>
             </span>
-            <p className="text-muted leading-relaxed max-w-[240px]">
-              {site.footerTagline}
-            </p>
+            <p className="max-w-xs leading-relaxed">{site.footerTagline}</p>
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-fg font-semibold">
+            <p className="font-mono text-xs uppercase tracking-widest text-fg">
               Pages
-            </h4>
-            <ul className="space-y-2.5">
+            </p>
+            <ul className="space-y-2">
               {site.navigation.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="hover:text-fg transition-colors">
+                  <Link
+                    href={item.href}
+                    className="underline decoration-transparent underline-offset-4 hover:text-fg hover:decoration-accent"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -67,74 +69,38 @@ export function Footer({ site }: FooterProps) {
           </div>
 
           <div className="space-y-4">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-fg font-semibold">
-              Agents
-            </h4>
-            <ul className="space-y-2.5 font-mono text-xs">
-              <li>
-                <Link href="/sitemap.md" className="hover:text-fg transition-colors" target="_blank">sitemap.md</Link>
-              </li>
-              <li>
-                <Link href="/llms.txt" className="hover:text-fg transition-colors" target="_blank">llms.txt</Link>
-              </li>
-              <li>
-                <Link href="/skills.md" className="hover:text-fg transition-colors" target="_blank">skills.md</Link>
-              </li>
-              <li>
-                <Link href="/feed.xml" className="hover:text-fg transition-colors" target="_blank">rss.xml</Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-mono text-xs uppercase tracking-wider text-fg font-semibold">
+            <p className="font-mono text-xs uppercase tracking-widest text-fg">
               Contact
-            </h4>
-            <ul className="space-y-2.5">
-              <li>
+            </p>
+            <a
+              href={`mailto:${site.email}`}
+              className="inline-flex items-center gap-2 underline decoration-accent underline-offset-4 hover:text-fg"
+            >
+              <Mail className="h-4 w-4" />
+              Email me
+            </a>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {socialLinks.map(({ href, label, icon: Icon }) => (
                 <a
-                  href={`mailto:${site.email}`}
-                  className="inline-flex items-center gap-2 hover:text-fg transition-colors"
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-11 w-11 items-center justify-center border-brutal bg-surface transition-colors hover:bg-subtle hover:text-fg"
+                  aria-label={label}
+                  title={label}
                 >
-                  <Mail className="h-4 w-4" />
-                  <span>Email me</span>
+                  <Icon className="h-4 w-4" />
                 </a>
-              </li>
-              <li>
-                <div className="flex flex-wrap gap-3 pt-2">
-                  {socialLinks.map(({ href, label, icon: Icon }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 hover:border-fg/30 hover:text-fg hover:bg-subtle/40 transition-all duration-200"
-                      aria-label={label}
-                      title={label}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  ))}
-                </div>
-              </li>
-            </ul>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-start justify-between gap-4 pt-8 sm:flex-row sm:items-center">
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs opacity-75">
-            <span>
-              © {year} {site.name}
-            </span>
-            <span aria-hidden className="text-border">
-              ✦
-            </span>
-            <span>Built in Bangkok</span>
-            <span aria-hidden className="text-border">
-              ✦
-            </span>
-            <span>Always shipping</span>
-          </p>
+        <div className="flex flex-wrap items-center gap-2 pt-8">
+          <Badge variant="outline">© {year}</Badge>
+          <Badge variant="outline">Built in Bangkok</Badge>
+          <Badge variant="outline">Always shipping</Badge>
         </div>
       </Container>
     </footer>

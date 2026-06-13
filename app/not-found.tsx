@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
 
 const destinations = [
@@ -15,8 +16,8 @@ export default function NotFound() {
       size="md"
       className="flex min-h-[60vh] flex-col items-start justify-center py-20"
     >
-      <p className="text-sm uppercase tracking-widest text-muted">404</p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+      <Badge variant="outline">404</Badge>
+      <h1 className="mt-4 font-display text-5xl font-bold leading-none tracking-tight sm:text-7xl">
         Nothing lives here.
       </h1>
       <p className="mt-4 max-w-prose text-muted">
@@ -24,23 +25,19 @@ export default function NotFound() {
         Founder sites change shape often — try one of these instead.
       </p>
 
-      <nav aria-label="Recovery links" className="mt-8">
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">
-          {destinations.map((d) => (
-            <li key={d.href}>
-              <Link href={d.href} className="text-accent hover:underline">
-                {d.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <nav aria-label="Recovery links" className="mt-8 flex flex-wrap gap-3">
+        {destinations.map((d) => (
+          <Button key={d.href} href={d.href} variant="secondary" size="sm">
+            {d.label}
+          </Button>
+        ))}
       </nav>
 
       <p className="mt-10 text-xs text-muted">
         Followed a broken link? Let me know at{" "}
         <a
           href={`mailto:${siteConfig.email}?subject=${encodeURIComponent(`Broken link on ${siteConfig.url}`)}`}
-          className="underline underline-offset-2 hover:text-fg"
+          className="underline decoration-accent underline-offset-4 hover:text-fg"
         >
           {siteConfig.email}
         </a>

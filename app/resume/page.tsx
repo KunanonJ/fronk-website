@@ -4,6 +4,8 @@ import { draftMode } from "next/headers";
 import { Download } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import {
   resolveResumeProfile,
@@ -29,11 +31,11 @@ export default async function ResumePage() {
     <Container size="lg" className="py-20">
       <header className="mb-12 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm uppercase tracking-widest text-muted">Resume</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+          <Badge variant="outline">Resume</Badge>
+          <h1 className="mt-4 font-display text-5xl font-bold leading-none tracking-tight sm:text-7xl">
             {profile.name}
           </h1>
-          <p className="mt-2 text-muted">{profile.headline}</p>
+          <p className="mt-2 text-lg text-muted">{profile.headline}</p>
           {profile.summary ? (
             <p className="mt-4 max-w-2xl text-muted">{profile.summary}</p>
           ) : null}
@@ -46,7 +48,7 @@ export default async function ResumePage() {
         </div>
       </header>
 
-      <section className="space-y-12">
+      <section className="space-y-8">
         {profile.sections.map((section) => (
           <TimelineSection
             key={section.title}
@@ -55,21 +57,18 @@ export default async function ResumePage() {
           />
         ))}
 
-        <div>
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+        <Card className="p-6">
+          <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-muted">
             Skills
           </h2>
           <div className="flex flex-wrap gap-2">
             {profile.skills.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full border border-border bg-subtle/40 px-3 py-1 text-sm"
-              >
+              <Badge key={skill} variant="outline" className="normal-case tracking-normal">
                 {skill}
-              </span>
+              </Badge>
             ))}
           </div>
-        </div>
+        </Card>
       </section>
     </Container>
   );
@@ -87,15 +86,15 @@ function TimelineSection({
   items: readonly ResolvedTimelineItem[];
 }) {
   return (
-    <div>
-      <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">
+    <Card className="p-6">
+      <h2 className="mb-6 font-mono text-xs uppercase tracking-widest text-muted">
         {title}
       </h2>
       <div className="space-y-6">
         {items.map((item) => (
           <article
             key={`${item.title}-${item.org}-${item.period}`}
-            className="flex gap-4"
+            className="flex gap-4 border-b-2 border-border pb-6 last:border-b-0 last:pb-0"
           >
             <CompanyLogo
               name={item.logoName ?? item.org}
@@ -111,12 +110,15 @@ function TimelineSection({
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-accent"
+                        className="underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
                       >
                         {item.title}
                       </a>
                     ) : (
-                      <Link href={item.href} className="hover:text-accent">
+                      <Link
+                        href={item.href}
+                        className="underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                      >
                         {item.title}
                       </Link>
                     )
@@ -125,7 +127,7 @@ function TimelineSection({
                   )}{" "}
                   <span className="text-muted">— {item.org}</span>
                 </h3>
-                <span className="text-sm text-muted">{item.period}</span>
+                <span className="font-mono text-sm text-muted">{item.period}</span>
               </div>
               {item.bullets && item.bullets.length > 0 && (
                 <ul className="mt-2 space-y-1 text-sm text-muted">
@@ -138,6 +140,6 @@ function TimelineSection({
           </article>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

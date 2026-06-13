@@ -110,14 +110,16 @@ export default async function PostPage({ params }: PageProps) {
         />
         <Link
           href="/writing"
-          className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
+          className="inline-flex items-center gap-1 text-sm text-muted underline decoration-transparent underline-offset-4 hover:text-fg hover:decoration-accent"
         >
           <ArrowLeft className="h-4 w-4" /> All writing
         </Link>
 
-        <header className="mt-8 mb-12">
-          <div className="flex flex-wrap items-baseline gap-3 text-sm text-muted">
-            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+        <header className="mb-12 mt-8">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <time dateTime={post.publishedAt} className="font-mono">
+              {formatDate(post.publishedAt)}
+            </time>
             <span>•</span>
             <span>{minutes} min read</span>
             {post.tags && post.tags.length > 0 && (
@@ -127,7 +129,7 @@ export default async function PostPage({ params }: PageProps) {
               </>
             )}
           </div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl">
             {post.title}
           </h1>
           {post.excerpt ? (
@@ -148,7 +150,7 @@ export default async function PostPage({ params }: PageProps) {
             width={1600}
             height={900}
             priority
-            className="mb-12 h-auto w-full rounded-xl border border-border"
+            className="mb-12 h-auto w-full border-brutal bg-surface"
             sizes="(min-width: 768px) 720px, 100vw"
           />
         ) : null}

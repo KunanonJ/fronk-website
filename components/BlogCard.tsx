@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { formatDate } from "@/lib/utils/formatDate";
 import { urlFor } from "@/lib/sanity/client";
 import type { PostSummary } from "@/lib/sanity/types";
@@ -10,40 +12,47 @@ export function BlogCard({ post }: { post: PostSummary }) {
     : null;
 
   return (
-    <Link
-      href={`/writing/${post.slug}`}
-      className="group block border-b border-border py-8 transition-[opacity,transform] duration-300 ease-out first:pt-0 last:border-b-0 hover:-translate-y-0.5 hover:opacity-90 focus-visible:opacity-90 focus-visible:outline-none"
-    >
-      <article className="flex gap-6">
-        {coverUrl ? (
-          <div className="relative hidden h-24 w-36 shrink-0 overflow-hidden rounded-lg border border-border sm:block">
-            <Image
-              src={coverUrl}
-              alt={post.coverImage?.alt ?? post.title}
-              width={144}
-              height={96}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-          </div>
-        ) : null}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-3 text-sm text-muted">
-            <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-            {post.tags && post.tags.length > 0 && (
-              <>
-                <span>•</span>
-                <span>{post.tags.slice(0, 2).join(", ")}</span>
-              </>
-            )}
-          </div>
-          <h3 className="mt-2 text-2xl font-semibold tracking-tight transition-colors duration-200 group-hover:text-accent">
-            {post.title}
-          </h3>
-          {post.excerpt ? (
-            <p className="mt-3 text-muted">{post.excerpt}</p>
+    <Card hover className="mb-4">
+      <Link
+        href={`/writing/${post.slug}`}
+        className="group relative block p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+      >
+        <article className="flex gap-6">
+          {coverUrl ? (
+            <div className="relative hidden h-24 w-36 shrink-0 overflow-hidden border-brutal bg-surface sm:block">
+              <Image
+                src={coverUrl}
+                alt={post.coverImage?.alt ?? post.title}
+                width={144}
+                height={96}
+                className="h-full w-full object-cover transition-transform duration-150 group-hover:scale-[1.02]"
+              />
+            </div>
           ) : null}
-        </div>
-      </article>
-    </Link>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+              <time dateTime={post.publishedAt} className="font-mono">
+                {formatDate(post.publishedAt)}
+              </time>
+              {post.tags && post.tags.length > 0 && (
+                <>
+                  {post.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="outline" className="normal-case tracking-normal">
+                      {tag}
+                    </Badge>
+                  ))}
+                </>
+              )}
+            </div>
+            <h3 className="mt-3 font-display text-2xl font-bold tracking-tight transition-colors duration-150 group-hover:text-accent">
+              {post.title}
+            </h3>
+            {post.excerpt ? (
+              <p className="mt-3 text-muted">{post.excerpt}</p>
+            ) : null}
+          </div>
+        </article>
+      </Link>
+    </Card>
   );
 }

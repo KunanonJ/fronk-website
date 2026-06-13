@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { VentureCard } from "@/components/VentureCard";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { getAllVentures, resolveVentures } from "@/lib/content/ventures";
 import { fetchAllVentures, fetchStandardPage } from "@/lib/sanity/fetch";
@@ -29,15 +30,11 @@ export default async function VenturesPage() {
 
   return (
     <Container size="xl" className="py-20">
-      <header className="mb-12 max-w-2xl">
-        <p className="text-sm uppercase tracking-widest text-muted">
-          {page.eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {page.heading}
-        </h1>
-        <p className="mt-4 text-lg text-muted">{page.description}</p>
-      </header>
+      <PageHeader
+        eyebrow={page.eyebrow}
+        title={page.heading}
+        description={page.description}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {ventures.map((venture, i) => (

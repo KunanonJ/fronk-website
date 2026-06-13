@@ -1,3 +1,14 @@
+/* ─── Soft brutalism design tokens (Phase 0) ───────────────────────────────
+ * Palette: warm paper + ink borders + mint accent.
+ * --bg / --fg       page background and text
+ * --surface         cards and elevated panels
+ * --border          2px ink (same as fg in each mode)
+ * --accent          mint brand color
+ * --shadow-hard     offset box shadow for brutal lift
+ * Utilities: border-brutal, shadow-brutal, sticker, card-brutal, font-display
+ * Deprecated: moving-border-gradient (removed in Phase 4 venture cards)
+ * ─────────────────────────────────────────────────────────────────────────── */
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -9,43 +20,47 @@
   --color-muted: var(--muted);
   --color-subtle: var(--subtle);
   --color-border: var(--border);
+  --color-surface: var(--surface);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-syne), var(--font-geist-sans), ui-sans-serif, system-ui,
+    sans-serif;
 
-  /* Standard easing — close to "easeOutExpo", feels native on Apple devices. */
   --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Animation utilities — Tailwind v4 generates `animate-<name>` classes
-   * from these tokens. `both` keeps the final state after the animation runs.
-   */
-  --animate-fade-up: fade-up 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-fade-in: fade-in 300ms ease-out both;
-  --animate-slide-down: slide-down 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-scale-in: scale-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Snappy brutalist motion — 150–200ms, no bounce */
+  --animate-fade-up: fade-up 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 150ms ease-out both;
+  --animate-slide-down: slide-down 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-scale-in: scale-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-resource-gradient: resource-gradient 6s linear infinite;
 }
 
 :root {
-  --bg: #ffffff;
-  --fg: #18181b;
-  --muted: #71717a;
-  --subtle: #f4f4f5;
-  --border: #e4e4e7;
+  --bg: #f5f5f0;
+  --fg: #0a0a0a;
+  --muted: #525252;
+  --subtle: #ebebe4;
+  --border: #0a0a0a;
+  --surface: #ffffff;
   --accent: #10b981;
-  --accent-fg: #ffffff;
+  --accent-fg: #0a0a0a;
+  --shadow-hard: 4px 4px 0 0 #0a0a0a;
 }
 
 .dark {
-  --bg: #09090b;
-  --fg: #fafafa;
-  --muted: #a1a1aa;
-  --subtle: #18181b;
-  --border: #27272a;
+  --bg: #0a0a0a;
+  --fg: #f5f5f0;
+  --muted: #a3a3a3;
+  --subtle: #171717;
+  --border: #f5f5f0;
+  --surface: #141414;
   --accent: #34d399;
-  --accent-fg: #09090b;
+  --accent-fg: #0a0a0a;
+  --shadow-hard: 4px 4px 0 0 #34d399;
 }
 
 html {
@@ -72,24 +87,19 @@ body {
   color: var(--accent-fg);
 }
 
-/* Subtle grain texture overlay — fixed, behind all content. Adds the
- * tactile feel of risograph / film without affecting legibility. The SVG is
- * a tiny inline turbulence filter (~250 bytes) so no extra network request.
- */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   body::before {
-    /* Keep grain crisp — no extra paint work needed; the filter result is static. */
     will-change: auto;
   }
 }
@@ -98,12 +108,64 @@ a {
   text-underline-offset: 3px;
 }
 
+/* ─── Brutalist utilities ─────────────────────────────────────────────────── */
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility border-brutal {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--border);
+}
+
+@utility shadow-brutal {
+  box-shadow: var(--shadow-hard);
+}
+
+@utility sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--border);
+  background-color: var(--accent);
+  padding: 0.25rem 0.625rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-fg);
+}
+
+@utility card-brutal {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--border);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-hard);
+  transition-property: transform, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility card-brutal-hover {
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--border);
+  }
+}
+
 /* ─── Motion ─────────────────────────────────────────────────────────────── */
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -123,7 +185,7 @@ a {
 @keyframes slide-down {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
@@ -134,7 +196,7 @@ a {
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
@@ -154,19 +216,19 @@ a {
   }
 }
 
-/* Stagger helper — set `--i: <index>` on each child for cascading entrance. */
 @utility stagger {
-  animation-delay: calc(var(--i, 0) * 60ms);
+  animation-delay: calc(var(--i, 0) * 50ms);
 }
 
+/* @deprecated Phase 4 — venture cards will drop gradient borders */
 @utility moving-border-gradient {
   background-image: linear-gradient(
     90deg,
     oklch(0.92 0.05 30),
     oklch(0.74 0.18 50),
     oklch(0.82 0.12 350),
-    oklch(0.50 0.20 260),
-    oklch(0.85 0.10 5),
+    oklch(0.5 0.2 260),
+    oklch(0.85 0.1 5),
     oklch(0.92 0.07 145),
     oklch(0.74 0.18 50),
     oklch(0.88 0.18 95),
@@ -181,8 +243,6 @@ a {
 /* ─── Print (used by `pnpm pdf` to render /resume to public/resume.pdf) ─── */
 
 @media print {
-  /* Beat the .dark class specificity by re-declaring the variables on
-   * every selector that might be holding them. */
   :root,
   .dark,
   html,
@@ -191,8 +251,11 @@ a {
     --fg: #18181b !important;
     --muted: #52525b !important;
     --subtle: #f4f4f5 !important;
-    --border: #d4d4d8 !important;
+    --border: #18181b !important;
+    --surface: #ffffff !important;
     --accent: #059669 !important;
+    --accent-fg: #ffffff !important;
+    --shadow-hard: none !important;
   }
 
   html,
@@ -201,10 +264,6 @@ a {
     color: #18181b !important;
   }
 
-  /* Site chrome — kill the sticky header, footer, and any element opted
-   * out with [data-print-hide]. We target the site's Header/Footer
-   * specifically by `data-site-chrome` so the resume page's own
-   * <header> (with name + role) stays visible. */
   [data-site-chrome],
   [data-print-hide],
   [data-print-hide] * {
@@ -215,12 +274,12 @@ a {
     padding: 0 !important;
   }
 
-  /* Stop entrance animations from playing in the PDF render. */
   *,
   *::before,
   *::after {
     animation: none !important;
     transition: none !important;
+    box-shadow: none !important;
   }
 
   article {
@@ -247,5 +306,9 @@ a {
     animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .card-brutal-hover:hover {
+    transform: none !important;
   }
 }

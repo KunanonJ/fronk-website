@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/Container";
 import { Prose } from "@/components/ui/Prose";
 import { PortableText } from "@/components/PortableText";
 import { NowFallback } from "@/components/content/NowFallback";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Badge } from "@/components/ui/Badge";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchStandardPage } from "@/lib/sanity/fetch";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -29,17 +31,15 @@ export default async function NowPage() {
 
   return (
     <Container size="lg" className="py-20">
-      <header className="mb-12">
-        <p className="text-sm uppercase tracking-widest text-muted">
-          {page.eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {page.heading}
-        </h1>
-        <p className="mt-4 text-sm text-muted">
-          Last updated {formatDate(lastUpdated)}.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={page.eyebrow}
+        title={page.heading}
+        meta={
+          <Badge variant="outline" className="mt-4">
+            Updated {formatDate(lastUpdated)}
+          </Badge>
+        }
+      />
 
       {cms?.body && cms.body.length > 0 ? (
         <Prose>
