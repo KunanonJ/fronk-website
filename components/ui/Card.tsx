@@ -19,8 +19,9 @@ export function Card<T extends ElementType = "div">({
   return (
     <Component
       className={cn(
-        "card-brutal",
-        hover && "card-brutal-hover",
+        "panel",
+        hover &&
+          "transition-colors duration-150 hover:border-border-strong hover:bg-surface-2",
         className,
       )}
       {...rest}
