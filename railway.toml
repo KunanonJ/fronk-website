@@ -1,3 +1,5 @@
+# Railway deploy — Next.js app + Sanity Cloud (CMS stays hosted at sanity.io)
+
 [build]
 builder = "NIXPACKS"
 
@@ -7,3 +9,6 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 healthcheckPath = "/"
 healthcheckTimeout = 30
+# Web service runs 24/7. For scheduled revalidation, add a second Railway
+# service with startCommand = "pnpm cron:revalidate" and a Cron Schedule
+# (see README → Deploying to Railway).
