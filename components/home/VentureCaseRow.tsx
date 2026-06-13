@@ -95,9 +95,14 @@ export function VentureCaseRow({ venture, index }: VentureCaseRowProps) {
           </div>
         )}
 
-        <span className="label-mono mt-auto inline-flex items-center gap-1.5 text-subtle">
+        <a
+          href={venture.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="label-mono mt-auto inline-flex w-fit items-center gap-1.5 text-subtle transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+        >
           → {venture.urlLabel}
-        </span>
+        </a>
       </div>
     </article>
   );
