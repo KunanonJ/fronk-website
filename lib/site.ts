@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
   shortName: "Fronk",
-  tagline: "Building fintech for Southeast Asia.",
+  tagline: "Building fintech and AI from Bangkok.",
   description:
     "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://fronk.example.com",

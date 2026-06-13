@@ -20,8 +20,8 @@ export function AboutFallback() {
 
         <Prose className="mt-6">
           <p>
-            I&apos;m Kunanon Jarat — most people call me Fronk. I&apos;m a founder based in
-            Bangkok. Day-to-day, I split my time between{" "}
+            I&apos;m Kunanon Jarat — Fronk to most people — a Bangkok-based
+            founder and builder. I run{" "}
             <a
               href="https://gogocash.co"
               target="_blank"
@@ -29,11 +29,12 @@ export function AboutFallback() {
             >
               GoGoCash
             </a>
-            , the fintech I founded in 2023,{" "}
+            , the shopping-to-earn cashback platform I founded in 2023; build{" "}
             <a href="https://manut.xyz" target="_blank" rel="noopener noreferrer">
               Manut AI
             </a>
-            , and IT operations at{" "}
+            , an all-in-one AI workspace for solo entrepreneurs; and own IT
+            operations at{" "}
             <a
               href="https://thebinaryholdings.com"
               target="_blank"
