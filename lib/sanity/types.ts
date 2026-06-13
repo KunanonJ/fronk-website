@@ -105,6 +105,9 @@ export interface ResumeTimelineItem {
   timeframe?: string | null;
   description?: string | null;
   highlights?: readonly string[] | null;
+  url?: string | null;
+  logoDomain?: string | null;
+  logoName?: string | null;
 }
 
 export interface ResumeTimelineSection {

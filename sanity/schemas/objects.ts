@@ -155,6 +155,25 @@ export const resumeTimelineItem = defineType({
       type: "array",
       of: [{ type: "string" }],
     }),
+    defineField({
+      name: "url",
+      title: "Link URL",
+      type: "url",
+    }),
+    defineField({
+      name: "logoDomain",
+      title: "Logo domain",
+      type: "string",
+      description: "Company domain for the logo, e.g. gogocash.co",
+      validation: (Rule) => Rule.max(120),
+    }),
+    defineField({
+      name: "logoName",
+      title: "Logo label",
+      type: "string",
+      description: "Short name shown with the logo",
+      validation: (Rule) => Rule.max(80),
+    }),
   ],
   preview: {
     select: { title: "title", subtitle: "timeframe" },

@@ -236,7 +236,10 @@ export const RESUME_PROFILE_QUERY = groq`
         subtitle,
         timeframe,
         description,
-        highlights
+        highlights,
+        url,
+        logoDomain,
+        logoName
       }
     }
   }

@@ -14,16 +14,17 @@ Hosting:   Railway (app) + Sanity Cloud (CMS API)
 
 | Path | Source | Notes |
 |---|---|---|
-| `/` | static | Hero + featured ventures + journal teaser |
-| `/about` | static | Bio |
-| `/ventures` | static | All ventures |
-| `/ventures/[slug]` | static (SSG) | Case study |
+| `/` | Sanity + fallback (ISR) | Hero, featured ventures, writing teaser |
+| `/about`, `/now`, `/contact` | Sanity + fallback (ISR) | Standard pages |
+| `/ventures` | Sanity + fallback (ISR) | Venture listing |
+| `/ventures/[slug]` | static (SSG) | Case study pages |
 | `/writing` | Sanity (ISR) | Blog index |
 | `/writing/[slug]` | Sanity (ISR) | Blog post |
-| `/resume` | static | CV + PDF download |
-| `/contact` | static | Email + socials |
+| `/resume` | Sanity + fallback (ISR) | CV header + timeline; noindex |
 | `/studio/[[...tool]]` | Sanity Studio | Editor (no header/footer) |
-| `/api/revalidate` | POST | Sanity webhook → revalidates `posts` tag |
+| `/api/revalidate` | POST | Sanity webhook → cache tags |
+| `/api/draft`, `/api/draft/disable` | GET | Draft preview mode |
+| `/api/cron/revalidate` | GET | Scheduled revalidation (Bearer auth) |
 | `/sitemap.xml`, `/robots.txt`, `/feed.xml` | generated | |
 
 ## Local development
@@ -58,25 +59,32 @@ empty state until Sanity is configured (see below).
 
 ## Editing content
 
-### Ventures (static)
+Most public copy is editable in **Sanity Studio** at `/studio`. When Sanity is
+unconfigured or a document is missing, the site falls back to static defaults in
+`lib/content/`.
 
-Edit `lib/content/ventures.ts`. Each entry feeds:
+| Content | Studio document | Fallback module |
+|---|---|---|
+| Site nav, footer, socials | `siteSettings` | `lib/content/siteSettings.ts` |
+| Home hero + CTAs | `homePage` | `lib/content/homePage.ts` |
+| About, Now, Contact, Ventures intro | `standardPage` | `lib/content/standardPage.ts` |
+| Venture cards | `venture` | `lib/content/ventures.ts` |
+| Resume header + timeline | `resumeProfile` | `lib/content/resumeTimeline.fallback.ts` |
+| Writing index copy | `writingPage` | `lib/content/writingPage.ts` |
+| Blog posts | `post` | empty state on `/writing` |
 
-- the landing-page "Selected ventures" grid (those with `featured: true`)
-- the full `/ventures` listing
-- the `/ventures/[slug]` case study page
+Venture **case study** pages (`/ventures/[slug]`) remain static TSX for now.
 
-Slug values become URLs. Tests in `lib/content/ventures.test.ts` guard the
-contract (sort order, lookup by slug, uniqueness).
+### Seed Sanity from static defaults
 
-### Bio / resume / contact
+```bash
+pnpm seed
+```
 
-Plain TSX under `app/about/page.tsx`, `app/resume/page.tsx`,
-`app/contact/page.tsx`. Replace placeholders directly.
+Requires Sanity write credentials in `.env.local`. The script is idempotent —
+it creates missing documents without overwriting edited content.
 
-### Blog (Sanity)
-
-The blog is sourced from Sanity. To start using it:
+### Blog setup (first time)
 
 1. Create a Sanity project at https://www.sanity.io/manage. Note the
    project ID and dataset name (default `production`).
