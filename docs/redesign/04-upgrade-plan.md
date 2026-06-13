@@ -1,5 +1,11 @@
 # Fronk Website → matveyan-style Redesign — Master Plan
 
+> **STATUS (2026-06-13): Phases 1–8 COMPLETE — merged to `main` as PR #3.**
+> Post-merge polish (EO/structured-data, copy upgrades, OG rebrand, responsive bug-hunt,
+> dopamine micro-interactions) and the remaining backlog now live in
+> **[`05-post-merge-polish.md`](./05-post-merge-polish.md)** (tracked on GitHub as issues #5–#9).
+> This doc is the historical plan-of-record for the redesign itself.
+>
 > Goal: re-skin kunanonj.com from "Soft Brutalism" to matveyan.com's **dark terminal/HUD** language — including the animations & parallax — without breaking content, CMS, perf budget, the resume-PDF pipeline, or CI.
 > Read alongside: `01-matveyan-teardown.md` (target, measured), `02-current-site-map.md` (before), `03-design-system.md` (new tokens).
 > Methodology: **TDD-first, phase-by-phase, commit-at-green, each phase independently revertible.**
