@@ -16,27 +16,27 @@ export function Header({ site }: HeaderProps) {
   return (
     <header
       data-site-chrome
-      className="sticky top-0 z-40 border-b-2 border-border bg-bg"
+      className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-sm"
     >
       <Container size="xl">
-        <div className="flex h-14 items-center justify-between gap-6">
+        <div className="flex h-16 items-center justify-between gap-6">
           <Link
             href="/"
-            className="font-display text-lg font-bold tracking-tight hover:text-accent"
+            className="font-display text-lg font-bold tracking-tight transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             aria-label={`${site.shortName} — home`}
           >
             {site.shortName}
             <span className="text-accent">.</span>
           </Link>
 
-          <nav className="hidden items-center gap-4 md:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-sm text-muted underline decoration-transparent decoration-2 underline-offset-4",
-                  "transition-colors hover:text-fg hover:decoration-accent",
+                  "label-mono text-[0.7rem] text-muted",
+                  "transition-colors hover:text-fg",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
                 )}
               >
