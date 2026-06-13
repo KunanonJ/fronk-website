@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
-import { VentureCard } from "@/components/VentureCard";
+import { VentureCaseRow } from "@/components/home/VentureCaseRow";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { getAllVentures, resolveVentures } from "@/lib/content/ventures";
 import { fetchAllVentures, fetchStandardPage } from "@/lib/sanity/fetch";
-import { cssVar } from "@/lib/utils/cssVar";
 
 export const revalidate = 60;
 
@@ -36,15 +35,9 @@ export default async function VenturesPage() {
         description={page.description}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-20 sm:space-y-28">
         {ventures.map((venture, i) => (
-          <div
-            key={venture.slug}
-            className="animate-fade-up stagger"
-            style={cssVar("--i", i)}
-          >
-            <VentureCard venture={venture} />
-          </div>
+          <VentureCaseRow key={venture.slug} venture={venture} index={i} />
         ))}
       </div>
     </Container>

@@ -15,11 +15,9 @@ import { Container } from "@/components/ui/Container";
 import { PortableText } from "@/components/PortableText";
 import { Prose } from "@/components/ui/Prose";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card } from "@/components/ui/Card";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
-import { cssVar } from "@/lib/utils/cssVar";
 
 export const revalidate = 60;
 
@@ -117,54 +115,48 @@ export default async function ContactPage() {
         </Prose>
       ) : null}
 
-      <ul className="grid gap-4 sm:grid-cols-2">
-        {channels.map((c, i) => {
-          const Icon = c.icon;
-          const inner = (
-            <div className="flex items-start gap-4">
-              <Icon className="mt-0.5 h-5 w-5 text-muted" aria-hidden />
-              <div>
-                <p className="font-medium">{c.label}</p>
-                <p className="mt-0.5 text-sm text-muted">{c.sub}</p>
-              </div>
-            </div>
-          );
+      {/* Channels — a single hairline panel of mono-labelled rows. Mint accent
+          is earned only by rows that are actual links; the copy-only Discord
+          handle stays monochrome. */}
+      <section aria-label="Contact channels" className="panel">
+        <p className="label-mono flex items-center justify-between gap-4 px-5 py-3 text-subtle rule-hud first:border-t-0">
+          <span>Channels</span>
+          <span>{channels.length} open</span>
+        </p>
 
-          const animationStyle = cssVar("--i", i);
+        <ul>
+          {channels.map((c) => {
+            const Icon = c.icon;
+            const isExternal = c.href?.startsWith("http");
 
-          if (c.href) {
-            const isExternal = c.href.startsWith("http");
+            const value = c.href ? (
+              <a
+                href={c.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:decoration-accent"
+              >
+                {c.sub}
+              </a>
+            ) : (
+              <span className="text-fg">{c.sub}</span>
+            );
+
             return (
               <li
                 key={c.label}
-                className="animate-fade-up stagger"
-                style={animationStyle}
+                className="flex items-center justify-between gap-4 rule-hud px-5 py-4"
               >
-                <Card
-                  hover
-                  as="a"
-                  href={c.href}
-                  className="block p-5"
-                  target={isExternal ? "_blank" : undefined}
-                  rel={isExternal ? "noopener noreferrer" : undefined}
-                >
-                  {inner}
-                </Card>
+                <span className="label-mono inline-flex items-center gap-3 text-fg">
+                  <Icon className="h-4 w-4 text-muted" aria-hidden />
+                  {c.label}
+                </span>
+                <span className="font-mono text-sm">{value}</span>
               </li>
             );
-          }
-
-          return (
-            <li
-              key={c.label}
-              className="animate-fade-up stagger"
-              style={animationStyle}
-            >
-                <Card className="flex items-start gap-4 p-5">{inner}</Card>
-            </li>
-          );
-        })}
-      </ul>
+          })}
+        </ul>
+      </section>
     </Container>
   );
 }

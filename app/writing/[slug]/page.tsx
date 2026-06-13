@@ -110,30 +110,38 @@ export default async function PostPage({ params }: PageProps) {
         />
         <Link
           href="/writing"
-          className="inline-flex items-center gap-1 text-sm text-muted underline decoration-transparent underline-offset-4 hover:text-fg hover:decoration-accent"
+          className="label-mono text-subtle transition-colors hover:text-fg"
         >
-          <ArrowLeft className="h-4 w-4" /> All writing
+          <ArrowLeft className="h-3.5 w-3.5" /> All writing
         </Link>
 
-        <header className="mb-12 mt-8">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-            <time dateTime={post.publishedAt} className="font-mono">
+        <header className="mb-12 mt-8 border-b border-border pb-8">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <time dateTime={post.publishedAt} className="label-mono text-subtle">
               {formatDate(post.publishedAt)}
             </time>
-            <span>•</span>
-            <span>{minutes} min read</span>
+            <span aria-hidden className="text-subtle">
+              ·
+            </span>
+            <span className="label-mono text-subtle">{minutes} min read</span>
             {post.tags && post.tags.length > 0 && (
               <>
-                <span>•</span>
-                <span>{post.tags.join(", ")}</span>
+                <span aria-hidden className="text-subtle">
+                  ·
+                </span>
+                <span className="label-mono text-subtle">
+                  {post.tags.join(" · ")}
+                </span>
               </>
             )}
           </div>
-          <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl">
+          <h1 className="mt-5 font-display text-4xl font-light leading-[1.05] tracking-tight text-fg sm:text-6xl">
             {post.title}
           </h1>
           {post.excerpt ? (
-            <p className="mt-4 text-lg text-muted">{post.excerpt}</p>
+            <p className="mt-5 max-w-2xl text-balance text-lg text-muted">
+              {post.excerpt}
+            </p>
           ) : null}
         </header>
 
@@ -150,7 +158,7 @@ export default async function PostPage({ params }: PageProps) {
             width={1600}
             height={900}
             priority
-            className="mb-12 h-auto w-full border-brutal bg-surface"
+            className="mb-12 h-auto w-full border border-border bg-surface"
             sizes="(min-width: 768px) 720px, 100vw"
           />
         ) : null}
