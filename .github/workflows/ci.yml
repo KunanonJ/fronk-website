@@ -10,6 +10,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least privilege: CI only reads the repo, builds, and tests. No write scopes.
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: typecheck-lint-test-build
@@ -45,6 +49,9 @@ jobs:
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm test
 
+      # `pnpm build` self-skips the Sanity schema deploy when SANITY_AUTH_TOKEN
+      # is unset (scripts/sanity-schema-deploy.mjs) — CI never sets it, so the
+      # build is side-effect-free.
       - name: Build
         env:
           NEXT_PUBLIC_SITE_URL: https://kunanonj.com
@@ -52,3 +59,66 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm build
+
+      # Reuses the .next from the Build step above (same job, repo-root cwd).
+      # Fails if any route's first-load JS exceeds 205KB gz or if Three.js
+      # leaks into the home route's first-load set.
+      - name: Perf budget
+        run: pnpm perf:budget
+
+  e2e-smoke:
+    name: e2e-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Cache the Chromium binary so warm runs skip the ~120MB download.
+      # --with-deps below stays (idempotent) to install system libs on a hit.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
+        run: pnpm build
+
+      # CI=true flips reuseExistingServer off, so Playwright manages its own
+      # server via PLAYWRIGHT_WEB_SERVER ("pnpm start" = prod, not dev). The
+      # explicit smoke.spec.ts path excludes the darwin-only visual.spec.ts
+      # baselines (which would fail on Linux); --project=desktop scopes to one
+      # Chromium engine.
+      - name: Run smoke e2e (desktop)
+        env:
+          CI: "true"
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
+        run: pnpm exec playwright test smoke.spec.ts --project=desktop
