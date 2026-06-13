@@ -5,6 +5,8 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@/components/Analytics";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { WebVitals } from "@/components/WebVitals";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { fetchSiteSettings } from "@/lib/sanity/fetch";
 import { siteConfig } from "@/lib/site";
@@ -131,6 +133,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </SiteShell>
         </ThemeProvider>
         <Analytics />
+        <GoogleAnalytics />
+        <WebVitals />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
+import { track } from "@/lib/analytics/gtag";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -21,7 +22,11 @@ export function ThemeToggle() {
       type="button"
       aria-label={label}
       title={label}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        const next = isDark ? "light" : "dark";
+        setTheme(next);
+        track("theme_change", { theme: next });
+      }}
       className="relative inline-flex h-11 w-11 items-center justify-center border border-border bg-surface text-fg transition-[color,background-color,border-color,transform] hover:bg-surface-2 active:scale-95 active:bg-surface-2 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
     >
       <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
