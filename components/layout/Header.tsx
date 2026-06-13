@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeaderNav } from "@/components/layout/HeaderNav";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -25,8 +26,7 @@ export function Header({ site }: HeaderProps) {
             className="font-display text-lg font-bold tracking-tight transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             aria-label={`${site.shortName} — home`}
           >
-            {site.shortName}
-            <span className="text-accent">.</span>
+            <Logo />
           </Link>
 
           <HeaderNav items={navItems} />

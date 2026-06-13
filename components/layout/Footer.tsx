@@ -11,6 +11,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { Logo } from "@/components/brand/Logo";
 import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 
 interface SocialLink {
@@ -43,10 +44,7 @@ export function Footer({ site }: FooterProps) {
       <Container size="xl">
         <div className="grid grid-cols-1 gap-10 border-b border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
           <div className="min-w-0 space-y-4">
-            <span className="font-display text-2xl font-bold tracking-tight text-fg">
-              {site.shortName}
-              <span className="text-accent">.</span>
-            </span>
+            <Logo className="text-2xl text-fg" />
             <p className="max-w-xs leading-relaxed">{site.footerTagline}</p>
           </div>
 
