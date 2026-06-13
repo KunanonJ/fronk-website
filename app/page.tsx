@@ -11,25 +11,18 @@ import {
   getFeaturedVentures,
   resolveFeaturedVentures,
 } from "@/lib/content/ventures";
-import { resolveSiteSettings } from "@/lib/content/siteSettings";
-import {
-  fetchFeaturedVentures,
-  fetchHomePage,
-  fetchSiteSettings,
-} from "@/lib/sanity/fetch";
+import { fetchFeaturedVentures, fetchHomePage } from "@/lib/sanity/fetch";
 import { cssVar } from "@/lib/utils/cssVar";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [homeCms, venturesCms, settingsCms] = await Promise.all([
+  const [homeCms, venturesCms] = await Promise.all([
     fetchHomePage(),
     fetchFeaturedVentures(6),
-    fetchSiteSettings(),
   ]);
 
   const content = resolveHomePage(homeCms);
-  const site = resolveSiteSettings(settingsCms);
   const featured = resolveFeaturedVentures(
     venturesCms,
     getFeaturedVentures(content.featuredLimit),
@@ -38,7 +31,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero content={content} personName={site.name} />
+      <Hero content={content} />
 
       <Container size="xl" as="section" className="py-20">
         <SectionHeader
