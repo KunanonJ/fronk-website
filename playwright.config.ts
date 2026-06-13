@@ -41,8 +41,10 @@ export default defineConfig({
   },
   projects: [
     {
+      // Chromium at a phone viewport so visual baselines capture the mobile
+      // breakpoint (the iPhone/WebKit engine is covered by the `webkit` project).
       name: "mobile",
-      use: { ...devices["iPhone 13"], viewport: { width: 375, height: 812 } },
+      use: { ...devices["Desktop Chrome"], viewport: { width: 375, height: 812 } },
     },
     {
       name: "tablet",
@@ -51,6 +53,15 @@ export default defineConfig({
     {
       name: "desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+    },
+    // Cross-browser engines (behavioral smoke only; visual.spec is Chromium-only).
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"], viewport: { width: 1440, height: 900 } },
     },
   ],
   // Reuse a running dev server if present; otherwise start one. Visual baselines

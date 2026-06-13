@@ -20,7 +20,7 @@ const components: PortableTextComponents = {
             alt={value.alt ?? ""}
             width={1600}
             height={900}
-            className="h-auto w-full border-brutal bg-surface"
+            className="h-auto w-full border border-border bg-surface"
             sizes="(min-width: 768px) 720px, 100vw"
           />
           {value.alt && (
@@ -36,13 +36,13 @@ const components: PortableTextComponents = {
     }: {
       value: { code: string; language?: string; filename?: string };
     }) => (
-      <div className="my-6 overflow-hidden border-brutal bg-surface">
+      <div className="my-6 overflow-hidden border border-border bg-surface">
         {value.filename && (
-          <div className="border-b-2 border-border bg-subtle px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted">
+          <div className="border-b border-border bg-surface-2 px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted">
             {value.filename}
           </div>
         )}
-        <pre className="overflow-x-auto bg-subtle p-4 text-sm">
+        <pre className="overflow-x-auto bg-surface-2 p-4 text-sm">
           <code className={value.language ? `language-${value.language}` : undefined}>
             {value.code}
           </code>

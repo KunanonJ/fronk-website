@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { VentureCaseRow } from "@/components/home/VentureCaseRow";
+import { Reveal } from "@/components/ui/Reveal";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { getAllVentures, resolveVentures } from "@/lib/content/ventures";
@@ -37,7 +38,9 @@ export default async function VenturesPage() {
 
       <div className="space-y-20 sm:space-y-28">
         {ventures.map((venture, i) => (
-          <VentureCaseRow key={venture.slug} venture={venture} index={i} />
+          <Reveal key={venture.slug}>
+            <VentureCaseRow venture={venture} index={i} />
+          </Reveal>
         ))}
       </div>
     </Container>

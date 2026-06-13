@@ -86,7 +86,7 @@ export function Footer({ site }: FooterProps) {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center border-brutal bg-surface transition-colors hover:bg-subtle hover:text-fg"
+                  className="inline-flex h-11 w-11 items-center justify-center border border-border bg-surface transition-colors hover:bg-surface-2 hover:text-fg"
                   aria-label={label}
                   title={label}
                 >

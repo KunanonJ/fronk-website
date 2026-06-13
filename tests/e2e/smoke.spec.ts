@@ -59,7 +59,14 @@ test.describe("a11y > reduced-motion users get a static, usable page", () => {
 });
 
 test.describe("a11y > keyboard users can reach the skip link", () => {
-  test("first Tab focuses the skip-to-content link", async ({ page }) => {
+  test("first Tab focuses the skip-to-content link", async ({ page, browserName }) => {
+    // WebKit/Safari does not move Tab focus to links unless full keyboard access
+    // is enabled — that's the browser's default, not a page defect. The skip link
+    // is present and focusable; Chromium + Firefox exercise the Tab behavior.
+    test.skip(
+      browserName === "webkit",
+      "Safari does not Tab to links by default (full keyboard access off)",
+    );
     await page.goto("/", { waitUntil: "networkidle" });
     await page.keyboard.press("Tab");
     const focusedHref = await page.evaluate(
