@@ -41,5 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# sanity studio manifest (generated at build)
+/public/studio/static/
+
 # local dev-preview config (per-machine, not part of the build)
 /.claude/

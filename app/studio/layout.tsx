@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { preloadModule } from "react-dom";
+
+const bridgeScript = "https://core.sanity-cdn.com/bridge.js";
 
 export const metadata: Metadata = {
   title: "Studio",
@@ -12,6 +15,16 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-export default function StudioLayout({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen">{children}</div>;
+export default function StudioLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  preloadModule(bridgeScript, { as: "script" });
+  return (
+    <>
+      <script src={bridgeScript} async type="module" />
+      <div className="min-h-screen">{children}</div>
+    </>
+  );
 }

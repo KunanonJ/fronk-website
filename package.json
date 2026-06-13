@@ -17,7 +17,9 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm sanity:manifest && next build && pnpm sanity:schema:deploy",
+    "sanity:manifest": "sanity manifest extract --path public/studio/static",
+    "sanity:schema:deploy": "node scripts/sanity-schema-deploy.mjs",
     "start": "next start -p ${PORT:-3000}",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",

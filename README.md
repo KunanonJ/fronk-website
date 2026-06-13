@@ -138,6 +138,7 @@ Set these on the **web service** under **Variables**:
 | `SANITY_REVALIDATE_SECRET` | yes | no | `openssl rand -hex 32` — webhook HMAC secret |
 | `SANITY_PREVIEW_SECRET` | yes* | no | `openssl rand -hex 32` — draft preview links |
 | `SANITY_API_READ_TOKEN` | yes* | no | Sanity → API → Tokens (Viewer) — draft previews |
+| `SANITY_AUTH_TOKEN` | no | yes | Sanity → API → Tokens (Deploy) — schema deploy on build |
 | `CRON_SECRET` | optional | no | `openssl rand -hex 32` — scheduled revalidation |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | optional | yes | Analytics (see below) |
 | `NEXT_PUBLIC_UMAMI_HOST` | optional | yes | Defaults to `https://cloud.umami.is` |
@@ -156,6 +157,15 @@ In [sanity.io/manage](https://www.sanity.io/manage) → your project:
 - `http://localhost:3000` (local dev)
 
 **API token** (API → Tokens): create a **Viewer** token → `SANITY_API_READ_TOKEN`.
+
+**Deploy token** (API → Tokens → **Deploy**): → `SANITY_AUTH_TOKEN` on Railway.
+Used during `pnpm build` to run `sanity schema deploy` so the Sanity Dashboard
+shows studio compatibility for your self-hosted `/studio`.
+
+**Dashboard studio URL:** In [sanity.io/manage](https://www.sanity.io/manage) →
+project → **Setup**, add `https://<your-domain>/studio` (full path, not just the
+apex domain). After deploy with `SANITY_AUTH_TOKEN` set, version/schema columns
+should populate and compatibility moves off **Unknown**.
 
 **Webhook** (API → Webhooks → Create):
 
