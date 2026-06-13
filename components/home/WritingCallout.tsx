@@ -20,7 +20,7 @@ export function WritingCallout({
   cta,
 }: WritingCalloutProps) {
   return (
-    <div className="panel flex flex-col items-start gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-12">
+    <div className="panel panel-live flex flex-col items-start gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-12">
       <div className="max-w-xl">
         {eyebrow ? <p className="label-mono text-subtle">{eyebrow}</p> : null}
         <h2 className="mt-3 font-display text-3xl font-semibold uppercase tracking-tight sm:text-4xl">

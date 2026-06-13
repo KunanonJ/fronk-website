@@ -27,7 +27,7 @@ export default async function ResumePage() {
   const profile = resolveResumeProfile(cms);
 
   return (
-    <Container size="lg" className="py-20">
+    <Container size="lg" className="py-14 sm:py-20 lg:py-24">
       <header className="mb-16 flex flex-col items-start justify-between gap-8 border-b border-border pb-12 sm:flex-row sm:items-end">
         <div className="max-w-2xl">
           <span className="label-mono text-subtle">§ Résumé / Kunanon Jarat</span>
@@ -139,7 +139,7 @@ function TimelineEntry({
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h3 className="font-display text-base font-semibold tracking-tight">
+          <h3 className="min-w-0 break-words font-display text-base font-semibold tracking-tight">
             <EntryTitle item={item} />{" "}
             <span className="font-normal text-muted">— {item.org}</span>
           </h3>

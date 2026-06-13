@@ -20,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: page.metadata.title,
     description: page.metadata.description,
+    alternates: { canonical: "/now" },
   };
 }
 
@@ -30,7 +31,7 @@ export default async function NowPage() {
   const lastUpdated = page.lastUpdated ?? DEFAULT_LAST_UPDATED;
 
   return (
-    <Container size="lg" className="py-24 sm:py-32">
+    <Container size="lg" className="py-16 sm:py-24 lg:py-32">
       <PageHeader
         eyebrow={page.eyebrow}
         title={page.heading}

@@ -42,7 +42,7 @@ export function Footer({ site }: FooterProps) {
     >
       <Container size="xl">
         <div className="grid grid-cols-1 gap-10 border-b border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <span className="font-display text-2xl font-bold tracking-tight text-fg">
               {site.shortName}
               <span className="text-accent">.</span>
@@ -50,7 +50,7 @@ export function Footer({ site }: FooterProps) {
             <p className="max-w-xs leading-relaxed">{site.footerTagline}</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-fg">
               Pages
             </p>
@@ -59,7 +59,7 @@ export function Footer({ site }: FooterProps) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="underline decoration-transparent underline-offset-4 hover:text-fg hover:decoration-accent"
+                    className="underline decoration-transparent underline-offset-4 transition-colors duration-200 hover:text-fg hover:decoration-accent"
                   >
                     {item.label}
                   </Link>
@@ -68,7 +68,7 @@ export function Footer({ site }: FooterProps) {
             </ul>
           </div>
 
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <p className="font-mono text-xs uppercase tracking-widest text-fg">
               Contact
             </p>

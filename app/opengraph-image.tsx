@@ -5,51 +5,88 @@ export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Terminal-HUD share card — matches the site identity: pure black, hairline
+// window frame, mono instrument labels, the ghosted wordmark, mint as the one
+// earned accent.
 export default function OpenGraphImage() {
+  const domain = siteConfig.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
   return new ImageResponse(
     (
       <div
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: 64,
-          background: "#f5f5f0",
-          color: "#0a0a0a",
+          padding: 72,
+          background: "#000000",
+          color: "#ededed",
           fontFamily: "system-ui, sans-serif",
-          border: "8px solid #0a0a0a",
         }}
       >
+        {/* Hairline window frame (the instrument bezel) */}
         <div
           style={{
+            position: "absolute",
+            top: 28,
+            left: 28,
+            right: 28,
+            bottom: 28,
+            border: "1px solid rgba(255,255,255,0.14)",
+          }}
+        />
+
+        {/* Giant ghosted wordmark rising from the dark */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -64,
+            left: 0,
+            right: 0,
             display: "flex",
-            alignItems: "center",
-            gap: 12,
-            fontSize: 24,
+            justifyContent: "center",
+            fontSize: 340,
             fontWeight: 800,
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.05em",
+            color: "rgba(255,255,255,0.05)",
           }}
         >
-          <span>{siteConfig.shortName}</span>
-          <span style={{ color: "#10b981" }}>.</span>
+          FRONK
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.2em",
-              color: "#525252",
-            }}
-          >
-            Founder · Bangkok
+        {/* Top row: wordmark + mono eyebrow */}
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em" }}>
+            Fronk
+            <span style={{ color: "#34d399" }}>.</span>
           </div>
           <div
             style={{
+              fontSize: 17,
+              letterSpacing: "0.24em",
+              textTransform: "uppercase",
+              color: "#8a8a8a",
+            }}
+          >
+            Founder · Builder · Writer
+          </div>
+        </div>
+
+        {/* Center: name + tagline */}
+        <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 20 }}>
+          <div
+            style={{
+              display: "flex",
               fontSize: 88,
               lineHeight: 0.95,
               fontWeight: 800,
@@ -58,33 +95,28 @@ export default function OpenGraphImage() {
             }}
           >
             {siteConfig.name}
+            <span style={{ color: "#34d399" }}>.</span>
           </div>
-          <div
-            style={{
-              fontSize: 34,
-              lineHeight: 1.2,
-              color: "#525252",
-              maxWidth: 900,
-            }}
-          >
+          <div style={{ display: "flex", fontSize: 33, lineHeight: 1.2, color: "#8a8a8a", maxWidth: 920 }}>
             {siteConfig.tagline}
           </div>
         </div>
 
+        {/* Bottom row: honest status strip + domain */}
         <div
           style={{
+            position: "relative",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            fontSize: 20,
-            fontWeight: 600,
-            color: "#525252",
+            fontSize: 18,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "#8a8a8a",
           }}
         >
-          <span>fintech · ai · web3</span>
-          <span style={{ color: "#10b981" }}>
-            {siteConfig.url.replace(/^https?:\/\//, "")}
-          </span>
+          <div style={{ display: "flex" }}>Building · GoGoCash · Manut AI</div>
+          <div style={{ display: "flex", color: "#34d399" }}>{domain}</div>
         </div>
       </div>
     ),

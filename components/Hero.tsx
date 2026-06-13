@@ -60,7 +60,7 @@ export function Hero({ content }: HeroProps) {
                 >
                   GoGoCash
                 </a>{" "}
-                and{" "}
+                (cashback) and{" "}
                 <a
                   className="text-fg underline decoration-accent underline-offset-4 hover:text-accent"
                   href="https://manut.xyz"
@@ -68,9 +68,9 @@ export function Hero({ content }: HeroProps) {
                   rel="noopener noreferrer"
                 >
                   Manut AI
-                </a>
-                . Cashback, AI workspaces, and the unglamorous plumbing — all from
-                Bangkok.
+                </a>{" "}
+                (AI workspaces for solo founders). I build the products and the
+                unglamorous plumbing under them — from Bangkok.
               </p>
             )}
 

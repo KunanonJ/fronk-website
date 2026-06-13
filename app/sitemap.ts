@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site";
-import { fetchAllPostSlugs } from "@/lib/sanity/fetch";
+import { fetchAllPosts } from "@/lib/sanity/fetch";
 
 export const revalidate = 3600;
 
@@ -18,11 +18,15 @@ const STATIC_ROUTES = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
-  const now = new Date();
+
+  // Stable lastmod for the code-driven static pages — bump when their content
+  // meaningfully changes. An honest signal beats `new Date()`, which churns
+  // every build and trains crawlers to ignore lastmod entirely.
+  const staticUpdated = new Date("2026-06-13");
 
   const staticPages: MetadataRoute.Sitemap = STATIC_ROUTES.map((path) => ({
     url: `${base}${path}`,
-    lastModified: now,
+    lastModified: staticUpdated,
     changeFrequency: path === "" ? "weekly" : "monthly",
     priority: path === "" ? 1 : 0.7,
   }));
@@ -31,10 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // directly to each venture's external landing site (gogocash.co, manut.xyz),
   // so there are no internal venture-slug URLs to expose to crawlers.
 
-  const postSlugs = await fetchAllPostSlugs();
-  const postPages: MetadataRoute.Sitemap = postSlugs.map((slug) => ({
-    url: `${base}/writing/${slug}`,
-    lastModified: now,
+  // Posts carry their real publish date so crawlers see genuine freshness.
+  const posts = await fetchAllPosts();
+  const postPages: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `${base}/writing/${post.slug}`,
+    lastModified: post.publishedAt ? new Date(post.publishedAt) : staticUpdated,
     changeFrequency: "monthly",
     priority: 0.5,
   }));
