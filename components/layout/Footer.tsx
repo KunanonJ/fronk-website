@@ -38,10 +38,10 @@ export function Footer({ site }: FooterProps) {
   return (
     <footer
       data-site-chrome
-      className="mt-32 border-t-2 border-border py-16 text-sm text-muted"
+      className="mt-32 border-t border-border pt-16 text-sm text-muted"
     >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-10 border-b-2 border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 border-b border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-4">
             <span className="font-display text-2xl font-bold tracking-tight text-fg">
               {site.shortName}
@@ -86,7 +86,7 @@ export function Footer({ site }: FooterProps) {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center border-brutal bg-surface transition-colors hover:bg-subtle hover:text-fg"
+                  className="inline-flex h-11 w-11 items-center justify-center border border-border bg-surface transition-colors hover:bg-surface-2 hover:text-fg"
                   aria-label={label}
                   title={label}
                 >
@@ -103,6 +103,18 @@ export function Footer({ site }: FooterProps) {
           <Badge variant="outline">Always shipping</Badge>
         </div>
       </Container>
+
+      {/* Giant wordmark rising out of the dark — the matveyan footer signature.
+          Gradient is brighter at the baseline, fading upward, so the letters
+          appear to emerge. Decorative; clipped at the viewport edges. */}
+      <div
+        aria-hidden
+        className="mt-12 select-none overflow-hidden px-2 leading-none"
+      >
+        <span className="block bg-gradient-to-t from-fg/[0.22] to-fg/[0.04] bg-clip-text text-center font-display text-wordmark font-bold uppercase tracking-tighter text-transparent">
+          {site.shortName}
+        </span>
+      </div>
     </footer>
   );
 }

@@ -33,6 +33,13 @@ describe("ventures > getFeaturedVentures", () => {
     const limited = getFeaturedVentures(2);
     expect(limited.length).toBeLessThanOrEqual(2);
   });
+
+  it("orders featured ventures flagship-first (by featuredOrder, not year)", () => {
+    // Home leads with the flagship (GoGoCash) even though it isn't the newest;
+    // getAllVentures stays year-descending for /ventures.
+    const featured = getFeaturedVentures();
+    expect(featured[0]?.slug).toBe("gogocash");
+  });
 });
 
 describe("ventures > getVentureBySlug", () => {

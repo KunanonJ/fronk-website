@@ -1,49 +1,59 @@
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { HeroCanvas } from "@/components/ui/HeroCanvas";
+import { HeroBackdrop } from "@/components/hero/HeroBackdrop";
+import { HeroRecede } from "@/components/hero/HeroRecede";
+import { StatusTicker } from "@/components/hud/StatusTicker";
 import type { ResolvedHomePage } from "@/lib/content/homePage";
 
 interface HeroProps {
   content: ResolvedHomePage;
-  personName: string;
 }
 
-export function Hero({ content, personName }: HeroProps) {
+// Honest "now" signals — every item is a real, already-published site claim.
+const TICKER_ITEMS: readonly string[] = [
+  "STATUS · SHIPPING",
+  "BUILDING · GOGOCASH",
+  "BUILDING · MANUT AI",
+  "GOGOCASH · 1,000+ USERS",
+  "GOGOCASH · 220+ MERCHANTS",
+  "BASED IN BANGKOK",
+];
+
+export function Hero({ content }: HeroProps) {
   return (
-    <section className="relative overflow-hidden border-b-2 border-border py-24 sm:py-32">
-      <HeroCanvas />
-      <Container size="xl">
-        <div className="grid items-center gap-12 md:grid-cols-[1fr_auto] md:gap-16">
-          <div className="space-y-6">
-            <Badge>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping bg-accent-fg opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 bg-accent-fg" />
+    <section className="relative flex min-h-[88vh] flex-col overflow-hidden border-b border-border">
+      <HeroBackdrop />
+
+      <HeroRecede className="flex flex-1 items-center justify-center py-24">
+        <Container size="lg">
+          <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+            <span className="label-mono mb-9 border border-border bg-surface-2 px-3 py-1.5 text-muted">
+              <span className="relative mr-1 flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping bg-accent opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 bg-accent" />
               </span>
               {content.heroEyebrow}
-            </Badge>
+            </span>
 
-            <h1 className="font-display text-6xl font-extrabold leading-[0.95] tracking-tight sm:text-8xl">
+            <h1 className="font-display text-display font-bold leading-[0.92] tracking-tight">
               {content.heroTitle}
               <span className="text-accent">.</span>
             </h1>
 
-            <p className="max-w-2xl text-2xl font-medium tracking-tight text-muted sm:text-3xl">
+            <p className="mt-6 text-balance text-lg font-medium text-fg sm:text-xl">
               {content.heroTagline}
             </p>
 
             {content.heroIntro ? (
-              <p className="max-w-2xl text-base text-muted sm:text-lg">
+              <p className="mt-4 max-w-xl text-balance text-sm leading-relaxed text-muted">
                 {content.heroIntro}
               </p>
             ) : (
-              <p className="max-w-2xl text-base text-muted sm:text-lg">
+              <p className="mt-4 max-w-xl text-balance text-sm leading-relaxed text-muted">
                 Founder of{" "}
                 <a
-                  className="text-fg underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                  className="text-fg underline decoration-accent underline-offset-4 hover:text-accent"
                   href="https://gogocash.co"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -52,51 +62,36 @@ export function Hero({ content, personName }: HeroProps) {
                 </a>{" "}
                 and{" "}
                 <a
-                  className="text-fg underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
+                  className="text-fg underline decoration-accent underline-offset-4 hover:text-accent"
                   href="https://manut.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Manut AI
                 </a>
-                . Cashback, AI workspaces, and the unglamorous plumbing — all
-                from Bangkok.
+                . Cashback, AI workspaces, and the unglamorous plumbing — all from
+                Bangkok.
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Button href={content.primaryCta.href} size="lg">
                 {content.primaryCta.label}
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button href={content.secondaryCta.href} variant="secondary" size="lg">
+              <Button
+                href={content.secondaryCta.href}
+                variant="secondary"
+                size="lg"
+              >
                 {content.secondaryCta.label}
               </Button>
             </div>
           </div>
+        </Container>
+      </HeroRecede>
 
-          <div className="order-first md:order-none">
-            <div className="relative mx-auto h-44 w-44 sm:h-56 sm:w-56 md:h-64 md:w-64">
-              <div
-                aria-hidden
-                className="absolute -right-3 -top-3 -z-10 h-full w-full border-brutal bg-accent"
-              />
-              <div className="relative h-full w-full overflow-hidden border-brutal bg-surface">
-                <Image
-                  src="/profile.jpg"
-                  alt={`${personName} — headshot`}
-                  width={400}
-                  height={400}
-                  priority
-                  loading="eager"
-                  sizes="(min-width: 768px) 256px, (min-width: 640px) 224px, 176px"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Container>
+      <StatusTicker items={TICKER_ITEMS} />
     </section>
   );
 }

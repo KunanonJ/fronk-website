@@ -1,12 +1,23 @@
-/* ─── Soft brutalism design tokens (Phase 0) ───────────────────────────────
- * Palette: warm paper + ink borders + mint accent.
- * --bg / --fg       page background and text
- * --surface         cards and elevated panels
- * --border          2px ink (same as fg in each mode)
- * --accent          mint brand color
- * --shadow-hard     offset box shadow for brutal lift
- * Utilities: border-brutal, shadow-brutal, sticker, card-brutal, font-display
- * Deprecated: moving-border-gradient (removed in Phase 4 venture cards)
+/* ─── Terminal-HUD design tokens (Phase 1) ─────────────────────────────────
+ * A dark "trading-terminal" shell (matveyan.com-inspired) with a paper-light
+ * variant. Discipline: monochrome shell, hairline rules, monospace instrument
+ * labels — colour appears only when earned (links/focus, ticker deltas,
+ * product art).
+ *
+ *   --bg / --fg        page canvas and primary text
+ *   --muted / --subtle secondary / tertiary text
+ *   --border           1px hairline (rgba) — frames, rules, panels, buttons
+ *   --border-strong    brighter hairline for hover/active
+ *   --surface          barely-raised panel fill
+ *   --surface-2        faint well / hover fill
+ *   --accent           the single earned highlight (links, focus ring)
+ *   --pos / --neg      ticker / status deltas (up / down)
+ *
+ * Motif utilities: frame-hud, label-mono, panel, rule-hud, ghost-number,
+ *   font-display (now weight-contrast sans). Legacy brutalist utilities
+ *   (border-brutal / shadow-brutal / sticker / card-brutal) are repurposed to
+ *   the terminal look as @deprecated shims so existing components flip
+ *   coherently; they are removed as components migrate (Phases 2–3).
  * ─────────────────────────────────────────────────────────────────────────── */
 
 @import "tailwindcss";
@@ -20,47 +31,68 @@
   --color-muted: var(--muted);
   --color-subtle: var(--subtle);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-syne), var(--font-geist-sans), ui-sans-serif, system-ui,
-    sans-serif;
+  --font-mono: var(--font-mono-instrument), ui-monospace, "SF Mono", monospace;
+  /* Headlines use weight-contrast sans (light + semibold), not a display face. */
+  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Fluid type scale for the redesign. */
+  --text-hud: 0.75rem;
+  --text-hero: clamp(2rem, 1rem + 4vw, 3.25rem);
+  --text-display: clamp(2.5rem, 1rem + 6vw, 5.5rem);
+  --text-wordmark: clamp(4rem, 2rem + 16vw, 12rem);
 
   --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Snappy brutalist motion — 150–200ms, no bounce */
+  /* Snappy reveals — 150–200ms, no bounce. */
   --animate-fade-up: fade-up 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in: fade-in 150ms ease-out both;
   --animate-slide-down: slide-down 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-scale-in: scale-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-resource-gradient: resource-gradient 6s linear infinite;
+  /* Status ticker marquee — track is 2× content, shifts one full copy. */
+  --animate-ticker: ticker 42s linear infinite;
 }
 
+/* ─── Light terminal (paper / schematic) ──────────────────────────────────── */
 :root {
-  --bg: #f5f5f0;
-  --fg: #0a0a0a;
-  --muted: #525252;
-  --subtle: #ebebe4;
-  --border: #0a0a0a;
+  --bg: #f5f5f3;
+  --fg: #0e0e0d;
+  --muted: #6b6b67;
+  --subtle: #707070;
+  --border: rgba(14, 14, 13, 0.15);
+  --border-strong: rgba(14, 14, 13, 0.42);
   --surface: #ffffff;
-  --accent: #10b981;
-  --accent-fg: #0a0a0a;
-  --shadow-hard: 4px 4px 0 0 #0a0a0a;
+  --surface-2: rgba(14, 14, 13, 0.035);
+  --accent: #0a7a54;
+  --accent-fg: #ffffff;
+  --pos: #0a7a54;
+  --neg: #c8453b;
+  --grain-opacity: 0.03;
 }
 
+/* ─── Dark terminal (pure black, matveyan reference) ───────────────────────── */
 .dark {
-  --bg: #0a0a0a;
-  --fg: #f5f5f0;
-  --muted: #a3a3a3;
-  --subtle: #171717;
-  --border: #f5f5f0;
-  --surface: #141414;
+  --bg: #000000;
+  --fg: #ededed;
+  --muted: #8a8a8a;
+  --subtle: #7a7a7a;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.3);
+  --surface: #0a0a0a;
+  --surface-2: rgba(255, 255, 255, 0.04);
   --accent: #34d399;
-  --accent-fg: #0a0a0a;
-  --shadow-hard: 4px 4px 0 0 #34d399;
+  --accent-fg: #000000;
+  --pos: #34d399;
+  --neg: #f87171;
+  --grain-opacity: 0.05;
 }
 
 html {
@@ -87,76 +119,119 @@ body {
   color: var(--accent-fg);
 }
 
+/* Film-grain overlay — atmosphere for the matte canvas. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.02;
+  opacity: var(--grain-opacity, 0.04);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  body::before {
-    will-change: auto;
-  }
 }
 
 a {
   text-underline-offset: 3px;
 }
 
-/* ─── Brutalist utilities ─────────────────────────────────────────────────── */
+/* ─── HUD motif utilities ─────────────────────────────────────────────────── */
+
+/* Fixed hairline window-frame, inset on all sides (the instrument bezel). */
+@utility frame-hud {
+  position: fixed;
+  inset: 10px;
+  z-index: 50;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+
+/* Monospace instrument label / eyebrow. */
+@utility label-mono {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Hairline panel (clean replacement for card-brutal). */
+@utility panel {
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+}
+
+/* Hairline rule. */
+@utility rule-hud {
+  border-top: 1px solid var(--border);
+}
+
+/* Oversized faint connective numeral. */
+@utility ghost-number {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  color: var(--fg);
+  opacity: 0.06;
+}
 
 @utility font-display {
   font-family: var(--font-display);
 }
 
+@utility stagger {
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* ─── @deprecated Phase 1 brutalist shims ─────────────────────────────────────
+ * Repurposed to the terminal look so legacy class usages flip coherently.
+ * Prefer frame-hud / panel / label-mono / rule-hud. Removed as components
+ * migrate in Phases 2–3. */
+
 @utility border-brutal {
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   border-color: var(--border);
 }
 
 @utility shadow-brutal {
-  box-shadow: var(--shadow-hard);
+  box-shadow: none;
 }
 
 @utility sticker {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  border-width: 2px;
-  border-style: solid;
-  border-color: var(--border);
-  background-color: var(--accent);
-  padding: 0.25rem 0.625rem;
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: transparent;
+  padding: 0.3rem 0.6rem;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--text-hud);
   line-height: 1;
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--accent-fg);
+  color: var(--muted);
 }
 
 @utility card-brutal {
-  border-width: 2px;
-  border-style: solid;
-  border-color: var(--border);
+  border: 1px solid var(--border);
   background-color: var(--surface);
-  box-shadow: var(--shadow-hard);
-  transition-property: transform, box-shadow;
+  transition-property: border-color, background-color, transform;
   transition-duration: 150ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @utility card-brutal-hover {
   &:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--border);
+    border-color: var(--border-strong);
+    background-color: var(--surface-2);
   }
 }
 
@@ -204,40 +279,27 @@ a {
   }
 }
 
-@keyframes resource-gradient {
-  0% {
-    background-position: 0% 50%;
+@keyframes ticker {
+  from {
+    transform: translateX(0);
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+  to {
+    transform: translateX(-50%);
   }
 }
 
-@utility stagger {
-  animation-delay: calc(var(--i, 0) * 50ms);
+/* ─── Scroll-reveal (components/ui/Reveal) ─── */
+/* Default `.reveal` is fully visible. Only when JS arms a below-fold element
+   (data-reveal) does the transition apply; the "hidden" start state uses
+   transform+opacity only, so there's no layout shift. */
+.reveal[data-reveal] {
+  transition:
+    opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-/* @deprecated Phase 4 — venture cards will drop gradient borders */
-@utility moving-border-gradient {
-  background-image: linear-gradient(
-    90deg,
-    oklch(0.92 0.05 30),
-    oklch(0.74 0.18 50),
-    oklch(0.82 0.12 350),
-    oklch(0.5 0.2 260),
-    oklch(0.85 0.1 5),
-    oklch(0.92 0.07 145),
-    oklch(0.74 0.18 50),
-    oklch(0.88 0.18 95),
-    oklch(0.62 0.22 25),
-    oklch(0.74 0.18 45),
-    oklch(0.82 0.12 350),
-    oklch(0.92 0.05 30)
-  );
-  background-size: 200% 200%;
+.reveal[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 /* ─── Print (used by `pnpm pdf` to render /resume to public/resume.pdf) ─── */
@@ -250,18 +312,24 @@ a {
     --bg: #ffffff !important;
     --fg: #18181b !important;
     --muted: #52525b !important;
-    --subtle: #f4f4f5 !important;
-    --border: #18181b !important;
+    --subtle: #71717a !important;
+    --border: rgba(24, 24, 27, 0.25) !important;
+    --border-strong: rgba(24, 24, 27, 0.5) !important;
     --surface: #ffffff !important;
-    --accent: #059669 !important;
+    --surface-2: #f4f4f5 !important;
+    --accent: #0a7a54 !important;
     --accent-fg: #ffffff !important;
-    --shadow-hard: none !important;
+    --grain-opacity: 0 !important;
   }
 
   html,
   body {
     background: #ffffff !important;
     color: #18181b !important;
+  }
+
+  body::before {
+    display: none !important;
   }
 
   [data-site-chrome],
@@ -309,6 +377,11 @@ a {
   }
 
   .card-brutal-hover:hover {
+    transform: none !important;
+  }
+
+  .reveal[data-reveal] {
+    opacity: 1 !important;
     transform: none !important;
   }
 }

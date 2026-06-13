@@ -12,7 +12,7 @@ export function PostAuthor({ author }: PostAuthorProps) {
     <Card className="p-5">
       <div className="flex items-start gap-4">
         {author.avatar ? (
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden border-brutal bg-surface">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden border border-border bg-surface">
             <Image
               src={urlFor(author.avatar).width(112).height(112).fit("crop").url()}
               alt={author.name}

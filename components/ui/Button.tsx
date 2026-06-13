@@ -1,26 +1,36 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
+import { CornerTicks } from "@/components/ui/CornerTicks";
 
 type Variant = "primary" | "secondary" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-none border-2 font-medium transition-[transform,box-shadow,background-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50";
+  "group relative inline-flex items-center justify-center gap-2 border font-mono text-xs uppercase tracking-wider transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANTS: Record<Variant, string> = {
+  // Mint is the single earned accent — the primary action wears it as a tinted
+  // hairline + text, not a heavy fill, keeping the shell monochrome.
   primary:
-    "border-border bg-accent text-accent-fg shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--border)]",
+    "border-accent/55 text-accent hover:border-accent hover:bg-accent/10",
   secondary:
-    "border-border bg-transparent text-fg shadow-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-subtle hover:shadow-[6px_6px_0_0_var(--border)]",
+    "border-border text-fg hover:border-border-strong hover:bg-surface-2",
   ghost:
-    "border-transparent bg-transparent text-fg underline decoration-2 underline-offset-4 hover:text-accent shadow-none",
+    "border-transparent text-muted underline decoration-1 underline-offset-4 hover:text-fg",
+};
+
+/** Corner-tick colour per variant (ghost has no ticks). */
+const TICK_COLOR: Record<Variant, string | null> = {
+  primary: "text-accent/70",
+  secondary: "text-border-strong",
+  ghost: null,
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-11 px-4 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: "h-9 px-4",
+  md: "h-11 px-5",
+  lg: "h-12 px-6 text-[0.8rem]",
 };
 
 type CommonProps = {
@@ -39,10 +49,15 @@ type ButtonAsLink = CommonProps &
 export function Button(props: ButtonAsButton | ButtonAsLink) {
   const { variant = "primary", size = "md", className, children, ...rest } = props;
   const classes = cn(BASE, VARIANTS[variant], SIZES[size], className);
+  const tickColor = TICK_COLOR[variant];
+  const ticks = tickColor ? (
+    <CornerTicks size={5} className={tickColor} />
+  ) : null;
 
   if ("href" in rest && rest.href !== undefined) {
     return (
       <Link className={classes} {...(rest as ComponentProps<typeof Link>)}>
+        {ticks}
         {children}
       </Link>
     );
@@ -50,6 +65,7 @@ export function Button(props: ButtonAsButton | ButtonAsLink) {
 
   return (
     <button className={classes} {...(rest as ComponentProps<"button">)}>
+      {ticks}
       {children}
     </button>
   );

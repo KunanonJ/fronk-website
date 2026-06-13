@@ -12,7 +12,15 @@ export interface Venture {
   url: string;
   /** Display string for the URL CTA (e.g. "gogocash.co"). */
   urlLabel: string;
+  /**
+   * Headline figures for the case-row instrument panel. Honest only — every
+   * value must be corroborated by the description / a published claim. Omit
+   * entirely when a venture has no real numbers yet (no fabricated metrics).
+   */
+  metrics?: readonly { value: string; label: string }[];
   featured?: boolean;
+  /** Lower sorts earlier in the home featured list (flagship-first). */
+  featuredOrder?: number;
 }
 
 const VENTURES: readonly Venture[] = [
@@ -28,7 +36,14 @@ const VENTURES: readonly Venture[] = [
     stack: ["Cashback", "E-commerce", "Affiliate"],
     url: "https://gogocash.co",
     urlLabel: "gogocash.co",
+    // Corroborated by the description above — not invented.
+    metrics: [
+      { value: "1,000+", label: "Users" },
+      { value: "220+", label: "Merchants" },
+      { value: "30%", label: "Max cashback" },
+    ],
     featured: true,
+    featuredOrder: 1,
   },
   {
     slug: "manut",
@@ -43,6 +58,7 @@ const VENTURES: readonly Venture[] = [
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
     featured: true,
+    featuredOrder: 2,
   },
 ];
 
@@ -51,7 +67,14 @@ export function getAllVentures(): readonly Venture[] {
 }
 
 export function getFeaturedVentures(limit?: number): readonly Venture[] {
-  const featured = getAllVentures().filter((v) => v.featured);
+  // Flagship-first on the home page, independent of getAllVentures' year sort.
+  const featured = getAllVentures()
+    .filter((v) => v.featured)
+    .sort(
+      (a, b) =>
+        (a.featuredOrder ?? Number.POSITIVE_INFINITY) -
+        (b.featuredOrder ?? Number.POSITIVE_INFINITY),
+    );
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
 }
 

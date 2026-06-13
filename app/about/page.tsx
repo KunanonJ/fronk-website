@@ -31,9 +31,9 @@ export default async function AboutPage() {
   const site = resolveSiteSettings(settingsCms);
 
   return (
-    <Container size="lg" className="py-20">
-      <div className="mb-12 flex flex-col gap-8 sm:flex-row sm:items-start">
-        <div className="relative hidden h-28 w-28 flex-shrink-0 overflow-hidden border-brutal bg-surface shadow-brutal sm:block">
+    <Container size="lg" className="py-24 sm:py-32">
+      <div className="mb-16 flex flex-col gap-8 sm:flex-row sm:items-start">
+        <div className="relative hidden h-28 w-28 flex-shrink-0 overflow-hidden border border-border bg-surface sm:block">
           <Image
             src="/profile.jpg"
             alt={`${site.name} — headshot`}

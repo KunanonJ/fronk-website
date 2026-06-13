@@ -1,4 +1,13 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+// Next 16 prints no JS-size table, and @next/bundle-analyzer is a silent no-op
+// under the default Turbopack build. So the treemap requires the webpack bundler
+// (`pnpm analyze` === `ANALYZE=true next build --webpack`); the actual per-route
+// first-load gate runs against the real Turbopack output via `pnpm perf:budget`.
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -30,4 +39,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

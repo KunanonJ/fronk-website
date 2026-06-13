@@ -10,6 +10,15 @@ function resolveCta(
   return { label: cta.label.trim(), href: cta.href.trim() };
 }
 
+/**
+ * One run of statement text. `strong` segments render heavier (the matveyan
+ * light-base / semibold-emphasis weight contrast). Plain prose otherwise.
+ */
+export interface StatementSegment {
+  text: string;
+  strong?: boolean;
+}
+
 export const DEFAULT_HOME_PAGE = {
   heroEyebrow: "Currently shipping",
   heroTitle: siteConfig.shortName,
@@ -17,13 +26,32 @@ export const DEFAULT_HOME_PAGE = {
   heroIntro: null as string | null,
   primaryCta: { label: "See what I'm shipping", href: "/ventures" },
   secondaryCta: { label: "Read writing", href: "/writing" },
-  featuredSectionKicker: "✦ Currently shipping",
+  featuredSectionKicker: "Selected ventures",
   featuredSectionTitle: "Two bets. Both live.",
   featuredLimit: 3,
   writingTitle: "Currently writing",
   writingDescription:
     "Long-form notes on building from zero — fundraising, hiring, shipping, and the daily reality of running early-stage companies.",
   writingCta: { label: "Read the journal", href: "/writing" },
+  // Specialization statement (home §B). Composed only from already-published
+  // facts — GoGoCash (cashback), Manut AI (AI workspace), Southeast Asia. The
+  // `strong` words carry the weight-contrast emphasis.
+  specializationEyebrow: "Operations / Software / Fintech / AI",
+  specializationStatement: [
+    { text: "I turn " },
+    { text: "messy operations", strong: true },
+    { text: " into " },
+    { text: "software", strong: true },
+    { text: " — cashback for " },
+    { text: "shoppers", strong: true },
+    { text: ", an " },
+    { text: "AI workspace", strong: true },
+    { text: " for " },
+    { text: "solo founders", strong: true },
+    { text: ", built in " },
+    { text: "Southeast Asia", strong: true },
+    { text: "." },
+  ],
 } as const;
 
 export type ResolvedHomePage = {
@@ -39,6 +67,8 @@ export type ResolvedHomePage = {
   writingTitle: string;
   writingDescription: string;
   writingCta: CtaLink;
+  specializationEyebrow: string;
+  specializationStatement: readonly StatementSegment[];
 };
 
 export function resolveHomePage(cms: HomePageContent | null): ResolvedHomePage {
@@ -72,5 +102,8 @@ export function resolveHomePage(cms: HomePageContent | null): ResolvedHomePage {
       DEFAULT_HOME_PAGE.writingDescription,
     ),
     writingCta: resolveCta(cms?.writingCta, DEFAULT_HOME_PAGE.writingCta),
+    // Code-owned honest content (no CMS field yet); editable in one place.
+    specializationEyebrow: DEFAULT_HOME_PAGE.specializationEyebrow,
+    specializationStatement: DEFAULT_HOME_PAGE.specializationStatement,
   };
 }
