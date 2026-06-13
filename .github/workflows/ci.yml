@@ -39,9 +39,16 @@ jobs:
         run: pnpm lint
 
       - name: Test
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm test
 
       - name: Build
         env:
-          NEXT_PUBLIC_SITE_URL: https://example.com
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm build

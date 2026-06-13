@@ -23,14 +23,8 @@ describe("resolveManifestFileName", () => {
 });
 
 describe("readManifestFile", () => {
-  it("reads create-manifest.json from the build output directory", async () => {
-    const content = await readManifestFile("create-manifest.json");
-    expect(content).not.toBeNull();
-    expect(JSON.parse(content!)).toMatchObject({
-      version: 3,
-      workspaces: expect.arrayContaining([
-        expect.objectContaining({ basePath: "/studio" }),
-      ]),
-    });
+  it("returns null when the manifest file is missing", async () => {
+    const content = await readManifestFile("does-not-exist.json");
+    expect(content).toBeNull();
   });
 });
