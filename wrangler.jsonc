@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fronk-website",
+  "account_id": "187ab61ed9dbc6e616cb23e6b95aa8f1",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-06-16",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://kunanonj.com",
+    "NEXT_PUBLIC_SANITY_PROJECT_ID": "nkspfk4b",
+    "NEXT_PUBLIC_SANITY_DATASET": "production",
+    "NEXT_PUBLIC_SANITY_API_VERSION": "2025-01-01",
+    "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
+    "NEXT_PUBLIC_UMAMI_HOST": "https://cloud.umami.is",
+  },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "fronk-website",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "fronk-website-opennext-cache",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}

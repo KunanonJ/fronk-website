@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fronk-website-revalidate-cron",
+  "account_id": "187ab61ed9dbc6e616cb23e6b95aa8f1",
+  "main": "workers/revalidate-cron.ts",
+  "compatibility_date": "2026-06-16",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "vars": {
+    "CRON_ENDPOINT_URL": "https://kunanonj.com/api/cron/revalidate",
+  },
+  "triggers": {
+    "crons": ["0 * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "env": {
+    "local": {
+      "name": "fronk-website-revalidate-cron-local",
+      "vars": {
+        "CRON_ENDPOINT_URL": "http://localhost:8788/api/cron/revalidate",
+      },
+    },
+  },
+}

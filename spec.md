@@ -28,7 +28,7 @@ Add Sanity CMS management for the public Fronk website while preserving the curr
 - Full visual redesign.
 - Removing current static fallbacks.
 - Replacing Sanity Studio with a custom admin UI.
-- Performing live Sanity or Railway mutations from this repo change.
+- Performing live hosting-provider mutations from this repo change.
 
 # Architecture
 
@@ -135,7 +135,7 @@ As an editor, I want to schedule a journal post so that it appears automatically
 
 Acceptance Criteria: Future posts are hidden publicly and visible in preview mode.
 
-As an operator, I want Sanity edits to revalidate only relevant pages so that Railway serves fresh content quickly.
+As an operator, I want Sanity edits to revalidate only relevant pages so that the hosted site serves fresh content quickly.
 
 Acceptance Criteria: Signed webhooks map document types to deterministic cache tags.
 
