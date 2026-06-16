@@ -1,26 +1,29 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const root = process.cwd();
 
 describe("Sanity Studio manifest static assets", () => {
-  it("manifest__given_cloudflare_worker_runtime__then_uses_public_asset_not_node_fs_route", () => {
-    const publicManifestPath = join(
-      root,
-      "public/studio/static/create-manifest.json",
-    );
+  it("manifest__given_cloudflare_worker_runtime__then_generates_public_asset_before_build", () => {
+    const packageJsonPath = join(root, "package.json");
     const runtimeRoutePath = join(
       root,
       "app/studio/static/[[...path]]/route.ts",
     );
 
-    expect(existsSync(publicManifestPath)).toBe(true);
-    expect(() =>
-      JSON.parse(readFileSync(publicManifestPath, "utf8")),
-    ).not.toThrow();
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    expect(packageJson.scripts["sanity:manifest"]).toBe(
+      "sanity manifest extract --path public/studio/static",
+    );
+    expect(packageJson.scripts.build).toMatch(
+      /^pnpm sanity:manifest && next build/,
+    );
 
-    expect(existsSync(runtimeRoutePath)).toBe(true);
-    expect(readFileSync(runtimeRoutePath, "utf8")).not.toContain("node:fs");
+    const runtimeRouteSource = readFileSync(runtimeRoutePath, "utf8");
+    expect(runtimeRouteSource).not.toContain("node:fs");
+    expect(runtimeRouteSource).toContain("env.ASSETS.fetch");
   });
 });
