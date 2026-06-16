@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 // Next 16 prints no JS-size table, and @next/bundle-analyzer is a silent no-op
 // under the default Turbopack build. So the treemap requires the webpack bundler
@@ -38,5 +39,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
 };
+
+initOpenNextCloudflareForDev();
 
 export default withBundleAnalyzer(nextConfig);

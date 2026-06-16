@@ -20,7 +20,16 @@
     "build": "pnpm sanity:manifest && next build && pnpm sanity:schema:deploy",
     "sanity:manifest": "sanity manifest extract --path public/studio/static",
     "sanity:schema:deploy": "node scripts/sanity-schema-deploy.mjs",
+    "studio:dev": "sanity dev",
+    "studio:build": "sanity build",
+    "studio:deploy": "sanity deploy",
     "start": "next start -p ${PORT:-3000}",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "cron:preview": "wrangler dev --config wrangler.revalidate-cron.jsonc --env local --test-scheduled --port 8789",
+    "cron:deploy": "wrangler deploy --config wrangler.revalidate-cron.jsonc --env=\"\"",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
@@ -35,7 +44,6 @@
     "seed": "node scripts/seed-content.mjs",
     "pdf": "node scripts/generate-resume-pdf.mjs",
     "cron:revalidate": "node scripts/cron-revalidate.mjs",
-    "setup:railway-cron": "node scripts/setup-railway-cron.mjs",
     "ensure:local-env": "node scripts/ensure-local-env.mjs"
   },
   "dependencies": {
@@ -51,10 +59,12 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sanity": "^4.10.2",
+    "styled-components": "^6.4.1",
     "three": "^0.169.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.9",
+    "@opennextjs/cloudflare": "1.19.11",
     "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.16",
@@ -72,6 +82,7 @@
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "wrangler": "4.100.0"
   }
 }

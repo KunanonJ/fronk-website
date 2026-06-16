@@ -1,30 +1,26 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { readManifestFile, resolveManifestFileName } from "./manifest";
 
-describe("resolveManifestFileName", () => {
-  it("defaults to create-manifest.json when path is empty", () => {
-    expect(resolveManifestFileName(undefined)).toBe("create-manifest.json");
-    expect(resolveManifestFileName([])).toBe("create-manifest.json");
-  });
+const root = process.cwd();
 
-  it("allows known flat manifest filenames", () => {
-    expect(resolveManifestFileName(["create-manifest.json"])).toBe(
-      "create-manifest.json",
+describe("Sanity Studio manifest static assets", () => {
+  it("manifest__given_cloudflare_worker_runtime__then_uses_public_asset_not_node_fs_route", () => {
+    const publicManifestPath = join(
+      root,
+      "public/studio/static/create-manifest.json",
     );
-    expect(resolveManifestFileName(["ba47da56.create-tools.json"])).toBe(
-      "ba47da56.create-tools.json",
+    const runtimeRoutePath = join(
+      root,
+      "app/studio/static/[[...path]]/route.ts",
     );
-  });
 
-  it("rejects path traversal and nested paths", () => {
-    expect(resolveManifestFileName(["..", "etc", "passwd"])).toBeNull();
-    expect(resolveManifestFileName(["nested", "file.json"])).toBeNull();
-  });
-});
+    expect(existsSync(publicManifestPath)).toBe(true);
+    expect(() =>
+      JSON.parse(readFileSync(publicManifestPath, "utf8")),
+    ).not.toThrow();
 
-describe("readManifestFile", () => {
-  it("returns null when the manifest file is missing", async () => {
-    const content = await readManifestFile("does-not-exist.json");
-    expect(content).toBeNull();
+    expect(existsSync(runtimeRoutePath)).toBe(true);
+    expect(readFileSync(runtimeRoutePath, "utf8")).not.toContain("node:fs");
   });
 });

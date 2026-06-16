@@ -5,6 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@/components/Analytics";
+import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { WebVitals } from "@/components/WebVitals";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
@@ -132,6 +133,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             {children}
           </SiteShell>
         </ThemeProvider>
+        <CloudflareAnalytics />
         <Analytics />
         <GoogleAnalytics />
         <WebVitals />

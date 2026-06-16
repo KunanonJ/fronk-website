@@ -1,13 +1,13 @@
 /**
- * Railway cron helper — calls /api/cron/revalidate and exits.
+ * Cron helper — calls /api/cron/revalidate and exits.
  *
- * Use on a separate Railway service (not the web app):
+ * Use from a scheduler or one-off shell:
  *   Start command: node scripts/cron-revalidate.mjs
  *   Cron schedule: 0 * * * *   (hourly, UTC)
  *
  * Required env:
- *   CRON_SECRET — same value as on the web service
- *   CRON_ENDPOINT_URL — e.g. https://your-app.up.railway.app/api/cron/revalidate
+ *   CRON_SECRET — same value as the deployed app endpoint
+ *   CRON_ENDPOINT_URL — e.g. https://kunanonj.com/api/cron/revalidate
  *     (falls back to NEXT_PUBLIC_SITE_URL + /api/cron/revalidate)
  */
 

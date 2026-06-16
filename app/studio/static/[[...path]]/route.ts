@@ -1,27 +1,35 @@
-import { readManifestFile, resolveManifestFileName } from "@/lib/sanity/manifest";
-import { NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
+
+type RouteContext = {
+  params: Promise<{ path?: string[] }>;
+};
+
+export function resolveStudioStaticAssetPath(path: string[] | undefined) {
+  if (!path?.length) return null;
+  if (path.some((segment) => !segment || segment === "." || segment === "..")) {
+    return null;
+  }
+
+  return `/studio/static/${path.map(encodeURIComponent).join("/")}`;
+}
 
 export async function GET(
-  _request: Request,
-  context: { params: Promise<{ path?: string[] }> },
-) {
-  const { path: segments } = await context.params;
-  const fileName = resolveManifestFileName(segments);
-  if (!fileName) {
-    return new NextResponse("Not found", { status: 404 });
-  }
+  request: Request,
+  { params }: RouteContext,
+): Promise<Response> {
+  const { path } = await params;
+  const assetPath = resolveStudioStaticAssetPath(path);
+  if (!assetPath) return new Response("Not found", { status: 404 });
 
-  const content = await readManifestFile(fileName);
-  if (!content) {
-    return new NextResponse("Not found", { status: 404 });
-  }
+  const { env } = await getCloudflareContext({ async: true });
+  if (!env.ASSETS)
+    return new Response("Assets binding unavailable", { status: 500 });
 
-  return new NextResponse(content, {
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-    },
-  });
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = assetPath;
+  assetUrl.search = "";
+
+  return env.ASSETS.fetch(assetUrl);
 }
