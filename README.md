@@ -1,5 +1,10 @@
 # Fronk Kunanon Jarat — Personal Website
 
+[![CI](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml)
+[![Live site](https://img.shields.io/badge/live-kunanonj.com-111?style=flat&labelColor=111&color=34d399)](https://kunanonj.com)
+[![Cloudflare Workers](https://img.shields.io/badge/runtime-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 Personal site of Fronk Kunanon Jarat. Portfolio of ventures, resume, and
 long-form writing. Built with Next.js + Sanity and deployed on Cloudflare
 Workers through OpenNext.
@@ -8,7 +13,49 @@ Workers through OpenNext.
 Tech:      Next.js 16 · React 19 · TypeScript · Tailwind v4
 Content:   Sanity CMS (site + blog) with static fallbacks
 Style:     Minimal, dark mode default
-Hosting:   Cloudflare Workers target + Sanity Cloud (CMS API)
+Hosting:   Cloudflare Workers + OpenNext + Sanity Cloud (CMS API)
+```
+
+## Useful links
+
+- Live site: https://kunanonj.com
+- GitHub repo: https://github.com/KunanonJ/fronk-website
+- Sanity Studio launcher: https://kunanonj.com/studio
+- RSS feed: https://kunanonj.com/feed.xml
+- Sitemap: https://kunanonj.com/sitemap.xml
+
+## Highlights
+
+- Full-stack Next.js App Router site running on Cloudflare Workers via OpenNext.
+- Sanity CMS-backed pages, writing, resume, and venture content with static
+  fallbacks so the site still renders without CMS data.
+- Sanity webhook revalidation plus a separate Cloudflare Cron Worker for
+  scheduled cache refresh.
+- External Sanity Studio launcher that keeps the public Worker runtime smaller.
+- SEO surfaces: metadata, sitemap, robots, RSS, JSON-LD, Open Graph image, and
+  identity `rel="me"` links.
+- Optional analytics adapters for Cloudflare Web Analytics, Umami, GA4, and Web
+  Vitals.
+- CI runs typecheck, lint, unit/integration tests, production build, performance
+  budget, and Playwright smoke checks.
+
+## Architecture
+
+```txt
+Visitor / crawler
+      |
+      v
+Cloudflare Worker custom domains
+  - Next.js app via OpenNext
+  - Static assets through Workers Assets
+  - R2-backed incremental cache
+      |
+      +--> Sanity Content Lake and CDN
+      +--> Resend newsletter audience
+      +--> Optional analytics providers
+
+Sanity webhook ----> /api/revalidate
+Cloudflare Cron ---> /api/cron/revalidate
 ```
 
 ## Routes
@@ -21,7 +68,7 @@ Hosting:   Cloudflare Workers target + Sanity Cloud (CMS API)
 | `/writing`                                 | Sanity (ISR)            | Blog index                              |
 | `/writing/[slug]`                          | Sanity (ISR)            | Blog post                               |
 | `/resume`                                  | Sanity + fallback (ISR) | CV header + timeline; noindex           |
-| `/studio/[[...tool]]`                      | Sanity Studio           | Editor (no header/footer)               |
+| `/studio/[[...tool]]`                      | Sanity Studio           | External Studio launcher                |
 | `/api/revalidate`                          | POST                    | Sanity webhook → cache tags             |
 | `/api/draft`, `/api/draft/disable`         | GET                     | Draft preview mode                      |
 | `/api/cron/revalidate`                     | GET                     | Scheduled revalidation (Bearer auth)    |
@@ -187,20 +234,22 @@ curl "http://localhost:8789/cdn-cgi/handler/scheduled?format=json"
 
 Set these values for the app Worker:
 
-| Variable                         | Required | Public? | Notes                                                   |
-| -------------------------------- | -------- | ------- | ------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`           | yes      | yes     | `https://kunanonj.com` (no trailing slash)              |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`  | yes      | yes     | [sanity.io/manage](https://www.sanity.io/manage)        |
-| `NEXT_PUBLIC_SANITY_DATASET`     | yes      | yes     | Usually `production`                                    |
-| `NEXT_PUBLIC_SANITY_API_VERSION` | yes      | yes     | e.g. `2025-01-01`                                       |
-| `NEXT_PUBLIC_SANITY_STUDIO_URL`  | yes\*    | yes     | Hosted Sanity Studio URL used by `/studio`              |
-| `SANITY_REVALIDATE_SECRET`       | yes      | no      | `openssl rand -hex 32` — webhook HMAC secret            |
-| `SANITY_PREVIEW_SECRET`          | yes\*    | no      | `openssl rand -hex 32` — draft preview links            |
-| `SANITY_API_READ_TOKEN`          | yes\*    | no      | Sanity → API → Tokens (Viewer) — draft previews         |
-| `SANITY_AUTH_TOKEN`              | no       | no      | Sanity → API → Tokens (Deploy) — schema deploy on build |
-| `CRON_SECRET`                    | optional | no      | `openssl rand -hex 32` — scheduled revalidation         |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`   | optional | yes     | Analytics (see below)                                   |
-| `NEXT_PUBLIC_UMAMI_HOST`         | optional | yes     | Defaults to `https://cloud.umami.is`                    |
+| Variable                                     | Required | Public? | Notes                                                   |
+| -------------------------------------------- | -------- | ------- | ------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                       | yes      | yes     | `https://kunanonj.com` (no trailing slash)              |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`              | yes      | yes     | [sanity.io/manage](https://www.sanity.io/manage)        |
+| `NEXT_PUBLIC_SANITY_DATASET`                 | yes      | yes     | Usually `production`                                    |
+| `NEXT_PUBLIC_SANITY_API_VERSION`             | yes      | yes     | e.g. `2025-01-01`                                       |
+| `NEXT_PUBLIC_SANITY_STUDIO_URL`              | yes\*    | yes     | Hosted Sanity Studio URL used by `/studio`              |
+| `SANITY_REVALIDATE_SECRET`                   | yes      | no      | `openssl rand -hex 32` — webhook HMAC secret            |
+| `SANITY_PREVIEW_SECRET`                      | yes\*    | no      | `openssl rand -hex 32` — draft preview links            |
+| `SANITY_API_READ_TOKEN`                      | yes\*    | no      | Sanity → API → Tokens (Viewer) — draft previews         |
+| `SANITY_AUTH_TOKEN`                          | no       | no      | Sanity → API → Tokens (Deploy) — schema deploy on build |
+| `CRON_SECRET`                                | optional | no      | `openssl rand -hex 32` — scheduled revalidation         |
+| `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
+| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`               | optional | yes     | Analytics (see below)                                   |
+| `NEXT_PUBLIC_UMAMI_HOST`                     | optional | yes     | Defaults to `https://cloud.umami.is`                    |
+| `NEXT_PUBLIC_GA_ID`                          | optional | yes     | GA4 measurement ID, for example `G-XXXXXXXXXX`          |
 
 \*Required if you use draft preview (`/api/draft`), unpublished content, or the
 Studio launcher.
@@ -324,13 +373,22 @@ curl -sS -X POST "https://kunanonj.com/api/revalidate" -w "\n%{http_code}\n"  # 
 After publishing a post in Studio, `/writing` should show the new content without
 a manual redeploy.
 
-## Analytics (Umami)
+## Analytics
 
-Optional. `<Analytics />` in `app/layout.tsx` injects the Umami tracker
-when `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set **and** `NODE_ENV === "production"`.
-Localhost / preview traffic is never tracked.
+Analytics are optional and disabled by default unless their public environment
+variables are present. Localhost and preview traffic is intentionally filtered
+where the adapter supports it.
 
-To turn it on:
+Available adapters in `app/layout.tsx`:
+
+| Adapter                  | Component                 | Env var                                                           |
+| ------------------------ | ------------------------- | ----------------------------------------------------------------- |
+| Cloudflare Web Analytics | `<CloudflareAnalytics />` | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`                      |
+| Umami                    | `<Analytics />`           | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, optional `NEXT_PUBLIC_UMAMI_HOST` |
+| Google Analytics 4       | `<GoogleAnalytics />`     | `NEXT_PUBLIC_GA_ID`                                               |
+| Web Vitals               | `<WebVitals />`           | Uses the active client analytics bridge                           |
+
+To turn Umami on:
 
 1. Create a website in Umami → copy its **Website ID** (UUID).
 2. Add to the app Worker environment:
@@ -340,8 +398,8 @@ To turn it on:
 3. Redeploy. The script now loads with `defer` + `lazyOnload`, so it never
    blocks first paint.
 
-The `UMAMI_API_KEY` env var is separately reserved for _reading_ analytics
-data (REST API) — not used by the tracker itself.
+The `UMAMI_API_KEY` env var is separately reserved for _reading_ analytics data
+(REST API) — not used by the tracker itself.
 
 ## Project structure
 
@@ -369,13 +427,16 @@ wrangler.revalidate-cron.jsonc # Cloudflare Cron Worker config
 ## Testing
 
 ```bash
-pnpm test         # unit + integration via Vitest
-pnpm typecheck    # tsc --noEmit
-pnpm lint         # ESLint
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm exec opennextjs-cloudflare build
 ```
 
-Test surface focuses on logic (`lib/`) and the revalidate API route. UI is
-exercised via dev-server smoke checks.
+Test surface includes unit/integration tests for content, analytics, route
+handlers, Open Graph helpers, and Worker helpers. CI also runs a production
+build, performance budget check, and Playwright smoke suite.
 
 ## License
 
