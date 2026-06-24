@@ -3,6 +3,7 @@
 [![CI](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/live-kunanonj.com-111?style=flat&labelColor=111&color=34d399)](https://kunanonj.com)
 [![Cloudflare Workers](https://img.shields.io/badge/runtime-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.12-339933)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Personal site of Fronk Kunanon Jarat. Portfolio of ventures, resume, and
@@ -10,10 +11,11 @@ long-form writing. Built with Next.js + Sanity and deployed on Cloudflare
 Workers through OpenNext.
 
 ```
-Tech:      Next.js 16 · React 19 · TypeScript · Tailwind v4
-Content:   Sanity CMS (site + blog) with static fallbacks
+Tech:      Next.js 16.2 · React 19.2 · TypeScript 6 · Tailwind v4
+Content:   Sanity CMS v6 (site + blog) with static fallbacks
+Tooling:   ESLint 10 · Vitest 4 · Playwright · pnpm 10
+Runtime:   Node.js ≥22.12 · Cloudflare Workers + OpenNext + R2 cache
 Style:     Minimal, dark mode default
-Hosting:   Cloudflare Workers + OpenNext + Sanity Cloud (CMS API)
 ```
 
 ## Useful links
@@ -75,6 +77,8 @@ Cloudflare Cron ---> /api/cron/revalidate
 | `/sitemap.xml`, `/robots.txt`, `/feed.xml` | generated               |                                         |
 
 ## Local development
+
+**Requirements:** Node.js **≥22.12.0** (see `.node-version`), pnpm **10.28+**.
 
 ```bash
 # 1. Install dependencies
@@ -172,12 +176,11 @@ pnpm build
 pnpm preview
 ```
 
-`pnpm preview` uses Wrangler's default local port. If `127.0.0.1:8787` is
-already occupied, run:
+`pnpm preview` builds with OpenNext and runs the app in Wrangler's local Worker
+runtime (default port **8787**). If that port is already in use:
 
 ```bash
-pnpm exec opennextjs-cloudflare build
-CI=1 pnpm exec wrangler dev --port 8788
+npx opennextjs-cloudflare preview -- --port 8791
 ```
 
 Production uses Cloudflare Worker custom domains for `kunanonj.com` and
@@ -410,6 +413,7 @@ app/                     # Next.js App Router routes
   studio/[[...tool]]/    # External Sanity Studio launcher
   studio/static/          # Sanity manifest asset proxy
 components/              # UI + layout components
+  icons/                 # Brand SVG icons (GitHub, LinkedIn, X)
   layout/                # Header, Footer, SiteShell
   ui/                    # Container, Button, Prose
 lib/
@@ -431,12 +435,15 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm exec opennextjs-cloudflare build
+pnpm perf:budget
+pnpm preview   # optional: smoke-test the Cloudflare Worker runtime locally
 ```
 
+CI pins Node **22.12.0** (`.node-version`) and runs typecheck, lint, unit tests,
+production build, performance budget, and Playwright smoke checks.
+
 Test surface includes unit/integration tests for content, analytics, route
-handlers, Open Graph helpers, and Worker helpers. CI also runs a production
-build, performance budget check, and Playwright smoke suite.
+handlers, Open Graph helpers, and Worker helpers.
 
 ## License
 
