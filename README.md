@@ -99,7 +99,8 @@ empty state until Sanity is configured (see below).
 | Command                        | Purpose                                                     |
 | ------------------------------ | ----------------------------------------------------------- |
 | `pnpm dev`                     | Dev server with Turbopack                                   |
-| `pnpm build`                   | Production build                                            |
+| `pnpm build`                   | Production Next.js build (CI, `pnpm start`)                 |
+| `pnpm build:cloudflare`        | OpenNext Worker build (Workers Builds / deploy)             |
 | `pnpm start`                   | Run the production build locally (port 3000 by default)     |
 | `pnpm preview`                 | Build and preview the app in the Cloudflare Workers runtime |
 | `pnpm deploy`                  | Build and deploy the app to Cloudflare Workers              |
@@ -186,6 +187,19 @@ npx opennextjs-cloudflare preview -- --port 8791
 Production uses Cloudflare Worker custom domains for `kunanonj.com` and
 `www.kunanonj.com`, R2-backed OpenNext cache, and a separate Cron Worker for
 scheduled revalidation.
+
+**Workers Builds** (CI/CD on push to `main`):
+
+| Step | Command |
+| ---- | ------- |
+| Build | `pnpm run build:cloudflare` |
+| Deploy | `npx wrangler deploy` |
+
+`pnpm build` runs Next.js only (used by GitHub Actions and `pnpm start`).
+OpenNext output lives under `.open-next/` and is produced by `build:cloudflare`
+or `pnpm deploy` / `pnpm preview`. Do **not** use `pnpm build` as the Workers
+Builds build command — `wrangler deploy` will fail with “Could not find compiled
+Open Next config”.
 
 Cloudflare deployment requirements:
 
