@@ -1,6 +1,8 @@
 import { createClient, type SanityClient } from "next-sanity";
-import imageUrlBuilder from "@sanity/image-url";
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import {
+  createImageUrlBuilder,
+  type SanityImageSource,
+} from "@sanity/image-url";
 import {
   apiVersion,
   dataset,
@@ -23,7 +25,7 @@ export function buildClient(options: BuildClientOptions = {}): SanityClient | nu
     dataset,
     apiVersion,
     useCdn: !preview && process.env.NODE_ENV === "production",
-    perspective: preview ? "previewDrafts" : "published",
+    perspective: preview ? "drafts" : "published",
     token: preview ? sanityReadToken : undefined,
   });
 }
@@ -31,7 +33,7 @@ export function buildClient(options: BuildClientOptions = {}): SanityClient | nu
 export const sanityClient: SanityClient | null = buildClient();
 
 const builder = isSanityConfigured()
-  ? imageUrlBuilder({ projectId, dataset })
+  ? createImageUrlBuilder({ projectId, dataset })
   : null;
 
 export function urlFor(source: SanityImageSource) {

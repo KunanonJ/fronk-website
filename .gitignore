@@ -34,6 +34,8 @@
 # misc
 .DS_Store
 *.pem
+.pnpm-store/
+.cursor/
 
 # debug
 npm-debug.log*

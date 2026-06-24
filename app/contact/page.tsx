@@ -1,15 +1,7 @@
 import type { Metadata } from "next";
-import {
-  Github,
-  Globe,
-  Hash,
-  Linkedin,
-  Mail,
-  MessageCircle,
-  Send,
-  Twitter,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Globe, Hash, Mail, MessageCircle, Send } from "lucide-react";
+import { GithubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
+import type { IconComponent } from "@/components/icons/types";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { PortableText } from "@/components/PortableText";
@@ -39,7 +31,7 @@ interface Channel {
   sub: string;
   href?: string;
   copy?: string;
-  icon: LucideIcon;
+  icon: IconComponent;
 }
 
 export default async function ContactPage() {
@@ -62,13 +54,13 @@ export default async function ContactPage() {
       label: "X / Twitter",
       sub: "@fkj98",
       href: site.socials.x,
-      icon: Twitter,
+      icon: XIcon,
     },
     {
       label: "LinkedIn",
       sub: "/in/kunanonj",
       href: site.socials.linkedin,
-      icon: Linkedin,
+      icon: LinkedInIcon,
     },
     {
       label: "Telegram",
@@ -86,7 +78,7 @@ export default async function ContactPage() {
       label: "GitHub",
       sub: "@KunanonJ",
       href: site.socials.github,
-      icon: Github,
+      icon: GithubIcon,
     },
     {
       label: "Farcaster",

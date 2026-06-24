@@ -1,14 +1,7 @@
 import Link from "next/link";
-import {
-  Github,
-  Globe,
-  Hash,
-  Linkedin,
-  Mail,
-  Send,
-  Twitter,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Globe, Hash, Mail, Send } from "lucide-react";
+import { GithubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
+import type { IconComponent } from "@/components/icons/types";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Logo } from "@/components/brand/Logo";
@@ -17,7 +10,7 @@ import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 interface SocialLink {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: IconComponent;
 }
 
 interface FooterProps {
@@ -28,9 +21,9 @@ export function Footer({ site }: FooterProps) {
   const year = new Date().getFullYear();
 
   const socialLinks: readonly SocialLink[] = [
-    { href: site.socials.x, label: "X", icon: Twitter },
-    { href: site.socials.linkedin, label: "LinkedIn", icon: Linkedin },
-    { href: site.socials.github, label: "GitHub", icon: Github },
+    { href: site.socials.x, label: "X", icon: XIcon },
+    { href: site.socials.linkedin, label: "LinkedIn", icon: LinkedInIcon },
+    { href: site.socials.github, label: "GitHub", icon: GithubIcon },
     { href: site.socials.telegram, label: "Telegram", icon: Send },
     { href: site.socials.farcaster, label: "Farcaster", icon: Hash },
     { href: site.socials.website, label: "Website", icon: Globe },

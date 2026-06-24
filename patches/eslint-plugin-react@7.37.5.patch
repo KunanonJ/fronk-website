@@ -1,0 +1,39 @@
+diff --git a/lib/rules/forward-ref-uses-ref.js b/lib/rules/forward-ref-uses-ref.js
+index 3a0b7de4c951e7ea92a9de7bac924ba95d643342..9140777c1b09d43294f0115e7792756d733c65bf 100644
+--- a/lib/rules/forward-ref-uses-ref.js
++++ b/lib/rules/forward-ref-uses-ref.js
+@@ -57,7 +57,7 @@ module.exports = {
+   },
+ 
+   create(context) {
+-    const sourceCode = context.getSourceCode();
++    const sourceCode = context.getSourceCode?.() ?? context.sourceCode;
+ 
+     return {
+       'FunctionExpression, ArrowFunctionExpression'(node) {
+diff --git a/lib/rules/jsx-filename-extension.js b/lib/rules/jsx-filename-extension.js
+index 4a2cfeede66b68255ca48bc38c0eb2f1537a785a..e82215e43a2a708f2b2d560ff4fcc635a9ab4ff8 100644
+--- a/lib/rules/jsx-filename-extension.js
++++ b/lib/rules/jsx-filename-extension.js
+@@ -61,7 +61,7 @@ module.exports = {
+   },
+ 
+   create(context) {
+-    const filename = context.getFilename();
++    const filename = context.getFilename?.() ?? context.filename;
+ 
+     let jsxNode;
+ 
+diff --git a/lib/util/version.js b/lib/util/version.js
+index c9dc683b7d149c5a3a941bdcbd32f657facdfbf6..380fb7968460f5c6981600ee80d47cb06d293683 100644
+--- a/lib/util/version.js
++++ b/lib/util/version.js
+@@ -28,7 +28,7 @@ function resetDetectedVersion() {
+ 
+ function resolveBasedir(contextOrFilename) {
+   if (contextOrFilename) {
+-    const filename = typeof contextOrFilename === 'string' ? contextOrFilename : contextOrFilename.getFilename();
++    const filename = typeof contextOrFilename === 'string' ? contextOrFilename : (contextOrFilename.getFilename?.() ?? contextOrFilename.filename);
+     const dirname = path.dirname(filename);
+     try {
+       if (fs.statSync(filename).isFile()) {

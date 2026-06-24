@@ -84,6 +84,10 @@ export const PREVIEW_POSTS_QUERY = groq`
       coverImage {
         ...,
         "alt": coalesce(alt, "")
+      },
+      seo {
+        title,
+        description
       }
     }
 `;
