@@ -17,35 +17,26 @@ type Phase = "cycling" | "fading" | "done";
  * Full-screen multilingual Hello intro (session-once, PRM skips).
  */
 export function IntroLoader() {
+  // SSR + first client render show nothing ("done"); the mount effect opts
+  // into the intro afterwards so server and client markup always match.
   const [phase, setPhase] = useState<Phase>("done");
   const [index, setIndex] = useState(0);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    if (prefersReducedMotion()) {
-      setPhase("done");
-      setReady(true);
-      return;
-    }
+    if (typeof window === "undefined" || prefersReducedMotion()) return;
 
     try {
-      if (sessionStorage.getItem(INTRO_SESSION_KEY) === "1") {
-        setPhase("done");
-        setReady(true);
-        return;
-      }
+      if (sessionStorage.getItem(INTRO_SESSION_KEY) === "1") return;
     } catch {
       // sessionStorage may throw — show loader once anyway
     }
 
-    setPhase("cycling");
-    setReady(true);
+    const start = window.requestAnimationFrame(() => setPhase("cycling"));
+    return () => window.cancelAnimationFrame(start);
   }, []);
 
   useEffect(() => {
-    if (!ready || phase !== "cycling") return;
+    if (phase !== "cycling") return;
 
     let i = 0;
     const id = window.setInterval(() => {
@@ -59,7 +50,7 @@ export function IntroLoader() {
     }, CYCLE_MS);
 
     return () => window.clearInterval(id);
-  }, [ready, phase]);
+  }, [phase]);
 
   useEffect(() => {
     if (phase !== "fading") return;
@@ -74,7 +65,7 @@ export function IntroLoader() {
     return () => window.clearTimeout(hold);
   }, [phase]);
 
-  if (!ready || phase === "done") return null;
+  if (phase === "done") return null;
 
   return (
     <div
