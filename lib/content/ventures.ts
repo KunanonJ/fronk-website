@@ -21,6 +21,20 @@ export interface Venture {
   featured?: boolean;
   /** Lower sorts earlier in the home featured list (flagship-first). */
   featuredOrder?: number;
+  /**
+   * Long-form case-study content for /ventures/[slug]. Same honesty rule as
+   * metrics: every claim restates a published fact — no invented numbers,
+   * clients, or outcomes.
+   */
+  caseStudy?: VentureCaseStudy;
+}
+
+export interface VentureCaseStudy {
+  /** Opening paragraph under the case-page header. */
+  intro: string;
+  sections: readonly { heading: string; body: string }[];
+  /** Display string, e.g. "2023 — present". */
+  timeline: string;
 }
 
 const VENTURES: readonly Venture[] = [
@@ -44,6 +58,25 @@ const VENTURES: readonly Venture[] = [
     ],
     featured: true,
     featuredOrder: 1,
+    caseStudy: {
+      intro:
+        "GoGoCash is a shopping-to-earn cashback platform: shop at the stores you already use, earn a cut of every purchase back. It has grown to more than a thousand users earning across 220+ merchants.",
+      timeline: "2023 — present",
+      sections: [
+        {
+          heading: "What it is",
+          body: "A cashback layer over everyday e-commerce. Members shop through GoGoCash at partner merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more — and earn up to 30% of the purchase back, funded by affiliate commissions.",
+        },
+        {
+          heading: "Where it stands",
+          body: "Live at gogocash.co with 1,000+ users and a merchant catalogue past 220 partners. The core loop — browse, shop, track cashback, withdraw — is in production and growing.",
+        },
+        {
+          heading: "My role",
+          body: "Founder. I own the product end to end: merchant partnerships, the cashback engine, and the member experience, from first commit in 2023 to today.",
+        },
+      ],
+    },
   },
   {
     slug: "manut",
@@ -59,6 +92,25 @@ const VENTURES: readonly Venture[] = [
     urlLabel: "manut.xyz",
     featured: true,
     featuredOrder: 2,
+    caseStudy: {
+      intro:
+        "Manut AI is an all-in-one workspace for solo entrepreneurs — one platform that runs the whole operation instead of a dozen stitched-together SaaS subscriptions.",
+      timeline: "2025 — present",
+      sections: [
+        {
+          heading: "What it is",
+          body: "A single workspace that connects MongoDB, Meta, AI agents, and multiple AI models. Docs, data, and automations live in one place, with AI agents doing the repetitive work a solo founder would otherwise do by hand.",
+        },
+        {
+          heading: "How it's built",
+          body: "Self-hosted first, with MongoDB as the data backbone and a model-agnostic AI layer — swap models without rebuilding workflows. Live at manut.xyz.",
+        },
+        {
+          heading: "My role",
+          body: "Founder. Started in 2025; I design and build the product — architecture, agent workflows, and the workspace experience.",
+        },
+      ],
+    },
   },
 ];
 
@@ -84,6 +136,23 @@ export function getVentureBySlug(slug: string): Venture | null {
 
 export function getAllVentureSlugs(): readonly string[] {
   return VENTURES.map((v) => v.slug);
+}
+
+/**
+ * Prev/next neighbours in the year-desc case-page order. No wrap-around —
+ * the edges return null so the footer nav renders a single direction.
+ */
+export function getAdjacentVentures(slug: string): {
+  prev: Venture | null;
+  next: Venture | null;
+} {
+  const ordered = getAllVentures();
+  const index = ordered.findIndex((v) => v.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: index > 0 ? ordered[index - 1] : null,
+    next: index < ordered.length - 1 ? ordered[index + 1] : null,
+  };
 }
 
 export function resolveVentures(

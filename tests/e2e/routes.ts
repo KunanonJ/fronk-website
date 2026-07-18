@@ -14,6 +14,16 @@ export const ROUTES: readonly RouteUnderTest[] = [
   { path: "/about", name: "about", expectsHeadingPattern: /\S/ },
   { path: "/now", name: "now", expectsHeadingPattern: /\S/ },
   { path: "/ventures", name: "ventures", expectsHeadingPattern: /\S/ },
+  {
+    path: "/ventures/gogocash",
+    name: "venture-gogocash",
+    expectsHeadingPattern: /GoGoCash/i,
+  },
+  {
+    path: "/ventures/manut",
+    name: "venture-manut",
+    expectsHeadingPattern: /Manut/i,
+  },
   { path: "/writing", name: "writing", expectsHeadingPattern: /\S/ },
   { path: "/contact", name: "contact", expectsHeadingPattern: /\S/ },
   { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },

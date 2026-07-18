@@ -1,5 +1,11 @@
+import Link from "next/link";
 import { HOME_MARKETING } from "@/lib/content/homeMarketing";
 import type { Venture } from "@/lib/content/ventures";
+
+/** Featured tiles deep-link to the internal case page when one exists. */
+function caseHref(venture: Venture): string {
+  return venture.caseStudy ? `/ventures/${venture.slug}` : venture.url;
+}
 
 interface FeaturedWorkPreviewProps {
   ventures: readonly Venture[];
@@ -29,10 +35,8 @@ export function FeaturedWorkPreview({ ventures }: FeaturedWorkPreviewProps) {
           </span>
         </div>
         <div className="grid gap-0 md:grid-cols-[1.2fr_1fr]">
-          <a
-            href={primary.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={caseHref(primary)}
             className="block space-y-3 p-6 transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-8"
           >
             <p className="text-xs uppercase tracking-[0.2em] text-muted">
@@ -56,21 +60,19 @@ export function FeaturedWorkPreview({ ventures }: FeaturedWorkPreviewProps) {
                 ))}
               </dl>
             ) : null}
-          </a>
+          </Link>
           <ul className="divide-y divide-border border-t border-border md:border-t-0 md:border-l">
             {rest.map((v) => (
               <li key={v.slug}>
-                <a
-                  href={v.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={caseHref(v)}
                   className="block space-y-1 p-5 transition-opacity duration-200 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-6"
                 >
                   <p className="font-display text-lg font-semibold text-fg">
                     {v.name}
                   </p>
                   <p className="text-sm text-muted">{v.tagline}</p>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
+import { getAllVentureSlugs } from "@/lib/content/ventures";
 
 export const revalidate = 3600;
 
@@ -31,9 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "" ? 1 : 0.7,
   }));
 
-  // Per-venture detail pages were removed — the /ventures grid now CTAs
-  // directly to each venture's external landing site (gogocash.co, manut.xyz),
-  // so there are no internal venture-slug URLs to expose to crawlers.
+  // Per-venture case pages are static, code-driven content.
+  const venturePages: MetadataRoute.Sitemap = getAllVentureSlugs().map(
+    (slug) => ({
+      url: `${base}/ventures/${slug}`,
+      lastModified: staticUpdated,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }),
+  );
 
   // Posts carry their real publish date so crawlers see genuine freshness.
   const posts = await fetchAllPosts();
@@ -44,5 +51,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...postPages];
+  return [...staticPages, ...venturePages, ...postPages];
 }

@@ -5,14 +5,18 @@ interface WorkRowProps {
   venture: Venture;
 }
 
-/** Simple work list row — opacity hover only (minimal motion). */
+/**
+ * Simple work list row — opacity hover only (minimal motion). Rows with a
+ * case study link to the internal case page; the live product stays one
+ * click away via the pill CTA on that page.
+ */
 export function WorkRow({ venture }: WorkRowProps) {
+  const caseHref = venture.caseStudy ? `/ventures/${venture.slug}` : null;
   return (
     <li className="border-b border-border">
-      <a
-        href={venture.url}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={caseHref ?? venture.url}
+        {...(caseHref ? {} : { target: "_blank", rel: "noopener noreferrer" })}
         className="group grid grid-cols-1 items-baseline gap-2 py-6 transition-opacity duration-200 hover:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] sm:gap-6"
       >
         <span className="font-display text-2xl font-medium tracking-tight text-fg sm:text-3xl">
@@ -20,7 +24,7 @@ export function WorkRow({ venture }: WorkRowProps) {
         </span>
         <span className="text-sm text-muted">{venture.tagline}</span>
         <span className="text-sm text-muted sm:text-right">{venture.year}</span>
-      </a>
+      </Link>
     </li>
   );
 }
