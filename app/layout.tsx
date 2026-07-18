@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Mono } from "next/font/google";
+import { Hanken_Grotesk, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Header } from "@/components/layout/Header";
@@ -31,10 +31,10 @@ const identityLinks: readonly string[] = [
   siteConfig.socials.website,
 ];
 
-// Inter — temporary portfolio grotesque until licensed Söhne woff2 land in
+// Hanken Grotesk — Söhne stand-in until licensed woff2 land in
 // public/fonts/soehne/ (then switch to next/font/local). Never ship Dennis Sans.
-const inter = Inter({
-  variable: "--font-inter",
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
   display: "swap",
 });
@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceMono.variable} h-full antialiased`}
+      className={`${hankenGrotesk.variable} ${spaceMono.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

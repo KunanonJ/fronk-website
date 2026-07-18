@@ -44,17 +44,20 @@ describe("portfolio foundation (FogLAMP mood Phase 0)", () => {
     expect(globalsCss).not.toMatch(/--shadow-hard:\s*\d+px\s+\d+px/);
   });
 
-  it("wires Inter as Söhne fallback until licensed woff2 exist", () => {
+  it("wires Hanken Grotesk as Söhne stand-in until licensed woff2 exist", () => {
     expect(globalsCss).toMatch(/--font-sans:/);
     expect(globalsCss).toMatch(/--font-display:/);
     if (hasSoehne) {
       expect(layoutTsx).toMatch(/soehne|Söhne|Soehne/i);
     } else {
-      expect(layoutTsx).toContain("Inter");
-      expect(layoutTsx).toContain("--font-inter");
-      expect(layoutTsx).toMatch(/Söhne|soehne|temporary/i);
+      expect(layoutTsx).toContain("Hanken_Grotesk");
+      expect(layoutTsx).toContain("--font-hanken");
+      expect(layoutTsx).toMatch(/Söhne|soehne/i);
+      expect(globalsCss).toMatch(/--font-sans:\s*var\(--font-hanken\)/);
+      expect(globalsCss).toMatch(/--font-display:\s*var\(--font-hanken\)/);
     }
     expect(layoutTsx).not.toContain("Syne");
+    expect(layoutTsx).not.toMatch(/\bInter\b/);
   });
 
   it("forces dark-only public theme with matching themeColor", () => {

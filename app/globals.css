@@ -39,10 +39,10 @@
   --color-neg: var(--neg);
   --color-hero-field: var(--hero-field);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
   /* Mono demoted — transitional only until Phase 1 drops HUD chrome. */
   --font-mono: var(--font-mono-instrument), ui-monospace, "SF Mono", monospace;
-  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid type scale for the redesign. */
   --text-hud: 0.75rem;
