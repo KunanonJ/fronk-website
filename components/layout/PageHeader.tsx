@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils/cn";
 
 export function PageHeader({
@@ -19,8 +18,10 @@ export function PageHeader({
 }) {
   return (
     <header className={cn("mb-12 max-w-2xl", className)}>
-      {eyebrow ? <Badge variant="outline">{eyebrow}</Badge> : null}
-      <h1 className="mt-4 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-7xl">
+      {eyebrow ? (
+        <p className="text-xs uppercase tracking-[0.2em] text-muted">{eyebrow}</p>
+      ) : null}
+      <h1 className="mt-4 font-display text-4xl font-medium leading-[1.05] tracking-tight text-fg sm:text-5xl lg:text-6xl">
         {title}
       </h1>
       {description ? (

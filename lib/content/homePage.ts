@@ -20,16 +20,17 @@ export interface StatementSegment {
 }
 
 export const DEFAULT_HOME_PAGE = {
-  heroEyebrow: "Currently shipping",
+  heroEyebrow: "Bangkok · Founder",
   heroTitle: siteConfig.shortName,
   heroTagline: siteConfig.tagline,
-  heroIntro: null as string | null,
-  primaryCta: { label: "See what I'm shipping", href: "/ventures" },
-  secondaryCta: { label: "Read writing", href: "/writing" },
-  featuredSectionKicker: "Selected ventures",
-  featuredSectionTitle: "Two bets. Both live.",
+  heroIntro:
+    "I founded GoGoCash and build Manut AI — cashback for shoppers, an AI workspace for solo founders." as string | null,
+  primaryCta: { label: "See ventures", href: "/ventures" },
+  secondaryCta: { label: "Contact", href: "/contact" },
+  featuredSectionKicker: "Ventures",
+  featuredSectionTitle: "Two products. Both live.",
   featuredLimit: 3,
-  writingTitle: "Currently writing",
+  writingTitle: "Writing",
   writingDescription:
     "Long-form notes on building from zero — fundraising, hiring, shipping, and the daily reality of running early-stage companies.",
   writingCta: { label: "Read the journal", href: "/writing" },
@@ -84,7 +85,9 @@ export function resolveHomePage(cms: HomePageContent | null): ResolvedHomePage {
     ),
     heroTitle: pickString(cms?.heroTitle, DEFAULT_HOME_PAGE.heroTitle),
     heroTagline: pickString(cms?.heroTagline, DEFAULT_HOME_PAGE.heroTagline),
-    heroIntro: cms?.heroIntro?.trim() ? cms.heroIntro.trim() : null,
+    heroIntro: cms?.heroIntro?.trim()
+      ? cms.heroIntro.trim()
+      : DEFAULT_HOME_PAGE.heroIntro,
     primaryCta: resolveCta(cms?.primaryCta, DEFAULT_HOME_PAGE.primaryCta),
     secondaryCta: resolveCta(cms?.secondaryCta, DEFAULT_HOME_PAGE.secondaryCta),
     featuredSectionKicker: pickString(

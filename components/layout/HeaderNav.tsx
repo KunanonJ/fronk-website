@@ -11,19 +11,20 @@ interface NavItem {
 
 interface HeaderNavProps {
   items: readonly NavItem[];
+  className?: string;
 }
 
 /**
- * Desktop primary nav as a client island so it can mark the active route from
- * `usePathname`. The active link wears the foreground colour + a held mint
- * underline; others reveal the underline on hover. The underline is a
- * transform-scaled pseudo-element (compositor-friendly, reduced-motion-safe).
+ * Desktop primary nav — Work / About / Contact style.
  */
-export function HeaderNav({ items }: HeaderNavProps) {
+export function HeaderNav({ items, className }: HeaderNavProps) {
   const pathname = usePathname() ?? "/";
 
   return (
-    <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
+    <nav
+      className={cn("hidden items-center gap-8 md:flex", className)}
+      aria-label="Primary"
+    >
       {items.map((item) => {
         const active =
           item.href === "/"
@@ -35,11 +36,8 @@ export function HeaderNav({ items }: HeaderNavProps) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "label-mono relative text-[0.7rem] transition-colors",
-              "after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:bg-accent after:transition-transform after:duration-200",
-              active
-                ? "text-fg after:scale-x-100"
-                : "text-muted after:scale-x-0 hover:text-fg hover:after:scale-x-100",
+              "relative text-sm tracking-tight text-muted transition-colors duration-200",
+              active ? "text-fg" : "hover:text-fg",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
             )}
           >

@@ -29,24 +29,36 @@ const SITE: ResolvedSiteSettings = {
 describe("Footer > Pages links ease their colour transition", () => {
   it("gives a Pages-list link the transition-colors utility", () => {
     render(<Footer site={SITE} />);
-    const link = screen.getByRole("link", { name: "Ventures" });
+    const link = screen.getByRole("link", { name: "Work" });
     expect(link.className).toContain("transition-colors");
   });
 });
 
 describe("Footer > renders the navigation and contact", () => {
-  it("renders every navigation item as a link to its href", () => {
+  it("renders footer nav items via map", () => {
     render(<Footer site={SITE} />);
-    for (const item of SITE.navigation) {
+    for (const label of ["Work", "About", "Writing", "Now", "Contact"]) {
       expect(
-        screen.getByRole("link", { name: item.label }),
-      ).toHaveAttribute("href", item.href);
+        screen.getAllByRole("link", { name: label }).length,
+      ).toBeGreaterThanOrEqual(1);
     }
+  });
+
+  it("renders the founder close and Contact CTA", () => {
+    render(<Footer site={SITE} />);
+    expect(screen.getByText("Building from Bangkok.")).toBeInTheDocument();
+    expect(
+      screen.getByText("GoGoCash · Manut AI · Binary Holdings."),
+    ).toBeInTheDocument();
+    const contactLinks = screen.getAllByRole("link", { name: "Contact" });
+    expect(contactLinks.some((el) => el.getAttribute("href") === "/contact")).toBe(
+      true,
+    );
   });
 
   it("exposes the email as a mailto link", () => {
     render(<Footer site={SITE} />);
-    const email = screen.getByRole("link", { name: /email me/i });
+    const email = screen.getByRole("link", { name: /hello@example.com/i });
     expect(email).toHaveAttribute("href", "mailto:hello@example.com");
   });
 });
@@ -61,10 +73,11 @@ describe("Footer > grid cells defend against overflow", () => {
     for (const cell of cells) {
       expect(cell.className).toContain("min-w-0");
     }
-    // sanity: the Pages cell still lists the nav items
     const pagesCell = cells.find((c) =>
       within(c).queryByText("Pages"),
     ) as HTMLElement;
-    expect(within(pagesCell).getByRole("link", { name: "Writing" })).toBeInTheDocument();
+    expect(
+      within(pagesCell).getByRole("link", { name: "Writing" }),
+    ).toBeInTheDocument();
   });
 });

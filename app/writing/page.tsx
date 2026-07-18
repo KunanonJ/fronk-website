@@ -48,24 +48,24 @@ export default async function WritingPage() {
               <li key={post._id} className="border-b border-border">
                 <Link
                   href={`/writing/${post.slug}`}
-                  className="group block py-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg sm:grid sm:grid-cols-[10rem_1fr] sm:gap-8"
+                  className="group block py-8 transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg sm:grid sm:grid-cols-[10rem_1fr] sm:gap-8"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-col sm:items-start sm:gap-2">
                     <time
                       dateTime={post.publishedAt}
-                      className="label-mono text-subtle"
+                      className="text-xs tracking-tight text-muted"
                     >
                       {formatDate(post.publishedAt)}
                     </time>
                     {post.tags && post.tags.length > 0 ? (
-                      <span className="label-mono text-subtle">
+                      <span className="text-xs tracking-tight text-muted">
                         {post.tags.slice(0, 2).join(" · ")}
                       </span>
                     ) : null}
                   </div>
 
                   <div className="mt-3 min-w-0 sm:mt-0">
-                    <h2 className="font-display text-2xl font-light tracking-tight text-fg transition-colors duration-150 group-hover:text-accent sm:text-3xl">
+                    <h2 className="font-display text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
                       {post.title}
                     </h2>
                     {post.excerpt ? (

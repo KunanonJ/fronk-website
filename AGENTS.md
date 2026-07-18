@@ -701,3 +701,26 @@ to Codex-native constructs:
 The authoritative historical source remains:
 
 - [CLAUDE.md](CLAUDE.md)
+
+## Learned User Preferences
+
+- Prefer spawning subagents for multi-phase work; audit after each completed task before continuing
+- When optional follow-ups are offered, implement them unless told otherwise
+- Prefer verifying with local `pnpm dev` when asked to run on the local machine
+- Portfolio redesign follows FogLAMP marketing mood/tone (not Dennis near-clone); user updates final content themselves
+- Prefer Söhne as the primary typeface (Inter is an acceptable temporary fallback until licensed woff2 land)
+- Target breakpoints: mobile 375px, tablet 768px, desktop 1440px; treat mobile as a miniature desktop layout
+- Prefer straightforward, minimized animation (not motion-for-showcase); keep meaningful hover/focus states and include an intro loading page when redesigning
+- Avoid overly complex design systems; keep components readable, use arrays/mapping for repetitive structured data; inline styles are acceptable
+- Multi-agent implementation plans should include explicit acceptance criteria per work package
+
+## Learned Workspace Facts
+
+- Production site is kunanonj.com (Fronk / Kunanon Jarat); GitHub remote `KunanonJ/fronk-website` on `main`
+- Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
+- Package manager is pnpm; Node engine is ≥22.12 (see `.node-version`)
+- Content uses Sanity CMS with static fallbacks for public pages
+- Active redesign program lives under `process/features/dennis-portfolio-redesign/` (FogLAMP mood pivot; umbrella `foglamp-mood-portfolio_UMBRELLA_PLAN_18-07-26.md`)
+- Redesign locks: dark-only near-black `#0a0a0a`, stronger grain, pill CTAs, Söhne/Inter, minimal motion by default, public routes `/`, `/ventures`, `/about`, `/contact`, `/now`, `/writing`, `/writing/[slug]`, `/resume`
+- Legacy terminal/HUD chrome and Dennis portrait/marquee hero are removed from the public shell; portrait lives on About
+- Bangkok is the site location signal (footer clock); portrait asset path is `public/profile.jpg` until replaced

@@ -12,6 +12,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [{ source: "/work", destination: "/ventures", permanent: true }];
+  },
   async headers() {
     return [
       {

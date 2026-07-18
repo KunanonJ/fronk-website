@@ -1,45 +1,64 @@
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Logo } from "@/components/brand/Logo";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeaderNav } from "@/components/layout/HeaderNav";
-import { MobileNav } from "@/components/layout/MobileNav";
+import { FullscreenMenu } from "@/components/layout/FullscreenMenu";
+import { Button } from "@/components/ui/Button";
 import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
+
+/** Primary chrome nav — Work / About / Contact. */
+export const PRIMARY_NAV = [
+  { href: "/ventures", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+] as const;
 
 interface HeaderProps {
   site: ResolvedSiteSettings;
 }
 
+/**
+ * FogLAMP-mood chrome: wordmark left, muted nav, Contact pill on desktop.
+ */
 export function Header({ site }: HeaderProps) {
-  const navItems = site.navigation.slice(1);
+  const menuNav = [
+    { href: "/", label: "Home" },
+    ...PRIMARY_NAV,
+    { href: "/writing", label: "Writing" },
+    { href: "/now", label: "Now" },
+  ];
+  const socialItems = [
+    { href: site.socials.x, label: "X / Twitter" },
+    { href: site.socials.linkedin, label: "LinkedIn" },
+    { href: site.socials.github, label: "GitHub" },
+    { href: site.socials.telegram, label: "Telegram" },
+    { href: site.socials.farcaster, label: "Farcaster" },
+    { href: site.socials.website, label: "Website" },
+  ];
 
   return (
-    <header
-      data-site-chrome
-      className="sticky top-0 z-40 border-b border-border bg-bg/85 backdrop-blur-sm"
-    >
-      <Container size="xl">
-        <div className="flex h-16 items-center justify-between gap-6">
-          <Link
-            href="/"
-            className="font-display text-lg font-bold tracking-tight transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-            aria-label={`${site.shortName} — home`}
+    <header data-site-chrome className="absolute inset-x-0 top-0 z-50 text-fg">
+      <div className="mx-auto flex h-16 w-full max-w-[90rem] items-center justify-between gap-4 px-5 sm:px-8 md:px-10">
+        <Link
+          href="/"
+          className="font-display text-sm font-medium tracking-tight text-fg transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+          aria-label={`${site.shortName} — home`}
+        >
+          {site.shortName}
+        </Link>
+
+        <div className="flex items-center gap-4 sm:gap-6">
+          <HeaderNav items={PRIMARY_NAV} />
+          <Button
+            href="/contact"
+            size="sm"
+            className="hidden md:inline-flex"
           >
-            <Logo />
-          </Link>
-
-          <HeaderNav items={navItems} />
-
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="hidden sm:inline-flex">
-              Bangkok
-            </Badge>
-            <ThemeToggle />
-            <MobileNav items={site.navigation} />
+            Contact
+          </Button>
+          <div className="md:hidden">
+            <FullscreenMenu navItems={menuNav} socialItems={socialItems} />
           </div>
         </div>
-      </Container>
+      </div>
     </header>
   );
 }

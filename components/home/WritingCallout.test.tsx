@@ -27,10 +27,9 @@ describe("WritingCallout > renders the writing invitation", () => {
     ).toHaveAttribute("href", "/writing");
   });
 
-  it("the panel surface wakes on hover (panel-live)", () => {
-    const { container } = render(<WritingCallout {...PROPS} />);
-    const panel = container.querySelector(".panel");
-    expect(panel).not.toBeNull();
-    expect(panel?.className).toContain("panel-live");
+  it("CTA uses opacity hover (minimal motion)", () => {
+    render(<WritingCallout {...PROPS} />);
+    const cta = screen.getByRole("link", { name: /read the journal/i });
+    expect(cta.className).toContain("hover:opacity-60");
   });
 });

@@ -1,10 +1,18 @@
 import Link from "next/link";
-import { Globe, Hash, Mail, Send } from "lucide-react";
-import { GithubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
+import {
+  GithubIcon,
+  GlobeIcon,
+  HashIcon,
+  LinkedInIcon,
+  MailIcon,
+  SendIcon,
+  XIcon,
+} from "@/components/icons";
 import type { IconComponent } from "@/components/icons/types";
 import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Logo } from "@/components/brand/Logo";
+import { Button } from "@/components/ui/Button";
+import { BangkokClock } from "@/components/layout/BangkokClock";
+import { FOOTER_COPY } from "@/lib/content/homeMarketing";
 import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 
 interface SocialLink {
@@ -17,40 +25,51 @@ interface FooterProps {
   site: ResolvedSiteSettings;
 }
 
-export function Footer({ site }: FooterProps) {
-  const year = new Date().getFullYear();
+const FOOTER_NAV = [
+  { href: "/ventures", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/writing", label: "Writing" },
+  { href: "/now", label: "Now" },
+  { href: "/contact", label: "Contact" },
+] as const;
 
+export function Footer({ site }: FooterProps) {
   const socialLinks: readonly SocialLink[] = [
     { href: site.socials.x, label: "X", icon: XIcon },
     { href: site.socials.linkedin, label: "LinkedIn", icon: LinkedInIcon },
     { href: site.socials.github, label: "GitHub", icon: GithubIcon },
-    { href: site.socials.telegram, label: "Telegram", icon: Send },
-    { href: site.socials.farcaster, label: "Farcaster", icon: Hash },
-    { href: site.socials.website, label: "Website", icon: Globe },
+    { href: site.socials.telegram, label: "Telegram", icon: SendIcon },
+    { href: site.socials.farcaster, label: "Farcaster", icon: HashIcon },
+    { href: site.socials.website, label: "Website", icon: GlobeIcon },
   ];
 
   return (
     <footer
       data-site-chrome
-      className="mt-32 border-t border-border pt-16 text-sm text-muted"
+      className="mt-24 border-t border-border bg-bg pt-16 pb-10 text-sm text-muted sm:mt-32"
     >
       <Container size="xl">
-        <div className="grid grid-cols-1 gap-10 border-b border-border pb-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-12 border-b border-border pb-12 min-w-0 sm:grid-cols-2 lg:grid-cols-3">
           <div className="min-w-0 space-y-4">
-            <Logo className="text-2xl text-fg" />
-            <p className="max-w-xs leading-relaxed">{site.footerTagline}</p>
+            <p className="font-display text-2xl font-semibold tracking-tight text-fg sm:text-3xl">
+              {FOOTER_COPY.title}
+            </p>
+            <p className="max-w-sm text-muted">{FOOTER_COPY.line}</p>
+            <Button href={FOOTER_COPY.ctaHref} size="md">
+              {FOOTER_COPY.ctaLabel}
+            </Button>
           </div>
 
           <div className="min-w-0 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-fg">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">
               Pages
             </p>
             <ul className="space-y-2">
-              {site.navigation.map((item) => (
+              {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="underline decoration-transparent underline-offset-4 transition-colors duration-200 hover:text-fg hover:decoration-accent"
+                    className="underline decoration-transparent underline-offset-4 transition-colors duration-200 hover:text-fg hover:decoration-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {item.label}
                   </Link>
@@ -60,16 +79,20 @@ export function Footer({ site }: FooterProps) {
           </div>
 
           <div className="min-w-0 space-y-4">
-            <p className="font-mono text-xs uppercase tracking-widest text-fg">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">
               Contact
             </p>
             <a
               href={`mailto:${site.email}`}
-              className="inline-flex items-center gap-2 underline decoration-accent underline-offset-4 hover:text-fg"
+              className="inline-flex items-center gap-2 text-fg underline decoration-border underline-offset-4 transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <Mail className="h-4 w-4" />
-              Email me
+              <MailIcon className="h-4 w-4" />
+              {site.email}
             </a>
+            <p className="flex flex-wrap items-center gap-2 pt-1">
+              <span>Bangkok</span>
+              <BangkokClock />
+            </p>
             <div className="flex flex-wrap gap-2 pt-2">
               {socialLinks.map(({ href, label, icon: Icon }) => (
                 <a
@@ -77,7 +100,7 @@ export function Footer({ site }: FooterProps) {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 w-11 items-center justify-center border border-border bg-surface transition-colors hover:bg-surface-2 hover:text-fg"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-fg transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   aria-label={label}
                   title={label}
                 >
@@ -88,25 +111,13 @@ export function Footer({ site }: FooterProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pt-8">
-          <Badge variant="outline">© {year}</Badge>
-          <Badge variant="outline">Built in Bangkok</Badge>
-          <Badge variant="outline">Always shipping</Badge>
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-8 text-xs text-muted">
+          <p>
+            © {new Date().getFullYear()} {site.shortName}
+          </p>
+          <p>{site.footerTagline}</p>
         </div>
       </Container>
-
-      {/* Giant wordmark rising out of the dark — the matveyan footer signature.
-          Gradient is brighter at the baseline, fading upward, so the letters
-          appear to emerge. Decorative; clipped at the viewport edges. */}
-      <div
-        aria-hidden
-        className="mt-12 flex select-none items-center justify-center gap-[0.04em] overflow-hidden px-2 text-wordmark leading-none"
-      >
-        <span className="bg-gradient-to-t from-fg/[0.22] to-fg/[0.04] bg-clip-text font-display font-bold tracking-tighter text-transparent">
-          fronk
-        </span>
-        <span className="h-[0.72em] w-[0.12em] translate-y-[0.04em] bg-gradient-to-t from-accent/35 to-accent/[0.06]" />
-      </div>
     </footer>
   );
 }

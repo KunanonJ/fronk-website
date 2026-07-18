@@ -5,7 +5,6 @@ import { Prose } from "@/components/ui/Prose";
 import { PortableText } from "@/components/PortableText";
 import { NowFallback } from "@/components/content/NowFallback";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Badge } from "@/components/ui/Badge";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchStandardPage } from "@/lib/sanity/fetch";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -36,9 +35,9 @@ export default async function NowPage() {
         eyebrow={page.eyebrow}
         title={page.heading}
         meta={
-          <Badge variant="outline" className="mt-4">
+          <p className="mt-4 text-sm text-muted">
             Updated {formatDate(lastUpdated)}
-          </Badge>
+          </p>
         }
       />
 

@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Globe, Hash, Mail, MessageCircle, Send } from "lucide-react";
-import { GithubIcon, LinkedInIcon, XIcon } from "@/components/icons/brand-icons";
+import {
+  GithubIcon,
+  GlobeIcon,
+  HashIcon,
+  LinkedInIcon,
+  MailIcon,
+  SendIcon,
+  XIcon,
+} from "@/components/icons";
 import type { IconComponent } from "@/components/icons/types";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
 import { PortableText } from "@/components/PortableText";
 import { Prose } from "@/components/ui/Prose";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { ContactForm } from "@/components/contact/ContactForm";
 import { resolveSiteSettings } from "@/lib/content/siteSettings";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { fetchSiteSettings, fetchStandardPage } from "@/lib/sanity/fetch";
@@ -30,7 +37,6 @@ interface Channel {
   label: string;
   sub: string;
   href?: string;
-  copy?: string;
   icon: IconComponent;
 }
 
@@ -48,14 +54,9 @@ export default async function ContactPage() {
       label: "Email",
       sub: site.email,
       href: `mailto:${site.email}`,
-      icon: Mail,
+      icon: MailIcon,
     },
-    {
-      label: "X / Twitter",
-      sub: "@fkj98",
-      href: site.socials.x,
-      icon: XIcon,
-    },
+    { label: "X / Twitter", sub: "@fkj98", href: site.socials.x, icon: XIcon },
     {
       label: "LinkedIn",
       sub: "/in/kunanonj",
@@ -66,13 +67,7 @@ export default async function ContactPage() {
       label: "Telegram",
       sub: "@fkj98",
       href: site.socials.telegram,
-      icon: Send,
-    },
-    {
-      label: "Discord",
-      sub: site.discordHandle,
-      copy: site.discordHandle,
-      icon: MessageCircle,
+      icon: SendIcon,
     },
     {
       label: "GitHub",
@@ -84,69 +79,62 @@ export default async function ContactPage() {
       label: "Farcaster",
       sub: "@fronk98",
       href: site.socials.farcaster,
-      icon: Hash,
+      icon: HashIcon,
     },
     {
       label: "Website",
       sub: "gogocash.co",
       href: site.socials.website,
-      icon: Globe,
+      icon: GlobeIcon,
     },
   ];
 
   return (
     <Container size="lg" className="py-14 sm:py-20 lg:py-24">
-      <PageHeader
-        eyebrow={page.eyebrow}
-        title={page.heading}
-        description={page.description || DEFAULT_CONTACT_INTRO}
-      />
+      <p className="text-xs uppercase tracking-[0.2em] text-muted">
+        {page.eyebrow}
+      </p>
+      <h1 className="mt-4 font-display text-5xl font-semibold tracking-tight text-fg sm:text-7xl">
+        {page.heading}
+      </h1>
+      <p className="mt-4 max-w-2xl text-lg text-muted">
+        {page.description || DEFAULT_CONTACT_INTRO}
+      </p>
 
       {cms?.body && cms.body.length > 0 ? (
-        <Prose className="mb-12">
+        <Prose className="mb-12 mt-8">
           <PortableText value={cms.body} />
         </Prose>
       ) : null}
 
-      {/* Channels — a single hairline panel of mono-labelled rows. Mint accent
-          is earned only by rows that are actual links; the copy-only Discord
-          handle stays monochrome. */}
-      <section aria-label="Contact channels" className="panel">
-        <p className="label-mono flex items-center justify-between gap-4 px-5 py-3 text-subtle rule-hud first:border-t-0">
-          <span>Channels</span>
-          <span>{channels.length} open</span>
-        </p>
+      <ContactForm email={site.email} />
 
+      <section aria-label="Contact channels" className="mt-16 border-t border-border">
         <ul>
           {channels.map((c) => {
             const Icon = c.icon;
             const isExternal = c.href?.startsWith("http");
-
-            const value = c.href ? (
-              <a
-                href={c.href}
-                target={isExternal ? "_blank" : undefined}
-                rel={isExternal ? "noopener noreferrer" : undefined}
-                className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:decoration-accent after:absolute after:inset-0 active:text-accent active:decoration-accent"
-              >
-                {c.sub}
-              </a>
-            ) : (
-              <span className="text-fg">{c.sub}</span>
-            );
-
             return (
               <li
                 key={c.label}
-                className="relative flex items-center justify-between gap-4 rule-hud px-5 py-4"
+                className="flex items-center justify-between gap-4 border-b border-border py-4"
               >
-                <span className="label-mono inline-flex flex-shrink-0 items-center gap-3 text-fg">
+                <span className="inline-flex items-center gap-3 text-sm text-fg">
                   <Icon className="h-4 w-4 text-muted" aria-hidden />
                   {c.label}
                 </span>
-                <span className="min-w-0 break-words [overflow-wrap:anywhere] text-right font-mono text-sm">
-                  {value}
-                </span>
+                {c.href ? (
+                  <a
+                    href={c.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="min-w-0 break-words text-right text-sm text-fg underline decoration-border underline-offset-4 transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    {c.sub}
+                  </a>
+                ) : (
+                  <span className="text-sm text-muted">{c.sub}</span>
+                )}
               </li>
             );
           })}

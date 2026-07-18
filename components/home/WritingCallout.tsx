@@ -1,5 +1,5 @@
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import Link from "next/link";
+import { ArrowDownRightIcon } from "@/components/icons";
 import type { CtaLink } from "@/lib/sanity/types";
 
 interface WritingCalloutProps {
@@ -9,10 +9,6 @@ interface WritingCalloutProps {
   cta: CtaLink;
 }
 
-/**
- * Home — the writing invitation, in terminal dress: a hairline panel with a
- * mono eyebrow, weight-contrast heading, and a tick-button CTA.
- */
 export function WritingCallout({
   eyebrow,
   title,
@@ -20,18 +16,25 @@ export function WritingCallout({
   cta,
 }: WritingCalloutProps) {
   return (
-    <div className="panel panel-live flex flex-col items-start gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-12">
+    <div className="flex flex-col items-start gap-6 border-t border-border pt-12 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-xl">
-        {eyebrow ? <p className="label-mono text-subtle">{eyebrow}</p> : null}
-        <h2 className="mt-3 font-display text-3xl font-semibold uppercase tracking-tight sm:text-4xl">
+        {eyebrow ? (
+          <p className="text-xs uppercase tracking-[0.2em] text-muted">
+            {eyebrow}
+          </p>
+        ) : null}
+        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
           {title}
         </h2>
         <p className="mt-3 text-muted">{description}</p>
       </div>
-      <Button href={cta.href} variant="secondary" size="lg" className="flex-shrink-0">
+      <Link
+        href={cta.href}
+        className="inline-flex shrink-0 items-center gap-2 text-sm text-fg transition-opacity duration-200 hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
         {cta.label}
-        <ArrowRight className="h-4 w-4" />
-      </Button>
+        <ArrowDownRightIcon className="h-4 w-4" />
+      </Link>
     </div>
   );
 }

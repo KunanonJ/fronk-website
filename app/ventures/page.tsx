@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Container } from "@/components/ui/Container";
-import { VentureCaseRow } from "@/components/home/VentureCaseRow";
-import { Reveal } from "@/components/ui/Reveal";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { WorkIndexList } from "@/components/work/WorkIndexList";
 import { resolveStandardPage } from "@/lib/content/standardPage";
 import { getAllVentures, resolveVentures } from "@/lib/content/ventures";
 import { fetchAllVentures, fetchStandardPage } from "@/lib/sanity/fetch";
@@ -33,17 +32,10 @@ export default async function VenturesPage() {
     <Container size="xl" className="py-14 sm:py-20 lg:py-24">
       <PageHeader
         eyebrow={page.eyebrow}
-        title={page.heading}
+        title="Work"
         description={page.description}
       />
-
-      <div className="space-y-20 sm:space-y-28">
-        {ventures.map((venture, i) => (
-          <Reveal key={venture.slug}>
-            <VentureCaseRow venture={venture} index={i} />
-          </Reveal>
-        ))}
-      </div>
+      <WorkIndexList ventures={ventures} />
     </Container>
   );
 }

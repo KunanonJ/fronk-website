@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Space_Mono } from "next/font/google";
+import { Inter, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { Header } from "@/components/layout/Header";
@@ -31,14 +31,15 @@ const identityLinks: readonly string[] = [
   siteConfig.socials.website,
 ];
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Inter — temporary portfolio grotesque until licensed Söhne woff2 land in
+// public/fonts/soehne/ (then switch to next/font/local). Never ship Dennis Sans.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Space Mono — the terminal "instrument" face for HUD labels, eyebrows,
-// the ticker, and code. Static font: weights 400/700 only.
+// Space Mono — transitional mono; HUD chrome removed in WP-03.
 const spaceMono = Space_Mono({
   variable: "--font-mono-instrument",
   subsets: ["latin"],
@@ -82,10 +83,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f5f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
+  // Public site is dark-only (FogLAMP near-black mood).
+  themeColor: "#0a0a0a",
 };
 
 interface RootLayoutProps {
@@ -99,7 +98,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${spaceMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceMono.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -123,7 +122,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          forcedTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <SiteShell

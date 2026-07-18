@@ -1,26 +1,25 @@
-/* ─── Terminal-HUD design tokens (Phase 1) ─────────────────────────────────
- * A dark "trading-terminal" shell (matveyan.com-inspired) with a paper-light
- * variant. Discipline: monochrome shell, hairline rules, monospace instrument
- * labels — colour appears only when earned (links/focus, ticker deltas,
- * product art).
+/* ─── Portfolio design tokens (dennis-portfolio-redesign Phase 0) ───────────
+ * Soft charcoal portfolio language inspired by dennissnellenberg.com
+ * structure/interactions — Fronk content & assets only (no proprietary copy).
  *
  *   --bg / --fg        page canvas and primary text
  *   --muted / --subtle secondary / tertiary text
- *   --border           1px hairline (rgba) — frames, rules, panels, buttons
+ *   --border           1px hairline (rgba)
  *   --border-strong    brighter hairline for hover/active
- *   --surface          barely-raised panel fill
+ *   --surface          raised panel fill
  *   --surface-2        faint well / hover fill
- *   --accent           the single earned highlight (links, focus ring)
- *   --pos / --neg      ticker / status deltas (up / down)
+ *   --hero-field       hero plane (near-black in FogLAMP mood)
+ *   --accent           focus / link highlight (near-neutral on dark)
+ *   --pos / --neg      status deltas
  *
- * Motif utilities: frame-hud, label-mono, panel, rule-hud, ghost-number,
- *   font-display (now weight-contrast sans). Legacy brutalist utilities
- *   (border-brutal / shadow-brutal / sticker / card-brutal) are repurposed to
- *   the terminal look as @deprecated shims so existing components flip
- *   coherently; they are removed as components migrate (Phases 2–3).
+ * @deprecated HUD motif utilities (frame-hud, label-mono, ghost-number,
+ *   rule-hud, panel-live, ticker/hud-pulse/cursor-blink) — keep for
+ *   transitional chrome; remove in Phase 1 shell rebuild. See
+ *   process/features/dennis-portfolio-redesign/references/hud-migration-map_11-07-26.md
  * ─────────────────────────────────────────────────────────────────────────── */
 
 @import "tailwindcss";
+/* Lenis CSS removed — public shell uses native scroll (minimal-motion lock). */
 @plugin "@tailwindcss/typography";
 
 @variant dark (&:where(.dark, .dark *));
@@ -38,11 +37,12 @@
   --color-accent-fg: var(--accent-fg);
   --color-pos: var(--pos);
   --color-neg: var(--neg);
+  --color-hero-field: var(--hero-field);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Mono demoted — transitional only until Phase 1 drops HUD chrome. */
   --font-mono: var(--font-mono-instrument), ui-monospace, "SF Mono", monospace;
-  /* Headlines use weight-contrast sans (light + semibold), not a display face. */
-  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid type scale for the redesign. */
   --text-hud: 0.75rem;
@@ -62,46 +62,50 @@
   --animate-hud-pulse: hud-pulse 2.4s ease-in-out infinite;
   /* Logotype terminal cursor — a hard on/off blink (steps), never a fade. */
   --animate-cursor-blink: cursor-blink 1.1s steps(1, end) infinite;
+  /* Location-pill wireframe globe */
+  --animate-globe-spin: globe-spin 12s linear infinite;
 }
 
-/* ─── Light terminal (paper / schematic) ──────────────────────────────────── */
+/* ─── Light portfolio ─────────────────────────────────────────────────────── */
 :root {
-  --bg: #f5f5f3;
-  --fg: #0e0e0d;
-  --muted: #6b6b67;
-  --subtle: #707070;
-  --border: rgba(14, 14, 13, 0.15);
-  --border-strong: rgba(14, 14, 13, 0.42);
+  --bg: #f0f0ee;
+  --fg: #1c1d20;
+  --muted: rgba(28, 29, 32, 0.55);
+  --subtle: rgba(28, 29, 32, 0.4);
+  --border: rgba(28, 29, 32, 0.14);
+  --border-strong: rgba(28, 29, 32, 0.4);
   --surface: #ffffff;
-  --surface-2: rgba(14, 14, 13, 0.035);
-  --accent: #0a7a54;
+  --surface-2: rgba(28, 29, 32, 0.04);
+  --hero-field: #c8cacb;
+  --accent: #1c1d20;
   --accent-fg: #ffffff;
   --pos: #0a7a54;
   --neg: #c8453b;
-  --grain-opacity: 0.03;
+  --grain-opacity: 0.02;
 }
 
-/* ─── Dark terminal (pure black, matveyan reference) ───────────────────────── */
+/* ─── Dark portfolio (FogLAMP near-black mood) ───────────────────────────── */
 .dark {
-  --bg: #000000;
-  --fg: #ededed;
-  --muted: #8a8a8a;
-  --subtle: #7a7a7a;
+  --bg: #0a0a0a;
+  --fg: #ffffff;
+  --muted: rgba(255, 255, 255, 0.55);
+  --subtle: rgba(255, 255, 255, 0.35);
   --border: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.3);
-  --surface: #0a0a0a;
+  --surface: #141414;
   --surface-2: rgba(255, 255, 255, 0.04);
-  --accent: #34d399;
-  --accent-fg: #000000;
+  --hero-field: #0a0a0a;
+  --accent: #eee;
+  --accent-fg: #0a0a0a;
   --pos: #34d399;
   --neg: #f87171;
-  --grain-opacity: 0.05;
+  --grain-opacity: 0.06;
 }
 
 html {
   background: var(--bg);
   color: var(--fg);
-  color-scheme: light dark;
+  color-scheme: dark;
   scroll-behavior: smooth;
 }
 
@@ -138,7 +142,7 @@ a {
   text-underline-offset: 3px;
 }
 
-/* ─── HUD motif utilities ─────────────────────────────────────────────────── */
+/* ─── @deprecated HUD motif utilities (remove in Phase 1) ─────────────────── */
 
 /* Fixed hairline window-frame, inset on all sides (the instrument bezel). */
 @utility frame-hud {
@@ -315,6 +319,12 @@ a {
   50%,
   99% {
     opacity: 0;
+  }
+}
+
+@keyframes globe-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
