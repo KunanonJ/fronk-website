@@ -18,7 +18,12 @@ const nextConfig: NextConfig = {
       { source: "/stock/asme", destination: "/about", permanent: true },
       // Ventures lives as the home section; keep a named URL
       { source: "/ventures", destination: "/#ventures", permanent: true },
-      { source: "/ventures/:slug", destination: "/#ventures", permanent: true },
+      // Exclude static files (e.g. future /ventures/*.png) from the section redirect.
+      {
+        source: "/ventures/:slug((?!.*\\..*).*)",
+        destination: "/#ventures",
+        permanent: true,
+      },
       { source: "/now", destination: "/", permanent: true },
       { source: "/writing", destination: "/blog", permanent: true },
       { source: "/writing/:slug", destination: "/blog/:slug", permanent: true },

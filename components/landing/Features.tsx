@@ -57,7 +57,7 @@ function InfoCardBody({ card }: { card: InfoCard }) {
     <div className="flex h-full flex-col p-5 sm:p-6">
       <img
         src={card.icon}
-        alt=""
+        alt={`${card.title} logo`}
         className="mb-4 h-10 w-10 rounded object-cover sm:h-12 sm:w-12"
       />
 

@@ -57,7 +57,7 @@ export const ventures = {
       type: "info" as const,
       number: "01",
       title: "GoGoCash",
-      icon: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260405_171918_4a5edc79-d78f-4637-ac8b-53c43c220606.png&w=1280&q=85",
+      icon: "/brand/gogocash.svg",
       items: [
         "1,000+ users",
         "220+ merchants",
@@ -70,7 +70,7 @@ export const ventures = {
       type: "info" as const,
       number: "02",
       title: "Manut",
-      icon: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260405_171741_ed9845ab-f5b2-4018-8ce7-07cc01823522.png&w=1280&q=85",
+      icon: "/brand/manut.png",
       items: [
         "ERP/CRM for automotive SMEs",
         "Intelligence AI workspace",
@@ -82,7 +82,7 @@ export const ventures = {
       type: "info" as const,
       number: "03",
       title: "Airplusauto",
-      icon: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260405_171809_f56666dc-c099-4778-ad82-9ad4f209567b.png&w=1280&q=85",
+      icon: "/brand/airplusauto.png",
       items: ["Venture in flight", "Shipping from Bangkok", "More soon"],
       href: "https://airplusauto.com",
     },
