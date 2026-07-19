@@ -61,8 +61,8 @@ jobs:
         run: pnpm build
 
       # Reuses the .next from the Build step above (same job, repo-root cwd).
-      # Fails if any route's first-load JS exceeds 205KB gz or if Three.js
-      # leaks into the home route's first-load set.
+      # Fails if any route's first-load JS exceeds its budget (205 KB default;
+      # 300 KB marketing) or if Three.js leaks into the home first-load set.
       - name: Perf budget
         run: pnpm perf:budget
 

@@ -25,15 +25,29 @@ import zlib from "node:zlib";
 // across all routes, hero-independent). Raise deliberately and document why.
 const DEFAULT_BUDGET_KB = 205;
 
-// Landing cutover (2026-07): framer-motion for intro splash + showcase motion adds
-// ~40–45 KB gz to first load on marketing routes only. Resume stays on the old bar.
-const ROUTE_BUDGETS_KB = {
-  "/": 260,
-  "/showcase": 260,
-};
+// Landing cutover (2026-07): `RouteSplash` mounts in the root layout, so every
+// marketing page pays framer-motion on first load (~40–80 KB gz above the
+// resume/system floor). Blog/editorial routes sit higher (~288 KB) because they
+// also ship landing nav + next/image card chrome. Resume/stock stay on DEFAULT.
+const MARKETING_BUDGET_KB = 300;
+
+const MARKETING_EXACT = new Set([
+  "/",
+  "/showcase",
+  "/about",
+  "/contact",
+  "/press",
+  "/blog",
+]);
+
+function isMarketingRoute(route) {
+  if (MARKETING_EXACT.has(route)) return true;
+  if (route.startsWith("/blog/")) return true;
+  return false;
+}
 
 function budgetKbForRoute(route) {
-  return ROUTE_BUDGETS_KB[route] ?? DEFAULT_BUDGET_KB;
+  return isMarketingRoute(route) ? MARKETING_BUDGET_KB : DEFAULT_BUDGET_KB;
 }
 const APP_DIR = ".next/server/app";
 // The Three.js chunk must never appear in the home route's first-load set.
@@ -91,7 +105,7 @@ const routes = findRouteHtml()
   .sort((a, b) => b.kb - a.kb);
 
 console.log(
-  `Landing-JS first-load budget: ${DEFAULT_BUDGET_KB} KB gzip (default); marketing routes up to ${Math.max(...Object.values(ROUTE_BUDGETS_KB))} KB\n`,
+  `Landing-JS first-load budget: ${DEFAULT_BUDGET_KB} KB gzip (default); marketing routes up to ${MARKETING_BUDGET_KB} KB\n`,
 );
 let worstOver = 0;
 let worstOverRoute = "";
