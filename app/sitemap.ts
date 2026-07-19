@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { resolveBlogCards } from "@/lib/content/blog";
+import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
+import { getAllVentureSlugs } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 
@@ -16,6 +18,21 @@ const STATIC_ROUTES: readonly {
   { path: "/contact", changeFrequency: "monthly", priority: 0.8 },
   { path: "/press", changeFrequency: "monthly", priority: 0.8 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
+  ...TOPIC_SLUGS.map((slug) => ({
+    path: `/topics/${slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.95,
+  })),
+  ...TOPIC_SLUGS.map((slug) => ({
+    path: `/th/topics/${slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  })),
+  ...getAllVentureSlugs().map((slug) => ({
+    path: `/ventures/${slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  })),
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

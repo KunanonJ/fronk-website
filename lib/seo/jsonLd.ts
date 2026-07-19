@@ -120,6 +120,55 @@ export type ArticleJsonLdInput = {
   tags?: readonly string[];
 };
 
+export type SoftwareAppJsonLdInput = {
+  name: string;
+  description: string;
+  url: string;
+  /** Canonical case-page on this site */
+  pagePath: string;
+  applicationCategory?: string;
+  operatingSystem?: string;
+};
+
+/** SoftwareApplication for product hubs (/ventures/[slug]). */
+export function buildSoftwareApplicationJsonLd(
+  input: SoftwareAppJsonLdInput,
+): Record<string, unknown> {
+  const pageUrl = `${BASE}${input.pagePath.startsWith("/") ? input.pagePath : `/${input.pagePath}`}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": `${pageUrl}/#software`,
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    applicationCategory: input.applicationCategory ?? "BusinessApplication",
+    operatingSystem: input.operatingSystem ?? "Web",
+    author: { "@id": PERSON_ID },
+    provider: { "@id": PERSON_ID },
+    isPartOf: { "@id": WEBSITE_ID },
+    mainEntityOfPage: pageUrl,
+  };
+}
+
+export type BreadcrumbItem = { name: string; path: string };
+
+/** BreadcrumbList for topic/venture hubs. */
+export function buildBreadcrumbJsonLd(
+  items: readonly BreadcrumbItem[],
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${BASE}${item.path.startsWith("/") ? item.path : `/${item.path}`}`,
+    })),
+  };
+}
+
 /** BlogPosting for /blog/[slug] — pairs with visible post chrome. */
 export function buildArticleJsonLd(
   input: ArticleJsonLdInput,

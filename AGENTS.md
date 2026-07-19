@@ -718,7 +718,8 @@ The authoritative historical source remains:
 - Production site is kunanonj.com (Fronk / Kunanon Jarat); GitHub remote `KunanonJ/fronk-website` on `main`
 - Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
 - Package manager is pnpm; Node engine is ≥22.12 (see `.node-version`)
-- Active public UI program: `process/features/landing-cutover/` (umbrella `landing-cutover_UMBRELLA_PLAN_19-07-26.md`); FogLAMP/Dennis redesign is superseded
-- Public marketing routes: `/`, `/showcase`; system routes `/resume`, `/studio`; retired `/about|/ventures|/contact|/now|/writing|/work` redirect into the landing
-- Landing content is static in `lib/content/landing.ts` (Sanity retained for studio/resume); portrait at `public/profile.jpg`
+- Active public UI program: `process/features/landing-cutover/` (cinematic `/` + `/showcase`); FogLAMP/Dennis redesign is superseded
+- Active discovery program: `process/features/sea-discovery/` (SEO/AEO/SEM/LinkedIn for AI transformation · ERP/CRM · startups TH/SEA)
+- Indexed authority routes: `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, `/ventures/[slug]`; system `/resume`, `/studio` (noindex); `/ventures` index → `/#ventures`; `/now` → `/`; `/writing` → `/blog`
+- Landing content is static in `lib/content/landing.ts` (Sanity retained for studio/resume/blog); portrait at `public/profile.jpg`
 - Bangkok is the site location signal; wordmark KunanonJ

@@ -9,9 +9,9 @@ import {
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 export const metadata: Metadata = routeShareMeta({
-  title: "About",
+  title: "About Kunanon Jarat — AI, ERP/CRM & startups from Bangkok",
   description:
-    "Kunanon Jarat (Fronk) — Bangkok founder of GoGoCash and Manut AI. Story, operating principles, and how to get in touch.",
+    "Kunanon Jarat (Fronk / KunanonJ) — Bangkok founder of GoGoCash and Manut AI. Building AI transformation, ERP/CRM, and tech startups for Thailand and SEA.",
   path: "/about",
 });
 

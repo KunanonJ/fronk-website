@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
   buildFaqJsonLd,
   buildProfilePageJsonLd,
   buildSiteJsonLd,
+  buildSoftwareApplicationJsonLd,
   PERSON_ID,
 } from "./jsonLd";
 
@@ -87,5 +89,33 @@ describe("buildArticleJsonLd > emits BlogPosting for a post", () => {
     expect(String(article.url)).toContain("/blog/shipping-from-bangkok");
     expect((article.author as Node)["@id"]).toBe(PERSON_ID);
     expect(article.headline).toBe("Shipping from Bangkok");
+  });
+});
+
+describe("buildSoftwareApplicationJsonLd > product hub entity", () => {
+  it("binds author to Person and uses the case-page path", () => {
+    const app = buildSoftwareApplicationJsonLd({
+      name: "Manut AI",
+      description: "ERP/CRM with Intelligence AI for automotive SMEs.",
+      url: "https://manut.xyz",
+      pagePath: "/ventures/manut",
+    });
+    expect(app["@type"]).toBe("SoftwareApplication");
+    expect(String(app["@id"])).toContain("/ventures/manut");
+    expect((app.author as Node)["@id"]).toBe(PERSON_ID);
+  });
+});
+
+describe("buildBreadcrumbJsonLd > ordered trail", () => {
+  it("numbers items from home through the hub", () => {
+    const crumbs = buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Topics", path: "/topics/ai-transformation-thailand" },
+    ]);
+    expect(crumbs["@type"]).toBe("BreadcrumbList");
+    const items = crumbs.itemListElement as Node[];
+    expect(items).toHaveLength(2);
+    expect(items[0].position).toBe(1);
+    expect(items[1].name).toBe("Topics");
   });
 });

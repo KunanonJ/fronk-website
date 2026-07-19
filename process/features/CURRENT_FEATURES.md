@@ -2,5 +2,6 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `landing-cutover` | active | Retire FogLAMP public UI; prisma-landing ported into Next/OpenNext; see `active/landing-cutover_UMBRELLA_PLAN_19-07-26.md` |
+| `sea-discovery` | active | SEO/AEO/SEM/LinkedIn growth for AI transformation · ERP/CRM · startups TH/SEA; see `active/sea-discovery_UMBRELLA_PLAN_19-07-26.md` |
+| `landing-cutover` | active | Cinematic `/` + `/showcase`; authority routes retained for sea-discovery (do not redirect hubs away) |
 | `dennis-portfolio-redesign` | superseded | FogLAMP mood pivot superseded by `landing-cutover` (19-07-26) |

@@ -33,4 +33,21 @@ describe("routeShareMeta", () => {
     expect(og.type).toBe("article");
     expect(og.publishedTime).toBe("2026-06-12");
   });
+
+  it("includes hreflang languages when provided", () => {
+    const meta = routeShareMeta({
+      title: "AI transformation Thailand",
+      description: "Hub",
+      path: "/topics/ai-transformation-thailand",
+      languages: {
+        en: "/topics/ai-transformation-thailand",
+        th: "/th/topics/ai-transformation-thailand",
+        "x-default": "/topics/ai-transformation-thailand",
+      },
+    });
+    expect(meta.alternates?.languages).toMatchObject({
+      en: "/topics/ai-transformation-thailand",
+      th: "/th/topics/ai-transformation-thailand",
+    });
+  });
 });

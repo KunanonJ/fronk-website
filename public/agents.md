@@ -11,7 +11,9 @@ Owner: Kunanon Jarat (Fronk) — Bangkok, Thailand
 
 | Resource | URL | Purpose |
 |---|---|---|
-| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, ventures, blog index for LLM context |
+| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, topic hubs, ventures, blog for LLM context |
+| Topic hubs (EN) | [/topics/ai-transformation-thailand](/topics/ai-transformation-thailand) | AI transformation · ERP/CRM · startups TH/SEA |
+| Venture hubs | [/ventures/manut](/ventures/manut), [/ventures/gogocash](/ventures/gogocash) | Product case pages |
 | Markdown sitemap | [/sitemap.md](/sitemap.md) | Human/agent-readable route map |
 | XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |
 | Skills & coding guidelines | [/skills.md](/skills.md) | Prompts and standards for coding agents |

@@ -4,12 +4,18 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { WebVitals } from "@/components/WebVitals";
 import RouteSplash from "@/components/landing/RouteSplash";
 import { siteConfig } from "@/lib/site";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
+import { resolveGscVerification } from "@/lib/seo/searchConsole";
 import { site as landingSite } from "@/lib/content/landing";
 import "./globals.css";
+
+const gscVerification = resolveGscVerification(
+  process.env.NEXT_PUBLIC_GSC_VERIFICATION,
+);
 
 const siteJsonLd: string = JSON.stringify(buildSiteJsonLd());
 
@@ -78,6 +84,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  ...(gscVerification
+    ? { verification: { google: gscVerification } }
+    : {}),
 };
 
 export const viewport: Viewport = {
@@ -122,6 +131,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <RouteSplash />
           {children}
         </ThemeProvider>
+        <GoogleTagManager />
         <CloudflareAnalytics />
         <Analytics />
         <GoogleAnalytics />

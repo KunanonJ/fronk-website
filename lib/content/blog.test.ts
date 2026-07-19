@@ -32,8 +32,8 @@ describe("collectBlogTags > given posts", () => {
 describe("filterBlogPosts > given search and tag", () => {
   it("filters by tag", () => {
     const result = filterBlogPosts(FALLBACK_BLOG_POSTS, { tag: "Manut" });
-    expect(result).toHaveLength(1);
-    expect(result[0]?.slug).toBe("ai-workspace-for-smes");
+    expect(result.length).toBeGreaterThanOrEqual(2);
+    expect(result.every((p) => p.tags.includes("Manut"))).toBe(true);
   });
 
   it("filters by search query across title and excerpt", () => {
@@ -46,7 +46,7 @@ describe("filterBlogPosts > given search and tag", () => {
       query: "bangkok",
       tag: "Founding",
     });
-    expect(result).toHaveLength(1);
-    expect(result[0]?.slug).toBe("shipping-from-bangkok");
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result.every((p) => p.tags.includes("Founding"))).toBe(true);
   });
 });

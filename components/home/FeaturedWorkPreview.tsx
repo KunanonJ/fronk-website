@@ -2,12 +2,9 @@ import Link from "next/link";
 import { HOME_MARKETING } from "@/lib/content/homeMarketing";
 import type { Venture } from "@/lib/content/ventures";
 
-/**
- * Featured tiles deep-link to the home ventures section when a case study
- * exists (case routes redirect there until dedicated pages ship).
- */
+/** Featured tiles deep-link to case hubs when a case study exists. */
 function caseHref(venture: Venture): string {
-  return venture.caseStudy ? "/#ventures" : venture.url;
+  return venture.caseStudy ? `/ventures/${venture.slug}` : venture.url;
 }
 
 interface FeaturedWorkPreviewProps {

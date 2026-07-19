@@ -9,6 +9,11 @@ type RouteShareInput = {
   type?: "website" | "article";
   publishedTime?: string;
   images?: readonly string[];
+  /**
+   * Optional hreflang map: locale → absolute or site-relative path.
+   * Always include `x-default` when providing alternates.
+   */
+  languages?: Record<string, string>;
 };
 
 /**
@@ -21,6 +26,7 @@ export function routeShareMeta({
   type = "website",
   publishedTime,
   images,
+  languages,
 }: RouteShareInput): Metadata {
   const url = path.startsWith("http")
     ? path
@@ -30,10 +36,15 @@ export function routeShareMeta({
     ? images.map((src) => ({ url: src }))
     : undefined;
 
+  const canonical = path.startsWith("/") ? path : `/${path}`;
+
   return {
     title,
     description,
-    alternates: { canonical: path.startsWith("/") ? path : `/${path}` },
+    alternates: {
+      canonical,
+      ...(languages ? { languages } : {}),
+    },
     openGraph: {
       type,
       locale: "en_US",

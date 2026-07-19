@@ -14,12 +14,13 @@ Retire the FogLAMP / multi-page marketing design on [kunanonj.com](https://kunan
 
 ## Locks
 
-- Public marketing UI = prisma-landing Home + Showcase only (`/`, `/showcase`)
+- Public **cinematic** marketing UI = prisma-landing Home + Showcase (`/`, `/showcase`)
 - Intro: smooth multilingual loader ending on **Welcome to KunanonJ** (session-once, PRM skip)
 - No `react-router-dom` in production — App Router + `next/link`
 - No FogLAMP `Header` / `Footer` / `SiteShell` chrome on landing routes
 - Keep `/studio` (Sanity) and `/resume` (CV utility) as system routes with minimal layout
-- Permanent redirects from retired marketing routes into landing anchors or `/`
+- **Amended by `sea-discovery` (19-07-26):** keep `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, and `/ventures/[slug]` **indexed** — do not redirect them into anchors
+- `/ventures` index may redirect to `/#ventures`; named case hubs (`/ventures/manut`, etc.) must resolve
 - FogLAMP redesign program (`dennis-portfolio-redesign` / `foglamp-mood-portfolio_*`) marked **SUPERSEDED** at closeout
 - Production deploy still requires explicit approval (not implied by this plan)
 
@@ -31,14 +32,16 @@ Retire the FogLAMP / multi-page marketing design on [kunanonj.com](https://kunan
 | `/showcase` | Creative Studio showcase page |
 | `/resume` | Keep existing resume page (minimal layout, no FogLAMP marketing chrome) |
 | `/studio/**` | Keep Sanity Studio |
-| `/about` | 308 → `/#about` |
+| `/about` | Indexed authority page (sea-discovery) |
+| `/blog`, `/blog/[slug]` | Indexed content engine (sea-discovery) |
+| `/contact`, `/press` | Indexed conversion / PR |
+| `/topics/*`, `/th/topics/*` | Indexed category pillars (sea-discovery) |
 | `/ventures` | 308 → `/#ventures` |
-| `/ventures/:slug` | 308 → `/#ventures` |
-| `/contact` | 308 → `/#contact` |
+| `/ventures/[slug]` | Indexed product case hubs (sea-discovery) |
 | `/now` | 308 → `/` |
-| `/writing` | 308 → `/` |
-| `/writing/:slug` | 308 → `/` |
-| `/work` | 308 → `/#ventures` (replace current `/ventures` redirect) |
+| `/writing` | 308 → `/blog` |
+| `/writing/:slug` | 308 → `/blog/:slug` |
+| `/work` | 308 → `/#ventures` |
 
 ## Phases
 

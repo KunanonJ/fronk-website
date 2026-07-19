@@ -1,29 +1,30 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { track } from "./gtag";
+import { ConversionEvents, track, trackConversion } from "./gtag";
 
-afterEach(() => {
-  delete window.gtag;
-});
-
-describe("track > GA4 event helper", () => {
-  it("no-ops (does not throw) when gtag is not on the page", () => {
+describe("track / trackConversion", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
     delete window.gtag;
-    expect(() => track("select_venture", { venture: "GoGoCash" })).not.toThrow();
+    delete window.dataLayer;
   });
 
-  it("forwards the event name and params to gtag", () => {
+  it("track is a no-op without gtag", () => {
+    expect(() => track("test_event")).not.toThrow();
+  });
+
+  it("trackConversion pushes dataLayer and calls gtag when present", () => {
     const gtag = vi.fn();
     window.gtag = gtag;
-    track("select_venture", { venture: "GoGoCash" });
-    expect(gtag).toHaveBeenCalledWith("event", "select_venture", {
-      venture: "GoGoCash",
+    window.dataLayer = [];
+
+    trackConversion(ConversionEvents.topicHubCta, { topic: "erp" });
+
+    expect(gtag).toHaveBeenCalledWith("event", "topic_hub_cta", {
+      topic: "erp",
     });
-  });
-
-  it("sends an empty params object when none are given", () => {
-    const gtag = vi.fn();
-    window.gtag = gtag;
-    track("newsletter_subscribe");
-    expect(gtag).toHaveBeenCalledWith("event", "newsletter_subscribe", {});
+    expect(window.dataLayer).toContainEqual({
+      event: "topic_hub_cta",
+      topic: "erp",
+    });
   });
 });

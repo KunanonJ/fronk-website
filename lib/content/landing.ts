@@ -64,7 +64,7 @@ export const ventures = {
         "Up to 30% cashback",
         "Shopping-to-earn platform",
       ],
-      href: "https://gogocash.co",
+      href: "/ventures/gogocash",
     },
     {
       type: "info" as const,
@@ -76,7 +76,7 @@ export const ventures = {
         "Intelligence AI workspace",
         "Ops in one place",
       ],
-      href: "https://manut.xyz",
+      href: "/ventures/manut",
     },
     {
       type: "info" as const,
@@ -97,6 +97,8 @@ export const socials = [
 
 /** Machine-readable / agent surfaces linked from the home footer */
 export const footerResources = [
+  { label: "AI transformation", href: "/topics/ai-transformation-thailand" },
+  { label: "ERP / CRM", href: "/topics/erp-crm-internal-systems" },
   { label: "Agents", href: "/agents.md" },
   { label: "sitemap.md", href: "/sitemap.md" },
   { label: "llms.txt", href: "/llms.txt" },

@@ -12,22 +12,29 @@ Canonical site: https://kunanonj.com
 | Route | Name | Notes |
 |---|---|---|
 | `/` | Home | Intro loader, hero, about, ventures, contact footer |
-| `/about` | About | Hero + founder story, principles, FAQ, CTAs |
-| `/ventures` | Ventures | Named URL → home `#ventures` (GoGoCash, Manut, Airplusauto) |
-| `/press` | Press | Press card grid (banner, date, CTA) |
+| `/about` | About | Founder story, principles, FAQ |
+| `/topics/ai-transformation-thailand` | AI transformation | EN pillar (TH mirror under `/th/topics/…`) |
+| `/topics/erp-crm-internal-systems` | ERP / CRM / internal systems | EN pillar |
+| `/topics/tech-startup-thailand-sea` | Tech startups TH/SEA | EN pillar |
+| `/th/topics/[slug]` | Thai topic mirrors | hreflang pair for pillars |
+| `/ventures` | Ventures index | → home `#ventures` |
+| `/ventures/manut` | Manut case hub | ERP/CRM + Intelligence AI |
+| `/ventures/gogocash` | GoGoCash case hub | Fintech cashback |
+| `/press` | Press | Press card grid |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
-| `/contact` | Contact | Forma-style video contact + form |
-| `/showcase` | Showcase | Creative studio showcase (liquid-glass) |
-| `/resume` | Resume | CV (Sanity + fallback); noindex |
-| `/studio` | Sanity Studio | CMS launcher — not for public content scraping |
+| `/contact` | Contact | Contact + form |
+| `/showcase` | Showcase | Creative studio showcase |
+| `/resume` | Resume | CV; noindex |
+| `/studio` | Sanity Studio | CMS — not for public scraping |
 
 ### Legacy redirects
 
 | From | To |
 |---|---|
 | `/stock/asme` | `/about` |
-| `/ventures`, `/ventures/:slug`, `/work` | `/#ventures` |
+| `/ventures` (index only) | `/#ventures` |
+| `/work` | `/#ventures` |
 | `/now` | `/` |
 | `/writing`, `/writing/[slug]` | `/blog`, `/blog/[slug]` |
 
@@ -38,10 +45,5 @@ Canonical site: https://kunanonj.com
 * **Agents index:** [/agents.md](/agents.md)
 * **Plain text for LLMs:** [/llms.txt](/llms.txt)
 * **Coding skills / prompts:** [/skills.md](/skills.md)
-* **RSS:** [/rss.xml](/rss.xml) (alias of [/feed.xml](/feed.xml))
 * **XML sitemap:** [/sitemap.xml](/sitemap.xml)
-* **Robots:** [/robots.txt](/robots.txt)
-
----
-
-*Last updated: 2026-07-19*
+* **RSS:** [/rss.xml](/rss.xml)

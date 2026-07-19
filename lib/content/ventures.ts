@@ -81,33 +81,33 @@ const VENTURES: readonly Venture[] = [
   {
     slug: "manut",
     name: "Manut AI",
-    tagline: "Notion on steroids, for solo entrepreneurs.",
+    tagline: "ERP/CRM workspace with Intelligence AI for automotive SMEs.",
     description:
-      "An all-in-one workspace for solo entrepreneurs. Connects MongoDB, Meta, AI agents, and multiple AI models into a single platform — so you run your whole operation in one place instead of stitching together a dozen SaaS tools.",
+      "An ERP/CRM workspace with Intelligence AI for SMEs in the automotive industry — ops, customers, and repeat decisions in one place instead of a dozen disconnected SaaS tools.",
     year: 2025,
     role: "Founder",
     status: "active",
-    stack: ["AI agents", "MongoDB", "Self-hosted"],
+    stack: ["ERP/CRM", "Intelligence AI", "Automotive SME"],
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
     featured: true,
     featuredOrder: 2,
     caseStudy: {
       intro:
-        "Manut AI is an all-in-one workspace for solo entrepreneurs — one platform that runs the whole operation instead of a dozen stitched-together SaaS subscriptions.",
+        "Manut AI is an ERP/CRM workspace with Intelligence AI for automotive SMEs — one operator surface for internal systems instead of SaaS sprawl.",
       timeline: "2025 — present",
       sections: [
         {
           heading: "What it is",
-          body: "A single workspace that connects MongoDB, Meta, AI agents, and multiple AI models. Docs, data, and automations live in one place, with AI agents doing the repetitive work a solo founder would otherwise do by hand.",
+          body: "ERP and CRM workflows for automotive SMEs, with Intelligence AI assisting the repetitive operator work — follow-ups, ops handoffs, and decisions that used to live in spreadsheets and five tabs.",
         },
         {
-          heading: "How it's built",
-          body: "Self-hosted first, with MongoDB as the data backbone and a model-agnostic AI layer — swap models without rebuilding workflows. Live at manut.xyz.",
+          heading: "Why it matters in Thailand & SEA",
+          body: "SMEs and startups need a system of record before flashy agents. Manut starts from that internal system, then layers AI where judgment repeats. Live at manut.xyz.",
         },
         {
           heading: "My role",
-          body: "Founder. Started in 2025; I design and build the product — architecture, agent workflows, and the workspace experience.",
+          body: "Founder. Started in 2025; I design and build the product — ERP/CRM structure, Intelligence AI workflows, and the operator experience from Bangkok.",
         },
       ],
     },

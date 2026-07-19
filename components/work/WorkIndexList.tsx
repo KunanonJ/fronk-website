@@ -11,7 +11,7 @@ interface WorkRowProps {
  * click away via the pill CTA on that page.
  */
 export function WorkRow({ venture }: WorkRowProps) {
-  const caseHref = venture.caseStudy ? "/#ventures" : null;
+  const caseHref = venture.caseStudy ? `/ventures/${venture.slug}` : null;
   return (
     <li className="border-b border-border">
       <Link
