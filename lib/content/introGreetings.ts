@@ -6,7 +6,7 @@ export const INTRO_GREETINGS = [
   "こんにちは",
   "Ciao",
   "Olá",
-  "Hallo",
+  "Welcome to KunanonJ",
 ] as const;
 
 export const INTRO_SESSION_KEY = "fronk-intro-seen";

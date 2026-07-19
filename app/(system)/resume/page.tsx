@@ -84,7 +84,9 @@ function formatIndex(n: number): string {
 function tailOpacity(position: number, total: number): number {
   if (total <= 1) return 1;
   const t = position / (total - 1);
-  return 1 - t * 0.45;
+  // Floor at 0.9: any deeper fade pushes text-subtle below WCAG AA 4.5:1
+  // on the near-black canvas (enforced by tests/e2e/a11y.spec.ts).
+  return 1 - t * 0.1;
 }
 
 function TimelineSection({

@@ -707,10 +707,9 @@ The authoritative historical source remains:
 - Prefer spawning subagents for multi-phase work; audit after each completed task before continuing
 - When optional follow-ups are offered, implement them unless told otherwise
 - Prefer verifying with local `pnpm dev` when asked to run on the local machine
-- Portfolio redesign follows FogLAMP marketing mood/tone (not Dennis near-clone); user updates final content themselves
-- Prefer Söhne as the primary typeface (Hanken Grotesk ships as the free stand-in until licensed woff2 land in `public/fonts/soehne/`)
+- Public marketing UI follows the prisma-landing cutover (Almarai + Instrument Serif, cream primary `#DEDBC8`); user updates final content themselves
 - Target breakpoints: mobile 375px, tablet 768px, desktop 1440px; treat mobile as a miniature desktop layout
-- Prefer straightforward, minimized animation (not motion-for-showcase); keep meaningful hover/focus states and include an intro loading page when redesigning
+- Prefer straightforward, minimized animation on the home shell; Showcase may use richer motion; keep intro loading (Apple-style Hello → Welcome to KunanonJ)
 - Avoid overly complex design systems; keep components readable, use arrays/mapping for repetitive structured data; inline styles are acceptable
 - Multi-agent implementation plans should include explicit acceptance criteria per work package
 
@@ -719,8 +718,7 @@ The authoritative historical source remains:
 - Production site is kunanonj.com (Fronk / Kunanon Jarat); GitHub remote `KunanonJ/fronk-website` on `main`
 - Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
 - Package manager is pnpm; Node engine is ≥22.12 (see `.node-version`)
-- Content uses Sanity CMS with static fallbacks for public pages
-- Active redesign program lives under `process/features/dennis-portfolio-redesign/` (FogLAMP mood pivot; umbrella `foglamp-mood-portfolio_UMBRELLA_PLAN_18-07-26.md`)
-- Redesign locks: dark-only near-black `#0a0a0a`, stronger grain, pill CTAs, Söhne/Hanken Grotesk, minimal motion by default, public routes `/`, `/ventures`, `/about`, `/contact`, `/now`, `/writing`, `/writing/[slug]`, `/resume`
-- Legacy terminal/HUD chrome and Dennis portrait/marquee hero are removed from the public shell; portrait lives on About
-- Bangkok is the site location signal (footer clock); portrait asset path is `public/profile.jpg` until replaced
+- Active public UI program: `process/features/landing-cutover/` (umbrella `landing-cutover_UMBRELLA_PLAN_19-07-26.md`); FogLAMP/Dennis redesign is superseded
+- Public marketing routes: `/`, `/showcase`; system routes `/resume`, `/studio`; retired `/about|/ventures|/contact|/now|/writing|/work` redirect into the landing
+- Landing content is static in `lib/content/landing.ts` (Sanity retained for studio/resume); portrait at `public/profile.jpg`
+- Bangkok is the site location signal; wordmark KunanonJ

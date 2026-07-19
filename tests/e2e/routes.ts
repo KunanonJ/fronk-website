@@ -1,6 +1,6 @@
 /**
- * Public routes under test. `/studio` (Sanity) and `/resume.pdf` are excluded —
- * the former is third-party chrome, the latter is a binary artifact.
+ * Public routes under test. `/studio` (Sanity) is excluded — third-party chrome.
+ * Retired FogLAMP marketing routes redirect into the landing shell.
  */
 export interface RouteUnderTest {
   readonly path: string;
@@ -10,21 +10,11 @@ export interface RouteUnderTest {
 }
 
 export const ROUTES: readonly RouteUnderTest[] = [
-  { path: "/", name: "home", expectsHeadingPattern: /\S/ },
-  { path: "/about", name: "about", expectsHeadingPattern: /\S/ },
-  { path: "/now", name: "now", expectsHeadingPattern: /\S/ },
-  { path: "/ventures", name: "ventures", expectsHeadingPattern: /\S/ },
+  { path: "/", name: "home", expectsHeadingPattern: /KunanonJ|See ventures|Ventures/i },
   {
-    path: "/ventures/gogocash",
-    name: "venture-gogocash",
-    expectsHeadingPattern: /GoGoCash/i,
+    path: "/showcase",
+    name: "showcase",
+    expectsHeadingPattern: /fintech|Visuals|Start a project/i,
   },
-  {
-    path: "/ventures/manut",
-    name: "venture-manut",
-    expectsHeadingPattern: /Manut/i,
-  },
-  { path: "/writing", name: "writing", expectsHeadingPattern: /\S/ },
-  { path: "/contact", name: "contact", expectsHeadingPattern: /\S/ },
   { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },
 ];

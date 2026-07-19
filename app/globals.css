@@ -43,6 +43,17 @@
   /* Mono demoted — transitional only until Phase 1 drops HUD chrome. */
   --font-mono: var(--font-mono-instrument), ui-monospace, "SF Mono", monospace;
   --font-display: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman",
+    serif;
+
+  /* landing-cutover — prisma-landing cream primary */
+  --color-primary: #dedbc8;
+  --color-showcase-bg: #e4e4e4;
+  --color-showcase-cream: #f4f1e8;
+  --color-showcase-ink: #111111;
+  --color-showcase-mute: #9a9590;
+  --color-showcase-cyan: #75c5de;
+  --color-showcase-panel: rgba(17, 17, 17, 0.95);
 
   /* Fluid type scale for the redesign. */
   --text-hud: 0.75rem;
@@ -70,8 +81,9 @@
 :root {
   --bg: #f0f0ee;
   --fg: #1c1d20;
-  --muted: rgba(28, 29, 32, 0.55);
-  --subtle: rgba(28, 29, 32, 0.4);
+  /* ≥4.5:1 on white (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
+  --muted: rgba(28, 29, 32, 0.7);
+  --subtle: rgba(28, 29, 32, 0.62);
   --border: rgba(28, 29, 32, 0.14);
   --border-strong: rgba(28, 29, 32, 0.4);
   --surface: #ffffff;
@@ -88,8 +100,9 @@
 .dark {
   --bg: #0a0a0a;
   --fg: #ffffff;
-  --muted: rgba(255, 255, 255, 0.55);
-  --subtle: rgba(255, 255, 255, 0.35);
+  /* ≥4.5:1 on #0a0a0a (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
+  --muted: rgba(255, 255, 255, 0.62);
+  --subtle: rgba(255, 255, 255, 0.5);
   --border: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.3);
   --surface: #141414;
@@ -126,8 +139,8 @@ body {
   color: var(--accent-fg);
 }
 
-/* Film-grain overlay — atmosphere for the matte canvas. */
-body::before {
+/* Film-grain overlay — skipped on landing-cutover public shell. */
+body:not(:has(.landing-root))::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -136,6 +149,18 @@ body::before {
   opacity: var(--grain-opacity, 0.04);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
+}
+
+/* landing-cutover — hero noise overlay */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+.landing-root {
+  position: relative;
+  z-index: 2;
 }
 
 a {

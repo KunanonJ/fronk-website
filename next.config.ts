@@ -13,7 +13,16 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
-    return [{ source: "/work", destination: "/ventures", permanent: true }];
+    return [
+      { source: "/about", destination: "/#about", permanent: true },
+      { source: "/ventures", destination: "/#ventures", permanent: true },
+      { source: "/ventures/:slug", destination: "/#ventures", permanent: true },
+      { source: "/contact", destination: "/#contact", permanent: true },
+      { source: "/now", destination: "/", permanent: true },
+      { source: "/writing", destination: "/", permanent: true },
+      { source: "/writing/:slug", destination: "/", permanent: true },
+      { source: "/work", destination: "/#ventures", permanent: true },
+    ];
   },
   async headers() {
     return [
@@ -36,10 +45,22 @@ const nextConfig: NextConfig = {
         hostname: "cdn.sanity.io",
         pathname: "/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.higgs.ai",
+      },
+      {
+        protocol: "https",
+        hostname: "d8j0ntlcm91z4.cloudfront.net",
+      },
+      {
+        protocol: "https",
+        hostname: "soft-zoom-63098134.figma.site",
+      },
     ],
   },
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
 };
 
