@@ -12,11 +12,7 @@ import {
   formatBlogDate,
   type BlogCard,
 } from "@/lib/content/blog";
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
+import { expandHashHref } from "@/lib/landing/nav";
 
 function BlogCardView({ post }: { post: BlogCard }) {
   return (
@@ -110,7 +106,7 @@ export default function BlogIndex({
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
-        resolveHref={resolveHomeHash}
+        resolveHref={expandHashHref}
         navId="blog-mobile-nav"
       />
 

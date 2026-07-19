@@ -6,11 +6,7 @@ import type { PortableTextBlock } from "@portabletext/react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { PortableText } from "@/components/PortableText";
 import { formatBlogDate } from "@/lib/content/blog";
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
+import { expandHashHref } from "@/lib/landing/nav";
 
 type BlogPostPageProps = {
   title: string;
@@ -36,7 +32,7 @@ export default function BlogPostPage({
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
-        resolveHref={resolveHomeHash}
+        resolveHref={expandHashHref}
         navId="blog-post-mobile-nav"
       />
 

@@ -110,3 +110,38 @@ export function buildFaqJsonLd(
     })),
   };
 }
+
+export type ArticleJsonLdInput = {
+  title: string;
+  description?: string;
+  slug: string;
+  publishedAt: string;
+  imageUrl?: string;
+  tags?: readonly string[];
+};
+
+/** BlogPosting for /blog/[slug] — pairs with visible post chrome. */
+export function buildArticleJsonLd(
+  input: ArticleJsonLdInput,
+): Record<string, unknown> {
+  const url = `${BASE}/blog/${input.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}/#article`,
+    headline: input.title,
+    description: input.description,
+    datePublished: input.publishedAt,
+    dateModified: input.publishedAt,
+    url,
+    mainEntityOfPage: url,
+    isPartOf: { "@id": WEBSITE_ID },
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": PERSON_ID },
+    ...(input.imageUrl
+      ? { image: [input.imageUrl] }
+      : { image: [`${BASE}/profile.jpg`] }),
+    ...(input.tags?.length ? { keywords: input.tags.join(", ") } : {}),
+    inLanguage: "en-US",
+  };
+}

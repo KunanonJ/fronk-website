@@ -11,7 +11,7 @@ interface WorkRowProps {
  * click away via the pill CTA on that page.
  */
 export function WorkRow({ venture }: WorkRowProps) {
-  const caseHref = venture.caseStudy ? `/ventures/${venture.slug}` : null;
+  const caseHref = venture.caseStudy ? "/#ventures" : null;
   return (
     <li className="border-b border-border">
       <Link
@@ -63,7 +63,7 @@ export function HomeWorkStrip({
   ventures,
   title,
   kicker,
-  seeAllHref = "/ventures",
+  seeAllHref = "/#ventures",
   seeAllLabel = "See all work",
 }: HomeWorkStripProps) {
   return (

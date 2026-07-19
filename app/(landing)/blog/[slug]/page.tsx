@@ -6,6 +6,8 @@ import {
   mapPostToBlogCard,
 } from "@/lib/content/blog";
 import { fetchAllPostSlugs, fetchPostBySlug } from "@/lib/sanity/fetch";
+import { buildArticleJsonLd } from "@/lib/seo/jsonLd";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,19 +27,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await fetchPostBySlug(slug);
   if (post) {
-    return {
+    const card = mapPostToBlogCard(post);
+    return routeShareMeta({
       title: post.seo?.title || post.title,
-      description: post.seo?.description || post.excerpt || undefined,
-      alternates: { canonical: `/blog/${slug}` },
-    };
+      description: post.seo?.description || post.excerpt || card.excerpt,
+      path: `/blog/${slug}`,
+      type: "article",
+      publishedTime: card.publishedAt,
+      images: [card.bannerSrc],
+    });
   }
   const fallback = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
   if (!fallback) return { title: "Post" };
-  return {
+  return routeShareMeta({
     title: fallback.title,
     description: fallback.excerpt,
-    alternates: { canonical: `/blog/${slug}` },
-  };
+    path: `/blog/${slug}`,
+    type: "article",
+    publishedTime: fallback.publishedAt,
+    images: [fallback.bannerSrc],
+  });
 }
 
 export default async function BlogPostRoute({ params }: Props) {
@@ -46,31 +55,64 @@ export default async function BlogPostRoute({ params }: Props) {
 
   if (post) {
     const card = mapPostToBlogCard(post);
+    const articleLd = JSON.stringify(
+      buildArticleJsonLd({
+        title: card.title,
+        description: card.excerpt,
+        slug: card.slug,
+        publishedAt: card.publishedAt,
+        imageUrl: card.bannerSrc,
+        tags: card.tags,
+      }),
+    );
     return (
-      <BlogPostPage
-        title={card.title}
-        excerpt={card.excerpt}
-        publishedAt={card.publishedAt}
-        tags={card.tags}
-        bannerSrc={card.bannerSrc}
-        bannerAlt={card.bannerAlt}
-        body={post.body}
-      />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: articleLd }}
+        />
+        <BlogPostPage
+          title={card.title}
+          excerpt={card.excerpt}
+          publishedAt={card.publishedAt}
+          tags={card.tags}
+          bannerSrc={card.bannerSrc}
+          bannerAlt={card.bannerAlt}
+          body={post.body}
+        />
+      </>
     );
   }
 
   const fallback = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
   if (!fallback) notFound();
 
+  const articleLd = JSON.stringify(
+    buildArticleJsonLd({
+      title: fallback.title,
+      description: fallback.excerpt,
+      slug: fallback.slug,
+      publishedAt: fallback.publishedAt,
+      imageUrl: fallback.bannerSrc,
+      tags: fallback.tags,
+    }),
+  );
+
   return (
-    <BlogPostPage
-      title={fallback.title}
-      excerpt={fallback.excerpt}
-      publishedAt={fallback.publishedAt}
-      tags={fallback.tags}
-      bannerSrc={fallback.bannerSrc}
-      bannerAlt={fallback.bannerAlt}
-      body={null}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: articleLd }}
+      />
+      <BlogPostPage
+        title={fallback.title}
+        excerpt={fallback.excerpt}
+        publishedAt={fallback.publishedAt}
+        tags={fallback.tags}
+        bannerSrc={fallback.bannerSrc}
+        bannerAlt={fallback.bannerAlt}
+        body={null}
+      />
+    </>
   );
 }

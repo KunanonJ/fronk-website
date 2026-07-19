@@ -3,12 +3,9 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
+import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
+import { expandHashHref } from "@/lib/landing/nav";
 
 function XIcon({ size = 20 }: { size?: number }) {
   return (
@@ -183,14 +180,11 @@ export default function AsmeCuriousHero() {
 
       <LandingTopNav
         wordmarkHref="/"
-        resolveHref={resolveHomeHash}
+        resolveHref={expandHashHref}
         navId="stock-asme-mobile-nav"
       />
 
-      <main
-        id="main"
-        className="relative z-10 flex flex-1 -translate-y-[20%] flex-col items-center justify-center px-6 py-12 pt-24 text-center"
-      >
+      <div className="relative z-10 flex flex-1 -translate-y-[20%] flex-col items-center justify-center px-6 py-12 pt-24 text-center">
         <h1
           className="mb-8 text-5xl tracking-tight whitespace-nowrap text-white md:text-6xl lg:text-7xl"
           style={{
@@ -198,7 +192,7 @@ export default function AsmeCuriousHero() {
               "var(--font-instrument-serif), 'Instrument Serif', serif",
           }}
         >
-          Built for the curious
+          {aboutPage.hero.title}
         </h1>
 
         <div className="w-full max-w-xl space-y-4">
@@ -225,20 +219,19 @@ export default function AsmeCuriousHero() {
           </form>
 
           <p className="px-4 text-sm leading-relaxed text-white">
-            Stay updated with the latest news and insights. Subscribe to our
-            newsletter today and never miss out on exciting updates.
+            {aboutPage.hero.support}
           </p>
 
           <div className="flex justify-center">
-            <button
-              type="button"
+            <a
+              href={aboutPage.hero.manifestoHref}
               className="liquid-glass rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5"
             >
-              Manifesto
-            </button>
+              {aboutPage.hero.manifestoLabel}
+            </a>
           </div>
         </div>
-      </main>
+      </div>
 
       <footer className="relative z-10 flex justify-center gap-4 pb-12">
         {ABOUT_SOCIALS.map(({ label, href, Icon }) => (

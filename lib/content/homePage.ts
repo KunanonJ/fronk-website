@@ -25,7 +25,7 @@ export const DEFAULT_HOME_PAGE = {
   heroTagline: siteConfig.tagline,
   heroIntro:
     "I founded GoGoCash and build Manut AI — cashback for shoppers, an AI workspace for solo founders." as string | null,
-  primaryCta: { label: "See ventures", href: "/ventures" },
+  primaryCta: { label: "See ventures", href: "/#ventures" },
   secondaryCta: { label: "Contact", href: "/contact" },
   featuredSectionKicker: "Ventures",
   featuredSectionTitle: "Two products. Both live.",

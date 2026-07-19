@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { hero } from "@/lib/content/landing";
@@ -11,7 +10,6 @@ const HERO_VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-const MotionLink = motion.create(Link);
 
 export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
@@ -63,7 +61,7 @@ export default function Hero() {
                 {hero.description}
               </motion.p>
 
-              <MotionLink
+              <motion.a
                 href={hero.ctaHref}
                 className="group inline-flex w-fit touch-manipulation items-center gap-2 rounded-full bg-primary py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:text-base"
                 initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
@@ -78,7 +76,7 @@ export default function Hero() {
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
                   <ArrowRight className="h-4 w-4 text-primary" />
                 </span>
-              </MotionLink>
+              </motion.a>
             </div>
           </div>
         </div>

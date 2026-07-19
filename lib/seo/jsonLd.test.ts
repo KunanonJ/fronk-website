@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildArticleJsonLd,
   buildFaqJsonLd,
   buildProfilePageJsonLd,
   buildSiteJsonLd,
@@ -69,5 +70,22 @@ describe("buildFaqJsonLd > emits a FAQPage from supplied Q&A", () => {
     expect((entities[0].acceptedAnswer as Node).text).toBe(
       "Kunanon Jarat, a Bangkok founder.",
     );
+  });
+});
+
+describe("buildArticleJsonLd > emits BlogPosting for a post", () => {
+  it("links author to Person and uses the /blog slug URL", () => {
+    const article = buildArticleJsonLd({
+      title: "Shipping from Bangkok",
+      description: "Notes on pace and craft.",
+      slug: "shipping-from-bangkok",
+      publishedAt: "2026-06-12",
+      imageUrl: "https://example.com/banner.jpg",
+      tags: ["Founding"],
+    });
+    expect(article["@type"]).toBe("BlogPosting");
+    expect(String(article.url)).toContain("/blog/shipping-from-bangkok");
+    expect((article.author as Node)["@id"]).toBe(PERSON_ID);
+    expect(article.headline).toBe("Shipping from Bangkok");
   });
 });

@@ -3,15 +3,16 @@ import BlogIndex from "@/components/landing/BlogIndex";
 import { resolveBlogCards } from "@/lib/content/blog";
 import { resolveWritingPageContent } from "@/lib/content/writingPage";
 import { fetchAllPosts, fetchWritingPage } from "@/lib/sanity/fetch";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 export async function generateMetadata(): Promise<Metadata> {
   const cmsPage = await fetchWritingPage();
   const page = resolveWritingPageContent(cmsPage);
-  return {
+  return routeShareMeta({
     title: page.metadata.title,
     description: page.metadata.description,
-    alternates: { canonical: "/blog" },
-  };
+    path: "/blog",
+  });
 }
 
 export default async function BlogRoute() {

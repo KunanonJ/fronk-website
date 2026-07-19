@@ -6,11 +6,15 @@ import Features from "@/components/landing/Features";
 import Hero from "@/components/landing/Hero";
 import IntroLoader from "@/components/landing/IntroLoader";
 import { contact, footerResources, site, socials } from "@/lib/content/landing";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 export const metadata: Metadata = {
+  ...routeShareMeta({
+    title: site.title,
+    description: site.description,
+    path: "/",
+  }),
   title: { absolute: site.title },
-  description: site.description,
-  alternates: { canonical: "/" },
 };
 
 export default function HomePage() {

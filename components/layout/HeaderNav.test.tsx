@@ -1,33 +1,66 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { HeaderNav } from "./HeaderNav";
 
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/ventures",
-}));
+const pathnameMock = vi.fn(() => "/about");
 
-const ITEMS = [
-  { href: "/ventures", label: "Work" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-] as const;
+vi.mock("next/navigation", () => ({
+  usePathname: () => pathnameMock(),
+}));
 
 describe("HeaderNav > marks the active route", () => {
   it("flags the link matching the pathname with aria-current=page", () => {
-    render(<HeaderNav items={ITEMS} />);
-    expect(screen.getByRole("link", { name: "Work" })).toHaveAttribute(
+    pathnameMock.mockReturnValue("/about");
+    render(
+      <HeaderNav
+        items={[
+          { href: "/#ventures", label: "Work" },
+          { href: "/about", label: "About" },
+          { href: "/contact", label: "Contact" },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute(
       "aria-current",
       "page",
     );
   });
 
   it("leaves sibling routes unmarked", () => {
-    render(<HeaderNav items={ITEMS} />);
+    pathnameMock.mockReturnValue("/about");
+    render(
+      <HeaderNav
+        items={[
+          { href: "/#ventures", label: "Work" },
+          { href: "/about", label: "About" },
+          { href: "/contact", label: "Contact" },
+        ]}
+      />,
+    );
     expect(
-      screen.getByRole("link", { name: "About" }),
+      screen.getByRole("link", { name: "Work" }),
     ).not.toHaveAttribute("aria-current");
     expect(
       screen.getByRole("link", { name: "Contact" }),
     ).not.toHaveAttribute("aria-current");
+  });
+
+  it("activates hash nav items from the location hash on home", async () => {
+    pathnameMock.mockReturnValue("/");
+    window.history.replaceState(null, "", "/#ventures");
+    render(
+      <HeaderNav
+        items={[
+          { href: "/#ventures", label: "Work" },
+          { href: "/about", label: "About" },
+        ]}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Work" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
   });
 });

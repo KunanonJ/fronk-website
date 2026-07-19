@@ -6,7 +6,7 @@ import type { ResolvedSiteSettings } from "@/lib/content/siteSettings";
 
 /** Primary chrome nav — Work / About / Contact. */
 export const PRIMARY_NAV = [
-  { href: "/ventures", label: "Work" },
+  { href: "/#ventures", label: "Work" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;

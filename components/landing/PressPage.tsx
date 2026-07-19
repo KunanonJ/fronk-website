@@ -9,11 +9,7 @@ import {
   pressPage,
   type PressItem,
 } from "@/lib/content/press";
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
+import { expandHashHref } from "@/lib/landing/nav";
 
 function PressCard({ item }: { item: PressItem }) {
   return (
@@ -81,7 +77,7 @@ export default function PressPage() {
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
-        resolveHref={resolveHomeHash}
+        resolveHref={expandHashHref}
         navId="press-mobile-nav"
       />
 

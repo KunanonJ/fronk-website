@@ -140,7 +140,7 @@ export function AboutFallback() {
             </a>{" "}
             cohort 2025 and the Bangkok Startup Association. Writing the
             occasional note in the{" "}
-            <Link href="/writing">journal</Link> when something is worth working
+            <Link href="/blog">blog</Link> when something is worth working
             out in public.
           </p>
 

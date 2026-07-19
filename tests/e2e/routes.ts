@@ -14,7 +14,8 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/about",
     name: "about",
-    expectsHeadingPattern: /Built for the curious|KunanonJ|Manifesto/i,
+    expectsHeadingPattern:
+      /Built for the curious|Founder,\s*Bangkok|GoGoCash|Manifesto|operating principles/i,
   },
   {
     path: "/showcase",

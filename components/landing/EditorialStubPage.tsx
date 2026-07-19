@@ -1,11 +1,7 @@
 "use client";
 
 import LandingTopNav from "@/components/landing/LandingTopNav";
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
+import { expandHashHref } from "@/lib/landing/nav";
 
 type EditorialStubPageProps = {
   eyebrow: string;
@@ -30,7 +26,7 @@ export default function EditorialStubPage({
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
-        resolveHref={resolveHomeHash}
+        resolveHref={expandHashHref}
         navId={navId}
       />
 

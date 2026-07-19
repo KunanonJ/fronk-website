@@ -1,13 +1,22 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { hero, nav } from "@/lib/content/landing";
+import {
+  HOME_SECTION_IDS,
+  activeSectionAtFocus,
+  isNavItemActive,
+  normalizePath,
+  parseHomeSectionHash,
+  resolveHomeAwareHref,
+  scrollSpySectionIds,
+  scrollToHomeSection,
+} from "@/lib/landing/nav";
 
 const MENU_EASE = [0.22, 1, 0.36, 1] as const;
-const SECTION_IDS = ["about", "ventures", "contact"] as const;
 
 function MenuToggleIcon({
   open,
@@ -40,64 +49,64 @@ function MenuToggleIcon({
   );
 }
 
-function normalizePath(pathname: string) {
-  if (!pathname || pathname === "/") return "/";
-  return pathname.replace(/\/$/, "");
-}
-
-function isItemActive(
-  href: string,
-  pathname: string,
-  activeSection: string | null,
-): boolean {
-  const path = normalizePath(pathname);
-
-  if (href.startsWith("#")) {
-    return path === "/" && activeSection === href.slice(1);
-  }
-
-  if (href === "/") {
-    return path === "/" && activeSection === null;
-  }
-
-  // Named routes that also map to home sections (scroll highlight on `/`).
-  if (path === "/" && activeSection) {
-    if (href === "/ventures" && activeSection === "ventures") return true;
-    if (href === "/contact" && activeSection === "contact") return true;
-  }
-
-  // `/#ventures`-style hrefs
-  if (href.startsWith("/#")) {
-    return path === "/" && activeSection === href.slice(2);
-  }
-
-  return path === href || path.startsWith(`${href}/`);
-}
-
 function NavItemAnchor({
   href,
   className,
   active,
+  reducedMotion,
   onClick,
   children,
 }: {
   href: string;
   className: string;
   active: boolean;
+  reducedMotion: boolean | null;
   onClick?: () => void;
   children: ReactNode;
 }) {
-  /* Hash-only stays a plain anchor (in-page scroll). Paths use Link for soft nav + splash. */
+  const behavior: ScrollBehavior = reducedMotion ? "auto" : "smooth";
+
+  /* In-page hash: plain anchor + forced scroll (same-hash re-clicks are no-ops otherwise). */
   if (href.startsWith("#")) {
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+      const id = parseHomeSectionHash(href);
+      if (!id) {
+        onClick?.();
+        return;
+      }
+      event.preventDefault();
+      const url = `${window.location.pathname}${window.location.search}#${id}`;
+      if (window.location.hash !== `#${id}`) {
+        window.history.pushState(null, "", url);
+      }
+      scrollToHomeSection(id, behavior);
+      onClick?.();
+    };
+
     return (
       <a
         href={href}
+        className={className}
+        aria-current={active ? "true" : undefined}
+        onClick={handleClick}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  /* Cross-page hash: let the router change path, then home hash effect scrolls. */
+  if (href.startsWith("/#")) {
+    return (
+      <Link
+        href={href}
+        scroll={false}
         className={className}
         aria-current={active ? "page" : undefined}
         onClick={onClick}
       >
         {children}
-      </a>
+      </Link>
     );
   }
 
@@ -145,13 +154,18 @@ export default function LandingTopNav({
   navId = "mobile-nav",
 }: LandingTopNavProps) {
   const pathname = usePathname() ?? "/";
-  const isHome = normalizePath(pathname) === "/";
+  const path = normalizePath(pathname);
   const prefersReducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [homeSection, setHomeSection] = useState<string | null>(null);
+  const isHome = path === "/";
   /** Section highlight only applies on `/`; derive null off-home (no effect setState). */
   const activeSection = isHome ? homeSection : null;
   const pos = position === "absolute" ? "absolute" : "fixed";
+  const hashLinkedSections = useMemo(() => scrollSpySectionIds(nav), []);
+
+  const hrefForNav = (href: string) =>
+    resolveHomeAwareHref(resolveHref(href), path);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -174,51 +188,58 @@ export default function LandingTopNav({
   useEffect(() => {
     if (!isHome) return;
 
-    const elements = SECTION_IDS.map((id) =>
-      document.getElementById(id),
-    ).filter((el): el is HTMLElement => Boolean(el));
+    const behavior: ScrollBehavior = prefersReducedMotion ? "auto" : "smooth";
 
-    if (elements.length === 0) return;
+    const scrollToCurrentHash = () => {
+      const id = parseHomeSectionHash(window.location.hash);
+      if (!id) return;
+      scrollToHomeSection(id, behavior);
+    };
 
-    const visible = new Map<string, number>();
+    // Next may restore scroll-to-top after soft nav; retry past that tick.
+    let rafInner = 0;
+    const rafOuter = window.requestAnimationFrame(() => {
+      rafInner = window.requestAnimationFrame(scrollToCurrentHash);
+    });
+    const timer = window.setTimeout(scrollToCurrentHash, 120);
+    window.addEventListener("hashchange", scrollToCurrentHash);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const id = entry.target.id;
-          if (entry.isIntersecting) {
-            visible.set(id, entry.intersectionRatio);
-          } else {
-            visible.delete(id);
-          }
-        }
+    return () => {
+      window.cancelAnimationFrame(rafOuter);
+      window.cancelAnimationFrame(rafInner);
+      window.clearTimeout(timer);
+      window.removeEventListener("hashchange", scrollToCurrentHash);
+    };
+  }, [isHome, path, prefersReducedMotion]);
 
-        if (visible.size === 0) {
-          setHomeSection(null);
-          return;
-        }
+  useEffect(() => {
+    if (!isHome) {
+      setHomeSection(null);
+      return;
+    }
 
-        let bestId = "";
-        let bestRatio = -1;
-        for (const [id, ratio] of visible) {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestId = id;
-          }
-        }
-        setHomeSection(bestId || null);
-      },
-      {
-        root: null,
-        // Bias toward the mid/upper viewport so the active nav tracks the reading section.
-        rootMargin: "-28% 0px -48% 0px",
-        threshold: [0, 0.15, 0.35, 0.55, 0.75],
-      },
-    );
+    /** Classic top-crossed spy over all home sections (+ short-footer band). */
+    const updateActiveSection = () => {
+      const focusY = window.innerHeight * 0.3;
+      const sections = HOME_SECTION_IDS.flatMap((id) => {
+        const el = document.getElementById(id);
+        if (!el) return [];
+        const rect = el.getBoundingClientRect();
+        return [{ id, top: rect.top, bottom: rect.bottom }];
+      });
+      setHomeSection(
+        activeSectionAtFocus(sections, focusY, window.innerHeight),
+      );
+    };
 
-    for (const el of elements) observer.observe(el);
-    return () => observer.disconnect();
-  }, [isHome, pathname]);
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, [isHome, path]);
 
   const wordmarkClass =
     "text-xs font-medium tracking-wide text-[#E1E0CC] transition-opacity hover:opacity-80";
@@ -231,13 +252,19 @@ export default function LandingTopNav({
       >
         <ul className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:gap-x-4 md:gap-x-6 lg:gap-x-8">
           {nav.map((item) => {
-            const active = isItemActive(item.href, pathname, activeSection);
+            const active = isNavItemActive(
+              item.href,
+              path,
+              activeSection,
+              hashLinkedSections,
+            );
             return (
               <li key={item.href}>
                 <NavItemAnchor
-                  href={resolveHref(item.href)}
+                  href={hrefForNav(item.href)}
                   className={navItemClassName(active)}
                   active={active}
+                  reducedMotion={prefersReducedMotion}
                 >
                   {item.label}
                 </NavItemAnchor>
@@ -295,10 +322,11 @@ export default function LandingTopNav({
               >
                 <ul className="flex flex-col gap-0.5 pb-2 pt-1">
                   {nav.map((item, index) => {
-                    const active = isItemActive(
+                    const active = isNavItemActive(
                       item.href,
-                      pathname,
+                      path,
                       activeSection,
+                      hashLinkedSections,
                     );
                     return (
                       <motion.li
@@ -323,9 +351,10 @@ export default function LandingTopNav({
                         }
                       >
                         <NavItemAnchor
-                          href={resolveHref(item.href)}
+                          href={hrefForNav(item.href)}
                           className={navItemClassName(active, true)}
                           active={active}
+                          reducedMotion={prefersReducedMotion}
                           onClick={() => setMenuOpen(false)}
                         >
                           {item.label}

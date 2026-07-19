@@ -12,7 +12,7 @@ Canonical site: https://kunanonj.com
 | Route | Name | Notes |
 |---|---|---|
 | `/` | Home | Intro loader, hero, about, ventures, contact footer |
-| `/about` | About | “Built for the curious” about surface |
+| `/about` | About | Hero + founder story, principles, FAQ, CTAs |
 | `/ventures` | Ventures | Named URL → home `#ventures` (GoGoCash, Manut, Airplusauto) |
 | `/press` | Press | Press card grid (banner, date, CTA) |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |

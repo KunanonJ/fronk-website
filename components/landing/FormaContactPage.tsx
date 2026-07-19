@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { contact, socials } from "@/lib/content/landing";
+import { expandHashHref } from "@/lib/landing/nav";
 
 const VIDEO_URL =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260602_150901_c45b90ec-18d7-42ff-90e2-b95d7109e330.mp4";
@@ -18,11 +19,6 @@ const SERVICES = [
   "Growth & Consulting",
   "Other",
 ] as const;
-
-function resolveHomeHash(href: string) {
-  if (href.startsWith("/") || href.startsWith("http")) return href;
-  return `/${href}`;
-}
 
 function TwitterIcon({ size = 13 }: { size?: number }) {
   return (
@@ -158,7 +154,8 @@ export default function FormaContactPage() {
   };
 
   return (
-    <div
+    <main
+      id="main"
       className="forma-contact min-h-screen bg-white p-3 sm:p-4 md:p-6"
       style={{ fontFamily: "var(--font-inter-contact), Inter, sans-serif" }}
     >
@@ -174,7 +171,7 @@ export default function FormaContactPage() {
 
         <LandingTopNav
           wordmarkHref="/"
-          resolveHref={resolveHomeHash}
+          resolveHref={expandHashHref}
           navId="contact-mobile-nav"
         />
 
@@ -332,6 +329,6 @@ export default function FormaContactPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

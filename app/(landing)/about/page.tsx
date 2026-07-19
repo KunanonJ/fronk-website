@@ -1,19 +1,36 @@
 import type { Metadata } from "next";
+import AboutPageContent from "@/components/landing/AboutPageContent";
 import AsmeCuriousHero from "@/components/landing/stock/AsmeCuriousHero";
-import { site } from "@/lib/content/landing";
+import { FAQ_ITEMS } from "@/lib/content/faq";
+import {
+  buildFaqJsonLd,
+  buildProfilePageJsonLd,
+} from "@/lib/seo/jsonLd";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = routeShareMeta({
   title: "About",
   description:
-    "Built for the curious — Kunanon Jarat (Fronk), Bangkok founder of GoGoCash, Manut, and Airplusauto.",
-  alternates: { canonical: "/about" },
-  openGraph: {
-    title: `About — ${site.wordmark}`,
-    description:
-      "Kunanon Jarat (Fronk) — building fintech and AI workspaces from Bangkok.",
-  },
-};
+    "Kunanon Jarat (Fronk) — Bangkok founder of GoGoCash and Manut AI. Story, operating principles, and how to get in touch.",
+  path: "/about",
+});
 
 export default function AboutPage() {
-  return <AsmeCuriousHero />;
+  const profileLd = JSON.stringify(buildProfilePageJsonLd());
+  const faqLd = JSON.stringify(buildFaqJsonLd(FAQ_ITEMS));
+
+  return (
+    <main id="main">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: profileLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqLd }}
+      />
+      <AsmeCuriousHero />
+      <AboutPageContent />
+    </main>
+  );
 }

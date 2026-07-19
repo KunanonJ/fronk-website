@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "Resume",
   description:
     "Kunanon Jarat (Fronk) — Founder, IT manager, and project leader across fintech, AI, and Web3.",
+  alternates: { canonical: "/resume" },
   robots: { index: false, follow: false },
 };
 
@@ -27,6 +28,7 @@ export default async function ResumePage() {
   const profile = resolveResumeProfile(cms);
 
   return (
+    <main id="main">
     <Container size="lg" className="py-14 sm:py-20 lg:py-24">
       <header className="mb-16 flex flex-col items-start justify-between gap-8 border-b border-border pb-12 sm:flex-row sm:items-end">
         <div className="max-w-2xl">
@@ -64,6 +66,7 @@ export default async function ResumePage() {
         <SkillsSection skills={profile.skills} />
       </div>
     </Container>
+    </main>
   );
 }
 

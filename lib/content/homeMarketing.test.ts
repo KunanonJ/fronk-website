@@ -17,7 +17,7 @@ describe("homeMarketing > Fronk voice contract", () => {
     expect(DEFAULT_HOME_PAGE.heroIntro).toMatch(/Manut AI/);
     expect(DEFAULT_HOME_PAGE.primaryCta).toEqual({
       label: "See ventures",
-      href: "/ventures",
+      href: "/#ventures",
     });
     expect(DEFAULT_HOME_PAGE.secondaryCta).toEqual({
       label: "Contact",
