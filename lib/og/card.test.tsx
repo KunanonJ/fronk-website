@@ -28,16 +28,18 @@ describe("OgCard", () => {
     expect(text).toContain("Case study");
     expect(text).toContain("GoGoCash");
     expect(text).toContain("Shopping-to-earn cashback");
+    expect(text).toContain("KunanonJ");
     const domain = siteConfig.url
       .replace(/^https?:\/\//, "")
       .replace(/\/$/, "");
     expect(text).toContain(domain);
   });
 
-  it("uses the FogLAMP near-black canvas, not the legacy pure black", () => {
+  it("uses the landing black + cream brand canvas", () => {
     const tree = OgCard({ title: "x" }) as {
-      props: { style: { background: string } };
+      props: { style: { background: string; color: string } };
     };
-    expect(tree.props.style.background).toBe("#0a0a0a");
+    expect(tree.props.style.background).toBe("#000000");
+    expect(tree.props.style.color).toBe("#dedbc8");
   });
 });

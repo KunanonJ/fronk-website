@@ -1,10 +1,12 @@
 import { ImageResponse } from "next/og";
+import { brand } from "@/lib/brand/tokens";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Apple touch icon — the Fronk mark ("f" + mint terminal cursor) on a dark
-// instrument tile, scaled for home-screen / iOS use.
+/**
+ * Apple touch icon — cream “K” monogram on black brand tile.
+ */
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -15,23 +17,25 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 14,
-          background: "#0a0a0a",
-          border: "7px solid rgba(255,255,255,0.16)",
-          fontFamily: "system-ui, sans-serif",
+          background: brand.black,
+          borderRadius: 40,
+          border: `5px solid ${brand.creamLine}`,
+          fontFamily: "Georgia, 'Times New Roman', serif",
         }}
       >
         <span
           style={{
-            color: "#ededed",
-            fontSize: 104,
-            fontWeight: 800,
+            color: brand.cream,
+            fontSize: 108,
+            fontWeight: 400,
+            fontStyle: "italic",
             letterSpacing: "-0.04em",
+            lineHeight: 1,
+            marginTop: -4,
           }}
         >
-          f
+          {brand.monogram}
         </span>
-        <span style={{ width: 30, height: 82, background: "#34d399" }} />
       </div>
     ),
     { ...size },

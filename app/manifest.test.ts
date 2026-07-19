@@ -11,9 +11,9 @@ describe("web app manifest", () => {
     expect(result.start_url).toBe("/");
   });
 
-  it("matches the FogLAMP near-black canvas", () => {
-    expect(result.background_color).toBe("#0a0a0a");
-    expect(result.theme_color).toBe("#0a0a0a");
+  it("matches the landing black brand canvas", () => {
+    expect(result.background_color).toBe("#000000");
+    expect(result.theme_color).toBe("#000000");
   });
 
   it("references at least one icon", () => {

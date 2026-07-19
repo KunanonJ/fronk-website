@@ -1,0 +1,19 @@
+# GitHub Linguist — keep the language bar focused on the product codebase.
+# The Next.js app (app/, components/, lib/) is TypeScript; remaining JS is
+# tooling / agent harness, not the marketing site runtime.
+
+# Codex / Claude agent hooks (CommonJS) — not product source
+.codex/** linguist-vendored
+.claude/** linguist-vendored
+.agents/** linguist-vendored
+
+# Ops scripts + ESM tool configs (small; keep detectable but de-emphasized)
+scripts/** linguist-vendored
+eslint.config.mjs linguist-vendored
+postcss.config.mjs linguist-vendored
+
+# Static design preview HTML (inline JS would skew stats)
+public/previews/** linguist-documentation
+
+# Generated / extracted Studio assets
+public/studio/** linguist-generated

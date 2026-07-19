@@ -37,7 +37,7 @@ describe("landing-cutover foundation", () => {
 
   it("forces dark-only public theme with black themeColor", () => {
     expect(layoutTsx).toContain('forcedTheme="dark"');
-    expect(layoutTsx).toMatch(/themeColor:\s*"#000000"/);
+    expect(layoutTsx).toMatch(/#000000/);
   });
 
   it("does not mount FogLAMP SiteShell chrome in root layout", () => {

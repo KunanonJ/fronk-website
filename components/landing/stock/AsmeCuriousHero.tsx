@@ -1,36 +1,30 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowRight, Globe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
+import { socials } from "@/lib/content/landing";
 
 function resolveHomeHash(href: string) {
   if (href.startsWith("/") || href.startsWith("http")) return href;
   return `/${href}`;
 }
 
-/** Lucide dropped brand icons; keep prompt-faithful Instagram / X (Twitter) marks. */
-function InstagramIcon({ size = 20 }: { size?: number }) {
+function XIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fill="currentColor"
       aria-hidden
     >
-      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.727-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
 }
 
-function TwitterIcon({ size = 20 }: { size?: number }) {
+function LinkedinIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -43,10 +37,37 @@ function TwitterIcon({ size = 20 }: { size?: number }) {
       strokeLinejoin="round"
       aria-hidden
     >
-      <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
     </svg>
   );
 }
+
+function GithubIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+      <path d="M9 18c-4.51 2-5-2-7-2" />
+    </svg>
+  );
+}
+
+const ABOUT_SOCIALS = [
+  { label: "X", href: socials[0].href, Icon: XIcon },
+  { label: "LinkedIn", href: socials[1].href, Icon: LinkedinIcon },
+  { label: "GitHub", href: socials[2].href, Icon: GithubIcon },
+] as const;
 
 const BG_VIDEO =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4";
@@ -220,27 +241,18 @@ export default function AsmeCuriousHero() {
       </main>
 
       <footer className="relative z-10 flex justify-center gap-4 pb-12">
-        <a
-          href="#"
-          aria-label="Instagram"
-          className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
-        >
-          <InstagramIcon size={20} />
-        </a>
-        <a
-          href="#"
-          aria-label="Twitter"
-          className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
-        >
-          <TwitterIcon size={20} />
-        </a>
-        <a
-          href="#"
-          aria-label="Website"
-          className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
-        >
-          <Globe size={20} aria-hidden />
-        </a>
+        {ABOUT_SOCIALS.map(({ label, href, Icon }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white"
+          >
+            <Icon size={20} />
+          </a>
+        ))}
       </footer>
     </div>
   );

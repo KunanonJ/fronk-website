@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
-  shortName: "Fronk",
+  shortName: "KunanonJ",
   tagline: "Building fintech and AI from Bangkok.",
   description:
     "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.",

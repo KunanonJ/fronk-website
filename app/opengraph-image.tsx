@@ -6,8 +6,7 @@ export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
-// FogLAMP-mood share card: near-black canvas, quiet wordmark, big display
-// title. Shared template lives in lib/og/card.tsx.
+/** Brand share preview — black + cream KunanonJ card. */
 export default function OpenGraphImage() {
   return renderOgCard({
     title: siteConfig.name,

@@ -1,10 +1,12 @@
 import { ImageResponse } from "next/og";
+import { brand } from "@/lib/brand/tokens";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-// Favicon — the Fronk mark: a lowercase "f" closed by a mint terminal cursor
-// block on a dark instrument tile. Mirrors the site logotype.
+/**
+ * Favicon — cream “K” monogram on black, aligned with landing CI.
+ */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,23 +17,25 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 5,
-          background: "#0a0a0a",
-          border: "3px solid rgba(255,255,255,0.16)",
-          fontFamily: "system-ui, sans-serif",
+          background: brand.black,
+          borderRadius: 14,
+          border: `2px solid ${brand.creamLine}`,
+          fontFamily: "Georgia, 'Times New Roman', serif",
         }}
       >
         <span
           style={{
-            color: "#ededed",
-            fontSize: 38,
-            fontWeight: 800,
+            color: brand.cream,
+            fontSize: 36,
+            fontWeight: 400,
+            fontStyle: "italic",
             letterSpacing: "-0.04em",
+            lineHeight: 1,
+            marginTop: -2,
           }}
         >
-          f
+          {brand.monogram}
         </span>
-        <span style={{ width: 11, height: 30, background: "#34d399" }} />
       </div>
     ),
     { ...size },
