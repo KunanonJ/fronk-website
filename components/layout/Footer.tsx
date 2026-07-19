@@ -28,7 +28,7 @@ interface FooterProps {
 const FOOTER_NAV = [
   { href: "/ventures", label: "Work" },
   { href: "/about", label: "About" },
-  { href: "/writing", label: "Writing" },
+  { href: "/blog", label: "Blog" },
   { href: "/now", label: "Now" },
   { href: "/contact", label: "Contact" },
 ] as const;

@@ -21,15 +21,16 @@ describe("landing-cutover foundation", () => {
     expect(globalsCss).toMatch(/\.noise-overlay\s*\{/);
   });
 
-  it("wires Almarai + Instrument Serif on the landing layout", () => {
+  it("wires Almarai on the landing layout", () => {
     expect(landingLayout).toContain("Almarai");
-    expect(landingLayout).toContain("Instrument_Serif");
     expect(landingLayout).toContain("landing-root");
   });
 
-  it("keeps Hanken available on root for system pages", () => {
+  it("keeps Hanken + Instrument Serif on root for system + splash", () => {
     expect(layoutTsx).toContain("Hanken_Grotesk");
     expect(layoutTsx).toContain("--font-hanken");
+    expect(layoutTsx).toContain("Instrument_Serif");
+    expect(layoutTsx).toContain("--font-instrument-serif");
     expect(layoutTsx).not.toContain("Syne");
     expect(layoutTsx).not.toMatch(/\bInter\b/);
   });

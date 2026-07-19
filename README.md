@@ -12,7 +12,7 @@ cinematic landing + showcase shell; resume and Sanity Studio remain as system
 surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
 
 ```
-Tech:      Next.js 16.2 · React 19.2 · TypeScript 6 · Tailwind v4 · framer-motion
+Tech:      Next.js 16.2 · React 19.2 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 4 · Playwright · pnpm 10
 Runtime:   Node.js ≥22.12 · Cloudflare Workers + OpenNext + R2 cache
@@ -25,8 +25,9 @@ Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
 - Showcase: https://kunanonj.com/showcase
 - GitHub repo: https://github.com/KunanonJ/fronk-website
 - Sanity Studio launcher: https://kunanonj.com/studio
-- Sitemap: https://kunanonj.com/sitemap.xml
-- RSS feed: https://kunanonj.com/feed.xml (legacy writing feed)
+- Sitemap: https://kunanonj.com/sitemap.xml · https://kunanonj.com/sitemap.md
+- Agents / LLMs: https://kunanonj.com/agents.md · https://kunanonj.com/llms.txt · https://kunanonj.com/skills.md
+- RSS feed: https://kunanonj.com/rss.xml (alias of `/feed.xml`)
 
 ## Highlights
 
@@ -69,13 +70,17 @@ Cloudflare Cron ---> /api/cron/revalidate
 | `/showcase`                                | Static landing                 | Creative studio showcase (spotlight reveal)        |
 | `/resume`                                  | Sanity + fallback (ISR)        | CV; noindex                                        |
 | `/studio/[[...tool]]`                      | Sanity Studio launcher         | External Studio URL                                |
-| `/about`, `/ventures`, `/contact`          | 308 redirect                   | Into `/#about`, `/#ventures`, `/#contact`          |
+| `/about`, `/ventures`                      | 308 redirect                   | Into `/#about`, `/#ventures`                       |
+| `/contact`                                 | Forma contact landing          | Video + contact form (nav Contact target)          |
+| `/press`                                   | Press card index               | Banner + title + blurb + DD/MM/YYYY + View CTA     |
+| `/blog`, `/blog/[slug]`                    | Sanity-backed blog             | Banner cards, tags, search/filter; edit in Studio  |
 | `/now`, `/writing`, `/writing/[slug]`      | 308 redirect                   | Into `/`                                           |
 | `/work`                                    | 308 redirect                   | Into `/#ventures`                                  |
 | `/api/revalidate`                          | POST                           | Sanity webhook → cache tags                        |
 | `/api/draft`, `/api/draft/disable`         | GET                            | Draft preview mode                                 |
 | `/api/cron/revalidate`                     | GET                            | Scheduled revalidation (Bearer auth)               |
-| `/sitemap.xml`, `/robots.txt`, `/feed.xml` | generated                      | Sitemap lists `/` and `/showcase`                  |
+| `/sitemap.xml`, `/robots.txt`, `/feed.xml`, `/rss.xml` | generated / redirect | XML sitemap + RSS (`/rss.xml` → `/feed.xml`)        |
+| `/agents.md`, `/sitemap.md`, `/skills.md`, `/llms.txt` | static / route         | Agent & LLM discovery surfaces (linked in footer)  |
 
 ## Local development
 

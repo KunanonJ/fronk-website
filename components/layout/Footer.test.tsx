@@ -37,7 +37,7 @@ describe("Footer > Pages links ease their colour transition", () => {
 describe("Footer > renders the navigation and contact", () => {
   it("renders footer nav items via map", () => {
     render(<Footer site={SITE} />);
-    for (const label of ["Work", "About", "Writing", "Now", "Contact"]) {
+    for (const label of ["Work", "About", "Blog", "Now", "Contact"]) {
       expect(
         screen.getAllByRole("link", { name: label }).length,
       ).toBeGreaterThanOrEqual(1);
@@ -77,7 +77,7 @@ describe("Footer > grid cells defend against overflow", () => {
       within(c).queryByText("Pages"),
     ) as HTMLElement;
     expect(
-      within(pagesCell).getByRole("link", { name: "Writing" }),
+      within(pagesCell).getByRole("link", { name: "Blog" }),
     ).toBeInTheDocument();
   });
 });

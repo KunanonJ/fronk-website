@@ -1,28 +1,47 @@
-# Sitemap (Markdown) — Fronk Jarat
+# Sitemap (Markdown) — KunanonJ
 
-This is the semantic site map for the personal website of **Kunanon Jarat (Fronk)**. 
+Semantic site map for **Kunanon Jarat (Fronk)**.  
+AI agents and indexes can use this directory to understand layout and routing.
 
-AI agents and search indexes can use this directory to understand the layout, routing taxonomy, and key features of this site.
+Canonical site: https://kunanonj.com
 
 ---
 
-## Page Index & Target Objectives
+## Page index
 
-| Route Path | Page Name | Primary Objective / Context |
+| Route | Name | Notes |
 |---|---|---|
-| `/` | **Home** | Primary entry, visual introduction, currently shipping highlights. |
-| `/about` | **About** | Detailed background, personal timeline, ventures, and philosophy. |
-| `/now` | **Now** | Real-time focus updates (inspired by Derek Sivers' "/now" page movement). |
-| `/ventures` | **Ventures** | Comprehensive catalog of active products, startups, and historical bets. |
-| `/writing` | **Writing** | The Journal index. Long-form operational updates sourced from Sanity CMS. |
-| `/resume` | **Resume** | Full CV, professional background, skills, and print PDF download action. |
-| `/contact` | **Contact** | Secure channels, email links, and verified social network coordinates. |
+| `/` | Home | Intro loader, hero, about, ventures, contact footer |
+| `/stock/asme` | About (stock) | “Built for the curious” about surface (nav → About) |
+| `/#ventures` | Ventures | Home section — GoGoCash, Manut, Airplusauto |
+| `/press` | Press | Press card grid (banner, date, CTA) |
+| `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
+| `/blog/[slug]` | Blog post | Long-form article |
+| `/contact` | Contact | Forma-style video contact + form |
+| `/showcase` | Showcase | Creative studio showcase (liquid-glass) |
+| `/resume` | Resume | CV (Sanity + fallback); noindex |
+| `/studio` | Sanity Studio | CMS launcher — not for public content scraping |
+
+### Legacy redirects
+
+| From | To |
+|---|---|
+| `/about` | `/#about` |
+| `/ventures`, `/work` | `/#ventures` |
+| `/now` | `/` |
+| `/writing`, `/writing/[slug]` | `/blog`, `/blog/[slug]` |
 
 ---
 
-## Supporting Resources
+## Supporting resources
 
-* **Plain Text Aggregator:** [/llms.txt](file:///Users/kunanonjarat/Developer/Fronk%20website/public/llms.txt) — Clean plain-text context block for LLM query tools.
-* **Agent Guidelines:** [/skills.md](file:///Users/kunanonjarat/Developer/Fronk%20website/public/skills.md) — System instruction guidelines and AI coding guidelines.
-* **Feed Syndication:** [/feed.xml](file:///Users/kunanonjarat/Developer/Fronk%20website/public/feed.xml) — XML RSS syndication for operational updates and CMS posts.
-* **Robots Rule File:** [/robots.txt](file:///Users/kunanonjarat/Developer/Fronk%20website/public/robots.txt) — Crawler authorization policy rules.
+* **Agents index:** [/agents.md](/agents.md)
+* **Plain text for LLMs:** [/llms.txt](/llms.txt)
+* **Coding skills / prompts:** [/skills.md](/skills.md)
+* **RSS:** [/rss.xml](/rss.xml) (alias of [/feed.xml](/feed.xml))
+* **XML sitemap:** [/sitemap.xml](/sitemap.xml)
+* **Robots:** [/robots.txt](/robots.txt)
+
+---
+
+*Last updated: 2026-07-19*

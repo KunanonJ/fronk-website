@@ -4,15 +4,15 @@ import { getAllVentures } from "@/lib/content/ventures";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 3600;
 
 export async function GET() {
   const ventures = getAllVentures();
   const posts = await fetchAllPosts();
+  const base = siteConfig.url.replace(/\/$/, "");
 
   const textLines: string[] = [];
 
-  // Title & Header
   textLines.push(`# ${siteConfig.name}`);
   textLines.push(`> ${siteConfig.tagline}`);
   textLines.push("");
@@ -20,10 +20,9 @@ export async function GET() {
   textLines.push("");
   textLines.push(`- **Location:** Bangkok, Thailand`);
   textLines.push(`- **Email:** ${siteConfig.email}`);
-  textLines.push(`- **Website:** ${siteConfig.url}`);
+  textLines.push(`- **Website:** ${base}`);
   textLines.push("");
 
-  // Social Links
   textLines.push("## Socials & Handles");
   textLines.push(`- **Twitter/X:** ${siteConfig.socials.x}`);
   textLines.push(`- **LinkedIn:** ${siteConfig.socials.linkedin}`);
@@ -33,9 +32,29 @@ export async function GET() {
   textLines.push(`- **Discord:** \`${siteConfig.discordHandle}\``);
   textLines.push("");
 
-  // Ventures
+  textLines.push("## Public routes");
+  textLines.push(`- Home: ${base}/`);
+  textLines.push(`- About: ${base}/stock/asme`);
+  textLines.push(`- Press: ${base}/press`);
+  textLines.push(`- Blog: ${base}/blog`);
+  textLines.push(`- Contact: ${base}/contact`);
+  textLines.push(`- Showcase: ${base}/showcase`);
+  textLines.push(`- Resume: ${base}/resume`);
+  textLines.push("");
+
+  textLines.push("## Agent & index surfaces");
+  textLines.push(`- Agents: ${base}/agents.md`);
+  textLines.push(`- Markdown sitemap: ${base}/sitemap.md`);
+  textLines.push(`- XML sitemap: ${base}/sitemap.xml`);
+  textLines.push(`- Skills: ${base}/skills.md`);
+  textLines.push(`- RSS: ${base}/rss.xml`);
+  textLines.push(`- This file: ${base}/llms.txt`);
+  textLines.push("");
+
   textLines.push("## Selected Ventures");
-  textLines.push("Active products and ventures built and actively managed by Fronk:");
+  textLines.push(
+    "Active products and ventures built and managed by Fronk:",
+  );
   textLines.push("");
 
   for (const v of ventures) {
@@ -49,9 +68,10 @@ export async function GET() {
     textLines.push("");
   }
 
-  // Writing
-  textLines.push("## Journal & Writing");
-  textLines.push("Long-form notes on building tech ventures, fundraising, hiring, and shipping:");
+  textLines.push("## Blog");
+  textLines.push(
+    "Long-form notes on building tech ventures, fundraising, hiring, and shipping:",
+  );
   textLines.push("");
 
   if (posts.length === 0) {
@@ -67,8 +87,8 @@ export async function GET() {
         : "Undated";
       textLines.push(`### ${post.title}`);
       textLines.push(`- **Published:** ${date}`);
-      textLines.push(`- **Slug:** \`/writing/${post.slug}\``);
-      textLines.push(`- **URL:** ${siteConfig.url}/writing/${post.slug}`);
+      textLines.push(`- **Slug:** \`/blog/${post.slug}\``);
+      textLines.push(`- **URL:** ${base}/blog/${post.slug}`);
       if (post.tags && post.tags.length > 0) {
         textLines.push(`- **Tags:** ${post.tags.join(", ")}`);
       }
@@ -79,9 +99,7 @@ export async function GET() {
     }
   }
 
-  const responseText = textLines.join("\n");
-
-  return new NextResponse(responseText, {
+  return new NextResponse(textLines.join("\n"), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",

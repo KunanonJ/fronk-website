@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Space_Mono } from "next/font/google";
+import { Hanken_Grotesk, Instrument_Serif, Space_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { WebVitals } from "@/components/WebVitals";
+import RouteSplash from "@/components/landing/RouteSplash";
 import { siteConfig } from "@/lib/site";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { site as landingSite } from "@/lib/content/landing";
@@ -32,6 +33,14 @@ const spaceMono = Space_Mono({
   variable: "--font-mono-instrument",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -80,7 +89,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={`${hankenGrotesk.variable} ${spaceMono.variable} dark h-full antialiased`}
+      className={`${hankenGrotesk.variable} ${spaceMono.variable} ${instrumentSerif.variable} dark h-full antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -104,6 +113,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem={false}
           disableTransitionOnChange
         >
+          <RouteSplash />
           {children}
         </ThemeProvider>
         <CloudflareAnalytics />

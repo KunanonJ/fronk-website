@@ -9,9 +9,12 @@ export const site = {
 } as const;
 
 export const nav = [
-  { label: "About", href: "#about" },
+  { label: "KunanonJ", href: "/" },
+  { label: "About", href: "/stock/asme" },
   { label: "Ventures", href: "#ventures" },
-  { label: "Contact", href: "#contact" },
+  { label: "Press", href: "/press" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const hero = {
@@ -37,18 +40,18 @@ export const about = {
   portraitSrc: "/profile.jpg",
   portraitAlt: "Kunanon Jarat — headshot",
   ctaLabel: "More About Me",
-  ctaHref: "/showcase",
+  ctaHref: "/stock/asme",
 } as const;
 
 export const ventures = {
   eyebrow: "Ventures",
-  line1: "Three ventures. Built from Bangkok.",
+  line1: "3 ventures. Built from Bangkok.",
   line2: "Fintech, AI workspaces, and more.",
-  videoTitle: "Building from Bangkok.",
+  videoTitle: "Building from Thailand, Sleep in Bangkok",
   cards: [
     {
       type: "video" as const,
-      title: "Building from Bangkok.",
+      title: "Building from Thailand, Sleep in Bangkok",
     },
     {
       type: "info" as const,
@@ -92,8 +95,19 @@ export const socials = [
   { label: "GitHub", href: "https://github.com/KunanonJ" },
 ] as const;
 
+/** Machine-readable / agent surfaces linked from the home footer */
+export const footerResources = [
+  { label: "Agents", href: "/agents.md" },
+  { label: "sitemap.md", href: "/sitemap.md" },
+  { label: "llms.txt", href: "/llms.txt" },
+  { label: "skills.md", href: "/skills.md" },
+  { label: "rss.xml", href: "/rss.xml" },
+] as const;
+
 export const contact = {
   label: "Contact",
   email: site.email,
   tagline: site.tagline,
+  ctaLabel: "Contact Me",
+  ctaHref: "/contact",
 } as const;

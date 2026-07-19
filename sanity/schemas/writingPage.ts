@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 
 export const writingPage = defineType({
   name: "writingPage",
-  title: "Writing page",
+  title: "Blog page",
   type: "document",
   fields: [
     defineField({
@@ -31,6 +31,6 @@ export const writingPage = defineType({
     }),
   ],
   preview: {
-    prepare: () => ({ title: "Writing page" }),
+    prepare: () => ({ title: "Blog page" }),
   },
 });

@@ -17,11 +17,11 @@ const nextConfig: NextConfig = {
       { source: "/about", destination: "/#about", permanent: true },
       { source: "/ventures", destination: "/#ventures", permanent: true },
       { source: "/ventures/:slug", destination: "/#ventures", permanent: true },
-      { source: "/contact", destination: "/#contact", permanent: true },
       { source: "/now", destination: "/", permanent: true },
-      { source: "/writing", destination: "/", permanent: true },
-      { source: "/writing/:slug", destination: "/", permanent: true },
+      { source: "/writing", destination: "/blog", permanent: true },
+      { source: "/writing/:slug", destination: "/blog/:slug", permanent: true },
       { source: "/work", destination: "/#ventures", permanent: true },
+      { source: "/rss.xml", destination: "/feed.xml", permanent: true },
     ];
   },
   async headers() {
@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "soft-zoom-63098134.figma.site",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

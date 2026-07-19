@@ -14,7 +14,22 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/showcase",
     name: "showcase",
-    expectsHeadingPattern: /fintech|Visuals|Start a project/i,
+    expectsHeadingPattern: /Live Better|Start Today|KunanonJ/i,
+  },
+  {
+    path: "/contact",
+    name: "contact",
+    expectsHeadingPattern: /Say hello|Send my message|products/i,
+  },
+  {
+    path: "/press",
+    name: "press",
+    expectsHeadingPattern: /Press|View|GoGoCash|Manut/i,
+  },
+  {
+    path: "/blog",
+    name: "blog",
+    expectsHeadingPattern: /Blog|Search posts|Read|GoGoCash|Manut|Bangkok/i,
   },
   { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },
 ];

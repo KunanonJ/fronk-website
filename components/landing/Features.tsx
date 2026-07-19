@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { useRef, type ReactNode } from "react";
@@ -77,18 +78,31 @@ function InfoCardBody({ card }: { card: InfoCard }) {
         ))}
       </ul>
 
-      <a
-        href={card.href}
-        target={card.href.startsWith("http") ? "_blank" : undefined}
-        rel={card.href.startsWith("http") ? "noreferrer" : undefined}
-        className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-primary transition-opacity hover:opacity-80 md:min-h-0"
-      >
-        Learn more
-        <ArrowRight
-          className="h-4 w-4"
-          style={{ transform: "rotate(-45deg)" }}
-        />
-      </a>
+      {card.href.startsWith("http") ? (
+        <a
+          href={card.href}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-primary transition-opacity hover:opacity-80 md:min-h-0"
+        >
+          Learn more
+          <ArrowRight
+            className="h-4 w-4"
+            style={{ transform: "rotate(-45deg)" }}
+          />
+        </a>
+      ) : (
+        <Link
+          href={card.href}
+          className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-primary transition-opacity hover:opacity-80 md:min-h-0"
+        >
+          Learn more
+          <ArrowRight
+            className="h-4 w-4"
+            style={{ transform: "rotate(-45deg)" }}
+          />
+        </Link>
+      )}
     </div>
   );
 }

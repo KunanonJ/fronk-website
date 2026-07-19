@@ -5,15 +5,15 @@ export const structure: StructureResolver = (S) =>
     .title("Content")
     .items([
       S.listItem()
-        .title("Writing")
+        .title("Blog")
         .child(
           S.list()
-            .title("Writing")
+            .title("Blog")
             .items([
               S.documentTypeListItem("post").title("Posts"),
               S.documentTypeListItem("author").title("Authors"),
               S.listItem()
-                .title("Writing page")
+                .title("Blog page")
                 .child(
                   S.document()
                     .schemaType("writingPage")

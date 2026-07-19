@@ -1,46 +1,78 @@
-# AI Coding Guidelines & Skills — Fronk Jarat
+# AI Coding Guidelines & Skills — KunanonJ
 
-This is a library of prompts, coding standards, and ubiquitous guidelines configured for AI coding agents (such as Claude Code, Cursor, Gemini, and Copilot) to ensure high-fidelity context when building software inside my projects.
+Prompts and standards for coding agents (Claude Code, Cursor, Codex, Copilot, Gemini) working on this site and related Fronk projects.
 
----
+Site: https://kunanonj.com  
+Stack: Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Sanity · Cloudflare Workers (OpenNext)
 
-## 1. Core Codebase Principles
-
-When generating code or reviewing commits within my repositories, always prioritize the following standards:
-
-1. **Keep Code Modules Deep:**
-   * Prefer creating robust, fully detailed helper functions rather than hundreds of shallow, highly abstract wrappers.
-   * Maximize functionality inside a single module, making interfaces clean and simple.
-
-2. **Tailwind CSS v4 & Next.js 16 Paradigms:**
-   * Always write theme elements matching Tailwind v4 specifications (CSS `@theme` tokens, keyframes, and `@utility` rules).
-   * Respect Next.js App Router rules: write server components by default, keeping client-side state hooks (`useClient`) strictly bounded at leaf component levels (like interactivity canvas overlays).
-
-3. **High-Aesthetic Micro-animations:**
-   * Favor fluid Apple cubic easing transitions (`cubic-bezier(0.16, 1, 0.3, 1)`) for card hovers and interactive triggers over standard linear animations.
-   * Prefer CSS overlays or inline SVG nodes over external asset requests.
+Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/sitemap.md)
 
 ---
 
-## 2. Standard Coding Prompts & Recipes
+## 1. Core principles
 
-You can import these system instructions straight into your LLM developer tools to align them instantly:
+1. **Deep modules, simple interfaces**
+   * Prefer complete helpers over shallow wrappers.
+   * Keep public APIs small; put complexity inside the module.
 
-### Recipe: System Alignment Instructions
+2. **Next.js App Router + Tailwind v4**
+   * Server Components by default; `"use client"` only at interactive leaves.
+   * Theme via CSS `@theme` tokens, keyframes, and `@utility` — not ad-hoc one-offs.
+   * Landing cream primary: `#dedbc8` (`--color-primary`).
+
+3. **Motion**
+   * Prefer Apple-like easing: `cubic-bezier(0.16, 1, 0.3, 1)` / `cubic-bezier(0.22, 1, 0.36, 1)`.
+   * Respect `prefers-reduced-motion`.
+   * Route transitions: global `RouteSplash` (do not reintroduce full-page flashes).
+
+4. **Content**
+   * Marketing copy lives in `lib/content/` (especially `landing.ts`).
+   * Blog/resume via Sanity with static fallbacks.
+   * Prefer `/blog` over legacy `/writing`.
+
+5. **TypeScript**
+   * Strict typing; avoid `any`.
+   * Typecheck uses TypeScript 7; ESLint resolves the TS6 API package side-by-side.
+
+---
+
+## 2. Recipes
+
+### System alignment
+
 ```markdown
-You are a senior front-end engineering assistant pair-programming with Fronk.
-When writing components, always ensure:
-- CSS animations leverage tailwind's custom easing metrics.
-- Component layouts remain strictly responsive (mobile-first grid flex offsets).
-- Keep code clean, readable, and perfectly typed in TypeScript.
-- Strictly maintain standard SEO meta-elements and descriptive ARIA tags.
+You are a senior front-end engineer pair-programming on kunanonj.com.
+When writing components:
+- Use TypeScript strictly; Server Components by default.
+- Match Tailwind v4 tokens and the dark cinematic landing aesthetic.
+- Keep SEO metadata, canonical URLs, and ARIA labels intact.
+- Prefer editing lib/content/* for copy changes over hardcoding strings in JSX.
 ```
 
-### Recipe: Clean Commit Message Generator
-```markdown
-Read the recent git changes and construct a commit message in this format:
-feat/fix/chore([scope]): [short active-voice summary]
+### Commit message
 
-- Detailed bullet point 1
-- Detailed bullet point 2
+```markdown
+feat|fix|chore([scope]): [short active-voice summary]
+
+- Detailed bullet 1
+- Detailed bullet 2
 ```
+
+### Before proposing UI changes
+
+1. Read [/sitemap.md](/sitemap.md) for current routes.
+2. Check `components/landing/` before inventing parallel chrome.
+3. Keep primary nav: KunanonJ · About · Ventures · Press · Blog · Contact.
+
+---
+
+## 3. Do not
+
+* Scrape or modify `/studio` content via public agents without credentials.
+* Reintroduce FogLAMP multi-page chrome (retired).
+* Break the global route splash or intro loader session behavior.
+* Commit secrets, `.env*`, or Sanity tokens.
+
+---
+
+*Last updated: 2026-07-19*

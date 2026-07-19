@@ -1,14 +1,14 @@
 import type { WritingPageContent } from "@/lib/sanity/types";
 
 export const DEFAULT_WRITING_PAGE = {
-  eyebrow: "Writing",
-  heading: "Journal.",
+  eyebrow: "Blog",
+  heading: "Blog",
   description:
-    "Working notes on building, hiring, and shipping. Published roughly once a week.",
+    "Notes on fintech, AI workspaces, and shipping from Bangkok. Search or filter by tag.",
   metadata: {
-    title: "Writing",
+    title: "Blog",
     description:
-      "Long-form notes on starting and running companies — fundraising, hiring, product, and the daily reality of building from zero.",
+      "Writing and notes from KunanonJ — fintech, AI, and building from Bangkok.",
   },
 } as const;
 
