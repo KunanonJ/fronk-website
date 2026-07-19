@@ -29,7 +29,7 @@ export const about = {
     { text: "I am Kunanon Jarat,", className: "font-normal" },
     { text: "a Bangkok founder.", className: "italic font-serif" },
     {
-      text: "I build GoGoCash, Manut, and Airplus from Bangkok.",
+      text: "I build GoGoCash, Manut, and Airplusauto from Bangkok.",
       className: "font-normal",
     },
   ],
@@ -78,10 +78,10 @@ export const ventures = {
     {
       type: "info" as const,
       number: "03",
-      title: "Airplus",
+      title: "Airplusauto",
       icon: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260405_171809_f56666dc-c099-4778-ad82-9ad4f209567b.png&w=1280&q=85",
       items: ["Venture in flight", "Shipping from Bangkok", "More soon"],
-      href: "#contact",
+      href: "https://airplusauto.com",
     },
   ],
 } as const;
@@ -90,7 +90,6 @@ export const socials = [
   { label: "X", href: "https://x.com/fkj98" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/kunanonj" },
   { label: "GitHub", href: "https://github.com/KunanonJ" },
-  { label: "Telegram", href: "https://t.me/fkj98" },
 ] as const;
 
 export const contact = {

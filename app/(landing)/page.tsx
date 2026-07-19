@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-[100svh] overflow-x-hidden bg-black">
+    <main id="main" className="min-h-[100svh] overflow-x-hidden bg-black">
       <IntroLoader />
       <Hero />
       <About />

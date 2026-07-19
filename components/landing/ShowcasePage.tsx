@@ -21,7 +21,9 @@ const splashEase = [0.96, -0.02, 0.38, 1.01] as const;
 export default function ShowcasePage() {
   const prefersReducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [splashDone, setSplashDone] = useState(!!prefersReducedMotion);
+  const [splashTimedOut, setSplashTimedOut] = useState(false);
+  // Derive splash completion from reduced-motion preference — avoid sync setState in effect.
+  const splashDone = !!prefersReducedMotion || splashTimedOut;
   const words = HEADLINE.split(" ");
 
   useEffect(() => {
@@ -41,11 +43,8 @@ export default function ShowcasePage() {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
-      setSplashDone(true);
-      return;
-    }
-    const t = window.setTimeout(() => setSplashDone(true), 1650);
+    if (prefersReducedMotion) return;
+    const t = window.setTimeout(() => setSplashTimedOut(true), 1650);
     return () => window.clearTimeout(t);
   }, [prefersReducedMotion]);
 
@@ -215,6 +214,7 @@ export default function ShowcasePage() {
 
       {/* Hero */}
       <main
+        id="main"
         className="relative min-h-[100svh] w-full overflow-hidden md:h-screen md:min-h-[800px]"
         style={{ backgroundColor: "#E4E4E4" }}
       >
