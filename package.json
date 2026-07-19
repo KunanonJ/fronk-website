@@ -1,8 +1,8 @@
 {
   "name": "fronk-website",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "Personal website for Fronk Kunanon Jarat — founder, builder, writer.",
+  "description": "KunanonJ personal site — cinematic landing + showcase on Next.js / Cloudflare Workers. Fintech & AI ventures from Bangkok.",
   "engines": {
     "node": ">=22.12.0"
   },
