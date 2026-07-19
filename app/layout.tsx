@@ -92,7 +92,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#f0eee6" },
   ],
 };
 
@@ -104,11 +104,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={`${hankenGrotesk.variable} ${spaceMono.variable} ${instrumentSerif.variable} dark h-full antialiased`}
+      className={`${hankenGrotesk.variable} ${spaceMono.variable} ${instrumentSerif.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-black text-primary">
+      <body className="flex min-h-full flex-col bg-landing text-primary">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: siteJsonLd }}
@@ -124,7 +124,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          forcedTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >

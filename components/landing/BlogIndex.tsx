@@ -102,7 +102,7 @@ export default function BlogIndex({
   );
 
   return (
-    <div className="relative min-h-[100svh] bg-black text-primary">
+    <div className="relative min-h-[100svh] bg-landing text-primary">
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
@@ -155,7 +155,7 @@ export default function BlogIndex({
               onClick={() => setActiveTag(null)}
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTag === null
-                  ? "border-primary/40 bg-primary text-black"
+                  ? "border-cream/40 bg-cream text-black"
                   : "border-white/15 bg-transparent text-primary/70 hover:border-white/35 hover:text-primary"
               }`}
             >
@@ -170,7 +170,7 @@ export default function BlogIndex({
                   onClick={() => setActiveTag(active ? null : tag)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     active
-                      ? "border-primary/40 bg-primary text-black"
+                      ? "border-cream/40 bg-cream text-black"
                       : "border-white/15 bg-transparent text-primary/70 hover:border-white/35 hover:text-primary"
                   }`}
                 >

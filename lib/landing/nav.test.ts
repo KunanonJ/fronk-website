@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   activeSectionAtFocus,
   expandHashHref,
+  flattenNavHrefs,
   isHashHref,
   isHomeSectionId,
+  isMenuChildActive,
   isNavItemActive,
   normalizePath,
   parseHomeSectionHash,
@@ -168,5 +170,57 @@ describe("isNavItemActive", () => {
     expect(isNavItemActive("/about", "/about", null)).toBe(true);
     expect(isNavItemActive("/blog", "/blog/hello", null)).toBe(true);
     expect(isNavItemActive("/press", "/", null)).toBe(false);
+  });
+});
+
+describe("flattenNavHrefs", () => {
+  it("flattens links, menus, and optional CTA", () => {
+    expect(
+      flattenNavHrefs(
+        [
+          { type: "link", href: "/about" },
+          {
+            type: "menu",
+            href: "/#ventures",
+            children: [
+              { href: "/ventures/manut" },
+              { href: "/ventures/gogocash" },
+            ],
+          },
+        ],
+        { href: "/contact" },
+      ),
+    ).toEqual([
+      { href: "/" },
+      { href: "/about" },
+      { href: "/#ventures" },
+      { href: "/ventures/manut" },
+      { href: "/ventures/gogocash" },
+      { href: "/contact" },
+    ]);
+  });
+});
+
+describe("isMenuChildActive", () => {
+  const children = [
+    { href: "/ventures/manut" },
+    { href: "/ventures/gogocash" },
+    { href: "/#ventures" },
+  ];
+
+  it("is true when a child path matches", () => {
+    expect(isMenuChildActive(children, "/ventures/manut", null)).toBe(true);
+    expect(isMenuChildActive(children, "/ventures/manut/team", null)).toBe(
+      true,
+    );
+  });
+
+  it("is true when a hash child matches the active section", () => {
+    expect(isMenuChildActive(children, "/", "ventures")).toBe(true);
+  });
+
+  it("is false when nothing matches", () => {
+    expect(isMenuChildActive(children, "/blog", null)).toBe(false);
+    expect(isMenuChildActive(children, "/", "about")).toBe(false);
   });
 });

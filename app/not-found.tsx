@@ -10,7 +10,7 @@ const destinations = [
 
 export default function NotFound() {
   return (
-    <main className="landing-root flex min-h-[100svh] flex-col items-start justify-center bg-black px-6 py-20 text-primary">
+    <main className="landing-root flex min-h-[100svh] flex-col items-start justify-center bg-landing px-6 py-20 text-primary">
       <p className="text-xs uppercase tracking-[0.2em] text-primary/60">404</p>
       <h1 className="mt-4 text-5xl font-semibold leading-none tracking-tight sm:text-7xl">
         Nothing lives here.

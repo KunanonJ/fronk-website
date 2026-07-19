@@ -16,7 +16,7 @@ type TopicHubPageProps = {
  */
 export default function TopicHubPage({ pillar }: TopicHubPageProps) {
   return (
-    <main id="main" className="bg-black text-primary">
+    <main id="main" className="bg-landing text-primary">
       <DiscoveryAnalytics />
       <article className="mx-auto max-w-3xl px-5 pb-24 pt-16 sm:px-8 sm:pt-24">
         <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/55">
@@ -97,7 +97,7 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
             href={pillar.ctaHref}
             data-analytics="topic_hub_cta"
             data-topic-slug={pillar.slug}
-            className="inline-flex border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.15em] text-primary transition-colors hover:bg-primary hover:text-black"
+            className="inline-flex border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.15em] text-primary transition-colors hover:bg-cream hover:text-black"
           >
             {pillar.ctaLabel}
           </Link>

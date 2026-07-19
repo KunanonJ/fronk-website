@@ -37,5 +37,30 @@ export const ROUTES: readonly RouteUnderTest[] = [
     name: "blog",
     expectsHeadingPattern: /Blog|Search posts|Read|GoGoCash|Manut|Bangkok/i,
   },
+  {
+    path: "/learn",
+    name: "learn",
+    expectsHeadingPattern: /Learn|Topic hubs|Writing|Operator notes/i,
+  },
+  {
+    path: "/examples",
+    name: "examples",
+    expectsHeadingPattern: /Examples|Builders|Operators|Founders/i,
+  },
+  {
+    path: "/stack",
+    name: "stack",
+    expectsHeadingPattern: /Stack|Build|Ship|Operate|Cursor|Next\.js/i,
+  },
+  {
+    path: "/proof",
+    name: "proof",
+    expectsHeadingPattern: /Proof|Users|Merchants|GoGoCash|Manut/i,
+  },
+  {
+    path: "/build",
+    name: "build",
+    expectsHeadingPattern: /Build|Next|In progress|Shipped/i,
+  },
   { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },
 ];

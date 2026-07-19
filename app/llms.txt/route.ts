@@ -65,6 +65,11 @@ export async function GET() {
   textLines.push(`- Topic hubs (TH): ${base}/th/topics/[slug]`);
   textLines.push(`- Press: ${base}/press`);
   textLines.push(`- Blog: ${base}/blog`);
+  textLines.push(`- Learn: ${base}/learn`);
+  textLines.push(`- Examples: ${base}/examples`);
+  textLines.push(`- Stack: ${base}/stack`);
+  textLines.push(`- Proof: ${base}/proof`);
+  textLines.push(`- Build: ${base}/build`);
   textLines.push(`- Contact: ${base}/contact`);
   textLines.push(`- Showcase: ${base}/showcase`);
   textLines.push(`- Resume: ${base}/resume (noindex)`);

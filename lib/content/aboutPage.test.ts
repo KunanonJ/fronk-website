@@ -23,6 +23,24 @@ describe("aboutPage content", () => {
     expect(aboutPage.cta.links.length).toBeGreaterThanOrEqual(2);
   });
 
+  it("ships a GitHub-grounded tech stack section with icons", () => {
+    expect(aboutPage.stack.id).toBe("stack");
+    expect(aboutPage.stack.groups.length).toBeGreaterThanOrEqual(3);
+    expect(aboutPage.stack.moreHref).toBe("/stack");
+    for (const group of aboutPage.stack.groups) {
+      expect(group.items.length).toBeGreaterThan(0);
+      for (const item of group.items) {
+        expect(item.name.length).toBeGreaterThan(0);
+        expect(item.icon.length).toBeGreaterThan(0);
+      }
+    }
+    expect(
+      aboutPage.stack.groups.some((g) =>
+        g.items.some((i) => i.name === "TypeScript"),
+      ),
+    ).toBe(true);
+  });
+
   it("anchors Manifesto to the story section", () => {
     expect(aboutPage.hero.manifestoHref).toBe("#story");
     expect(aboutPage.story.id).toBe("story");

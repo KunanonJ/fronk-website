@@ -77,6 +77,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "sanity": "^6.5.0",
+    "simple-icons": "^16.27.0",
     "styled-components": "^6.4.4",
     "three": "^0.185.1"
   },

@@ -20,7 +20,7 @@ export default function EditorialStubPage({
   navId,
 }: EditorialStubPageProps) {
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-black text-primary">
+    <div className="relative min-h-[100svh] overflow-hidden bg-landing text-primary">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(225,224,204,0.08),_transparent_55%)]" />
 
       <LandingTopNav

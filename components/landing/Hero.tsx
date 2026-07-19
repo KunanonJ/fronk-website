@@ -43,12 +43,12 @@ export default function Hero() {
               </h1>
             </div>
 
-            <div className="col-span-12 flex max-w-md flex-col gap-3 sm:gap-4 lg:col-span-4 lg:max-w-none lg:pb-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-primary/60 sm:text-xs">
+            <div className="col-span-12 flex max-w-md flex-col gap-3 text-cream sm:gap-4 lg:col-span-4 lg:max-w-none lg:pb-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-cream/60 sm:text-xs">
                 {hero.contextLabel}
               </p>
               <motion.p
-                className="text-xs text-primary/70 sm:text-sm md:text-base"
+                className="text-xs text-cream/70 sm:text-sm md:text-base"
                 style={{ lineHeight: 1.25 }}
                 initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -63,7 +63,7 @@ export default function Hero() {
 
               <motion.a
                 href={hero.ctaHref}
-                className="group inline-flex w-fit touch-manipulation items-center gap-2 rounded-full bg-primary py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:text-base"
+                className="group inline-flex w-full touch-manipulation items-center justify-between gap-2 rounded-full bg-cream py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:w-fit sm:text-base"
                 initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={
@@ -73,8 +73,8 @@ export default function Hero() {
                 }
               >
                 {hero.ctaLabel}
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
-                  <ArrowRight className="h-4 w-4 text-primary" />
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
+                  <ArrowRight className="h-4 w-4 text-cream" />
                 </span>
               </motion.a>
             </div>

@@ -8,13 +8,64 @@ export const site = {
   tagline: "Building fintech and digital workspaces from Bangkok.",
 } as const;
 
+export type NavChild = { label: string; href: string };
+
+export type NavItem =
+  | { type: "link"; label: string; href: string }
+  | {
+      type: "menu";
+      label: string;
+      /** Optional parent href (e.g. section deep-link). */
+      href?: string;
+      children: readonly NavChild[];
+    };
+
+/** Human library pages (creed-style secondary IA) — home footer + Library nav menu */
+export const footerLibrary = [
+  { label: "Learn", href: "/learn" },
+  { label: "Examples", href: "/examples" },
+  { label: "Stack", href: "/stack" },
+  { label: "Proof", href: "/proof" },
+  { label: "Build", href: "/build" },
+] as const;
+
+/** Primary chrome items (creed-style pill). Flat links + Library menu + Contact CTA. */
+export const primaryNav: readonly NavItem[] = [
+  { type: "link", label: "About", href: "/about" },
+  { type: "link", label: "Ventures", href: "/#ventures" },
+  {
+    type: "menu",
+    label: "Library",
+    children: footerLibrary.map((item) => ({
+      label: item.label,
+      href: item.href,
+    })),
+  },
+  { type: "link", label: "Blog", href: "/blog" },
+  { type: "link", label: "Press", href: "/press" },
+];
+
+export const navCta = { label: "Contact", href: "/contact" } as const;
+
+/**
+ * Flat nav for scroll-spy / active helpers (includes wordmark + CTA + menu parents).
+ * @deprecated Prefer `primaryNav` + `navCta` for chrome; kept for spy helpers.
+ */
 export const nav = [
   { label: "KunanonJ", href: "/" },
   { label: "About", href: "/about" },
   { label: "Ventures", href: "/#ventures" },
-  { label: "Press", href: "/press" },
   { label: "Blog", href: "/blog" },
+  { label: "Press", href: "/press" },
   { label: "Contact", href: "/contact" },
+] as const;
+
+/** Operator keyword tips (hpbrn-style) for home about / about page. */
+export const aboutKeywords = [
+  { text: "Bangkok", tip: "Base of operations — Thailand first, SEA next" },
+  { text: "GoGoCash", tip: "Shopping-to-earn cashback · 1,000+ users" },
+  { text: "Manut", tip: "ERP/CRM + Intelligence AI for automotive SMEs" },
+  { text: "ERP/CRM", tip: "Internal systems before agent theater" },
 ] as const;
 
 export const hero = {
@@ -97,8 +148,6 @@ export const socials = [
 
 /** Machine-readable / agent surfaces linked from the home footer */
 export const footerResources = [
-  { label: "AI transformation", href: "/topics/ai-transformation-thailand" },
-  { label: "ERP / CRM", href: "/topics/erp-crm-internal-systems" },
   { label: "Agents", href: "/agents.md" },
   { label: "sitemap.md", href: "/sitemap.md" },
   { label: "llms.txt", href: "/llms.txt" },

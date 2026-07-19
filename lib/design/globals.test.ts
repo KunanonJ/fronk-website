@@ -13,8 +13,10 @@ const landingLayout = readFileSync(
  * Contract for landing-cutover public shell (supersedes FogLAMP Phase 0).
  */
 describe("landing-cutover foundation", () => {
-  it("exposes landing primary cream token", () => {
-    expect(globalsCss).toMatch(/--color-primary:\s*#dedbc8\b/i);
+  it("exposes landing cream CTA token and themeable primary ink", () => {
+    expect(globalsCss).toMatch(/--color-cream:\s*#dedbc8\b/i);
+    expect(globalsCss).toMatch(/--color-primary:\s*var\(--landing-ink\)/);
+    expect(globalsCss).toMatch(/--landing-ink:\s*#dedbc8\b/i);
   });
 
   it("defines hero noise-overlay utility for landing", () => {
@@ -35,9 +37,11 @@ describe("landing-cutover foundation", () => {
     expect(layoutTsx).not.toMatch(/\bInter\b/);
   });
 
-  it("forces dark-only public theme with black themeColor", () => {
-    expect(layoutTsx).toContain('forcedTheme="dark"');
+  it("unlocks theme toggle with dark default and dual themeColor", () => {
+    expect(layoutTsx).not.toContain("forcedTheme");
+    expect(layoutTsx).toContain('defaultTheme="dark"');
     expect(layoutTsx).toMatch(/#000000/);
+    expect(layoutTsx).toMatch(/#f0eee6/i);
   });
 
   it("does not mount FogLAMP SiteShell chrome in root layout", () => {

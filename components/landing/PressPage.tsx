@@ -73,7 +73,7 @@ function PressCard({ item }: { item: PressItem }) {
  */
 export default function PressPage() {
   return (
-    <div className="relative min-h-[100svh] bg-black text-primary">
+    <div className="relative min-h-[100svh] bg-landing text-primary">
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"

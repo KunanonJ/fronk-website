@@ -61,6 +61,40 @@ export function scrollSpySectionIds(
   return ids;
 }
 
+type NavTreeItem =
+  | { type: "link"; href: string }
+  | { type: "menu"; href?: string; children: readonly { href: string }[] };
+
+/** Flatten primary nav + optional CTA into href rows for scroll-spy / active state. */
+export function flattenNavHrefs(
+  items: readonly NavTreeItem[],
+  cta?: { href: string },
+): { href: string }[] {
+  const out: { href: string }[] = [{ href: "/" }];
+  for (const item of items) {
+    if (item.type === "link") {
+      out.push({ href: item.href });
+      continue;
+    }
+    if (item.href) out.push({ href: item.href });
+    for (const child of item.children) out.push({ href: child.href });
+  }
+  if (cta) out.push({ href: cta.href });
+  return out;
+}
+
+/** True when pathname matches a menu child (prefix-aware). */
+export function isMenuChildActive(
+  children: readonly { href: string }[],
+  pathname: string,
+  activeSection: string | null,
+  hashLinkedSections: readonly string[] = [],
+): boolean {
+  return children.some((child) =>
+    isNavItemActive(child.href, pathname, activeSection, hashLinkedSections),
+  );
+}
+
 export function isHashHref(href: string): boolean {
   return href.startsWith("#") || href.startsWith("/#");
 }

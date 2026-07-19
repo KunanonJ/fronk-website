@@ -23,6 +23,11 @@ Canonical site: https://kunanonj.com
 | `/press` | Press | Press card grid |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
+| `/learn` | Learn | Hub index → topics, writing, operator notes |
+| `/examples` | Examples | Persona scenario cards (Builders / Operators / Founders) |
+| `/stack` | Stack | Tools table (Build / Ship / Operate) |
+| `/proof` | Proof | Venture metrics + press/case evidence |
+| `/build` | Build | Thin public board (Next / In progress / Shipped) |
 | `/contact` | Contact | Contact + form |
 | `/showcase` | Showcase | Creative studio showcase |
 | `/resume` | Resume | CV; noindex |

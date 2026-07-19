@@ -46,8 +46,10 @@
   --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman",
     serif;
 
-  /* landing-cutover — prisma-landing cream primary */
-  --color-primary: #dedbc8;
+  /* landing-cutover — cream CTA fill (stable); primary ink flips with theme */
+  --color-cream: #dedbc8;
+  --color-landing: var(--landing-canvas);
+  --color-primary: var(--landing-ink);
   --color-showcase-bg: #e4e4e4;
   --color-showcase-cream: #f4f1e8;
   --color-showcase-ink: #111111;
@@ -77,7 +79,7 @@
   --animate-globe-spin: globe-spin 12s linear infinite;
 }
 
-/* ─── Light portfolio ─────────────────────────────────────────────────────── */
+/* ─── Light portfolio + landing shell ───────────────────────────────────── */
 :root {
   --bg: #f0f0ee;
   --fg: #1c1d20;
@@ -94,6 +96,9 @@
   --pos: #0a7a54;
   --neg: #c8453b;
   --grain-opacity: 0.02;
+  /* landing canvas / ink (text-primary resolves to ink) */
+  --landing-canvas: #f0eee6;
+  --landing-ink: #1a1a18;
 }
 
 /* ─── Dark portfolio (FogLAMP near-black mood) ───────────────────────────── */
@@ -113,12 +118,14 @@
   --pos: #34d399;
   --neg: #f87171;
   --grain-opacity: 0.06;
+  --landing-canvas: #000000;
+  --landing-ink: #dedbc8;
 }
 
 html {
   background: var(--bg);
   color: var(--fg);
-  color-scheme: dark;
+  color-scheme: light;
   scroll-behavior: smooth;
 }
 
@@ -677,5 +684,123 @@ a {
   .panel-live:hover,
   .group:hover .tick-armed {
     transform: none !important;
+  }
+}
+
+/* ─── Landing interactive chrome (hpbrn-style cursor + keyword tips) ──────── */
+
+html.has-smooth-cursor,
+html.has-smooth-cursor * {
+  cursor: none !important;
+}
+
+.smooth-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 28px;
+  height: 28px;
+  margin: -2px 0 0 -2px;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.smooth-cursor-arrow,
+.smooth-cursor-hand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+}
+
+.smooth-cursor-hand {
+  opacity: 0;
+}
+
+.smooth-cursor.is-hand .smooth-cursor-arrow {
+  opacity: 0;
+}
+
+.smooth-cursor.is-hand .smooth-cursor-hand {
+  opacity: 1;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  html.has-smooth-cursor,
+  html.has-smooth-cursor * {
+    cursor: auto !important;
+  }
+
+  .smooth-cursor {
+    display: none !important;
+  }
+}
+
+.keyword {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-color: rgba(222, 219, 200, 0.35);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.keyword:hover,
+.keyword:focus-visible {
+  text-decoration-color: rgba(222, 219, 200, 0.85);
+}
+
+.keyword[data-tooltip]::after,
+.activity-day[data-tooltip]::after {
+  /* content only on hover/focus so tips stay out of the a11y tree at rest */
+  content: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.55rem);
+  z-index: 40;
+  width: max-content;
+  max-width: 16rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(222, 219, 200, 0.18);
+  background: rgba(10, 10, 10, 0.96);
+  color: #dedbc8;
+  font-family: var(--font-almarai), system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.keyword[data-tooltip]:hover::after,
+.keyword[data-tooltip]:focus-visible::after,
+.activity-day[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.activity-day {
+  position: relative;
+}
+
+.activity-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(222, 219, 200, 0.35) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keyword[data-tooltip]::after,
+  .activity-day[data-tooltip]::after {
+    transition: none;
   }
 }

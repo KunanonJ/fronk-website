@@ -18,6 +18,11 @@ const STATIC_ROUTES: readonly {
   { path: "/contact", changeFrequency: "monthly", priority: 0.8 },
   { path: "/press", changeFrequency: "monthly", priority: 0.8 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/learn", changeFrequency: "weekly", priority: 0.85 },
+  { path: "/examples", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/stack", changeFrequency: "monthly", priority: 0.75 },
+  { path: "/proof", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/build", changeFrequency: "weekly", priority: 0.75 },
   ...TOPIC_SLUGS.map((slug) => ({
     path: `/topics/${slug}`,
     changeFrequency: "monthly" as const,

@@ -3,6 +3,8 @@
  * aligned with landing CI routes (`/blog`, `/contact`, `/#ventures`).
  */
 
+import type { StackIconId } from "@/lib/content/stackIcons";
+
 export type AboutInlineLink = {
   type: "link";
   text: string;
@@ -31,6 +33,18 @@ export type AboutPathChip = {
   detail: string;
 };
 
+export type AboutStackItem = {
+  name: string;
+  detail: string;
+  /** Brand icon key — see StackBrandIcon. */
+  icon: StackIconId;
+};
+
+export type AboutStackGroup = {
+  label: string;
+  items: readonly AboutStackItem[];
+};
+
 export const aboutPage = {
   hero: {
     title: "Built for the curious",
@@ -44,8 +58,6 @@ export const aboutPage = {
     id: "story",
     eyebrow: "Profile",
     heading: "Founder, Bangkok.",
-    portraitSrc: "/profile.jpg",
-    portraitAlt: "Kunanon Jarat — headshot",
     paragraphs: [
       {
         spans: [
@@ -202,6 +214,131 @@ export const aboutPage = {
         ],
       },
     ] satisfies readonly AboutParagraph[],
+  },
+
+  /**
+   * Tech stack grounded in public GitHub (@KunanonJ + @mygogocash).
+   * Prefer languages/frameworks evidenced in active repos — not a wishlist.
+   */
+  stack: {
+    id: "stack",
+    eyebrow: "Tech stack",
+    heading: "What shows up in the repos.",
+    lede: "Read from public GitHub — personal (@KunanonJ) and GoGoCash (@mygogocash). TypeScript is the through-line; Solidity and Python still appear where the problem needs them.",
+    groups: [
+      {
+        label: "Core",
+        items: [
+          {
+            name: "TypeScript",
+            detail: "Primary language across site, GoGoCash, Manut",
+            icon: "typescript",
+          },
+          {
+            name: "React / Next.js",
+            detail: "Web apps, admin, marketing, kunanonj.com",
+            icon: "nextdotjs",
+          },
+          {
+            name: "Expo / React Native",
+            detail: "Mobile + web from one codebase (GoGoCash, Manut)",
+            icon: "expo",
+          },
+          {
+            name: "Tailwind CSS",
+            detail: "UI styling on product and personal surfaces",
+            icon: "tailwindcss",
+          },
+        ],
+      },
+      {
+        label: "GoGoCash",
+        items: [
+          {
+            name: "Turborepo",
+            detail: "Monorepo for API, admin, and customer app",
+            icon: "turborepo",
+          },
+          {
+            name: "NestJS",
+            detail: "API services on Google Cloud Run",
+            icon: "nestjs",
+          },
+          {
+            name: "MongoDB",
+            detail: "Primary product data store",
+            icon: "mongodb",
+          },
+          {
+            name: "Firebase",
+            detail: "Hosting, Firestore, analytics on public surfaces",
+            icon: "firebase",
+          },
+          {
+            name: "Playwright",
+            detail: "E2E coverage on landing and product flows",
+            icon: "playwright",
+          },
+          {
+            name: "Solidity / ERC-20",
+            detail: "GGC token (OpenZeppelin) — Web3 lineage",
+            icon: "solidity",
+          },
+        ],
+      },
+      {
+        label: "Manut",
+        items: [
+          {
+            name: "Cloudflare Workers",
+            detail: "Fail-closed edge runtime + Durable Objects",
+            icon: "cloudflare",
+          },
+          {
+            name: "Hono",
+            detail: "Edge API layer",
+            icon: "hono",
+          },
+          {
+            name: "Postgres + Prisma",
+            detail: "Hyperdrive-backed relational ops data",
+            icon: "prisma",
+          },
+          {
+            name: "R2 + Queues",
+            detail: "Object storage and async work on the edge",
+            icon: "cloudflare",
+          },
+        ],
+      },
+      {
+        label: "Personal & agents",
+        items: [
+          {
+            name: "OpenNext / Cloudflare",
+            detail: "kunanonj.com on Workers",
+            icon: "cloudflare",
+          },
+          {
+            name: "Sanity",
+            detail: "Studio, resume, and editorial content",
+            icon: "sanity",
+          },
+          {
+            name: "Cursor / Claude Code",
+            detail: "AI coding agents (skills hub + daily build)",
+            icon: "cursor",
+          },
+          {
+            name: "Local-first finance tools",
+            detail: "OpenFinance, tres-finos experiments",
+            icon: "finance",
+          },
+        ],
+      },
+    ] satisfies readonly AboutStackGroup[],
+    moreHref: "/stack",
+    moreLabel: "Full stack page",
   },
 
   path: {

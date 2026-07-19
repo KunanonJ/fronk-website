@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { AnnotatedText } from "@/components/landing/AnnotatedText";
+import ContributionActivity from "@/components/landing/ContributionActivity";
+import StackBrandIcon from "@/components/landing/StackBrandIcon";
 import {
   aboutPage,
   type AboutInline,
@@ -15,7 +17,7 @@ const serif = {
 
 function InlineSpan({ span }: { span: AboutInline }) {
   if (span.type === "text") {
-    return <>{span.text}</>;
+    return <AnnotatedText text={span.text} />;
   }
 
   const className =
@@ -90,10 +92,10 @@ function SectionHeading({
  * Landing CI (black + cream); copy from lib/content/aboutPage.
  */
 export default function AboutPageContent() {
-  const { story, principles, now, path, faq, cta } = aboutPage;
+  const { story, principles, now, stack, path, faq, cta } = aboutPage;
 
   return (
-    <div className="relative border-t border-white/10 bg-black text-primary">
+    <div className="relative border-t border-black/10 bg-landing text-primary dark:border-white/10">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24">
         {/* Story */}
         <section
@@ -102,24 +104,10 @@ export default function AboutPageContent() {
           className="scroll-mt-28"
         >
           <SectionEyebrow>{story.eyebrow}</SectionEyebrow>
-          <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-10">
-            <div className="relative mx-auto aspect-square w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl border border-white/10 md:mx-0">
-              <Image
-                src={story.portraitSrc}
-                alt={story.portraitAlt}
-                fill
-                sizes="220px"
-                className="object-cover object-top"
-                priority={false}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <SectionHeading id="about-story-heading">
-                {story.heading}
-              </SectionHeading>
-              <RichParagraphs paragraphs={story.paragraphs} />
-            </div>
-          </div>
+          <SectionHeading id="about-story-heading">
+            {story.heading}
+          </SectionHeading>
+          <RichParagraphs paragraphs={story.paragraphs} />
         </section>
 
         {/* Principles */}
@@ -158,6 +146,63 @@ export default function AboutPageContent() {
           <SectionEyebrow>{now.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-now-heading">{now.heading}</SectionHeading>
           <RichParagraphs paragraphs={now.paragraphs} />
+        </section>
+
+        <ContributionActivity />
+
+        {/* Tech stack — grounded in public GitHub */}
+        <section
+          id={stack.id}
+          aria-labelledby="about-stack-heading"
+          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+        >
+          <SectionEyebrow>{stack.eyebrow}</SectionEyebrow>
+          <SectionHeading id="about-stack-heading">
+            {stack.heading}
+          </SectionHeading>
+          <p className="mb-8 text-sm leading-relaxed text-primary/65 sm:text-base">
+            {stack.lede}
+          </p>
+          <div className="space-y-8">
+            {stack.groups.map((group) => (
+              <div key={group.label}>
+                <p className="mb-3 text-[10px] uppercase tracking-[0.18em] text-primary/45">
+                  {group.label}
+                </p>
+                <ul className="flex flex-wrap gap-2.5">
+                  {group.items.map((item) => (
+                    <li
+                      key={item.name}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-2 pl-2.5 pr-4"
+                    >
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <StackBrandIcon
+                          id={item.icon}
+                          title={item.name}
+                          className="h-3.5 w-3.5"
+                        />
+                      </span>
+                      <span className="text-sm font-medium text-primary">
+                        {item.name}
+                      </span>
+                      <span className="text-xs text-primary/50">
+                        {item.detail}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Link
+              href={stack.moreHref}
+              className="group inline-flex items-center gap-2 text-sm text-primary/70 underline-offset-4 transition-colors hover:text-primary hover:underline"
+            >
+              {stack.moreLabel}
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </section>
 
         {/* Path */}
@@ -242,7 +287,7 @@ export default function AboutPageContent() {
                 href={link.href}
                 className={
                   index === 0
-                    ? "inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
+                    ? "inline-flex items-center gap-2 rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
                     : "inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:border-white/40 hover:bg-white/10"
                 }
               >
