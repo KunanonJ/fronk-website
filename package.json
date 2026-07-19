@@ -20,7 +20,9 @@
       "tar": "7.5.16",
       "undici@<7": "6.27.0",
       "undici@>=7": "7.28.0",
-      "ws": "8.21.0"
+      "ws": "8.21.0",
+      "adm-zip": "0.6.0",
+      "json-2-csv": "5.5.11"
     },
     "patchedDependencies": {
       "eslint-plugin-react@7.37.5": "patches/eslint-plugin-react@7.37.5.patch"
