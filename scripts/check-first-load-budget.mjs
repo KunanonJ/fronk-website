@@ -23,7 +23,18 @@ import zlib from "node:zlib";
 
 // Re-baselined 2026-06-13 from the measured floor (~194–197 KB gz, uniform
 // across all routes, hero-independent). Raise deliberately and document why.
-const BUDGET_KB = 205;
+const DEFAULT_BUDGET_KB = 205;
+
+// Landing cutover (2026-07): framer-motion for intro splash + showcase motion adds
+// ~40–45 KB gz to first load on marketing routes only. Resume stays on the old bar.
+const ROUTE_BUDGETS_KB = {
+  "/": 260,
+  "/showcase": 260,
+};
+
+function budgetKbForRoute(route) {
+  return ROUTE_BUDGETS_KB[route] ?? DEFAULT_BUDGET_KB;
+}
 const APP_DIR = ".next/server/app";
 // The Three.js chunk must never appear in the home route's first-load set.
 const HERO_FIELD_HINT = "WebGLRenderer";
@@ -79,12 +90,23 @@ const routes = findRouteHtml()
   })
   .sort((a, b) => b.kb - a.kb);
 
-console.log(`Landing-JS first-load budget: ${BUDGET_KB} KB gzip\n`);
-let worst = 0;
+console.log(
+  `Landing-JS first-load budget: ${DEFAULT_BUDGET_KB} KB gzip (default); marketing routes up to ${Math.max(...Object.values(ROUTE_BUDGETS_KB))} KB\n`,
+);
+let worstOver = 0;
+let worstOverRoute = "";
+let worstOverBudget = 0;
 for (const r of routes) {
-  worst = Math.max(worst, r.kb);
-  const flag = r.kb > BUDGET_KB ? "❌" : "✅";
-  console.log(`  ${flag} ${r.kb.toFixed(1).padStart(6)} KB  ${r.route}`);
+  const budget = budgetKbForRoute(r.route);
+  const over = r.kb - budget;
+  if (over > worstOver) {
+    worstOver = over;
+    worstOverRoute = r.route;
+    worstOverBudget = budget;
+  }
+  const flag = r.kb > budget ? "❌" : "✅";
+  const budgetNote = budget !== DEFAULT_BUDGET_KB ? ` / ${budget} KB` : "";
+  console.log(`  ${flag} ${r.kb.toFixed(1).padStart(6)} KB${budgetNote}  ${r.route}`);
 }
 
 // Assert the hero's Three.js chunk is excluded from the home first-load set.
@@ -100,11 +122,14 @@ console.log(
   `\n  Three.js excluded from "/" first-load: ${threeLeaked ? "NO ❌ (leaked!)" : "yes ✅"}`,
 );
 
-const overBudget = worst > BUDGET_KB;
+const overBudget = worstOver > 0;
 if (overBudget || threeLeaked) {
   console.error(
-    `\n[perf] FAIL — ${overBudget ? `worst route ${worst.toFixed(1)}KB > ${BUDGET_KB}KB budget` : ""}${overBudget && threeLeaked ? "; " : ""}${threeLeaked ? "Three.js leaked into first load" : ""}`,
+    `\n[perf] FAIL — ${overBudget ? `${worstOverRoute} ${routes.find((r) => r.route === worstOverRoute)?.kb.toFixed(1)}KB > ${worstOverBudget}KB budget` : ""}${overBudget && threeLeaked ? "; " : ""}${threeLeaked ? "Three.js leaked into first load" : ""}`,
   );
   process.exit(1);
 }
-console.log(`\n[perf] PASS — worst route ${worst.toFixed(1)}KB within ${BUDGET_KB}KB; hero stays async.`);
+const worstKb = Math.max(...routes.map((r) => r.kb));
+console.log(
+  `\n[perf] PASS — all routes within budget (worst ${worstKb.toFixed(1)}KB on ${routes[0]?.route}); hero stays async.`,
+);
