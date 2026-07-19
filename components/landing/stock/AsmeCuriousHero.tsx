@@ -56,8 +56,8 @@ const FADE_OUT_LEAD_S = 0.55;
 const LOOP_RESET_DELAY_MS = 100;
 
 /**
- * Design-stock hero: Asme / "Built for the curious".
- * Not wired into primary IA — preview at `/stock/asme`.
+ * About hero: Asme / "Built for the curious".
+ * Primary IA route: `/about` (legacy `/stock/asme` redirects here).
  */
 export default function AsmeCuriousHero() {
   const videoRef = useRef<HTMLVideoElement | null>(null);

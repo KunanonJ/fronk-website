@@ -36,8 +36,8 @@ Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
 - Full-stack Next.js App Router on Cloudflare Workers via OpenNext.
 - Landing content is static and owner-editable in `lib/content/landing.ts`.
 - Sanity retained for Studio launcher and `/resume` (with static fallbacks).
-- Retired FogLAMP multi-page routes redirect into the landing (`/#about`,
-  `/#ventures`, `/#contact`, or `/`).
+- Primary nav routes: `/`, `/about`, `/ventures` → `/#ventures`, `/press`,
+  `/blog`, `/contact`. Legacy `/stock/asme` and `/writing` redirect into them.
 - SEO surfaces: metadata, sitemap, robots, JSON-LD, Open Graph, `rel="me"`.
 - Optional analytics: Cloudflare Web Analytics, Umami, GA4, Web Vitals.
 - CI: typecheck, lint, unit tests, production build, first-load perf budget,
@@ -70,7 +70,8 @@ Cloudflare Cron ---> /api/cron/revalidate
 | `/showcase`                                | Static landing                 | Creative studio showcase (spotlight reveal)        |
 | `/resume`                                  | Sanity + fallback (ISR)        | CV; noindex                                        |
 | `/studio/[[...tool]]`                      | Sanity Studio launcher         | External Studio URL                                |
-| `/about`, `/ventures`                      | 308 redirect                   | Into `/#about`, `/#ventures`                       |
+| `/about`                                   | About page                     | “Built for the curious” (ex-`/stock/asme`)         |
+| `/ventures`, `/work`                       | 308 redirect                   | Into `/#ventures`                                  |
 | `/contact`                                 | Forma contact landing          | Video + contact form (nav Contact target)          |
 | `/press`                                   | Press card index               | Banner + title + blurb + DD/MM/YYYY + View CTA     |
 | `/blog`, `/blog/[slug]`                    | Sanity-backed blog             | Banner cards, tags, search/filter; edit in Studio  |

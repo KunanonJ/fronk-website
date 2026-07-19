@@ -12,6 +12,11 @@ export interface RouteUnderTest {
 export const ROUTES: readonly RouteUnderTest[] = [
   { path: "/", name: "home", expectsHeadingPattern: /KunanonJ|See ventures|Ventures/i },
   {
+    path: "/about",
+    name: "about",
+    expectsHeadingPattern: /Built for the curious|KunanonJ|Manifesto/i,
+  },
+  {
     path: "/showcase",
     name: "showcase",
     expectsHeadingPattern: /Live Better|Start Today|KunanonJ/i,

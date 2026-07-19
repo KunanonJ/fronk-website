@@ -53,7 +53,7 @@ These agents live in the private repo harness (`.claude/agents/`, `.codex/agents
 1. Start with [/llms.txt](/llms.txt) for identity and current content.
 2. Use [/sitemap.md](/sitemap.md) for the public route map.
 3. Follow [/skills.md](/skills.md) when generating code against this stack (Next.js 16, React 19, TypeScript, Tailwind v4).
-4. Prefer `/blog` over legacy `/writing` (redirected).
+4. Prefer `/about` (not `/stock/asme`) and `/blog` (not `/writing`).
 5. Do not scrape `/studio` or `/api/*` for content.
 
 ---

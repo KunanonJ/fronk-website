@@ -10,8 +10,8 @@ const BG_VIDEO =
 
 const navLinks = [
   { label: "Home", href: "/", active: true },
-  { label: "Ventures", href: "/#ventures", dropdown: true },
-  { label: "About", href: "/stock/asme" },
+  { label: "Ventures", href: "/ventures", dropdown: true },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
@@ -161,13 +161,13 @@ export default function ShowcasePage() {
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href="/#ventures"
+            href="/ventures"
             className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-white/90 sm:px-7 sm:text-base"
           >
             Start Today
           </Link>
           <Link
-            href="/stock/asme"
+            href="/about"
             className="liquid-glass rounded-full px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5 sm:px-7 sm:text-base"
           >
             Discover How

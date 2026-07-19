@@ -10,8 +10,8 @@ export const site = {
 
 export const nav = [
   { label: "KunanonJ", href: "/" },
-  { label: "About", href: "/stock/asme" },
-  { label: "Ventures", href: "#ventures" },
+  { label: "About", href: "/about" },
+  { label: "Ventures", href: "/ventures" },
   { label: "Press", href: "/press" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
@@ -22,7 +22,7 @@ export const hero = {
   description:
     "Founder of GoGoCash and Manut — cashback for shoppers, an ERP/CRM workspace with Intelligence AI for SME in Automotive Industry.",
   ctaLabel: "See ventures",
-  ctaHref: "#ventures",
+  ctaHref: "/ventures",
   contextLabel: site.contextLabel,
 } as const;
 
@@ -40,7 +40,7 @@ export const about = {
   portraitSrc: "/profile.jpg",
   portraitAlt: "Kunanon Jarat — headshot",
   ctaLabel: "More About Me",
-  ctaHref: "/stock/asme",
+  ctaHref: "/about",
 } as const;
 
 export const ventures = {

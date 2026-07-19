@@ -14,7 +14,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
-      { source: "/about", destination: "/#about", permanent: true },
+      // About page is real at `/about` (was stock `/stock/asme`)
+      { source: "/stock/asme", destination: "/about", permanent: true },
+      // Ventures lives as the home section; keep a named URL
       { source: "/ventures", destination: "/#ventures", permanent: true },
       { source: "/ventures/:slug", destination: "/#ventures", permanent: true },
       { source: "/now", destination: "/", permanent: true },

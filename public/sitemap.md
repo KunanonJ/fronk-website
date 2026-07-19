@@ -12,8 +12,8 @@ Canonical site: https://kunanonj.com
 | Route | Name | Notes |
 |---|---|---|
 | `/` | Home | Intro loader, hero, about, ventures, contact footer |
-| `/stock/asme` | About (stock) | “Built for the curious” about surface (nav → About) |
-| `/#ventures` | Ventures | Home section — GoGoCash, Manut, Airplusauto |
+| `/about` | About | “Built for the curious” about surface |
+| `/ventures` | Ventures | Named URL → home `#ventures` (GoGoCash, Manut, Airplusauto) |
 | `/press` | Press | Press card grid (banner, date, CTA) |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
@@ -26,8 +26,8 @@ Canonical site: https://kunanonj.com
 
 | From | To |
 |---|---|
-| `/about` | `/#about` |
-| `/ventures`, `/work` | `/#ventures` |
+| `/stock/asme` | `/about` |
+| `/ventures`, `/ventures/:slug`, `/work` | `/#ventures` |
 | `/now` | `/` |
 | `/writing`, `/writing/[slug]` | `/blog`, `/blog/[slug]` |
 

@@ -34,7 +34,8 @@ export async function GET() {
 
   textLines.push("## Public routes");
   textLines.push(`- Home: ${base}/`);
-  textLines.push(`- About: ${base}/stock/asme`);
+  textLines.push(`- About: ${base}/about`);
+  textLines.push(`- Ventures: ${base}/ventures`);
   textLines.push(`- Press: ${base}/press`);
   textLines.push(`- Blog: ${base}/blog`);
   textLines.push(`- Contact: ${base}/contact`);

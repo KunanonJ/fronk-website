@@ -5,7 +5,7 @@ Unmapped hero / page experiments. Preview locally; do **not** add to nav or
 
 | Route | Component | Prompt |
 | ----- | --------- | ------ |
-| `/stock/asme` | `AsmeCuriousHero.tsx` | Liquid glass + Instrument Serif + video loop fade (“Built for the curious”) |
+| `/about` (ex `/stock/asme`) | `AsmeCuriousHero.tsx` | Liquid glass + Instrument Serif + video loop fade (“Built for the curious”) |
 | `/stock/velorah` | `VelorahDreamsHero.tsx` | Cinematic navy theme + fade-rise + “Where dreams rise through the silence.” |
 | `/showcase` | `../ShowcasePage.tsx` | Liquid glass video hero (live / mapped) |
 | `/press` | `../PressPage.tsx` | Press cards (static `lib/content/press.ts`) |

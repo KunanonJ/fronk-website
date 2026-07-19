@@ -3,7 +3,14 @@ import { siteConfig } from "@/lib/site";
 
 export const revalidate = 3600;
 
-const STATIC_ROUTES = ["", "/showcase", "/contact", "/press", "/blog"] as const;
+const STATIC_ROUTES = [
+  "",
+  "/about",
+  "/showcase",
+  "/contact",
+  "/press",
+  "/blog",
+] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteConfig.url.replace(/\/$/, "");

@@ -60,10 +60,15 @@ function isItemActive(
     return path === "/" && activeSection === null;
   }
 
-  // Route targets that still have a matching home section (About / Contact).
+  // Named routes that also map to home sections (scroll highlight on `/`).
   if (path === "/" && activeSection) {
-    if (href === "/stock/asme" && activeSection === "about") return true;
+    if (href === "/ventures" && activeSection === "ventures") return true;
     if (href === "/contact" && activeSection === "contact") return true;
+  }
+
+  // `/#ventures`-style hrefs
+  if (href.startsWith("/#")) {
+    return path === "/" && activeSection === href.slice(2);
   }
 
   return path === href || path.startsWith(`${href}/`);
