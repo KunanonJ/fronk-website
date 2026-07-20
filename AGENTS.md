@@ -721,5 +721,7 @@ The authoritative historical source remains:
 - Active public UI program: `process/features/landing-cutover/` (cinematic `/` + `/showcase`); FogLAMP/Dennis redesign is superseded
 - Active discovery program: `process/features/sea-discovery/` (SEO/AEO/SEM/LinkedIn for AI transformation · ERP/CRM · startups TH/SEA)
 - Indexed authority routes: `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, `/ventures/[slug]`; system `/resume`, `/studio` (noindex); `/ventures` index → `/#ventures`; `/now` → `/`; `/writing` → `/blog`
-- Landing content is static in `lib/content/landing.ts` (Sanity retained for studio/resume/blog); portrait at `public/profile.jpg`
+- Landing content is static in `lib/content/landing.ts`; blog/editorial via hosted Sanity Studio at `https://fronk-website.sanity.studio/` (`/studio` on-site is a launcher only); Learn/topic hubs are code-driven (`lib/content/learn.ts`); portrait at `public/profile.jpg`
+- Public contact email is fronk.kunanon@gmail.com; venture Airplus is branded Airplusauto (`https://airplusauto.com`); landing socials omit Telegram
 - Bangkok is the site location signal; wordmark KunanonJ
+- Reference Prisma Vite prototype lives at sibling `/Users/kunanonjarat/Developer/prisma-landing`
