@@ -110,7 +110,7 @@ export default function BlogIndex({
         navId="blog-mobile-nav"
       />
 
-      <main id="main" className="relative z-10 px-4 pb-28 pt-16 sm:px-6 md:px-10 md:pb-20 md:pt-28">
+      <main id="main" className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10">
         <header className="mx-auto mb-8 max-w-6xl sm:mb-10">
           <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/60 sm:text-xs">
             {eyebrow}

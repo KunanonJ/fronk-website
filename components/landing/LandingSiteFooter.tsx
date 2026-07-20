@@ -15,7 +15,7 @@ export default function LandingSiteFooter() {
   return (
     <footer
       id="contact"
-      className="scroll-mt-8 border-t border-black/10 bg-landing px-4 py-12 pb-28 text-center text-primary sm:px-6 md:scroll-mt-28 md:py-16 md:pb-16 dark:border-white/10"
+      className="scroll-mt-28 border-t border-black/10 bg-landing px-4 py-12 text-center text-primary sm:px-6 md:py-16 dark:border-white/10"
     >
       <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
         {contact.label}

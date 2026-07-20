@@ -116,7 +116,7 @@ export default function Features() {
   return (
     <section
       id="ventures"
-      className="relative scroll-mt-8 bg-landing px-4 py-14 sm:px-6 sm:py-20 md:scroll-mt-28 md:py-24 lg:py-28"
+      className="relative scroll-mt-28 bg-landing px-4 py-14 sm:px-6 sm:py-20 md:py-24 lg:py-28"
     >
       <div className="bg-noise pointer-events-none absolute inset-0 opacity-[0.12]" />
 
