@@ -32,7 +32,7 @@ export default function Hero() {
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
 
-        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 md:p-8 lg:p-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 pb-[max(5.75rem,calc(4.5rem+env(safe-area-inset-bottom)))] sm:p-6 md:p-8 md:pb-8 lg:p-10">
           <div className="grid grid-cols-12 items-end gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 min-w-0 lg:col-span-8">
               <h1

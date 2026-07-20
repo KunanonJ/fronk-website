@@ -101,7 +101,7 @@ export default function AboutPageContent() {
         <section
           id={story.id}
           aria-labelledby="about-story-heading"
-          className="scroll-mt-28"
+          className="scroll-mt-8 md:scroll-mt-28"
         >
           <SectionEyebrow>{story.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-story-heading">

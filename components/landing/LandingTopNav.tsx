@@ -401,9 +401,9 @@ export default function LandingTopNav({
         return (
           <motion.li
             key={item.label}
-            initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
+            initial={prefersReducedMotion ? false : { y: -8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={prefersReducedMotion ? undefined : { y: -4, opacity: 0 }}
+            exit={prefersReducedMotion ? undefined : { y: 4, opacity: 0 }}
             transition={
               prefersReducedMotion
                 ? { duration: 0 }
@@ -431,9 +431,9 @@ export default function LandingTopNav({
         <motion.li
           key={item.label}
           className="space-y-0.5"
-          initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
+          initial={prefersReducedMotion ? false : { y: -8, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={prefersReducedMotion ? undefined : { y: -4, opacity: 0 }}
+          exit={prefersReducedMotion ? undefined : { y: 4, opacity: 0 }}
           transition={
             prefersReducedMotion
               ? { duration: 0 }
@@ -480,11 +480,11 @@ export default function LandingTopNav({
 
   return (
     <div
-      className={`${pos} inset-x-0 top-0 z-50 px-3 pt-3 pointer-events-none`}
+      className={`${pos} inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none md:bottom-auto md:top-0 md:pb-0 md:pt-3`}
     >
       <div
         ref={shellRef}
-        className={`pointer-events-auto relative mx-auto w-full transition-[max-width] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`pointer-events-auto relative mx-auto flex w-full flex-col-reverse transition-[max-width] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:block ${
           scrolled ? "max-w-[720px]" : "max-w-[880px]"
         }`}
       >
@@ -552,7 +552,7 @@ export default function LandingTopNav({
             <motion.nav
               id={navId}
               aria-label="Primary"
-              className="relative overflow-hidden px-2 pb-3 md:hidden"
+              className="relative overflow-hidden px-2 pt-3 md:hidden"
               initial={
                 prefersReducedMotion ? false : { height: 0, opacity: 0 }
               }
@@ -564,7 +564,7 @@ export default function LandingTopNav({
                   : { duration: 0.4, ease: MENU_EASE }
               }
             >
-              <ul className="flex flex-col gap-0.5 pt-1">
+              <ul className="flex flex-col gap-0.5 pb-1">
                 {renderMobileTree()}
                 <li className="pt-2">
                   <NavItemAnchor

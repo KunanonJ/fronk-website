@@ -233,7 +233,7 @@ export default function AsmeCuriousHero() {
         </div>
       </div>
 
-      <footer className="relative z-10 flex justify-center gap-4 pb-12">
+      <footer className="relative z-10 flex justify-center gap-4 pb-28 md:pb-12">
         {ABOUT_SOCIALS.map(({ label, href, Icon }) => (
           <a
             key={label}

@@ -175,7 +175,7 @@ export default function FormaContactPage() {
           navId="contact-mobile-nav"
         />
 
-        <div className="relative z-10 flex min-h-[calc(100vh-24px)] flex-col gap-6 p-4 pt-16 sm:min-h-[calc(100vh-32px)] sm:p-6 sm:pt-16 md:min-h-[calc(100vh-48px)] md:p-8 md:pt-16 lg:h-full">
+        <div className="relative z-10 flex min-h-[calc(100vh-24px)] flex-col gap-6 p-4 pb-28 pt-8 sm:min-h-[calc(100vh-32px)] sm:p-6 sm:pb-28 sm:pt-16 md:min-h-[calc(100vh-48px)] md:p-8 md:pb-8 md:pt-16 lg:h-full">
           <div className="min-h-[2rem] flex-1" />
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">

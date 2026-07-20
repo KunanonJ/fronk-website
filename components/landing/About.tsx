@@ -10,7 +10,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="scroll-mt-28 bg-landing px-3 py-12 sm:px-6 sm:py-16 md:py-24 lg:py-32"
+      className="scroll-mt-8 bg-landing px-3 py-12 sm:px-6 sm:py-16 md:scroll-mt-28 md:py-24 lg:py-32"
     >
       <div className="mx-auto flex max-w-6xl flex-col items-center rounded-2xl bg-[#101010] px-5 py-10 text-center sm:px-10 sm:py-16 md:px-16 md:py-20 lg:rounded-3xl">
         <p className="mb-4 text-[10px] text-primary sm:mb-6 sm:text-xs">

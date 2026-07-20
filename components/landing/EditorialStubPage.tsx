@@ -32,7 +32,7 @@ export default function EditorialStubPage({
 
       <main
         id="main"
-        className="relative z-10 mx-auto flex min-h-[100svh] max-w-3xl flex-col justify-center px-6 pb-20 pt-28 sm:px-8"
+        className="relative z-10 mx-auto flex min-h-[100svh] max-w-3xl flex-col justify-center px-6 pb-28 pt-16 sm:px-8 md:pb-20 md:pt-28"
       >
         <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/60 sm:text-xs">
           {eyebrow}

@@ -36,7 +36,7 @@ export default function BlogPostPage({
         navId="blog-post-mobile-nav"
       />
 
-      <main id="main" className="relative z-10 px-4 pb-24 pt-28 sm:px-6 md:px-10">
+      <main id="main" className="relative z-10 px-4 pb-28 pt-16 sm:px-6 md:px-10 md:pb-24 md:pt-28">
         <article className="mx-auto max-w-3xl">
           <Link
             href="/blog"

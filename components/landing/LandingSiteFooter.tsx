@@ -15,7 +15,7 @@ export default function LandingSiteFooter() {
   return (
     <footer
       id="contact"
-      className="scroll-mt-28 border-t border-black/10 bg-landing px-4 py-12 text-center text-primary sm:px-6 md:py-16 dark:border-white/10"
+      className="scroll-mt-8 border-t border-black/10 bg-landing px-4 py-12 pb-28 text-center text-primary sm:px-6 md:scroll-mt-28 md:py-16 md:pb-16 dark:border-white/10"
     >
       <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
         {contact.label}
@@ -29,13 +29,13 @@ export default function LandingSiteFooter() {
       <p className="mx-auto mt-4 max-w-md text-sm text-primary/60">
         {contact.tagline}
       </p>
-      <div className="mt-6 flex justify-center">
+      <div className="mx-auto mt-6 flex w-full max-w-7xl justify-stretch sm:justify-center">
         <Link
           href={contact.ctaHref}
-          className="group inline-flex w-fit touch-manipulation items-center gap-2 rounded-full bg-cream py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:text-base"
+          className="group inline-flex w-full touch-manipulation items-center justify-between gap-2 rounded-full bg-cream py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:w-fit sm:justify-center sm:text-base"
         >
           {contact.ctaLabel}
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
             <ArrowRight className="h-4 w-4 text-cream" />
           </span>
         </Link>
