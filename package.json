@@ -22,7 +22,8 @@
       "undici@>=7": "7.28.0",
       "ws": "8.21.0",
       "adm-zip": "0.6.0",
-      "json-2-csv": "5.5.11"
+      "json-2-csv": "5.5.11",
+      "brace-expansion@5": "5.0.7"
     },
     "patchedDependencies": {
       "eslint-plugin-react@7.37.5": "patches/eslint-plugin-react@7.37.5.patch"
