@@ -185,17 +185,17 @@ Production uses Cloudflare Worker custom domains for `kunanonj.com` and
 `www.kunanonj.com`, R2-backed OpenNext cache, and a separate Cron Worker for
 scheduled revalidation.
 
-**Workers Builds** (CI/CD on push to `main`):
+**Workers Builds** (CI/CD):
 
-| Step   | Command                       |
-| ------ | ----------------------------- |
-| Build  | `pnpm run build:cloudflare`   |
-| Deploy | `npx wrangler deploy`         |
+| Trigger | Branches | Build | Deploy |
+| ------- | -------- | ----- | ------ |
+| Deploy default branch | `main` | `pnpm run build:cloudflare` | `npx wrangler deploy` |
+| Deploy non-production branches | all except `main` | `pnpm run build:cloudflare` | `npx wrangler versions upload` |
 
 `pnpm build` runs Next.js only (used by GitHub Actions and `pnpm start`).
 OpenNext output lives under `.open-next/` and is produced by `build:cloudflare`
-or `pnpm run deploy` / `pnpm preview`. Do **not** use `pnpm build` as the
-Workers Builds build command.
+or `pnpm run deploy` / `pnpm preview`. Do **not** use `pnpm build` as a
+Workers Builds build command — Wrangler needs `.open-next/worker.js`.
 
 Cloudflare deployment requirements:
 
