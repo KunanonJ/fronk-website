@@ -27,7 +27,7 @@ const DEFAULT_BUDGET_KB = 205;
 
 // Landing cutover (2026-07): `RouteSplash` mounts in the root layout, so every
 // marketing page pays framer-motion on first load (~40–80 KB gz above the
-// resume/system floor). Blog/editorial routes sit higher (~288 KB) because they
+// resume/system floor). Blog/editorial/library routes sit higher because they
 // also ship landing nav + next/image card chrome. Resume/stock stay on DEFAULT.
 const MARKETING_BUDGET_KB = 300;
 
@@ -38,6 +38,11 @@ const MARKETING_EXACT = new Set([
   "/contact",
   "/press",
   "/blog",
+  "/learn",
+  "/examples",
+  "/stack",
+  "/proof",
+  "/build",
 ]);
 
 function isMarketingRoute(route) {

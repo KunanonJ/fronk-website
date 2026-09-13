@@ -12,7 +12,7 @@ cinematic landing + showcase shell; resume and Sanity Studio remain as system
 surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
 
 ```
-Tech:      Next.js 16.2 · React 19.2 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
+Tech:      Next.js 16.3 · React 19.2 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 4 · Playwright · pnpm 10
 Runtime:   Node.js ≥22.12 · Cloudflare Workers + OpenNext + R2 cache
@@ -284,8 +284,8 @@ pnpm preview   # optional: smoke-test the Cloudflare Worker runtime locally
 ```
 
 CI pins Node **22.12.0** (`.node-version`) and runs typecheck, lint, unit tests,
-production build, performance budget (260 KB gzip on `/` and `/showcase`;
-205 KB elsewhere), and Playwright smoke checks.
+production build, performance budget (300 KB gzip on marketing/library routes;
+205 KB on resume and other system routes), and Playwright smoke checks.
 
 ## License
 

@@ -247,10 +247,7 @@ export default function LandingTopNav({
   }, [isHome, path, prefersReducedMotion]);
 
   useEffect(() => {
-    if (!isHome) {
-      setHomeSection(null);
-      return;
-    }
+    if (!isHome) return;
 
     const updateActiveSection = () => {
       const focusY = window.innerHeight * 0.3;
@@ -265,10 +262,13 @@ export default function LandingTopNav({
       );
     };
 
-    updateActiveSection();
+    // Defer the first read so we don't setState in the effect body.
+    // Off-home, `activeSection` is already derived as null.
+    const raf = window.requestAnimationFrame(updateActiveSection);
     window.addEventListener("scroll", updateActiveSection, { passive: true });
     window.addEventListener("resize", updateActiveSection);
     return () => {
+      window.cancelAnimationFrame(raf);
       window.removeEventListener("scroll", updateActiveSection);
       window.removeEventListener("resize", updateActiveSection);
     };
