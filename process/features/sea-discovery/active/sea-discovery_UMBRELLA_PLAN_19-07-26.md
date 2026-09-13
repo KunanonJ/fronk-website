@@ -10,6 +10,8 @@
 
 Make kunanonj.com the primary discoverable authority for AI transformation, ERP/CRM, internal systems, and tech startups in Thailand/SEA — across Google, AI answer engines, paid search, and LinkedIn.
 
+**Wave 2 (13-09-26):** name-first then category — fix crawl/AEO blockers, align Person entity off-site, merge cornerstone blog into the index graph, then distribute via LinkedIn Articles + selective directories.
+
 ## IA reconciliation with landing-cutover
 
 Cinematic marketing shell stays `/` + `/showcase`.  
@@ -37,6 +39,10 @@ Cinematic marketing shell stays `/` + `/showcase`.
 | 4 SEM | `phase-4_sem_PLAN_19-07-26.md` | Ads/LinkedIn via GTM, conversions, SEM brief |
 | 5 Distribution | `phase-5_distribution_PLAN_19-07-26.md` | llms enrichment + LinkedIn playbook |
 | 6 Operate | `phase-6_operate_PLAN_19-07-26.md` | Monthly operating loop |
+| 7 Crawl + AEO unblock | `phase-7_crawl-aeo-unblock_PLAN_13-09-26.md` | Robots host, citation bots, GSC/CF matrix |
+| 8 Entity pack | `phase-8_entity-pack_PLAN_13-09-26.md` | Person aliases, who-is, off-site drafts |
+| 9 Content merge | `phase-9_content-merge_PLAN_13-09-26.md` | Merge fallbacks + calendar posts 5–12 |
+| 10 Presence | `phase-10_presence_PLAN_13-09-26.md` | LinkedIn Articles + selective directories |
 
 ## Out of scope
 

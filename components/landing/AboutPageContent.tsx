@@ -107,6 +107,9 @@ export default function AboutPageContent() {
           <SectionHeading id="about-story-heading">
             {story.heading}
           </SectionHeading>
+          <p className="mt-4 text-base leading-relaxed text-primary/80 sm:text-lg">
+            {story.whoIs}
+          </p>
           <RichParagraphs paragraphs={story.paragraphs} />
         </section>
 

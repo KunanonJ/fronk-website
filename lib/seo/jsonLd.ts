@@ -7,9 +7,26 @@ const BASE = siteConfig.url.replace(/\/$/, "");
 export const PERSON_ID = `${BASE}/#person`;
 export const WEBSITE_ID = `${BASE}/#website`;
 
+/** Aliases people / AI engines use when searching for this person. */
+export const PERSON_ALTERNATE_NAMES = [
+  "KunanonJ",
+  "Kunanon Jarat",
+  "Fronk",
+] as const;
+
+/** Topical expertise for Person.knowsAbout (matches topic pillars). */
+export const PERSON_KNOWS_ABOUT = [
+  "AI transformation Thailand",
+  "ERP CRM internal systems",
+  "Tech startups Southeast Asia",
+  "Fintech",
+  "Automotive SME software",
+] as const;
+
 function sameAs(): readonly string[] {
   const s = siteConfig.socials;
-  return [s.x, s.linkedin, s.github, s.telegram, s.farcaster, s.website];
+  // Profile URLs only — product domains belong on Organization.url.
+  return [s.x, s.linkedin, s.github, s.telegram, s.farcaster];
 }
 
 function orgId(url: string): string {
@@ -45,12 +62,13 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         "@type": "Person",
         "@id": PERSON_ID,
         name: siteConfig.name,
-        alternateName: siteConfig.shortName,
+        alternateName: [...PERSON_ALTERNATE_NAMES],
         url: BASE,
         email: siteConfig.email,
         image: `${BASE}/profile.jpg`,
         jobTitle: "Founder",
         worksFor: orgs.map((o) => ({ "@id": o["@id"] })),
+        knowsAbout: [...PERSON_KNOWS_ABOUT],
         address: {
           "@type": "PostalAddress",
           addressLocality: "Bangkok",

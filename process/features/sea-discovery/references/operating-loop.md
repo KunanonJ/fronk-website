@@ -6,7 +6,9 @@
 2. **CWV:** LCP/INP on `/`, topic hubs, venture hubs
 3. **Conversions:** contact CTA + Ads conversions; cut wasted spend
 4. **Content:** ship next calendar row; refresh weakest hub FAQ
-5. **AI spot-check:** run prompts in `reports/ai-citation-spotcheck.md`; log results
+5. **AI spot-check:** run name + category prompts in `reports/ai-citation-spotcheck.md`; log results
+6. **LinkedIn:** ship Articles per `references/linkedin-distribution.md` (not only short posts)
+7. **Directories:** only per `references/directory-shortlist.md` — no spray
 
 ## Quarterly
 
