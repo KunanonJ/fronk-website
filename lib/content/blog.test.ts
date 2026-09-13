@@ -15,8 +15,46 @@ describe("formatBlogDate > given ISO date", () => {
 });
 
 describe("resolveBlogCards > given empty Sanity posts", () => {
-  it("returns fallback stock", () => {
-    expect(resolveBlogCards([])).toEqual(FALLBACK_BLOG_POSTS);
+  it("returns fallback stock sorted by publishedAt desc", () => {
+    expect(resolveBlogCards([])).toEqual(
+      [...FALLBACK_BLOG_POSTS].sort((a, b) =>
+        b.publishedAt.localeCompare(a.publishedAt),
+      ),
+    );
+  });
+});
+
+describe("resolveBlogCards > given Sanity posts", () => {
+  it("merges fallbacks and lets Sanity win on the same slug", () => {
+    const cards = resolveBlogCards([
+      {
+        _id: "cms-hello",
+        slug: "hello-world",
+        title: "Hello World",
+        excerpt: "From Sanity",
+        publishedAt: "2026-05-14T13:42:00.000Z",
+        tags: [],
+        coverImage: null,
+      },
+      {
+        _id: "cms-ai",
+        slug: "ai-transformation-thailand-smes",
+        title: "AI transformation (CMS)",
+        excerpt: "Edited in Studio",
+        publishedAt: "2026-07-11",
+        tags: ["AI"],
+        coverImage: null,
+      },
+    ]);
+
+    const slugs = cards.map((c) => c.slug);
+    expect(slugs).toContain("hello-world");
+    expect(slugs).toContain("ai-vs-traditional-erp-sea");
+    expect(slugs).toContain("intelligence-ai-inside-erp");
+
+    const ai = cards.find((c) => c.slug === "ai-transformation-thailand-smes");
+    expect(ai?.title).toBe("AI transformation (CMS)");
+    expect(ai?.id).toBe("cms-ai");
   });
 });
 

@@ -112,6 +112,7 @@ export default async function BlogPostRoute({ params }: Props) {
         bannerSrc={fallback.bannerSrc}
         bannerAlt={fallback.bannerAlt}
         body={null}
+        bodyParagraphs={fallback.bodyParagraphs}
       />
     </>
   );

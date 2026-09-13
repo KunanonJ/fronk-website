@@ -45,6 +45,18 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     expect(worksFor).toEqual(orgIds);
     expect(person.sameAs as string[]).toContain(siteSocialsX);
   });
+
+  it("Person alternateName and knowsAbout support name + category discovery", () => {
+    const person = byType("Person")!;
+    const aliases = person.alternateName as string[];
+    expect(aliases).toEqual(
+      expect.arrayContaining(["KunanonJ", "Kunanon Jarat", "Fronk"]),
+    );
+    expect(person.knowsAbout as string[]).toEqual(
+      expect.arrayContaining(["AI transformation Thailand", "Fintech"]),
+    );
+    expect(person.sameAs as string[]).not.toContain("https://gogocash.co");
+  });
 });
 
 const siteSocialsX = "https://x.com/fkj98";

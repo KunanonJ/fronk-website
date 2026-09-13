@@ -16,6 +16,7 @@ type BlogPostPageProps = {
   bannerSrc: string;
   bannerAlt: string;
   body: PortableTextBlock[] | null;
+  bodyParagraphs?: readonly string[];
 };
 
 export default function BlogPostPage({
@@ -26,7 +27,11 @@ export default function BlogPostPage({
   bannerSrc,
   bannerAlt,
   body,
+  bodyParagraphs,
 }: BlogPostPageProps) {
+  const hasPortable = Boolean(body && body.length > 0);
+  const hasParagraphs = Boolean(bodyParagraphs && bodyParagraphs.length > 0);
+
   return (
     <div className="relative min-h-[100svh] bg-landing text-primary">
       <LandingTopNav
@@ -88,8 +93,14 @@ export default function BlogPostPage({
           </div>
 
           <div className="prose prose-invert mt-10 max-w-none prose-headings:font-medium prose-a:text-primary prose-p:text-primary/80">
-            {body && body.length > 0 ? (
-              <PortableText value={body} />
+            {hasPortable ? (
+              <PortableText value={body!} />
+            ) : hasParagraphs ? (
+              bodyParagraphs!.map((paragraph) => (
+                <p key={paragraph.slice(0, 48)} className="text-base leading-relaxed text-primary/80">
+                  {paragraph}
+                </p>
+              ))
             ) : (
               <p className="text-sm text-primary/60">
                 Full article body will appear here once published in Sanity

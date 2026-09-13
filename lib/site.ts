@@ -1,10 +1,13 @@
+import { resolvePublicSiteUrl } from "@/lib/seo/siteUrl";
+
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
   shortName: "KunanonJ",
   tagline: "Building fintech and AI from Bangkok.",
   description:
     "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://fronk.example.com",
+  /** Fail-closed via resolvePublicSiteUrl — never emit fronk.example.com in production. */
+  url: resolvePublicSiteUrl(),
   // OG image is generated dynamically by app/opengraph-image.tsx — no static
   // asset needed.
   email: "fronk.kunanon@gmail.com",
@@ -14,6 +17,7 @@ export const siteConfig = {
     github: "https://github.com/KunanonJ",
     telegram: "https://t.me/fkj98",
     farcaster: "https://farcaster.xyz/fronk98",
+    /** Product URL — not a Person sameAs profile. */
     website: "https://gogocash.co",
   },
   discordHandle: "fronk98",

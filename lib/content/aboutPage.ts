@@ -58,6 +58,9 @@ export const aboutPage = {
     id: "story",
     eyebrow: "Profile",
     heading: "Founder, Bangkok.",
+    /** ~50-word answer block for name queries / AEO (matches FAQ + llms.txt). */
+    whoIs:
+      "Kunanon Jarat (Fronk / KunanonJ) is a Bangkok founder building fintech and AI operator systems for Thailand and SEA. He founded GoGoCash (shopping-to-earn cashback) and builds Manut AI (ERP/CRM with Intelligence AI for automotive SMEs), with a background in electrical engineering, smart contracts, and shipping fintech products.",
     paragraphs: [
       {
         spans: [
