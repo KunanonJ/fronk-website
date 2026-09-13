@@ -1,17 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useFinePointer } from "@/lib/hooks/useFinePointer";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 const INTERACTIVE_SELECTOR =
   "a, button, [role='button'], .keyword, .activity-day, input, textarea, label, summary";
-
-function prefersFinePointer(): boolean {
-  return window.matchMedia("(pointer: fine)").matches;
-}
-
-function prefersReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 /**
  * hpbrn-style smooth cursor — landing only, fine pointer, PRM/coarse off.
@@ -22,13 +16,13 @@ export default function SmoothCursor() {
   const target = useRef({ x: -100, y: -100 });
   const vel = useRef({ x: 0, y: 0 });
   const raf = useRef(0);
-  const [enabled, setEnabled] = useState(false);
+  const finePointer = useFinePointer();
+  const reducedMotion = useReducedMotion();
+  const enabled = finePointer && !reducedMotion;
   const [isHand, setIsHand] = useState(false);
 
   useEffect(() => {
-    const canEnable = prefersFinePointer() && !prefersReducedMotion();
-    setEnabled(canEnable);
-    if (!canEnable) return;
+    if (!enabled) return;
 
     document.documentElement.classList.add("has-smooth-cursor");
 
@@ -67,7 +61,7 @@ export default function SmoothCursor() {
       window.removeEventListener("pointermove", onMove);
       window.cancelAnimationFrame(raf.current);
     };
-  }, []);
+  }, [enabled]);
 
   if (!enabled) return null;
 
