@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: venture.description,
     path: `/ventures/${slug}`,
     languages,
+    hasOwnOgImage: true,
   });
 }
 

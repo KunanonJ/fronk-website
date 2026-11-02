@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: pillar.description,
     path: `/topics/${slug}`,
     languages: topicHreflang(slug),
+    hasOwnOgImage: true,
   });
 }
 
