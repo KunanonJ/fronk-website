@@ -3,7 +3,7 @@
 [![CI](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/live-kunanonj.com-111?style=flat&labelColor=111&color=34d399)](https://kunanonj.com)
 [![Cloudflare Workers](https://img.shields.io/badge/runtime-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
-[![Node](https://img.shields.io/badge/node-%3E%3D22.12-339933)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.22-339933)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
@@ -12,10 +12,10 @@ cinematic landing + showcase shell; resume and Sanity Studio remain as system
 surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
 
 ```
-Tech:      Next.js 16.3 · React 19.2 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
+Tech:      Next.js 16.4 · React 19.3 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
-Tooling:   ESLint 10 · Vitest 4 · Playwright · pnpm 10
-Runtime:   Node.js ≥22.12 · Cloudflare Workers + OpenNext + R2 cache
+Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
+Runtime:   Node.js ≥22.22 · Cloudflare Workers + OpenNext + R2 cache
 Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
 ```
 
@@ -85,7 +85,7 @@ Cloudflare Cron ---> /api/cron/revalidate
 
 ## Local development
 
-**Requirements:** Node.js **≥22.12.0** (see `.node-version`), pnpm **10.28+**.
+**Requirements:** Node.js **≥22.22.2** (see `.node-version`), pnpm **10.34+**.
 
 ```bash
 # 1. Install dependencies
@@ -283,7 +283,7 @@ pnpm perf:budget
 pnpm preview   # optional: smoke-test the Cloudflare Worker runtime locally
 ```
 
-CI pins Node **22.12.0** (`.node-version`) and runs typecheck, lint, unit tests,
+CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint, unit tests,
 production build, performance budget (300 KB gzip on marketing/library routes;
 205 KB on resume and other system routes), and Playwright smoke checks.
 
