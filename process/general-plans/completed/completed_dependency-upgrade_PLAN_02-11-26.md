@@ -1,6 +1,6 @@
 # Dependency Upgrade + Security Remediation (02-11-26)
 
-- **Status:** ✅ COMPLETE. Archived 02-11-26 through UPDATE PROCESS (user-approved). Verified locally on Node 26.12.0. Open follow-up: the first CI run on Node 22.23.4 happens once these changes are ported to the git clone (see Resume and Execution Handoff).
+- **Status:** ✅ COMPLETE. Archived 02-11-26 through UPDATE PROCESS (user-approved). Verified locally on Node 26.12.0, then in CI on Node 22.23.4 through PR #32 (all 4 checks green; see Verification evidence).
 - **Approval:** user, in chat on 2026-11-02 ("please upgrade all of it")
 - **Type:** SIMPLE (manifest + lockfile; code changes only if verification forces them)
 - **Executor:** orchestrator directly (the vc-* agents are not present in this checkout; there is no `.claude/`)
@@ -145,11 +145,21 @@ Run locally on 2026-11-02 with Node 26.12.0, pnpm 10.34.9 and CI's env vars:
   - New: `@sanity/workflow-blueprint` (via Sanity CLI) wants `typescript@^6.0.3 || ^7`, while the `typescript` alias points to `@typescript/typescript6@6.0.2`, its latest. Harmless; it only affects Sanity workflow tooling.
 - **Sanity CLI telemetry:** the upgraded CLI collects usage telemetry. Opt out with `npx sanity telemetry disable`.
 
-### Not verified locally
+### CI on Node 22.23.4 (PR #32, 02-11-26)
 
-- Running on Node 22.23.4: there is no Node version manager on this machine, so CI is the first run on that version.
+Ported to the git clone (`~/Developer/fronk-website`, branch `chore/deps-upgrade-2026-11`) and verified by PR #32:
+
+| Check | Result |
+|---|---|
+| CI / typecheck-lint-test-build | pass on Node 22.23.4 and pnpm 10.34.9 (69/69 test files; perf budget worst route 286.8 KB / 300 KB) |
+| CI / e2e-smoke | pass (14/14) |
+| Workers Builds: fronk-website | pass (non-production `wrangler versions upload`) |
+| AccessLint | pass |
+
+### Still not verified
+
 - E2E on mobile, tablet, WebKit and Firefox, and the darwin visual baselines (CI does not run these either).
-- A real Cloudflare deploy.
+- A production Cloudflare deploy. It happens on merge to `main`, where Workers Builds runs `npx wrangler deploy`.
 
 ## Rollback
 
@@ -161,7 +171,7 @@ This work was done in `~/Developer/fronk-website-main`, which is not a git repo.
 
 1. Copy `package.json`, `pnpm-lock.yaml` and `.node-version` (plus the `README.md` version lines) into the git clone as one execution commit.
 2. Copy the process changes as a separate commit: this archived plan, `AGENTS.md`, `CLAUDE.md`, `process/development-protocols/orchestration.md`, `process/features/CURRENT_FEATURES.md`, and `process/general-plans/backlog/`.
-3. Push and confirm CI is green on Node 22.23.4. This is the only check that has not run yet.
+3. Push and confirm CI is green on Node 22.23.4. Done 02-11-26: steps 1-3 landed as PR #32 and every check passed. Merging it deploys to production.
 4. Deferred follow-ups live in `process/general-plans/backlog/backlog.md`.
 
 ## Lessons Learned
