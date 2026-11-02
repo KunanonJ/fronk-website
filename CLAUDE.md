@@ -50,6 +50,8 @@ Your responsibilities:
 
 **Exception**: Trivial questions that don't require mode-specific work (e.g., "What is RIPER-5?") can be answered directly.
 
+**Harness absent**: `.claude/` is gitignored, so a fresh clone or export may not contain the agents or skills named here, and `process/context/` may not exist yet. In that case follow "Harness-Absent Fallback" in `process/development-protocols/orchestration.md`: say what is missing, run the phase directly with the same plan files and approval gates, and recommend reinstalling the harness.
+
 ---
 
 ### Repository Context
@@ -610,7 +612,7 @@ Each mode has strict boundaries:
 
 **Rules not loading**: Verify `@` syntax and file paths are correct
 
-**Subagent not found**: Ensure agent files exist in `.claude/agents/`
+**Subagent not found**: Ensure agent files exist in `.claude/agents/`. `.claude/` is gitignored, so a fresh clone needs the harness reinstalled; until then use the Harness-Absent Fallback in `process/development-protocols/orchestration.md`.
 
 **Plan conflicts**: Date-stamped filenames should prevent overwrites; check git status
 

@@ -2,11 +2,21 @@
 
 **Date**: 19-07-26  
 **Complexity**: Phase program  
-**Status**: CODE DONE (pending deploy approval)  
+**Status**: ✅ COMPLETE (shipped; verified live 02-11-26 by plan audit)  
 **Feature**: `landing-cutover`  
 **Source prototype**: `/Users/kunanonjarat/Developer/prisma-landing` (Vite SPA at `:5173`)  
 **Deploy**: keep Next.js + OpenNext + Cloudflare Workers (`pnpm run build:cloudflare`)  
 **User locks**: **1C** full public UI cutover · **2A** port into existing Next stack
+
+**Archive Note (02-11-26, plan audit):** The status above used to say "pending deploy approval", but production already serves this code. Public HTTP checks on 02-11-26:
+
+- kunanonj.com answers through the OpenNext Worker (`x-opennext: 1`, `server: cloudflare`).
+- The home `<title>`, landing copy and `--font-almarai` match a local build of this repo.
+- `/showcase` returns 200.
+- The retirement redirects (`/now`, `/work`, `/ventures`, `/stock/asme`, `/writing`) return 308 to their `next.config.ts` targets.
+- `/about`, `/blog`, `/resume` and `/studio` return 200.
+
+Closeout steps 1-2 were already done: the FogLAMP plans are archived with `_SUPERSEDED` in `dennis-portfolio-redesign/completed/`, and `CURRENT_FEATURES.md` and AGENTS.md were updated. Step 3 happened in the 02-11-26 UPDATE PROCESS, which archived this folder's plans to `completed/`.
 
 ## Goal
 

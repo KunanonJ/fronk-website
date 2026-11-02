@@ -3,6 +3,7 @@
 **Date**: 16-06-26
 **Complexity**: Complex
 **Status**: ✅ COMPLETE - Cloudflare production domain, Sanity handoff, cron schedule, and old hosting cleanup verified
+**Archive Note**: The 02-11-26 plan audit moved this plan from `active/` to `completed/`. This status line and the Phase 5 status are authoritative. The TESTING markers on Phases 1-4 were never updated after cutover. The four unchecked boxes under "Phase Completion Rules" are the template checklist, not open tasks. Two items moved to `process/general-plans/backlog/backlog.md`: the one deferred item (Turnstile on newsletter signup) and a check of the production Web Analytics token.
 **Execution Model**: Standard complex plan, phased Cloudflare migration with production cutover approval gate
 
 ## Overview
