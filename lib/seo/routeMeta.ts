@@ -1,5 +1,23 @@
 import type { Metadata } from "next";
+import { OG_SIZE } from "@/lib/og/card";
 import { siteConfig } from "@/lib/site";
+
+/**
+ * Site-wide share card served by `app/opengraph-image.tsx`.
+ *
+ * A page-level `openGraph` object replaces the inherited one wholesale, which
+ * drops the image Next.js derives from the root `opengraph-image` file. Routes
+ * that pass no `images` fall back to this card so they still ship `og:image`.
+ * Routes that ship their own `opengraph-image` file must pass
+ * `hasOwnOgImage: true`: in Next.js 16.4 a config-based `openGraph.images`
+ * replaces the file-based image (verified in the build output).
+ */
+export const DEFAULT_OG_IMAGE = {
+  url: "/opengraph-image",
+  width: OG_SIZE.width,
+  height: OG_SIZE.height,
+  alt: `${siteConfig.name}: ${siteConfig.tagline}`,
+};
 
 type RouteShareInput = {
   title: string;
@@ -14,6 +32,11 @@ type RouteShareInput = {
    * Always include `x-default` when providing alternates.
    */
   languages?: Record<string, string>;
+  /**
+   * Set when the route segment ships its own `opengraph-image` file, so the
+   * site-wide default does not replace it. Guarded by a test in routeMeta.test.ts.
+   */
+  hasOwnOgImage?: boolean;
 };
 
 /**
@@ -27,6 +50,7 @@ export function routeShareMeta({
   publishedTime,
   images,
   languages,
+  hasOwnOgImage = false,
 }: RouteShareInput): Metadata {
   const url = path.startsWith("http")
     ? path
@@ -34,7 +58,9 @@ export function routeShareMeta({
 
   const ogImages = images?.length
     ? images.map((src) => ({ url: src }))
-    : undefined;
+    : hasOwnOgImage
+      ? undefined
+      : [DEFAULT_OG_IMAGE];
 
   const canonical = path.startsWith("/") ? path : `/${path}`;
 
@@ -61,7 +87,9 @@ export function routeShareMeta({
       site: "@fkj98",
       title,
       description,
-      ...(ogImages ? { images: [...images!] } : {}),
+      // Without explicit images, Next.js copies the route's resolved openGraph
+      // images (including its own opengraph-image file) into the Twitter card.
+      ...(images?.length ? { images: [...images] } : {}),
     },
   };
 }
