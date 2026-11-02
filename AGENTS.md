@@ -71,6 +71,12 @@ You do NOT:
 Exception: Trivial questions that don't require mode-specific work, for example "What is
 RIPER-5?", can be answered directly.
 
+Harness absent: `.claude/` is gitignored, so a fresh clone or export may not contain the agents
+or skills named here, and `process/context/` may not exist yet. In that case follow
+"Harness-Absent Fallback" in `process/development-protocols/orchestration.md`: say what is missing,
+run the phase directly with the same plan files and approval gates, and recommend reinstalling the
+harness.
+
 ### Repository Context
 
 Authoritative context for this repository:
@@ -670,7 +676,9 @@ Rules not loading: Verify `process/development-protocols/` exists and that the h
 
 Subagent not found: Ensure agent files exist in `.claude/agents/` and mirrored TOML exists in
 `.codex/agents/`. Shared skills should exist under `.claude/skills/` through the `.agents/skills/`
-symlink, but agent wrappers should not exist there.
+symlink, but agent wrappers should not exist there. `.claude/` is gitignored, so a fresh clone needs
+the harness reinstalled; until then use the Harness-Absent Fallback in
+`process/development-protocols/orchestration.md`.
 
 Plan conflicts: Date-stamped filenames should prevent overwrites; check git status.
 
@@ -717,8 +725,9 @@ The authoritative historical source remains:
 
 - Production site is kunanonj.com (Fronk / Kunanon Jarat); GitHub remote `KunanonJ/fronk-website` on `main`
 - Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
-- Package manager is pnpm; Node engine is ≥22.12 (see `.node-version`)
-- Active public UI program: `process/features/landing-cutover/` (cinematic `/` + `/showcase`); FogLAMP/Dennis redesign is superseded
+- Package manager is pnpm 10.34 (`packageManager`); Node engine is ≥22.22.2 and CI pins 22.23.4 (see `.node-version`)
+- Transitive security fixes live as exact pins in `pnpm.overrides` (some major-scoped, e.g. `glob@10`). On every dependency upgrade: re-run `pnpm audit`, re-check each override against the patched ranges (pnpm never warns when a pin goes stale or undercuts a parent's declared range), and compare the lockfile's `engines.node` values with `.node-version`
+- Public UI: the cinematic `/` + `/showcase` from `landing-cutover` is live (verified 02-11-26; plans archived in `process/features/landing-cutover/completed/`); the FogLAMP/Dennis redesign and `website-power-upgrade` are superseded
 - Active discovery program: `process/features/sea-discovery/` (SEO/AEO/SEM/LinkedIn for AI transformation · ERP/CRM · startups TH/SEA)
 - Indexed authority routes: `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, `/ventures/[slug]`; system `/resume`, `/studio` (noindex); `/ventures` index → `/#ventures`; `/now` → `/`; `/writing` → `/blog`
 - Landing content is static in `lib/content/landing.ts`; blog/editorial via hosted Sanity Studio at `https://fronk-website.sanity.studio/` (`/studio` on-site is a launcher only); Learn/topic hubs are code-driven (`lib/content/learn.ts`); portrait at `public/profile.jpg`

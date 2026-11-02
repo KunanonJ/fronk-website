@@ -16,6 +16,23 @@ Feature override paths:
 
 Rule: if the current shell CWD differs from the real work context, pass the work-context paths, not the shell CWD.
 
+## Harness-Absent Fallback
+
+`.claude/` is gitignored, so fresh clones, ZIP exports and CI checkouts can lack the RIPER-5 agents and skills that `CLAUDE.md`, `AGENTS.md` and `.vc-installed-files` reference (the `.agents/skills` symlink is then broken). `process/context/` can also be missing until `vc-generate-context` runs.
+
+When the routed agent, skill or context router does not exist:
+
+1. Say so at the start of the phase and name the missing path.
+2. Run the phase directly in the main session rather than inventing a substitute agent.
+3. Keep the guarantees the agent would have enforced:
+   - write or update the plan file in the usual `active/` folder
+   - follow `plan-lifecycle.md`, including the direct-plan contract sections
+   - respect the same approval gates (EXECUTE approval, UPDATE PROCESS Phase 3 approval)
+   - record verification evidence in the plan
+4. If the checkout is not a git repo, snapshot the tree before editing and list the files to port at closeout.
+5. Report validators that could not run (for example `.claude/skills/*/scripts` or `git diff --check`) as skipped, with the reason.
+6. Recommend reinstalling the harness and running `vc-generate-context` as follow-ups. Do not create them silently.
+
 ## Feature Scope Detection
 
 Before setting `Feature:` in a subagent prompt:

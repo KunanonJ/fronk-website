@@ -3,6 +3,7 @@
 **Date**: 16-06-26
 **Complexity**: Complex
 **Status**: ✅ COMPLETE - Repository references removed; Sanity references removed; live app services deleted; local link removed
+**Archive Note**: The 02-11-26 plan audit moved this plan from `active/` to `completed/`. This status line and "Final Verification Evidence - 2026-06-16" are authoritative. The PLANNED markers on Phases 1-2 under "Phased Delivery Plan" were never updated after that work shipped. The four unchecked boxes under "Phase Completion Rules" are the template checklist, not open tasks. A 02-11-26 scan found no Railway references outside `process/`.
 **Execution Model**: Standard complex plan with a hard approval gate before live Railway teardown
 
 ## Overview
