@@ -1,6 +1,6 @@
 # Dependency Upgrade + Security Remediation (02-11-26)
 
-- **Status:** ✅ COMPLETE. Archived 02-11-26 through UPDATE PROCESS (user-approved). Verified locally on Node 26.12.0, then in CI on Node 22.23.4 through PR #32 (all 4 checks green; see Verification evidence).
+- **Status:** ✅ COMPLETE. Archived 02-11-26 through UPDATE PROCESS (user-approved). Verified locally on Node 26.12.0, then in CI on Node 22.23.4 through PR #32 (all 4 checks green), and deployed to production when PR #32 merged as `57ef4a0` (see Verification evidence).
 - **Approval:** user, in chat on 2026-11-02 ("please upgrade all of it")
 - **Type:** SIMPLE (manifest + lockfile; code changes only if verification forces them)
 - **Executor:** orchestrator directly (the vc-* agents are not present in this checkout; there is no `.claude/`)
@@ -156,10 +156,20 @@ Ported to the git clone (`~/Developer/fronk-website`, branch `chore/deps-upgrade
 | Workers Builds: fronk-website | pass (non-production `wrangler versions upload`) |
 | AccessLint | pass |
 
+### Production deploy (PR #32 merged, 02-11-26)
+
+Merged as `57ef4a0`. On that commit, Workers Builds (`npx wrangler deploy`), typecheck-lint-test-build and e2e-smoke all passed. A smoke test of kunanonj.com afterwards found:
+
+- the homepage serving a new static asset set
+- `/showcase`, `/about`, `/blog`, `/resume` and `/studio` returning 200
+- the retirement redirects returning 308
+- the `next/og` image routes (`/opengraph-image` plus the venture and topic cards) returning PNGs
+
+The smoke test also found that most pages shipped no `og:image`. That predated this upgrade and was fixed separately (see the `twitter-image` note in `process/general-plans/backlog/backlog.md`).
+
 ### Still not verified
 
 - E2E on mobile, tablet, WebKit and Firefox, and the darwin visual baselines (CI does not run these either).
-- A production Cloudflare deploy. It happens on merge to `main`, where Workers Builds runs `npx wrangler deploy`.
 
 ## Rollback
 
@@ -171,7 +181,7 @@ This work was done in `~/Developer/fronk-website-main`, which is not a git repo.
 
 1. Copy `package.json`, `pnpm-lock.yaml` and `.node-version` (plus the `README.md` version lines) into the git clone as one execution commit.
 2. Copy the process changes as a separate commit: this archived plan, `AGENTS.md`, `CLAUDE.md`, `process/development-protocols/orchestration.md`, `process/features/CURRENT_FEATURES.md`, and `process/general-plans/backlog/`.
-3. Push and confirm CI is green on Node 22.23.4. Done 02-11-26: steps 1-3 landed as PR #32 and every check passed. Merging it deploys to production.
+3. Push and confirm CI is green on Node 22.23.4. Done 02-11-26: steps 1-3 landed as PR #32, every check passed, and it merged as `57ef4a0`, which deployed to production.
 4. Deferred follow-ups live in `process/general-plans/backlog/backlog.md`.
 
 ## Lessons Learned

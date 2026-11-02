@@ -75,7 +75,7 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Added:** 02-11-26 by plan audit, from `process/features/website-power-upgrade/completed/website-power-upgrade_UMBRELLA_PLAN_18-07-26_SUPERSEDED.md`
 - **Problem:**
   - **No coverage gate:** Vitest coverage is configured in `vitest.config.mts` (v8 provider) but sets no thresholds, and CI runs `vitest run` without coverage.
-  - **No `twitter-image` routes:** low impact, because X falls back to `og:image` and 3 `opengraph-image` routes exist.
+  - **No `twitter-image` routes:** low impact. Next.js copies each page's `og:image` into its Twitter card, and since 02-11-26 every page built with `routeShareMeta()` has one (it falls back to the site card, `/opengraph-image`). Before that fix, `/`, `/about`, `/blog`, `/contact`, `/press`, `/showcase` and `/learn` shipped no share image at all.
 - **Root cause:** the program was superseded before its QA phase (D) and closeout (E) finished.
 - **Why deferred:** the owning program closed, and neither gap blocks anything today.
 - **Fix options:**
