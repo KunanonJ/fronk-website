@@ -6,6 +6,7 @@ import type { PortableTextBlock } from "@portabletext/react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { PortableText } from "@/components/PortableText";
 import { formatBlogDate } from "@/lib/content/blog";
+import { linkifyInternalPaths } from "@/lib/content/linkify";
 import { expandHashHref } from "@/lib/landing/nav";
 
 type BlogPostPageProps = {
@@ -98,7 +99,19 @@ export default function BlogPostPage({
             ) : hasParagraphs ? (
               bodyParagraphs!.map((paragraph) => (
                 <p key={paragraph.slice(0, 48)} className="text-base leading-relaxed text-primary/80">
-                  {paragraph}
+                  {linkifyInternalPaths(paragraph).map((segment, index) =>
+                    segment.type === "link" ? (
+                      <Link
+                        key={`${segment.href}-${index}`}
+                        href={segment.href}
+                        className="text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
+                      >
+                        {segment.text}
+                      </Link>
+                    ) : (
+                      segment.text
+                    ),
+                  )}
                 </p>
               ))
             ) : (
