@@ -21,7 +21,7 @@ Cinematic marketing shell stays `/` + `/showcase`.
 |------|------|
 | `/about` | Person entity |
 | `/blog`, `/blog/[slug]` | Content cluster engine |
-| `/contact`, `/press` | Conversion + PR |
+| `/contact` | Conversion. (`/press` hidden 04-11-26 at owner request: unlinked, noindex, out of sitemap/llms. Its items linked to own sites, not real coverage.) |
 | `/topics/*` | Category pillars (EN) |
 | `/th/topics/*` | Thai pillar mirrors |
 | `/ventures/[slug]` | Product case hubs (Manut, GoGoCash) |

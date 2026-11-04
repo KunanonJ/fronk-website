@@ -43,7 +43,7 @@ export const primaryNav: readonly NavItem[] = [
     })),
   },
   { type: "link", label: "Blog", href: "/blog" },
-  { type: "link", label: "Press", href: "/press" },
+  // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
 
 export const navCta = { label: "Contact", href: "/contact" } as const;
@@ -58,7 +58,6 @@ export const nav = [
   { label: "Ventures", href: "/#ventures" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Blog", href: "/blog" },
-  { label: "Press", href: "/press" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
