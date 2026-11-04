@@ -1,7 +1,7 @@
 # Accessibility: colour contrast in both themes - Plan
 
 **Date**: 04-11-26
-**Status**: EXECUTING (user: "continue until cover all", 04-11-26)
+**Status**: COMPLETED 04-11-26. Merged as #36 (squash `0e9d7e9`); CI green including the new two-theme a11y run. Live re-scan (17 routes, dark + light, real scroll, animations on): 0 serious/critical violations. Archived in UPDATE PROCESS.
 **Branch**: `fix/a11y-contrast` (from `main` at `e5c9517`)
 **Harness note**: `.claude/` and `process/context/` are absent. Phases run in the main session per the Harness-Absent Fallback.
 
@@ -56,4 +56,4 @@ None (styling only). CI gains an a11y step.
 ## Resume and Execution Handoff
 
 - Execute anchor: this file.
-- After merge, archive with the other 04-11-26 plans in UPDATE PROCESS.
+- Archived 04-11-26 with the portfolio and phase-11 plans.
