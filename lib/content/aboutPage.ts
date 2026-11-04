@@ -87,7 +87,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: ", an ERP/CRM workspace with Intelligence AI for automotive SMEs; and own IT operations at ",
+            text: ", an ERP/CRM workspace with Intelligence AI for automotive SMEs; and lead IT and AI engineering at ",
           },
           {
             type: "link",
@@ -188,7 +188,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: " as a parallel build. Helping the broader Binary Holdings group run smoother as IT Manager. Participating in ",
+            text: " as a parallel build. Helping the broader Binary Holdings group run smoother as IT Manager and AI Engineering Lead. Participating in ",
           },
           {
             type: "link",

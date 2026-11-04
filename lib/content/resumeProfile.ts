@@ -15,7 +15,7 @@ export type { ResolvedTimelineItem, ResolvedTimelineSection };
 
 export const DEFAULT_RESUME_PROFILE = {
   name: "Kunanon Jarat",
-  headline: "Founder. IT Manager. Based in Bangkok.",
+  headline: "Founder. IT Manager & AI Engineering Lead. Based in Bangkok.",
   summary: null as string | null,
 } as const;
 

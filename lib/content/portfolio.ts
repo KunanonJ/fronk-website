@@ -63,7 +63,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     summary:
       "An internal operations platform built to replace Zoho at The Binary Holdings, bringing HR, approvals, Thai accounting, expenses, CRMs and an AI assistant into one login-only web app.",
     category: "Internal platform",
-    role: "IT Manager",
+    role: "IT Manager & AI Engineering Lead",
     organization: "The Binary Holdings",
     period: "May to Oct 2026",
     year: 2026,
@@ -114,7 +114,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     summary:
       "A dependency-free Node.js job that reads validator balances from the Avalanche P-Chain every morning, works out burn rate and runway, and emails a red or green report before any validator runs dry.",
     category: "Ops automation",
-    role: "IT Manager",
+    role: "IT Manager & AI Engineering Lead",
     organization: "The Binary Holdings",
     period: "May to Sep 2026",
     year: 2026,
@@ -152,7 +152,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     summary:
       "A single-page tool where staff at The Binary Holdings and The Binary Labs fill in a short form, see a live preview and copy a Gmail-ready signature in one click.",
     category: "Internal tool",
-    role: "IT Manager",
+    role: "IT Manager & AI Engineering Lead",
     organization: "The Binary Holdings",
     period: "Sep 2026",
     year: 2026,
@@ -194,7 +194,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     summary:
       "A team-built set of internal AI agents at The Binary Holdings. The main one, Fando, finds sports clips, has Gemini judge and caption them, queues them for human approval and publishes the approved ones.",
     category: "AI agents",
-    role: "Co-builder (team project)",
+    role: "AI Engineering Lead (team project)",
     organization: "The Binary Holdings",
     period: "Mar to Apr 2026",
     year: 2026,

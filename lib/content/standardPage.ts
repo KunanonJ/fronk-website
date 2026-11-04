@@ -17,7 +17,7 @@ const DEFAULTS: Record<StandardPageSlug, StandardPageDefaults> = {
     eyebrow: "About",
     heading: "Founder, builder, operator.",
     description:
-      "Kunanon Jarat (Fronk) — founder of GoGoCash, IT Manager at The Binary Holdings. Building fintech and adjacent infrastructure from Bangkok.",
+      "Kunanon Jarat (Fronk) — founder of GoGoCash, IT Manager and AI Engineering Lead at The Binary Holdings. Building fintech and adjacent infrastructure from Bangkok.",
   },
   now: {
     title: "Now",

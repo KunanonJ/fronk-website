@@ -10,7 +10,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "Who is Fronk (Kunanon Jarat)?",
     answer:
-      'Kunanon Jarat — "Fronk" — is a Bangkok-based founder, builder, and writer. He founded GoGoCash, builds Manut AI, and owns IT operations at The Binary Holdings.',
+      'Kunanon Jarat — "Fronk" — is a Bangkok-based founder, builder, and writer. He founded GoGoCash, builds Manut AI, and is IT Manager and AI Engineering Lead at The Binary Holdings.',
   },
   {
     question: "What is GoGoCash?",

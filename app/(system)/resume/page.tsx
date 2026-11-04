@@ -15,7 +15,7 @@ import { fetchResumeProfile } from "@/lib/sanity/fetch";
 export const metadata: Metadata = {
   title: "Resume",
   description:
-    "Kunanon Jarat (Fronk) — Founder, IT manager, and project leader across fintech, AI, and Web3.",
+    "Kunanon Jarat (Fronk) — Founder, IT manager, AI engineering lead, and project leader across fintech, AI, and Web3.",
   alternates: { canonical: "/resume" },
   robots: { index: false, follow: false },
 };
