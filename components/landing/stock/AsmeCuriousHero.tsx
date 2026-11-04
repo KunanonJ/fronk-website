@@ -74,7 +74,8 @@ const FADE_OUT_LEAD_S = 0.55;
 const LOOP_RESET_DELAY_MS = 100;
 
 /**
- * About hero: Asme / "Built for the curious".
+ * About hero: Asme liquid-glass design. The h1 is the person's name
+ * (`aboutPage.hero.title`) so name queries match the page heading.
  * Primary IA route: `/about` (legacy `/stock/asme` redirects here).
  */
 export default function AsmeCuriousHero() {

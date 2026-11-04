@@ -16,4 +16,11 @@ describe("FAQ_ITEMS > is non-empty and well-formed", () => {
     expect(corpus).toContain("Manut AI");
     expect(corpus).toContain("Bangkok");
   });
+
+  it("describes Manut the same way as the venture hub (FAQPage JSON-LD)", () => {
+    const manut = FAQ_ITEMS.find((i) => i.question === "What is Manut AI?");
+    expect(manut?.answer).toMatch(/ERP\/CRM/);
+    expect(manut?.answer).toMatch(/automotive/i);
+    expect(manut?.answer).not.toMatch(/solo entrepreneurs/i);
+  });
 });
