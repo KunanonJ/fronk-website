@@ -81,3 +81,52 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Fix options:**
   1. Measure current coverage, set `coverage.thresholds` slightly below it, and run coverage in CI.
   2. Add `twitter-image` routes only if X previews ever look wrong.
+
+## P2: Visual regression baselines are stale
+
+- **Added:** 04-11-26, from `completed/completed_portfolio-page_PLAN_04-11-26.md`
+- **Problem:** `tests/e2e/visual.spec.ts` fails on every route. Only 21 baselines are tracked: 4 for current routes (about, contact, home, resume, last updated 13-09-26) and 9 for routes that now redirect (`now`, `ventures`, `writing`). The other 10 current routes have none. Mobile baselines differ in page height (e.g. home 2036 vs 1569px), unrelated to any recent change.
+- **Root cause:** the suite is darwin-only and not in CI, so drift went unnoticed through several redesigns.
+- **Why deferred:** refreshing every baseline would bless months of unreviewed visual drift in one step; that needs a deliberate review.
+- **Fix options:**
+  1. Delete the retired-route baselines, run `--update-snapshots` once, review every image, commit as a new baseline.
+  2. Or drop the suite and rely on smoke, axe and manual screenshots.
+
+## P3: Dead fallback components carry stale Manut copy
+
+- **Added:** 04-11-26, from `features/sea-discovery/completed/phase-11_audit-fixes_PLAN_04-11-26.md`
+- **Problem:** `components/content/AboutFallback.tsx` and `NowFallback.tsx` still describe Manut as a workspace "for solo entrepreneurs" ("Notion on steroids").
+- **Root cause:** no page imports them any more (copy moved to `lib/content/aboutPage.ts` and `faq.ts`).
+- **Why deferred:** not rendered, so no user or crawler impact.
+- **Fix options:** delete both files, or align the copy if they are revived.
+
+## P3: Dev-only hydration warning on the nav menu button under reduced motion
+
+- **Added:** 04-11-26
+- **Problem:** with `prefers-reduced-motion: reduce`, `next dev` logs a hydration mismatch on every landing page: the server HTML has `tabindex="0"` on the `motion.button` menu toggle in `LandingTopNav`, the client does not.
+- **Root cause:** inferred to be framer-motion rendering different attributes for reduced motion on server vs client. Production smoke tests log no error.
+- **Why deferred:** dev-only, pre-existing, no visible effect.
+- **Fix options:** make the toggle a plain `<button>` wrapping the animated icon, or pass an explicit `tabIndex`.
+
+## P3: `next build` rewrites the agent-rules heading in `AGENTS.md`
+
+- **Added:** 04-11-26
+- **Problem:** every `next build` changes `# This is NOT the Next.js you know` to `## …` inside the `nextjs-agent-rules` block, leaving `AGENTS.md` dirty.
+- **Root cause:** Next.js 16 regenerates the block with an H2; the committed file has an H1.
+- **Why deferred:** cosmetic; reverted by hand each build on 04-11-26.
+- **Fix options:** commit the H2 form once so builds stop changing it.
+
+## P3: Harness and context router missing in this checkout
+
+- **Added:** 04-11-26
+- **Problem:** `.claude/` (RIPER-5 agents and skills) and `process/context/` (including `all-context.md`, referenced by `CLAUDE.md`) do not exist here, so every phase ran under the Harness-Absent Fallback.
+- **Root cause:** `.claude/` is gitignored and this checkout started as a ZIP export; `process/context/` was never generated.
+- **Why deferred:** needs the owner to reinstall the harness (`vc-setup`/`vc-update`) and then run `vc-generate-context`.
+- **Fix options:** reinstall the harness, then `vc-generate-context` and `vc-audit-context`.
+
+## P3: Portfolio screenshots
+
+- **Added:** 04-11-26
+- **Problem:** the four `/portfolio` projects show placeholder tiles; none of the source folders has product screenshots.
+- **Why deferred:** the owner chose to supply images.
+- **Fix options:** drop files in `public/portfolio/<slug>/` and register `cover`/`gallery` in `lib/content/portfolio.ts` (instructions at the top of that file; a test checks the files exist). Use internal screenshots only after redacting data.
