@@ -33,6 +33,16 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /Press|View|GoGoCash|Manut/i,
   },
   {
+    path: "/portfolio",
+    name: "portfolio",
+    expectsHeadingPattern: /Selected work|Portfolio|TBH Intranet/i,
+  },
+  {
+    path: "/portfolio/tbh-intranet",
+    name: "portfolio-project",
+    expectsHeadingPattern: /TBH Intranet|What it does|Tech stack/i,
+  },
+  {
     path: "/blog",
     name: "blog",
     expectsHeadingPattern: /Blog|Search posts|Read|GoGoCash|Manut|Bangkok/i,
