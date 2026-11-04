@@ -154,7 +154,7 @@ export const footerResources = [
   { label: "sitemap.md", href: "/sitemap.md" },
   { label: "llms.txt", href: "/llms.txt" },
   { label: "skills.md", href: "/skills.md" },
-  { label: "rss.xml", href: "/rss.xml" },
+  { label: "feed.xml", href: "/feed.xml" },
 ] as const;
 
 export const contact = {

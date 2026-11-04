@@ -16,7 +16,12 @@ type TopicHubPageProps = {
  */
 export default function TopicHubPage({ pillar }: TopicHubPageProps) {
   return (
-    <main id="main" className="bg-landing text-primary">
+    // Root <html lang> is "en"; mark Thai pillar content as Thai.
+    <main
+      id="main"
+      lang={pillar.locale === "th" ? "th" : undefined}
+      className="bg-landing text-primary"
+    >
       <DiscoveryAnalytics />
       <article className="mx-auto max-w-3xl px-5 pb-24 pt-16 sm:px-8 sm:pt-24">
         <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/55">

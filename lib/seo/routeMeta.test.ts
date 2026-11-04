@@ -18,6 +18,25 @@ describe("routeShareMeta", () => {
     expect(meta.description).toBe("Founder story from Bangkok.");
   });
 
+  it("advertises the RSS feed, since page alternates replace the layout's", () => {
+    const meta = routeShareMeta({ title: "Blog", description: "Notes", path: "/blog" });
+    expect(meta.alternates?.types).toEqual({
+      "application/rss+xml": "/feed.xml",
+    });
+  });
+
+  it("defaults og:locale to en_US and lets Thai routes pass th_TH", () => {
+    const en = routeShareMeta({ title: "A", description: "B", path: "/about" });
+    const th = routeShareMeta({
+      title: "A",
+      description: "B",
+      path: "/th/topics/x",
+      locale: "th_TH",
+    });
+    expect(en.openGraph?.locale).toBe("en_US");
+    expect(th.openGraph?.locale).toBe("th_TH");
+  });
+
   it("supports article type with publishedTime", () => {
     const meta = routeShareMeta({
       title: "Shipping from Bangkok",

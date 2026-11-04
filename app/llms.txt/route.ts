@@ -120,7 +120,7 @@ export async function GET() {
   textLines.push(`- Markdown sitemap: ${base}/sitemap.md`);
   textLines.push(`- XML sitemap: ${base}/sitemap.xml`);
   textLines.push(`- Skills: ${base}/skills.md`);
-  textLines.push(`- RSS: ${base}/rss.xml`);
+  textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push("");
 

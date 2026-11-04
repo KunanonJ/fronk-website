@@ -17,7 +17,7 @@ Owner: Kunanon Jarat (Fronk) — Bangkok, Thailand
 | Markdown sitemap | [/sitemap.md](/sitemap.md) | Human/agent-readable route map |
 | XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |
 | Skills & coding guidelines | [/skills.md](/skills.md) | Prompts and standards for coding agents |
-| RSS feed | [/rss.xml](/rss.xml) | Blog/writing syndication (`/feed.xml` alias) |
+| RSS feed | [/feed.xml](/feed.xml) | Blog syndication (`/rss.xml` redirects here) |
 | Robots | [/robots.txt](/robots.txt) | Crawler rules |
 
 ---

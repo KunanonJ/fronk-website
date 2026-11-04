@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FEED_PATH } from "@/lib/content/rss";
 import { OG_SIZE } from "@/lib/og/card";
 import { siteConfig } from "@/lib/site";
 
@@ -37,6 +38,8 @@ type RouteShareInput = {
    * site-wide default does not replace it. Guarded by a test in routeMeta.test.ts.
    */
   hasOwnOgImage?: boolean;
+  /** `og:locale`. Thai routes pass `th_TH`. */
+  locale?: "en_US" | "th_TH";
 };
 
 /**
@@ -51,6 +54,7 @@ export function routeShareMeta({
   images,
   languages,
   hasOwnOgImage = false,
+  locale = "en_US",
 }: RouteShareInput): Metadata {
   const url = path.startsWith("http")
     ? path
@@ -70,10 +74,13 @@ export function routeShareMeta({
     alternates: {
       canonical,
       ...(languages ? { languages } : {}),
+      // A page-level `alternates` replaces the root layout's wholesale, so
+      // the feed link has to be repeated here to reach every page's <head>.
+      types: { "application/rss+xml": FEED_PATH },
     },
     openGraph: {
       type,
-      locale: "en_US",
+      locale,
       url,
       siteName: siteConfig.name,
       title,
