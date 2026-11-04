@@ -110,10 +110,10 @@ jobs:
 
       # CI=true flips reuseExistingServer off, so Playwright manages its own
       # server via PLAYWRIGHT_WEB_SERVER ("pnpm start" = prod, not dev). The
-      # explicit smoke.spec.ts path excludes the darwin-only visual.spec.ts
-      # baselines (which would fail on Linux); --project=desktop scopes to one
-      # Chromium engine.
-      - name: Run smoke e2e (desktop)
+      # explicit spec paths exclude the darwin-only visual.spec.ts baselines
+      # (which would fail on Linux); --project=desktop scopes to one Chromium
+      # engine. a11y.spec.ts scans every route in dark and light themes.
+      - name: Run smoke + a11y e2e (desktop)
         env:
           CI: "true"
           PLAYWRIGHT_WEB_SERVER: pnpm start
@@ -121,4 +121,4 @@ jobs:
           NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
-        run: pnpm exec playwright test smoke.spec.ts --project=desktop
+        run: pnpm exec playwright test smoke.spec.ts a11y.spec.ts --project=desktop

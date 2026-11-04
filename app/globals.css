@@ -85,7 +85,8 @@
   --fg: #1c1d20;
   /* ≥4.5:1 on white (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
   --muted: rgba(28, 29, 32, 0.7);
-  --subtle: rgba(28, 29, 32, 0.62);
+  /* 0.62 measured 4.1:1 on #f0f0ee; 0.7 clears 4.5:1 (axe, 04-11-26). */
+  --subtle: rgba(28, 29, 32, 0.7);
   --border: rgba(28, 29, 32, 0.14);
   --border-strong: rgba(28, 29, 32, 0.4);
   --surface: #ffffff;
@@ -107,7 +108,8 @@
   --fg: #ffffff;
   /* ≥4.5:1 on #0a0a0a (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
   --muted: rgba(255, 255, 255, 0.62);
-  --subtle: rgba(255, 255, 255, 0.5);
+  /* 0.5 measured 4.48:1 on #0a0a0a; 0.55 clears 4.5:1 (axe, 04-11-26). */
+  --subtle: rgba(255, 255, 255, 0.55);
   --border: rgba(255, 255, 255, 0.12);
   --border-strong: rgba(255, 255, 255, 0.3);
   --surface: #141414;

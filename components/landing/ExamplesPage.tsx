@@ -38,7 +38,7 @@ export default function ExamplesPage() {
               className={
                 active
                   ? "rounded-full bg-cream px-4 py-2 text-sm font-medium text-black"
-                  : "rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-primary/75 transition-colors hover:border-white/30 hover:text-primary"
+                  : "rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-sm text-primary/75 transition-colors hover:border-primary/30 hover:text-primary"
               }
               onClick={() => setPersona(item)}
             >
@@ -56,7 +56,7 @@ export default function ExamplesPage() {
           <Link
             key={card.title}
             href={card.href}
-            className="group flex flex-col rounded-2xl border border-white/10 bg-[#101010] p-5 transition-colors hover:border-white/25 sm:p-6"
+            className="group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6"
           >
             <h2 className="text-base font-medium text-primary sm:text-lg">
               {card.title}

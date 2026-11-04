@@ -26,7 +26,7 @@ export default function LandingSiteFooter() {
       >
         {contact.email}
       </a>
-      <p className="mx-auto mt-4 max-w-md text-sm text-primary/60">
+      <p className="mx-auto mt-4 max-w-md text-sm text-primary/70">
         {contact.tagline}
       </p>
       <div className="mx-auto mt-6 flex w-full max-w-7xl justify-stretch sm:justify-center">
@@ -59,7 +59,7 @@ export default function LandingSiteFooter() {
         aria-label="Library"
         className="mx-auto mt-10 max-w-2xl border-t border-black/10 pt-6 dark:border-white/10"
       >
-        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/50">
+        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70">
           Library
         </p>
         <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5">
@@ -80,7 +80,7 @@ export default function LandingSiteFooter() {
         aria-label="Machine-readable resources"
         className="mx-auto mt-8 max-w-2xl border-t border-black/10 pt-6 dark:border-white/10"
       >
-        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/50">
+        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70">
           For agents &amp; indexes
         </p>
         <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5">
@@ -88,7 +88,7 @@ export default function LandingSiteFooter() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="font-mono text-xs text-primary/55 underline-offset-2 transition-colors hover:text-primary hover:underline sm:text-sm"
+                className="font-mono text-xs text-primary/70 underline-offset-2 transition-colors hover:text-primary hover:underline sm:text-sm"
               >
                 {item.label}
               </Link>

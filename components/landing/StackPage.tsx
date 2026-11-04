@@ -23,14 +23,14 @@ export default function StackPage() {
             <section key={group} aria-labelledby={`stack-${group}`}>
               <h2
                 id={`stack-${group}`}
-                className="mb-4 text-sm font-medium uppercase tracking-[0.16em] text-primary/55"
+                className="mb-4 text-sm font-medium uppercase tracking-[0.16em] text-primary/70"
               >
                 {group}
               </h2>
-              <div className="overflow-x-auto rounded-2xl border border-white/10">
+              <div className="overflow-x-auto rounded-2xl border border-primary/10">
                 <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
                   <thead>
-                    <tr className="border-b border-white/10 text-[10px] uppercase tracking-[0.14em] text-primary/45">
+                    <tr className="border-b border-primary/10 text-[10px] uppercase tracking-[0.14em] text-primary/70">
                       <th className="px-4 py-3 font-medium sm:px-5">Name</th>
                       <th className="px-4 py-3 font-medium sm:px-5">Purpose</th>
                       <th className="px-4 py-3 font-medium sm:px-5">Website</th>
@@ -40,7 +40,7 @@ export default function StackPage() {
                     {items.map((item) => (
                       <tr
                         key={item.name}
-                        className="border-b border-white/5 last:border-0"
+                        className="border-b border-primary/5 last:border-0"
                       >
                         <td className="px-4 py-3.5 font-medium text-primary sm:px-5">
                           <span className="inline-flex items-center gap-2.5">

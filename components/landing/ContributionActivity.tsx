@@ -51,9 +51,9 @@ export default function ContributionActivity() {
     <section
       id="activity"
       aria-labelledby="about-activity-heading"
-      className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+      className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
     >
-      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/55 sm:text-xs">
+      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
         Activity
       </p>
       <h2
@@ -63,7 +63,7 @@ export default function ContributionActivity() {
       >
         GitHub year
       </h2>
-      <p className="mb-6 text-sm text-primary/60">
+      <p className="mb-6 text-sm text-primary/70">
         {loaded
           ? `${calendar.total.toLocaleString()} contributions · @${GITHUB_CONTRIBUTIONS_LOGIN}`
           : `Loading @${GITHUB_CONTRIBUTIONS_LOGIN}…`}
@@ -94,7 +94,7 @@ export default function ContributionActivity() {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-primary/50">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-primary/70">
         <div className="flex items-center gap-1.5">
           <span>Less</span>
           {[0, 1, 2, 3, 4].map((level) => (
