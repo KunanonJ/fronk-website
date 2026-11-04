@@ -17,7 +17,6 @@ const STATIC_ROUTES: readonly {
   { path: "/about", changeFrequency: "monthly", priority: 0.9 },
   { path: "/showcase", changeFrequency: "monthly", priority: 0.7 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/press", changeFrequency: "monthly", priority: 0.8 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
   { path: "/learn", changeFrequency: "weekly", priority: 0.85 },
   { path: "/examples", changeFrequency: "monthly", priority: 0.8 },

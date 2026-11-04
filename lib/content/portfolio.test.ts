@@ -152,7 +152,7 @@ describe("portfolio nav", () => {
     const labels = primaryNav.map((item) => item.label);
     const index = labels.indexOf("Portfolio");
     expect(index).toBe(labels.indexOf("Ventures") + 1);
-    expect(primaryNav[index]).toEqual({
+    expect(primaryNav[index]).toMatchObject({
       type: "link",
       label: "Portfolio",
       href: "/portfolio",

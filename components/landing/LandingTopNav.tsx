@@ -11,9 +11,28 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import {
+  BadgeCheck,
+  BriefcaseBusiness,
+  ChevronDown,
+  GraduationCap,
+  Hammer,
+  Layers,
+  LibraryBig,
+  Lightbulb,
+  PenLine,
+  Rocket,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { hero, navCta, primaryNav, type NavItem } from "@/lib/content/landing";
+import {
+  hero,
+  navCta,
+  primaryNav,
+  type NavIconId,
+  type NavItem,
+} from "@/lib/content/landing";
 import {
   HOME_SECTION_IDS,
   activeSectionAtFocus,
@@ -29,6 +48,32 @@ import {
 
 const MENU_EASE = [0.22, 1, 0.36, 1] as const;
 const SCROLL_SHRINK_Y = 24;
+
+const NAV_ICONS = {
+  about: UserRound,
+  ventures: Rocket,
+  portfolio: BriefcaseBusiness,
+  library: LibraryBig,
+  blog: PenLine,
+  learn: GraduationCap,
+  examples: Lightbulb,
+  stack: Layers,
+  proof: BadgeCheck,
+  build: Hammer,
+} satisfies Record<NavIconId, LucideIcon>;
+
+/** Decorative: the label next to it carries the meaning. */
+function NavIcon({
+  id,
+  className = "h-3.5 w-3.5",
+}: {
+  id?: NavIconId;
+  className?: string;
+}) {
+  if (!id) return null;
+  const Icon = NAV_ICONS[id];
+  return <Icon className={`shrink-0 opacity-80 ${className}`} aria-hidden />;
+}
 
 function MenuToggleIcon({
   open,
@@ -134,14 +179,14 @@ function NavItemAnchor({
 
 function desktopLinkClass(active: boolean) {
   return active
-    ? "inline-flex min-h-9 items-center gap-1 rounded-md bg-black/8 px-2.5 py-1 text-sm font-medium text-primary dark:bg-white/15"
-    : "inline-flex min-h-9 items-center gap-1 rounded-md px-2.5 py-1 text-sm text-primary/70 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
+    ? "inline-flex min-h-9 items-center gap-1.5 rounded-md bg-black/8 px-2.5 py-1 text-sm font-medium text-primary dark:bg-white/15"
+    : "inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 py-1 text-sm text-primary/70 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
 }
 
 function mobileLinkClass(active: boolean) {
   return active
-    ? "flex min-h-11 items-center rounded-lg bg-black/8 px-3 text-sm font-medium text-primary dark:bg-white/15"
-    : "flex min-h-11 items-center rounded-lg px-3 text-sm text-primary/80 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
+    ? "flex min-h-11 items-center gap-2.5 rounded-lg bg-black/8 px-3 text-sm font-medium text-primary dark:bg-white/15"
+    : "flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm text-primary/80 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
 }
 
 type LandingTopNavProps = {
@@ -302,6 +347,7 @@ export default function LandingTopNav({
             active={active}
             reducedMotion={prefersReducedMotion}
           >
+            <NavIcon id={item.icon} />
             {item.label}
           </NavItemAnchor>
         </li>
@@ -329,6 +375,7 @@ export default function LandingTopNav({
             )
           }
         >
+          <NavIcon id={item.icon} />
           {item.label}
           <ChevronDown
             className={`h-3.5 w-3.5 transition-transform duration-300 ${
@@ -371,13 +418,14 @@ export default function LandingTopNav({
                     href={hrefForNav(child.href)}
                     className={
                       active
-                        ? "block rounded-lg bg-black/8 px-3 py-2 text-sm font-medium text-primary dark:bg-white/15"
-                        : "block rounded-lg px-3 py-2 text-sm text-primary/75 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10"
+                        ? "flex items-center gap-2.5 rounded-lg bg-black/8 px-3 py-2 text-sm font-medium text-primary dark:bg-white/15"
+                        : "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-primary/75 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10"
                     }
                     active={active}
                     reducedMotion={prefersReducedMotion}
                     onClick={closeAll}
                   >
+                    <NavIcon id={child.icon} className="h-4 w-4" />
                     {child.label}
                   </NavItemAnchor>
                 );
@@ -421,6 +469,7 @@ export default function LandingTopNav({
               reducedMotion={prefersReducedMotion}
               onClick={closeAll}
             >
+              <NavIcon id={item.icon} className="h-4 w-4" />
               {item.label}
             </NavItemAnchor>
           </motion.li>
@@ -463,6 +512,7 @@ export default function LandingTopNav({
                 reducedMotion={prefersReducedMotion}
                 onClick={closeAll}
               >
+                <NavIcon id={child.icon} className="h-4 w-4" />
                 {child.label}
               </NavItemAnchor>
             );
@@ -506,8 +556,11 @@ export default function LandingTopNav({
             {hero.wordmark}
           </Link>
 
+          {/* Optically centred between the wordmark and the wider right group
+              (theme toggle + Contact): -ml-8 balances the two gaps so the
+              links never touch Contact, even in the 720px scrolled pill. */}
           <nav
-            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
+            className="absolute left-1/2 top-1/2 -ml-8 hidden -translate-x-1/2 -translate-y-1/2 md:block"
             aria-label="Primary"
           >
             <ul className="flex items-center gap-1">

@@ -25,7 +25,6 @@ Canonical site: https://kunanonj.com
 | `/portfolio/node-validator-automation` | Node Validator Automation | Daily Avalanche L1 validator health report |
 | `/portfolio/email-signature-generator` | Email Signature Generator | Self-serve branded Gmail signatures |
 | `/portfolio/ai-automation` | AI Automation | AI agents for content ops and hiring |
-| `/press` | Press | Press card grid |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
 | `/learn` | Learn | Hub index → topics, writing, operator notes |

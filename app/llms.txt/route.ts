@@ -67,7 +67,6 @@ export async function GET() {
   textLines.push(`- Portfolio projects: ${base}/portfolio/[slug]`);
   textLines.push(`- Topic hubs (EN): ${base}/topics/[slug]`);
   textLines.push(`- Topic hubs (TH): ${base}/th/topics/[slug]`);
-  textLines.push(`- Press: ${base}/press`);
   textLines.push(`- Blog: ${base}/blog`);
   textLines.push(`- Learn: ${base}/learn`);
   textLines.push(`- Examples: ${base}/examples`);

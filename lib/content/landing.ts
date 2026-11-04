@@ -8,42 +8,58 @@ export const site = {
   tagline: "Building fintech and digital workspaces from Bangkok.",
 } as const;
 
-export type NavChild = { label: string; href: string };
+/** Icon keys for nav items; mapped to lucide icons in `LandingTopNav`. */
+export type NavIconId =
+  | "about"
+  | "ventures"
+  | "portfolio"
+  | "library"
+  | "blog"
+  | "learn"
+  | "examples"
+  | "stack"
+  | "proof"
+  | "build";
+
+export type NavChild = { label: string; href: string; icon?: NavIconId };
 
 export type NavItem =
-  | { type: "link"; label: string; href: string }
+  | { type: "link"; label: string; href: string; icon?: NavIconId }
   | {
       type: "menu";
       label: string;
       /** Optional parent href (e.g. section deep-link). */
       href?: string;
+      icon?: NavIconId;
       children: readonly NavChild[];
     };
 
 /** Human library pages (creed-style secondary IA) — home footer + Library nav menu */
 export const footerLibrary = [
-  { label: "Learn", href: "/learn" },
-  { label: "Examples", href: "/examples" },
-  { label: "Stack", href: "/stack" },
-  { label: "Proof", href: "/proof" },
-  { label: "Build", href: "/build" },
-] as const;
+  { label: "Learn", href: "/learn", icon: "learn" },
+  { label: "Examples", href: "/examples", icon: "examples" },
+  { label: "Stack", href: "/stack", icon: "stack" },
+  { label: "Proof", href: "/proof", icon: "proof" },
+  { label: "Build", href: "/build", icon: "build" },
+] as const satisfies readonly NavChild[];
 
 /** Primary chrome items (creed-style pill). Flat links + Library menu + Contact CTA. */
 export const primaryNav: readonly NavItem[] = [
-  { type: "link", label: "About", href: "/about" },
-  { type: "link", label: "Ventures", href: "/#ventures" },
-  { type: "link", label: "Portfolio", href: "/portfolio" },
+  { type: "link", label: "About", href: "/about", icon: "about" },
+  { type: "link", label: "Ventures", href: "/#ventures", icon: "ventures" },
+  { type: "link", label: "Portfolio", href: "/portfolio", icon: "portfolio" },
   {
     type: "menu",
     label: "Library",
+    icon: "library",
     children: footerLibrary.map((item) => ({
       label: item.label,
       href: item.href,
+      icon: item.icon,
     })),
   },
-  { type: "link", label: "Blog", href: "/blog" },
-  { type: "link", label: "Press", href: "/press" },
+  { type: "link", label: "Blog", href: "/blog", icon: "blog" },
+  // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
 
 export const navCta = { label: "Contact", href: "/contact" } as const;
@@ -58,7 +74,6 @@ export const nav = [
   { label: "Ventures", href: "/#ventures" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Blog", href: "/blog" },
-  { label: "Press", href: "/press" },
   { label: "Contact", href: "/contact" },
 ] as const;
 
