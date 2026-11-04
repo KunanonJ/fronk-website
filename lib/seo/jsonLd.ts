@@ -66,7 +66,7 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         url: BASE,
         email: siteConfig.email,
         image: `${BASE}/profile.jpg`,
-        jobTitle: "Founder",
+        jobTitle: ["Founder", "IT Manager", "AI Engineering Lead"],
         worksFor: orgs.map((o) => ({ "@id": o["@id"] })),
         knowsAbout: [...PERSON_KNOWS_ABOUT],
         address: {

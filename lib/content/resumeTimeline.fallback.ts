@@ -16,13 +16,14 @@ export interface ResolvedTimelineSection {
 
 const currentlyItems: readonly ResolvedTimelineItem[] = [
   {
-    title: "IT Manager",
+    title: "IT Manager & AI Engineering Lead",
     org: "The Binary Holdings · Full-time · On-site, Bangkok",
     logoName: "The Binary Holdings",
     logoDomain: "thebinaryholdings.com",
     period: "Nov 2025 — Present",
     bullets: [
       "Owning IT infrastructure and operations across the group.",
+      "Leading AI engineering: internal AI agents, automations and the intranet's AI assistant.",
     ],
   },
   {
