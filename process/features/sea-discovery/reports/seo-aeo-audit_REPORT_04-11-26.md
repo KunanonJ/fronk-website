@@ -36,7 +36,7 @@ The technical base is solid. Crawlers that don't run JS get real text and a sing
 - Long titles and descriptions: `/ventures/manut` (title 92 characters, description 173), `/about` (title 79 characters with the name twice; use `title.absolute`), and Portfolio descriptions (161 to 202 characters).
 - Venture SoftwareApplication JSON-LD: credit the Organization rather than the Person; no `offers` or rating, so it can't get a rich result; breadcrumb points at `/#ventures`.
 - Sitemap `lastmod` is a fixed 2026-07-19 for every static route, and `dateModified` always equals `datePublished`.
-- `rel="me"` lists gogocash.co (a product, not a profile), against the Phase 8 rule.
+- ~~`rel="me"` lists gogocash.co (a product, not a profile), against the Phase 8 rule.~~ Done 04-11-26: `IDENTITY_LINKS` in `lib/seo/identity.ts` lists profiles only, with a test.
 - Root-layout canonical leaks onto `/studio` and the 404 page (which also carries both `noindex` and `index, follow`). Remove the root canonical.
 - Portfolio: add CreativeWork JSON-LD (creator: Person). *(The Binary Holdings in `Person.worksFor`: done 04-11-26, added as an employer Organization without `founder`. `jobTitle` lists Founder, IT Manager and AI Engineering Lead.)*
 - Home weight: about 244 KB gzip JS across 11 scripts, 9 font preloads, and a 73 KB `manut.png` preloaded for a 40px logo.
