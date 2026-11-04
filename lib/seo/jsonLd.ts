@@ -34,7 +34,7 @@ function orgId(url: string): string {
 }
 
 /** One Organization node per venture the person founded — honest, from real venture data. */
-function organizations(): Record<string, unknown>[] {
+function foundedOrganizations(): Record<string, unknown>[] {
   return getAllVentures()
     .filter((v) => v.role.toLowerCase() === "founder")
     .map((v) => ({
@@ -47,9 +47,31 @@ function organizations(): Record<string, unknown>[] {
     }));
 }
 
+/** Employer the person works for but did not found, so no `founder` link. */
+export const EMPLOYER_ORGANIZATION = {
+  name: "The Binary Holdings",
+  url: "https://thebinaryholdings.com",
+} as const;
+
+function employerOrganizations(): Record<string, unknown>[] {
+  return [
+    {
+      "@type": "Organization",
+      "@id": orgId(EMPLOYER_ORGANIZATION.url),
+      name: EMPLOYER_ORGANIZATION.name,
+      url: EMPLOYER_ORGANIZATION.url,
+    },
+  ];
+}
+
+function organizations(): Record<string, unknown>[] {
+  return [...foundedOrganizations(), ...employerOrganizations()];
+}
+
 /**
  * The site-wide schema.org @graph: a Person (the knowledge-panel entity), a
- * WebSite, and the founded Organizations, cross-linked by @id. All values are
+ * WebSite, the founded Organizations and the employer Organization,
+ * cross-linked by @id. Person.worksFor references all of them. All values are
  * developer-controlled constants / real venture data — no XSS surface, no
  * fabricated claims.
  */

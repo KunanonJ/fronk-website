@@ -6,6 +6,7 @@ import {
   buildProfilePageJsonLd,
   buildSiteJsonLd,
   buildSoftwareApplicationJsonLd,
+  EMPLOYER_ORGANIZATION,
   PERSON_ID,
 } from "./jsonLd";
 
@@ -25,17 +26,33 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     expect(graph().filter((n) => n["@type"] === "Organization").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("links WebSite.publisher and every Organization.founder to the Person @id", () => {
+  it("links WebSite.publisher and every founded Organization.founder to the Person @id", () => {
     const personId = byType("Person")!["@id"];
     expect((byType("WebSite")!.publisher as Node)["@id"]).toBe(personId);
-    for (const org of graph().filter((n) => n["@type"] === "Organization")) {
+    const orgs = graph().filter((n) => n["@type"] === "Organization");
+    const founded = orgs.filter((o) => o.name !== EMPLOYER_ORGANIZATION.name);
+    expect(founded.length).toBeGreaterThanOrEqual(2);
+    for (const org of founded) {
       expect((org.founder as Node)["@id"]).toBe(personId);
+    }
+    for (const org of orgs) {
       expect(org.name).toBeTruthy();
       expect(String(org.url)).toMatch(/^https?:\/\//);
     }
   });
 
-  it("Person.worksFor references exactly the Organization @ids (honest, real ventures)", () => {
+  it("lists The Binary Holdings as an employer, not as a founded company", () => {
+    const tbh = graph().find(
+      (n) => n["@type"] === "Organization" && n.name === "The Binary Holdings",
+    );
+    expect(tbh).toBeDefined();
+    expect(tbh!.url).toBe("https://thebinaryholdings.com");
+    expect(tbh!.founder).toBeUndefined();
+    const worksFor = (byType("Person")!.worksFor as Node[]).map((w) => w["@id"]);
+    expect(worksFor).toContain(tbh!["@id"]);
+  });
+
+  it("Person.worksFor references exactly the Organization @ids (ventures + employer)", () => {
     const person = byType("Person")!;
     const orgIds = graph()
       .filter((n) => n["@type"] === "Organization")
