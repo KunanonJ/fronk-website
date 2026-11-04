@@ -1,6 +1,6 @@
 # Portfolio Page - Plan
 
-Status: DRAFT, awaiting approval (no code changed yet)
+Status: COMPLETED 04-11-26. Merged as #34 (squash `dd556d6`) and verified live: `/portfolio` and all 4 project pages 200, nav link present, `/.well-known/security.txt` 200. Archived in UPDATE PROCESS.
 Created: 04-11-26
 Plan type: SIMPLE (single plan, general folder)
 Harness note: `.claude/` and `process/context/` are absent in this checkout. Phases run directly in the main session per the Harness-Absent Fallback in `process/development-protocols/orchestration.md`.
@@ -130,6 +130,8 @@ Not touched: ventures content and pages, Sanity schemas, footer (Portfolio could
 | Image path | Temporary cover registered, dev server, then removed | Card and detail rendered it via `/_next/image`. Live site serves local images through `/_next/image` (200). |
 | Manual | Playwright screenshots: dark/light, 375 / 768 / 1024 / 1440px | Layout OK. Nav fits at 768px, top and scrolled. |
 | Visual | `playwright test visual.spec.ts` | NOT UPDATED (see deviations) |
+| Perf budget | `pnpm perf:budget` (CI step; missed locally on the first push) | First CI run FAILED: `/portfolio/ai-automation` 239.9 > 205 KB default. Fixed in `4ccca40` by budgeting `/portfolio*` as library pages (300 KB, like `/stack` 249.7). PASS: all `/portfolio` routes 239.6 KB. |
+| CI + live | PR #34 checks; production after merge | All checks green. Live: `/portfolio`, 4 slugs and `security.txt` return 200. |
 
 ## Deviations from plan
 

@@ -2,7 +2,7 @@
 
 **Date**: 04-11-26
 **Feature**: `sea-discovery`
-**Status**: DRAFT, awaiting approval (no code changed yet)
+**Status**: COMPLETED 04-11-26. Merged as #35 (squash `e5c9517`) and verified live: `/about` h1 "Kunanon Jarat", `/feed.xml` 15 items, Thai pages `lang="th"` + `og:locale` `th_TH`, RSS `<link rel="alternate">` in `<head>`. Archived in UPDATE PROCESS. Full audit: `../reports/seo-aeo-audit_REPORT_04-11-26.md`.
 **Branch**: `fix/seo-audit-p1` (from `main` at `8d62622`)
 **Source**: SEO/AEO audit run 04-11-26 against the live site plus code. Findings 4 to 8 were confirmed in code during research.
 **Harness note**: `.claude/` and `process/context/` are absent. Phases run in the main session per the Harness-Absent Fallback.
@@ -63,7 +63,8 @@ Five code fixes. Not in scope: owner/dashboard actions from the same audit (GSC/
 | HTML | `next start` + curl | `/about` h1 "Kunanon Jarat", new support line, FAQ JSON-LD Manut answer updated, 0 "solo entrepreneurs". `/th/topics/*`: `<main lang="th">` and `og:locale` `th_TH`; EN pillar unchanged. RSS `<link rel="alternate">` on `/`, `/about`, `/blog` and a Thai page. `/feed.xml` has 15 items with self link `/feed.xml`; `/rss.xml` returns 308 to `/feed.xml`. llms.txt, agents.md and footer point to `/feed.xml`. A fallback post renders `<a href="/ventures/manut">` and `<a href="/topics/erp-crm-internal-systems">`. |
 | Layout | Playwright screenshot of `/about` at 375 and 1440px | No horizontal overflow (h1 is 219px wide at 375px) |
 | Smoke e2e | `smoke.spec.ts` (desktop, tablet, mobile) | PASS 42/42 |
-| A11y e2e | `a11y.spec.ts` (desktop, tablet, mobile) | Fails on 12 routes with `color-contrast`, **pre-existing**: a per-route axe diff of live `main` vs this branch shows identical violations (0 added, 0 removed). Mostly small text at `text-primary/45` to `/50`. Earlier "passes" were timing: on a cold server, axe ran before scroll-reveal content became visible. Follow-up, out of scope here. |
+| A11y e2e | `a11y.spec.ts` (desktop, tablet, mobile) | Fails on 12 routes with `color-contrast`, **pre-existing**: a per-route axe diff of live `main` vs this branch shows identical violations (0 added, 0 removed). Mostly small text at `text-primary/45` to `/50`. Earlier "passes" were timing: on a cold server, axe ran before scroll-reveal content became visible. Follow-up, out of scope here. Fixed separately in #36 (`process/general-plans/completed/completed_a11y-contrast_PLAN_04-11-26.md`). |
+| CI + live | PR #35 checks; production after merge | All checks green, including perf budget (worst 286.6 of 300 KB). Live verified: see Status line. |
 
 ## Deviations
 
