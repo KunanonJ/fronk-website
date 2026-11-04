@@ -47,9 +47,10 @@ export type AboutStackGroup = {
 
 export const aboutPage = {
   hero: {
-    title: "Built for the curious",
+    /** The page h1: the person's name, so name queries match the heading. */
+    title: "Kunanon Jarat",
     support:
-      "Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on exciting updates.",
+      "Notes on building fintech, ERP/CRM and AI systems from Bangkok. New posts by email.",
     manifestoLabel: "Manifesto",
     manifestoHref: "#story",
   },
@@ -86,7 +87,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: ", an all-in-one AI workspace for solo entrepreneurs; and own IT operations at ",
+            text: ", an ERP/CRM workspace with Intelligence AI for automotive SMEs; and own IT operations at ",
           },
           {
             type: "link",

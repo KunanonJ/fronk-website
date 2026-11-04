@@ -20,7 +20,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "What is Manut AI?",
     answer:
-      'Manut AI is an all-in-one workspace for solo entrepreneurs — "Notion on steroids." It connects MongoDB, Meta, AI agents, and multiple AI models into one platform, so you run your whole operation in one place instead of stitching together a dozen SaaS tools.',
+      "Manut AI is an ERP/CRM workspace with Intelligence AI for SMEs in the automotive industry. It keeps operations, customers, and repeat decisions in one place instead of a dozen disconnected SaaS tools. Fronk is building it from Bangkok.",
   },
   {
     question: "What is Fronk's background?",

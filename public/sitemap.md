@@ -56,4 +56,4 @@ Canonical site: https://kunanonj.com
 * **Plain text for LLMs:** [/llms.txt](/llms.txt)
 * **Coding skills / prompts:** [/skills.md](/skills.md)
 * **XML sitemap:** [/sitemap.xml](/sitemap.xml)
-* **RSS:** [/rss.xml](/rss.xml)
+* **RSS:** [/feed.xml](/feed.xml)

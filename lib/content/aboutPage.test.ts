@@ -64,4 +64,17 @@ describe("aboutPage content", () => {
     expect(corpus).toContain("Manut");
     expect(corpus).toMatch(/Bangkok|Bangkok-based/i);
   });
+
+  it("uses the person's name as the page h1", () => {
+    expect(aboutPage.hero.title).toContain("Kunanon Jarat");
+  });
+
+  it("describes Manut the same way as the venture hub", () => {
+    const corpus = [
+      flattenSpans(aboutPage.story.paragraphs),
+      aboutPage.story.whoIs,
+    ].join(" ");
+    expect(corpus).not.toMatch(/solo entrepreneurs/i);
+    expect(corpus).toMatch(/ERP\/CRM workspace with Intelligence AI for automotive SMEs/);
+  });
 });
