@@ -43,6 +43,7 @@ Cinematic marketing shell stays `/` + `/showcase`.
 | 8 Entity pack | `phase-8_entity-pack_PLAN_13-09-26.md` | Person aliases, who-is, off-site drafts |
 | 9 Content merge | `phase-9_content-merge_PLAN_13-09-26.md` | Merge fallbacks + calendar posts 5–12 |
 | 10 Presence | `phase-10_presence_PLAN_13-09-26.md` | LinkedIn Articles + selective directories |
+| 11 Audit fixes | `phase-11_audit-fixes_PLAN_04-11-26.md` | 04-11-26 audit P1 code fixes: Manut copy, /about h1, Thai lang/locale, RSS feed + discovery, blog hub links |
 
 ## Out of scope
 
