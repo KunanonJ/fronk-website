@@ -8,6 +8,7 @@ import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { WebVitals } from "@/components/WebVitals";
 import RouteSplash from "@/components/landing/RouteSplash";
 import { siteConfig } from "@/lib/site";
+import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { resolveGscVerification } from "@/lib/seo/searchConsole";
 import { site as landingSite } from "@/lib/content/landing";
@@ -18,16 +19,6 @@ const gscVerification = resolveGscVerification(
 );
 
 const siteJsonLd: string = JSON.stringify(buildSiteJsonLd());
-
-const identityLinks: readonly string[] = [
-  `mailto:${siteConfig.email}`,
-  siteConfig.socials.x,
-  siteConfig.socials.linkedin,
-  siteConfig.socials.github,
-  siteConfig.socials.telegram,
-  siteConfig.socials.farcaster,
-  siteConfig.socials.website,
-];
 
 const hankenGrotesk = Hanken_Grotesk({
   variable: "--font-hanken",
@@ -118,7 +109,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="dns-prefetch" href="https://icons.duckduckgo.com" />
         <link rel="dns-prefetch" href="https://d8j0ntlcm91z4.cloudfront.net" />
         <link rel="dns-prefetch" href="https://images.higgs.ai" />
-        {identityLinks.map((href) => (
+        {IDENTITY_LINKS.map((href) => (
           <link key={href} rel="me" href={href} />
         ))}
         <ThemeProvider

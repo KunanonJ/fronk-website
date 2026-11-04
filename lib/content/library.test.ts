@@ -48,6 +48,14 @@ describe("proof content", () => {
       expect(card.href.length).toBeGreaterThan(0);
     }
   });
+
+  it("shows only venture case cards, no press items", () => {
+    for (const card of getProofCards()) {
+      expect(card.id, card.id).not.toMatch(/^press-/);
+      expect(card.href, card.id).toMatch(/^\/ventures\//);
+      expect(card.external, card.id).toBeFalsy();
+    }
+  });
 });
 
 describe("build board", () => {
