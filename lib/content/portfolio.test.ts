@@ -70,6 +70,58 @@ describe("portfolio content", () => {
   });
 });
 
+describe("portfolio visuals", () => {
+  it("gives every project a mockup, a workflow and an architecture", () => {
+    for (const p of projects) {
+      expect(p.mockup, p.slug).toBeDefined();
+      expect(p.workflow, p.slug).toBeDefined();
+      expect(p.architecture, p.slug).toBeDefined();
+    }
+  });
+
+  it("has workflows of 3+ named steps with unique labels", () => {
+    for (const p of projects) {
+      const steps = p.workflow?.steps ?? [];
+      expect(p.workflow?.title.trim(), p.slug).toBeTruthy();
+      expect(steps.length, p.slug).toBeGreaterThanOrEqual(3);
+      expect(new Set(steps.map((s) => s.label)).size, p.slug).toBe(steps.length);
+      for (const step of steps) expect(step.label.trim(), p.slug).not.toBe("");
+    }
+  });
+
+  it("has architectures of 2+ uniquely named layers, each with nodes", () => {
+    for (const p of projects) {
+      const layers = p.architecture?.layers ?? [];
+      expect(layers.length, p.slug).toBeGreaterThanOrEqual(2);
+      expect(new Set(layers.map((l) => l.label)).size, p.slug).toBe(layers.length);
+      for (const layer of layers) {
+        expect(layer.nodes.length, `${p.slug} ${layer.label}`).toBeGreaterThan(0);
+        const labels = layer.nodes.map((n) => n.label);
+        expect(new Set(labels).size, `${p.slug} ${layer.label}`).toBe(labels.length);
+      }
+    }
+  });
+
+  it("keeps mockup labels short and data-free (no digits)", () => {
+    for (const p of projects) {
+      const m = p.mockup;
+      if (!m) continue;
+      const texts =
+        m.kind === "app-shell"
+          ? [m.title, ...m.nav, ...m.tiles]
+          : m.kind === "email-report"
+            ? [m.subject, m.status, ...m.columns]
+            : m.kind === "form-preview"
+              ? [...m.fields, m.action]
+              : [m.title, ...m.columns];
+      for (const t of texts) {
+        expect(t.length, `${p.slug}: ${t}`).toBeLessThanOrEqual(28);
+        expect(t, `${p.slug}: ${t}`).not.toMatch(/\d/);
+      }
+    }
+  });
+});
+
 describe("portfolio helpers", () => {
   it("looks projects up by slug", () => {
     const first = projects[0]!;
