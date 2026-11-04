@@ -42,7 +42,7 @@ export default function LibraryPageShell({
         className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10"
       >
         <header className={`mx-auto mb-10 ${width} sm:mb-14`}>
-          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/60 sm:text-xs">
+          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
             {eyebrow}
           </p>
           <h1

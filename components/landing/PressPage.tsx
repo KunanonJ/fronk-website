@@ -13,7 +13,7 @@ import { expandHashHref } from "@/lib/landing/nav";
 
 function PressCard({ item }: { item: PressItem }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101010] transition-colors hover:border-white/25">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-primary/10 bg-surface transition-colors hover:border-primary/25">
       <a
         href={item.href}
         target="_blank"
@@ -31,7 +31,7 @@ function PressCard({ item }: { item: PressItem }) {
       </a>
 
       <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.16em] text-primary/50">
+        <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.16em] text-primary/70">
           <time dateTime={item.date}>{formatPressDate(item.date)}</time>
           {item.source ? <span>{item.source}</span> : null}
         </div>
@@ -56,7 +56,7 @@ function PressCard({ item }: { item: PressItem }) {
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group/cta inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-white/35 hover:bg-white/10"
+            className="group/cta inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/35 hover:bg-primary/10"
           >
             View
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5" />
@@ -83,7 +83,7 @@ export default function PressPage() {
 
       <main id="main" className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10">
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
-          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/60 sm:text-xs">
+          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
             {pressPage.eyebrow}
           </p>
           <h1

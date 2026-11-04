@@ -444,7 +444,7 @@ export default function LandingTopNav({
                 }
           }
         >
-          <p className="px-3 pt-2 text-[10px] uppercase tracking-[0.18em] text-primary/45">
+          <p className="px-3 pt-2 text-[10px] uppercase tracking-[0.18em] text-primary/70">
             {item.label}
           </p>
           {item.children.map((child) => {

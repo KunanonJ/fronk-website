@@ -46,7 +46,7 @@ export default function BlogPostPage({
         <article className="mx-auto max-w-3xl">
           <Link
             href="/blog"
-            className="text-xs text-primary/55 transition-colors hover:text-primary"
+            className="text-xs text-primary/70 transition-colors hover:text-primary"
           >
             ← Back to Blog
           </Link>
@@ -55,14 +55,14 @@ export default function BlogPostPage({
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <time
                 dateTime={publishedAt}
-                className="text-[10px] uppercase tracking-[0.16em] text-primary/50"
+                className="text-[10px] uppercase tracking-[0.16em] text-primary/70"
               >
                 {formatBlogDate(publishedAt)}
               </time>
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/60"
+                  className="rounded-full border border-primary/10 bg-primary/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/70"
                 >
                   {tag}
                 </span>
@@ -82,7 +82,7 @@ export default function BlogPostPage({
             </p>
           </header>
 
-          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10">
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-primary/10">
             <Image
               src={bannerSrc}
               alt={bannerAlt}
@@ -115,7 +115,7 @@ export default function BlogPostPage({
                 </p>
               ))
             ) : (
-              <p className="text-sm text-primary/60">
+              <p className="text-sm text-primary/70">
                 Full article body will appear here once published in Sanity
                 Studio. This fallback preview shows title, banner, tags, and
                 excerpt only.

@@ -24,7 +24,7 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
     >
       <DiscoveryAnalytics />
       <article className="mx-auto max-w-3xl px-5 pb-24 pt-16 sm:px-8 sm:pt-24">
-        <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/55">
+        <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/70">
           {pillar.locale === "th" ? "หัวข้อ" : "Topic"}
         </p>
         <h1

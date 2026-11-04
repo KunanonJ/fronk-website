@@ -61,11 +61,8 @@ function InfoCardBody({ card }: { card: InfoCard }) {
         className="mb-4 h-10 w-10 rounded object-cover sm:h-12 sm:w-12"
       />
 
-      <h3
-        className="mb-1 text-lg font-medium leading-snug sm:text-xl"
-        style={{ color: "#E1E0CC" }}
-      >
-        <span className="mr-2 text-sm text-primary/60">{card.number}</span>
+      <h3 className="mb-1 text-lg font-medium leading-snug text-primary sm:text-xl">
+        <span className="mr-2 text-sm text-primary/70">{card.number}</span>
         {card.title}
       </h3>
 
@@ -73,7 +70,9 @@ function InfoCardBody({ card }: { card: InfoCard }) {
         {card.items.map((item) => (
           <li key={item} className="flex items-start gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <span className="text-sm leading-snug text-gray-400">{item}</span>
+            <span className="text-sm leading-snug text-gray-600 dark:text-gray-400">
+              {item}
+            </span>
           </li>
         ))}
       </ul>
@@ -132,7 +131,9 @@ export default function Features() {
               lineClassName="text-left"
               segments={[
                 { text: ventures.line1, className: "text-primary" },
-                { text: ventures.line2, className: "text-gray-500" },
+                // Muted second line: /70 clears 4.5:1 on both canvases at
+                // mobile size (gray-500 measured about 4.3:1 on black).
+                { text: ventures.line2, className: "text-primary/70" },
               ]}
             />
           </h2>
@@ -167,7 +168,7 @@ export default function Features() {
               <FeatureCard
                 key={card.title}
                 index={index + 1}
-                className="min-h-0 bg-[#212121]"
+                className="min-h-0 bg-surface dark:bg-[#212121]"
               >
                 <InfoCardBody card={card} />
               </FeatureCard>
@@ -203,7 +204,7 @@ export default function Features() {
               <FeatureCard
                 key={card.title}
                 index={index}
-                className="h-full bg-[#212121]"
+                className="h-full bg-surface dark:bg-[#212121]"
               >
                 <InfoCardBody card={card} />
               </FeatureCard>

@@ -241,7 +241,7 @@ export default function FormaContactPage() {
 
                     <div className="flex items-center gap-3">
                       <div className="h-px flex-1 bg-gray-200" />
-                      <span className="text-sm font-medium text-gray-400">
+                      <span className="text-sm font-medium text-gray-600">
                         OR
                       </span>
                       <div className="h-px flex-1 bg-gray-200" />

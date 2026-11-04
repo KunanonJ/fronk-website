@@ -14,7 +14,7 @@ function LearnCard({ item }: { item: LearnLink }) {
   return (
     <Link
       href={item.href}
-      className="group flex flex-col rounded-2xl border border-white/10 bg-[#101010] p-5 transition-colors hover:border-white/25 sm:p-6"
+      className="group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6"
     >
       <h3 className="text-base font-medium text-primary sm:text-lg">
         {item.title}

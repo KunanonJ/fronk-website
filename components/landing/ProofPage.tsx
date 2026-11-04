@@ -25,13 +25,13 @@ export default function ProofPage() {
           {metrics.map((metric) => (
             <li
               key={`${metric.source}-${metric.label}`}
-              className="rounded-2xl border border-white/10 bg-[#101010] px-4 py-5"
+              className="rounded-2xl border border-primary/10 bg-surface px-4 py-5"
             >
               <p className="text-2xl font-medium text-primary sm:text-3xl">
                 {metric.value}
               </p>
               <p className="mt-1 text-sm text-primary/70">{metric.label}</p>
-              <p className="mt-2 text-[10px] uppercase tracking-[0.14em] text-primary/40">
+              <p className="mt-2 text-[10px] uppercase tracking-[0.14em] text-primary/70">
                 {metric.source}
               </p>
             </li>
@@ -42,11 +42,11 @@ export default function ProofPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => {
           const className =
-            "group flex flex-col rounded-2xl border border-white/10 bg-[#101010] p-5 transition-colors hover:border-white/25 sm:p-6";
+            "group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6";
           const inner = (
             <>
               {card.source ? (
-                <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-primary/45">
+                <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-primary/70">
                   {card.source}
                 </p>
               ) : null}

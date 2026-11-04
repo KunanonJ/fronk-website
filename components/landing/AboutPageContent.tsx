@@ -63,7 +63,7 @@ function RichParagraphs({
 
 function SectionEyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/55 sm:text-xs">
+    <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
       {children}
     </p>
   );
@@ -117,7 +117,7 @@ export default function AboutPageContent() {
         <section
           id={principles.id}
           aria-labelledby="about-principles-heading"
-          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{principles.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-principles-heading">
@@ -127,7 +127,7 @@ export default function AboutPageContent() {
             {principles.items.map((item) => (
               <li
                 key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6"
+                className="rounded-2xl border border-primary/10 bg-white/[0.03] p-5 sm:p-6"
               >
                 <p className="text-base font-medium text-primary sm:text-lg">
                   {item.title}
@@ -144,7 +144,7 @@ export default function AboutPageContent() {
         <section
           id={now.id}
           aria-labelledby="about-now-heading"
-          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{now.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-now-heading">{now.heading}</SectionHeading>
@@ -157,7 +157,7 @@ export default function AboutPageContent() {
         <section
           id={stack.id}
           aria-labelledby="about-stack-heading"
-          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{stack.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-stack-heading">
@@ -169,14 +169,14 @@ export default function AboutPageContent() {
           <div className="space-y-8">
             {stack.groups.map((group) => (
               <div key={group.label}>
-                <p className="mb-3 text-[10px] uppercase tracking-[0.18em] text-primary/45">
+                <p className="mb-3 text-[10px] uppercase tracking-[0.18em] text-primary/70">
                   {group.label}
                 </p>
                 <ul className="flex flex-wrap gap-2.5">
                   {group.items.map((item) => (
                     <li
                       key={item.name}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-2 pl-2.5 pr-4"
+                      className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 py-2 pl-2.5 pr-4"
                     >
                       <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <StackBrandIcon
@@ -188,7 +188,7 @@ export default function AboutPageContent() {
                       <span className="text-sm font-medium text-primary">
                         {item.name}
                       </span>
-                      <span className="text-xs text-primary/50">
+                      <span className="text-xs text-primary/70">
                         {item.detail}
                       </span>
                     </li>
@@ -212,7 +212,7 @@ export default function AboutPageContent() {
         <section
           id={path.id}
           aria-labelledby="about-path-heading"
-          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{path.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-path-heading">{path.heading}</SectionHeading>
@@ -220,12 +220,12 @@ export default function AboutPageContent() {
             {path.chips.map((chip) => (
               <li
                 key={chip.label}
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2"
+                className="rounded-full border border-primary/15 bg-primary/5 px-4 py-2"
               >
                 <span className="text-sm font-medium text-primary">
                   {chip.label}
                 </span>
-                <span className="ml-2 text-xs text-primary/50">
+                <span className="ml-2 text-xs text-primary/70">
                   {chip.detail}
                 </span>
               </li>
@@ -246,7 +246,7 @@ export default function AboutPageContent() {
         <section
           id={faq.id}
           aria-labelledby="about-faq-heading"
-          className="mt-16 border-t border-white/10 pt-16 sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{faq.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-faq-heading">{faq.heading}</SectionHeading>
@@ -254,7 +254,7 @@ export default function AboutPageContent() {
             {FAQ_ITEMS.map((item) => (
               <div
                 key={item.question}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6"
+                className="rounded-2xl border border-primary/10 bg-white/[0.03] p-5 sm:p-6"
               >
                 <dt className="text-base font-medium text-primary">
                   {item.question}
@@ -270,7 +270,7 @@ export default function AboutPageContent() {
         {/* CTA */}
         <section
           aria-labelledby="about-cta-heading"
-          className="mt-16 border-t border-white/10 pt-16 text-center sm:mt-20 sm:pt-20"
+          className="mt-16 border-t border-primary/10 pt-16 text-center sm:mt-20 sm:pt-20"
         >
           <SectionEyebrow>{cta.eyebrow}</SectionEyebrow>
           <h2
@@ -291,7 +291,7 @@ export default function AboutPageContent() {
                 className={
                   index === 0
                     ? "inline-flex items-center gap-2 rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
-                    : "inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:border-white/40 hover:bg-white/10"
+                    : "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
                 }
               >
                 {link.label}
