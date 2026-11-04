@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveBlogCards } from "@/lib/content/blog";
+import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
@@ -10,6 +11,7 @@ export const revalidate = 3600;
 
 export async function GET() {
   const ventures = getAllVentures();
+  const portfolio = getAllPortfolioProjects();
   const posts = await fetchAllPosts();
   const cards = resolveBlogCards(posts);
   const topics = getAllTopicPillars("en");
@@ -61,6 +63,8 @@ export async function GET() {
   textLines.push(`- About: ${base}/about`);
   textLines.push(`- Ventures index: ${base}/ventures (redirects to ${base}/#ventures)`);
   textLines.push(`- Venture hubs: ${base}/ventures/[slug]`);
+  textLines.push(`- Portfolio: ${base}/portfolio`);
+  textLines.push(`- Portfolio projects: ${base}/portfolio/[slug]`);
   textLines.push(`- Topic hubs (EN): ${base}/topics/[slug]`);
   textLines.push(`- Topic hubs (TH): ${base}/th/topics/[slug]`);
   textLines.push(`- Press: ${base}/press`);
@@ -96,6 +100,18 @@ export async function GET() {
     textLines.push(`- **Status:** ${v.status.toUpperCase()}`);
     textLines.push(`- **Stack:** ${v.stack.join(", ")}`);
     textLines.push(`- **Summary:** ${v.description}`);
+    textLines.push("");
+  }
+
+  textLines.push("## Portfolio (internal tools built at The Binary Holdings)");
+  textLines.push("");
+  for (const p of portfolio) {
+    textLines.push(`### ${p.name} (${p.year})`);
+    textLines.push(`- **Project page:** ${base}/portfolio/${p.slug}`);
+    textLines.push(`- **Tagline:** ${p.tagline}`);
+    textLines.push(`- **Role:** ${p.role}, ${p.organization}`);
+    textLines.push(`- **Stack:** ${p.stack.join(", ")}`);
+    textLines.push(`- **Summary:** ${p.summary}`);
     textLines.push("");
   }
 

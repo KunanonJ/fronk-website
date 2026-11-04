@@ -33,6 +33,7 @@ export const footerLibrary = [
 export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "About", href: "/about" },
   { type: "link", label: "Ventures", href: "/#ventures" },
+  { type: "link", label: "Portfolio", href: "/portfolio" },
   {
     type: "menu",
     label: "Library",
@@ -55,6 +56,7 @@ export const nav = [
   { label: "KunanonJ", href: "/" },
   { label: "About", href: "/about" },
   { label: "Ventures", href: "/#ventures" },
+  { label: "Portfolio", href: "/portfolio" },
   { label: "Blog", href: "/blog" },
   { label: "Press", href: "/press" },
   { label: "Contact", href: "/contact" },

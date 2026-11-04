@@ -20,6 +20,11 @@ Canonical site: https://kunanonj.com
 | `/ventures` | Ventures index | → home `#ventures` |
 | `/ventures/manut` | Manut case hub | ERP/CRM + Intelligence AI |
 | `/ventures/gogocash` | GoGoCash case hub | Fintech cashback |
+| `/portfolio` | Portfolio | Project card grid (internal tools built at The Binary Holdings) |
+| `/portfolio/tbh-intranet` | TBH Intranet | Back-office platform: HR, approvals, Thai accounting, CRMs, AI assistant |
+| `/portfolio/node-validator-automation` | Node Validator Automation | Daily Avalanche L1 validator health report |
+| `/portfolio/email-signature-generator` | Email Signature Generator | Self-serve branded Gmail signatures |
+| `/portfolio/ai-automation` | AI Automation | AI agents for content ops and hiring |
 | `/press` | Press | Press card grid |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
