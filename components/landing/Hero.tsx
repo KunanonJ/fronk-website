@@ -35,8 +35,11 @@ export default function Hero() {
         <div className="absolute bottom-0 left-0 right-0 z-10 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 md:p-8 lg:p-10">
           <div className="grid grid-cols-12 items-end gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 min-w-0 lg:col-span-8">
+              {/* lg is 14.5vw, not 16vw: at 1024-1279px the 16vw wordmark ran
+                  11-19px into the lede column once the pull-up animation laid
+                  the letters out (measured 04-11-26). xl's 15vw already clears it. */}
               <h1
-                className="max-w-full overflow-visible font-medium leading-[0.85] tracking-[-0.07em] text-[clamp(2.75rem,18vw,9rem)] sm:text-[20vw] md:text-[18vw] lg:text-[16vw] xl:text-[15vw]"
+                className="max-w-full overflow-visible font-medium leading-[0.85] tracking-[-0.07em] text-[clamp(2.75rem,18vw,9rem)] sm:text-[20vw] md:text-[18vw] lg:text-[14.5vw] xl:text-[15vw]"
                 style={{ color: "#E1E0CC" }}
               >
                 <WordsPullUp text={hero.wordmark} showAsterisk={false} />
