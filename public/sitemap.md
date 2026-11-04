@@ -30,7 +30,7 @@ Canonical site: https://kunanonj.com
 | `/learn` | Learn | Hub index → topics, writing, operator notes |
 | `/examples` | Examples | Persona scenario cards (Builders / Operators / Founders) |
 | `/stack` | Stack | Tools table (Build / Ship / Operate) |
-| `/proof` | Proof | Venture metrics + press/case evidence |
+| `/proof` | Proof | Venture metrics + case studies |
 | `/build` | Build | Thin public board (Next / In progress / Shipped) |
 | `/contact` | Contact | Contact + form |
 | `/showcase` | Showcase | Creative studio showcase |

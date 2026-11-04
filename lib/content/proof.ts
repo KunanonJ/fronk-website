@@ -1,4 +1,3 @@
-import { pressItems } from "@/lib/content/press";
 import { getAllVentures } from "@/lib/content/ventures";
 
 export type ProofMetric = {
@@ -20,7 +19,7 @@ export const proofPage = {
   eyebrow: "Proof",
   title: "Proof",
   description:
-    "Honest signals — venture metrics and selected mentions. No invented scores.",
+    "Honest signals — venture metrics and case studies. No invented scores.",
 } as const;
 
 /** Flatten published venture metrics for the proof strip. */
@@ -38,17 +37,12 @@ export function getProofMetrics(): readonly ProofMetric[] {
   return out;
 }
 
-/** Press + venture case links as proof cards. */
+/**
+ * Venture case links as proof cards. Press items were removed 04-11-26
+ * (owner request): they linked to the owner's own sites, not real coverage,
+ * and /press is hidden.
+ */
 export function getProofCards(): readonly ProofCard[] {
-  const pressCards: ProofCard[] = pressItems.map((item) => ({
-    id: `press-${item.id}`,
-    title: item.title,
-    description: item.description,
-    href: item.href,
-    external: true,
-    source: item.source,
-  }));
-
   const ventureCards: ProofCard[] = getAllVentures()
     .filter((v) => v.caseStudy)
     .map((v) => ({
@@ -59,5 +53,5 @@ export function getProofCards(): readonly ProofCard[] {
       source: "Venture",
     }));
 
-  return [...ventureCards, ...pressCards];
+  return ventureCards;
 }
