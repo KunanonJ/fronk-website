@@ -11,9 +11,12 @@
  *      16:10 crops look best on cards; any size works on the detail page.
  *   2. Register them on the project below as `cover` and/or `gallery` with
  *      `src: "/portfolio/<slug>/<file>"`, a real `alt`, and pixel `width`/`height`.
- *   Until a `cover` is set, cards and detail pages show a typographic placeholder.
+ *   Until a `cover` is set, cards and the detail hero show the code-drawn
+ *   `mockup` (or a typographic placeholder if there is none).
  *   `portfolio.test.ts` fails if a registered image file is missing.
  */
+
+import type { VisualIconId } from "@/lib/content/visualIcons";
 
 export interface PortfolioImage {
   /** Site-relative path under `/portfolio/<slug>/`. */
@@ -22,6 +25,53 @@ export interface PortfolioImage {
   width: number;
   height: number;
 }
+
+/**
+ * Diagrams drawn in code (see `components/landing/portfolio/`). Same honesty
+ * rule as the copy: steps and components restate what the project's source
+ * shows; mockups hold no real data and are captioned as illustrative.
+ */
+export interface PortfolioWorkflowStep {
+  label: string;
+  detail?: string;
+  icon?: VisualIconId;
+}
+
+export interface PortfolioWorkflow {
+  /** Short name for the flow, e.g. "Approval flow". */
+  title: string;
+  steps: readonly PortfolioWorkflowStep[];
+}
+
+export interface PortfolioArchitectureNode {
+  label: string;
+  note?: string;
+  icon?: VisualIconId;
+}
+
+export interface PortfolioArchitecture {
+  /** Top to bottom: who uses it, then the app, services, and hosting. */
+  layers: readonly {
+    label: string;
+    nodes: readonly PortfolioArchitectureNode[];
+  }[];
+}
+
+export type PortfolioMockup =
+  | {
+      kind: "app-shell";
+      title: string;
+      nav: readonly string[];
+      tiles: readonly string[];
+    }
+  | {
+      kind: "email-report";
+      subject: string;
+      status: string;
+      columns: readonly string[];
+    }
+  | { kind: "form-preview"; fields: readonly string[]; action: string }
+  | { kind: "review-queue"; title: string; columns: readonly string[] };
 
 export interface PortfolioProject {
   slug: string;
@@ -46,6 +96,10 @@ export interface PortfolioProject {
   sections: readonly { heading: string; body: string }[];
   cover?: PortfolioImage;
   gallery?: readonly PortfolioImage[];
+  /** Illustrative UI; used as the cover until a screenshot is registered. */
+  mockup?: PortfolioMockup;
+  workflow?: PortfolioWorkflow;
+  architecture?: PortfolioArchitecture;
 }
 
 export const portfolioPage = {
@@ -68,6 +122,62 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "May to Oct 2026",
     year: 2026,
     access: "internal",
+    mockup: {
+      kind: "app-shell",
+      title: "Intranet",
+      nav: ["Dashboard", "HR", "Approvals", "Accounting", "CRM", "ARIA"],
+      tiles: ["Leave requests", "Pending approvals", "Expenses", "Company news"],
+    },
+    workflow: {
+      title: "Approval flow",
+      steps: [
+        { label: "Submit a request", detail: "Leave, travel or expense", icon: "filetext" },
+        { label: "Approval chain", detail: "Each approver signs off in turn", icon: "listchecks" },
+        { label: "Recorded", detail: "Lands in the HR or accounting module", icon: "database" },
+        { label: "Notified", detail: "Requester hears back in the app and by push", icon: "bell" },
+      ],
+    },
+    architecture: {
+      layers: [
+        {
+          label: "Users",
+          nodes: [{ label: "Staff", note: "Browser, installable web app", icon: "users" }],
+        },
+        {
+          label: "Web app",
+          nodes: [
+            { label: "Next.js 16", note: "React 19", icon: "nextdotjs" },
+            { label: "Tailwind CSS 4", icon: "tailwindcss" },
+            { label: "shadcn/ui", icon: "shadcnui" },
+          ],
+        },
+        {
+          label: "API",
+          nodes: [
+            { label: "Express 5", note: "Zod validation", icon: "express" },
+            { label: "Socket.IO", note: "Real-time features", icon: "socketdotio" },
+          ],
+        },
+        {
+          label: "Services",
+          nodes: [
+            { label: "PostgreSQL", note: "On Supabase, via Prisma", icon: "postgresql" },
+            { label: "Supabase Auth + Storage", icon: "supabase" },
+            { label: "Google Gemini", note: "ARIA assistant, embedding search", icon: "googlegemini" },
+            { label: "Claude", note: "ARIA assistant", icon: "anthropic" },
+            { label: "Integrations", note: "Gmail, Sheets, Bank of Thailand FX rates, PostHog", icon: "network" },
+          ],
+        },
+        {
+          label: "Build + hosting",
+          nodes: [
+            { label: "Turborepo", note: "Monorepo", icon: "turborepo" },
+            { label: "Vercel", note: "Hosting + cron", icon: "vercel" },
+            { label: "GitHub Actions", note: "CI with Vitest + Playwright", icon: "githubactions" },
+          ],
+        },
+      ],
+    },
     stack: [
       "Next.js 16",
       "React 19",
@@ -119,6 +229,49 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "May to Sep 2026",
     year: 2026,
     access: "internal",
+    mockup: {
+      kind: "email-report",
+      subject: "Validator health report",
+      status: "All validators healthy",
+      columns: ["Validator", "Balance", "Runway", "Status"],
+    },
+    workflow: {
+      title: "Daily run",
+      steps: [
+        { label: "Scheduled run", detail: "GitHub Actions, every morning Bangkok time", icon: "clock" },
+        { label: "Read validators", detail: "Current set from the P-Chain over JSON-RPC", icon: "server" },
+        { label: "Compare with yesterday", detail: "Burn rate and days of runway", icon: "trendingdown" },
+        { label: "Check alert rules", detail: "Low balance, short runway, inactive, sharp drop", icon: "shieldalert" },
+        { label: "Email the report", detail: "Resend, with a fallback if sending fails", icon: "mail" },
+        { label: "Save the snapshot", detail: "Committed to the repo as an audit trail", icon: "gitcommit" },
+      ],
+    },
+    architecture: {
+      layers: [
+        {
+          label: "Trigger",
+          nodes: [{ label: "GitHub Actions", note: "Daily cron", icon: "githubactions" }],
+        },
+        {
+          label: "Job",
+          nodes: [{ label: "Node.js script", note: "Built-in modules only, no dependencies", icon: "nodedotjs" }],
+        },
+        {
+          label: "Data in",
+          nodes: [
+            { label: "Avalanche P-Chain", note: "JSON-RPC over HTTPS", icon: "network" },
+            { label: "Yesterday's snapshot", note: "JSON file", icon: "filetext" },
+          ],
+        },
+        {
+          label: "Out",
+          nodes: [
+            { label: "Resend", note: "HTML + plain-text email", icon: "resend" },
+            { label: "Git history", note: "Daily JSON snapshots", icon: "github" },
+          ],
+        },
+      ],
+    },
     stack: [
       "Node.js",
       "JavaScript",
@@ -157,6 +310,47 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "Sep 2026",
     year: 2026,
     access: "internal",
+    mockup: {
+      kind: "form-preview",
+      fields: ["Name", "Title", "Email", "Phone", "Company"],
+      action: "Copy signature",
+    },
+    workflow: {
+      title: "From form to Gmail",
+      steps: [
+        { label: "Pick the company", detail: "Or open a company-specific link", icon: "building" },
+        { label: "Fill in details", detail: "Checked as you type", icon: "pen" },
+        { label: "Live preview", detail: "Email-safe HTML with 2x images", icon: "eye" },
+        { label: "Copy", detail: "Rich text, plain-text fallback, or raw HTML for IT", icon: "copy" },
+        { label: "Paste into Gmail", detail: "Into the signature settings", icon: "mail" },
+      ],
+    },
+    architecture: {
+      layers: [
+        {
+          label: "Browser",
+          nodes: [
+            { label: "Single HTML page", note: "Nothing typed leaves the browser", icon: "html5" },
+            { label: "CSS", icon: "css" },
+            { label: "JavaScript", icon: "javascript" },
+          ],
+        },
+        {
+          label: "Assets",
+          nodes: [
+            { label: "Python build script", note: "Pillow + librsvg render the PNGs", icon: "python" },
+            { label: "Permanent image URLs", note: "Gmail only shows public HTTPS images", icon: "image" },
+          ],
+        },
+        {
+          label: "Hosting",
+          nodes: [
+            { label: "GitHub Pages", icon: "githubpages" },
+            { label: "GitHub Actions", note: "Deploy + daily image check", icon: "githubactions" },
+          ],
+        },
+      ],
+    },
     stack: [
       "HTML",
       "CSS",
@@ -199,6 +393,61 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "Mar to Apr 2026",
     year: 2026,
     access: "internal",
+    mockup: {
+      kind: "review-queue",
+      title: "Clip review queue",
+      columns: ["Clip", "Title", "Score", "Approve"],
+    },
+    workflow: {
+      title: "Fando clip pipeline",
+      steps: [
+        { label: "Find clips", detail: "YouTube, Instagram, TikTok, Twitch and X", icon: "search" },
+        { label: "Gemini review", detail: "Real match content? Writes title and caption", icon: "sparkles" },
+        { label: "Skip duplicates", detail: "Perceptual image hashing", icon: "layers" },
+        { label: "Human approval", detail: "Approve column in a Google Sheet", icon: "usercheck" },
+        { label: "Trim and store", detail: "ffmpeg, 29-second cap, Cloud Storage", icon: "scissors" },
+        { label: "Publish", detail: "Playwright posts to the CMS and checks it is live", icon: "send" },
+      ],
+    },
+    architecture: {
+      layers: [
+        {
+          label: "Sources",
+          nodes: [
+            { label: "YouTube Data API", icon: "video" },
+            { label: "Apify", note: "Instagram", icon: "globe" },
+            { label: "yt-dlp", note: "Downloads", icon: "video" },
+          ],
+        },
+        {
+          label: "Agents",
+          nodes: [
+            { label: "Python agents", note: "Google Agent Development Kit", icon: "python" },
+            { label: "Vertex AI Agent Engine", note: "Deployment target", icon: "googlecloud" },
+          ],
+        },
+        {
+          label: "AI",
+          nodes: [{ label: "Gemini", note: "Relevance, titles, captions", icon: "googlegemini" }],
+        },
+        {
+          label: "Human in the loop",
+          nodes: [{ label: "Google Sheets", note: "Approval queue", icon: "googlesheets" }],
+        },
+        {
+          label: "Media + publishing",
+          nodes: [
+            { label: "ffmpeg", note: "Trim", icon: "ffmpeg" },
+            { label: "Cloud Storage", icon: "googlecloud" },
+            { label: "Playwright", note: "Browser publishing to the CMS", icon: "monitor" },
+          ],
+        },
+        {
+          label: "Also in the repo",
+          nodes: [{ label: "Recruitment agent", note: "FastAPI, Supabase, Resend", icon: "fastapi" }],
+        },
+      ],
+    },
     stack: [
       "Python",
       "Google ADK",

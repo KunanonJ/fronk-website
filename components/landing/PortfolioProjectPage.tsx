@@ -3,6 +3,11 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
 import PortfolioCover from "@/components/landing/PortfolioCover";
+import PortfolioArchitecture from "@/components/landing/portfolio/PortfolioArchitecture";
+import PortfolioMockup, {
+  MockupStage,
+} from "@/components/landing/portfolio/PortfolioMockup";
+import PortfolioWorkflow from "@/components/landing/portfolio/PortfolioWorkflow";
 import {
   getAdjacentPortfolioProjects,
   type PortfolioProject,
@@ -47,7 +52,8 @@ export default function PortfolioProjectPage({
         All projects
       </Link>
 
-      {/* Only real screenshots here: a placeholder would repeat the header. */}
+      {/* Hero: the real screenshot, else the illustrative mockup. The initials
+          placeholder is never used here, since it would repeat the header. */}
       {project.cover ? (
         <PortfolioCover
           project={project}
@@ -55,6 +61,19 @@ export default function PortfolioProjectPage({
           sizes="(min-width: 1152px) 1152px, 100vw"
           className="rounded-2xl"
         />
+      ) : project.mockup ? (
+        <figure>
+          <MockupStage className="overflow-hidden rounded-2xl border border-primary/12 px-[6%] py-[5%]">
+            <PortfolioMockup
+              mockup={project.mockup}
+              label={`Illustrative mockup of ${project.name}`}
+              className="max-w-4xl drop-shadow-[0_16px_40px_rgba(0,0,0,0.2)]"
+            />
+          </MockupStage>
+          <figcaption className="mt-3 text-xs text-primary/70">
+            Illustrative mockup, not real data.
+          </figcaption>
+        </figure>
       ) : null}
 
       {project.gallery && project.gallery.length > 0 ? (
@@ -174,6 +193,24 @@ export default function PortfolioProjectPage({
           </section>
         </aside>
       </div>
+
+      {project.workflow ? (
+        <div className="mt-20">
+          <PortfolioWorkflow
+            workflow={project.workflow}
+            headingId="portfolio-workflow"
+          />
+        </div>
+      ) : null}
+
+      {project.architecture ? (
+        <div className="mt-20">
+          <PortfolioArchitecture
+            architecture={project.architecture}
+            headingId="portfolio-architecture"
+          />
+        </div>
+      ) : null}
 
       {prev && next ? (
         <nav

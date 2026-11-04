@@ -1,4 +1,7 @@
 import Image from "next/image";
+import PortfolioMockup, {
+  MockupStage,
+} from "@/components/landing/portfolio/PortfolioMockup";
 import type { PortfolioProject } from "@/lib/content/portfolio";
 
 const serif = {
@@ -28,10 +31,10 @@ type PortfolioCoverProps = {
 };
 
 /**
- * 16:10 cover. Renders the registered screenshot when present, otherwise a
- * placeholder tile (gradient + initials) built from theme tokens, so it works
- * in light and dark. The placeholder is decorative: the card always renders
- * the project name as real text, so it is hidden from assistive tech.
+ * 16:10 cover. Order of preference: the registered screenshot, then the
+ * code-drawn mockup, then a placeholder tile (gradient + initials). All built
+ * from theme tokens, so they work in light and dark. Mockup and placeholder are
+ * decorative: the card always renders the project name as real text.
  */
 export default function PortfolioCover({
   project,
@@ -54,6 +57,19 @@ export default function PortfolioCover({
           className="object-cover"
         />
       </div>
+    );
+  }
+
+  // No screenshot yet: show the code-drawn mockup. Decorative here, since the
+  // card renders the project name as text right below.
+  if (project.mockup) {
+    return (
+      <MockupStage className={`${frame} p-[6%]`}>
+        <PortfolioMockup
+          mockup={project.mockup}
+          className="drop-shadow-[0_12px_28px_rgba(0,0,0,0.18)]"
+        />
+      </MockupStage>
     );
   }
 
