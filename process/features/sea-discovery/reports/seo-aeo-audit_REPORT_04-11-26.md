@@ -38,7 +38,7 @@ The technical base is solid. Crawlers that don't run JS get real text and a sing
 - Sitemap `lastmod` is a fixed 2026-07-19 for every static route, and `dateModified` always equals `datePublished`.
 - `rel="me"` lists gogocash.co (a product, not a profile), against the Phase 8 rule.
 - Root-layout canonical leaks onto `/studio` and the 404 page (which also carries both `noindex` and `index, follow`). Remove the root canonical.
-- Portfolio: add CreativeWork JSON-LD (creator: Person) and The Binary Holdings in the Person's `worksFor`.
+- Portfolio: add CreativeWork JSON-LD (creator: Person). *(The Binary Holdings in `Person.worksFor`: done 04-11-26, added as an employer Organization without `founder`. `jobTitle` lists Founder, IT Manager and AI Engineering Lead.)*
 - Home weight: about 244 KB gzip JS across 11 scripts, 9 font preloads, and a 73 KB `manut.png` preloaded for a 40px logo.
 - Inferred, unverified: during ISR the sitemap and `/blog` omitted hello-world while llms.txt (force-dynamic) listed it. Sanity fetches during background revalidation may be returning empty. Check revalidation.
 
