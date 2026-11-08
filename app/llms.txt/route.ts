@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { resolveBlogCards } from "@/lib/content/blog";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
+import {
+  PACK_INSTALL,
+  SKILLS_REPO_URL,
+  SKILLS_TAG,
+  getAllSkills,
+} from "@/lib/content/skills";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
@@ -65,6 +71,8 @@ export async function GET() {
   textLines.push(`- Venture hubs: ${base}/ventures/[slug]`);
   textLines.push(`- Portfolio: ${base}/portfolio`);
   textLines.push(`- Portfolio projects: ${base}/portfolio/[slug]`);
+  textLines.push(`- Skills: ${base}/skills`);
+  textLines.push(`- Skill pages: ${base}/skills/[slug]`);
   textLines.push(`- Topic hubs (EN): ${base}/topics/[slug]`);
   textLines.push(`- Topic hubs (TH): ${base}/th/topics/[slug]`);
   textLines.push(`- Blog: ${base}/blog`);
@@ -113,11 +121,29 @@ export async function GET() {
     textLines.push("");
   }
 
+  const skills = getAllSkills();
+  textLines.push("## Skills (Superstacks agent skills, MIT)");
+  textLines.push("");
+  textLines.push(
+    `${skills.length} agent skills for Claude Code, Codex and Cursor from ${SKILLS_REPO_URL} (${SKILLS_TAG}). Machine-readable catalog: ${base}/skills.json`,
+  );
+  textLines.push(`- **Install (Claude Code):** \`${PACK_INSTALL.claudeCode.join("` then `")}\``);
+  textLines.push(`- **Install (npx):** \`${PACK_INSTALL.npx}\``);
+  textLines.push("");
+  for (const skill of skills) {
+    const origin = skill.source ? `adapted from ${skill.source.name}` : "original";
+    textLines.push(
+      `- [${skill.name}](${base}/skills/${skill.slug}) (${origin}, ${skill.license}): ${skill.description}`,
+    );
+  }
+  textLines.push("");
+
   textLines.push("## Agent & index surfaces");
   textLines.push(`- Agents: ${base}/agents.md`);
   textLines.push(`- Markdown sitemap: ${base}/sitemap.md`);
   textLines.push(`- XML sitemap: ${base}/sitemap.xml`);
-  textLines.push(`- Skills: ${base}/skills.md`);
+  textLines.push(`- Agent guide (coding skills for this site): ${base}/skills.md`);
+  textLines.push(`- Skills catalog (JSON): ${base}/skills.json`);
   textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push("");

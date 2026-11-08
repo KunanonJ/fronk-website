@@ -43,6 +43,16 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /AI Automation|How it works|Architecture/i,
   },
   {
+    path: "/skills",
+    name: "skills",
+    expectsHeadingPattern: /agent skills|Install the whole pack|verify-loop/i,
+  },
+  {
+    path: "/skills/verify-loop",
+    name: "skill-detail",
+    expectsHeadingPattern: /verify-loop|Install this skill|SKILL\.md/i,
+  },
+  {
     path: "/blog",
     name: "blog",
     expectsHeadingPattern: /Blog|Search posts|Read|GoGoCash|Manut|Bangkok/i,

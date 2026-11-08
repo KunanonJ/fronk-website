@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   BadgeCheck,
+  Blocks,
   BriefcaseBusiness,
   ChevronDown,
   GraduationCap,
@@ -47,12 +48,20 @@ import {
 } from "@/lib/landing/nav";
 
 const MENU_EASE = [0.22, 1, 0.36, 1] as const;
+
+/**
+ * Top-level desktop icons show from lg (1024px). With six links (Skills added
+ * 2026-11) the 768-1023px bar only clears the wordmark and Contact without
+ * them, and from lg the scrolled pill widens to 800px to keep >=23px clearance.
+ */
+const DESKTOP_ICON_CLASS = "hidden h-3.5 w-3.5 lg:block";
 const SCROLL_SHRINK_Y = 24;
 
 const NAV_ICONS = {
   about: UserRound,
   ventures: Rocket,
   portfolio: BriefcaseBusiness,
+  skills: Blocks,
   library: LibraryBig,
   blog: PenLine,
   learn: GraduationCap,
@@ -347,7 +356,7 @@ export default function LandingTopNav({
             active={active}
             reducedMotion={prefersReducedMotion}
           >
-            <NavIcon id={item.icon} />
+            <NavIcon id={item.icon} className={DESKTOP_ICON_CLASS} />
             {item.label}
           </NavItemAnchor>
         </li>
@@ -375,7 +384,7 @@ export default function LandingTopNav({
             )
           }
         >
-          <NavIcon id={item.icon} />
+          <NavIcon id={item.icon} className={DESKTOP_ICON_CLASS} />
           {item.label}
           <ChevronDown
             className={`h-3.5 w-3.5 transition-transform duration-300 ${
@@ -535,7 +544,7 @@ export default function LandingTopNav({
       <div
         ref={shellRef}
         className={`pointer-events-auto relative mx-auto w-full transition-[max-width] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          scrolled ? "max-w-[720px]" : "max-w-[880px]"
+          scrolled ? "max-w-[720px] lg:max-w-[800px]" : "max-w-[880px]"
         }`}
       >
         <div

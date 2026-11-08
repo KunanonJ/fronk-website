@@ -13,6 +13,7 @@ export type NavIconId =
   | "about"
   | "ventures"
   | "portfolio"
+  | "skills"
   | "library"
   | "blog"
   | "learn"
@@ -48,6 +49,7 @@ export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "About", href: "/about", icon: "about" },
   { type: "link", label: "Ventures", href: "/#ventures", icon: "ventures" },
   { type: "link", label: "Portfolio", href: "/portfolio", icon: "portfolio" },
+  { type: "link", label: "Skills", href: "/skills", icon: "skills" },
   {
     type: "menu",
     label: "Library",
@@ -73,6 +75,7 @@ export const nav = [
   { label: "About", href: "/about" },
   { label: "Ventures", href: "/#ventures" },
   { label: "Portfolio", href: "/portfolio" },
+  { label: "Skills", href: "/skills" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ] as const;
@@ -168,7 +171,9 @@ export const footerResources = [
   { label: "Agents", href: "/agents.md" },
   { label: "sitemap.md", href: "/sitemap.md" },
   { label: "llms.txt", href: "/llms.txt" },
-  { label: "skills.md", href: "/skills.md" },
+  // `/skills.md` is the coding guide for agents working on this site, not the
+  // `/skills` catalog, so it is labelled to keep the two apart.
+  { label: "Agent guide", href: "/skills.md" },
   { label: "feed.xml", href: "/feed.xml" },
 ] as const;
 

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { resolveBlogCards } from "@/lib/content/blog";
 import { getAllPortfolioSlugs } from "@/lib/content/portfolio";
+import { getAllSkillSlugs } from "@/lib/content/skills";
 import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
 import { getAllVentureSlugs } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
@@ -27,6 +28,12 @@ const STATIC_ROUTES: readonly {
     path: `/portfolio/${slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.7,
+  })),
+  { path: "/skills", changeFrequency: "monthly", priority: 0.8 },
+  ...getAllSkillSlugs().map((slug) => ({
+    path: `/skills/${slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
   })),
   ...TOPIC_SLUGS.map((slug) => ({
     path: `/topics/${slug}`,

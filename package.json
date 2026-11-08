@@ -59,6 +59,7 @@
     "test:e2e:update": "playwright test --update-snapshots",
     "analyze": "ANALYZE=true next build --webpack",
     "perf:budget": "node scripts/check-first-load-budget.mjs",
+    "skills:sync": "node scripts/sync-skills.mjs",
     "seed": "node scripts/seed-content.mjs",
     "pdf": "node scripts/generate-resume-pdf.mjs",
     "cron:revalidate": "node scripts/cron-revalidate.mjs",
