@@ -18,14 +18,9 @@ export const ROUTES: readonly RouteUnderTest[] = [
       /Kunanon Jarat|Founder,\s*Bangkok|GoGoCash|Manifesto|operating principles/i,
   },
   {
-    path: "/showcase",
-    name: "showcase",
-    expectsHeadingPattern: /Live Better|Start Today|KunanonJ/i,
-  },
-  {
     path: "/contact",
     name: "contact",
-    expectsHeadingPattern: /Say hello|Send my message|products/i,
+    expectsHeadingPattern: /Say hello|Send message|Let's talk/i,
   },
   {
     path: "/press",

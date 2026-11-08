@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
       { source: "/writing/:slug", destination: "/blog/:slug", permanent: true },
       { source: "/work", destination: "/#ventures", permanent: true },
       { source: "/rss.xml", destination: "/feed.xml", permanent: true },
+      // Retired 06-11-26: template wellness page, unrelated to the site (ux-experience Phase 0)
+      { source: "/showcase", destination: "/", permanent: true },
     ];
   },
   async headers() {

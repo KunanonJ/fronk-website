@@ -33,7 +33,6 @@ Canonical site: https://kunanonj.com
 | `/proof` | Proof | Venture metrics + case studies |
 | `/build` | Build | Thin public board (Next / In progress / Shipped) |
 | `/contact` | Contact | Contact + form |
-| `/showcase` | Showcase | Creative studio showcase |
 | `/resume` | Resume | CV; noindex |
 | `/studio` | Sanity Studio | CMS — not for public scraping |
 

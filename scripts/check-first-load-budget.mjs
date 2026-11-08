@@ -33,7 +33,6 @@ const MARKETING_BUDGET_KB = 300;
 
 const MARKETING_EXACT = new Set([
   "/",
-  "/showcase",
   "/about",
   "/contact",
   "/press",

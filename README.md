@@ -8,7 +8,7 @@
 
 Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
 and AI workspaces (GoGoCash, Manut, Airplusauto). Public marketing UI is a
-cinematic landing + showcase shell; resume and Sanity Studio remain as system
+cinematic landing shell; resume and Sanity Studio remain as system
 surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
 
 ```
@@ -22,7 +22,6 @@ Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
 ## Useful links
 
 - Live site: https://kunanonj.com
-- Showcase: https://kunanonj.com/showcase
 - GitHub repo: https://github.com/KunanonJ/fronk-website
 - Sanity Studio launcher: https://kunanonj.com/studio
 - Sitemap: https://kunanonj.com/sitemap.xml · https://kunanonj.com/sitemap.md
@@ -31,8 +30,8 @@ Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
 
 ## Highlights
 
-- Public marketing cutover: Home (`/`) + Showcase (`/showcase`) with Apple-style
-  multilingual intro (“Welcome to KunanonJ”).
+- Public marketing cutover: Home (`/`) with an Apple-style multilingual intro
+  (“Welcome to KunanonJ”). `/showcase` was retired on 06-11-26 and redirects to `/`.
 - Full-stack Next.js App Router on Cloudflare Workers via OpenNext.
 - Landing content is static and owner-editable in `lib/content/landing.ts`.
 - Sanity retained for Studio launcher and `/resume` (with static fallbacks).
@@ -67,7 +66,6 @@ Cloudflare Cron ---> /api/cron/revalidate
 | Path                                       | Source                         | Notes                                              |
 | ------------------------------------------ | ------------------------------ | -------------------------------------------------- |
 | `/`                                        | Static landing                 | Intro loader, Hero, About, Ventures, contact       |
-| `/showcase`                                | Static landing                 | Creative studio showcase (spotlight reveal)        |
 | `/resume`                                  | Sanity + fallback (ISR)        | CV; noindex                                        |
 | `/studio/[[...tool]]`                      | Sanity Studio launcher         | External Studio URL                                |
 | `/about`                                   | About page                     | “Built for the curious” (ex-`/stock/asme`)         |
@@ -234,7 +232,7 @@ Redeploy after setting `NEXT_PUBLIC_SITE_URL` so sitemap and OG URLs are correct
 
 ```bash
 curl -sS "https://kunanonj.com/" -o /dev/null -w "%{http_code}\n"            # 200
-curl -sS "https://kunanonj.com/showcase" -o /dev/null -w "%{http_code}\n"   # 200
+curl -sS "https://kunanonj.com/contact" -o /dev/null -w "%{http_code}\n"    # 200
 curl -sS "https://kunanonj.com/studio" -o /dev/null -w "%{http_code}\n"     # 200
 ```
 
@@ -254,12 +252,12 @@ variables are present.
 
 ```
 app/
-  (landing)/             # Public marketing shell (/ and /showcase)
+  (landing)/             # Public marketing shell (/ and marketing pages)
   (system)/resume/       # CV utility route
   api/                   # revalidate, draft, cron, subscribe
   studio/                # External Sanity Studio launcher
 components/
-  landing/               # IntroLoader, Hero, About, Features, Showcase
+  landing/               # IntroLoader, Hero, About, Features, page components
   layout/                # Legacy FogLAMP chrome (unused on landing)
   ui/                    # Shared primitives
 lib/
