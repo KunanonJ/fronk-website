@@ -45,12 +45,15 @@ const MARKETING_EXACT = new Set([
   // Portfolio (2026-11) uses LibraryPageShell like /stack and /proof: landing
   // nav + next/image card chrome on top of the RouteSplash floor.
   "/portfolio",
+  // Skills (2026-11): landing nav + small tabs/copy-button islands.
+  "/skills",
 ]);
 
 function isMarketingRoute(route) {
   if (MARKETING_EXACT.has(route)) return true;
   if (route.startsWith("/blog/")) return true;
   if (route.startsWith("/portfolio/")) return true;
+  if (route.startsWith("/skills/")) return true;
   return false;
 }
 

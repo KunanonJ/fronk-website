@@ -25,6 +25,8 @@ Canonical site: https://kunanonj.com
 | `/portfolio/node-validator-automation` | Node Validator Automation | Daily Avalanche L1 validator health report |
 | `/portfolio/email-signature-generator` | Email Signature Generator | Self-serve branded Gmail signatures |
 | `/portfolio/ai-automation` | AI Automation | AI agents for content ops and hiring |
+| `/skills` | Skills | Superstacks agent skills: install commands, ZIP downloads, credits |
+| `/skills/[slug]` | Skill | One skill: install tabs, SKILL.md source, files, credit (20 pages) |
 | `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
 | `/blog/[slug]` | Blog post | Long-form article |
 | `/learn` | Learn | Hub index → topics, writing, operator notes |
@@ -52,6 +54,7 @@ Canonical site: https://kunanonj.com
 
 * **Agents index:** [/agents.md](/agents.md)
 * **Plain text for LLMs:** [/llms.txt](/llms.txt)
-* **Coding skills / prompts:** [/skills.md](/skills.md)
+* **Agent guide (coding skills / prompts for this site):** [/skills.md](/skills.md)
+* **Skills catalog (JSON):** [/skills.json](/skills.json)
 * **XML sitemap:** [/sitemap.xml](/sitemap.xml)
 * **RSS:** [/feed.xml](/feed.xml)
