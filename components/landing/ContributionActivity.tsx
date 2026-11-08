@@ -69,7 +69,11 @@ export default function ContributionActivity() {
           : `Loading @${GITHUB_CONTRIBUTIONS_LOGIN}…`}
       </p>
 
+      {/* role="img": aria-label is prohibited on a role-less div, and with no
+          data (API down, no GITHUB_TOKEN) every day cell is aria-hidden, so the
+          label must sit on a role that takes a name. */}
       <div
+        role="img"
         className="activity-scroll overflow-x-auto pb-2"
         aria-label="GitHub contribution activity for the past year"
       >
