@@ -58,10 +58,10 @@ export const examplesByPersona: Record<
       ctaLabel: "See proof",
     },
     {
-      title: "Creative moments without derailing ops",
-      body: "Showcase holds richer motion; the home shell stays restrained so operators can still scan.",
-      href: "/showcase",
-      ctaLabel: "Open showcase",
+      title: "Internal tools, shown honestly",
+      body: "Portfolio pages describe what each internal tool does and what it runs on, with no invented clients or numbers.",
+      href: "/portfolio",
+      ctaLabel: "See portfolio",
     },
   ],
   Founders: [

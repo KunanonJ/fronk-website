@@ -74,7 +74,6 @@ export async function GET() {
   textLines.push(`- Proof: ${base}/proof`);
   textLines.push(`- Build: ${base}/build`);
   textLines.push(`- Contact: ${base}/contact`);
-  textLines.push(`- Showcase: ${base}/showcase`);
   textLines.push(`- Resume: ${base}/resume (noindex)`);
   textLines.push("");
 

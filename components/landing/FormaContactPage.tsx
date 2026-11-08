@@ -1,24 +1,19 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
-import { contact, socials } from "@/lib/content/landing";
+import {
+  CONTACT_LIMITS,
+  CONTACT_TOPICS,
+  contactMessages,
+  contactPage,
+  type ContactTopic,
+} from "@/lib/content/contact";
+import { socials } from "@/lib/content/landing";
 import { expandHashHref } from "@/lib/landing/nav";
 
 const VIDEO_URL =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260602_150901_c45b90ec-18d7-42ff-90e2-b95d7109e330.mp4";
-
-const SERVICES = [
-  "Website",
-  "Mobile App",
-  "Web App",
-  "E-Commerce",
-  "Visual Identity",
-  "3D & Motion",
-  "Digital Marketing",
-  "Growth & Consulting",
-  "Other",
-] as const;
 
 function TwitterIcon({ size = 13 }: { size?: number }) {
   return (
@@ -125,32 +120,64 @@ const SOCIAL_BUTTONS = [
 const inputClassName =
   "min-w-0 flex-1 rounded-xl border border-gray-200 bg-transparent px-3 py-2.5 text-sm text-black placeholder-gray-400 transition focus:border-transparent focus:ring-2 focus:ring-gray-900 focus:outline-none";
 
+
+type Status = "idle" | "sending" | "sent" | "error";
+
+const mailtoHref = `mailto:${contactPage.email}?subject=${encodeURIComponent(contactPage.mailtoSubject)}`;
+
 /**
- * Forma-style video contact landing. Served at `/contact` from landing nav.
+ * Video contact landing at `/contact`. The form posts to `/api/contact`, which
+ * emails the owner through Resend. Success is shown only after the server
+ * confirms; on failure the visitor keeps their text and gets a mailto fallback.
  */
 export default function FormaContactPage() {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [topics, setTopics] = useState<ContactTopic[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [company, setCompany] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState("");
+  const mountedAt = useRef<number | null>(null);
 
-  const toggleService = (service: string) => {
-    setSelected((prev) =>
-      prev.includes(service)
-        ? prev.filter((s) => s !== service)
-        : [...prev, service],
+  useEffect(() => {
+    mountedAt.current = performance.now();
+  }, []);
+
+  const toggleTopic = (topic: ContactTopic) => {
+    setTopics((prev) =>
+      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic],
     );
   };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (sending || sent) return;
-    setSending(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSending(false);
-    setSent(true);
+    if (status === "sending" || status === "sent") return;
+    setStatus("sending");
+    setError("");
+
+    const elapsedMs =
+      mountedAt.current === null ? null : performance.now() - mountedAt.current;
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message, topics, company, elapsedMs }),
+      });
+      const data = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+      if (response.ok && data?.ok) {
+        setStatus("sent");
+        return;
+      }
+      setError(data?.message ?? contactMessages.failed);
+    } catch {
+      setError(contactMessages.failed);
+    }
+    setStatus("error");
   };
 
   return (
@@ -179,10 +206,10 @@ export default function FormaContactPage() {
           <div className="min-h-[2rem] flex-1" />
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <p className="shrink-0 text-3xl leading-tight font-medium text-white drop-shadow-lg sm:text-4xl lg:max-w-lg xl:max-w-2xl xl:text-5xl">
-              We craft bold ideas
+            <p className="shrink-0 text-3xl leading-tight font-medium text-white drop-shadow-lg [text-shadow:0_1px_2px_rgb(0_0_0/0.55),0_2px_18px_rgb(0_0_0/0.45)] sm:text-4xl lg:max-w-lg xl:max-w-2xl xl:text-5xl">
+              {contactPage.headlineLead}
               <br />
-              and ship them as{" "}
+              {contactPage.headlineTail}{" "}
               <span
                 style={{
                   fontFamily:
@@ -191,38 +218,42 @@ export default function FormaContactPage() {
                   fontWeight: 400,
                 }}
               >
-                products
+                {contactPage.headlineAccent}
               </span>
             </p>
 
             <div className="w-full shrink-0 lg:w-[min(480px,45%)]">
               <div className="flex flex-col gap-4 overflow-hidden rounded-2xl bg-white p-4 shadow-2xl sm:rounded-3xl sm:p-6">
                 <h1 className="text-xl font-semibold tracking-tight text-black sm:text-2xl">
-                  Say hello! 👋
+                  {contactPage.cardTitle}
                 </h1>
 
-                {sent ? (
-                  <div className="flex flex-col items-center gap-3 py-6 text-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-xl text-green-700">
+                {status === "sent" ? (
+                  <div
+                    role="status"
+                    className="flex flex-col items-center gap-3 py-6 text-center"
+                  >
+                    <div
+                      aria-hidden
+                      className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-xl text-green-700"
+                    >
                       ✓
                     </div>
                     <p className="text-base font-semibold text-gray-900">
-                      You&apos;re all set!
+                      {contactPage.successTitle}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      Expect a reply within 24 hours.
-                    </p>
+                    <p className="text-sm text-gray-600">{contactPage.successBody}</p>
                   </div>
                 ) : (
                   <>
-                    <div className="flex flex-row items-center justify-between gap-3 rounded-2xl bg-gray-50 px-4 py-2.5">
-                      <div className="min-w-0">
-                        <p className="text-xs text-gray-500">Drop us a line</p>
+                    <div className="flex flex-col items-start gap-2 rounded-2xl bg-gray-50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                      <div className="min-w-0 max-w-full">
+                        <p className="text-xs text-gray-600">{contactPage.directLabel}</p>
                         <a
-                          href={`mailto:${contact.email}`}
-                          className="truncate font-semibold text-blue-600 transition-opacity hover:underline"
+                          href={mailtoHref}
+                          className="block font-semibold break-all text-blue-700 transition-opacity hover:underline sm:truncate sm:break-normal"
                         >
-                          {contact.email}
+                          {contactPage.email}
                         </a>
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
@@ -239,87 +270,124 @@ export default function FormaContactPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3" aria-hidden>
                       <div className="h-px flex-1 bg-gray-200" />
                       <span className="text-sm font-medium text-gray-600">
-                        OR
+                        {contactPage.divider}
                       </span>
                       <div className="h-px flex-1 bg-gray-200" />
                     </div>
 
                     <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-                      <label
-                        htmlFor="forma-message"
-                        className="text-sm font-medium text-black"
-                      >
-                        Tell us about your vision
-                      </label>
+                      <p className="text-sm font-medium text-black">{contactPage.formLabel}</p>
 
                       <div className="flex flex-col gap-2 sm:flex-row">
+                        <label htmlFor="contact-name" className="sr-only">
+                          {contactPage.namePlaceholder}
+                        </label>
                         <input
+                          id="contact-name"
                           type="text"
                           name="name"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Full name"
+                          placeholder={contactPage.namePlaceholder}
                           autoComplete="name"
+                          maxLength={CONTACT_LIMITS.nameMax}
                           required
                           className={inputClassName}
                         />
+                        <label htmlFor="contact-email" className="sr-only">
+                          {contactPage.emailPlaceholder}
+                        </label>
                         <input
+                          id="contact-email"
                           type="email"
                           name="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Email"
+                          placeholder={contactPage.emailPlaceholder}
                           autoComplete="email"
+                          maxLength={CONTACT_LIMITS.emailMax}
                           required
                           className={inputClassName}
                         />
                       </div>
 
+                      <label htmlFor="contact-message" className="sr-only">
+                        {contactPage.messagePlaceholder}
+                      </label>
                       <textarea
-                        id="forma-message"
+                        id="contact-message"
                         name="message"
                         rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="What are you looking to build or improve..."
+                        placeholder={contactPage.messagePlaceholder}
+                        minLength={CONTACT_LIMITS.messageMin}
+                        maxLength={CONTACT_LIMITS.messageMax}
                         required
                         className={`${inputClassName} resize-none`}
                       />
 
-                      <div className="flex flex-col gap-2">
-                        <p className="text-sm font-medium text-black">
-                          I need help with...
-                        </p>
+                      {/* Honeypot: hidden from people and assistive tech, tempting to bots. */}
+                      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                        <label htmlFor="contact-company">Company</label>
+                        <input
+                          id="contact-company"
+                          type="text"
+                          name="company"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                        />
+                      </div>
+
+                      <fieldset className="flex flex-col gap-2">
+                        <legend className="mb-2 text-sm font-medium text-black">
+                          {contactPage.topicsLabel}
+                        </legend>
                         <div className="flex flex-wrap gap-1.5">
-                          {SERVICES.map((service) => {
-                            const active = selected.includes(service);
+                          {CONTACT_TOPICS.map((topic) => {
+                            const active = topics.includes(topic);
                             return (
                               <button
-                                key={service}
+                                key={topic}
                                 type="button"
-                                onClick={() => toggleService(service)}
+                                aria-pressed={active}
+                                onClick={() => toggleTopic(topic)}
                                 className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                                   active
                                     ? "border-black bg-gray-100 text-black"
                                     : "border-gray-200 bg-white text-gray-700 hover:border-gray-400"
                                 }`}
                               >
-                                {service}
+                                {topic}
                               </button>
                             );
                           })}
                         </div>
+                      </fieldset>
+
+                      <div aria-live="polite" className="text-sm">
+                        {status === "error" && error ? (
+                          <p className="rounded-xl bg-red-50 px-3 py-2 text-red-800">
+                            {error} {contactPage.errorFallbackLead}{" "}
+                            <a href={mailtoHref} className="font-semibold underline">
+                              {contactPage.email}
+                            </a>
+                            .
+                          </p>
+                        ) : null}
                       </div>
 
                       <button
                         type="submit"
-                        disabled={sending}
+                        disabled={status === "sending"}
                         className="w-full rounded-2xl bg-black py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
                       >
-                        {sending ? "Sending..." : "Send my message"}
+                        {status === "sending" ? contactPage.sending : contactPage.submit}
                       </button>
                     </form>
                   </>
