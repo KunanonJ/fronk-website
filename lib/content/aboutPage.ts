@@ -47,13 +47,23 @@ export type AboutStackGroup = {
 };
 
 export const aboutPage = {
+  /**
+   * Centered portrait hero (09-11-26, owner choice). The email signup was
+   * removed while the blog is hidden; it never submitted anywhere anyway.
+   */
   hero: {
     /** The page h1: the person's name, so name queries match the heading. */
     title: "Kunanon Jarat",
-    support:
-      "Notes on building fintech, ERP/CRM and AI systems from Bangkok. New posts by email.",
-    manifestoLabel: "Manifesto",
-    manifestoHref: "#story",
+    nickname: "Fronk",
+    location: "Bangkok, Thailand",
+    role: "Founder of GoGoCash and Manut AI. IT Manager & AI Engineering Lead at The Binary Holdings.",
+    /** 480x480 WebP crop of /profile.jpg for the round frame. */
+    portraitSrc: "/profile-portrait.webp",
+    portraitAlt: "Kunanon Jarat (Fronk), headshot",
+    primaryCta: { label: "Contact me", href: "/contact" },
+    secondaryCta: { label: "See my work", href: "/portfolio" },
+    storyLabel: "Read my story",
+    storyHref: "#story",
   },
 
   story: {
