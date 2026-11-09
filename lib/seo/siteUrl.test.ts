@@ -10,13 +10,15 @@ describe("resolvePublicSiteUrl", () => {
     expect(resolvePublicSiteUrl("https://kunanonj.com/", "development")).toBe(
       CANONICAL_SITE_URL,
     );
-    expect(resolvePublicSiteUrl("https://staging.example.org", "production")).toBe(
-      "https://staging.example.org",
-    );
+    expect(
+      resolvePublicSiteUrl("https://staging.example.org", "production"),
+    ).toBe("https://staging.example.org");
   });
 
   it("never emits the placeholder in production when env is missing", () => {
-    expect(resolvePublicSiteUrl(undefined, "production")).toBe(CANONICAL_SITE_URL);
+    expect(resolvePublicSiteUrl(undefined, "production")).toBe(
+      CANONICAL_SITE_URL,
+    );
     expect(resolvePublicSiteUrl(PLACEHOLDER_SITE_URL, "production")).toBe(
       CANONICAL_SITE_URL,
     );
@@ -26,7 +28,9 @@ describe("resolvePublicSiteUrl", () => {
   });
 
   it("keeps the placeholder only outside production", () => {
-    expect(resolvePublicSiteUrl(undefined, "development")).toBe(PLACEHOLDER_SITE_URL);
+    expect(resolvePublicSiteUrl(undefined, "development")).toBe(
+      PLACEHOLDER_SITE_URL,
+    );
     expect(resolvePublicSiteUrl(PLACEHOLDER_SITE_URL, "test")).toBe(
       PLACEHOLDER_SITE_URL,
     );

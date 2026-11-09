@@ -12,11 +12,17 @@ import { isCrossSite, readBodyText } from "@/src/server/http";
 // { ok, message }. It never echoes visitor input back.
 export async function POST(request: Request) {
   if (isCrossSite(request)) {
-    return Response.json({ ok: false, message: contactMessages.failed }, { status: 403 });
+    return Response.json(
+      { ok: false, message: contactMessages.failed },
+      { status: 403 },
+    );
   }
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().startsWith("application/json")) {
-    return Response.json({ ok: false, message: contactMessages.failed }, { status: 415 });
+    return Response.json(
+      { ok: false, message: contactMessages.failed },
+      { status: 415 },
+    );
   }
 
   const text = await readBodyText(request, CONTACT_LIMITS.maxBodyBytes);

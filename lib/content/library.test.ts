@@ -2,17 +2,18 @@ import { describe, expect, it } from "vitest";
 import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildBoard, buildColumns } from "@/lib/content/buildBoard";
-import {
-  EXAMPLE_PERSONAS,
-  examplesByPersona,
-} from "@/lib/content/examples";
+import { EXAMPLE_PERSONAS, examplesByPersona } from "@/lib/content/examples";
 import {
   getLearnTopicLinks,
   getLearnWritingLinks,
   learnOperatorNotes,
 } from "@/lib/content/learn";
 import { getProofCards, getProofMetrics } from "@/lib/content/proof";
-import { STACK_GROUPS, stackItems, stackItemsByGroup } from "@/lib/content/stack";
+import {
+  STACK_GROUPS,
+  stackItems,
+  stackItemsByGroup,
+} from "@/lib/content/stack";
 import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
 import { footerLibrary, primaryNav } from "@/lib/content/landing";
 

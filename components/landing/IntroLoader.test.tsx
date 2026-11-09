@@ -103,7 +103,10 @@ describe("IntroLoader", () => {
     render(<IntroLoader />);
     advance(20);
     const skip = screen.getByRole("button", { name: "Skip intro" });
-    expect(screen.getByText(INTRO_GREETINGS[0])).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByText(INTRO_GREETINGS[0])).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     expect(screen.queryByRole("status")).toBeNull();
 
     fireEvent.click(skip);

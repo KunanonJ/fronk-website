@@ -1,8 +1,4 @@
-import {
-  ChartColumn,
-  FlaskConical,
-  type LucideIcon,
-} from "lucide-react";
+import { ChartColumn, FlaskConical, type LucideIcon } from "lucide-react";
 import {
   siClaude,
   siClaudecode,
@@ -27,7 +23,6 @@ import {
   type SimpleIcon,
 } from "simple-icons";
 import type { StackIconId } from "@/lib/content/stackIcons";
-
 
 const BRAND: Partial<Record<StackIconId, SimpleIcon>> = {
   typescript: siTypescript,

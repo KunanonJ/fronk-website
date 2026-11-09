@@ -126,7 +126,10 @@ type VisualIconProps = {
 };
 
 /** Decorative icon for diagrams; the adjacent label carries the meaning. */
-export default function VisualIcon({ id, className = "h-4 w-4" }: VisualIconProps) {
+export default function VisualIcon({
+  id,
+  className = "h-4 w-4",
+}: VisualIconProps) {
   if (isBrand(id)) {
     return (
       <svg

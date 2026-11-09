@@ -24,7 +24,9 @@ describe("security.txt (RFC 9116)", () => {
   });
 
   it("points Canonical at the .well-known location over https", () => {
-    expect(body).toMatch(/^Canonical: https:\/\/.+\/\.well-known\/security\.txt$/m);
+    expect(body).toMatch(
+      /^Canonical: https:\/\/.+\/\.well-known\/security\.txt$/m,
+    );
   });
 
   it("uses only `Field: value` lines", () => {

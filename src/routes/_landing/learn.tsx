@@ -14,7 +14,6 @@ const metadata: Metadata = routeShareMeta({
   path: "/learn",
 });
 
-
 export const Route = createFileRoute("/_landing/learn")({
   loader: ({ context }) => context.queryClient.ensureQueryData(learnCardsQuery),
   head: () => pageHead(metadata),

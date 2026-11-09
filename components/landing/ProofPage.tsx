@@ -1,10 +1,6 @@
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
 import { LibraryLinkCard } from "@/components/landing/LibraryLinkCard";
-import {
-  getProofCards,
-  getProofMetrics,
-  proofPage,
-} from "@/lib/content/proof";
+import { getProofCards, getProofMetrics, proofPage } from "@/lib/content/proof";
 import { cn } from "@/lib/utils/cn";
 
 /**

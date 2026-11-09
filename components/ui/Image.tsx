@@ -30,7 +30,23 @@ const FILL: CSSProperties = {
 };
 
 const Image = forwardRef<HTMLImageElement, NextImageProps>(function Image(
-  { src, alt, fill, priority, quality: _q, placeholder: _p, blurDataURL: _b, unoptimized: _u, loader: _l, overrideSrc, style, width, height, loading, ...rest },
+  {
+    src,
+    alt,
+    fill,
+    priority,
+    quality: _q,
+    placeholder: _p,
+    blurDataURL: _b,
+    unoptimized: _u,
+    loader: _l,
+    overrideSrc,
+    style,
+    width,
+    height,
+    loading,
+    ...rest
+  },
   ref,
 ) {
   const resolved = typeof src === "string" ? src : src.src;
@@ -39,8 +55,16 @@ const Image = forwardRef<HTMLImageElement, NextImageProps>(function Image(
       ref={ref}
       alt={alt}
       src={overrideSrc ?? resolved}
-      width={fill ? undefined : (width ?? (typeof src === "object" ? src.width : undefined))}
-      height={fill ? undefined : (height ?? (typeof src === "object" ? src.height : undefined))}
+      width={
+        fill
+          ? undefined
+          : (width ?? (typeof src === "object" ? src.width : undefined))
+      }
+      height={
+        fill
+          ? undefined
+          : (height ?? (typeof src === "object" ? src.height : undefined))
+      }
       loading={priority ? "eager" : (loading ?? "lazy")}
       fetchPriority={priority ? "high" : undefined}
       decoding="async"

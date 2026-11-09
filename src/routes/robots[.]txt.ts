@@ -5,7 +5,10 @@ import { robotsToText } from "@/lib/seo/metadataRoutes";
 export const Route = createFileRoute("/robots.txt")({
   server: {
     handlers: {
-      GET: async () => new Response(robotsToText(robots()), { headers: { "Content-Type": "text/plain" } }),
+      GET: async () =>
+        new Response(robotsToText(robots()), {
+          headers: { "Content-Type": "text/plain" },
+        }),
     },
   },
 });

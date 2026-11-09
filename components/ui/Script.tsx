@@ -9,7 +9,12 @@ type NextScriptProps = ScriptHTMLAttributes<HTMLScriptElement> & {
   onReady?: () => void;
 };
 
-export default function Script({ strategy, onReady: _onReady, src, ...rest }: NextScriptProps) {
+export default function Script({
+  strategy,
+  onReady: _onReady,
+  src,
+  ...rest
+}: NextScriptProps) {
   const async = src && strategy !== "beforeInteractive" ? true : undefined;
   return <script src={src} async={async} {...rest} />;
 }

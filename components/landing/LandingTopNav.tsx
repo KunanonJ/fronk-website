@@ -102,12 +102,18 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 
   return (
     <span className="relative block h-3.5 w-5" aria-hidden="true">
-      <span className={cn(bar, "top-0", open && "translate-y-[6px] rotate-45")} />
+      <span
+        className={cn(bar, "top-0", open && "translate-y-[6px] rotate-45")}
+      />
       <span
         className={cn(bar, "top-[6px]", open && "scale-x-[0.35] opacity-0")}
       />
       <span
-        className={cn(bar, "top-[12px]", open && "-translate-y-[6px] -rotate-45")}
+        className={cn(
+          bar,
+          "top-[12px]",
+          open && "-translate-y-[6px] -rotate-45",
+        )}
       />
     </span>
   );
@@ -226,10 +232,7 @@ export default function LandingTopNav({
   const activeSection = isHome ? homeSection : null;
   const pos = position === "absolute" ? "absolute" : "fixed";
 
-  const spyItems = useMemo(
-    () => flattenNavHrefs(primaryNav, navCta),
-    [],
-  );
+  const spyItems = useMemo(() => flattenNavHrefs(primaryNav, navCta), []);
   const hashLinkedSections = useMemo(
     () => scrollSpySectionIds(spyItems),
     [spyItems],
@@ -445,7 +448,10 @@ export default function LandingTopNav({
         return (
           <li
             key={item.label}
-            className={cn("transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0", EASE)}
+            className={cn(
+              "transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0",
+              EASE,
+            )}
             style={{ transitionDelay: `${50 + index * 40}ms` }}
           >
             <NavItemAnchor
@@ -464,7 +470,10 @@ export default function LandingTopNav({
       return (
         <li
           key={item.label}
-          className={cn("space-y-0.5 transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0", EASE)}
+          className={cn(
+            "space-y-0.5 transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0",
+            EASE,
+          )}
           style={{ transitionDelay: `${50 + index * 40}ms` }}
         >
           <p className="px-3 pt-3 font-mono text-label uppercase text-ink-2">
@@ -577,19 +586,19 @@ export default function LandingTopNav({
           >
             <div className="min-h-0 overflow-hidden">
               <div className="px-2 pb-3">
-                  <ul className="flex flex-col gap-0.5 pt-1">
-                    {renderMobileTree()}
-                    <li className="pt-2">
-                      <NavItemAnchor
-                        href={hrefForNav(navCta.href)}
-                        className="flex min-h-12 items-center justify-center rounded-full bg-ink px-3 text-sm font-medium text-page"
-                        active={ctaActive}
-                        onClick={closeAll}
-                      >
-                        {navCta.label}
-                      </NavItemAnchor>
-                    </li>
-                  </ul>
+                <ul className="flex flex-col gap-0.5 pt-1">
+                  {renderMobileTree()}
+                  <li className="pt-2">
+                    <NavItemAnchor
+                      href={hrefForNav(navCta.href)}
+                      className="flex min-h-12 items-center justify-center rounded-full bg-ink px-3 text-sm font-medium text-page"
+                      active={ctaActive}
+                      onClick={closeAll}
+                    >
+                      {navCta.label}
+                    </NavItemAnchor>
+                  </li>
+                </ul>
               </div>
             </div>
           </nav>

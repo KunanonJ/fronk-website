@@ -59,7 +59,10 @@ test.describe("a11y > reduced-motion users get a static, usable page", () => {
 });
 
 test.describe("a11y > keyboard users can reach the skip link", () => {
-  test("first Tab focuses the skip-to-content link", async ({ page, browserName }) => {
+  test("first Tab focuses the skip-to-content link", async ({
+    page,
+    browserName,
+  }) => {
     // WebKit/Safari does not move Tab focus to links unless full keyboard access
     // is enabled — that's the browser's default, not a page defect. The skip link
     // is present and focusable; Chromium + Firefox exercise the Tab behavior.
@@ -69,15 +72,20 @@ test.describe("a11y > keyboard users can reach the skip link", () => {
     );
     await page.goto("/", { waitUntil: "networkidle" });
     await page.keyboard.press("Tab");
-    const focusedHref = await page.evaluate(
-      () => (document.activeElement as HTMLAnchorElement | null)?.getAttribute("href"),
+    const focusedHref = await page.evaluate(() =>
+      (document.activeElement as HTMLAnchorElement | null)?.getAttribute(
+        "href",
+      ),
     );
     expect(focusedHref).toBe("#main");
   });
 });
 
 test.describe("resume > company logos are self-hosted (ux-audit finding 12)", () => {
-  test("logos render and no image request leaves the site", async ({ page, baseURL }) => {
+  test("logos render and no image request leaves the site", async ({
+    page,
+    baseURL,
+  }) => {
     const origin = new URL(baseURL ?? "http://localhost:3000").origin;
     const offsite: string[] = [];
     page.on("request", (request) => {

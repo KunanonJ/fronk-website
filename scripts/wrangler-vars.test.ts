@@ -4,7 +4,10 @@ import { parseJsonc, readWranglerVars } from "./wrangler-vars.mjs";
 describe("wrangler vars for the Vite build", () => {
   it("parses comments, URLs inside strings and trailing commas", () => {
     const text = `/** header */\n{\n  // line\n  "url": "https://kunanonj.com", /* inline */\n  "list": [1, 2,],\n}`;
-    expect(parseJsonc(text)).toEqual({ url: "https://kunanonj.com", list: [1, 2] });
+    expect(parseJsonc(text)).toEqual({
+      url: "https://kunanonj.com",
+      list: [1, 2],
+    });
   });
 
   it("reads the public site and Sanity settings from both Worker configs", () => {

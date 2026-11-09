@@ -41,18 +41,31 @@ export default function PortfolioPage() {
                 href={`/portfolio/${project.slug}`}
                 className="group flex h-full flex-col rounded-card border border-hairline bg-surface p-3 shadow-card transition-[border-color,transform] duration-150 ease-smooth hover:border-hairline-strong motion-safe:hover:-translate-y-0.5"
               >
-                <PortfolioCover project={project} index={index} priority={index < 2} />
+                <PortfolioCover
+                  project={project}
+                  index={index}
+                  priority={index < 2}
+                />
                 <div className="flex flex-1 flex-col px-3 pt-5 pb-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-mono text-label uppercase text-ink-2">
-                      <span aria-hidden>{String(index + 1).padStart(2, "0")} · </span>
+                      <span aria-hidden>
+                        {String(index + 1).padStart(2, "0")} ·{" "}
+                      </span>
                       {project.category} · {project.year}
                     </p>
                     <Chip tone="signal">{ACCESS_LABEL[project.access]}</Chip>
                   </div>
-                  <h2 className="mt-3 font-display text-h3 text-ink">{project.name}</h2>
-                  <p className="mt-1.5 text-small text-ink-2">{project.tagline}</p>
-                  <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Tech stack">
+                  <h2 className="mt-3 font-display text-h3 text-ink">
+                    {project.name}
+                  </h2>
+                  <p className="mt-1.5 text-small text-ink-2">
+                    {project.tagline}
+                  </p>
+                  <ul
+                    className="mt-5 flex flex-wrap gap-1.5"
+                    aria-label="Tech stack"
+                  >
                     {shownStack.map((tech) => (
                       <li key={tech}>
                         <Chip>{tech}</Chip>

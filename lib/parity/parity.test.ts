@@ -38,7 +38,9 @@ const START_HTML = `<!DOCTYPE html><html lang="en"><head>
 
 describe("parity helpers", () => {
   it("parses attributes, lower-casing names and decoding entities", () => {
-    expect(parseAttributes(` charSet="utf-8" content="a &amp; b" data-x='y'`)).toEqual({
+    expect(
+      parseAttributes(` charSet="utf-8" content="a &amp; b" data-x='y'`),
+    ).toEqual({
       charset: "utf-8",
       content: "a & b",
       "data-x": "y",
@@ -46,9 +48,9 @@ describe("parity helpers", () => {
   });
 
   it("normalises hashed metadata image URLs", () => {
-    expect(normaliseUrl("https://kunanonj.com/x/opengraph-image-abc12?deadbeef")).toBe(
-      "https://kunanonj.com/x/opengraph-image",
-    );
+    expect(
+      normaliseUrl("https://kunanonj.com/x/opengraph-image-abc12?deadbeef"),
+    ).toBe("https://kunanonj.com/x/opengraph-image");
     expect(normaliseUrl("/apple-icon?123")).toBe("/apple-icon");
   });
 
@@ -72,24 +74,42 @@ describe("parity helpers", () => {
   });
 
   it("masks per-request timestamps in text bodies", () => {
-    expect(normaliseBody("<a><lastBuildDate>Mon, 09 Nov 2026 09:56:06 GMT</lastBuildDate></a>")).toBe(
-      "<a><lastBuildDate>DATE</lastBuildDate></a>",
-    );
+    expect(
+      normaliseBody(
+        "<a><lastBuildDate>Mon, 09 Nov 2026 09:56:06 GMT</lastBuildDate></a>",
+      ),
+    ).toBe("<a><lastBuildDate>DATE</lastBuildDate></a>");
   });
 
   it("collects internal page links only", () => {
-    expect(internalLinks(NEXT_HTML).sort()).toEqual(["/about", "/blog", "/skills"]);
+    expect(internalLinks(NEXT_HTML).sort()).toEqual([
+      "/about",
+      "/blog",
+      "/skills",
+    ]);
   });
 
   it("reports differences and honours ignores", () => {
-    const a = { status: 200, title: "A", tags: ["meta x", "meta y"], jsonLd: [] };
-    const b = { status: 404, title: "A", tags: ["meta x", "meta z"], jsonLd: [] };
+    const a = {
+      status: 200,
+      title: "A",
+      tags: ["meta x", "meta y"],
+      jsonLd: [],
+    };
+    const b = {
+      status: 404,
+      title: "A",
+      tags: ["meta x", "meta z"],
+      jsonLd: [],
+    };
     expect(diffRecord("/", a, a)).toEqual([]);
     expect(diffRecord("/", a, b)).toEqual([
       { field: "status", a: 200, b: 404 },
       { field: "tags", onlyA: ["meta y"], onlyB: ["meta z"] },
     ]);
     expect(diffRecord("/", a, b, ["*:status", "/:tags"])).toEqual([]);
-    expect(diffRecord("/x", a, undefined)).toEqual([{ field: "presence", a: true, b: false }]);
+    expect(diffRecord("/x", a, undefined)).toEqual([
+      { field: "presence", a: true, b: false },
+    ]);
   });
 });

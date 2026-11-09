@@ -28,7 +28,9 @@ describe.runIf(!BLOG_PUBLIC)("while the blog is hidden", () => {
       item.type === "menu" ? item.children.map((c) => c.href) : [item.href],
     );
     expect(hrefs.some(isBlogHref)).toBe(false);
-    expect(footerResources.some((item) => item.href === "/feed.xml")).toBe(false);
+    expect(footerResources.some((item) => item.href === "/feed.xml")).toBe(
+      false,
+    );
   });
 
   it("drops blog links from topic-hub related links", () => {

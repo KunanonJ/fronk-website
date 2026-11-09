@@ -9,7 +9,9 @@ import { readBodyText } from "@/src/server/http";
  */
 
 export type FormGuardEnv = {
-  FORM_RATE_LIMIT?: { limit: (options: { key: string }) => Promise<{ success: boolean }> };
+  FORM_RATE_LIMIT?: {
+    limit: (options: { key: string }) => Promise<{ success: boolean }>;
+  };
   TURNSTILE_SECRET_KEY?: string;
 };
 
@@ -24,28 +26,46 @@ export async function guardForm(
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
 
   if (env.FORM_RATE_LIMIT) {
-    const { success } = await env.FORM_RATE_LIMIT.limit({ key: `${scope}:${ip}` });
-    if (!success) return Response.json({ ok: false, message: contactMessages.rateLimited }, { status: 429 });
+    const { success } = await env.FORM_RATE_LIMIT.limit({
+      key: `${scope}:${ip}`,
+    });
+    if (!success)
+      return Response.json(
+        { ok: false, message: contactMessages.rateLimited },
+        { status: 429 },
+      );
   }
 
   if (env.TURNSTILE_SECRET_KEY) {
-    const text = await readBodyText(request.clone(), CONTACT_LIMITS.maxBodyBytes);
+    const text = await readBodyText(
+      request.clone(),
+      CONTACT_LIMITS.maxBodyBytes,
+    );
     let body: { turnstileToken?: unknown } | null;
     try {
       body = text ? (JSON.parse(text) as { turnstileToken?: unknown }) : null;
     } catch {
       body = null;
     }
-    const token = typeof body?.turnstileToken === "string" ? body.turnstileToken : "";
+    const token =
+      typeof body?.turnstileToken === "string" ? body.turnstileToken : "";
     let passed = false;
     if (token) {
-      const form = new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: token, remoteip: ip });
+      const form = new URLSearchParams({
+        secret: env.TURNSTILE_SECRET_KEY,
+        response: token,
+        remoteip: ip,
+      });
       const outcome = (await fetcher(SITEVERIFY, { method: "POST", body: form })
         .then((r) => r.json())
         .catch(() => null)) as { success?: boolean } | null;
       passed = outcome?.success === true;
     }
-    if (!passed) return Response.json({ ok: false, message: contactMessages.botCheck }, { status: 403 });
+    if (!passed)
+      return Response.json(
+        { ok: false, message: contactMessages.botCheck },
+        { status: 403 },
+      );
   }
 
   return null;

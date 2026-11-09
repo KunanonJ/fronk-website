@@ -72,7 +72,9 @@ export default function ContributionActivity() {
           {calendar.weeks.map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
               {week.days.map((day, di) => {
-                const tip = day.date ? dayTitle(day.date, day.count) : undefined;
+                const tip = day.date
+                  ? dayTitle(day.date, day.count)
+                  : undefined;
                 return (
                   <span
                     key={`${wi}-${di}`}

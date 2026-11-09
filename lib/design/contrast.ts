@@ -24,8 +24,14 @@ export function parseColor(input: string): Rgba {
   if (fn) {
     const parts = fn[1]!.split(/[\s,/]+/).filter(Boolean);
     const [r, g, b] = parts.slice(0, 3).map(Number);
-    const a = parts[3] === undefined ? 1 : parts[3].endsWith("%") ? parseFloat(parts[3]) / 100 : Number(parts[3]);
-    if ([r, g, b, a].every((n) => Number.isFinite(n))) return { r: r!, g: g!, b: b!, a };
+    const a =
+      parts[3] === undefined
+        ? 1
+        : parts[3].endsWith("%")
+          ? parseFloat(parts[3]) / 100
+          : Number(parts[3]);
+    if ([r, g, b, a].every((n) => Number.isFinite(n)))
+      return { r: r!, g: g!, b: b!, a };
   }
   throw new Error(`Unsupported colour: ${input}`);
 }
@@ -49,11 +55,17 @@ export function relativeLuminance({ r, g, b }: Rgb): number {
  * Contrast ratio between `fg` and `bg`. Translucent colours are composited:
  * `bg` over `base` (default white) first, then `fg` over the result.
  */
-export function contrastRatio(fg: string, bg: string, base = "#ffffff"): number {
+export function contrastRatio(
+  fg: string,
+  bg: string,
+  base = "#ffffff",
+): number {
   const baseRgb = parseColor(base);
   const bgRgb = composite(parseColor(bg), baseRgb);
   const fgRgb = composite(parseColor(fg), bgRgb);
-  const [hi, lo] = [relativeLuminance(fgRgb), relativeLuminance(bgRgb)].sort((x, y) => y - x);
+  const [hi, lo] = [relativeLuminance(fgRgb), relativeLuminance(bgRgb)].sort(
+    (x, y) => y - x,
+  );
   return (hi! + 0.05) / (lo! + 0.05);
 }
 

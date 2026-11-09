@@ -47,8 +47,9 @@
     "upload": "pnpm build && wrangler versions upload",
     "cron:preview": "wrangler dev --config wrangler.revalidate-cron.jsonc --env local --test-scheduled --port 8789",
     "cron:deploy": "wrangler deploy --config wrangler.revalidate-cron.jsonc --env=\"\"",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "knip": "knip",
     "typecheck:tsc6": "tsc6 --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -92,7 +93,7 @@
     "@axe-core/playwright": "^4.14.0",
     "@cloudflare/vite-plugin": "1.67.0",
     "@eslint/js": "10.0.1",
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "1.64.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-devtools": "0.10.14",
@@ -100,7 +101,7 @@
     "@tanstack/react-router-devtools": "1.167.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
-    "@types/node": "^26.6.6",
+    "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",
@@ -118,7 +119,7 @@
     "typescript-7": "npm:typescript@^7.0.2",
     "typescript-eslint": "8.72.1",
     "vite": "8.3.6",
-    "vitest": "^5.0.5",
+    "vitest": "5.0.5",
     "wrangler": "4.156.1"
   }
 }

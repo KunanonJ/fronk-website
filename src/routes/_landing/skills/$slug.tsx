@@ -59,8 +59,13 @@ function SkillRouteView({ slug }: { slug: string }) {
 
 export const Route = createFileRoute("/_landing/skills/$slug")({
   loader: async ({ params }) => {
-    if (!(getSkillBySlug(params.slug))) throw notFound();
-    return { head: pageHead(await generateMetadata({ params: Promise.resolve(params) }), { fileOgImage: fileOg(`/skills/${params.slug}`, "Agent skill") }) };
+    if (!getSkillBySlug(params.slug)) throw notFound();
+    return {
+      head: pageHead(
+        await generateMetadata({ params: Promise.resolve(params) }),
+        { fileOgImage: fileOg(`/skills/${params.slug}`, "Agent skill") },
+      ),
+    };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

@@ -1,7 +1,12 @@
 /// <reference types="vite/client" />
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { lazy, Suspense, type ReactNode } from "react";
-import { HeadContent, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+  useRouterState,
+} from "@tanstack/react-router";
 import type { RouterContext } from "../router";
 import NotFound from "@/components/NotFound";
 import RouteError from "@/components/RouteError";
@@ -29,7 +34,9 @@ const themeColors = global.meta.filter((m) => isNamedMeta(m, "theme-color"));
 const globalMeta = global.meta.filter((m) => !isNamedMeta(m, "theme-color"));
 
 // Router + Query devtools in development only; the import is dropped from builds.
-const Devtools = import.meta.env.DEV ? lazy(() => import("../devtools")) : () => null;
+const Devtools = import.meta.env.DEV
+  ? lazy(() => import("../devtools"))
+  : () => null;
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
@@ -37,8 +44,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [...globalMeta, { title: landingSite.title }],
     links: [
       // Same two Latin faces next/font preloaded; Thai loads on demand.
-      { rel: "preload", href: geistLatin, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-      { rel: "preload", href: geistMonoLatin, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+      {
+        rel: "preload",
+        href: geistLatin,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        href: geistMonoLatin,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
       { rel: "stylesheet", href: fontsCss },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://cdn.sanity.io", crossOrigin: "" },
@@ -57,16 +76,34 @@ function RootDocument({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
   return (
-    <html lang={lang} className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html
+      lang={lang}
+      className="h-full antialiased"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
         {themeColors.map((m) => (
-          <meta key={m.media} name="theme-color" media={m.media} content={m.content} />
+          <meta
+            key={m.media}
+            name="theme-color"
+            media={m.media}
+            content={m.content}
+          />
         ))}
       </head>
       <body className="flex min-h-full flex-col bg-page text-ink">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: siteJsonLd }} />
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: siteJsonLd }}
+        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
           <RouteFade />
           {children}
         </ThemeProvider>

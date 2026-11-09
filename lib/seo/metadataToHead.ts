@@ -47,7 +47,13 @@ export type FileOgImage = {
   type?: string;
 };
 
-type OgImage = { url: string | URL; width?: number | string; height?: number | string; alt?: string; type?: string };
+type OgImage = {
+  url: string | URL;
+  width?: number | string;
+  height?: number | string;
+  alt?: string;
+  type?: string;
+};
 
 function absolute(base: URL | null | undefined, value: string | URL): string {
   const href = new URL(String(value), base ?? undefined).href;
@@ -55,12 +61,23 @@ function absolute(base: URL | null | undefined, value: string | URL): string {
   return href.replace(/^(https?:\/\/[^/]+)\/$/, "$1");
 }
 
-function resolveTitle(root: Metadata["title"], page: Metadata["title"]): string | undefined {
-  const template = root && typeof root === "object" && "template" in root ? root.template : undefined;
+function resolveTitle(
+  root: Metadata["title"],
+  page: Metadata["title"],
+): string | undefined {
+  const template =
+    root && typeof root === "object" && "template" in root
+      ? root.template
+      : undefined;
   const rootDefault =
-    typeof root === "string" ? root : root && typeof root === "object" && "default" in root ? root.default : undefined;
+    typeof root === "string"
+      ? root
+      : root && typeof root === "object" && "default" in root
+        ? root.default
+        : undefined;
   if (page == null) return rootDefault ?? undefined;
-  if (typeof page === "string") return template ? template.replace("%s", page) : page;
+  if (typeof page === "string")
+    return template ? template.replace("%s", page) : page;
   if ("absolute" in page && page.absolute) return page.absolute;
   if ("default" in page && page.default) return page.default;
   return rootDefault ?? undefined;
@@ -70,8 +87,10 @@ function robotsContent(robots: Metadata["robots"]): string | undefined {
   if (!robots) return undefined;
   if (typeof robots === "string") return robots;
   const parts: string[] = [];
-  if (robots.index !== undefined) parts.push(robots.index ? "index" : "noindex");
-  if (robots.follow !== undefined) parts.push(robots.follow ? "follow" : "nofollow");
+  if (robots.index !== undefined)
+    parts.push(robots.index ? "index" : "noindex");
+  if (robots.follow !== undefined)
+    parts.push(robots.follow ? "follow" : "nofollow");
   if (robots.nocache) parts.push("nocache");
   return parts.join(", ") || undefined;
 }
@@ -93,7 +112,8 @@ export function metadataToHead(
   page: Metadata,
   options: { fileOgImage?: FileOgImage } = {},
 ): HeadTags {
-  const base = (page.metadataBase ?? root.metadataBase) as URL | null | undefined;
+  const base = (page.metadataBase ?? root.metadataBase) as
+    URL | null | undefined;
   const meta: HeadMeta[] = [];
   const links: HeadLink[] = [];
 
@@ -106,7 +126,8 @@ export function metadataToHead(
   for (const author of toList(page.authors ?? root.authors)) {
     if (!author) continue;
     if (author.name) meta.push({ name: "author", content: author.name });
-    if (author.url) links.push({ rel: "author", href: absolute(base, author.url) });
+    if (author.url)
+      links.push({ rel: "author", href: absolute(base, author.url) });
   }
   const creator = page.creator ?? root.creator;
   if (creator) meta.push({ name: "creator", content: creator });
@@ -115,19 +136,25 @@ export function metadataToHead(
   if (robots) meta.push({ name: "robots", content: robots });
 
   const google = (page.verification ?? root.verification)?.google;
-  for (const value of toList(google)) meta.push({ name: "google-site-verification", content: String(value) });
+  for (const value of toList(google))
+    meta.push({ name: "google-site-verification", content: String(value) });
 
   const alternates = page.alternates ?? root.alternates;
   if (alternates?.canonical) {
-    const canonical = typeof alternates.canonical === "object" && "url" in alternates.canonical
-      ? alternates.canonical.url
-      : (alternates.canonical as string | URL);
+    const canonical =
+      typeof alternates.canonical === "object" && "url" in alternates.canonical
+        ? alternates.canonical.url
+        : (alternates.canonical as string | URL);
     links.push({ rel: "canonical", href: absolute(base, canonical) });
   }
   for (const [lang, href] of Object.entries(alternates?.languages ?? {})) {
     for (const entry of toList(href as string | { url: string })) {
       const url = typeof entry === "object" ? entry.url : entry;
-      links.push({ rel: "alternate", hrefLang: lang, href: absolute(base, url) });
+      links.push({
+        rel: "alternate",
+        hrefLang: lang,
+        href: absolute(base, url),
+      });
     }
   }
   for (const [type, href] of Object.entries(alternates?.types ?? {})) {
@@ -137,7 +164,10 @@ export function metadataToHead(
     }
   }
 
-  const og = (page.openGraph ?? root.openGraph ?? {}) as Record<string, unknown>;
+  const og = (page.openGraph ?? root.openGraph ?? {}) as Record<
+    string,
+    unknown
+  >;
   const ogImages: OgImage[] = og.images
     ? asImages(og.images)
     : options.fileOgImage
@@ -150,17 +180,23 @@ export function metadataToHead(
     ["og:site_name", og.siteName],
     ["og:locale", og.locale],
   ];
-  for (const [property, content] of ogPairs) if (content) meta.push({ property, content: String(content) });
+  for (const [property, content] of ogPairs)
+    if (content) meta.push({ property, content: String(content) });
   for (const img of ogImages) {
     meta.push({ property: "og:image", content: absolute(base, img.url) });
-    if (img.width) meta.push({ property: "og:image:width", content: String(img.width) });
-    if (img.height) meta.push({ property: "og:image:height", content: String(img.height) });
+    if (img.width)
+      meta.push({ property: "og:image:width", content: String(img.width) });
+    if (img.height)
+      meta.push({ property: "og:image:height", content: String(img.height) });
     if (img.alt) meta.push({ property: "og:image:alt", content: img.alt });
     if (img.type) meta.push({ property: "og:image:type", content: img.type });
   }
   if (og.type) meta.push({ property: "og:type", content: String(og.type) });
   if (og.type === "article" && og.publishedTime) {
-    meta.push({ property: "article:published_time", content: String(og.publishedTime) });
+    meta.push({
+      property: "article:published_time",
+      content: String(og.publishedTime),
+    });
   }
 
   const tw = (page.twitter ?? root.twitter ?? {}) as Record<string, unknown>;
@@ -172,11 +208,14 @@ export function metadataToHead(
     ["twitter:title", tw.title],
     ["twitter:description", tw.description],
   ];
-  for (const [name, content] of twPairs) if (content) meta.push({ name, content: String(content) });
+  for (const [name, content] of twPairs)
+    if (content) meta.push({ name, content: String(content) });
   for (const img of twImages) {
     meta.push({ name: "twitter:image", content: absolute(base, img.url) });
-    if (img.width) meta.push({ name: "twitter:image:width", content: String(img.width) });
-    if (img.height) meta.push({ name: "twitter:image:height", content: String(img.height) });
+    if (img.width)
+      meta.push({ name: "twitter:image:width", content: String(img.width) });
+    if (img.height)
+      meta.push({ name: "twitter:image:height", content: String(img.height) });
     if (img.alt) meta.push({ name: "twitter:image:alt", content: img.alt });
     if (img.type) meta.push({ name: "twitter:image:type", content: img.type });
   }
@@ -188,9 +227,13 @@ export function metadataToHead(
 export function viewportContent(viewport: Viewport): string {
   const parts = [
     viewport.width ? `width=${viewport.width}` : "",
-    viewport.initialScale !== undefined ? `initial-scale=${viewport.initialScale}` : "",
+    viewport.initialScale !== undefined
+      ? `initial-scale=${viewport.initialScale}`
+      : "",
     viewport.viewportFit ? `viewport-fit=${viewport.viewportFit}` : "",
-    viewport.interactiveWidget ? `interactive-widget=${viewport.interactiveWidget}` : "",
+    viewport.interactiveWidget
+      ? `interactive-widget=${viewport.interactiveWidget}`
+      : "",
   ];
   return parts.filter(Boolean).join(", ");
 }
@@ -205,19 +248,31 @@ export function rootHead(viewport: Viewport, iconVersion = ""): HeadTags {
     { charSet: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
   ];
-  const themeColors: (string | { color: string; media?: string })[] = Array.isArray(viewport.themeColor)
-    ? viewport.themeColor
-    : viewport.themeColor
-      ? [viewport.themeColor]
-      : [];
+  const themeColors: (string | { color: string; media?: string })[] =
+    Array.isArray(viewport.themeColor)
+      ? viewport.themeColor
+      : viewport.themeColor
+        ? [viewport.themeColor]
+        : [];
   for (const entry of themeColors) {
     if (!entry) continue;
-    if (typeof entry === "string") meta.push({ name: "theme-color", content: entry });
-    else meta.push({ name: "theme-color", content: entry.color, ...(entry.media ? { media: entry.media } : {}) });
+    if (typeof entry === "string")
+      meta.push({ name: "theme-color", content: entry });
+    else
+      meta.push({
+        name: "theme-color",
+        content: entry.color,
+        ...(entry.media ? { media: entry.media } : {}),
+      });
   }
   const links: HeadLink[] = [
     { rel: "icon", href: `/icon${v}`, type: "image/png", sizes: "64x64" },
-    { rel: "apple-touch-icon", href: `/apple-icon${v}`, type: "image/png", sizes: "180x180" },
+    {
+      rel: "apple-touch-icon",
+      href: `/apple-icon${v}`,
+      type: "image/png",
+      sizes: "180x180",
+    },
     { rel: "manifest", href: "/manifest.webmanifest" },
     ...IDENTITY_LINKS.map((href) => ({ rel: "me", href })),
   ];
@@ -229,11 +284,16 @@ export function headToHtml(...heads: HeadTags[]): string {
   const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   const attrs = (o: Record<string, string>) =>
     Object.entries(o)
-      .map(([k, v]) => `${k === "charSet" ? "charset" : k === "hrefLang" ? "hreflang" : k}="${esc(v)}"`)
+      .map(
+        ([k, v]) =>
+          `${k === "charSet" ? "charset" : k === "hrefLang" ? "hreflang" : k}="${esc(v)}"`,
+      )
       .join(" ");
   return heads
     .flatMap((h) => [
-      ...h.meta.map((m) => ("title" in m ? `<title>${m.title}</title>` : `<meta ${attrs(m)}>`)),
+      ...h.meta.map((m) =>
+        "title" in m ? `<title>${m.title}</title>` : `<meta ${attrs(m)}>`,
+      ),
       ...h.links.map((l) => `<link ${attrs(l)}>`),
     ])
     .join("\n");

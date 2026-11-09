@@ -7,14 +7,18 @@ describe("LandingSiteFooter", () => {
   it("keeps the #contact anchor and the contact email", () => {
     const { container } = render(<LandingSiteFooter />);
     expect(container.querySelector("footer#contact")).not.toBeNull();
-    expect(screen.getByRole("link", { name: /@/ }).getAttribute("href")).toMatch(/^mailto:/);
+    expect(
+      screen.getByRole("link", { name: /@/ }).getAttribute("href"),
+    ).toMatch(/^mailto:/);
   });
 
   it("has Work, Library and Elsewhere columns with every link", () => {
     render(<LandingSiteFooter />);
     const nav = screen.getByRole("navigation", { name: "Footer" });
     for (const item of [...footerWork, ...footerLibrary, ...socials]) {
-      expect(within(nav).getByRole("link", { name: item.label })).toHaveAttribute("href", item.href);
+      expect(
+        within(nav).getByRole("link", { name: item.label }),
+      ).toHaveAttribute("href", item.href);
     }
     for (const label of ["Work", "Library", "Elsewhere"]) {
       expect(within(nav).getByText(label)).toBeInTheDocument();
@@ -28,7 +32,9 @@ describe("LandingSiteFooter", () => {
       expect(link.className).toMatch(/min-h-8/);
       expect(link.className).toMatch(/min-w-8/);
     }
-    const wordmark = [...container.querySelectorAll("p")].find((p) => p.textContent === "Kunanon");
+    const wordmark = [...container.querySelectorAll("p")].find(
+      (p) => p.textContent === "Kunanon",
+    );
     expect(wordmark).toHaveAttribute("aria-hidden", "true");
   });
 });

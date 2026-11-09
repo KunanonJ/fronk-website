@@ -64,7 +64,9 @@ const APP_DIR = "dist/client";
 
 function chunksForHtml(htmlPath) {
   const html = fs.readFileSync(htmlPath, "utf8");
-  const refs = [...html.matchAll(/\/assets\/([^"'\\]+?\.js)/g)].map((m) => m[1]);
+  const refs = [...html.matchAll(/\/assets\/([^"'\\]+?\.js)/g)].map(
+    (m) => m[1],
+  );
   return [...new Set(refs)];
 }
 
@@ -107,7 +109,11 @@ const routes = findRouteHtml()
         .replace(/\.html$/, "")
         .replace(/(^|\/)index$/, "");
     const chunks = chunksForHtml(htmlPath);
-    return { route: route === "/" ? "/" : route.replace(/\/$/, ""), chunks, kb: gzipKb(chunks) };
+    return {
+      route: route === "/" ? "/" : route.replace(/\/$/, ""),
+      chunks,
+      kb: gzipKb(chunks),
+    };
   })
   // /portfolio.html and /portfolio/index.html are the same route.
   .filter((r) => (seen.has(r.route) ? false : seen.add(r.route)))
@@ -129,7 +135,9 @@ for (const r of routes) {
   }
   const flag = r.kb > budget ? "❌" : "✅";
   const budgetNote = budget !== DEFAULT_BUDGET_KB ? ` / ${budget} KB` : "";
-  console.log(`  ${flag} ${r.kb.toFixed(1).padStart(6)} KB${budgetNote}  ${r.route}`);
+  console.log(
+    `  ${flag} ${r.kb.toFixed(1).padStart(6)} KB${budgetNote}  ${r.route}`,
+  );
 }
 
 const overBudget = worstOver > 0;

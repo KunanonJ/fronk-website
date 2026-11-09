@@ -71,7 +71,6 @@ export const primaryNav: readonly NavItem[] = [
 
 export const navCta = { label: "Contact", href: "/contact" } as const;
 
-
 /** Operator keyword tips (hpbrn-style) for home about / about page. */
 export const aboutKeywords = [
   { text: "Bangkok", tip: "Base of operations — Thailand first, SEA next" },

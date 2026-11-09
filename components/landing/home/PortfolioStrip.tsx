@@ -13,7 +13,11 @@ export default function PortfolioStrip() {
   if (projects.length === 0) return null;
 
   return (
-    <Section eyebrow="Portfolio" heading="Selected work" className="pt-0 md:pt-0 lg:pt-0">
+    <Section
+      eyebrow="Portfolio"
+      heading="Selected work"
+      className="pt-0 md:pt-0 lg:pt-0"
+    >
       <ol className="grid gap-4 sm:grid-cols-2">
         {projects.map((project, index) => (
           <li key={project.slug}>
@@ -25,7 +29,9 @@ export default function PortfolioStrip() {
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="mt-4 text-h3 text-ink">{project.name}</span>
-              <span className="mt-2 flex-1 text-small text-ink-2">{project.tagline}</span>
+              <span className="mt-2 flex-1 text-small text-ink-2">
+                {project.tagline}
+              </span>
               <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-link">
                 View project
                 <ArrowUpRight className="h-4 w-4" aria-hidden />

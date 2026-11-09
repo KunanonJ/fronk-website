@@ -8,10 +8,7 @@ import {
   topicHreflang,
   type TopicSlug,
 } from "@/lib/content/topics/pillars";
-import {
-  buildBreadcrumbJsonLd,
-  buildFaqJsonLd,
-} from "@/lib/seo/jsonLd";
+import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/jsonLd";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
@@ -62,8 +59,13 @@ function ThaiTopicPillarPageView({ slug }: { slug: string }) {
 
 export const Route = createFileRoute("/_landing/th/topics/$slug")({
   loader: async ({ params }) => {
-    if (!(isTopicSlug(params.slug) && getTopicPillar(params.slug, "th"))) throw notFound();
-    return { head: pageHead(await generateMetadata({ params: Promise.resolve(params) })) };
+    if (!(isTopicSlug(params.slug) && getTopicPillar(params.slug, "th")))
+      throw notFound();
+    return {
+      head: pageHead(
+        await generateMetadata({ params: Promise.resolve(params) }),
+      ),
+    };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

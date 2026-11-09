@@ -105,9 +105,7 @@ const experienceItems: readonly ResolvedTimelineItem[] = [
     logoName: "VaporFund",
     logoDomain: "vaporfund.com",
     period: "Nov 2023 — Sep 2024",
-    bullets: [
-      "Parallel PM role alongside Playbux during the same period.",
-    ],
+    bullets: ["Parallel PM role alongside Playbux during the same period."],
   },
   {
     title: "IT Project Manager",
@@ -203,9 +201,7 @@ const earlyRolesItems: readonly ResolvedTimelineItem[] = [
     logoName: "CAT Telecom",
     logoDomain: "cattelecom.com",
     period: "Aug 2020 — Nov 2020",
-    bullets: [
-      "Worked on core network deployment in Thailand.",
-    ],
+    bullets: ["Worked on core network deployment in Thailand."],
   },
   {
     title: "Research Assistant (Contract)",
@@ -213,9 +209,7 @@ const earlyRolesItems: readonly ResolvedTimelineItem[] = [
     logoName: "NECTEC",
     logoDomain: "nectec.or.th",
     period: "Jul 2020 — Oct 2020",
-    bullets: [
-      "Helped develop Bluetooth tag technology for NSTDA activities.",
-    ],
+    bullets: ["Helped develop Bluetooth tag technology for NSTDA activities."],
   },
   {
     title: "Application Developer (Intern)",
@@ -223,9 +217,7 @@ const earlyRolesItems: readonly ResolvedTimelineItem[] = [
     logoName: "Triple T Broadband",
     logoDomain: "3bb.co.th",
     period: "Jun 2020 — Jul 2020",
-    bullets: [
-      "Built a Bluetooth beacon detection application.",
-    ],
+    bullets: ["Built a Bluetooth beacon detection application."],
   },
 ];
 
@@ -320,7 +312,6 @@ const skills = [
   "Cross-functional team lead",
   "Vendor & stakeholder management",
 ] as const;
-
 
 export const RESUME_TIMELINE_FALLBACK: readonly ResolvedTimelineSection[] = [
   { title: "Currently", items: currentlyItems },

@@ -33,7 +33,11 @@ function PixelBlock({ seed }: { seed: number }) {
                   width: CELL,
                   height: CELL,
                   background:
-                    tone === "signal" ? brand.signal : tone === "glaze" ? brand.glaze : "transparent",
+                    tone === "signal"
+                      ? brand.signal
+                      : tone === "glaze"
+                        ? brand.glaze
+                        : "transparent",
                 }}
               />
             );
@@ -47,7 +51,8 @@ function PixelBlock({ seed }: { seed: number }) {
 /** Stable seed from the title, so each page gets its own pattern. */
 function seedFrom(text: string): number {
   let h = 2166136261;
-  for (let i = 0; i < text.length; i += 1) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  for (let i = 0; i < text.length; i += 1)
+    h = Math.imul(h ^ text.charCodeAt(i), 16777619);
   return h >>> 0;
 }
 
@@ -82,12 +87,21 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
         fontFamily: "Geist",
       }}
     >
-      <div style={{ position: "absolute", top: 72, right: 72, display: "flex" }}>
+      <div
+        style={{ position: "absolute", top: 72, right: 72, display: "flex" }}
+      >
         <PixelBlock seed={seedFrom(title)} />
       </div>
 
       {/* Top row: monogram + wordmark */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          position: "relative",
+        }}
+      >
         <div
           style={{
             width: 44,
@@ -104,13 +118,28 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
         >
           {brand.monogram}
         </div>
-        <div style={{ display: "flex", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em" }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 28,
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+          }}
+        >
           {brand.wordmark}
         </div>
       </div>
 
       {/* Eyebrow, title, subtitle */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative", maxWidth: 820 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 20,
+          position: "relative",
+          maxWidth: 820,
+        }}
+      >
         <div style={{ ...label, color: brand.signal, fontWeight: 800 }}>
           {eyebrow ?? "Bangkok · Thailand"}
         </div>
@@ -126,16 +155,43 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
           {title}
         </div>
         {subtitle ? (
-          <div style={{ display: "flex", fontSize: 30, lineHeight: 1.35, color: brand.inkMuted }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 30,
+              lineHeight: 1.35,
+              color: brand.inkMuted,
+            }}
+          >
             {subtitle}
           </div>
         ) : null}
       </div>
 
       {/* Bottom rule + name + domain */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative" }}>
-        <div style={{ width: "100%", height: 1, background: brand.hairline, display: "flex" }} />
-        <div style={{ ...label, justifyContent: "space-between", alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 20,
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: 1,
+            background: brand.hairline,
+            display: "flex",
+          }}
+        />
+        <div
+          style={{
+            ...label,
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <div style={{ display: "flex" }}>{siteConfig.name}</div>
           <div style={{ display: "flex" }}>{domain}</div>
         </div>

@@ -20,10 +20,7 @@ export default function PortfolioWorkflow({
   return (
     <section aria-labelledby={headingId}>
       <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
-        <h2
-          id={headingId}
-          className="font-display text-h3 text-ink"
-        >
+        <h2 id={headingId} className="font-display text-h3 text-ink">
           How it works
         </h2>
         <p className="font-mono text-label uppercase text-ink-2">
@@ -38,7 +35,10 @@ export default function PortfolioWorkflow({
         {workflow.steps.map((step, index) => {
           const last = index === count - 1;
           return (
-            <li key={step.label} className="relative flex gap-4 lg:flex-col lg:gap-3">
+            <li
+              key={step.label}
+              className="relative flex gap-4 lg:flex-col lg:gap-3"
+            >
               {!last ? (
                 <span
                   aria-hidden="true"

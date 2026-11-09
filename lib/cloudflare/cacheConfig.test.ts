@@ -21,7 +21,9 @@ type WranglerConfig = {
 };
 
 const root = process.cwd();
-const wrangler = parseJsonc(readFileSync(join(root, "wrangler.jsonc"), "utf8")) as WranglerConfig;
+const wrangler = parseJsonc(
+  readFileSync(join(root, "wrangler.jsonc"), "utf8"),
+) as WranglerConfig;
 const server = readFileSync(join(root, "src/server.ts"), "utf8");
 
 describe("production Worker config (TanStack Start)", () => {
@@ -33,15 +35,24 @@ describe("production Worker config (TanStack Start)", () => {
   });
 
   it("rate-limits the forms and routes trailing slashes through the Worker", () => {
-    expect(wrangler.ratelimits?.map((r) => r.name)).toContain("FORM_RATE_LIMIT");
+    expect(wrangler.ratelimits?.map((r) => r.name)).toContain(
+      "FORM_RATE_LIMIT",
+    );
     expect(wrangler.assets?.run_worker_first).toEqual(["/*/"]);
   });
 
   it("keeps the legacy Durable Object classes bound and exported for rollback", () => {
     const bound = wrangler.durable_objects?.bindings?.map((b) => b.class_name);
-    expect(bound).toEqual(expect.arrayContaining(["DOQueueHandler", "DOShardedTagCache"]));
-    expect(wrangler.migrations?.[0]?.new_sqlite_classes).toEqual(["DOQueueHandler", "DOShardedTagCache"]);
+    expect(bound).toEqual(
+      expect.arrayContaining(["DOQueueHandler", "DOShardedTagCache"]),
+    );
+    expect(wrangler.migrations?.[0]?.new_sqlite_classes).toEqual([
+      "DOQueueHandler",
+      "DOShardedTagCache",
+    ]);
     expect(server).toMatch(/export class DOQueueHandler extends DurableObject/);
-    expect(server).toMatch(/export class DOShardedTagCache extends DurableObject/);
+    expect(server).toMatch(
+      /export class DOShardedTagCache extends DurableObject/,
+    );
   });
 });

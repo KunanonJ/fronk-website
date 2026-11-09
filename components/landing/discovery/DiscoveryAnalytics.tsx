@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { ConversionEvents, trackConversion } from "@/lib/analytics/gtag";
 
-const EVENT_MAP: Record<string, (typeof ConversionEvents)[keyof typeof ConversionEvents]> =
-  {
-    contact_cta_click: ConversionEvents.contactCta,
-    venture_outbound_click: ConversionEvents.ventureOutbound,
-    topic_hub_cta: ConversionEvents.topicHubCta,
-  };
+const EVENT_MAP: Record<
+  string,
+  (typeof ConversionEvents)[keyof typeof ConversionEvents]
+> = {
+  contact_cta_click: ConversionEvents.contactCta,
+  venture_outbound_click: ConversionEvents.ventureOutbound,
+  topic_hub_cta: ConversionEvents.topicHubCta,
+};
 
 /**
  * Delegates clicks on `[data-analytics]` CTAs to GA4/GTM conversion events.

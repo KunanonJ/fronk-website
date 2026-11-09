@@ -1,6 +1,5 @@
 export type TextSegment =
-  | { type: "text"; text: string }
-  | { type: "link"; text: string; href: string };
+  { type: "text"; text: string } | { type: "link"; text: string; href: string };
 
 /**
  * Internal site paths written inline in plain-text post bodies, e.g.

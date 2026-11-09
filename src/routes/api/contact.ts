@@ -8,7 +8,9 @@ import { methodNotAllowed } from "@/src/server/http";
 export const Route = createFileRoute("/api/contact")({
   server: {
     handlers: {
-      POST: async ({ request }) => (await guardForm(request, "contact", env as FormGuardEnv)) ?? POST(request),
+      POST: async ({ request }) =>
+        (await guardForm(request, "contact", env as FormGuardEnv)) ??
+        POST(request),
       ANY: () => methodNotAllowed("POST"),
     },
   },

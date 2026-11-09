@@ -21,7 +21,12 @@ export const HIDDEN_BLOG_ROBOTS = { index: false, follow: true } as const;
 
 /** True for `/blog` and `/blog/...` hrefs. */
 export function isBlogHref(href: string): boolean {
-  return href === "/blog" || href.startsWith("/blog/") || href.startsWith("/blog?") || href.startsWith("/blog#");
+  return (
+    href === "/blog" ||
+    href.startsWith("/blog/") ||
+    href.startsWith("/blog?") ||
+    href.startsWith("/blog#")
+  );
 }
 
 /** Drops links to the blog while it's hidden; returns the input unchanged otherwise. */

@@ -52,8 +52,7 @@ const siteSettings = {
     { _type: "navItem", _key: k(), label: "Writing", href: "/writing" },
     { _type: "navItem", _key: k(), label: "Contact", href: "/contact" },
   ],
-  footerTagline:
-    "Building fintech and digital workspaces from Bangkok.",
+  footerTagline: "Building fintech and digital workspaces from Bangkok.",
 };
 
 const homePage = {
@@ -68,7 +67,11 @@ const homePage = {
   writingTitle: "Currently writing",
   writingDescription:
     "Long-form notes on building from zero — fundraising, hiring, shipping, and the daily reality of running early-stage companies.",
-  primaryCta: { _type: "cta", label: "See what I'm shipping", href: "/ventures" },
+  primaryCta: {
+    _type: "cta",
+    label: "See what I'm shipping",
+    href: "/ventures",
+  },
   secondaryCta: { _type: "cta", label: "Read writing", href: "/writing" },
   writingCta: { _type: "cta", label: "Read the journal", href: "/writing" },
 };
@@ -123,7 +126,8 @@ const standardPages = [
     slug: { _type: "slug", current: "contact" },
     eyebrow: "Contact",
     heading: "Say hello.",
-    description: "Get in touch with Fronk Kunanon Jarat — email and social links.",
+    description:
+      "Get in touch with Fronk Kunanon Jarat — email and social links.",
   },
   {
     _id: "page-ventures",

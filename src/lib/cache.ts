@@ -6,9 +6,12 @@ import type { RevalidationTag } from "@/lib/sanity/revalidation";
  * the edge keeps a copy until a Sanity webhook (or the hourly cron) purges
  * its Cache-Tag. s-maxage is avoided: it switches off stale-while-revalidate.
  */
-export const EDGE_LIFETIME = "public, max-age=86400, stale-while-revalidate=86400";
+export const EDGE_LIFETIME =
+  "public, max-age=86400, stale-while-revalidate=86400";
 
-export function edgeCacheHeaders(tags: readonly RevalidationTag[]): Record<string, string> {
+export function edgeCacheHeaders(
+  tags: readonly RevalidationTag[],
+): Record<string, string> {
   return {
     "Cache-Control": "public, max-age=0, must-revalidate",
     "CDN-Cache-Control": EDGE_LIFETIME,
@@ -21,16 +24,26 @@ export function routeCacheHeaders(
   match: { status: string },
   tags: readonly RevalidationTag[],
 ): Record<string, string> {
-  return match.status === "success" ? edgeCacheHeaders(tags) : { "Cache-Control": "no-store" };
+  return match.status === "success"
+    ? edgeCacheHeaders(tags)
+    : { "Cache-Control": "no-store" };
 }
 
 /** The same headers on a response another handler built (feed, llms, sitemap). */
-export async function withEdgeCache(response: Response | Promise<Response>, tags: readonly RevalidationTag[]): Promise<Response> {
+export async function withEdgeCache(
+  response: Response | Promise<Response>,
+  tags: readonly RevalidationTag[],
+): Promise<Response> {
   const res = await response;
   if (!res.ok) return res;
   const headers = new Headers(res.headers);
-  for (const [key, value] of Object.entries(edgeCacheHeaders(tags))) headers.set(key, value);
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  for (const [key, value] of Object.entries(edgeCacheHeaders(tags)))
+    headers.set(key, value);
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers,
+  });
 }
 
 /**
@@ -47,7 +60,11 @@ export async function withEdgeLifetime(
   const headers = new Headers(res.headers);
   headers.set("CDN-Cache-Control", lifetime);
   if (browser) headers.set("Cache-Control", browser);
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  return new Response(res.body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers,
+  });
 }
 
 /**
@@ -57,6 +74,8 @@ export async function withEdgeLifetime(
  */
 const IMAGE_LIFETIME = "public, max-age=86400";
 
-export function withImageCache(response: Response | Promise<Response>): Promise<Response> {
+export function withImageCache(
+  response: Response | Promise<Response>,
+): Promise<Response> {
   return withEdgeLifetime(response, IMAGE_LIFETIME, IMAGE_LIFETIME);
 }

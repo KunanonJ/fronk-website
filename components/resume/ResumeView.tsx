@@ -92,7 +92,10 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-6 flex items-baseline gap-3 border-t border-hairline pt-6">
-      <span aria-hidden="true" className="font-mono text-label tabular-nums text-ink-2">
+      <span
+        aria-hidden="true"
+        className="font-mono text-label tabular-nums text-ink-2"
+      >
         {formatIndex(index)}
       </span>
       <h2 id={id} className="font-display text-h3 text-ink">
@@ -112,7 +115,11 @@ function TimelineSection({
   const headingId = `resume-section-${sectionIndex}`;
   return (
     <section aria-labelledby={headingId}>
-      <SectionHeader id={headingId} index={sectionIndex} title={section.title} />
+      <SectionHeader
+        id={headingId}
+        index={sectionIndex}
+        title={section.title}
+      />
 
       <div>
         {section.items.map((item, itemIndex) => (
@@ -165,7 +172,10 @@ function TimelineEntry({
           <ul className="mt-3 space-y-1.5 text-small text-ink-2">
             {item.bullets.map((bullet) => (
               <li key={bullet} className="flex gap-2.5">
-                <span aria-hidden="true" className="mt-[0.6em] size-1 shrink-0 bg-ink-2" />
+                <span
+                  aria-hidden="true"
+                  className="mt-[0.6em] size-1 shrink-0 bg-ink-2"
+                />
                 <span>{bullet}</span>
               </li>
             ))}
@@ -227,7 +237,10 @@ function SkillsSection({
             key={skill}
             className="flex items-baseline gap-3 border-t border-hairline pt-3 text-small text-ink"
           >
-            <span aria-hidden="true" className="font-mono text-label tabular-nums text-ink-2">
+            <span
+              aria-hidden="true"
+              className="font-mono text-label tabular-nums text-ink-2"
+            >
               {formatIndex(i)}
             </span>
             <span>{skill}</span>

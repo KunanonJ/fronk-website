@@ -14,7 +14,6 @@ const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-
 export const Route = createFileRoute("/_system/resume")({
   loader: ({ context }) => context.queryClient.ensureQueryData(resumeQuery),
   head: () => pageHead(metadata),

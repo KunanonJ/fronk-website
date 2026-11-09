@@ -28,7 +28,11 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
   // Root <html lang> is "en"; mark Thai pillar content as Thai.
   return (
     <>
-      <LandingTopNav position="fixed" wordmarkHref="/" navId="topic-mobile-nav" />
+      <LandingTopNav
+        position="fixed"
+        wordmarkHref="/"
+        navId="topic-mobile-nav"
+      />
       <main id="main" lang={th ? "th" : undefined} className="bg-page text-ink">
         <DiscoveryAnalytics />
         <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 md:px-8">
@@ -45,11 +49,17 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
             ))}
           </div>
 
-          <HubSection title={th ? "หลักฐานจากงานจริง" : "Operator proof"} th={th}>
+          <HubSection
+            title={th ? "หลักฐานจากงานจริง" : "Operator proof"}
+            th={th}
+          >
             <ul className="space-y-3 text-body text-ink-2">
               {pillar.proof.map((item) => (
                 <li key={item} className="flex gap-3">
-                  <span aria-hidden className="mt-[0.65em] size-1.5 shrink-0 bg-signal" />
+                  <span
+                    aria-hidden
+                    className="mt-[0.65em] size-1.5 shrink-0 bg-signal"
+                  />
                   <span>{item}</span>
                 </li>
               ))}
@@ -60,7 +70,9 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
             <dl className="divide-y divide-hairline border-y border-hairline">
               {pillar.faqs.map((faq) => (
                 <div key={faq.question} className="py-5">
-                  <dt className="text-body font-medium text-ink">{faq.question}</dt>
+                  <dt className="text-body font-medium text-ink">
+                    {faq.question}
+                  </dt>
                   <dd className="mt-2 text-body text-ink-2">{faq.answer}</dd>
                 </div>
               ))}

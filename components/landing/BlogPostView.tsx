@@ -9,7 +9,13 @@ import { buildArticleJsonLd } from "@/lib/seo/jsonLd";
  * One blog post: the Sanity post when there is one, otherwise the fallback
  * copy for that slug, otherwise a 404. The route loads the post.
  */
-export default function BlogPostView({ slug, post }: { slug: string; post: Post | null }) {
+export default function BlogPostView({
+  slug,
+  post,
+}: {
+  slug: string;
+  post: Post | null;
+}) {
   if (post) {
     const card = mapPostToBlogCard(post);
     const articleLd = serializeJsonLd(

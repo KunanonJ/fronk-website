@@ -20,9 +20,15 @@ describe("routeShareMeta", () => {
   });
 
   it("advertises the RSS feed only while the blog is public (page alternates replace the layout's)", () => {
-    const meta = routeShareMeta({ title: "Blog", description: "Notes", path: "/blog" });
+    const meta = routeShareMeta({
+      title: "Blog",
+      description: "Notes",
+      path: "/blog",
+    });
     if (BLOG_PUBLIC) {
-      expect(meta.alternates?.types).toEqual({ "application/rss+xml": "/feed.xml" });
+      expect(meta.alternates?.types).toEqual({
+        "application/rss+xml": "/feed.xml",
+      });
     } else {
       expect(meta.alternates?.types).toBeUndefined();
     }
@@ -116,7 +122,8 @@ describe("routeShareMeta", () => {
     expect(routes.length).toBeGreaterThan(0);
     for (const file of routes) {
       const source = readFileSync(file, "utf8");
-      if (source.includes("routeShareMeta(")) expect(source, file).toContain("hasOwnOgImage: true");
+      if (source.includes("routeShareMeta("))
+        expect(source, file).toContain("hasOwnOgImage: true");
     }
   });
 

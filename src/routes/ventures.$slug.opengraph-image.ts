@@ -5,7 +5,8 @@ import render from "@/src/server/og/ventureOg";
 export const Route = createFileRoute("/ventures/$slug/opengraph-image")({
   server: {
     handlers: {
-      GET: async ({ params }) => withImageCache(render({ params: Promise.resolve(params) })),
+      GET: async ({ params }) =>
+        withImageCache(render({ params: Promise.resolve(params) })),
     },
   },
 });

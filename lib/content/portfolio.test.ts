@@ -83,7 +83,9 @@ describe("portfolio visuals", () => {
       const steps = p.workflow?.steps ?? [];
       expect(p.workflow?.title.trim(), p.slug).toBeTruthy();
       expect(steps.length, p.slug).toBeGreaterThanOrEqual(3);
-      expect(new Set(steps.map((s) => s.label)).size, p.slug).toBe(steps.length);
+      expect(new Set(steps.map((s) => s.label)).size, p.slug).toBe(
+        steps.length,
+      );
       for (const step of steps) expect(step.label.trim(), p.slug).not.toBe("");
     }
   });
@@ -92,11 +94,17 @@ describe("portfolio visuals", () => {
     for (const p of projects) {
       const layers = p.architecture?.layers ?? [];
       expect(layers.length, p.slug).toBeGreaterThanOrEqual(2);
-      expect(new Set(layers.map((l) => l.label)).size, p.slug).toBe(layers.length);
+      expect(new Set(layers.map((l) => l.label)).size, p.slug).toBe(
+        layers.length,
+      );
       for (const layer of layers) {
-        expect(layer.nodes.length, `${p.slug} ${layer.label}`).toBeGreaterThan(0);
+        expect(layer.nodes.length, `${p.slug} ${layer.label}`).toBeGreaterThan(
+          0,
+        );
         const labels = layer.nodes.map((n) => n.label);
-        expect(new Set(labels).size, `${p.slug} ${layer.label}`).toBe(labels.length);
+        expect(new Set(labels).size, `${p.slug} ${layer.label}`).toBe(
+          labels.length,
+        );
       }
     }
   });
@@ -138,7 +146,6 @@ describe("portfolio helpers", () => {
       next: null,
     });
   });
-
 });
 
 describe("portfolio nav", () => {
@@ -152,5 +159,4 @@ describe("portfolio nav", () => {
       href: "/portfolio",
     });
   });
-
 });

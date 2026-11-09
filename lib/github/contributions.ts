@@ -120,8 +120,7 @@ export function parseGithubContributionsHtml(
   html: string,
 ): ContributionCalendar {
   const countById = new Map<string, number>();
-  const tipRe =
-    /<tool-tip[^>]*\bfor="([^"]+)"[^>]*>([\s\S]*?)<\/tool-tip>/gi;
+  const tipRe = /<tool-tip[^>]*\bfor="([^"]+)"[^>]*>([\s\S]*?)<\/tool-tip>/gi;
   for (const match of html.matchAll(tipRe)) {
     countById.set(match[1]!, parseTooltipCount(match[2] ?? ""));
   }

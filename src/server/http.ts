@@ -8,7 +8,8 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  "Permissions-Policy":
+    "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
 };
 
 /** Copy of `response` with SECURITY_HEADERS added where the response has not set them. */
@@ -19,14 +20,21 @@ export function withSecurityHeaders(response: Response): Response {
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     if (!headers.has(name)) headers.set(name, value);
   }
-  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 /**
  * The body as text, or null once it passes `maxBytes`. Reads the stream
  * itself, so a missing or false Content-Length cannot get a large body parsed.
  */
-export async function readBodyText(request: Request, maxBytes: number): Promise<string | null> {
+export async function readBodyText(
+  request: Request,
+  maxBytes: number,
+): Promise<string | null> {
   const declared = Number(request.headers.get("content-length") ?? 0);
   if (declared > maxBytes) return null;
   if (!request.body) return "";

@@ -21,10 +21,7 @@ export default function PortfolioArchitecture({
 
   return (
     <section aria-labelledby={headingId}>
-      <h2
-        id={headingId}
-        className="mb-6 font-display text-h3 text-ink"
-      >
+      <h2 id={headingId} className="mb-6 font-display text-h3 text-ink">
         Architecture
       </h2>
 
@@ -55,7 +52,10 @@ export default function PortfolioArchitecture({
               </ul>
             </li>
             {index < layers.length - 1 ? (
-              <li aria-hidden="true" className="flex justify-center py-1.5 text-ink-2">
+              <li
+                aria-hidden="true"
+                className="flex justify-center py-1.5 text-ink-2"
+              >
                 <ArrowDown className="h-4 w-4" />
               </li>
             ) : null}

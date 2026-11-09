@@ -259,9 +259,7 @@ export default function SkillsIndexPage() {
                   </span>
                   <span className="font-mono">{skill.name}</span>
                   {step.note ? (
-                    <span className="text-small text-ink-2">
-                      ({step.note})
-                    </span>
+                    <span className="text-small text-ink-2">({step.note})</span>
                   ) : null}
                 </Link>
                 {index < SKILL_PIPELINE.length - 1 ? (
@@ -301,7 +299,9 @@ export default function SkillsIndexPage() {
                   className="sr-only"
                 />
                 {filter.label}
-                <span className="font-mono text-label tabular-nums">{filter.count}</span>
+                <span className="font-mono text-label tabular-nums">
+                  {filter.count}
+                </span>
               </label>
             ))}
           </div>

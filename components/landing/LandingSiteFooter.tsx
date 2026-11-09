@@ -21,9 +21,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <MonoLabel className="mb-3">
-        {label}
-      </MonoLabel>
+      <MonoLabel className="mb-3">{label}</MonoLabel>
       <ul className="flex flex-col gap-1">{children}</ul>
     </div>
   );
@@ -51,7 +49,9 @@ export default function LandingSiteFooter() {
             >
               {contact.email}
             </a>
-            <p className="mt-3 max-w-sm text-small text-ink-2">{contact.tagline}</p>
+            <p className="mt-3 max-w-sm text-small text-ink-2">
+              {contact.tagline}
+            </p>
             <Link
               href={contact.ctaHref}
               className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-page transition-opacity hover:opacity-90"
@@ -86,7 +86,12 @@ export default function LandingSiteFooter() {
             <FooterColumn label="Elsewhere">
               {socials.map((item) => (
                 <li key={item.href}>
-                  <a href={item.href} target="_blank" rel="noreferrer" className={LINK}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={LINK}
+                  >
                     {item.label}
                   </a>
                 </li>
@@ -112,7 +117,9 @@ export default function LandingSiteFooter() {
 
         <div className="flex flex-col gap-2 border-t border-hairline py-6 text-small text-ink-2 sm:flex-row sm:items-center sm:justify-between">
           {/* Static pages bake the build year; a visit after New Year shows the new one. */}
-          <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Kunanon Jarat. Bangkok, Thailand.</p>
+          <p suppressHydrationWarning>
+            &copy; {new Date().getFullYear()} Kunanon Jarat. Bangkok, Thailand.
+          </p>
           <p className="font-mono text-label uppercase">Built in Bangkok</p>
         </div>
       </div>

@@ -2,7 +2,13 @@ import { DurableObject } from "cloudflare:workers";
 import handler from "@tanstack/react-start/server-entry";
 import { redirectFor } from "./lib/redirects";
 import { withSecurityHeaders } from "./server/http";
-import { ALL_CONTENT_TAGS, handleCronRequest, handleSanityWebhook, purgeTags, type CachePurger } from "./server/revalidate";
+import {
+  ALL_CONTENT_TAGS,
+  handleCronRequest,
+  handleSanityWebhook,
+  purgeTags,
+  type CachePurger,
+} from "./server/revalidate";
 
 /**
  * Worker entry for the Start build (wrangler.start.jsonc "main"). Start picks
@@ -25,7 +31,8 @@ const worker = {
   async scheduled(_controller: unknown, _env: Env, ctx: Ctx): Promise<void> {
     ctx.waitUntil(
       purgeTags(ctx.cache, ALL_CONTENT_TAGS).then((result) => {
-        if (!result.success) console.error("[cron] cache purge failed", result.errors);
+        if (!result.success)
+          console.error("[cron] cache purge failed", result.errors);
       }),
     );
   },
@@ -40,7 +47,11 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     return new Response(null, { status: 308, headers: { Location: location } });
   }
   if (url.pathname === "/api/revalidate" && request.method === "POST") {
-    return handleSanityWebhook(request, env.SANITY_REVALIDATE_SECRET, ctx.cache);
+    return handleSanityWebhook(
+      request,
+      env.SANITY_REVALIDATE_SECRET,
+      ctx.cache,
+    );
   }
   if (url.pathname === "/api/cron/revalidate" && request.method === "GET") {
     return handleCronRequest(request, env.CRON_SECRET, ctx.cache);
@@ -58,4 +69,3 @@ export default worker;
  */
 export class DOQueueHandler extends DurableObject {}
 export class DOShardedTagCache extends DurableObject {}
-

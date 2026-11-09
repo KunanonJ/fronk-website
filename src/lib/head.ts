@@ -11,6 +11,11 @@ const ROOT_OG = fileOg("", `${siteConfig.name} — ${siteConfig.tagline}`);
  * A route's head() from the same Metadata object its Next page exports, with
  * the root layout's metadata merged in the way Next merges it.
  */
-export function pageHead(page: Metadata, options: { fileOgImage?: FileOgImage } = {}) {
-  return metadataToHead(rootMetadata, page, { fileOgImage: options.fileOgImage ?? ROOT_OG });
+export function pageHead(
+  page: Metadata,
+  options: { fileOgImage?: FileOgImage } = {},
+) {
+  return metadataToHead(rootMetadata, page, {
+    fileOgImage: options.fileOgImage ?? ROOT_OG,
+  });
 }

@@ -17,6 +17,7 @@ export function redirectFor(pathname: string): string | null {
   if (writing) return `/blog/${writing[1]}`;
   // Drop a trailing slash with a 308. Leading slashes collapse to one, so a
   // path like //evil.com/ can never become a protocol-relative Location.
-  if (pathname.length > 1 && pathname.endsWith("/")) return "/" + pathname.replace(/^\/+|\/+$/g, "");
+  if (pathname.length > 1 && pathname.endsWith("/"))
+    return "/" + pathname.replace(/^\/+|\/+$/g, "");
   return null;
 }

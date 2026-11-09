@@ -40,7 +40,9 @@ describe("page titles stay short enough for results and sitelinks", () => {
   it("every venture and portfolio title fits in 60 characters with the suffix", () => {
     const titles = [
       ...getAllVentures().map((v) => namedPageTitle(v.name, v.tagline)),
-      ...getAllPortfolioProjects().map((p) => namedPageTitle(p.name, p.tagline)),
+      ...getAllPortfolioProjects().map((p) =>
+        namedPageTitle(p.name, p.tagline),
+      ),
     ];
     for (const title of titles) {
       expect((title + TITLE_SUFFIX).length, title).toBeLessThanOrEqual(

@@ -42,14 +42,18 @@ async function probe(browser, route) {
       for (const e of list.getEntries()) {
         window.__ux.lcp = e.startTime;
         const el = e.element;
-        window.__ux.lcpEl = el ? `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}` : e.url || "";
+        window.__ux.lcpEl = el
+          ? `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}`
+          : e.url || "";
       }
     }).observe({ type: "largest-contentful-paint", buffered: true });
     new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) if (!e.hadRecentInput) window.__ux.cls += e.value;
+      for (const e of list.getEntries())
+        if (!e.hadRecentInput) window.__ux.cls += e.value;
     }).observe({ type: "layout-shift", buffered: true });
     new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) window.__ux.tbt += Math.max(0, e.duration - 50);
+      for (const e of list.getEntries())
+        window.__ux.tbt += Math.max(0, e.duration - 50);
     }).observe({ type: "longtask", buffered: true });
   });
 
@@ -64,7 +68,10 @@ async function probe(browser, route) {
     uploadThroughput: (750 * 1024) / 8,
   });
 
-  const response = await page.goto(BASE + route, { waitUntil: "load", timeout: 120_000 });
+  const response = await page.goto(BASE + route, {
+    waitUntil: "load",
+    timeout: 120_000,
+  });
   await page.waitForTimeout(3000);
 
   const result = await page.evaluate(() => {
@@ -79,7 +86,8 @@ async function probe(browser, route) {
           ? "css"
           : /\.m?js$/.test(path)
             ? "script"
-            : r.initiatorType === "img" || /\.(avif|webp|png|jpe?g|gif|svg)$/.test(path)
+            : r.initiatorType === "img" ||
+                /\.(avif|webp|png|jpe?g|gif|svg)$/.test(path)
               ? "img"
               : r.initiatorType;
       if (type === "font") fonts += 1;
@@ -89,11 +97,15 @@ async function probe(browser, route) {
     bytes.document = nav ? nav.transferSize : 0;
 
     let smallText = 0;
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+    );
     const seen = new Set();
     while (walker.nextNode()) {
       const el = walker.currentNode.parentElement;
-      if (!el || seen.has(el) || !walker.currentNode.textContent?.trim()) continue;
+      if (!el || seen.has(el) || !walker.currentNode.textContent?.trim())
+        continue;
       seen.add(el);
       const style = getComputedStyle(el);
       if (style.visibility === "hidden" || style.display === "none") continue;
@@ -105,16 +117,20 @@ async function probe(browser, route) {
     // here: visually hidden controls (sr-only inputs whose <label> is the real
     // target, the skip link at rest) and inline links inside a sentence.
     let smallTargets = 0;
-    for (const el of document.querySelectorAll("a[href], button, [role='button'], input, select, textarea")) {
+    for (const el of document.querySelectorAll(
+      "a[href], button, [role='button'], input, select, textarea",
+    )) {
       const rect = el.getBoundingClientRect();
       if (rect.width <= 1 || rect.height <= 1) continue;
       const style = getComputedStyle(el);
       // Inline exception: the link sits in running text of its block.
       let block = el.parentElement;
-      while (block && getComputedStyle(block).display.startsWith("inline")) block = block.parentElement;
+      while (block && getComputedStyle(block).display.startsWith("inline"))
+        block = block.parentElement;
       const blockText = block?.textContent?.trim() ?? "";
       const ownText = el.textContent?.trim() ?? "";
-      if (style.display === "inline" && blockText.length > ownText.length) continue;
+      if (style.display === "inline" && blockText.length > ownText.length)
+        continue;
       if (rect.width < 24 || rect.height < 24) smallTargets += 1;
     }
 
@@ -135,9 +151,24 @@ try {
   await browser.close();
 }
 
-console.log(`UX probe: ${BASE} (390x844, 4x CPU, ~1.6 Mbps, 150 ms RTT, cold cache)\n`);
 console.log(
-  ["route", "status", "LCP ms", "LCP el", "CLS", "TBT ms", "JS KB", "CSS KB", "img KB", "fonts", "<12px", "<24px"].join("\t"),
+  `UX probe: ${BASE} (390x844, 4x CPU, ~1.6 Mbps, 150 ms RTT, cold cache)\n`,
+);
+console.log(
+  [
+    "route",
+    "status",
+    "LCP ms",
+    "LCP el",
+    "CLS",
+    "TBT ms",
+    "JS KB",
+    "CSS KB",
+    "img KB",
+    "fonts",
+    "<12px",
+    "<24px",
+  ].join("\t"),
 );
 for (const r of rows) {
   console.log(

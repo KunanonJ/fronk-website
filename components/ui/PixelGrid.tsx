@@ -97,7 +97,9 @@ export function PixelGrid({
       viewBox={`0 0 ${width} ${height}`}
       className={cn("block h-auto w-full", className)}
       data-state={state}
-      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
+      {...(label
+        ? { role: "img", "aria-label": label }
+        : { "aria-hidden": true })}
     >
       {cells.map(({ x, y, tone }) => (
         <rect

@@ -60,7 +60,13 @@ function Label({
   );
 }
 
-function WindowFrame({ title, children }: { title: string; children: ReactNode }) {
+function WindowFrame({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
   return (
     <>
       <rect
@@ -87,7 +93,11 @@ function WindowFrame({ title, children }: { title: string; children: ReactNode }
   );
 }
 
-function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }) {
+function AppShell({
+  mockup,
+}: {
+  mockup: Extract<Mockup, { kind: "app-shell" }>;
+}) {
   const tileX = [176, 406];
   const tileY = [106, 254];
   const chart = [
@@ -98,8 +108,20 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
   ];
   return (
     <WindowFrame title={mockup.title}>
-      <rect x={0.5} y={32} width={150} height={H - 32.5} className="fill-ink/[0.03]" />
-      <line x1={150.5} y1={32} x2={150.5} y2={H - 0.5} className="stroke-ink/10" />
+      <rect
+        x={0.5}
+        y={32}
+        width={150}
+        height={H - 32.5}
+        className="fill-ink/[0.03]"
+      />
+      <line
+        x1={150.5}
+        y1={32}
+        x2={150.5}
+        y2={H - 0.5}
+        className="stroke-ink/10"
+      />
       <circle cx={24} cy={58} r={8} className="fill-ink/20" />
       <Label x={40} y={62} size={13} weight={600} tone="fill-ink">
         {mockup.title}
@@ -109,10 +131,29 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
         return (
           <g key={item}>
             {i === 0 ? (
-              <rect x={10} y={y - 17} width={130} height={26} rx={7} className="fill-signal/10" />
+              <rect
+                x={10}
+                y={y - 17}
+                width={130}
+                height={26}
+                rx={7}
+                className="fill-signal/10"
+              />
             ) : null}
-            <rect x={20} y={y - 10} width={10} height={10} rx={2} className={i === 0 ? "fill-signal" : "fill-ink/30"} />
-            <Label x={38} y={y} size={12} tone={i === 0 ? "fill-ink" : "fill-ink/75"}>
+            <rect
+              x={20}
+              y={y - 10}
+              width={10}
+              height={10}
+              rx={2}
+              className={i === 0 ? "fill-signal" : "fill-ink/30"}
+            />
+            <Label
+              x={38}
+              y={y}
+              size={12}
+              tone={i === 0 ? "fill-ink" : "fill-ink/75"}
+            >
               {item}
             </Label>
           </g>
@@ -123,7 +164,14 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
         {mockup.nav[0] ?? "Dashboard"}
       </Label>
       <Bar x={176} y={82} w={180} tone="fill-ink/12" />
-      <rect x={420} y={52} width={160} height={24} rx={12} className="fill-ink/[0.05] stroke-ink/10" />
+      <rect
+        x={420}
+        y={52}
+        width={160}
+        height={24}
+        rx={12}
+        className="fill-ink/[0.05] stroke-ink/10"
+      />
       <circle cx={604} cy={64} r={12} className="fill-ink/15" />
 
       {mockup.tiles.slice(0, 4).map((tile, i) => {
@@ -131,7 +179,14 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
         const y = tileY[Math.floor(i / 2)]!;
         return (
           <g key={tile}>
-            <rect x={x} y={y} width={210} height={128} rx={12} className="fill-ink/[0.03] stroke-ink/12" />
+            <rect
+              x={x}
+              y={y}
+              width={210}
+              height={128}
+              rx={12}
+              className="fill-ink/[0.03] stroke-ink/12"
+            />
             <Label x={x + 16} y={y + 28} size={12} tone="fill-ink/85">
               {tile}
             </Label>
@@ -155,7 +210,11 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
   );
 }
 
-function EmailReport({ mockup }: { mockup: Extract<Mockup, { kind: "email-report" }> }) {
+function EmailReport({
+  mockup,
+}: {
+  mockup: Extract<Mockup, { kind: "email-report" }>;
+}) {
   const colX = [24, 210, 350, 480];
   const runway = [0.7, 0.55, 0.85, 0.6, 0.75];
   return (
@@ -168,9 +227,22 @@ function EmailReport({ mockup }: { mockup: Extract<Mockup, { kind: "email-report
         {mockup.subject}
       </Label>
 
-      <rect x={24} y={118} width={592} height={38} rx={8} className="fill-success/15" />
+      <rect
+        x={24}
+        y={118}
+        width={592}
+        height={38}
+        rx={8}
+        className="fill-success/15"
+      />
       <circle cx={46} cy={137} r={9} className="fill-success" />
-      <path d="M41.5 137.5 L45 141 L51 133.5" className="fill-none stroke-surface" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M41.5 137.5 L45 141 L51 133.5"
+        className="fill-none stroke-surface"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <Label x={64} y={141} size={13} weight={600} tone="fill-success">
         {mockup.status}
       </Label>
@@ -188,13 +260,47 @@ function EmailReport({ mockup }: { mockup: Extract<Mockup, { kind: "email-report
             <circle cx={32} cy={y + 18} r={5} className="fill-ink/20" />
             <Bar x={44} y={y + 14} w={110} h={8} tone="fill-ink/16" />
             <Bar x={210} y={y + 14} w={70} h={8} tone="fill-ink/14" />
-            <rect x={350} y={y + 15} width={90} height={6} rx={3} className="fill-ink/10" />
-            <rect x={350} y={y + 15} width={90 * r} height={6} rx={3} className="fill-ink/35" />
-            <rect x={480} y={y + 9} width={46} height={18} rx={9} className="fill-success/15" />
-            <Label x={503} y={y + 22} size={10} weight={600} anchor="middle" tone="fill-success">
+            <rect
+              x={350}
+              y={y + 15}
+              width={90}
+              height={6}
+              rx={3}
+              className="fill-ink/10"
+            />
+            <rect
+              x={350}
+              y={y + 15}
+              width={90 * r}
+              height={6}
+              rx={3}
+              className="fill-ink/35"
+            />
+            <rect
+              x={480}
+              y={y + 9}
+              width={46}
+              height={18}
+              rx={9}
+              className="fill-success/15"
+            />
+            <Label
+              x={503}
+              y={y + 22}
+              size={10}
+              weight={600}
+              anchor="middle"
+              tone="fill-success"
+            >
               OK
             </Label>
-            <line x1={24} y1={y + 36} x2={616} y2={y + 36} className="stroke-ink/[0.06]" />
+            <line
+              x1={24}
+              y1={y + 36}
+              x2={616}
+              y2={y + 36}
+              className="stroke-ink/[0.06]"
+            />
           </g>
         );
       })}
@@ -202,7 +308,11 @@ function EmailReport({ mockup }: { mockup: Extract<Mockup, { kind: "email-report
   );
 }
 
-function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview" }> }) {
+function FormPreview({
+  mockup,
+}: {
+  mockup: Extract<Mockup, { kind: "form-preview" }>;
+}) {
   const placeholder = [150, 120, 190, 110, 140];
   const contacts = [150, 120, 170];
   return (
@@ -217,10 +327,27 @@ function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview
             <Label x={24} y={y + 10} size={10} tone="fill-ink/70">
               {field}
             </Label>
-            <rect x={24} y={y + 16} width={270} height={26} rx={6} className="fill-ink/[0.03] stroke-ink/15" />
-            <Bar x={34} y={y + 26} w={placeholder[i] ?? 120} h={6} tone="fill-ink/15" />
+            <rect
+              x={24}
+              y={y + 16}
+              width={270}
+              height={26}
+              rx={6}
+              className="fill-ink/[0.03] stroke-ink/15"
+            />
+            <Bar
+              x={34}
+              y={y + 26}
+              w={placeholder[i] ?? 120}
+              h={6}
+              tone="fill-ink/15"
+            />
             {i === mockup.fields.length - 1 ? (
-              <path d={`M274 ${y + 26} l5 5 l5 -5`} className="fill-none stroke-ink/50" strokeWidth={1.5} />
+              <path
+                d={`M274 ${y + 26} l5 5 l5 -5`}
+                className="fill-none stroke-ink/50"
+                strokeWidth={1.5}
+              />
             ) : null}
           </g>
         );
@@ -230,8 +357,22 @@ function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview
       <Label x={342} y={66} size={10} tone="fill-ink/70" caps>
         Preview
       </Label>
-      <rect x={342} y={80} width={274} height={176} rx={10} className="fill-ink/[0.02] stroke-ink/12" />
-      <rect x={360} y={100} width={44} height={44} rx={8} className="fill-ink/15" />
+      <rect
+        x={342}
+        y={80}
+        width={274}
+        height={176}
+        rx={10}
+        className="fill-ink/[0.02] stroke-ink/12"
+      />
+      <rect
+        x={360}
+        y={100}
+        width={44}
+        height={44}
+        rx={8}
+        className="fill-ink/15"
+      />
       <Label x={418} y={116} size={15} weight={600} tone="fill-ink">
         Your Name
       </Label>
@@ -248,8 +389,22 @@ function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview
         <circle key={cx} cx={cx} cy={240} r={6} className="fill-ink/20" />
       ))}
 
-      <rect x={342} y={280} width={274} height={36} rx={18} className="fill-signal" />
-      <Label x={479} y={303} size={13} weight={600} anchor="middle" tone="fill-paper">
+      <rect
+        x={342}
+        y={280}
+        width={274}
+        height={36}
+        rx={18}
+        className="fill-signal"
+      />
+      <Label
+        x={479}
+        y={303}
+        size={13}
+        weight={600}
+        anchor="middle"
+        tone="fill-paper"
+      >
         {mockup.action}
       </Label>
       <Label x={479} y={336} size={10} anchor="middle" tone="fill-ink/70">
@@ -259,7 +414,11 @@ function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview
   );
 }
 
-function ReviewQueue({ mockup }: { mockup: Extract<Mockup, { kind: "review-queue" }> }) {
+function ReviewQueue({
+  mockup,
+}: {
+  mockup: Extract<Mockup, { kind: "review-queue" }>;
+}) {
   const colEdges = [24, 52, 172, 420, 528, 616];
   const titleW = [200, 170, 215, 150, 190];
   const subW = [120, 140, 100, 130, 110];
@@ -270,38 +429,109 @@ function ReviewQueue({ mockup }: { mockup: Extract<Mockup, { kind: "review-queue
       <Label x={24} y={64} size={15} weight={600} tone="fill-ink">
         {mockup.title}
       </Label>
-      <rect x={440} y={48} width={80} height={24} rx={12} className="fill-ink/[0.05] stroke-ink/12" />
+      <rect
+        x={440}
+        y={48}
+        width={80}
+        height={24}
+        rx={12}
+        className="fill-ink/[0.05] stroke-ink/12"
+      />
       <Bar x={456} y={57} w={48} h={6} tone="fill-ink/20" />
-      <rect x={528} y={48} width={88} height={24} rx={12} className="fill-ink/[0.05] stroke-ink/12" />
+      <rect
+        x={528}
+        y={48}
+        width={88}
+        height={24}
+        rx={12}
+        className="fill-ink/[0.05] stroke-ink/12"
+      />
       <Bar x={544} y={57} w={56} h={6} tone="fill-ink/20" />
 
       <rect x={24} y={84} width={592} height={28} className="fill-ink/[0.04]" />
       {mockup.columns.slice(0, 4).map((col, i) => (
-        <Label key={col} x={colEdges[i + 1]! + 10} y={102} size={10} tone="fill-ink/75" caps>
+        <Label
+          key={col}
+          x={colEdges[i + 1]! + 10}
+          y={102}
+          size={10}
+          tone="fill-ink/75"
+          caps
+        >
           {col}
         </Label>
       ))}
-      <rect x={24} y={84} width={592} height={300} className="fill-none stroke-ink/12" />
+      <rect
+        x={24}
+        y={84}
+        width={592}
+        height={300}
+        className="fill-none stroke-ink/12"
+      />
       {colEdges.slice(1, -1).map((x) => (
-        <line key={x} x1={x} y1={84} x2={x} y2={384} className="stroke-ink/10" />
+        <line
+          key={x}
+          x1={x}
+          y1={84}
+          x2={x}
+          y2={384}
+          className="stroke-ink/10"
+        />
       ))}
       {approved.map((ok, i) => {
         const y = 112 + i * 54;
         return (
           <g key={i}>
             <line x1={24} y1={y} x2={616} y2={y} className="stroke-ink/10" />
-            <Label x={38} y={y + 31} size={10} anchor="middle" tone="fill-ink/60">
+            <Label
+              x={38}
+              y={y + 31}
+              size={10}
+              anchor="middle"
+              tone="fill-ink/60"
+            >
               {i + 1}
             </Label>
-            <rect x={62} y={y + 9} width={64} height={36} rx={4} className="fill-ink/15" />
-            <path d={`M90 ${y + 20} L101 ${y + 27} L90 ${y + 34} Z`} className="fill-ink/45" />
+            <rect
+              x={62}
+              y={y + 9}
+              width={64}
+              height={36}
+              rx={4}
+              className="fill-ink/15"
+            />
+            <path
+              d={`M90 ${y + 20} L101 ${y + 27} L90 ${y + 34} Z`}
+              className="fill-ink/45"
+            />
             <Bar x={184} y={y + 17} w={titleW[i]!} tone="fill-ink/18" />
             <Bar x={184} y={y + 31} w={subW[i]!} h={6} tone="fill-ink/10" />
-            <rect x={432} y={y + 24} width={84} height={6} rx={3} className="fill-ink/10" />
-            <rect x={432} y={y + 24} width={84 * score[i]!} height={6} rx={3} className="fill-ink/35" />
+            <rect
+              x={432}
+              y={y + 24}
+              width={84}
+              height={6}
+              rx={3}
+              className="fill-ink/10"
+            />
+            <rect
+              x={432}
+              y={y + 24}
+              width={84 * score[i]!}
+              height={6}
+              rx={3}
+              className="fill-ink/35"
+            />
             {ok ? (
               <>
-                <rect x={563} y={y + 18} width={18} height={18} rx={4} className="fill-success" />
+                <rect
+                  x={563}
+                  y={y + 18}
+                  width={18}
+                  height={18}
+                  rx={4}
+                  className="fill-success"
+                />
                 <path
                   d={`M567.5 ${y + 27} L571 ${y + 30.5} L577 ${y + 23.5}`}
                   className="fill-none stroke-surface"
@@ -311,7 +541,14 @@ function ReviewQueue({ mockup }: { mockup: Extract<Mockup, { kind: "review-queue
                 />
               </>
             ) : (
-              <rect x={563.5} y={y + 18.5} width={17} height={17} rx={4} className="fill-none stroke-ink/40" />
+              <rect
+                x={563.5}
+                y={y + 18.5}
+                width={17}
+                height={17}
+                rx={4}
+                className="fill-none stroke-ink/40"
+              />
             )}
           </g>
         );
@@ -327,7 +564,11 @@ type PortfolioMockupProps = {
   className?: string;
 };
 
-export default function PortfolioMockup({ mockup, label, className = "" }: PortfolioMockupProps) {
+export default function PortfolioMockup({
+  mockup,
+  label,
+  className = "",
+}: PortfolioMockupProps) {
   const decorative = !label;
   return (
     <svg

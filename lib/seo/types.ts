@@ -8,11 +8,21 @@
 
 type Url = string | URL;
 
-export type MetadataTitle = string | { absolute: string } | { default: string; template?: string };
+export type MetadataTitle =
+  string | { absolute: string } | { default: string; template?: string };
 
-export type MetadataImage = Url | { url: Url; width?: number | string; height?: number | string; alt?: string; type?: string };
+export type MetadataImage =
+  | Url
+  | {
+      url: Url;
+      width?: number | string;
+      height?: number | string;
+      alt?: string;
+      type?: string;
+    };
 
-export type MetadataRobots = string | { index?: boolean; follow?: boolean; nocache?: boolean };
+export type MetadataRobots =
+  string | { index?: boolean; follow?: boolean; nocache?: boolean };
 
 export type Metadata = {
   metadataBase?: URL | null;
@@ -52,10 +62,14 @@ export type Viewport = {
   initialScale?: number;
   viewportFit?: "auto" | "contain" | "cover";
   interactiveWidget?: "resizes-visual" | "resizes-content" | "overlays-content";
-  themeColor?: string | { color: string; media?: string } | { color: string; media?: string }[];
+  themeColor?:
+    | string
+    | { color: string; media?: string }
+    | { color: string; media?: string }[];
 };
 
-type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+type ChangeFrequency =
+  "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 export type RobotsRule = {
   userAgent?: string | string[];

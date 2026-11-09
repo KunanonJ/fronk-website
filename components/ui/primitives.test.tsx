@@ -43,7 +43,9 @@ describe("Chip", () => {
     expect(container.querySelector(".bg-ember")).not.toBeNull();
     expect(screen.getByText(word)).toBeInTheDocument();
     // Ember sits on the chip's Paper surface, never on a tint.
-    expect((container.firstElementChild as HTMLElement).className).toMatch(/bg-surface\b/);
+    expect((container.firstElementChild as HTMLElement).className).toMatch(
+      /bg-surface\b/,
+    );
   });
 });
 
@@ -66,7 +68,9 @@ describe("Section", () => {
     );
     const region = screen.getByRole("region", { name: "Work" });
     expect(region).toHaveAttribute("id", "work");
-    expect(screen.getByRole("heading", { level: 2, name: "Work" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Work" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -74,7 +78,9 @@ describe("PixelGrid", () => {
   const opts = { cols: 16, rows: 6, seed: 42, density: 0.45 } as const;
 
   it("is deterministic for the same seed (no hydration mismatch)", () => {
-    expect(pixelCells({ ...opts, state: "idle" })).toEqual(pixelCells({ ...opts, state: "idle" }));
+    expect(pixelCells({ ...opts, state: "idle" })).toEqual(
+      pixelCells({ ...opts, state: "idle" }),
+    );
     expect(pixelCells({ ...opts, state: "idle" })).not.toEqual(
       pixelCells({ ...opts, seed: 43, state: "idle" }),
     );
@@ -90,9 +96,14 @@ describe("PixelGrid", () => {
 
   it("is decorative by default and an image when labelled", () => {
     const { container, unmount } = render(<PixelGrid />);
-    expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector("svg")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     unmount();
     render(<PixelGrid label="Validator activity" state="live" />);
-    expect(screen.getByRole("img", { name: "Validator activity" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Validator activity" }),
+    ).toBeInTheDocument();
   });
 });

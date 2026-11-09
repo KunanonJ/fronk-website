@@ -64,12 +64,16 @@ export function parseContactInput(raw: unknown): ContactInput {
   };
 }
 
+// eslint-disable-next-line no-control-regex -- stripping control characters is the point
+const CONTROL_CHARS = /[\u0000-\u001f\u007f]+/g;
+
 /** Collapse control characters (CR/LF included) so a subject can't inject headers. */
 const singleLine = (value: string): string =>
-  // eslint-disable-next-line no-control-regex -- stripping control characters is the point
-  value.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim();
+  value.replace(CONTROL_CHARS, " ").replace(/\s+/g, " ").trim();
 
-export function buildSubject(input: Pick<ContactInput, "name" | "topics">): string {
+export function buildSubject(
+  input: Pick<ContactInput, "name" | "topics">,
+): string {
   const about = input.topics.length > 0 ? input.topics.join(", ") : "Message";
   return singleLine(`[kunanonj.com] ${about} from ${input.name}`).slice(
     0,
@@ -93,7 +97,10 @@ function validate(input: ContactInput): string | null {
   if (!input.name || input.name.length > CONTACT_LIMITS.nameMax) {
     return contactMessages.invalidName;
   }
-  if (input.email.length > CONTACT_LIMITS.emailMax || !isValidEmail(input.email)) {
+  if (
+    input.email.length > CONTACT_LIMITS.emailMax ||
+    !isValidEmail(input.email)
+  ) {
     return contactMessages.invalidEmail;
   }
   if (input.message.length < CONTACT_LIMITS.messageMin) {
@@ -129,7 +136,11 @@ export async function sendContactMessage(
   const invalid = validate(input);
   if (invalid) return { ok: false, status: 400, message: invalid };
 
-  const sent: ContactResult = { ok: true, status: 200, message: contactMessages.sent };
+  const sent: ContactResult = {
+    ok: true,
+    status: 200,
+    message: contactMessages.sent,
+  };
   if (looksAutomated(input)) return sent;
 
   const apiKey = config.apiKey?.trim();
@@ -139,7 +150,11 @@ export async function sendContactMessage(
     return { ok: false, status: 503, message: contactMessages.notConfigured };
   }
 
-  const failed: ContactResult = { ok: false, status: 502, message: contactMessages.failed };
+  const failed: ContactResult = {
+    ok: false,
+    status: 502,
+    message: contactMessages.failed,
+  };
   try {
     const response = await fetchImpl(RESEND_EMAILS_URL, {
       method: "POST",

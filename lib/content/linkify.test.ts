@@ -59,7 +59,8 @@ describe("fallback blog posts", () => {
     if (href === "/about") return true;
     const [, section, slug] = href.split("/");
     if (section === "topics") return topicSlugs.has(slug ?? "");
-    if (section === "ventures") return Boolean(getVentureBySlug(slug ?? "")?.caseStudy);
+    if (section === "ventures")
+      return Boolean(getVentureBySlug(slug ?? "")?.caseStudy);
     if (section === "blog") return blogSlugs.has(slug ?? "");
     return false;
   }

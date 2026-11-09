@@ -114,9 +114,10 @@ App boots at http://localhost:3000.
 | `pnpm deploy:staging`          | Build and deploy the staging Worker (`fronk-website-start`) |
 | `pnpm cron:preview`            | Preview the separate Cloudflare Cron Worker locally         |
 | `pnpm cron:deploy`             | Deploy the separate Cloudflare Cron Worker                  |
-| `pnpm typecheck`               | `tsc --noEmit`                                              |
-| `pnpm lint`                    | ESLint                                                      |
+| `pnpm typecheck`               | `tsc --noEmit` with TypeScript 7 (see Toolchain below)      |
+| `pnpm lint`                    | ESLint, failing on any warning                              |
 | `pnpm format` / `format:check` | Prettier write / verify                                     |
+| `pnpm knip`                    | Unused files, exports and dependencies                      |
 | `pnpm test`                    | Vitest (unit + integration)                                 |
 | `pnpm test:watch`              | Vitest watch mode                                           |
 | `pnpm test:coverage`           | Vitest with V8 coverage                                     |
@@ -281,17 +282,37 @@ wrangler.jsonc           # Production Worker; wrangler.start.jsonc = staging
 ## Testing
 
 ```bash
-pnpm lint
 pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm knip
 pnpm test
 pnpm build
 pnpm perf:budget
-pnpm preview   # optional: smoke-test the Cloudflare Worker runtime locally
+node scripts/start-gates.mjs   # parity crawl + Playwright smoke and axe on the build
 ```
 
-CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint, unit tests,
-production build, performance budget (300 KB gzip on marketing/library routes;
-205 KB on resume and other system routes), and Playwright smoke checks.
+CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint (no
+warnings), Prettier, knip, unit tests, the production build, the first-load JS
+budget (200 KB gzip by default, 255 KB on marketing routes), Playwright smoke
+and axe checks, the visual baselines (in the Playwright container) and the
+parity crawl.
+
+### Toolchain and dependency policy
+
+- **TypeScript:** `typescript` is TypeScript 6 (`@typescript/typescript6`), the
+  JavaScript API that typescript-eslint and editors load; `typescript-7` provides
+  the `tsc` that `pnpm typecheck` runs. `pnpm typecheck:tsc6` checks with 6.
+- **Pins:** test and build tooling is pinned to exact versions. `@playwright/test`
+  must match the Playwright container image in `.github/workflows/ci.yml`; bump
+  both together (Dependabot skips it).
+- **Overrides:** `pnpm.overrides` holds exact pins for transitive security fixes.
+  After any upgrade, run `pnpm audit` and drop overrides the parents no longer need.
+- **Updates:** Dependabot opens grouped weekly PRs after a 7-day cooldown
+  (`.github/dependabot.yml`). Every merge to `main` deploys production, so merge
+  them only on a green CI.
+- **Build guard:** `vite build` fails when `NEXT_PUBLIC_SITE_URL` or the Sanity
+  project/dataset are missing (they come from the wrangler `vars`).
 
 ## License
 

@@ -23,7 +23,9 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
   it("includes a Person, a WebSite, and at least two Organizations", () => {
     expect(byType("Person")).toBeDefined();
     expect(byType("WebSite")).toBeDefined();
-    expect(graph().filter((n) => n["@type"] === "Organization").length).toBeGreaterThanOrEqual(2);
+    expect(
+      graph().filter((n) => n["@type"] === "Organization").length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it("links WebSite.publisher and every founded Organization.founder to the Person @id", () => {
@@ -48,7 +50,9 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     expect(tbh).toBeDefined();
     expect(tbh!.url).toBe("https://thebinaryholdings.com");
     expect(tbh!.founder).toBeUndefined();
-    const worksFor = (byType("Person")!.worksFor as Node[]).map((w) => w["@id"]);
+    const worksFor = (byType("Person")!.worksFor as Node[]).map(
+      (w) => w["@id"],
+    );
     expect(worksFor).toContain(tbh!["@id"]);
   });
 
@@ -90,8 +94,14 @@ describe("buildProfilePageJsonLd > is a ProfilePage bound to the Person", () => 
 describe("buildFaqJsonLd > emits a FAQPage from supplied Q&A", () => {
   it("maps each item to a Question whose acceptedAnswer carries the answer text", () => {
     const faq = buildFaqJsonLd([
-      { question: "Who is Fronk?", answer: "Kunanon Jarat, a Bangkok founder." },
-      { question: "What is GoGoCash?", answer: "A shopping-to-earn cashback platform." },
+      {
+        question: "Who is Fronk?",
+        answer: "Kunanon Jarat, a Bangkok founder.",
+      },
+      {
+        question: "What is GoGoCash?",
+        answer: "A shopping-to-earn cashback platform.",
+      },
     ]);
     expect(faq["@type"]).toBe("FAQPage");
     const entities = faq.mainEntity as Node[];

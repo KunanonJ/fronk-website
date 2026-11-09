@@ -12,6 +12,14 @@ export const Route = createFileRoute("/_landing/blog/")({
 });
 
 function BlogRoute() {
-  const { cards, eyebrow, heading, description } = useSuspenseQuery(blogIndexQuery).data;
-  return <BlogIndex posts={cards} eyebrow={eyebrow} heading={heading} description={description} />;
+  const { cards, eyebrow, heading, description } =
+    useSuspenseQuery(blogIndexQuery).data;
+  return (
+    <BlogIndex
+      posts={cards}
+      eyebrow={eyebrow}
+      heading={heading}
+      description={description}
+    />
+  );
 }

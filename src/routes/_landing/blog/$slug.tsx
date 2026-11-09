@@ -7,7 +7,9 @@ import { blogPostQuery } from "@/src/queries/content";
 
 export const Route = createFileRoute("/_landing/blog/$slug")({
   loader: async ({ context, params }) => {
-    const result = await context.queryClient.ensureQueryData(blogPostQuery(params.slug));
+    const result = await context.queryClient.ensureQueryData(
+      blogPostQuery(params.slug),
+    );
     if (!result) throw notFound();
     return { head: result.head };
   },

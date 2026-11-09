@@ -33,12 +33,33 @@ const PUBLIC_ENV = [
   "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
 ];
 
+/**
+ * Values a build cannot do without. A missing one would be inlined as
+ * `undefined` and the site would ship without Sanity content (as in #79).
+ */
+const REQUIRED_PUBLIC_ENV = [
+  "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_SANITY_PROJECT_ID",
+  "NEXT_PUBLIC_SANITY_DATASET",
+];
+
 const wranglerConfig = process.env.START_WRANGLER_CONFIG ?? "wrangler.jsonc";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   // Precedence: the shell (CI overrides), then local .env files, then the
   // Worker's own `vars`, so Workers Builds needs no build variables.
-  const env = { ...readWranglerVars(path.join(root, wranglerConfig)), ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
+  const env = {
+    ...readWranglerVars(path.join(root, wranglerConfig)),
+    ...loadEnv(mode, root, "NEXT_PUBLIC_"),
+    ...process.env,
+  };
+  const missing =
+    command === "build" ? REQUIRED_PUBLIC_ENV.filter((key) => !env[key]) : [];
+  if (missing.length > 0) {
+    throw new Error(
+      `Build needs ${missing.join(", ")}: set them in ${wranglerConfig} "vars" or the shell.`,
+    );
+  }
   return {
     server: { port: 3000 },
     // IPv4 explicitly: in the CI container "localhost" binds ::1 while the
@@ -49,11 +70,17 @@ export default defineConfig(({ mode }) => {
       alias: [{ find: /^@\//, replacement: `${root}/` }],
     },
     define: Object.fromEntries(
-      PUBLIC_ENV.map((key) => [`process.env.${key}`, env[key] === undefined ? "undefined" : JSON.stringify(env[key])]),
+      PUBLIC_ENV.map((key) => [
+        `process.env.${key}`,
+        env[key] === undefined ? "undefined" : JSON.stringify(env[key]),
+      ]),
     ),
     plugins: [
       // Production config by default; `pnpm deploy:staging` builds against the staging Worker.
-      cloudflare({ configPath: wranglerConfig, viteEnvironment: { name: "ssr" } }),
+      cloudflare({
+        configPath: wranglerConfig,
+        viteEnvironment: { name: "ssr" },
+      }),
       tanstackStart({
         // Pages built from lib/content are rendered once per deploy and served
         // as static assets; Sanity-backed pages render on request (Phase 4

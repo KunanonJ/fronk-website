@@ -6,9 +6,7 @@ import {
   buildBreadcrumbJsonLd,
   buildSoftwareApplicationJsonLd,
 } from "@/lib/seo/jsonLd";
-import {
-  getVentureBySlug,
-} from "@/lib/content/ventures";
+import { getVentureBySlug } from "@/lib/content/ventures";
 import { fileOg } from "@/src/lib/og";
 import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { pageHead } from "@/src/lib/head";
@@ -19,12 +17,24 @@ type Props = { params: Promise<{ slug: string }> };
 
 const RELATED: Record<string, readonly { label: string; href: string }[]> = {
   manut: [
-    { label: "ERP / CRM / internal systems", href: "/topics/erp-crm-internal-systems" },
-    { label: "AI transformation Thailand", href: "/topics/ai-transformation-thailand" },
-    { label: "Manut automotive case (blog)", href: "/blog/manut-ai-erp-crm-automotive" },
+    {
+      label: "ERP / CRM / internal systems",
+      href: "/topics/erp-crm-internal-systems",
+    },
+    {
+      label: "AI transformation Thailand",
+      href: "/topics/ai-transformation-thailand",
+    },
+    {
+      label: "Manut automotive case (blog)",
+      href: "/blog/manut-ai-erp-crm-automotive",
+    },
   ],
   gogocash: [
-    { label: "Tech startups Bangkok & SEA", href: "/topics/tech-startup-thailand-sea" },
+    {
+      label: "Tech startups Bangkok & SEA",
+      href: "/topics/tech-startup-thailand-sea",
+    },
     { label: "Cashback loops (blog)", href: "/blog/cashback-loops" },
   ],
 };
@@ -93,8 +103,13 @@ function VentureCasePageView({ slug }: { slug: string }) {
 
 export const Route = createFileRoute("/_landing/ventures/$slug")({
   loader: async ({ params }) => {
-    if (!(getVentureBySlug(params.slug)?.caseStudy)) throw notFound();
-    return { head: pageHead(await generateMetadata({ params: Promise.resolve(params) }), { fileOgImage: fileOg(`/ventures/${params.slug}`, "Venture hub") }) };
+    if (!getVentureBySlug(params.slug)?.caseStudy) throw notFound();
+    return {
+      head: pageHead(
+        await generateMetadata({ params: Promise.resolve(params) }),
+        { fileOgImage: fileOg(`/ventures/${params.slug}`, "Venture hub") },
+      ),
+    };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

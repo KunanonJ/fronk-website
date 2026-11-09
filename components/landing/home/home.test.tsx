@@ -24,8 +24,12 @@ describe("Home hero", () => {
 
   it("offers Contact and See my work, and labels the live state in words", () => {
     render(<Hero />);
-    expect(screen.getByRole("link", { name: hero.primaryCta.label })).toHaveAttribute("href", "/contact");
-    expect(screen.getByRole("link", { name: hero.secondaryCta.label })).toHaveAttribute("href", "/portfolio");
+    expect(
+      screen.getByRole("link", { name: hero.primaryCta.label }),
+    ).toHaveAttribute("href", "/contact");
+    expect(
+      screen.getByRole("link", { name: hero.secondaryCta.label }),
+    ).toHaveAttribute("href", "/portfolio");
     expect(screen.getByText("Live")).toBeInTheDocument();
     expect(screen.getByText(hero.status)).toBeInTheDocument();
   });
@@ -34,7 +38,9 @@ describe("Home hero", () => {
 describe("Home ventures", () => {
   it("shows exactly two ventures, GoGoCash and Manut AI, with no Airplusauto", () => {
     const { container } = render(<Features />);
-    const titles = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
+    const titles = screen
+      .getAllByRole("heading", { level: 3 })
+      .map((h) => h.textContent);
     expect(titles).toEqual(["GoGoCash", "Manut AI"]);
     expect(container.textContent).not.toMatch(/Airplusauto/i);
     expect(container.querySelector("video")).toBeNull();
@@ -45,7 +51,9 @@ describe("Home ventures", () => {
     const names = ventures.cards.map((c) => c.linkLabel);
     expect(new Set(names).size).toBe(names.length);
     for (const card of ventures.cards) {
-      expect(screen.getByRole("link", { name: card.linkLabel })).toHaveAttribute("href", card.href);
+      expect(
+        screen.getByRole("link", { name: card.linkLabel }),
+      ).toHaveAttribute("href", card.href);
     }
     expect(screen.queryByRole("link", { name: /^Learn more$/ })).toBeNull();
   });
@@ -69,6 +77,9 @@ describe("Proof and portfolio strips", () => {
       expect(links[i]).toHaveAttribute("href", `/portfolio/${p.slug}`);
       expect(links[i]).toHaveTextContent(p.name);
     });
-    expect(screen.getByRole("link", { name: /All work/ })).toHaveAttribute("href", "/portfolio");
+    expect(screen.getByRole("link", { name: /All work/ })).toHaveAttribute(
+      "href",
+      "/portfolio",
+    );
   });
 });

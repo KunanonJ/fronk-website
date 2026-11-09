@@ -97,7 +97,9 @@ export default function PortfolioProjectPage({
       <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-hairline bg-hairline md:grid-cols-4">
         {meta.map((row) => (
           <div key={row.label} className="flex flex-col gap-1.5 bg-surface p-5">
-            <dt className="font-mono text-label uppercase text-ink-2">{row.label}</dt>
+            <dt className="font-mono text-label uppercase text-ink-2">
+              {row.label}
+            </dt>
             <dd className="text-small font-medium text-ink">{row.value}</dd>
           </div>
         ))}
@@ -110,16 +112,19 @@ export default function PortfolioProjectPage({
           </p>
 
           <section aria-labelledby="portfolio-highlights">
-            <h2 id="portfolio-highlights" className="mb-4 font-display text-h3 text-ink">
+            <h2
+              id="portfolio-highlights"
+              className="mb-4 font-display text-h3 text-ink"
+            >
               What it does
             </h2>
             <ul className="space-y-3">
               {project.highlights.map((item) => (
-                <li
-                  key={item}
-                  className="flex gap-3 text-body text-ink-2"
-                >
-                  <span className="mt-[0.6em] size-1.5 shrink-0 bg-signal" aria-hidden="true" />
+                <li key={item} className="flex gap-3 text-body text-ink-2">
+                  <span
+                    className="mt-[0.6em] size-1.5 shrink-0 bg-signal"
+                    aria-hidden="true"
+                  />
                   {item}
                 </li>
               ))}
@@ -131,9 +136,7 @@ export default function PortfolioProjectPage({
               <h2 className="mb-3 font-display text-h3 text-ink">
                 {section.heading}
               </h2>
-              <p className="text-body text-ink-2">
-                {section.body}
-              </p>
+              <p className="text-body text-ink-2">{section.body}</p>
             </section>
           ))}
         </div>

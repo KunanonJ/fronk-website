@@ -40,7 +40,10 @@ export default function BlogPostPage({
         navId="blog-post-mobile-nav"
       />
 
-      <main id="main" className="relative z-10 px-4 pb-24 pt-28 sm:px-6 md:px-10">
+      <main
+        id="main"
+        className="relative z-10 px-4 pb-24 pt-28 sm:px-6 md:px-10"
+      >
         <article className="mx-auto max-w-3xl">
           <Link
             href="/blog"
@@ -66,9 +69,7 @@ export default function BlogPostPage({
                 </span>
               ))}
             </div>
-            <h1
-              className="text-4xl font-medium tracking-tight text-ink sm:text-5xl"
-            >
+            <h1 className="text-4xl font-medium tracking-tight text-ink sm:text-5xl">
               {title}
             </h1>
             <p className="mt-4 text-base leading-relaxed text-ink/70">
@@ -92,7 +93,10 @@ export default function BlogPostPage({
               <PortableText value={body!} />
             ) : hasParagraphs ? (
               bodyParagraphs!.map((paragraph) => (
-                <p key={paragraph.slice(0, 48)} className="text-base leading-relaxed text-ink/80">
+                <p
+                  key={paragraph.slice(0, 48)}
+                  className="text-base leading-relaxed text-ink/80"
+                >
                   {linkifyInternalPaths(paragraph).map((segment, index) =>
                     segment.type === "link" ? (
                       <Link

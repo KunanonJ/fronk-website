@@ -5,4 +5,3 @@ export function pickString(
   const trimmed = value?.trim();
   return trimmed ? trimmed : fallback;
 }
-

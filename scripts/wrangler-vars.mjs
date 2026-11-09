@@ -33,7 +33,8 @@ export function parseJsonc(text) {
       out += "\n";
     } else if (ch === "/" && next === "*") {
       i += 2;
-      while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i += 1;
+      while (i < text.length && !(text[i] === "*" && text[i + 1] === "/"))
+        i += 1;
       i += 1;
     } else {
       out += ch;

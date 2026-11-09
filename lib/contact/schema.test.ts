@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 import { contactMessages } from "@/lib/content/contact";
 import { firstContactError } from "./schema";
 
-const valid = { name: "Ada", email: "ada@example.com", message: "Hello there, a project.", topics: [], company: "" };
+const valid = {
+  name: "Ada",
+  email: "ada@example.com",
+  message: "Hello there, a project.",
+  topics: [],
+  company: "",
+};
 
 describe("contactFormSchema", () => {
   it("accepts a valid message", () => {

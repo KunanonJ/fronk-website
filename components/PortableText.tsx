@@ -43,7 +43,11 @@ const components: PortableTextComponents = {
           </div>
         )}
         <pre className="overflow-x-auto bg-ink/[0.04] p-4 text-sm">
-          <code className={value.language ? `language-${value.language}` : undefined}>
+          <code
+            className={
+              value.language ? `language-${value.language}` : undefined
+            }
+          >
             {value.code}
           </code>
         </pre>
@@ -59,7 +63,12 @@ const components: PortableTextComponents = {
         "text-ink underline decoration-ink decoration-2 underline-offset-4 hover:text-ink";
       if (isExternal) {
         return (
-          <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={className}
+          >
             {children}
           </a>
         );

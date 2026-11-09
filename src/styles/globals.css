@@ -13,11 +13,13 @@
 
 @theme inline {
   /* visual-redesign Phase 0: Geist + Geist Mono, Noto Sans Thai for Thai. */
-  --font-sans: var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif,
-    system-ui, sans-serif;
+  --font-sans:
+    var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
-  --font-display: var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif,
-    system-ui, sans-serif;
+  --font-display:
+    var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif, system-ui,
+    sans-serif;
 
   /* Role colours (visual-redesign Phase 0). */
   --color-page: var(--page);
@@ -80,7 +82,6 @@
 
   /* helumi and the intro use this curve; not "--ease-out", which Tailwind already defines. */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-
 }
 
 /* ─── Palette (owner, visual-redesign 09-11-26) ─────────────────────────────
@@ -175,7 +176,16 @@ body {
  * in light, the lighter blue in dark; both pass 3:1 on page and surface). In
  * the base layer so components with their own focus utilities keep them. */
 @layer base {
-  :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  :where(
+    a,
+    button,
+    [role="button"],
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex]
+  ):focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }

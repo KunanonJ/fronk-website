@@ -4,10 +4,7 @@ import { pageHead } from "../../lib/head";
 import AboutHero from "@/components/landing/about/AboutHero";
 import AboutPageContent from "@/components/landing/AboutPageContent";
 import type { Metadata } from "@/lib/seo/types";
-import {
-  buildFaqJsonLd,
-  buildProfilePageJsonLd,
-} from "@/lib/seo/jsonLd";
+import { buildFaqJsonLd, buildProfilePageJsonLd } from "@/lib/seo/jsonLd";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
