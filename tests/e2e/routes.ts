@@ -102,8 +102,20 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /\S/,
   },
   {
+    // One section and one FAQ: the grid variant the canvas does not draw.
+    path: "/th/topics/tech-startup-thailand-sea",
+    name: "topic-hub-th-short",
+    expectsHeadingPattern: /SEA/,
+  },
+  {
     path: "/ventures/gogocash",
     name: "venture-hub",
     expectsHeadingPattern: /GoGoCash/i,
+  },
+  {
+    // No metrics and no core loop: the venture variant the canvas leaves out.
+    path: "/ventures/manut",
+    name: "venture-hub-manut",
+    expectsHeadingPattern: /Manut AI/i,
   },
 ];

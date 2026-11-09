@@ -383,6 +383,7 @@
   },
   {
     "path": "/th/topics/tech-startup-thailand-sea",
+    "test": "topic-hub-th-short",
     "intended": ["htmlLang"]
   },
   {
@@ -417,14 +418,17 @@
   },
   {
     "path": "/ventures/gogocash",
-    "test": "venture-hub"
+    "test": "venture-hub",
+    "intended": ["h1"]
   },
   {
     "path": "/ventures/gogocash/opengraph-image",
     "seed": false
   },
   {
-    "path": "/ventures/manut"
+    "path": "/ventures/manut",
+    "test": "venture-hub-manut",
+    "intended": ["h1"]
   },
   {
     "path": "/ventures/manut/opengraph-image",
