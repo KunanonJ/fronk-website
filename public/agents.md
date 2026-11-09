@@ -11,13 +11,13 @@ Owner: Kunanon Jarat (Fronk) — Bangkok, Thailand
 
 | Resource | URL | Purpose |
 |---|---|---|
-| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, topic hubs, ventures, blog for LLM context |
+| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, topic hubs, ventures and portfolio for LLM context |
 | Topic hubs (EN) | [/topics/ai-transformation-thailand](/topics/ai-transformation-thailand) | AI transformation · ERP/CRM · startups TH/SEA |
 | Venture hubs | [/ventures/manut](/ventures/manut), [/ventures/gogocash](/ventures/gogocash) | Product case pages |
 | Markdown sitemap | [/sitemap.md](/sitemap.md) | Human/agent-readable route map |
 | XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |
 | Skills & coding guidelines | [/skills.md](/skills.md) | Prompts and standards for coding agents |
-| RSS feed | [/feed.xml](/feed.xml) | Blog syndication (`/rss.xml` redirects here) |
+| RSS feed | [/feed.xml](/feed.xml) | Blog syndication; empty while the blog is hidden (`/rss.xml` redirects here) |
 | Robots | [/robots.txt](/robots.txt) | Crawler rules |
 
 ---
@@ -55,7 +55,7 @@ These agents live in the private repo harness (`.claude/agents/`, `.codex/agents
 1. Start with [/llms.txt](/llms.txt) for identity and current content.
 2. Use [/sitemap.md](/sitemap.md) for the public route map.
 3. Follow [/skills.md](/skills.md) when generating code against this stack (Next.js 16, React 19, TypeScript, Tailwind v4).
-4. Prefer `/about` (not `/stock/asme`) and `/blog` (not `/writing`).
+4. Prefer `/about` (not `/stock/asme`). The blog (`/blog`) is hidden and noindex for now; don't cite it.
 5. Do not scrape `/studio` or `/api/*` for content.
 
 ---

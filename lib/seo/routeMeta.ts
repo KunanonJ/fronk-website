@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { FEED_PATH } from "@/lib/content/rss";
 import { OG_SIZE } from "@/lib/og/card";
 import { siteConfig } from "@/lib/site";
@@ -76,7 +77,8 @@ export function routeShareMeta({
       ...(languages ? { languages } : {}),
       // A page-level `alternates` replaces the root layout's wholesale, so
       // the feed link has to be repeated here to reach every page's <head>.
-      types: { "application/rss+xml": FEED_PATH },
+      // Not advertised while the blog is hidden (the feed is empty then).
+      ...(BLOG_PUBLIC ? { types: { "application/rss+xml": FEED_PATH } } : {}),
     },
     openGraph: {
       type,

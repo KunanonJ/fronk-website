@@ -3,6 +3,7 @@
  * aligned with landing CI routes (`/blog`, `/contact`, `/#ventures`).
  */
 
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import type { StackIconId } from "@/lib/content/stackIcons";
 
 export type AboutInlineLink = {
@@ -196,15 +197,25 @@ export const aboutPage = {
             href: "https://protocol.camp",
             external: true,
           },
-          {
-            type: "text",
-            text: " cohort 2025 and the Bangkok Startup Association. Writing the occasional note in the ",
-          },
-          { type: "link", text: "blog", href: "/blog" },
-          {
-            type: "text",
-            text: " when something is worth working out in public.",
-          },
+          // The blog sentence returns with the blog (BLOG_PUBLIC; hidden 09-11-26).
+          ...(BLOG_PUBLIC
+            ? ([
+                {
+                  type: "text",
+                  text: " cohort 2025 and the Bangkok Startup Association. Writing the occasional note in the ",
+                },
+                { type: "link", text: "blog", href: "/blog" },
+                {
+                  type: "text",
+                  text: " when something is worth working out in public.",
+                },
+              ] as const)
+            : ([
+                {
+                  type: "text",
+                  text: " cohort 2025 and the Bangkok Startup Association.",
+                },
+              ] as const)),
         ],
       },
       {

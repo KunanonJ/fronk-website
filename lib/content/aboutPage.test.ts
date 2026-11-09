@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aboutPage } from "./aboutPage";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 
 function flattenSpans(
   paragraphs: readonly { spans: readonly { text: string; href?: string }[] }[],
@@ -46,7 +47,7 @@ describe("aboutPage content", () => {
     expect(aboutPage.story.id).toBe("story");
   });
 
-  it("uses /blog not legacy /writing", () => {
+  it("never links legacy /writing, and links /blog only while the blog is public", () => {
     const corpus = [
       flattenSpans(aboutPage.story.paragraphs),
       flattenSpans(aboutPage.now.paragraphs),
@@ -54,8 +55,9 @@ describe("aboutPage content", () => {
       ...aboutPage.cta.links.map((l) => l.href),
     ].join(" ");
 
-    expect(corpus).toContain("/blog");
     expect(corpus).not.toContain("/writing");
+    if (BLOG_PUBLIC) expect(corpus).toContain("/blog");
+    else expect(corpus).not.toContain("/blog");
   });
 
   it("grounds key entities from the real bio", () => {

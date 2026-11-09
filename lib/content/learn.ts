@@ -1,4 +1,5 @@
 import type { BlogCard } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 
 export type LearnLink = {
@@ -11,7 +12,7 @@ export const learnPage = {
   eyebrow: "Learn",
   title: "Learn",
   description:
-    "How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, writing, and operator notes.",
+    `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
 } as const;
 
 export function getLearnTopicLinks(): readonly LearnLink[] {
@@ -26,6 +27,8 @@ export function getLearnWritingLinks(
   posts: readonly BlogCard[],
   limit = 6,
 ): readonly LearnLink[] {
+  // No "Writing" cards while the blog is hidden (BLOG_PUBLIC).
+  if (!BLOG_PUBLIC) return [];
   return posts.slice(0, limit).map((post) => ({
     title: post.title,
     description: post.excerpt,

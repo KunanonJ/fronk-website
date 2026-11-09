@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { resolveBlogCards } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { getAllPortfolioSlugs } from "@/lib/content/portfolio";
 import { getAllSkillSlugs } from "@/lib/content/skills";
 import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
@@ -17,7 +18,10 @@ const STATIC_ROUTES: readonly {
   { path: "", changeFrequency: "weekly", priority: 1 },
   { path: "/about", changeFrequency: "monthly", priority: 0.9 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
+  // /blog and its posts are listed only while the blog is public (BLOG_PUBLIC).
+  ...(BLOG_PUBLIC
+    ? [{ path: "/blog", changeFrequency: "weekly" as const, priority: 0.9 }]
+    : []),
   { path: "/learn", changeFrequency: "weekly", priority: 0.85 },
   { path: "/examples", changeFrequency: "monthly", priority: 0.8 },
   { path: "/stack", changeFrequency: "monthly", priority: 0.75 },
@@ -62,6 +66,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));
+
+  if (!BLOG_PUBLIC) return staticEntries;
 
   const posts = await fetchAllPosts();
   const cards = resolveBlogCards(posts);

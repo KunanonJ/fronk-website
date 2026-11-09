@@ -63,7 +63,7 @@ feat|fix|chore([scope]): [short active-voice summary]
 
 1. Read [/sitemap.md](/sitemap.md) for current routes.
 2. Check `components/landing/` before inventing parallel chrome.
-3. Keep primary nav: KunanonJ · About · Ventures · Press · Blog · Contact.
+3. Keep primary nav: KunanonJ · About · Ventures · Portfolio · Skills · Library · Contact (Press and Blog are hidden; `BLOG_PUBLIC` in `lib/content/blogVisibility.ts` restores Blog).
 
 ---
 

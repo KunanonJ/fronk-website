@@ -8,6 +8,7 @@ import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { WebVitals } from "@/components/WebVitals";
 import RouteFade from "@/components/landing/RouteFade";
 import { siteConfig } from "@/lib/site";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { resolveGscVerification } from "@/lib/seo/searchConsole";
@@ -52,9 +53,8 @@ export const metadata: Metadata = {
   creator: siteConfig.name,
   alternates: {
     canonical: "/",
-    types: {
-      "application/rss+xml": "/feed.xml",
-    },
+    // RSS only carries blog posts, so it isn't advertised while the blog is hidden.
+    ...(BLOG_PUBLIC ? { types: { "application/rss+xml": "/feed.xml" } } : {}),
   },
   openGraph: {
     type: "website",

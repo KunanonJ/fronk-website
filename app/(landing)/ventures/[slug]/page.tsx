@@ -10,6 +10,7 @@ import {
   buildSoftwareApplicationJsonLd,
 } from "@/lib/seo/jsonLd";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -85,7 +86,7 @@ export default async function VentureCasePage({ params }: Props) {
       />
       <VentureHubPage
         venture={venture}
-        relatedTopics={RELATED[slug] ?? []}
+        relatedTopics={withoutHiddenBlogLinks(RELATED[slug] ?? [])}
       />
     </>
   );

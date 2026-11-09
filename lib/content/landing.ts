@@ -1,3 +1,5 @@
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
+
 export const site = {
   wordmark: "KunanonJ",
   contextLabel: "Bangkok 🇹🇭 · Founder",
@@ -60,7 +62,10 @@ export const primaryNav: readonly NavItem[] = [
       icon: item.icon,
     })),
   },
-  { type: "link", label: "Blog", href: "/blog", icon: "blog" },
+  // Blog hidden 09-11-26 (owner request); flip BLOG_PUBLIC to restore it.
+  ...(BLOG_PUBLIC
+    ? [{ type: "link", label: "Blog", href: "/blog", icon: "blog" } as const]
+    : []),
   // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
 
@@ -76,7 +81,7 @@ export const nav = [
   { label: "Ventures", href: "/#ventures" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Skills", href: "/skills" },
-  { label: "Blog", href: "/blog" },
+  ...(BLOG_PUBLIC ? [{ label: "Blog", href: "/blog" } as const] : []),
   { label: "Contact", href: "/contact" },
 ] as const;
 
@@ -174,7 +179,8 @@ export const footerResources = [
   // `/skills.md` is the coding guide for agents working on this site, not the
   // `/skills` catalog, so it is labelled to keep the two apart.
   { label: "Agent guide", href: "/skills.md" },
-  { label: "feed.xml", href: "/feed.xml" },
+  // The RSS feed only carries blog posts, so it's listed only while the blog is public.
+  ...(BLOG_PUBLIC ? [{ label: "feed.xml", href: "/feed.xml" } as const] : []),
 ] as const;
 
 export const contact = {
