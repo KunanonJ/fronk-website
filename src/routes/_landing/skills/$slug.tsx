@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -32,14 +33,14 @@ function SkillRouteView({ slug }: { slug: string }) {
   const skill = getSkillBySlug(slug);
   if (!skill) throw notFound();
 
-  const crumbLd = JSON.stringify(
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Skills", path: "/skills" },
       { name: skill.name, path: `/skills/${slug}` },
     ]),
   );
-  const codeLd = JSON.stringify(buildSkillJsonLd(skill));
+  const codeLd = serializeJsonLd(buildSkillJsonLd(skill));
 
   return (
     <>

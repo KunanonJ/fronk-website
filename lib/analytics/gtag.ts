@@ -26,7 +26,6 @@ export const ConversionEvents = {
   contactCta: "contact_cta_click",
   ventureOutbound: "venture_outbound_click",
   topicHubCta: "topic_hub_cta",
-  newsletterSubscribe: "newsletter_subscribe",
 } as const;
 
 export function trackConversion(

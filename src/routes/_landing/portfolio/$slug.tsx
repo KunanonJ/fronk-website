@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import PortfolioProjectPage from "@/components/landing/PortfolioProjectPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -30,7 +31,7 @@ function PortfolioProjectRouteView({ slug }: { slug: string }) {
   const project = getPortfolioProjectBySlug(slug);
   if (!project) throw notFound();
 
-  const crumbLd = JSON.stringify(
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Portfolio", path: "/portfolio" },

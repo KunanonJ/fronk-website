@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import VentureHubPage from "@/components/landing/discovery/VentureHubPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -56,7 +57,7 @@ function VentureCasePageView({ slug }: { slug: string }) {
   const venture = getVentureBySlug(slug);
   if (!venture?.caseStudy) throw notFound();
 
-  const appLd = JSON.stringify(
+  const appLd = serializeJsonLd(
     buildSoftwareApplicationJsonLd({
       name: venture.name,
       description: venture.description,
@@ -64,7 +65,7 @@ function VentureCasePageView({ slug }: { slug: string }) {
       pagePath: `/ventures/${slug}`,
     }),
   );
-  const crumbLd = JSON.stringify(
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Ventures", path: "/#ventures" },

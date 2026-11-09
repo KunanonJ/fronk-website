@@ -15,7 +15,8 @@ export function redirectFor(pathname: string): string | null {
   if (exact) return exact;
   const writing = /^\/writing\/([^/]+)$/.exec(pathname);
   if (writing) return `/blog/${writing[1]}`;
-  // Next drops a trailing slash with a 308 (trailingSlash: false).
-  if (pathname.length > 1 && pathname.endsWith("/")) return pathname.replace(/\/+$/, "") || "/";
+  // Drop a trailing slash with a 308. Leading slashes collapse to one, so a
+  // path like //evil.com/ can never become a protocol-relative Location.
+  if (pathname.length > 1 && pathname.endsWith("/")) return "/" + pathname.replace(/^\/+|\/+$/g, "");
   return null;
 }

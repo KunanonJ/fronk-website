@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { pageHead } from "../../lib/head";
 import AboutHero from "@/components/landing/about/AboutHero";
 import AboutPageContent from "@/components/landing/AboutPageContent";
@@ -22,8 +23,8 @@ const metadata: Metadata = {
 };
 
 function AboutPage() {
-  const profileLd = JSON.stringify(buildProfilePageJsonLd());
-  const faqLd = JSON.stringify(buildFaqJsonLd(FAQ_ITEMS));
+  const profileLd = serializeJsonLd(buildProfilePageJsonLd());
+  const faqLd = serializeJsonLd(buildFaqJsonLd(FAQ_ITEMS));
 
   return (
     <main id="main">

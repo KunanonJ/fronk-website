@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import TopicHubPage from "@/components/landing/discovery/TopicHubPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -37,8 +38,8 @@ function TopicPillarPageView({ slug }: { slug: string }) {
   const pillar = getTopicPillar(slug, "en");
   if (!pillar) throw notFound();
 
-  const faqLd = JSON.stringify(buildFaqJsonLd(pillar.faqs));
-  const crumbLd = JSON.stringify(
+  const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: pillar.h1, path: `/topics/${slug as TopicSlug}` },

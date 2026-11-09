@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
 import type { Metadata } from "@/lib/seo/types";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -13,7 +14,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 function SkillsRoute() {
-  const crumbLd = JSON.stringify(
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Skills", path: "/skills" },

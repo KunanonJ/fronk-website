@@ -4,7 +4,7 @@ import {
   isContactTopic,
   type ContactTopic,
 } from "@/lib/content/contact";
-import { isValidEmail } from "@/lib/newsletter/subscribe";
+import { isValidEmail } from "@/lib/contact/email";
 
 const RESEND_EMAILS_URL = "https://api.resend.com/emails";
 const SUBJECT_MAX = 150;

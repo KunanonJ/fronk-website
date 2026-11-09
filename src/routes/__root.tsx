@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { lazy, Suspense, type ReactNode } from "react";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
 import type { RouterContext } from "../router";
@@ -18,7 +19,7 @@ import geistLatin from "../fonts/geist-latin.woff2?url";
 import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
 
-const siteJsonLd = JSON.stringify(buildSiteJsonLd());
+const siteJsonLd = serializeJsonLd(buildSiteJsonLd());
 const global = rootHead(rootViewport);
 // Router head() keeps one meta per name, so the two media-scoped theme
 // colours are rendered straight into <head> instead.
