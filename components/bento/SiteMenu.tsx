@@ -46,27 +46,34 @@ function Row({
  * canvas order, the Library group in two columns, then the ink "Contact me"
  * button. The current page's row (or its parent section) carries
  * aria-current="page", a Glaze fill and a small accent square.
+ *
+ * It is server-rendered on every page and `hidden` while closed, so its links
+ * stay in the HTML for crawlers; opening it replays the panel animation.
  */
 export default function SiteMenu({
+  open,
   pathname,
   onNavigate,
 }: {
+  open: boolean;
   pathname: string;
   onNavigate: () => void;
 }) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    if (!open) return;
     ref.current
       ?.querySelector<HTMLElement>("a[href]")
       ?.focus({ preventScroll: true });
-  }, []);
+  }, [open]);
 
   return (
     <nav
       ref={ref}
       id="site-menu"
       aria-label="Site"
+      hidden={!open}
       className={cn(PANEL, "kj-menu w-[360px]")}
     >
       {siteMenu.rows.map((row) => (
