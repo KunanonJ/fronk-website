@@ -34,7 +34,7 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** The page body for one slug; shared with the TanStack Start route. */
 function TopicPillarPageView({ slug }: { slug: string }) {
-  if (!isTopicSlug(slug)) notFound();
+  if (!isTopicSlug(slug)) throw notFound();
   const pillar = getTopicPillar(slug, "en");
   if (!pillar) throw notFound();
 

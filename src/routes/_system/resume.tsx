@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { Metadata } from "@/lib/seo/types";
 import { ResumeView } from "@/components/resume/ResumeView";
-import { edgeCacheHeaders } from "@/src/lib/cache";
+import { routeCacheHeaders } from "@/src/lib/cache";
 import { pageHead } from "@/src/lib/head";
 import { resumeQuery } from "@/src/queries/content";
 
@@ -18,7 +18,7 @@ const metadata: Metadata = {
 export const Route = createFileRoute("/_system/resume")({
   loader: ({ context }) => context.queryClient.ensureQueryData(resumeQuery),
   head: () => pageHead(metadata),
-  headers: () => edgeCacheHeaders(["resume"]),
+  headers: ({ match }) => routeCacheHeaders(match, ["resume"]),
   component: ResumeRoute,
 });
 
