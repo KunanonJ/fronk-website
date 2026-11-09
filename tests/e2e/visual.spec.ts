@@ -16,7 +16,10 @@ import { ROUTES } from "./routes";
  * CI runs the same image (the `visual` job). After an intentional visual
  * change, refresh with `--update-snapshots=changed` and review every image.
  *
- * Reduced motion keeps captures deterministic. Chromium only: WebKit and
+ * Reduced motion keeps captures deterministic (it also turns off every
+ * entrance animation and the Bangkok scene loops), the clock is frozen so the
+ * Home "Based in Bangkok" card always reads 10:30 AM, and the first-visit
+ * intro is marked as seen so it never covers a capture. Chromium only: WebKit and
  * Firefox rasterise fonts too differently for pixel diffs (smoke.spec covers
  * them). CMS-driven routes are skipped: an owner edit in Sanity would
  * otherwise fail unrelated pull requests.
@@ -33,6 +36,8 @@ for (const theme of THEMES) {
   test.describe(`visual (${theme})`, () => {
     test.beforeEach(async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
+      // 03:30 UTC = 10:30 AM in Bangkok (GMT+7, no DST).
+      await page.clock.setFixedTime(new Date("2026-11-09T03:30:00Z"));
       await page.addInitScript((value) => {
         try {
           localStorage.setItem("theme", value);
