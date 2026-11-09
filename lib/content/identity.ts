@@ -20,9 +20,8 @@ export const PERSON_ALTERNATE_NAMES = [
   "Fronk Kunanon Jarat",
 ] as const;
 
-/** Meta description for Home and the site (about 155 characters). */
-export const PERSON_META_DESCRIPTION =
-  "Kunanon Jarat (Fronk): AI engineering lead and solopreneur in Bangkok. Founder of GoGoCash, builder of Manut AI, open to Forward Deployed Engineer roles.";
+/** Meta description for Home and the site; lives in identityMeta.ts for bundle size. */
+export { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 
 /** Short headline for profile cards and agent docs. */
 export const PERSON_HEADLINE =
