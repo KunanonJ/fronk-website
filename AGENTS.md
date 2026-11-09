@@ -727,11 +727,11 @@ The authoritative historical source remains:
 - Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
 - Package manager is pnpm 10.34 (`packageManager`); Node engine is ≥22.22.2 and CI pins 22.23.4 (see `.node-version`)
 - Transitive security fixes live as exact pins in `pnpm.overrides` (some major-scoped, e.g. `glob@10`). On every dependency upgrade: re-run `pnpm audit`, re-check each override against the patched ranges (pnpm never warns when a pin goes stale or undercuts a parent's declared range), and compare the lockfile's `engines.node` values with `.node-version`
-- Public UI: the cinematic `/` + `/showcase` from `landing-cutover` is live (verified 02-11-26; plans archived in `process/features/landing-cutover/completed/`); the FogLAMP/Dennis redesign and `website-power-upgrade` are superseded
+- Public UI: the `visual-redesign` system is live (Phases 0-6, 09-11-26; plans in `process/features/visual-redesign/completed/`): light by default with a dark toggle, role tokens in `app/globals.css` (Signal/Glaze/Paper/Ink/Clay/Ember; Ember only for live or failed states), Geist + Geist Mono + Noto Sans Thai, CSS-only motion (no framer-motion). `/showcase` and `/stock/velorah` redirect to `/`. It supersedes `landing-cutover`, the FogLAMP/Dennis redesign and `website-power-upgrade`
 - Active discovery program: `process/features/sea-discovery/` (SEO/AEO/SEM/LinkedIn for AI transformation · ERP/CRM · startups TH/SEA)
 - Indexed authority routes: `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, `/ventures/[slug]`; system `/resume`, `/studio` (noindex); `/ventures` index → `/#ventures`; `/now` → `/`; `/writing` → `/blog`
 - Landing content is static in `lib/content/landing.ts`; blog/editorial via hosted Sanity Studio at `https://fronk-website.sanity.studio/` (`/studio` on-site is a launcher only); Learn/topic hubs are code-driven (`lib/content/learn.ts`); portrait at `public/profile.jpg`
-- Public contact email is fronk.kunanon@gmail.com; venture Airplus is branded Airplusauto (`https://airplusauto.com`); landing socials omit Telegram
+- Public contact email is fronk.kunanon@gmail.com; the site lists two ventures, GoGoCash and Manut AI (Airplusauto dropped by the owner on 09-11-26); landing socials omit Telegram
 - Bangkok is the site location signal; wordmark KunanonJ
 - Reference Prisma Vite prototype lives at sibling `/Users/kunanonjarat/Developer/prisma-landing`
 

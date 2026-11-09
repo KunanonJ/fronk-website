@@ -1,6 +1,6 @@
 # Phase 5 report: Library, Skills, hubs and resume (09-11-26)
 
-**Plan:** `../active/phase-5_library-skills-hubs_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-5_library-skills-hubs_PLAN_09-11-26.md`
 **Branch:** `feat/redesign-library`
 **Mode:** EXECUTE under the owner's standing approval (Phases 3-6).
 

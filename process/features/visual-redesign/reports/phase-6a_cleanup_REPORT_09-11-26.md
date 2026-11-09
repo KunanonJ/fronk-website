@@ -1,6 +1,6 @@
 # Phase 6a report: cleanup, nav without framer-motion, dev speed (09-11-26)
 
-**Plan:** `../active/phase-6_cleanup-guardrails_PLAN_09-11-26.md` (split: 6a cleanup here; 6b = Linux visual baselines in CI, the head snapshot for the migration, closeout)
+**Plan:** `../completed/phase-6_cleanup-guardrails_PLAN_09-11-26.md` (split: 6a cleanup here; 6b = Linux visual baselines in CI, the head snapshot for the migration, closeout)
 **Branch:** `feat/redesign-cleanup`
 **Mode:** EXECUTE under the owner's standing approval.
 

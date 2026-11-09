@@ -7,12 +7,13 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
-and AI workspaces (GoGoCash, Manut, Airplusauto). Public marketing UI is a
-cinematic landing shell; resume and Sanity Studio remain as system
+and AI workspaces (GoGoCash, Manut AI). The public UI uses the
+visual-redesign system (09-11-26): light by default with a dark toggle, the
+Signal/Glaze/Ink palette and Geist; resume and Sanity Studio remain as system
 surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
 
 ```
-Tech:      Next.js 16.4 · React 19.3 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 · framer-motion
+Tech:      Next.js 16.4 · React 19.3 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
 Runtime:   Node.js ≥22.22 · Cloudflare Workers + OpenNext + R2 cache
@@ -132,7 +133,7 @@ App boots at http://localhost:3000.
 Edit static copy in:
 
 - [`lib/content/landing.ts`](./lib/content/landing.ts) — wordmark, hero, about,
-  ventures (GoGoCash / Manut / Airplusauto), socials, contact
+  ventures (GoGoCash / Manut AI), socials, contact
 - [`lib/content/introGreetings.ts`](./lib/content/introGreetings.ts) — intro
   greetings and timing (ends on **Welcome to KunanonJ**; whole intro capped at
   1.5 s by a unit test, skippable)

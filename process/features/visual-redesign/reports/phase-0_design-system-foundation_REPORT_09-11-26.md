@@ -1,6 +1,6 @@
 # Phase 0 report: Design system foundation (09-11-26)
 
-**Plan:** `../active/phase-0_design-system-foundation_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-0_design-system-foundation_PLAN_09-11-26.md`
 **Branch:** `feat/design-system-foundation`
 **Mode:** EXECUTE under the Harness-Absent Fallback. The owner chose "Merge, start Phase 0".
 

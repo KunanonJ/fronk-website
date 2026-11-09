@@ -1,6 +1,6 @@
 # Phase 2 report: Home (09-11-26)
 
-**Plan:** `../active/phase-2_home_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-2_home_PLAN_09-11-26.md`
 **Branch:** `feat/redesign-home`
 **Owner decisions (09-11-26):**
 - keep the intro, restyled;

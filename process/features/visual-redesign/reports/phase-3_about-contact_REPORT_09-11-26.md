@@ -1,6 +1,6 @@
 # Phase 3 report: About and Contact (09-11-26)
 
-**Plan:** `../active/phase-3_about-contact_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-3_about-contact_PLAN_09-11-26.md`
 **Branch:** `feat/redesign-about-contact`
 **Mode:** EXECUTE under the owner's standing approval (09-11-26) to run Phases 3-6 and merge each on green checks.
 
