@@ -6,7 +6,7 @@ import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { WebVitals } from "@/components/WebVitals";
-import RouteSplash from "@/components/landing/RouteSplash";
+import RouteFade from "@/components/landing/RouteFade";
 import { siteConfig } from "@/lib/site";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
@@ -118,7 +118,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          <RouteSplash />
+          <RouteFade />
           {children}
         </ThemeProvider>
         <GoogleTagManager />

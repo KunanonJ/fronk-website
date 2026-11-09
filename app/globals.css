@@ -257,120 +257,36 @@ body:not(:has(.landing-root))::before {
   animation: fade-rise 0.8s ease-out 0.4s both;
 }
 
-/* Route transition splash — cover → hold → reveal panel wipe */
-.route-splash {
-  pointer-events: auto;
-  /* Block interaction while covering; fade shell after panels clear */
-  animation: route-splash-shell 1.8s linear forwards;
+/*
+ * First-visit intro (IntroLoader). Never runs under reduced motion; the whole
+ * thing finishes within 1.5 s. Exit duration is set inline from INTRO_TIMING.
+ * (The 1.8 s route-splash panel wipe was removed 09-11-26; route changes now
+ * use a ~250 ms fade of <main>, see components/landing/RouteFade.tsx.)
+ */
+.intro-overlay {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.route-splash-box {
-  /* Brand CI — landing cream primary (same as CTA / text-primary) */
-  background: var(--color-primary, #dedbc8);
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-.route-splash-box-top {
-  transform: translateY(-101%);
-  animation: route-splash-top 1.55s forwards;
-}
-
-.route-splash-box-bottom {
-  transform: translateY(101%);
-  animation: route-splash-bottom 1.55s forwards;
-}
-
-/* Cover (ease-out) → hold → reveal (ease-in-out) */
-@keyframes route-splash-top {
-  0% {
-    transform: translateY(-101%);
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  32% {
-    transform: translateY(0%);
-    animation-timing-function: linear;
-  }
-  48% {
-    transform: translateY(0%);
-    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
-  }
-  100% {
-    transform: translateY(-101%);
-  }
-}
-
-@keyframes route-splash-bottom {
-  0% {
-    transform: translateY(101%);
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  32% {
-    transform: translateY(0%);
-    animation-timing-function: linear;
-  }
-  48% {
-    transform: translateY(0%);
-    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
-  }
-  100% {
-    transform: translateY(101%);
-  }
-}
-
-@keyframes route-splash-shell {
-  0%,
-  88% {
-    opacity: 1;
-    visibility: visible;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-.route-splash-mark {
-  z-index: 1;
-}
-
-.route-splash-mark-text {
+.intro-overlay.is-exiting {
   opacity: 0;
-  transform: translateY(8px);
-  animation: route-splash-mark 1.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 0.22s;
+  pointer-events: none;
 }
 
-@keyframes route-splash-mark {
-  0% {
+.intro-word {
+  animation: intro-word-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes intro-word-in {
+  from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: scale(0.96);
     filter: blur(6px);
   }
-  22% {
+  to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-  55% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-6px) scale(1.01);
-    filter: blur(4px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .route-splash,
-  .route-splash-box-top,
-  .route-splash-box-bottom,
-  .route-splash-mark-text {
-    animation: none !important;
+    transform: none;
+    filter: none;
   }
 }
 

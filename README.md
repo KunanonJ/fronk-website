@@ -133,7 +133,8 @@ Edit static copy in:
 - [`lib/content/landing.ts`](./lib/content/landing.ts) — wordmark, hero, about,
   ventures (GoGoCash / Manut / Airplusauto), socials, contact
 - [`lib/content/introGreetings.ts`](./lib/content/introGreetings.ts) — intro
-  loader greetings (ends on **Welcome to KunanonJ**)
+  greetings and timing (ends on **Welcome to KunanonJ**; whole intro capped at
+  1.5 s by a unit test, skippable)
 
 UI lives under `components/landing/` and `app/(landing)/`.
 

@@ -25,9 +25,10 @@ import zlib from "node:zlib";
 // across all routes, hero-independent). Raise deliberately and document why.
 const DEFAULT_BUDGET_KB = 205;
 
-// Landing cutover (2026-07): `RouteSplash` mounts in the root layout, so every
-// marketing page pays framer-motion on first load (~40–80 KB gz above the
-// resume/system floor). Blog/editorial/library routes sit higher because they
+// Landing cutover (2026-07): marketing pages pay framer-motion and landing
+// chrome on first load (~40–80 KB gz above the resume/system floor). The root
+// `RouteSplash` that pulled framer-motion into every route was replaced by the
+// dependency-free `RouteFade` (2026-11, ux-experience Phase 1). Blog/editorial/library routes sit higher because they
 // also ship landing nav + next/image card chrome. Resume/stock stay on DEFAULT.
 const MARKETING_BUDGET_KB = 300;
 
@@ -43,7 +44,7 @@ const MARKETING_EXACT = new Set([
   "/proof",
   "/build",
   // Portfolio (2026-11) uses LibraryPageShell like /stack and /proof: landing
-  // nav + next/image card chrome on top of the RouteSplash floor.
+  // nav + next/image card chrome on top of the marketing floor.
   "/portfolio",
   // Skills (2026-11): landing nav + small tabs/copy-button islands.
   "/skills",

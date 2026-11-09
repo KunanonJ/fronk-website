@@ -1,6 +1,6 @@
 # Phase 1: Remove waiting
 
-**Status:** PLANNED (re-research at phase entry). Waiting for EXECUTE approval.
+**Status:** EXECUTED 09-11-26, verified locally on the Workers preview; PR open, waiting on merge/deploy approval. Evidence: `../reports/phase-1_remove-waiting_REPORT_09-11-26.md`.
 **Created:** 06-11-26
 **Umbrella:** `ux-experience_UMBRELLA_PLAN_06-11-26.md`
 **Covers audit findings:** 4 (8.1 s intro), 5 (1.8 s route wipe), 8 (cursor rAF never idles)
@@ -54,13 +54,13 @@ Every landing route, because the splash and cursor are global. Visual baselines 
 
 | Gate | Expected | Result |
 |---|---|---|
-| Unit | Intro total under 1500 ms; skip handler ends the intro; cursor loop stops after convergence (fake timers) | |
-| Probe (first visit, phone) | Hero visible under 1.5 s (baseline 8.1 s) | |
-| Probe (navigation) | New page's h1 visible under 300 ms after the click | |
-| Keyboard | Tab reaches "Skip intro"; Enter skips | |
-| Reduced motion | No intro, no fade | |
-| Idle cursor (desktop, Performance panel) | No rAF callbacks after 1 s still | |
-| typecheck / lint / test / build:cloudflare / perf:budget / e2e smoke+a11y | green | |
+| Unit | Intro total under 1500 ms; skip handler ends the intro; cursor loop stops after convergence (fake timers) | pass: 21 new tests across 4 files |
+| Probe (first visit, phone) | Hero visible under 1.5 s (baseline 8.1 s) | intro on screen 1454 ms (1468 ms throttled) |
+| Probe (navigation) | New page's h1 visible under 300 ms after the click | 199-282 ms (unthrottled and throttled) |
+| Keyboard | Tab reaches "Skip intro"; Enter skips | Changed: any key (Tab included) ends the intro at once; the button remains for pointer and screen-reader users |
+| Reduced motion | No intro, no fade | pass |
+| Idle cursor (desktop, Performance panel) | No rAF callbacks after 1 s still | 0 rAF calls in 1 s idle (rAF counter instead of the panel) |
+| typecheck / lint / test / build:cloudflare / perf:budget / e2e smoke+a11y | green | green; 409/409 unit, 100/100 e2e; marketing routes +3.3 KB gz (bundler artifact, see report) |
 
 ## Blockers that justify BLOCKED
 

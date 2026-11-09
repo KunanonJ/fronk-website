@@ -23,7 +23,8 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 3. **Motion**
    * Prefer Apple-like easing: `cubic-bezier(0.16, 1, 0.3, 1)` / `cubic-bezier(0.22, 1, 0.36, 1)`.
    * Respect `prefers-reduced-motion`.
-   * Route transitions: global `RouteSplash` (do not reintroduce full-page flashes).
+   * Route transitions: global `RouteFade`, a ~250 ms opacity fade of `<main>`. Never cover the page with a full-screen wipe or splash.
+   * First-visit intro: at most 1.5 s, skippable on any key, click, tap or scroll (`lib/content/introGreetings.ts`).
 
 4. **Content**
    * Marketing copy lives in `lib/content/` (especially `landing.ts`).

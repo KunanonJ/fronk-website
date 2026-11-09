@@ -2,7 +2,7 @@
 
 **Date:** 06-11-26
 **Complexity:** Phase program (6 phases)
-**Status:** PLANNED. No phase has started. Phase 0 is next and waits for EXECUTE approval.
+**Status:** IN PROGRESS. Phase 0 shipped (#53, 08-11-26). Phase 1 executed 09-11-26 and its PR is open. Phase 2 is next.
 **Feature:** `ux-experience`
 **Evidence:** `../reports/ux-audit_REPORT_06-11-26.md` (live-site audit, findings 1-20)
 **Harness note:** `.claude/` and `process/context/` are absent in this checkout. Phases run directly in the main session under the Harness-Absent Fallback (`process/development-protocols/orchestration.md`), with the same plan files and approval gates.
