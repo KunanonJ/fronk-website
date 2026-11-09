@@ -12,9 +12,6 @@ import {
 import { socials } from "@/lib/content/landing";
 import { expandHashHref } from "@/lib/landing/nav";
 
-const VIDEO_URL =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260602_150901_c45b90ec-18d7-42ff-90e2-b95d7109e330.mp4";
-
 function TwitterIcon({ size = 13 }: { size?: number }) {
   return (
     <svg
@@ -89,7 +86,7 @@ function SocialBtn({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`flex h-8 w-8 items-center justify-center rounded-xl transition-opacity hover:opacity-80 ${className}`}
+      className={`flex h-9 w-9 items-center justify-center rounded-full border border-hairline-strong bg-surface text-ink-2 transition-colors hover:text-ink ${className}`}
     >
       {children}
     </a>
@@ -100,25 +97,27 @@ const SOCIAL_BUTTONS = [
   {
     label: "X",
     href: socials[0].href,
-    className: "bg-gray-100 text-gray-800",
+    className: "",
     Icon: TwitterIcon,
   },
   {
     label: "LinkedIn",
     href: socials[1].href,
-    className: "bg-blue-100 text-blue-600",
+    className: "",
     Icon: LinkedinIcon,
   },
   {
     label: "GitHub",
     href: socials[2].href,
-    className: "bg-orange-100 text-orange-500",
+    className: "",
     Icon: GithubIcon,
   },
 ] as const;
 
 const inputClassName =
-  "min-w-0 flex-1 rounded-xl border border-gray-200 bg-transparent px-3 py-2.5 text-sm text-black placeholder-gray-400 transition focus:border-transparent focus:ring-2 focus:ring-gray-900 focus:outline-none";
+  "w-full min-w-0 rounded-input border border-hairline-strong bg-surface px-4 py-3 text-body text-ink transition-colors focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/30";
+
+const labelClassName = "font-mono text-label uppercase text-ink-2";
 
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -181,219 +180,191 @@ export default function FormaContactPage() {
   };
 
   return (
-    <main
-      id="main"
-      className="forma-contact min-h-screen bg-white p-3 sm:p-4 md:p-6"
-      style={{ fontFamily: "var(--font-inter-contact), Inter, sans-serif" }}
-    >
-      <div className="relative min-h-[calc(100vh-24px)] overflow-hidden rounded-2xl sm:min-h-[calc(100vh-32px)] sm:rounded-3xl md:min-h-[calc(100vh-48px)] lg:h-[calc(100vh-48px)]">
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          src={VIDEO_URL}
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
+    <main id="main" className="forma-contact relative min-h-[100svh] overflow-hidden bg-page text-ink">
+      <LandingTopNav
+        wordmarkHref="/"
+        resolveHref={expandHashHref}
+        navId="contact-mobile-nav"
+      />
 
-        <LandingTopNav
-          wordmarkHref="/"
-          resolveHref={expandHashHref}
-          navId="contact-mobile-nav"
-        />
+      {/* Glaze-to-Clay wash (visual-redesign Phase 3); decorative. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-surface-tint via-page to-surface-warm"
+      />
 
-        <div className="relative z-10 flex min-h-[calc(100vh-24px)] flex-col gap-6 p-4 pt-16 sm:min-h-[calc(100vh-32px)] sm:p-6 sm:pt-16 md:min-h-[calc(100vh-48px)] md:p-8 md:pt-16 lg:h-full">
-          <div className="min-h-[2rem] flex-1" />
+      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 pt-32 pb-20 sm:px-6 md:pt-40 md:pb-28 lg:grid-cols-12 lg:items-start lg:gap-12">
+        <div className="lg:col-span-5 lg:pt-6">
+          <p className="font-mono text-label uppercase text-ink-2">Contact</p>
+          <p className="mt-4 font-display text-[clamp(2.25rem,1.6rem+2.4vw,3.5rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-ink">
+            {contactPage.headlineLead}
+            <br />
+            {contactPage.headlineTail}{" "}
+            <span className="text-link">{contactPage.headlineAccent}</span>
+          </p>
+        </div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <p className="shrink-0 text-3xl leading-tight font-medium text-white drop-shadow-lg [text-shadow:0_1px_2px_rgb(0_0_0/0.55),0_2px_18px_rgb(0_0_0/0.45)] sm:text-4xl lg:max-w-lg xl:max-w-2xl xl:text-5xl">
-              {contactPage.headlineLead}
-              <br />
-              {contactPage.headlineTail}{" "}
-              <span
-                style={{
-                  fontFamily:
-                    "var(--font-instrument-serif), 'Instrument Serif', serif",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                }}
-              >
-                {contactPage.headlineAccent}
-              </span>
-            </p>
+        <div className="lg:col-span-7">
+          <div className="flex flex-col gap-5 rounded-panel border border-hairline bg-surface p-5 shadow-card sm:p-8">
+            <h1 className="font-display text-h3 text-ink">{contactPage.cardTitle}</h1>
 
-            <div className="w-full shrink-0 lg:w-[min(480px,45%)]">
-              <div className="flex flex-col gap-4 overflow-hidden rounded-2xl bg-white p-4 shadow-2xl sm:rounded-3xl sm:p-6">
-                <h1 className="text-xl font-semibold tracking-tight text-black sm:text-2xl">
-                  {contactPage.cardTitle}
-                </h1>
-
-                {status === "sent" ? (
-                  <div
-                    role="status"
-                    className="flex flex-col items-center gap-3 py-6 text-center"
-                  >
-                    <div
-                      aria-hidden
-                      className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-xl text-green-700"
-                    >
-                      ✓
-                    </div>
-                    <p className="text-base font-semibold text-gray-900">
-                      {contactPage.successTitle}
-                    </p>
-                    <p className="text-sm text-gray-600">{contactPage.successBody}</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex flex-col items-start gap-2 rounded-2xl bg-gray-50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                      <div className="min-w-0 max-w-full">
-                        <p className="text-xs text-gray-600">{contactPage.directLabel}</p>
-                        <a
-                          href={mailtoHref}
-                          className="block font-semibold break-all text-blue-700 transition-opacity hover:underline sm:truncate sm:break-normal"
-                        >
-                          {contactPage.email}
-                        </a>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        {SOCIAL_BUTTONS.map(({ label, href, className, Icon }) => (
-                          <SocialBtn
-                            key={label}
-                            label={label}
-                            href={href}
-                            className={className}
-                          >
-                            <Icon size={13} />
-                          </SocialBtn>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3" aria-hidden>
-                      <div className="h-px flex-1 bg-gray-200" />
-                      <span className="text-sm font-medium text-gray-600">
-                        {contactPage.divider}
-                      </span>
-                      <div className="h-px flex-1 bg-gray-200" />
-                    </div>
-
-                    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-                      <p className="text-sm font-medium text-black">{contactPage.formLabel}</p>
-
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        <label htmlFor="contact-name" className="sr-only">
-                          {contactPage.namePlaceholder}
-                        </label>
-                        <input
-                          id="contact-name"
-                          type="text"
-                          name="name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder={contactPage.namePlaceholder}
-                          autoComplete="name"
-                          maxLength={CONTACT_LIMITS.nameMax}
-                          required
-                          className={inputClassName}
-                        />
-                        <label htmlFor="contact-email" className="sr-only">
-                          {contactPage.emailPlaceholder}
-                        </label>
-                        <input
-                          id="contact-email"
-                          type="email"
-                          name="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder={contactPage.emailPlaceholder}
-                          autoComplete="email"
-                          maxLength={CONTACT_LIMITS.emailMax}
-                          required
-                          className={inputClassName}
-                        />
-                      </div>
-
-                      <label htmlFor="contact-message" className="sr-only">
-                        {contactPage.messagePlaceholder}
-                      </label>
-                      <textarea
-                        id="contact-message"
-                        name="message"
-                        rows={4}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder={contactPage.messagePlaceholder}
-                        minLength={CONTACT_LIMITS.messageMin}
-                        maxLength={CONTACT_LIMITS.messageMax}
-                        required
-                        className={`${inputClassName} resize-none`}
-                      />
-
-                      {/* Honeypot: hidden from people and assistive tech, tempting to bots. */}
-                      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
-                        <label htmlFor="contact-company">Company</label>
-                        <input
-                          id="contact-company"
-                          type="text"
-                          name="company"
-                          tabIndex={-1}
-                          autoComplete="off"
-                          value={company}
-                          onChange={(e) => setCompany(e.target.value)}
-                        />
-                      </div>
-
-                      <fieldset className="flex flex-col gap-2">
-                        <legend className="mb-2 text-sm font-medium text-black">
-                          {contactPage.topicsLabel}
-                        </legend>
-                        <div className="flex flex-wrap gap-1.5">
-                          {CONTACT_TOPICS.map((topic) => {
-                            const active = topics.includes(topic);
-                            return (
-                              <button
-                                key={topic}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => toggleTopic(topic)}
-                                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-                                  active
-                                    ? "border-black bg-gray-100 text-black"
-                                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-400"
-                                }`}
-                              >
-                                {topic}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </fieldset>
-
-                      <div aria-live="polite" className="text-sm">
-                        {status === "error" && error ? (
-                          <p className="rounded-xl bg-red-50 px-3 py-2 text-red-800">
-                            {error} {contactPage.errorFallbackLead}{" "}
-                            <a href={mailtoHref} className="font-semibold underline">
-                              {contactPage.email}
-                            </a>
-                            .
-                          </p>
-                        ) : null}
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={status === "sending"}
-                        className="w-full rounded-2xl bg-black py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
-                      >
-                        {status === "sending" ? contactPage.sending : contactPage.submit}
-                      </button>
-                    </form>
-                  </>
-                )}
+            {status === "sent" ? (
+              <div role="status" className="flex flex-col items-start gap-3 py-6">
+                <div
+                  aria-hidden
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-tint text-xl text-success"
+                >
+                  ✓
+                </div>
+                <p className="text-lead font-semibold text-ink">{contactPage.successTitle}</p>
+                <p className="text-body text-ink-2">{contactPage.successBody}</p>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex flex-col items-start gap-3 rounded-2xl bg-surface-tint px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0 max-w-full">
+                    <p className={labelClassName}>{contactPage.directLabel}</p>
+                    <a
+                      href={mailtoHref}
+                      className="mt-1 block font-semibold break-all text-link underline-offset-4 hover:underline sm:truncate sm:break-normal"
+                    >
+                      {contactPage.email}
+                    </a>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {SOCIAL_BUTTONS.map(({ label, href, className, Icon }) => (
+                      <SocialBtn key={label} label={label} href={href} className={className}>
+                        <Icon size={14} />
+                      </SocialBtn>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3" aria-hidden>
+                  <div className="h-px flex-1 bg-hairline-strong" />
+                  <span className="text-small text-ink-2">{contactPage.divider}</span>
+                  <div className="h-px flex-1 bg-hairline-strong" />
+                </div>
+
+                <form className="flex flex-col gap-5" onSubmit={onSubmit}>
+                  <p className="text-small font-medium text-ink">{contactPage.formLabel}</p>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="contact-name" className={labelClassName}>
+                        {contactPage.namePlaceholder}
+                      </label>
+                      <input
+                        id="contact-name"
+                        type="text"
+                        name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        autoComplete="name"
+                        maxLength={CONTACT_LIMITS.nameMax}
+                        required
+                        className={inputClassName}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="contact-email" className={labelClassName}>
+                        {contactPage.emailPlaceholder}
+                      </label>
+                      <input
+                        id="contact-email"
+                        type="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
+                        maxLength={CONTACT_LIMITS.emailMax}
+                        required
+                        className={inputClassName}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="contact-message" className={labelClassName}>
+                      {contactPage.messagePlaceholder}
+                    </label>
+                    <textarea
+                      id="contact-message"
+                      name="message"
+                      rows={5}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      minLength={CONTACT_LIMITS.messageMin}
+                      maxLength={CONTACT_LIMITS.messageMax}
+                      required
+                      className={`${inputClassName} resize-none`}
+                    />
+                  </div>
+
+                  {/* Honeypot: hidden from people and assistive tech, tempting to bots. */}
+                  <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                    <label htmlFor="contact-company">Company</label>
+                    <input
+                      id="contact-company"
+                      type="text"
+                      name="company"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                    />
+                  </div>
+
+                  <fieldset className="flex flex-col gap-2">
+                    <legend className={`${labelClassName} mb-2`}>{contactPage.topicsLabel}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {CONTACT_TOPICS.map((topic) => {
+                        const active = topics.includes(topic);
+                        return (
+                          <button
+                            key={topic}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => toggleTopic(topic)}
+                            className={`inline-flex min-h-9 items-center rounded-full border px-3.5 text-small font-medium transition-colors ${
+                              active
+                                ? "border-action bg-surface-tint text-ink"
+                                : "border-hairline-strong bg-surface text-ink-2 hover:border-ink/40 hover:text-ink"
+                            }`}
+                          >
+                            {topic}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+
+                  <div aria-live="polite" className="text-small">
+                    {status === "error" && error ? (
+                      <p className="flex items-start gap-2.5 rounded-xl border border-hairline-strong bg-surface px-3.5 py-3 text-error">
+                        {/* Ember marks the failure; the words carry it. */}
+                        <span aria-hidden className="mt-1.5 size-2 shrink-0 bg-ember" />
+                        <span>
+                          {error} {contactPage.errorFallbackLead}{" "}
+                          <a href={mailtoHref} className="font-semibold text-link underline">
+                            {contactPage.email}
+                          </a>
+                          .
+                        </span>
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={status === "sending"}
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-action text-sm font-semibold text-on-action transition-colors hover:bg-action-hover disabled:opacity-60"
+                  >
+                    {status === "sending" ? contactPage.sending : contactPage.submit}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </div>
       </div>

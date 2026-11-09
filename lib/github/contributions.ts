@@ -34,6 +34,24 @@ export function creamFillForLevel(level: number): string {
   return `rgba(222, 219, 200, ${alpha})`;
 }
 
+/**
+ * Heatmap level classes in the link colour (Signal in light, the lighter blue
+ * in dark), so the grid reads on both themes (visual-redesign Phase 3).
+ * Level 0 is a faint hairline cell. Static strings for Tailwind.
+ */
+const ACTIVITY_LEVEL_CLASSES = [
+  "bg-hairline-strong",
+  "bg-link/25",
+  "bg-link/50",
+  "bg-link/75",
+  "bg-link",
+] as const;
+
+export function activityLevelClass(level: number): string {
+  const idx = Math.min(4, Math.max(0, Math.floor(level)));
+  return ACTIVITY_LEVEL_CLASSES[idx]!;
+}
+
 type GhDay = {
   date: string;
   contributionCount: number;

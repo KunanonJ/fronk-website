@@ -2,7 +2,7 @@
 
 **Date:** 09-11-26
 **Complexity:** Phase program (7 phases, 0 to 6)
-**Status:** IN PROGRESS. Phase 0 shipped (#62) and Phase 1 shipped (#63), both verified live 09-11-26. Phase 2 (home) executed 09-11-26, PR open. Phase 3 (about and contact) is next.
+**Status:** IN PROGRESS. Phases 0-2 shipped and verified live (#62, #63, #64). Phase 3 (about and contact) executed 09-11-26. Owner standing approval (09-11-26): run Phases 3-6, merging each on green checks, stopping only for real decisions.
 **Feature:** `visual-redesign`
 **Evidence:**
 - `process/general-plans/references/visual-redesign-research_REPORT_09-11-26.md` (Mobbin, helumi.app tokens, palette contrast, ranked changes)

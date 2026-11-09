@@ -1,6 +1,6 @@
 # Phase 2: Home
 
-**Status:** EXECUTED 09-11-26 on `feat/redesign-home`. Owner decisions: intro kept and restyled; hero "Building fintech and AI from Bangkok." / "Founder of GoGoCash and Manut AI."; two ventures (Airplusauto dropped). All gates green; LCP on `/` 0.93-1.03 s. PR open, waiting on merge approval. Evidence: `../reports/phase-2_home_REPORT_09-11-26.md`.
+**Status:** SHIPPED in #64 (09-11-26), verified live: LCP on `/` 1.6 s on the real network with a throttled phone (was 13.1 s); e2e + axe 100/100 live. Evidence: `../reports/phase-2_home_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers audit findings:** 6 (LCP 10.7 s on `/`, video hero), 7 (JS on `/`), 11 (six identical "Learn more"), 13 (home doesn't surface the work; the writing part is deferred while the blog is hidden), 16 (two vs three ventures), 17 (photo card), 18 (clipped "3")
