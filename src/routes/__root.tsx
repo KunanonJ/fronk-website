@@ -11,10 +11,10 @@ import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import RouteFade from "@/components/landing/RouteFade";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "next-themes";
 import { WebVitals } from "@/components/WebVitals";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
-import { rootHead } from "@/lib/seo/metadataToHead";
+import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
 import geistLatin from "../fonts/geist-latin.woff2?url";
@@ -25,8 +25,8 @@ const siteJsonLd = serializeJsonLd(buildSiteJsonLd());
 const global = rootHead(rootViewport);
 // Router head() keeps one meta per name, so the two media-scoped theme
 // colours are rendered straight into <head> instead.
-const themeColors = global.meta.filter((m) => m.name === "theme-color");
-const globalMeta = global.meta.filter((m) => m.name !== "theme-color");
+const themeColors = global.meta.filter((m) => isNamedMeta(m, "theme-color"));
+const globalMeta = global.meta.filter((m) => !isNamedMeta(m, "theme-color"));
 
 // Router + Query devtools in development only; the import is dropped from builds.
 const Devtools = import.meta.env.DEV ? lazy(() => import("../devtools")) : () => null;
@@ -34,7 +34,7 @@ const Devtools = import.meta.env.DEV ? lazy(() => import("../devtools")) : () =>
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     // The default title; every page's head() replaces it (404 and error pages keep it).
-    meta: [...globalMeta, { title: landingSite.title }] as never[],
+    meta: [...globalMeta, { title: landingSite.title }],
     links: [
       // Same two Latin faces next/font preloaded; Thai loads on demand.
       { rel: "preload", href: geistLatin, as: "font", type: "font/woff2", crossOrigin: "anonymous" },

@@ -49,3 +49,14 @@ export async function withEdgeLifetime(
   if (browser) headers.set("Cache-Control", browser);
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
 }
+
+/**
+ * Generated images (OG cards, icons): a day at the edge, whose cache key
+ * includes the deploy version, and a day in browsers, since the URLs carry no
+ * content hash.
+ */
+const IMAGE_LIFETIME = "public, max-age=86400";
+
+export function withImageCache(response: Response | Promise<Response>): Promise<Response> {
+  return withEdgeLifetime(response, IMAGE_LIFETIME, IMAGE_LIFETIME);
+}

@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  CONTRIBUTION_CREAM_ALPHA,
   contributionLevel,
-  creamFillForLevel,
   emptyContributionCalendar,
   normalizeContributionCalendar,
   parseGithubContributionsHtml,
@@ -19,20 +17,6 @@ describe("contributionLevel", () => {
     expect(contributionLevel(6)).toBe(3);
     expect(contributionLevel(10)).toBe(3);
     expect(contributionLevel(11)).toBe(4);
-  });
-});
-
-describe("creamFillForLevel", () => {
-  it("uses cream alphas for levels 0–4", () => {
-    expect(creamFillForLevel(0)).toBe(
-      `rgba(222, 219, 200, ${CONTRIBUTION_CREAM_ALPHA[0]})`,
-    );
-    expect(creamFillForLevel(4)).toBe(
-      `rgba(222, 219, 200, ${CONTRIBUTION_CREAM_ALPHA[4]})`,
-    );
-    expect(creamFillForLevel(99)).toBe(
-      `rgba(222, 219, 200, ${CONTRIBUTION_CREAM_ALPHA[4]})`,
-    );
   });
 });
 

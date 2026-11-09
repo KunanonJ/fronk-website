@@ -15,8 +15,27 @@ import { IDENTITY_LINKS } from "@/lib/seo/identity";
  *   Twitter copies the openGraph images when it has none of its own.
  */
 
-export type HeadMeta = Record<string, string>;
-export type HeadLink = Record<string, string>;
+/** One <meta> (or the <title>) for a route's head(), in the shapes this site emits. */
+export type HeadMeta =
+  | { title: string }
+  | { charSet: string }
+  | { name: string; content: string; media?: string }
+  | { property: string; content: string };
+type NamedMeta = Extract<HeadMeta, { name: string }>;
+
+/** True for a `<meta name>` entry with the given name. */
+export function isNamedMeta(meta: HeadMeta, name: string): meta is NamedMeta {
+  return "name" in meta && meta.name === name;
+}
+
+/** One <link> for a route's head(). */
+export type HeadLink = {
+  rel: string;
+  href: string;
+  type?: string;
+  sizes?: string;
+  hrefLang?: string;
+};
 export type HeadTags = { meta: HeadMeta[]; links: HeadLink[] };
 
 /** A file-based OG image (Next's opengraph-image convention). */

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
 import { LibraryLinkCard } from "@/components/landing/LibraryLinkCard";

@@ -5,7 +5,7 @@
  * HTML the normalised head tags, JSON-LD, <html>/<main> lang, title and h1;
  * for text endpoints the body. Runs against any base URL.
  *
- *   node scripts/parity-crawl.mjs http://localhost:8795 out.json
+ *   node scripts/parity-crawl.mjs http://127.0.0.1:4173 out.json
  *
  * Routes: the sitemap, links discovered from crawled pages, and fixed lists
  * (hidden/system pages, text endpoints, config redirects, 404s), plus every

@@ -1,7 +1,6 @@
 /**
- * Brand glyphs for the About hero's social links (moved from the retired
- * AsmeCuriousHero). Inline SVG: lucide no longer ships brand marks, and
- * simple-icons dropped LinkedIn.
+ * Brand glyphs for social links (About hero, contact page). Inline SVG:
+ * lucide no longer ships brand marks, and simple-icons dropped LinkedIn.
  */
 export function XIcon({ size = 20 }: { size?: number }) {
   return (

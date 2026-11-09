@@ -28,7 +28,6 @@ import {
 } from "simple-icons";
 import type { StackIconId } from "@/lib/content/stackIcons";
 
-export type { StackIconId };
 
 const BRAND: Partial<Record<StackIconId, SimpleIcon>> = {
   typescript: siTypescript,

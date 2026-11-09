@@ -51,9 +51,10 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
 export default worker;
 
 /**
- * OpenNext's Durable Object classes, kept as empty classes after the cutover
- * so the production Worker's v1 migration still matches and a dashboard
- * rollback to the Next version works. Phase 6 deletes them with a migration.
+ * The Durable Object classes of the old Next.js (OpenNext) build, kept as
+ * empty classes so the production Worker's v1 migration still matches and a
+ * dashboard rollback to a Next version works. Remove them with a
+ * `deleted_classes` migration once that rollback is no longer wanted.
  */
 export class DOQueueHandler extends DurableObject {}
 export class DOShardedTagCache extends DurableObject {}

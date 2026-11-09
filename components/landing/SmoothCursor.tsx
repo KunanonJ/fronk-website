@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { useFinePointer } from "@/lib/hooks/useFinePointer";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";

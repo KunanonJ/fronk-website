@@ -1,35 +1,46 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { parseJsonc } from "@/scripts/wrangler-vars.mjs";
 
 /**
- * Guards the production Worker config after the TanStack Start cutover
- * (tanstack-migration Phase 5). Without `cache.enabled` the Cache-Tag purge
- * does nothing; without the cron there is no safety net for missed Sanity
- * webhooks; without the legacy Durable Object classes a dashboard rollback to
- * the Next version breaks. See the comments in wrangler.jsonc and src/server.ts.
+ * Guards the production Worker config. Without `cache.enabled` the Cache-Tag
+ * purge does nothing; without the cron there is no safety net for missed
+ * Sanity webhooks; without the legacy Durable Object classes a dashboard
+ * rollback to a Next.js version breaks. See wrangler.jsonc and src/server.ts.
  */
+type WranglerConfig = {
+  name: string;
+  main: string;
+  cache?: { enabled?: boolean };
+  triggers?: { crons?: string[] };
+  ratelimits?: { name: string }[];
+  assets?: { run_worker_first?: string[] };
+  durable_objects?: { bindings?: { class_name: string }[] };
+  migrations?: { tag: string; new_sqlite_classes?: string[] }[];
+};
+
 const root = process.cwd();
-const wrangler = readFileSync(join(root, "wrangler.jsonc"), "utf8");
+const wrangler = parseJsonc(readFileSync(join(root, "wrangler.jsonc"), "utf8")) as WranglerConfig;
 const server = readFileSync(join(root, "src/server.ts"), "utf8");
 
 describe("production Worker config (TanStack Start)", () => {
   it("runs the Start entry with the Worker cache and the hourly purge", () => {
-    expect(wrangler).toMatch(/"name":\s*"fronk-website"/);
-    expect(wrangler).toMatch(/"main":\s*"src\/server.ts"/);
-    expect(wrangler).toMatch(/"cache":\s*\{\s*"enabled":\s*true\s*\}/);
-    expect(wrangler).toMatch(/"crons":\s*\[\s*"0 \* \* \* \*"\s*\]/);
+    expect(wrangler.name).toBe("fronk-website");
+    expect(wrangler.main).toBe("src/server.ts");
+    expect(wrangler.cache?.enabled).toBe(true);
+    expect(wrangler.triggers?.crons).toEqual(["0 * * * *"]);
   });
 
   it("rate-limits the forms and routes trailing slashes through the Worker", () => {
-    expect(wrangler).toMatch(/"name":\s*"FORM_RATE_LIMIT"/);
-    expect(wrangler).toMatch(/"run_worker_first":\s*\[\s*"\/\*\/"\s*\]/);
+    expect(wrangler.ratelimits?.map((r) => r.name)).toContain("FORM_RATE_LIMIT");
+    expect(wrangler.assets?.run_worker_first).toEqual(["/*/"]);
   });
 
-  it("keeps OpenNext's Durable Object classes bound and exported for rollback", () => {
-    expect(wrangler).toMatch(/"class_name":\s*"DOQueueHandler"/);
-    expect(wrangler).toMatch(/"class_name":\s*"DOShardedTagCache"/);
-    expect(wrangler).toMatch(/"new_sqlite_classes":\s*\[\s*"DOQueueHandler",\s*"DOShardedTagCache"\s*\]/);
+  it("keeps the legacy Durable Object classes bound and exported for rollback", () => {
+    const bound = wrangler.durable_objects?.bindings?.map((b) => b.class_name);
+    expect(bound).toEqual(expect.arrayContaining(["DOQueueHandler", "DOShardedTagCache"]));
+    expect(wrangler.migrations?.[0]?.new_sqlite_classes).toEqual(["DOQueueHandler", "DOShardedTagCache"]);
     expect(server).toMatch(/export class DOQueueHandler extends DurableObject/);
     expect(server).toMatch(/export class DOShardedTagCache extends DurableObject/);
   });

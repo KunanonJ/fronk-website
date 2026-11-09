@@ -1,17 +1,7 @@
 {
-  "entry": [
-    "src/router.tsx",
-    "src/routes/**/*.{ts,tsx}",
-    "postcss.config.mjs",
-    "workers/revalidate-cron.ts",
-    "scripts/*.mjs"
-  ],
-  "ignore": [
-    ".codex/**"
-  ],
-  "ignoreDependencies": [
-    "@tailwindcss/postcss",
-    "cloudflare"
-  ],
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/routes/**/*.{ts,tsx}!", "workers/revalidate-cron.ts!", "scripts/*.mjs"],
+  "ignore": [".codex/**"],
+  "ignoreDependencies": ["cloudflare"],
   "ignoreExportsUsedInFile": true
 }

@@ -23,17 +23,6 @@ export function contributionLevel(count: number): number {
   return 4;
 }
 
-/** Cream alpha steps on black for levels 0–4. */
-export const CONTRIBUTION_CREAM_ALPHA = [
-  0.08, 0.22, 0.4, 0.62, 0.92,
-] as const;
-
-export function creamFillForLevel(level: number): string {
-  const idx = Math.min(4, Math.max(0, Math.floor(level)));
-  const alpha = CONTRIBUTION_CREAM_ALPHA[idx] ?? 0.08;
-  return `rgba(222, 219, 200, ${alpha})`;
-}
-
 /**
  * Heatmap level classes in the link colour (Signal in light, the lighter blue
  * in dark), so the grid reads on both themes (visual-redesign Phase 3).

@@ -12,8 +12,7 @@ import type {
 export type ResumeProfileView = ReturnType<typeof resolveResumeProfile>;
 
 /**
- * The resume page body. Shared by the Next page (app/(system)/resume) and the
- * TanStack Start route, which each load the profile their own way.
+ * The resume page body; the /resume route loads the profile.
  */
 export function ResumeView({ profile }: { profile: ResumeProfileView }) {
   return (

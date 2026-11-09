@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nav, primaryNav } from "@/lib/content/landing";
+import { primaryNav } from "@/lib/content/landing";
 import snapshot from "@/lib/content/skills.generated.json";
 import {
   ADAPTED_COUNT,
@@ -244,7 +244,4 @@ describe("skills nav", () => {
     });
   });
 
-  it("is in the flat nav used by scroll-spy helpers", () => {
-    expect(nav.some((item) => item.href === "/skills")).toBe(true);
-  });
 });

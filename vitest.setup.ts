@@ -48,12 +48,7 @@ vi.mock("@/components/navigation/Link", async () => {
 
 vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => "/",
-  useSearchParams: () => new URLSearchParams(),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
   notFound: () => {
     throw new Error("notFound");
-  },
-  redirect: () => {
-    throw new Error("redirect");
   },
 }));

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from "web-vitals";
 
-/* `next/web-vitals` on the web-vitals package (tanstack-migration). */
+/** Report each Core Web Vital once per page load (the web-vitals package). */
 export function useReportWebVitals(callback: (metric: Metric) => void): void {
   const ref = useRef(callback);
   useEffect(() => {

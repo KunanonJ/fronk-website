@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { nav, primaryNav } from "@/lib/content/landing";
+import { primaryNav } from "@/lib/content/landing";
 import {
   getAdjacentPortfolioProjects,
   getAllPortfolioProjects,
@@ -153,7 +153,4 @@ describe("portfolio nav", () => {
     });
   });
 
-  it("is in the flat nav used by scroll-spy helpers", () => {
-    expect(nav.some((item) => item.href === "/portfolio")).toBe(true);
-  });
 });

@@ -52,7 +52,7 @@ describe("handleSanityWebhook", () => {
   });
 
   it("knows every content tag for the hourly purge", () => {
-    expect(ALL_CONTENT_TAGS).toEqual(["site", "home", "pages", "ventures", "resume", "posts", "writing"]);
+    expect(ALL_CONTENT_TAGS).toEqual(["resume", "posts", "writing"]);
   });
 });
 

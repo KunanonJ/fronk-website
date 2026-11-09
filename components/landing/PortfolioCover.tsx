@@ -20,7 +20,7 @@ type PortfolioCoverProps = {
   project: PortfolioProject;
   /** Position in the list; picks the placeholder glow corner. */
   index?: number;
-  /** `sizes` hint for next/image. */
+  /** `sizes` hint for the image. */
   sizes?: string;
   priority?: boolean;
   className?: string;

@@ -16,7 +16,7 @@
 /playwright-report/
 /.playwright-mcp/
 
-# next.js
+# build output of the old Next.js setup (checkouts from before the migration)
 /.next/
 /out/
 /.open-next/

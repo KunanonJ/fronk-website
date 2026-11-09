@@ -715,7 +715,7 @@ The authoritative historical source remains:
 - Prefer spawning subagents for multi-phase work; audit after each completed task before continuing
 - When optional follow-ups are offered, implement them unless told otherwise
 - Prefer verifying with local `pnpm dev` when asked to run on the local machine
-- Public marketing UI is mid-redesign (`process/features/visual-redesign/`): light by default, the owner's Signal/Glaze/Paper/Ink/Clay/Ember palette as role tokens in `app/globals.css`, Geist + Geist Mono; user updates final content themselves
+- Public marketing UI is mid-redesign (`process/features/visual-redesign/`): light by default, the owner's Signal/Glaze/Paper/Ink/Clay/Ember palette as role tokens in `src/styles/globals.css`, Geist + Geist Mono; user updates final content themselves
 - Target breakpoints: mobile 375px, tablet 768px, desktop 1440px; treat mobile as a miniature desktop layout
 - Prefer straightforward, minimized animation on the home shell; Showcase may use richer motion; keep intro loading (Apple-style Hello → Welcome to KunanonJ)
 - Avoid overly complex design systems; keep components readable, use arrays/mapping for repetitive structured data; inline styles are acceptable
@@ -724,23 +724,13 @@ The authoritative historical source remains:
 ## Learned Workspace Facts
 
 - Production site is kunanonj.com (Fronk / Kunanon Jarat); GitHub remote `KunanonJ/fronk-website` on `main`
-- Deploy target is Cloudflare Workers via OpenNext; production builds use `pnpm run build:cloudflare`
+- Deploy target is Cloudflare Workers: TanStack Start built with Vite and `@cloudflare/vite-plugin` (`src/server.ts` is the Worker entry). Workers Builds runs `pnpm run build:cloudflare` and `npx wrangler deploy` on every merge to `main`
 - Package manager is pnpm 10.34 (`packageManager`); Node engine is ≥22.22.2 and CI pins 22.23.4 (see `.node-version`)
 - Transitive security fixes live as exact pins in `pnpm.overrides` (some major-scoped, e.g. `glob@10`). On every dependency upgrade: re-run `pnpm audit`, re-check each override against the patched ranges (pnpm never warns when a pin goes stale or undercuts a parent's declared range), and compare the lockfile's `engines.node` values with `.node-version`
-- Public UI: the `visual-redesign` system is live (Phases 0-6, 09-11-26; plans in `process/features/visual-redesign/completed/`): light by default with a dark toggle, role tokens in `app/globals.css` (Signal/Glaze/Paper/Ink/Clay/Ember; Ember only for live or failed states), Geist + Geist Mono + Noto Sans Thai, CSS-only motion (no framer-motion). `/showcase` and `/stock/velorah` redirect to `/`. It supersedes `landing-cutover`, the FogLAMP/Dennis redesign and `website-power-upgrade`
+- Public UI: the `visual-redesign` system is live (Phases 0-6, 09-11-26; plans in `process/features/visual-redesign/completed/`): light by default with a dark toggle, role tokens in `src/styles/globals.css` (Signal/Glaze/Paper/Ink/Clay/Ember; Ember only for live or failed states), Geist + Geist Mono + Noto Sans Thai, CSS-only motion (no framer-motion). `/showcase` and `/stock/velorah` redirect to `/`. It supersedes `landing-cutover`, the FogLAMP/Dennis redesign and `website-power-upgrade`
 - Active discovery program: `process/features/sea-discovery/` (SEO/AEO/SEM/LinkedIn for AI transformation · ERP/CRM · startups TH/SEA)
 - Indexed authority routes: `/about`, `/blog`, `/contact`, `/press`, `/topics/*`, `/th/topics/*`, `/ventures/[slug]`; system `/resume`, `/studio` (noindex); `/ventures` index → `/#ventures`; `/now` → `/`; `/writing` → `/blog`
 - Landing content is static in `lib/content/landing.ts`; blog/editorial via hosted Sanity Studio at `https://fronk-website.sanity.studio/` (`/studio` on-site is a launcher only); Learn/topic hubs are code-driven (`lib/content/learn.ts`); portrait at `public/profile.jpg`
 - Public contact email is fronk.kunanon@gmail.com; the site lists two ventures, GoGoCash and Manut AI (Airplusauto dropped by the owner on 09-11-26); landing socials omit Telegram
 - Bangkok is the site location signal; wordmark KunanonJ
 - Reference Prisma Vite prototype lives at sibling `/Users/kunanonjarat/Developer/prisma-landing`
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->

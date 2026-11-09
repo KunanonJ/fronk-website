@@ -12,7 +12,5 @@ const ROOT_OG = fileOg("", `${siteConfig.name} — ${siteConfig.tagline}`);
  * the root layout's metadata merged in the way Next merges it.
  */
 export function pageHead(page: Metadata, options: { fileOgImage?: FileOgImage } = {}) {
-  const { meta, links } = metadataToHead(rootMetadata, page, { fileOgImage: options.fileOgImage ?? ROOT_OG });
-  // Start's head() takes React element props; ours are plain string maps.
-  return { meta: meta as never[], links: links as never[] };
+  return metadataToHead(rootMetadata, page, { fileOgImage: options.fileOgImage ?? ROOT_OG });
 }

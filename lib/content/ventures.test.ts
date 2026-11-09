@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   getAllVentureSlugs,
   getAllVentures,
-  getFeaturedVentures,
   getVentureBySlug,
 } from "./ventures";
 
@@ -20,25 +19,6 @@ describe("ventures > getAllVentures", () => {
     const second = getAllVentures();
     expect(first).not.toBe(second);
     expect(first.map((v) => v.slug)).toEqual(second.map((v) => v.slug));
-  });
-});
-
-describe("ventures > getFeaturedVentures", () => {
-  it("returns only ventures marked featured", () => {
-    const featured = getFeaturedVentures();
-    expect(featured.every((v) => v.featured === true)).toBe(true);
-  });
-
-  it("respects the limit argument", () => {
-    const limited = getFeaturedVentures(2);
-    expect(limited.length).toBeLessThanOrEqual(2);
-  });
-
-  it("orders featured ventures flagship-first (by featuredOrder, not year)", () => {
-    // Home leads with the flagship (GoGoCash) even though it isn't the newest;
-    // getAllVentures stays year-descending for /ventures.
-    const featured = getFeaturedVentures();
-    expect(featured[0]?.slug).toBe("gogocash");
   });
 });
 

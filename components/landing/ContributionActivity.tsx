@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   GITHUB_CONTRIBUTIONS_LOGIN,

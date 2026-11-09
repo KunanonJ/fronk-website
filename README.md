@@ -95,7 +95,6 @@ pnpm install
 cp .env.example .env.local
 
 # 3. Run the dev server
-pnpm run ensure:local-env   # optional helper if present
 pnpm dev
 ```
 

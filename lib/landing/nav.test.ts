@@ -3,7 +3,6 @@ import {
   activeSectionAtFocus,
   expandHashHref,
   flattenNavHrefs,
-  isHashHref,
   isHomeSectionId,
   isMenuChildActive,
   isNavItemActive,
@@ -94,14 +93,6 @@ describe("resolveHomeAwareHref", () => {
   it("leaves ordinary routes untouched", () => {
     expect(resolveHomeAwareHref("/about", "/")).toBe("/about");
     expect(resolveHomeAwareHref("#ventures", "/")).toBe("#ventures");
-  });
-});
-
-describe("isHashHref", () => {
-  it("detects hash forms", () => {
-    expect(isHashHref("#ventures")).toBe(true);
-    expect(isHashHref("/#ventures")).toBe(true);
-    expect(isHashHref("/ventures")).toBe(false);
   });
 });
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { useReportWebVitals } from "@/lib/analytics/useReportWebVitals";
 import { track } from "@/lib/analytics/gtag";
 
