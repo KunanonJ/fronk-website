@@ -16,6 +16,7 @@ const BENTO_ROUTES: ReadonlySet<string> = new Set([
   "/contact",
   "/resume",
   "/skills",
+  "/portfolio",
 ]);
 
 /** Route prefixes rebuilt on the canvas layout; each covers its child pages. */
@@ -24,6 +25,7 @@ const BENTO_PREFIXES: readonly string[] = [
   "/topics/",
   "/th/topics/",
   "/skills/",
+  "/portfolio/",
 ];
 
 function isBentoRoute(pathname: string): boolean {
