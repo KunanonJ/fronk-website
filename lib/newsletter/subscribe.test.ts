@@ -16,9 +16,8 @@ describe("isValidEmail", () => {
 
 const CONFIG = { apiKey: "re_test", audienceId: "aud_123" };
 const okFetch = () =>
-  vi.fn(
-    async (_url: string | URL | Request, _init?: RequestInit) =>
-      new Response(JSON.stringify({ id: "c1" }), { status: 201 }),
+  vi.fn<(url: string | URL | Request, init?: RequestInit) => Promise<Response>>(
+    async () => new Response(JSON.stringify({ id: "c1" }), { status: 201 }),
   );
 
 describe("subscribeEmail", () => {

@@ -76,7 +76,7 @@ export default function PortfolioCover({
       className={frame}
       aria-hidden="true"
       style={{
-        backgroundImage: `radial-gradient(120% 90% at ${glow}, color-mix(in srgb, var(--landing-ink) 16%, transparent), transparent 62%), linear-gradient(180deg, color-mix(in srgb, var(--landing-ink) 4%, transparent), color-mix(in srgb, var(--landing-ink) 8%, transparent))`,
+        backgroundImage: `radial-gradient(120% 90% at ${glow}, color-mix(in srgb, var(--ink) 16%, transparent), transparent 62%), linear-gradient(180deg, color-mix(in srgb, var(--ink) 4%, transparent), color-mix(in srgb, var(--ink) 8%, transparent))`,
       }}
     >
       <span

@@ -95,7 +95,7 @@ export default function CopyButton({
         )}
       >
         {status === "copied" ? (
-          <Check className="h-3.5 w-3.5 shrink-0 text-success-text" aria-hidden />
+          <Check className="h-3.5 w-3.5 shrink-0 text-success" aria-hidden />
         ) : status === "error" ? (
           // Ember marks a failure, always next to the word "Failed".
           <span aria-hidden className="mx-[3px] size-2 shrink-0 bg-ember" />

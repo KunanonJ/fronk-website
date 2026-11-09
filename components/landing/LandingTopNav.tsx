@@ -10,7 +10,6 @@ import {
 } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   BadgeCheck,
   Blocks,
@@ -46,8 +45,21 @@ import {
   scrollSpySectionIds,
   scrollToHomeSection,
 } from "@/lib/landing/nav";
+import { cn } from "@/lib/utils/cn";
 
-const MENU_EASE = [0.22, 1, 0.36, 1] as const;
+/**
+ * Motion is CSS only (visual-redesign Phase 6 dropped framer-motion): the
+ * menus fade and slide in through `@starting-style` (Tailwind `starting:`),
+ * and `motion-reduce:` turns every transition off.
+ */
+const EASE = "ease-[cubic-bezier(0.22,1,0.36,1)]";
+
+/** Smooth in-page scrolling unless the reader prefers reduced motion. */
+function scrollBehavior(): ScrollBehavior {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
 
 /**
  * Top-level desktop icons show from lg (1024px). With six links (Skills added
@@ -84,32 +96,20 @@ function NavIcon({
   return <Icon className={`shrink-0 opacity-60 ${className}`} aria-hidden />;
 }
 
-function MenuToggleIcon({
-  open,
-  reducedMotion,
-}: {
-  open: boolean;
-  reducedMotion: boolean | null;
-}) {
-  const duration = reducedMotion ? 0 : 0.35;
-  const transition = { duration, ease: MENU_EASE };
+function MenuToggleIcon({ open }: { open: boolean }) {
+  const bar = cn(
+    "absolute left-0 block h-[1.5px] w-full origin-center rounded-full bg-current transition-[translate,rotate,scale,opacity] duration-300 motion-reduce:transition-none",
+    EASE,
+  );
 
   return (
     <span className="relative block h-3.5 w-5" aria-hidden="true">
-      <motion.span
-        className="absolute left-0 top-0 block h-[1.5px] w-full origin-center rounded-full bg-current"
-        animate={open ? { y: 6, rotate: 45 } : { y: 0, rotate: 0 }}
-        transition={transition}
+      <span className={cn(bar, "top-0", open && "translate-y-[6px] rotate-45")} />
+      <span
+        className={cn(bar, "top-[6px]", open && "scale-x-[0.35] opacity-0")}
       />
-      <motion.span
-        className="absolute left-0 top-[6px] block h-[1.5px] w-full origin-center rounded-full bg-current"
-        animate={open ? { opacity: 0, scaleX: 0.35 } : { opacity: 1, scaleX: 1 }}
-        transition={transition}
-      />
-      <motion.span
-        className="absolute left-0 top-[12px] block h-[1.5px] w-full origin-center rounded-full bg-current"
-        animate={open ? { y: -6, rotate: -45 } : { y: 0, rotate: 0 }}
-        transition={transition}
+      <span
+        className={cn(bar, "top-[12px]", open && "-translate-y-[6px] -rotate-45")}
       />
     </span>
   );
@@ -119,19 +119,15 @@ function NavItemAnchor({
   href,
   className,
   active,
-  reducedMotion,
   onClick,
   children,
 }: {
   href: string;
   className: string;
   active: boolean;
-  reducedMotion: boolean | null;
   onClick?: () => void;
   children: ReactNode;
 }) {
-  const behavior: ScrollBehavior = reducedMotion ? "auto" : "smooth";
-
   if (href.startsWith("#")) {
     const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
       const id = parseHomeSectionHash(href);
@@ -144,7 +140,7 @@ function NavItemAnchor({
       if (window.location.hash !== `#${id}`) {
         window.history.pushState(null, "", url);
       }
-      scrollToHomeSection(id, behavior);
+      scrollToHomeSection(id, scrollBehavior());
       onClick?.();
     };
 
@@ -223,7 +219,6 @@ export default function LandingTopNav({
 }: LandingTopNavProps) {
   const pathname = usePathname() ?? "/";
   const path = normalizePath(pathname);
-  const prefersReducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -287,12 +282,10 @@ export default function LandingTopNav({
   useEffect(() => {
     if (!isHome) return;
 
-    const behavior: ScrollBehavior = prefersReducedMotion ? "auto" : "smooth";
-
     const scrollToCurrentHash = () => {
       const id = parseHomeSectionHash(window.location.hash);
       if (!id) return;
-      scrollToHomeSection(id, behavior);
+      scrollToHomeSection(id, scrollBehavior());
     };
 
     let rafInner = 0;
@@ -308,7 +301,7 @@ export default function LandingTopNav({
       window.clearTimeout(timer);
       window.removeEventListener("hashchange", scrollToCurrentHash);
     };
-  }, [isHome, path, prefersReducedMotion]);
+  }, [isHome, path]);
 
   useEffect(() => {
     if (!isHome) return;
@@ -364,7 +357,6 @@ export default function LandingTopNav({
             href={hrefForNav(item.href)}
             className={desktopLinkClass(active)}
             active={active}
-            reducedMotion={prefersReducedMotion}
           >
             <NavIcon id={item.icon} className={DESKTOP_ICON_CLASS} />
             {item.label}
@@ -404,55 +396,41 @@ export default function LandingTopNav({
             aria-hidden
           />
         </button>
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              role="menu"
-              aria-label={item.label}
-              className="absolute left-1/2 top-full z-50 mt-2 min-w-[12rem] -translate-x-1/2 rounded-2xl border border-hairline-strong bg-surface p-1.5 shadow-card"
-              initial={
-                prefersReducedMotion ? false : { opacity: 0, y: 6, scale: 0.98 }
-              }
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={
-                prefersReducedMotion
-                  ? undefined
-                  : { opacity: 0, y: 4, scale: 0.98 }
-              }
-              transition={
-                prefersReducedMotion
-                  ? { duration: 0 }
-                  : { duration: 0.28, ease: MENU_EASE }
-              }
-            >
-              {item.children.map((child) => {
-                const active = isNavItemActive(
-                  child.href,
-                  path,
-                  activeSection,
-                  hashLinkedSections,
-                );
-                return (
-                  <NavItemAnchor
-                    key={child.href}
-                    href={hrefForNav(child.href)}
-                    className={
-                      active
-                        ? "flex min-h-10 items-center gap-2.5 rounded-xl bg-surface-tint px-3 py-2 text-sm font-medium text-ink"
-                        : "flex min-h-10 items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink-2 transition-colors hover:bg-surface-tint hover:text-ink"
-                    }
-                    active={active}
-                    reducedMotion={prefersReducedMotion}
-                    onClick={closeAll}
-                  >
-                    <NavIcon id={child.icon} className="h-4 w-4" />
-                    {child.label}
-                  </NavItemAnchor>
-                );
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {expanded ? (
+          <div
+            role="menu"
+            aria-label={item.label}
+            className={cn(
+              "absolute left-1/2 top-full z-50 mt-2 min-w-[12rem] -translate-x-1/2 scale-100 rounded-2xl border border-hairline-strong bg-surface p-1.5 shadow-card transition-[opacity,translate,scale] duration-[280ms] motion-reduce:transition-none starting:translate-y-1.5 starting:scale-[0.98] starting:opacity-0",
+              EASE,
+            )}
+          >
+            {item.children.map((child) => {
+              const active = isNavItemActive(
+                child.href,
+                path,
+                activeSection,
+                hashLinkedSections,
+              );
+              return (
+                <NavItemAnchor
+                  key={child.href}
+                  href={hrefForNav(child.href)}
+                  className={
+                    active
+                      ? "flex min-h-10 items-center gap-2.5 rounded-xl bg-surface-tint px-3 py-2 text-sm font-medium text-ink"
+                      : "flex min-h-10 items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink-2 transition-colors hover:bg-surface-tint hover:text-ink"
+                  }
+                  active={active}
+                  onClick={closeAll}
+                >
+                  <NavIcon id={child.icon} className="h-4 w-4" />
+                  {child.label}
+                </NavItemAnchor>
+              );
+            })}
+          </div>
+        ) : null}
       </li>
     );
   };
@@ -467,51 +445,29 @@ export default function LandingTopNav({
           hashLinkedSections,
         );
         return (
-          <motion.li
+          <li
             key={item.label}
-            initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={prefersReducedMotion ? undefined : { y: -4, opacity: 0 }}
-            transition={
-              prefersReducedMotion
-                ? { duration: 0 }
-                : {
-                    duration: 0.3,
-                    delay: 0.05 + index * 0.04,
-                    ease: MENU_EASE,
-                  }
-            }
+            className={cn("transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0", EASE)}
+            style={{ transitionDelay: `${50 + index * 40}ms` }}
           >
             <NavItemAnchor
               href={hrefForNav(item.href)}
               className={mobileLinkClass(active)}
               active={active}
-              reducedMotion={prefersReducedMotion}
               onClick={closeAll}
             >
               <NavIcon id={item.icon} className="h-4 w-4" />
               {item.label}
             </NavItemAnchor>
-          </motion.li>
+          </li>
         );
       }
 
       return (
-        <motion.li
+        <li
           key={item.label}
-          className="space-y-0.5"
-          initial={prefersReducedMotion ? false : { y: 8, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={prefersReducedMotion ? undefined : { y: -4, opacity: 0 }}
-          transition={
-            prefersReducedMotion
-              ? { duration: 0 }
-              : {
-                  duration: 0.3,
-                  delay: 0.05 + index * 0.04,
-                  ease: MENU_EASE,
-                }
-          }
+          className={cn("space-y-0.5 transition-[opacity,translate] duration-300 motion-reduce:transition-none starting:translate-y-2 starting:opacity-0", EASE)}
+          style={{ transitionDelay: `${50 + index * 40}ms` }}
         >
           <p className="px-3 pt-3 font-mono text-label uppercase text-ink-2">
             {item.label}
@@ -529,7 +485,6 @@ export default function LandingTopNav({
                 href={hrefForNav(child.href)}
                 className={mobileLinkClass(active)}
                 active={active}
-                reducedMotion={prefersReducedMotion}
                 onClick={closeAll}
               >
                 <NavIcon id={child.icon} className="h-4 w-4" />
@@ -537,7 +492,7 @@ export default function LandingTopNav({
               </NavItemAnchor>
             );
           })}
-        </motion.li>
+        </li>
       );
     });
 
@@ -592,7 +547,6 @@ export default function LandingTopNav({
               href={hrefForNav(navCta.href)}
               className="hidden min-h-9 items-center rounded-full bg-ink px-4 text-sm font-medium text-page transition-opacity hover:opacity-90 md:inline-flex"
               active={ctaActive}
-              reducedMotion={prefersReducedMotion}
             >
               {navCta.label}
             </NavItemAnchor>
@@ -608,48 +562,40 @@ export default function LandingTopNav({
                 setMenuOpen((open) => !open);
               }}
             >
-              <MenuToggleIcon
-                open={menuOpen}
-                reducedMotion={prefersReducedMotion}
-              />
+              <MenuToggleIcon open={menuOpen} />
             </button>
           </div>
         </header>
 
-        <AnimatePresence initial={false}>
-          {menuOpen && (
-            <motion.nav
-              id={navId}
-              aria-label="Primary"
-              className="relative overflow-hidden px-2 pb-3 md:hidden"
-              initial={
-                prefersReducedMotion ? false : { height: 0, opacity: 0 }
-              }
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={
-                prefersReducedMotion
-                  ? { duration: 0 }
-                  : { duration: 0.4, ease: MENU_EASE }
-              }
-            >
-              <ul className="flex flex-col gap-0.5 pt-1">
-                {renderMobileTree()}
-                <li className="pt-2">
-                  <NavItemAnchor
-                    href={hrefForNav(navCta.href)}
-                    className="flex min-h-12 items-center justify-center rounded-full bg-ink px-3 text-sm font-medium text-page"
-                    active={ctaActive}
-                    reducedMotion={prefersReducedMotion}
-                    onClick={closeAll}
-                  >
-                    {navCta.label}
-                  </NavItemAnchor>
-                </li>
-              </ul>
-            </motion.nav>
-          )}
-        </AnimatePresence>
+        {menuOpen ? (
+          // Grows from 0fr to 1fr on mount (@starting-style); no JS animation.
+          <nav
+            id={navId}
+            aria-label="Primary"
+            className={cn(
+              "relative grid grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-[400ms] motion-reduce:transition-none starting:grid-rows-[0fr] starting:opacity-0 md:hidden",
+              EASE,
+            )}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="px-2 pb-3">
+                  <ul className="flex flex-col gap-0.5 pt-1">
+                    {renderMobileTree()}
+                    <li className="pt-2">
+                      <NavItemAnchor
+                        href={hrefForNav(navCta.href)}
+                        className="flex min-h-12 items-center justify-center rounded-full bg-ink px-3 text-sm font-medium text-page"
+                        active={ctaActive}
+                        onClick={closeAll}
+                      >
+                        {navCta.label}
+                      </NavItemAnchor>
+                    </li>
+                  </ul>
+              </div>
+            </div>
+          </nav>
+        ) : null}
       </div>
     </div>
   );

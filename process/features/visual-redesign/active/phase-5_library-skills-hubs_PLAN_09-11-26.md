@@ -1,6 +1,6 @@
 # Phase 5: Library, Skills, hubs and resume
 
-**Status:** EXECUTED 09-11-26 on `feat/redesign-library` (owner standing approval). Hubs stay nav-less (restyle only; their 205 KB budget). Evidence: `../reports/phase-5_library-skills-hubs_REPORT_09-11-26.md`.
+**Status:** SHIPPED in #67 (09-11-26), verified live: e2e + axe 120/120 on kunanonj.com; hub head/JSON-LD/FAQ identical prod-to-prod; live phone LCP 1.46-1.72 s. Evidence: `../reports/phase-5_library-skills-hubs_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers audit findings:** 12 (`/resume` company icons from `icons.duckduckgo.com`, 4 of them 404s), plus the remaining type-floor and tap-target debt on these routes (9, 10)

@@ -112,11 +112,6 @@ describe("palette rules the components rely on", () => {
       );
     }
   });
-
-  it("the legacy cream fill (used with black text) is Glaze, not Signal", () => {
-    expect(css).toMatch(/--color-cream:\s*var\(--palette-glaze\)/);
-    expect(contrastRatio("#000000", resolve(light, "--palette-glaze"))).toBeGreaterThan(15);
-  });
 });
 
 describe("contrast helpers", () => {

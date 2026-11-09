@@ -113,8 +113,7 @@ export default function SmoothCursor() {
       >
         <path
           d="M4 2.5L20 11.2L12.4 13.1L10 21.5L4 2.5Z"
-          fill="#DEDBC8"
-          stroke="#111"
+          className="fill-ink stroke-page"
           strokeWidth="1"
         />
       </svg>
@@ -127,11 +126,10 @@ export default function SmoothCursor() {
       >
         <path
           d="M8.5 11V7.2a1.4 1.4 0 0 1 2.8 0V11M11.3 10.5V6.4a1.4 1.4 0 0 1 2.8 0V11M14.1 10.8V7.6a1.4 1.4 0 0 1 2.8 0v5.7c0 2.7-1.8 4.7-4.6 4.7H11a4.2 4.2 0 0 1-3.8-2.4L5.5 12.4a1.5 1.5 0 0 1 2.1-2l1 1.1"
-          stroke="#DEDBC8"
+          className="fill-ink stroke-page"
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
-          fill="#111"
         />
       </svg>
     </div>

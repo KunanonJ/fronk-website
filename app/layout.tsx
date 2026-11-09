@@ -25,8 +25,7 @@ const siteJsonLd: string = JSON.stringify(buildSiteJsonLd());
 /*
  * visual-redesign Phase 0: one sans and one mono (both variable fonts), plus
  * Noto Sans Thai for Thai pages. Thai isn't preloaded; its unicode-range means
- * only pages with Thai text download it. The retired families (Hanken Grotesk,
- * Instrument Serif, Space Mono, Almarai) are aliased to these in globals.css.
+ * only pages with Thai text download it.
  */
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -105,15 +104,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-landing text-primary">
+      <body className="flex min-h-full flex-col bg-page text-ink">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: siteJsonLd }}
         />
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
-        <link rel="dns-prefetch" href="https://d8j0ntlcm91z4.cloudfront.net" />
-        <link rel="dns-prefetch" href="https://images.higgs.ai" />
         {IDENTITY_LINKS.map((href) => (
           <link key={href} rel="me" href={href} />
         ))}

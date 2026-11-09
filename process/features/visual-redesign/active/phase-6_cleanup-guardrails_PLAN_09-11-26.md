@@ -1,6 +1,6 @@
 # Phase 6: Cleanup and guardrails
 
-**Status:** OUTLINE. Re-research at phase entry, then complete the plan before asking for EXECUTE approval.
+**Status:** IN PROGRESS. Split into 6a (cleanup, nav without framer-motion, dev speed: EXECUTED 09-11-26 on `feat/redesign-cleanup`, report `../reports/phase-6a_cleanup_REPORT_09-11-26.md`) and 6b (Linux visual baselines in CI, migration head snapshot, closeout). Owner decisions taken 09-11-26: retire `/stock/velorah`; keep `/design`; Linux baselines in CI; hubs get the nav once it is slimmed.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers audit findings:** 7 (budget), 9 and 10 (final sweep to 0), 19 (dead code and unused dependencies), 20 (stale baselines, lint warnings), plus the leftovers from ux-experience Phase 5

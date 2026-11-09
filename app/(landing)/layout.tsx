@@ -7,10 +7,10 @@ export default function LandingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="landing-root min-h-[100svh] bg-landing font-sans text-primary antialiased">
+    <div className="landing-root min-h-[100svh] bg-page font-sans text-ink antialiased">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:border focus:border-black/40 focus:bg-cream focus:px-3 focus:py-2 focus:text-black dark:focus:border-white/40"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:rounded-chip focus:bg-ink focus:px-3 focus:py-2 focus:text-page"
       >
         Skip to content
       </a>
