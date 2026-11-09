@@ -72,16 +72,16 @@ export const buildBoard: Record<BuildColumn, readonly BuildCard[]> = {
     },
     {
       id: "KJ-29",
-      title: "Landing chrome",
-      body: "Floating pill nav, Activity heatmap, and keyword tips on the public shell.",
+      title: "Bento rollout",
+      body: "The last pages move onto the bento layout, one route group at a time.",
       venture: "site",
     },
   ],
   shipped: [
     {
       id: "KJ-21",
-      title: "Prisma-style landing cutover",
-      body: "Home + showcase cinematic shell with KunanonJ brand tokens.",
+      title: "Bento redesign",
+      body: "Public pages rebuilt as bento cards, with a new header, site menu, share panel, and footer.",
       venture: "site",
     },
     {

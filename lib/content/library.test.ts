@@ -146,6 +146,14 @@ describe("build board", () => {
       }
     }
   });
+
+  it("no longer describes the retired pre-bento chrome", () => {
+    const text = buildColumns
+      .flatMap((c) => buildBoard[c.id])
+      .map((t) => `${t.title} ${t.body}`)
+      .join(" ");
+    expect(text).not.toMatch(/pill nav|keyword tips|cinematic|Prisma-style/i);
+  });
 });
 
 describe("examples content", () => {
