@@ -1,6 +1,6 @@
 # Phase 4 report: Portfolio and brand images (09-11-26)
 
-**Plan:** `../active/phase-4_portfolio_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-4_portfolio_PLAN_09-11-26.md`
 **Branch:** `feat/redesign-portfolio`
 **Mode:** EXECUTE under the owner's standing approval (Phases 3-6).
 

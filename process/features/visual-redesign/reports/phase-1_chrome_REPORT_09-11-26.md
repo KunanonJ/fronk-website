@@ -1,6 +1,6 @@
 # Phase 1 report: Chrome (09-11-26)
 
-**Plan:** `../active/phase-1_chrome_PLAN_09-11-26.md`
+**Plan:** `../completed/phase-1_chrome_PLAN_09-11-26.md`
 **Branch:** `feat/redesign-chrome`
 **Mode:** EXECUTE (owner: "Yes, start Phase 1"). Owner decision at entry: keep the nav icons, quieter.
 

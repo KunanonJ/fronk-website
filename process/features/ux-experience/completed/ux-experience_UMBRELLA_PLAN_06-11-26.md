@@ -2,7 +2,7 @@
 
 **Date:** 06-11-26
 **Complexity:** Phase program (6 phases)
-**Status:** CLOSED 09-11-26. Phases 0 and 1 shipped (#53 on 08-11-26, #55 on 09-11-26). Phases 2 to 5 were superseded, not executed: the owner chose a visual redesign (light default, new palette) to run next, and its program absorbs their findings (mapping table in `process/features/visual-redesign/active/visual-redesign_UMBRELLA_PLAN_09-11-26.md`).
+**Status:** CLOSED 09-11-26. Phases 0 and 1 shipped (#53 on 08-11-26, #55 on 09-11-26). Phases 2 to 5 were superseded, not executed: the owner chose a visual redesign (light default, new palette) to run next, and its program absorbs their findings (mapping table in `process/features/visual-redesign/completed/visual-redesign_UMBRELLA_PLAN_09-11-26.md`).
 **Feature:** `ux-experience`
 **Evidence:** `../reports/ux-audit_REPORT_06-11-26.md` (live-site audit, findings 1-20)
 **Harness note:** `.claude/` and `process/context/` are absent in this checkout. Phases run directly in the main session under the Harness-Absent Fallback (`process/development-protocols/orchestration.md`), with the same plan files and approval gates.

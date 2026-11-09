@@ -1,6 +1,6 @@
 # Phase 2: Speed
 
-**Status:** SUPERSEDED 09-11-26 by visual-redesign (see its umbrella mapping table: `process/features/visual-redesign/active/visual-redesign_UMBRELLA_PLAN_09-11-26.md`). Not executed; its findings are folded into the redesign phases.
+**Status:** SUPERSEDED 09-11-26 by visual-redesign (see its umbrella mapping table: `process/features/visual-redesign/completed/visual-redesign_UMBRELLA_PLAN_09-11-26.md`). Not executed; its findings are folded into the redesign phases.
 **Created:** 06-11-26
 **Umbrella:** `ux-experience_UMBRELLA_PLAN_06-11-26.md`
 **Covers audit findings:** 6 (mobile LCP 4-10.7 s), 7 (240-310 KB JS per route)

@@ -34,7 +34,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "pnpm sanity:manifest && next build && pnpm sanity:schema:deploy",
-    "build:cloudflare": "pnpm sanity:manifest && pnpm exec opennextjs-cloudflare build && pnpm sanity:schema:deploy",
+    "build:cloudflare": "opennextjs-cloudflare build",
     "sanity:manifest": "node scripts/sanity-manifest.mjs",
     "sanity:schema:deploy": "node scripts/sanity-schema-deploy.mjs",
     "studio:dev": "sanity dev",

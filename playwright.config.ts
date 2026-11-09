@@ -1,22 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Visual-regression + behavioral E2E harness for the terminal-HUD redesign.
+ * Behavioral E2E (smoke.spec, a11y.spec) and visual regression (visual.spec).
  *
- * Why this exists: the redesign is highly visual (pure-black shell, hairline
- * frame, WebGL hero, live HUD). Unit tests can't catch a broken gradient or a
- * shifted frame. This harness screenshots every route at mobile/tablet/desktop
- * and re-runs with reduced-motion forced, so each redesign phase can prove it
- * changed only what it meant to.
- *
- * Baselines are intentionally NOT committed pre-redesign (the soft-brutalism
- * look is about to be replaced). Generate/refresh them per phase against a
- * locally-running server:
- *
- *   pnpm dev                       # in one terminal
- *   pnpm test:e2e --update-snapshots
- *
- * CI can adopt these once the look stabilizes (Phase 8).
+ * Smoke and a11y run on every PR (CI job e2e-smoke, desktop Chromium) and can
+ * run locally against any server via PLAYWRIGHT_BASE_URL. Visual baselines
+ * are Linux-only and captured in the pinned Playwright Docker image; see the
+ * header of tests/e2e/visual.spec.ts for the local command and refresh flow.
  */
 
 const PORT = Number(process.env.PORT ?? 3000);

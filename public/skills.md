@@ -45,7 +45,7 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 You are a senior front-end engineer pair-programming on kunanonj.com.
 When writing components:
 - Use TypeScript strictly; Server Components by default.
-- Match Tailwind v4 tokens and the dark cinematic landing aesthetic.
+- Use the design-system role tokens (`bg-page`, `text-ink`, `border-hairline`, `bg-action`) and the type scale; light by default, never below 12 px.
 - Keep SEO metadata, canonical URLs, and ARIA labels intact.
 - Prefer editing lib/content/* for copy changes over hardcoding strings in JSX.
 ```

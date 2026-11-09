@@ -18,16 +18,6 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
   1. When OpenNext or `eslint-config-next` publish new releases, run `pnpm update` and `pnpm audit` again.
   2. If exposure ever matters, try a major-forcing override behind the full CI suite (typecheck, lint, test, build, `build:cloudflare`).
 
-## P2: `build:cloudflare` runs the Sanity steps twice
-
-- **Added:** 02-11-26
-- **Problem:** `pnpm build:cloudflare` extracts the Sanity manifest twice and calls `sanity:schema:deploy` twice (seen in the 02-11-26 build log). With `SANITY_AUTH_TOKEN` set, a production build deploys the schema twice.
-- **Root cause:** `opennextjs-cloudflare build` runs the project's own `build` script. For pnpm, `@opennextjs/aws/dist/build/buildNextApp.js` uses `config.buildCommand`, falling back to `pnpm build`. `pnpm build` already runs both Sanity steps, and `build:cloudflare` wraps the same steps around it again.
-- **Why deferred:** pre-existing and idempotent; outside the dependency-upgrade scope.
-- **Fix options:**
-  1. Reduce `build:cloudflare` to `pnpm exec opennextjs-cloudflare build`.
-  2. Or set OpenNext's `buildCommand` to a plain `next build` and keep the wrapper steps.
-
 ## P3: Owner decisions left open by the dependency upgrade
 
 - **Added:** 02-11-26
@@ -45,18 +35,13 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Problem:**
   - **Node 22 end of life:** 2027-04-30. CI now pins 22.23.4; Node 24 is the current LTS (24.22.2 on 02-11-26).
   - **pnpm 12:** out (12.16.1); the repo stays on pnpm 10 (10.34.9).
-  - **5 lint warnings:**
-    - `<img>` in `components/landing/Features.tsx`
-    - effect cleanups reading `triggerRef.current` in `components/layout/FullscreenMenu.tsx` and `components/layout/MobileNav.tsx` (focus may return to a stale node)
-    - unused `_url`/`_init` in `lib/newsletter/subscribe.test.ts`
   - **TypeScript peer warning:** `@sanity/workflow-blueprint` (through the Sanity CLI) wants `typescript@^6.0.3 || ^7.0.0`. The `typescript` alias points to `@typescript/typescript6@6.0.2`, the newest release of that package.
-- **Root cause:** upstream release cadence, plus warnings that predate the upgrade.
+- **Root cause:** upstream release cadence. (The lint warnings listed here earlier were fixed in visual-redesign Phase 6a: lint is at 0.)
 - **Why deferred:** each is a separate, testable change outside the upgrade's scope.
 - **Fix options:**
   1. Plan the Node 24 move before 2027-04-30: bump `.node-version` and `engines`, then run CI.
   2. Evaluate pnpm 12 (lockfile and settings migration) as its own plan.
-  3. Fix the two ref-cleanup warnings by copying `triggerRef.current` into a local variable inside each effect.
-  4. Bump the `typescript` alias once `@typescript/typescript6` publishes 6.0.3.
+  3. Bump the `typescript` alias once `@typescript/typescript6` publishes 6.0.3.
 
 ## P3: Cloudflare suite leftovers
 
@@ -81,42 +66,6 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Fix options:**
   1. Measure current coverage, set `coverage.thresholds` slightly below it, and run coverage in CI.
   2. Add `twitter-image` routes only if X previews ever look wrong.
-
-## P2: Visual regression baselines are stale
-
-- **Added:** 04-11-26, from `completed/completed_portfolio-page_PLAN_04-11-26.md`
-- **Problem:** `tests/e2e/visual.spec.ts` fails on every route. Only 21 baselines are tracked: 4 for current routes (about, contact, home, resume, last updated 13-09-26) and 9 for routes that now redirect (`now`, `ventures`, `writing`). The other 10 current routes have none. Mobile baselines differ in page height (e.g. home 2036 vs 1569px), unrelated to any recent change.
-- **Root cause:** the suite is darwin-only and not in CI, so drift went unnoticed through several redesigns.
-- **Why deferred:** refreshing every baseline would bless months of unreviewed visual drift in one step; that needs a deliberate review.
-- **Fix options:**
-  1. Delete the retired-route baselines, run `--update-snapshots` once, review every image, commit as a new baseline.
-  2. Or drop the suite and rely on smoke, axe and manual screenshots.
-
-## P3: Dead fallback components carry stale Manut copy
-
-- **Added:** 04-11-26, from `features/sea-discovery/completed/phase-11_audit-fixes_PLAN_04-11-26.md`
-- **Problem:** `components/content/AboutFallback.tsx` and `NowFallback.tsx` still describe Manut as a workspace "for solo entrepreneurs" ("Notion on steroids").
-- **Root cause:** no page imports them any more (copy moved to `lib/content/aboutPage.ts` and `faq.ts`).
-- **Why deferred:** not rendered, so no user or crawler impact.
-- **Fix options:** delete both files, or align the copy if they are revived.
-
-## P3: Dev-only hydration warning on the nav menu button under reduced motion
-
-**Resolved 09-11-26 (visual-redesign Phase 1):** the menu toggle is now a plain `<button>`; `next dev` under reduced motion logs no hydration warning on `/portfolio` or `/about`.
-
-- **Added:** 04-11-26
-- **Problem:** with `prefers-reduced-motion: reduce`, `next dev` logs a hydration mismatch on every landing page: the server HTML has `tabindex="0"` on the `motion.button` menu toggle in `LandingTopNav`, the client does not.
-- **Root cause:** inferred to be framer-motion rendering different attributes for reduced motion on server vs client. Production smoke tests log no error.
-- **Why deferred:** dev-only, pre-existing, no visible effect.
-- **Fix options:** make the toggle a plain `<button>` wrapping the animated icon, or pass an explicit `tabIndex`.
-
-## P3: `next build` rewrites the agent-rules heading in `AGENTS.md`
-
-- **Added:** 04-11-26
-- **Problem:** every `next build` changes `# This is NOT the Next.js you know` to `## …` inside the `nextjs-agent-rules` block, leaving `AGENTS.md` dirty.
-- **Root cause:** Next.js 16 regenerates the block with an H2; the committed file has an H1.
-- **Why deferred:** cosmetic; reverted by hand each build on 04-11-26.
-- **Fix options:** commit the H2 form once so builds stop changing it.
 
 ## P3: Harness and context router missing in this checkout
 
