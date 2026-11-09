@@ -152,3 +152,48 @@ test.describe("resume > the detail view is a typed search param", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 });
+
+test.describe("skills > the catalog filter is a typed search param", () => {
+  test("?show=user narrows the catalog, All brings back a clean URL", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+
+    // /skills is prerendered: the filter applies after hydration, with no
+    // hydration mismatch.
+    await page.goto("/skills?show=user", { waitUntil: "networkidle" });
+    const group = page.getByRole("group", { name: "Show" });
+    await expect(
+      group.getByRole("button", { name: /^You invoke/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(/^Showing \d+ of 20 skills$/)).toBeVisible();
+    // Verify and ship holds only skills the agent loads on its own.
+    const ship = page.getByRole("article", { name: "Verify and ship" });
+    await expect(ship).toHaveCount(0);
+
+    await group.getByRole("button", { name: /^All/ }).click();
+    await expect(page).toHaveURL(/\/skills$/);
+    await expect(ship).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("an unknown filter falls back to all without an error", async ({
+    page,
+  }) => {
+    const response = await page.goto("/skills?show=everything", {
+      waitUntil: "networkidle",
+    });
+    expect(response?.ok()).toBe(true);
+    await expect(page).toHaveURL(/\/skills$/);
+    await expect(
+      page
+        .getByRole("group", { name: "Show" })
+        .getByRole("button", { name: /^All/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+});
