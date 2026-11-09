@@ -3,7 +3,8 @@ import type { PortfolioMockup as Mockup } from "@/lib/content/portfolio";
 
 /**
  * Illustrative product mockups drawn as SVG (640×400, 16:10). Theme tokens
- * only, so they follow light and dark mode. Placeholder bars and generic
+ * only, so they follow light and dark mode; the accent (`mark`) marks status
+ * and the active item, as in the bento canvas. Placeholder bars and generic
  * labels, never real data.
  */
 
@@ -137,7 +138,7 @@ function AppShell({
                 width={130}
                 height={26}
                 rx={7}
-                className="fill-signal/10"
+                className="fill-mark/10"
               />
             ) : null}
             <rect
@@ -146,7 +147,7 @@ function AppShell({
               width={10}
               height={10}
               rx={2}
-              className={i === 0 ? "fill-signal" : "fill-ink/30"}
+              className={i === 0 ? "fill-mark" : "fill-ink/30"}
             />
             <Label
               x={38}
@@ -199,7 +200,7 @@ function AppShell({
                 width={12}
                 height={h}
                 rx={2}
-                className="fill-ink/20"
+                className={i === 1 ? "fill-mark/45" : "fill-ink/20"}
               />
             ))}
             <Bar x={x + 140} y={y + 100} w={54} h={6} tone="fill-ink/10" />
@@ -233,9 +234,9 @@ function EmailReport({
         width={592}
         height={38}
         rx={8}
-        className="fill-success/15"
+        className="fill-mark/12"
       />
-      <circle cx={46} cy={137} r={9} className="fill-success" />
+      <circle cx={46} cy={137} r={9} className="fill-mark" />
       <path
         d="M41.5 137.5 L45 141 L51 133.5"
         className="fill-none stroke-surface"
@@ -243,7 +244,7 @@ function EmailReport({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <Label x={64} y={141} size={13} weight={600} tone="fill-success">
+      <Label x={64} y={141} size={13} weight={600} tone="fill-mark">
         {mockup.status}
       </Label>
 
@@ -282,7 +283,7 @@ function EmailReport({
               width={46}
               height={18}
               rx={9}
-              className="fill-success/15"
+              className="fill-mark/12"
             />
             <Label
               x={503}
@@ -290,7 +291,7 @@ function EmailReport({
               size={10}
               weight={600}
               anchor="middle"
-              tone="fill-success"
+              tone="fill-mark"
             >
               OK
             </Label>
@@ -395,7 +396,7 @@ function FormPreview({
         width={274}
         height={36}
         rx={18}
-        className="fill-signal"
+        className="fill-mark"
       />
       <Label
         x={479}
@@ -403,7 +404,7 @@ function FormPreview({
         size={13}
         weight={600}
         anchor="middle"
-        tone="fill-paper"
+        tone="fill-surface"
       >
         {mockup.action}
       </Label>
@@ -530,7 +531,7 @@ function ReviewQueue({
                   width={18}
                   height={18}
                   rx={4}
-                  className="fill-success"
+                  className="fill-mark"
                 />
                 <path
                   d={`M567.5 ${y + 27} L571 ${y + 30.5} L577 ${y + 23.5}`}
@@ -585,26 +586,5 @@ export default function PortfolioMockup({
       {mockup.kind === "form-preview" ? <FormPreview mockup={mockup} /> : null}
       {mockup.kind === "review-queue" ? <ReviewQueue mockup={mockup} /> : null}
     </svg>
-  );
-}
-
-/** Soft backdrop that frames a mockup like a product shot. */
-export function MockupStage({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`flex items-center justify-center ${className}`}
-      style={{
-        backgroundImage:
-          "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--palette-signal) 12%, transparent), transparent 60%), linear-gradient(180deg, var(--surface-tint), color-mix(in srgb, var(--surface-warm) 55%, var(--surface-tint)))",
-      }}
-    >
-      {children}
-    </div>
   );
 }

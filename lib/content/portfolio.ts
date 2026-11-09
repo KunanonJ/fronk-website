@@ -11,8 +11,8 @@
  *      16:10 crops look best on cards; any size works on the detail page.
  *   2. Register them on the project below as `cover` and/or `gallery` with
  *      `src: "/portfolio/<slug>/<file>"`, a real `alt`, and pixel `width`/`height`.
- *   Until a `cover` is set, cards and the detail hero show the code-drawn
- *   `mockup` (or a typographic placeholder if there is none).
+ *   Until a `cover` is set, cards and the detail "Interface" card show the
+ *   code-drawn `mockup`; with neither, the visual is left out.
  *   `portfolio.test.ts` fails if a registered image file is missing.
  */
 
@@ -46,7 +46,6 @@ export interface PortfolioWorkflow {
 export interface PortfolioArchitectureNode {
   label: string;
   note?: string;
-  icon?: VisualIconId;
 }
 
 export interface PortfolioArchitecture {
@@ -93,7 +92,13 @@ export interface PortfolioProject {
   urlLabel?: string;
   stack: readonly string[];
   highlights: readonly string[];
+  /** First section is "The problem", then "How it is built". */
   sections: readonly { heading: string; body: string }[];
+  /**
+   * What the project replaced, restated from its own copy, for the "The
+   * problem" card. Only where the copy names both sides.
+   */
+  beforeAfter?: { before: string; after: string };
   cover?: PortfolioImage;
   gallery?: readonly PortfolioImage[];
   /** Illustrative UI; used as the cover until a screenshot is registered. */
@@ -102,9 +107,20 @@ export interface PortfolioProject {
   architecture?: PortfolioArchitecture;
 }
 
+/** One line of a hero h1: words, some muted (bento canvas). */
+export type HeadlineLine = readonly { text: string; muted?: boolean }[];
+
 export const portfolioPage = {
   eyebrow: "Portfolio",
   title: "Selected work",
+  /** The h1 in three lines (bento canvas); the last is the accent line. */
+  headline: [
+    [{ text: "Selected work:", muted: true }, { text: "internal tools," }],
+    [{ text: "automations" }, { text: "and", muted: true }],
+    [{ text: "AI agents." }],
+  ] satisfies readonly HeadlineLine[],
+  /** Every project is his work: the byline on each project page. */
+  author: { name: "Kunanon Jarat", href: "/about" },
   description:
     "Internal tools, automations and AI agents built at The Binary Holdings. They run behind a login, so each page shows what the product does and how it is built rather than a live link.",
 } as const;
@@ -122,6 +138,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "May to Oct 2026",
     year: 2026,
     access: "internal",
+    beforeAfter: { before: "Zoho", after: "One login-only web app" },
     mockup: {
       kind: "app-shell",
       title: "Intranet",
@@ -166,26 +183,24 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Staff",
               note: "Browser, installable web app",
-              icon: "users",
             },
           ],
         },
         {
           label: "Web app",
           nodes: [
-            { label: "Next.js 16", note: "React 19", icon: "nextdotjs" },
-            { label: "Tailwind CSS 4", icon: "tailwindcss" },
-            { label: "shadcn/ui", icon: "shadcnui" },
+            { label: "Next.js 16", note: "React 19" },
+            { label: "Tailwind CSS 4" },
+            { label: "shadcn/ui" },
           ],
         },
         {
           label: "API",
           nodes: [
-            { label: "Express 5", note: "Zod validation", icon: "express" },
+            { label: "Express 5", note: "Zod validation" },
             {
               label: "Socket.IO",
               note: "Real-time features",
-              icon: "socketdotio",
             },
           ],
         },
@@ -195,31 +210,27 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "PostgreSQL",
               note: "On Supabase, via Prisma",
-              icon: "postgresql",
             },
-            { label: "Supabase Auth + Storage", icon: "supabase" },
+            { label: "Supabase Auth + Storage" },
             {
               label: "Google Gemini",
               note: "ARIA assistant, embedding search",
-              icon: "googlegemini",
             },
-            { label: "Claude", note: "ARIA assistant", icon: "anthropic" },
+            { label: "Claude", note: "ARIA assistant" },
             {
               label: "Integrations",
               note: "Gmail, Sheets, Bank of Thailand FX rates, PostHog",
-              icon: "network",
             },
           ],
         },
         {
           label: "Build + hosting",
           nodes: [
-            { label: "Turborepo", note: "Monorepo", icon: "turborepo" },
-            { label: "Vercel", note: "Hosting + cron", icon: "vercel" },
+            { label: "Turborepo", note: "Monorepo" },
+            { label: "Vercel", note: "Hosting + cron" },
             {
               label: "GitHub Actions",
               note: "CI with Vitest + Playwright",
-              icon: "githubactions",
             },
           ],
         },
@@ -325,7 +336,6 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "GitHub Actions",
               note: "Daily cron",
-              icon: "githubactions",
             },
           ],
         },
@@ -335,7 +345,6 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Node.js script",
               note: "Built-in modules only, no dependencies",
-              icon: "nodedotjs",
             },
           ],
         },
@@ -345,12 +354,10 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Avalanche P-Chain",
               note: "JSON-RPC over HTTPS",
-              icon: "network",
             },
             {
               label: "Yesterday's snapshot",
               note: "JSON file",
-              icon: "filetext",
             },
           ],
         },
@@ -360,12 +367,10 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Resend",
               note: "HTML + plain-text email",
-              icon: "resend",
             },
             {
               label: "Git history",
               note: "Daily JSON snapshots",
-              icon: "github",
             },
           ],
         },
@@ -452,10 +457,9 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Single HTML page",
               note: "Nothing typed leaves the browser",
-              icon: "html5",
             },
-            { label: "CSS", icon: "css" },
-            { label: "JavaScript", icon: "javascript" },
+            { label: "CSS" },
+            { label: "JavaScript" },
           ],
         },
         {
@@ -464,23 +468,20 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Python build script",
               note: "Pillow + librsvg render the PNGs",
-              icon: "python",
             },
             {
               label: "Permanent image URLs",
               note: "Gmail only shows public HTTPS images",
-              icon: "image",
             },
           ],
         },
         {
           label: "Hosting",
           nodes: [
-            { label: "GitHub Pages", icon: "githubpages" },
+            { label: "GitHub Pages" },
             {
               label: "GitHub Actions",
               note: "Deploy + daily image check",
-              icon: "githubactions",
             },
           ],
         },
@@ -573,9 +574,9 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
         {
           label: "Sources",
           nodes: [
-            { label: "YouTube Data API", icon: "video" },
-            { label: "Apify", note: "Instagram", icon: "globe" },
-            { label: "yt-dlp", note: "Downloads", icon: "video" },
+            { label: "YouTube Data API" },
+            { label: "Apify", note: "Instagram" },
+            { label: "yt-dlp", note: "Downloads" },
           ],
         },
         {
@@ -584,12 +585,10 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Python agents",
               note: "Google Agent Development Kit",
-              icon: "python",
             },
             {
               label: "Vertex AI Agent Engine",
               note: "Deployment target",
-              icon: "googlecloud",
             },
           ],
         },
@@ -599,7 +598,6 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Gemini",
               note: "Relevance, titles, captions",
-              icon: "googlegemini",
             },
           ],
         },
@@ -609,19 +607,17 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Google Sheets",
               note: "Approval queue",
-              icon: "googlesheets",
             },
           ],
         },
         {
           label: "Media + publishing",
           nodes: [
-            { label: "ffmpeg", note: "Trim", icon: "ffmpeg" },
-            { label: "Cloud Storage", icon: "googlecloud" },
+            { label: "ffmpeg", note: "Trim" },
+            { label: "Cloud Storage" },
             {
               label: "Playwright",
               note: "Browser publishing to the CMS",
-              icon: "monitor",
             },
           ],
         },
@@ -631,7 +627,6 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
             {
               label: "Recruitment agent",
               note: "FastAPI, Supabase, Resend",
-              icon: "fastapi",
             },
           ],
         },

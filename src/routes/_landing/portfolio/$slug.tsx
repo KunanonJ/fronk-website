@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import PortfolioProjectPage from "@/components/landing/PortfolioProjectPage";
+import { PageMain } from "@/components/bento/Bento";
+import PortfolioProjectPage from "@/components/landing/portfolio/PortfolioProjectPage";
 import type { Metadata } from "@/lib/seo/types";
 import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -38,13 +39,13 @@ function PortfolioProjectRouteView({ slug }: { slug: string }) {
   );
 
   return (
-    <>
+    <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
       />
       <PortfolioProjectPage project={project} />
-    </>
+    </PageMain>
   );
 }
 
