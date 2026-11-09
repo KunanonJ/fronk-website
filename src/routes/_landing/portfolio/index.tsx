@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import PortfolioPage from "@/components/landing/PortfolioPage";
 import type { Metadata } from "@/lib/seo/types";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -13,7 +14,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 function PortfolioRoute() {
-  const crumbLd = JSON.stringify(
+  const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Portfolio", path: "/portfolio" },

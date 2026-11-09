@@ -1,4 +1,5 @@
 import { notFound } from "@/lib/router/navigation";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import BlogPostPage from "@/components/landing/BlogPostPage";
 import { FALLBACK_BLOG_POSTS, mapPostToBlogCard } from "@/lib/content/blog";
 import type { Post } from "@/lib/sanity/types";
@@ -13,7 +14,7 @@ export default function BlogPostView({ slug, post }: { slug: string; post: Post 
 
   if (post) {
     const card = mapPostToBlogCard(post);
-    const articleLd = JSON.stringify(
+    const articleLd = serializeJsonLd(
       buildArticleJsonLd({
         title: card.title,
         description: card.excerpt,
@@ -45,7 +46,7 @@ export default function BlogPostView({ slug, post }: { slug: string; post: Post 
   const fallback = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
   if (!fallback) notFound();
 
-  const articleLd = JSON.stringify(
+  const articleLd = serializeJsonLd(
     buildArticleJsonLd({
       title: fallback.title,
       description: fallback.excerpt,

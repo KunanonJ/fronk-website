@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { CONTACT_LIMITS, CONTACT_TOPICS, contactMessages } from "@/lib/content/contact";
-import { isValidEmail } from "@/lib/newsletter/subscribe";
+import { isValidEmail } from "@/lib/contact/email";
 
 /**
  * The contact form's rules as a Valibot schema (Standard Schema), so the form

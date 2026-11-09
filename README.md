@@ -196,8 +196,14 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 - **Worker cache** (`cache.enabled`): Sanity-backed pages and text files send
   `Cache-Tag` and `CDN-Cache-Control`; `POST /api/revalidate` (Sanity webhook,
   signature checked with `@sanity/webhook`) purges the document's tags, and the
-  hourly cron (`scheduled()`) purges everything as a safety net.
-- **Forms:** `FORM_RATE_LIMIT` (5 per minute per IP) on contact and subscribe;
+  hourly cron (`scheduled()`) purges everything as a safety net. Webhooks signed
+  more than 5 minutes ago are rejected (replay window).
+- **Security headers:** HSTS, `nosniff`, `X-Frame-Options: SAMEORIGIN`,
+  `Referrer-Policy` and `Permissions-Policy` on every response: Worker responses
+  get them from `src/server/http.ts`, static files from `public/_headers`. Keep
+  the two lists the same.
+- **Forms:** `/api/contact` accepts only same-site JSON POSTs under 20 KB, with
+  `FORM_RATE_LIMIT` (5 per minute per IP);
   Turnstile once `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set.
 - **Legacy:** OpenNext's two Durable Object classes stay exported as empty classes
   so a dashboard rollback to the last Next version still works; remove them with a
@@ -220,7 +226,7 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 | `SANITY_REVALIDATE_SECRET`                   | yes\*    | no      | Webhook HMAC secret                                     |
 | `SANITY_AUTH_TOKEN`                          | optional | no      | Schema deploy on build                                  |
 | `CRON_SECRET`                                | optional | no      | Old cron Worker bridge (`/api/cron/revalidate`)         |
-| `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact, subscribe)               |
+| `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact form)                      |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`             | optional | yes     | Turnstile widget (build-time)                           |
 | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`               | optional | yes     | Umami                                                   |

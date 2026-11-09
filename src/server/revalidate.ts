@@ -1,4 +1,4 @@
-import { SIGNATURE_HEADER_NAME, isValidSignature } from "@sanity/webhook";
+import { SIGNATURE_HEADER_NAME, decodeSignatureHeader, isValidSignature } from "@sanity/webhook";
 import { REVALIDATE_TAGS, getRevalidationTagsForType } from "@/lib/sanity/revalidation";
 
 /*
@@ -17,10 +17,18 @@ export async function purgeTags(cache: CachePurger | undefined, tags: string[]) 
   return cache.purge({ tags });
 }
 
+/**
+ * How old a signed webhook may be. Sanity signs the timestamp, so a captured
+ * request cannot be replayed after this window; a delivery that arrives later
+ * is covered by the hourly purge.
+ */
+export const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000;
+
 export async function handleSanityWebhook(
   request: Request,
   secret: string | undefined,
   cache: CachePurger | undefined,
+  now: number = Date.now(),
 ): Promise<Response> {
   if (!secret) return Response.json({ message: "Missing SANITY_REVALIDATE_SECRET" }, { status: 500 });
 
@@ -28,6 +36,10 @@ export async function handleSanityWebhook(
   const signature = request.headers.get(SIGNATURE_HEADER_NAME) ?? "";
   if (!signature || !(await isValidSignature(payload, signature, secret))) {
     return Response.json({ message: "Invalid signature" }, { status: 401 });
+  }
+  // The signature is valid, so the header decodes; its timestamp is in ms.
+  if (Math.abs(now - decodeSignatureHeader(signature).timestamp) > WEBHOOK_MAX_AGE_MS) {
+    return Response.json({ message: "Stale signature" }, { status: 401 });
   }
 
   let body: { _type?: string } | null;
@@ -40,7 +52,7 @@ export async function handleSanityWebhook(
 
   const tags = [...getRevalidationTagsForType(body._type)];
   const result = await purgeTags(cache, tags);
-  return Response.json({ status: 200, revalidated: result.success, tags, now: Date.now() }, { status: result.success ? 200 : 500 });
+  return Response.json({ status: 200, revalidated: result.success, tags, now }, { status: result.success ? 200 : 500 });
 }
 
 /**

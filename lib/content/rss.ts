@@ -31,7 +31,7 @@ export function buildRssFeed({
 }: RssFeedInput): string {
   const items = cards
     .map((card) => {
-      const url = `${base}/blog/${card.slug}`;
+      const url = escapeXml(`${base}/blog/${card.slug}`);
       const published = new Date(card.publishedAt);
       const pubDate = Number.isNaN(published.getTime())
         ? ""

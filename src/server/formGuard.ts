@@ -1,10 +1,11 @@
-import { contactMessages } from "@/lib/content/contact";
+import { CONTACT_LIMITS, contactMessages } from "@/lib/content/contact";
+import { readBodyText } from "@/src/server/http";
 
 /*
- * Abuse checks for the form endpoints, run by the Start server routes before
- * the shared Next handlers: a per-IP rate limit (ratelimits binding) and
+ * Abuse checks for the contact endpoint, run by its server route before the
+ * handler: a per-IP rate limit (ratelimits binding) and
  * Turnstile verification once TURNSTILE_SECRET_KEY is set. Each check is
- * skipped when its binding or secret is absent (Next, unit tests, local).
+ * skipped when its binding or secret is absent (unit tests, local dev).
  */
 
 export type FormGuardEnv = {
@@ -16,7 +17,7 @@ const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export async function guardForm(
   request: Request,
-  scope: "contact" | "subscribe",
+  scope: "contact",
   env: FormGuardEnv,
   fetcher: typeof fetch = fetch,
 ): Promise<Response | null> {
@@ -28,7 +29,13 @@ export async function guardForm(
   }
 
   if (env.TURNSTILE_SECRET_KEY) {
-    const body = (await request.clone().json().catch(() => null)) as { turnstileToken?: unknown } | null;
+    const text = await readBodyText(request.clone(), CONTACT_LIMITS.maxBodyBytes);
+    let body: { turnstileToken?: unknown } | null;
+    try {
+      body = text ? (JSON.parse(text) as { turnstileToken?: unknown }) : null;
+    } catch {
+      body = null;
+    }
     const token = typeof body?.turnstileToken === "string" ? body.turnstileToken : "";
     let passed = false;
     if (token) {

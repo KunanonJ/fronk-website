@@ -34,7 +34,6 @@ import { Route as LandingStackRouteImport } from './routes/_landing/stack'
 import { Route as SystemDesignRouteImport } from './routes/_system/design'
 import { Route as SystemResumeRouteImport } from './routes/_system/resume'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
-import { Route as ApiSubscribeRouteImport } from './routes/api/subscribe'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
 import { Route as LandingPortfolioIndexRouteImport } from './routes/_landing/portfolio/index'
@@ -174,11 +173,6 @@ const ApiContactRoute = ApiContactRouteImport.update({
   path: '/api/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSubscribeRoute = ApiSubscribeRouteImport.update({
-  id: '/api/subscribe',
-  path: '/api/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LandingBlogIndexRoute = LandingBlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -278,7 +272,6 @@ export interface FileRoutesByFullPath {
   '/design': typeof SystemDesignRoute
   '/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
-  '/api/subscribe': typeof ApiSubscribeRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
@@ -318,7 +311,6 @@ export interface FileRoutesByTo {
   '/design': typeof SystemDesignRoute
   '/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
-  '/api/subscribe': typeof ApiSubscribeRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
@@ -360,7 +352,6 @@ export interface FileRoutesById {
   '/_system/design': typeof SystemDesignRoute
   '/_system/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
-  '/api/subscribe': typeof ApiSubscribeRoute
   '/_landing/': typeof LandingIndexRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
   '/_landing/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -403,7 +394,6 @@ export interface FileRouteTypes {
     | '/design'
     | '/resume'
     | '/api/contact'
-    | '/api/subscribe'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
@@ -443,7 +433,6 @@ export interface FileRouteTypes {
     | '/design'
     | '/resume'
     | '/api/contact'
-    | '/api/subscribe'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
@@ -484,7 +473,6 @@ export interface FileRouteTypes {
     | '/_system/design'
     | '/_system/resume'
     | '/api/contact'
-    | '/api/subscribe'
     | '/_landing/'
     | '/_landing/blog/$slug'
     | '/_landing/portfolio/$slug'
@@ -517,7 +505,6 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   DotwellKnownSecurityDottxtRoute: typeof DotwellKnownSecurityDottxtRoute
   ApiContactRoute: typeof ApiContactRoute
-  ApiSubscribeRoute: typeof ApiSubscribeRoute
   ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
   PortfolioSlugOpengraphImageRoute: typeof PortfolioSlugOpengraphImageRoute
   SkillsSlugOpengraphImageRoute: typeof SkillsSlugOpengraphImageRoute
@@ -702,13 +689,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/subscribe': {
-      id: '/api/subscribe'
-      path: '/api/subscribe'
-      fullPath: '/api/subscribe'
-      preLoaderRoute: typeof ApiSubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_landing/blog/': {
       id: '/_landing/blog/'
       path: '/blog'
@@ -883,7 +863,6 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   DotwellKnownSecurityDottxtRoute: DotwellKnownSecurityDottxtRoute,
   ApiContactRoute: ApiContactRoute,
-  ApiSubscribeRoute: ApiSubscribeRoute,
   ApiGithubContributionsRoute: ApiGithubContributionsRoute,
   PortfolioSlugOpengraphImageRoute: PortfolioSlugOpengraphImageRoute,
   SkillsSlugOpengraphImageRoute: SkillsSlugOpengraphImageRoute,

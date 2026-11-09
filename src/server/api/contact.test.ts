@@ -79,6 +79,26 @@ describe("POST /api/contact", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("answers 413 when the body is larger than its Content-Length claims", async () => {
+    const { status } = await callRoute(JSON.stringify({ ...VALID, message: "x".repeat(30_000) }), {
+      "content-length": "100",
+    });
+    expect(status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("answers 415 for a body that is not JSON", async () => {
+    const { status } = await callRoute(JSON.stringify(VALID), { "content-type": "text/plain" });
+    expect(status).toBe(415);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("answers 403 for a cross-site browser post", async () => {
+    const { status } = await callRoute(JSON.stringify(VALID), { "sec-fetch-site": "cross-site" });
+    expect(status).toBe(403);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("answers 502 when Resend rejects the send", async () => {
     fetchMock.mockResolvedValue(new Response("{}", { status: 422 }));
     const { status, json } = await callRoute(JSON.stringify(VALID));
