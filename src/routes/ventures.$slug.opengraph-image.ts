@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withEdgeLifetime } from "@/src/lib/cache";
 import render from "@/app/(landing)/ventures/[slug]/opengraph-image";
 
-/** Next's file-convention image (next/og is @cf-wasm/og in this build). */
+/** Next's file-convention image (next/og is @cf-wasm/og in this build). Edge-cached
+ * for a day (the Worker cache key includes the deploy version). Browsers get a
+ * day too, not the renderer's year: unlike Next, these URLs carry no hash. */
+const OG_EDGE = "public, max-age=86400";
+
 export const Route = createFileRoute("/ventures/$slug/opengraph-image")({
   server: {
     handlers: {
-      GET: async ({ params }) => render({ params: Promise.resolve(params) }),
+      GET: async ({ params }) => withEdgeLifetime(render({ params: Promise.resolve(params) }), OG_EDGE, OG_EDGE),
     },
   },
 });

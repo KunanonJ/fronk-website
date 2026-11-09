@@ -16,3 +16,5 @@ The exit gate in the umbrella table, plus the standard gates (typecheck, lint, u
 
 - `wrangler.jsonc` drops `r2_buckets`, both `durable_objects` and the self service binding; it adds `cache`, `ratelimits` and `triggers.crons`. Delete the `fronk-website-revalidate-cron` Worker a week after a clean run.
 - Owner checks the Workers plan (Paid) before the cutover, and picks the one product analytics tool to keep next to Cloudflare Web Analytics; GTM is removed.
+- Carried from Phase 4: on staging, send a signed test webhook and confirm the tag purge (`ctx.cache.purge` returns success and the next request misses), check stale-while-revalidate inside `CDN-Cache-Control`, and measure a cold `/resume` render's CPU time. Set `SANITY_REVALIDATE_SECRET` on the Worker and point the Sanity webhook at the Start Worker at cutover.
+
