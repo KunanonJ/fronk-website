@@ -11,3 +11,9 @@ Server routes for /api/contact, /api/subscribe, /api/github/contributions, /api/
 ## Gates
 
 The exit gate in the umbrella table, plus the standard gates (typecheck, lint, unit tests, Next CI unchanged and green).
+
+## Additions from the target architecture (09-11-26)
+
+- Contact and newsletter on `@tanstack/react-form-start` with one Valibot schema for client and server; POST server functions with `createCsrfMiddleware` and `.validator()`; field errors through `createServerValidate`.
+- Turnstile on both forms (explicit-render widget; `siteverify` on the server) and a `ratelimits` binding keyed by IP and route. These are intended parity differences on `/contact` and the subscribe form; list them in the phase report.
+- Bindings through `import { env } from "cloudflare:workers"`; secrets via `wrangler secret put` with `secrets.required`.

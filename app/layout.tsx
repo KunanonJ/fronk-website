@@ -7,18 +7,10 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { WebVitals } from "@/components/WebVitals";
 import RouteFade from "@/components/landing/RouteFade";
-import { siteConfig } from "@/lib/site";
-import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
-import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
-import { resolveGscVerification } from "@/lib/seo/searchConsole";
-import { site as landingSite } from "@/lib/content/landing";
+import { rootMetadata, rootViewport } from "@/lib/seo/rootMetadata";
 import "./globals.css";
-
-const gscVerification = resolveGscVerification(
-  process.env.NEXT_PUBLIC_GSC_VERIFICATION,
-);
 
 const siteJsonLd: string = JSON.stringify(buildSiteJsonLd());
 
@@ -46,51 +38,9 @@ const notoSansThai = Noto_Sans_Thai({
   preload: false,
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: landingSite.title,
-    template: `%s${TITLE_SUFFIX}`,
-  },
-  description: landingSite.description,
-  authors: [{ name: siteConfig.name }],
-  creator: siteConfig.name,
-  alternates: {
-    canonical: "/",
-    // RSS only carries blog posts, so it isn't advertised while the blog is hidden.
-    ...(BLOG_PUBLIC ? { types: { "application/rss+xml": "/feed.xml" } } : {}),
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    title: landingSite.title,
-    description: landingSite.description,
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: "@fkj98",
-    site: "@fkj98",
-    title: landingSite.title,
-    description: landingSite.description,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  ...(gscVerification
-    ? { verification: { google: gscVerification } }
-    : {}),
-};
+export const metadata: Metadata = rootMetadata;
 
-export const viewport: Viewport = {
-  // Ink (dark) and the light page colour (globals.css --page).
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b0d17" },
-    { media: "(prefers-color-scheme: light)", color: "#f5f6fa" },
-  ],
-};
+export const viewport: Viewport = rootViewport;
 
 interface RootLayoutProps {
   children: React.ReactNode;

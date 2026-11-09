@@ -1,8 +1,9 @@
 # TanStack Start migration: umbrella plan
 
-**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phase 1 (scaffold) next.
+**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phase 1 (scaffold) executed 09-11-26; Phase 2 (content routes) next.
 **Created:** 09-11-26
 **Research:** `process/general-plans/references/tanstack-start-migration-research_REPORT_09-11-26.md`. That report covers the API mapping, the inventory, the risks and the parity references.
+**Target architecture:** `../references/target-architecture_09-11-26.md` (approved 09-11-26). It sets which TanStack packages and Cloudflare products each phase adopts.
 **Owner ask:** move kunanonj.com from Next.js (OpenNext on Workers) to TanStack Start on Cloudflare Workers. Use the TanStack suite where it replaces hand-rolled code, and prove parity against the redesigned site.
 
 ## Owner decisions (09-11-26)
@@ -10,6 +11,14 @@
 1. **Merging:** merge every phase PR on green, *including the cutover* once the parity gates pass. Rollback is through the Cloudflare dashboard (Workers deployments).
 2. **Staging:** a separate staging Worker (`fronk-website-start`) is checked on real Cloudflare before cutover. The owner runs `wrangler login` once, and only that staging Worker is deployed from this machine.
 3. **Draft mode:** dropped. `/resume` shows published Sanity content only.
+
+Target-architecture decisions (09-11-26, owner said "go" on every recommendation):
+
+4. **Workers plan:** run on Workers Paid. Free allows 10 ms CPU for SSR, and with the Worker cache on, every request counts toward the 100k-a-day limit. The owner checks the account's plan before the Phase 5 cutover.
+5. **Bento redesign:** lands as Phase 7, after Next is removed. Phases 1 to 6 keep pixel parity with today's site.
+6. **Validation:** Valibot 1, used as Standard Schema by Router (`validateSearch`), Form and server functions.
+7. **Analytics:** trim to Cloudflare Web Analytics plus one product tool (GA or Umami, picked by the owner at Phase 5). GTM goes.
+8. **Email:** keep Resend for contact mail and the newsletter audience.
 
 ## Approach
 
@@ -37,12 +46,13 @@
 | 4 Caching and Sanity | `phase-4_caching-sanity_PLAN_09-11-26.md` | Sanity reads through server functions and TanStack Query; a response cache with webhook purge; the hourly cron in `src/server.ts`; draft mode removed |
 | 5 Staging and cutover | `phase-5_cutover_PLAN_09-11-26.md` | Staging Worker parity clean against production; perf budget ported; `build:cloudflare` and `wrangler.jsonc` switched; production verified live |
 | 6 Remove Next | `phase-6_remove-next_PLAN_09-11-26.md` | Shared code on Router APIs; Next, OpenNext, shims and `app/` removed; tooling and tests on Vite; knip clean |
+| 7 Bento redesign | `phase-7_bento-redesign_PLAN_09-11-26.md` | The approved canvas design built in `src/ui` route group by route group; new visual baselines; motion respects reduced motion; perf budget holds |
 
 Each phase follows the same loop: research at entry → execute → gates → PR → merge on green → verify → report in `../reports/`.
 
 ## Program-wide rules
 
-- Pin exact versions taken from the registry at phase entry. On 09-11-26: `@tanstack/react-start` 1.169.5, `@tanstack/react-router` 1.170.46, `@tanstack/react-query` 5.107.1, `@tanstack/react-form` 1.33.5, `@cloudflare/vite-plugin` 1.67.0, `vite` 8.3.6.
+- Pin exact versions taken from the registry at phase entry. On 09-11-26: `@tanstack/react-start` 1.169.5, `@tanstack/react-router` 1.170.46, `@tanstack/react-query` 5.107.1, `@tanstack/react-router-ssr-query` 1.167.3, `@tanstack/react-form-start` 1.33.5, `@cloudflare/vite-plugin` 1.67.0, `vite` 8.3.6.
 - No production behaviour changes before Phase 5. Next's CI jobs keep running unchanged; Start adds its own job from Phase 1.
 - Fix known Next debts only where they block parity (e.g. `<html lang="th">` on Thai pages, noted in the research report). Record the rest in `../backlog/`.
 - Test runtime-rendered pages, not just prerenders (lesson from the ISR fix, #61).

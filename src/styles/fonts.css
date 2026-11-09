@@ -1,0 +1,14 @@
+/*
+ * Self-hosted fonts for the Start build (Fontsource; Next used next/font).
+ * Sets the same variables next/font put on <html>, which app/globals.css
+ * reads in --font-sans / --font-mono / --font-display.
+ */
+@import "@fontsource-variable/geist/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
+@import "@fontsource-variable/noto-sans-thai/wght.css";
+
+:root {
+  --font-geist-sans: "Geist Variable";
+  --font-geist-mono: "Geist Mono Variable";
+  --font-noto-thai: "Noto Sans Thai Variable";
+}

@@ -1,0 +1,56 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig, loadEnv } from "vite";
+
+/*
+ * TanStack Start build (tanstack-migration). Runs next to Next until the
+ * Phase 5 cutover: Next keeps `app/` and next.config.ts; Start reads `src/`
+ * and the shared `components/` and `lib/` through the `@/` alias.
+ */
+const root = path.dirname(fileURLToPath(import.meta.url));
+const shim = (file: string) => path.join(root, "src/shims", file);
+
+/** Every NEXT_PUBLIC_* the code reads; unset ones become `undefined`, never `process`. */
+const PUBLIC_ENV = [
+  "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_GSC_VERIFICATION",
+  "NEXT_PUBLIC_GTM_ID",
+  "NEXT_PUBLIC_GA_ID",
+  "NEXT_PUBLIC_UMAMI_HOST",
+  "NEXT_PUBLIC_UMAMI_WEBSITE_ID",
+  "NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN",
+  "NEXT_PUBLIC_SANITY_PROJECT_ID",
+  "NEXT_PUBLIC_SANITY_DATASET",
+  "NEXT_PUBLIC_SANITY_API_VERSION",
+  "NEXT_PUBLIC_SANITY_STUDIO_URL",
+];
+
+export default defineConfig(({ mode }) => {
+  const env = { ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
+  return {
+    server: { port: 3000 },
+    // The visual suite runs in the Playwright Docker image against the preview.
+    preview: { allowedHosts: ["host.docker.internal"] },
+    resolve: {
+      alias: [
+        { find: /^next\/link$/, replacement: shim("link.tsx") },
+        { find: /^next\/navigation$/, replacement: shim("navigation.ts") },
+        { find: /^next\/image$/, replacement: shim("image.tsx") },
+        { find: /^next\/script$/, replacement: shim("script.tsx") },
+        { find: /^next\/web-vitals$/, replacement: shim("web-vitals.ts") },
+        { find: /^@\//, replacement: `${root}/` },
+      ],
+    },
+    define: Object.fromEntries(
+      PUBLIC_ENV.map((key) => [`process.env.${key}`, env[key] === undefined ? "undefined" : JSON.stringify(env[key])]),
+    ),
+    plugins: [
+      cloudflare({ configPath: "wrangler.start.jsonc", viteEnvironment: { name: "ssr" } }),
+      tanstackStart(),
+      react(),
+    ],
+  };
+});

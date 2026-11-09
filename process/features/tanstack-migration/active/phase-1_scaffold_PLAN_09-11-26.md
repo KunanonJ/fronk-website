@@ -1,6 +1,6 @@
 # Phase 1: Scaffold
 
-**Status:** OUTLINE (finalised at entry from the installed packages' docs and types).
+**Status:** DONE 09-11-26. Report: `../reports/phase-1_scaffold_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `tanstack-migration_UMBRELLA_PLAN_09-11-26.md`
 
@@ -43,3 +43,12 @@ Start, Vite and the Cloudflare plugin build and run under workerd next to Next. 
 - The parity diff for `/` and `/about` is clean (or only listed intended differences).
 - Smoke + axe pass on both routes against the Start preview, in both themes.
 - Next's build and CI are unchanged and green.
+
+## Outcome and deviations (09-11-26)
+
+- `@tanstack/react-query` was not added yet; it arrives with the Sanity reads in Phase 4. Tailwind runs through the existing PostCSS config, so `@tailwindcss/vite` was not needed.
+- `src/server.ts` is the Worker entry (`wrangler.start.jsonc` `main`), per the target architecture. It delegates to Start's handler; Phase 4 adds the webhook purge and `scheduled()`.
+- Router defaults: `defaultPreload: "intent"` and `scrollRestoration: true`. `defaultViewTransition` waits for Phase 7, because `RouteFade` already animates navigation and the parity gates compare today's behaviour.
+- The two theme-colour metas render directly in `<head>`: Router's head dedupe keeps one meta per `name`.
+- `scripts/start-gates.mjs` hung because killing the `pnpm` wrapper left `vite preview` alive, holding the script's stderr. It now runs vite directly in its own process group and kills the group.
+
