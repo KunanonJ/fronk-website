@@ -71,19 +71,6 @@ export const primaryNav: readonly NavItem[] = [
 
 export const navCta = { label: "Contact", href: "/contact" } as const;
 
-/**
- * Flat nav for scroll-spy / active helpers (includes wordmark + CTA + menu parents).
- * @deprecated Prefer `primaryNav` + `navCta` for chrome; kept for spy helpers.
- */
-export const nav = [
-  { label: "KunanonJ", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Ventures", href: "/#ventures" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Skills", href: "/skills" },
-  ...(BLOG_PUBLIC ? [{ label: "Blog", href: "/blog" } as const] : []),
-  { label: "Contact", href: "/contact" },
-] as const;
 
 /** Operator keyword tips (hpbrn-style) for home about / about page. */
 export const aboutKeywords = [

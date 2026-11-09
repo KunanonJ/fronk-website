@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, useState } from "react";
 import Image from "@/components/ui/Image";
 import Link from "@/components/navigation/Link";

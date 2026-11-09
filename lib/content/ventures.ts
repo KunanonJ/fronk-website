@@ -118,57 +118,10 @@ export function getAllVentures(): readonly Venture[] {
   return [...VENTURES].sort((a, b) => b.year - a.year);
 }
 
-export function getFeaturedVentures(limit?: number): readonly Venture[] {
-  // Flagship-first on the home page, independent of getAllVentures' year sort.
-  const featured = getAllVentures()
-    .filter((v) => v.featured)
-    .sort(
-      (a, b) =>
-        (a.featuredOrder ?? Number.POSITIVE_INFINITY) -
-        (b.featuredOrder ?? Number.POSITIVE_INFINITY),
-    );
-  return typeof limit === "number" ? featured.slice(0, limit) : featured;
-}
-
 export function getVentureBySlug(slug: string): Venture | null {
   return VENTURES.find((v) => v.slug === slug) ?? null;
 }
 
 export function getAllVentureSlugs(): readonly string[] {
   return VENTURES.map((v) => v.slug);
-}
-
-/**
- * Prev/next neighbours in the year-desc case-page order. No wrap-around —
- * the edges return null so the footer nav renders a single direction.
- */
-export function getAdjacentVentures(slug: string): {
-  prev: Venture | null;
-  next: Venture | null;
-} {
-  const ordered = getAllVentures();
-  const index = ordered.findIndex((v) => v.slug === slug);
-  if (index === -1) return { prev: null, next: null };
-  return {
-    prev: index > 0 ? ordered[index - 1] : null,
-    next: index < ordered.length - 1 ? ordered[index + 1] : null,
-  };
-}
-
-export function resolveVentures(
-  cmsVentures: readonly Venture[] | null | undefined,
-  fallback: readonly Venture[] = VENTURES,
-): readonly Venture[] {
-  if (!cmsVentures || cmsVentures.length === 0) return fallback;
-  return cmsVentures;
-}
-
-export function resolveFeaturedVentures(
-  cmsVentures: readonly Venture[] | null | undefined,
-  fallback: readonly Venture[] = VENTURES,
-  limit?: number,
-): readonly Venture[] {
-  const source = resolveVentures(cmsVentures, fallback);
-  const featured = source.filter((venture) => venture.featured);
-  return typeof limit === "number" ? featured.slice(0, limit) : featured;
 }

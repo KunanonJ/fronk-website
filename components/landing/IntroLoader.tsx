@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import {

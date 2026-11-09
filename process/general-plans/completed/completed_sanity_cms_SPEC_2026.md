@@ -1,3 +1,8 @@
+> **Historical spec (Next.js era).** Moved from the repo root after the
+> TanStack Start migration. Draft mode, `/api/draft*`, ISR and the read token
+> are gone, and Sanity failures now render an error state instead of fallback
+> content. See `README.md` for how the site works today.
+
 # Executive Summary
 
 Add Sanity CMS management for the public Fronk website while preserving the current hardcoded content as production fallback. The first implementation covers editable home, standard pages, ventures, resume profile content, writing, draft preview, app-level scheduling, and tag-based revalidation.

@@ -6,9 +6,8 @@ import { resolveGscVerification } from "@/lib/seo/searchConsole";
 import { siteConfig } from "@/lib/site";
 
 /*
- * Root metadata and viewport, shared by the Next root layout and the
- * TanStack Start root route (tanstack-migration Phase 1). Kept free of
- * next/font so both builds can import it.
+ * Root metadata and viewport: the defaults every page's head builds on
+ * (src/routes/__root.tsx and pageHead).
  */
 
 const gscVerification = resolveGscVerification(

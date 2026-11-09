@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import FormaContactPage from "@/components/landing/FormaContactPage";
+import ContactPage from "@/components/landing/ContactPage";
 import type { Metadata } from "@/lib/seo/types";
 import { contactPage } from "@/lib/content/contact";
 import { pageHead } from "@/src/lib/head";
@@ -12,7 +12,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 function ContactRoute() {
-  return <FormaContactPage />;
+  return <ContactPage />;
 }
 
 export const Route = createFileRoute("/_landing/contact")({

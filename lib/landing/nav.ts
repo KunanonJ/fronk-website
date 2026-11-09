@@ -95,10 +95,6 @@ export function isMenuChildActive(
   );
 }
 
-export function isHashHref(href: string): boolean {
-  return href.startsWith("#") || href.startsWith("/#");
-}
-
 export function isNavItemActive(
   href: string,
   pathname: string,

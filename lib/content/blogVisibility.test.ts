@@ -4,7 +4,7 @@ import {
   isBlogHref,
   withoutHiddenBlogLinks,
 } from "@/lib/content/blogVisibility";
-import { footerResources, nav, primaryNav } from "@/lib/content/landing";
+import { footerResources, primaryNav } from "@/lib/content/landing";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 
 // Keep the routes off the network: no Sanity in unit tests.
@@ -28,7 +28,6 @@ describe.runIf(!BLOG_PUBLIC)("while the blog is hidden", () => {
       item.type === "menu" ? item.children.map((c) => c.href) : [item.href],
     );
     expect(hrefs.some(isBlogHref)).toBe(false);
-    expect(nav.some((item) => isBlogHref(item.href))).toBe(false);
     expect(footerResources.some((item) => item.href === "/feed.xml")).toBe(false);
   });
 

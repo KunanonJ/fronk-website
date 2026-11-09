@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import FormaContactPage from "./FormaContactPage";
+import ContactPage from "./ContactPage";
 import { contactMessages, contactPage } from "@/lib/content/contact";
 
 vi.mock("@/components/landing/LandingTopNav", () => ({ default: () => null }));
@@ -21,7 +21,7 @@ function fillAndSubmit() {
   fireEvent.click(screen.getByRole("button", { name: contactPage.submit }));
 }
 
-describe("FormaContactPage", () => {
+describe("ContactPage", () => {
   beforeEach(() => {
     fetchMock.mockReset();
     vi.stubGlobal("fetch", fetchMock);
@@ -32,13 +32,13 @@ describe("FormaContactPage", () => {
   });
 
   it("shows founder-voice copy, not the old agency template", () => {
-    const { container } = render(<FormaContactPage />);
+    const { container } = render(<ContactPage />);
     expect(container.textContent).toContain(contactPage.headlineLead);
     expect(container.textContent).not.toMatch(/craft bold ideas|Drop us a line|3D & Motion/);
   });
 
   it("exposes topic chips as toggle buttons", () => {
-    render(<FormaContactPage />);
+    render(<ContactPage />);
     const chip = screen.getByRole("button", { name: "Hiring" });
     expect(chip).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(chip);
@@ -49,7 +49,7 @@ describe("FormaContactPage", () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ ok: true, message: contactMessages.sent }), { status: 200 }),
     );
-    render(<FormaContactPage />);
+    render(<ContactPage />);
     fillAndSubmit();
 
     expect(await screen.findByText(contactPage.successTitle)).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe("FormaContactPage", () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ ok: false, message: contactMessages.failed }), { status: 502 }),
     );
-    render(<FormaContactPage />);
+    render(<ContactPage />);
     fillAndSubmit();
 
     expect(await screen.findByText(new RegExp(contactMessages.failed))).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe("FormaContactPage", () => {
 
   it("treats a network error as a failure, not a success", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
-    render(<FormaContactPage />);
+    render(<ContactPage />);
     fillAndSubmit();
 
     await waitFor(() =>

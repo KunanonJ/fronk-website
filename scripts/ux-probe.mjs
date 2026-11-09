@@ -15,7 +15,7 @@
  */
 import { chromium } from "@playwright/test";
 
-const BASE = (process.env.BASE ?? "http://localhost:8795").replace(/\/$/, "");
+const BASE = (process.env.BASE ?? "http://127.0.0.1:4173").replace(/\/$/, "");
 const ROUTES = process.argv.slice(2).length
   ? process.argv.slice(2)
   : ["/", "/about", "/contact", "/portfolio"];

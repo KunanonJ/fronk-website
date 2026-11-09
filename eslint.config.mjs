@@ -7,10 +7,9 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 /*
- * Lint for the TanStack Start app. The rule set is what eslint-config-next
- * shipped before the move off Next (React + React Hooks recommended, a
- * jsx-a11y subset, typescript-eslint recommended), with the plugins as direct
- * dependencies so upgrades are explicit.
+ * Lint for the TanStack Start app: React + React Hooks recommended, a jsx-a11y
+ * subset and typescript-eslint recommended (the set eslint-config-next used to
+ * provide), with the plugins as direct dependencies so upgrades are explicit.
  */
 export default defineConfig([
   globalIgnores([
@@ -21,11 +20,12 @@ export default defineConfig([
     ".agents/**",
     ".codex/**",
     ".vibecode-backup/**",
-    ".next/**",
-    ".open-next/**",
     "public/studio/static/**",
     "src/routeTree.gen.ts",
     "node_modules/**",
+    // Build output of the old Next.js setup, still present in older clones.
+    ".next/**",
+    ".open-next/**",
   ]),
   js.configs.recommended,
   ...tseslint.configs.recommended,

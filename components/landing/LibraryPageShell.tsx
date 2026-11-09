@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { expandHashHref } from "@/lib/landing/nav";

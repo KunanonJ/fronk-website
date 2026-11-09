@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "@/components/navigation/Link";
 import { ArrowDown } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
@@ -7,7 +5,7 @@ import {
   GithubIcon,
   LinkedinIcon,
   XIcon,
-} from "@/components/landing/about/SocialIcons";
+} from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
 import { expandHashHref } from "@/lib/landing/nav";

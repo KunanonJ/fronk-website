@@ -1,5 +1,3 @@
-"use client";
-
 import { useSyncExternalStore } from "react";
 
 const FINE_POINTER_QUERY = "(pointer: fine)";

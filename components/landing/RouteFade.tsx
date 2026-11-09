@@ -1,5 +1,3 @@
-"use client";
-
 import { useLayoutEffect, useRef } from "react";
 import { usePathname } from "@/lib/router/navigation";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";

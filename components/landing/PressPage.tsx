@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "@/components/ui/Image";
 import { ArrowUpRight } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";

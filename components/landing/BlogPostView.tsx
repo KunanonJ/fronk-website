@@ -7,11 +7,9 @@ import { buildArticleJsonLd } from "@/lib/seo/jsonLd";
 
 /**
  * One blog post: the Sanity post when there is one, otherwise the fallback
- * copy for that slug, otherwise a 404. Shared by the Next page and the
- * TanStack Start route, which each fetch the post their own way.
+ * copy for that slug, otherwise a 404. The route loads the post.
  */
 export default function BlogPostView({ slug, post }: { slug: string; post: Post | null }) {
-
   if (post) {
     const card = mapPostToBlogCard(post);
     const articleLd = serializeJsonLd(

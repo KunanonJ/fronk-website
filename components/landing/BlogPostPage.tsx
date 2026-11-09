@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "@/components/ui/Image";
 import Link from "@/components/navigation/Link";
 import type { PortableTextBlock } from "@portabletext/react";

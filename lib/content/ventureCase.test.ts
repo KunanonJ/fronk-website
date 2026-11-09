@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  getAdjacentVentures,
-  getAllVentures,
-  getAllVentureSlugs,
-  getVentureBySlug,
-} from "@/lib/content/ventures";
+import { getAllVentureSlugs, getVentureBySlug } from "@/lib/content/ventures";
 
 describe("venture case studies", () => {
   it("every venture ships a case study with intro, sections and timeline", () => {
@@ -34,22 +29,4 @@ describe("venture case studies", () => {
     expect(getVentureBySlug("manut")?.metrics).toBeUndefined();
   });
 
-  describe("getAdjacentVentures", () => {
-    it("walks the year-desc order without wrapping", () => {
-      const ordered = getAllVentures();
-      const first = getAdjacentVentures(ordered[0].slug);
-      expect(first.prev).toBeNull();
-      expect(first.next?.slug).toBe(ordered[1].slug);
-
-      const last = getAdjacentVentures(ordered[ordered.length - 1].slug);
-      expect(last.prev?.slug).toBe(ordered[ordered.length - 2].slug);
-      expect(last.next).toBeNull();
-    });
-
-    it("returns nulls for an unknown slug", () => {
-      const result = getAdjacentVentures("does-not-exist");
-      expect(result.prev).toBeNull();
-      expect(result.next).toBeNull();
-    });
-  });
 });
