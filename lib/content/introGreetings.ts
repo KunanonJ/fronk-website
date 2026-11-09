@@ -21,6 +21,12 @@ export const INTRO_TIMING = {
   lastHoldMs: 450,
   /** Overlay fade-out; the hero is already showing through during it. */
   exitMs: 300,
+  /**
+   * The arrival burst (confetti, sparkles, champagne pop) starts with the last
+   * greeting and must be over by the end of the exit fade, so the intro's
+   * total time does not change.
+   */
+  burstMs: 740,
 } as const;
 
 /** When the exit fade starts, measured from the first greeting. */

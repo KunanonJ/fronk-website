@@ -1,11 +1,9 @@
 import Image from "@/components/ui/Image";
 import Link from "@/components/navigation/Link";
 import type { PortableTextBlock } from "@portabletext/react";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 import { PortableText } from "@/components/PortableText";
 import { formatBlogDate } from "@/lib/content/blog";
 import { linkifyInternalPaths } from "@/lib/content/linkify";
-import { expandHashHref } from "@/lib/landing/nav";
 
 type BlogPostPageProps = {
   title: string;
@@ -33,16 +31,9 @@ export default function BlogPostPage({
 
   return (
     <div className="relative min-h-[100svh] bg-page text-ink">
-      <LandingTopNav
-        position="fixed"
-        wordmarkHref="/"
-        resolveHref={expandHashHref}
-        navId="blog-post-mobile-nav"
-      />
-
       <main
         id="main"
-        className="relative z-10 px-4 pb-24 pt-28 sm:px-6 md:px-10"
+        className="relative z-10 px-4 pb-24 pt-14 sm:px-6 md:px-10"
       >
         <article className="mx-auto max-w-3xl">
           <Link

@@ -1,12 +1,10 @@
 import type { ReactNode } from "react";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 
 type SkillsPageShellProps = {
   eyebrow: string;
   title: string;
   /** Lede under the title. */
   description: ReactNode;
-  navId: string;
   /** Rendered above the eyebrow (detail pages: the breadcrumb). */
   breadcrumb?: ReactNode;
   /** Rendered under the lede (badges, version, GitHub link). */
@@ -25,7 +23,6 @@ export default function SkillsPageShell({
   eyebrow,
   title,
   description,
-  navId,
   breadcrumb,
   meta,
   monoTitle = false,
@@ -33,11 +30,9 @@ export default function SkillsPageShell({
 }: SkillsPageShellProps) {
   return (
     <div className="relative min-h-[100svh] bg-page text-ink">
-      <LandingTopNav position="fixed" wordmarkHref="/" navId={navId} />
-
       <main
         id="main"
-        className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10"
+        className="relative z-10 px-4 pb-20 pt-14 sm:px-6 md:px-10"
       >
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
           {breadcrumb}

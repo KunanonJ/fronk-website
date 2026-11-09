@@ -24,7 +24,6 @@ export default function BuildPage() {
       eyebrow={buildPage.eyebrow}
       title={buildPage.title}
       description={buildPage.description}
-      navId="build-mobile-nav"
     >
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {buildColumns.map((column) => {

@@ -15,7 +15,6 @@ import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/GoogleTagManager";
-import RouteFade from "@/components/landing/RouteFade";
 import { ThemeProvider } from "next-themes";
 import { WebVitals } from "@/components/WebVitals";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
@@ -104,7 +103,6 @@ function RootDocument({ children }: { children: ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          <RouteFade />
           {children}
         </ThemeProvider>
         <GoogleTagManager />

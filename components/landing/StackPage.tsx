@@ -14,7 +14,6 @@ export default function StackPage() {
       eyebrow={stackPage.eyebrow}
       title={stackPage.title}
       description={stackPage.description}
-      navId="stack-mobile-nav"
     >
       <div className="space-y-16">
         {STACK_GROUPS.map((group) => {

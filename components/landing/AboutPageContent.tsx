@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
 import { ArrowUpRight, Plus } from "lucide-react";
-import { AnnotatedText } from "@/components/landing/AnnotatedText";
 import ContributionActivity from "@/components/landing/ContributionActivity";
 import StackBrandIcon from "@/components/landing/StackBrandIcon";
 import {
@@ -13,7 +12,7 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
 
 function InlineSpan({ span }: { span: AboutInline }) {
   if (span.type === "text") {
-    return <AnnotatedText text={span.text} />;
+    return span.text;
   }
 
   // py-0.5 lifts inline links to a 24 px+ hit area without changing layout.

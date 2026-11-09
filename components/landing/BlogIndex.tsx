@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import Image from "@/components/ui/Image";
 import Link from "@/components/navigation/Link";
 import { ArrowUpRight, Search } from "lucide-react";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 import {
   blogPage,
   collectBlogTags,
@@ -10,7 +9,6 @@ import {
   formatBlogDate,
   type BlogCard,
 } from "@/lib/content/blog";
-import { expandHashHref } from "@/lib/landing/nav";
 
 function BlogCardView({ post }: { post: BlogCard }) {
   return (
@@ -101,16 +99,9 @@ export default function BlogIndex({
 
   return (
     <div className="relative min-h-[100svh] bg-page text-ink">
-      <LandingTopNav
-        position="fixed"
-        wordmarkHref="/"
-        resolveHref={expandHashHref}
-        navId="blog-mobile-nav"
-      />
-
       <main
         id="main"
-        className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10"
+        className="relative z-10 px-4 pb-20 pt-14 sm:px-6 md:px-10"
       >
         <header className="mx-auto mb-8 max-w-6xl sm:mb-10">
           <p className="mb-3 font-mono text-label uppercase text-ink-2">

@@ -25,4 +25,10 @@ describe("intro timing", () => {
     expect(INTRO_GREETINGS).toContain("สวัสดี");
     expect(INTRO_GREETINGS.at(-1)).toBe("Welcome to KunanonJ");
   });
+
+  it("fits the arrival burst inside the last hold and the exit fade", () => {
+    expect(INTRO_TIMING.burstMs).toBeLessThanOrEqual(
+      INTRO_TIMING.lastHoldMs + INTRO_TIMING.exitMs,
+    );
+  });
 });
