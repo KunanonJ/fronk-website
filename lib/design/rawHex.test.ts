@@ -9,7 +9,7 @@ import { read, sourceFiles } from "@/lib/design/sourceScan";
  * Allowlisted: renderers that can't read CSS variables (icons, OG images) and
  * app/layout.tsx, whose viewport themeColor metadata must be a literal.
  */
-const MAX_RAW_HEX = 7;
+const MAX_RAW_HEX = 2;
 const ALLOW = [/^app\/icon\.tsx$/, /^app\/apple-icon\.tsx$/, /opengraph-image\.tsx$/, /^app\/layout\.tsx$/];
 
 describe("raw hex ratchet", () => {

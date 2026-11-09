@@ -93,74 +93,54 @@ export const aboutKeywords = [
   { text: "ERP/CRM", tip: "Internal systems before agent theater" },
 ] as const;
 
+/** Home hero (visual-redesign Phase 2; statement chosen by the owner 09-11-26). */
 export const hero = {
   wordmark: site.wordmark,
-  description:
-    "Founder of GoGoCash and Manut — cashback for shoppers, an ERP/CRM workspace with Intelligence AI for SME in Automotive Industry.",
-  ctaLabel: "See ventures",
-  ctaHref: "#ventures",
-  contextLabel: site.contextLabel,
+  eyebrow: "Kunanon Jarat (Fronk) · Bangkok",
+  statement: "Building fintech and AI from Bangkok.",
+  statementSecondary: "Founder of GoGoCash and Manut AI.",
+  lead: "Cashback for shoppers, and an ERP/CRM workspace with Intelligence AI for automotive SMEs. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
+  primaryCta: { label: "Contact me", href: "/contact" },
+  secondaryCta: { label: "See my work", href: "/portfolio" },
+  /** Shown in a "live" chip: something that is genuinely in progress now. */
+  status: "Building GoGoCash and Manut AI",
 } as const;
 
+/** Home "About" section. */
 export const about = {
   label: "About",
-  segments: [
-    { text: "I am Kunanon Jarat,", className: "font-normal" },
-    { text: "a Bangkok founder.", className: "italic font-serif" },
-    {
-      text: "I build GoGoCash, Manut, and Airplusauto from Bangkok.",
-      className: "font-normal",
-    },
-  ],
-  body: "Founder of GoGoCash and Manut — cashback for shoppers, and an ERP/CRM workspace with Intelligence AI for SMEs in the automotive industry. Based in Bangkok.",
-  portraitSrc: "/profile.jpg",
-  portraitAlt: "Kunanon Jarat — headshot",
-  ctaLabel: "More About Me",
+  heading: "I'm Kunanon Jarat, a founder and operator in Bangkok.",
+  body: "Founder of GoGoCash and Manut AI: cashback for shoppers, and an ERP/CRM workspace with Intelligence AI for SMEs in the automotive industry. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
+  ctaLabel: "More about me",
   ctaHref: "/about",
 } as const;
 
+/**
+ * Home ventures. Two ventures only (owner, 09-11-26): GoGoCash and Manut AI.
+ * Numbers here restate the published metrics in lib/content/ventures.ts.
+ */
 export const ventures = {
   eyebrow: "Ventures",
-  line1: "3 ventures. Built from Bangkok.",
-  line2: "Fintech, AI workspaces, and more.",
-  videoTitle: "Building from Thailand, Sleep in Bangkok",
+  heading: "Two ventures, built from Bangkok.",
+  subheading: "Fintech for shoppers, and AI workspaces for automotive SMEs.",
   cards: [
     {
-      type: "video" as const,
-      title: "Building from Thailand, Sleep in Bangkok",
-    },
-    {
-      type: "info" as const,
       number: "01",
       title: "GoGoCash",
       icon: "/brand/gogocash.svg",
-      items: [
-        "1,000+ users",
-        "220+ merchants",
-        "Up to 30% cashback",
-        "Shopping-to-earn platform",
-      ],
+      summary: "A shopping-to-earn cashback platform.",
+      items: ["1,000+ users", "220+ merchants", "Up to 30% cashback"],
       href: "/ventures/gogocash",
+      linkLabel: "GoGoCash case study",
     },
     {
-      type: "info" as const,
       number: "02",
-      title: "Manut",
-      icon: "/brand/manut.png",
-      items: [
-        "ERP/CRM for automotive SMEs",
-        "Intelligence AI workspace",
-        "Ops in one place",
-      ],
+      title: "Manut AI",
+      icon: "/brand/manut-144.webp",
+      summary: "An ERP/CRM workspace with Intelligence AI for automotive SMEs.",
+      items: ["ERP/CRM", "Intelligence AI", "Automotive SMEs"],
       href: "/ventures/manut",
-    },
-    {
-      type: "info" as const,
-      number: "03",
-      title: "Airplusauto",
-      icon: "/brand/airplusauto.png",
-      items: ["Venture in flight", "Shipping from Bangkok", "More soon"],
-      href: "https://airplusauto.com",
+      linkLabel: "Manut AI case study",
     },
   ],
 } as const;

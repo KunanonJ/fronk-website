@@ -1,6 +1,6 @@
 # Phase 1: Chrome (nav, theme toggle, footer, 404)
 
-**Status:** EXECUTED 09-11-26 on `feat/redesign-chrome` (owner approved starting Phase 1; nav icons kept, quieter). All gates green; PR open, waiting on merge approval. Evidence: `../reports/phase-1_chrome_REPORT_09-11-26.md`.
+**Status:** SHIPPED in #63 (09-11-26) and verified in production (e2e + axe 100/100 live, 404 status kept). Evidence: `../reports/phase-1_chrome_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers:** audit finding 10 (footer and nav tap targets), and finding 20's reduced-motion hydration warning if it is still in the nav toggle.

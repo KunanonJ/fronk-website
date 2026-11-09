@@ -2,7 +2,7 @@
 
 **Date:** 09-11-26
 **Complexity:** Phase program (7 phases, 0 to 6)
-**Status:** IN PROGRESS. Phase 0 shipped (#62, 09-11-26, verified live). Phase 1 (chrome) executed 09-11-26, PR open. Phase 2 (home) is next.
+**Status:** IN PROGRESS. Phase 0 shipped (#62) and Phase 1 shipped (#63), both verified live 09-11-26. Phase 2 (home) executed 09-11-26, PR open. Phase 3 (about and contact) is next.
 **Feature:** `visual-redesign`
 **Evidence:**
 - `process/general-plans/references/visual-redesign-research_REPORT_09-11-26.md` (Mobbin, helumi.app tokens, palette contrast, ranked changes)

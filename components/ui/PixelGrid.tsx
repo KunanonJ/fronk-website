@@ -55,7 +55,8 @@ export function pixelCells({
 
 const FILL: Record<Cell["tone"], string> = {
   signal: "fill-signal",
-  glaze: "fill-glaze",
+  // Glaze is bright on dark surfaces, so dark mode uses a faint hairline tint.
+  glaze: "fill-glaze dark:fill-hairline-strong",
   ember: "fill-ember",
 };
 

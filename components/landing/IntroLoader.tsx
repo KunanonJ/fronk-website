@@ -82,17 +82,13 @@ export default function IntroLoader() {
   return (
     <div
       data-testid="intro-overlay"
-      className={`intro-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black${exiting ? " is-exiting" : ""}`}
+      className={`intro-overlay fixed inset-0 z-[100] flex items-center justify-center bg-page${exiting ? " is-exiting" : ""}`}
       style={{ transitionDuration: `${INTRO_TIMING.exitMs}ms` }}
     >
       <p
         key={greeting}
         aria-hidden
-        className="intro-word px-6 text-center text-4xl font-light leading-tight tracking-[-0.03em] text-white sm:text-6xl md:text-7xl"
-        style={{
-          fontFamily:
-            'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        }}
+        className="intro-word px-6 text-center font-display text-4xl font-semibold leading-tight tracking-[-0.04em] text-ink sm:text-6xl md:text-7xl"
       >
         {greeting}
       </p>
@@ -100,7 +96,7 @@ export default function IntroLoader() {
         type="button"
         onClick={() => setPhase("exiting")}
         tabIndex={exiting ? -1 : 0}
-        className="absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] min-h-6 rounded-full border border-white/30 px-4 py-2 text-xs tracking-wide text-white/80 transition-colors hover:border-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-6 sm:bottom-6"
+        className="absolute right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] min-h-9 rounded-full border border-hairline-strong px-4 py-2 font-mono text-label uppercase text-ink-2 transition-colors hover:border-ink/40 hover:text-ink sm:right-6 sm:bottom-6"
       >
         Skip intro
       </button>
