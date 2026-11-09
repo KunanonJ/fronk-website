@@ -1,112 +1,94 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
+import {
+  HubLinkList,
+  HubSection,
+  hubType,
+} from "@/components/landing/discovery/hubParts";
 import type { Venture } from "@/lib/content/ventures";
-
-const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
 
 type VentureHubPageProps = {
   venture: Venture;
   relatedTopics?: readonly { label: string; href: string }[];
 };
 
+/**
+ * Venture case hub (restyled in visual-redesign Phase 5; copy, metrics,
+ * links and JSON-LD unchanged).
+ */
 export default function VentureHubPage({
   venture,
   relatedTopics = [],
 }: VentureHubPageProps) {
   const caseStudy = venture.caseStudy;
+  const type = hubType(false);
 
   return (
-    <main id="main" className="bg-landing text-primary">
+    <main id="main" className="bg-page text-ink">
       <DiscoveryAnalytics />
-      <article className="mx-auto max-w-3xl px-5 pb-24 pt-16 sm:px-8 sm:pt-24">
-        <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/70">
-          Venture
-        </p>
-        <h1
-          className="text-4xl font-medium tracking-tight text-primary sm:text-5xl"
-          style={serif}
-        >
-          {venture.name}
-        </h1>
-        <p className="mt-3 text-xl text-primary/70" style={serif}>
+      <article className="mx-auto max-w-3xl px-4 pb-24 pt-16 sm:px-6 sm:pt-24 md:px-8">
+        <p className={type.eyebrow}>Venture</p>
+        <h1 className={type.h1}>{venture.name}</h1>
+        <p className="mt-3 font-display text-h3 font-medium text-ink-2">
           {venture.tagline}
         </p>
-        <p className="mt-6 text-lg leading-relaxed text-primary/75">
+        <p className="mt-6 text-lead text-ink-2">
           {caseStudy?.intro ?? venture.description}
         </p>
 
         {venture.metrics && venture.metrics.length > 0 ? (
-          <ul className="mt-10 grid grid-cols-3 gap-4 border-y border-primary/15 py-6">
+          <dl className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-3">
             {venture.metrics.map((metric) => (
-              <li key={metric.label}>
-                <p className="text-2xl text-primary" style={serif}>
-                  {metric.value}
-                </p>
-                <p className="text-xs uppercase tracking-[0.15em] text-primary/70">
+              <div key={metric.label} className="flex flex-col bg-surface p-5 sm:p-6">
+                <dt className="font-mono text-label uppercase text-ink-2">
                   {metric.label}
-                </p>
-              </li>
+                </dt>
+                <dd className="mt-2 font-display text-h2 tabular-nums text-ink">
+                  {metric.value}
+                </dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         ) : null}
 
         {caseStudy ? (
-          <div className="mt-12 space-y-10">
+          <div className="mt-14 space-y-12">
             {caseStudy.sections.map((section) => (
               <section key={section.heading}>
-                <h2
-                  className="mb-3 text-2xl font-medium text-primary"
-                  style={serif}
-                >
-                  {section.heading}
-                </h2>
-                <p className="text-base leading-relaxed text-primary/75">
-                  {section.body}
-                </p>
+                <h2 className={`mb-3 ${type.h2}`}>{section.heading}</h2>
+                <p className="text-body text-ink-2">{section.body}</p>
               </section>
             ))}
-            <p className="text-sm text-primary/70">{caseStudy.timeline}</p>
+            <p className="font-mono text-label uppercase text-ink-2">
+              {caseStudy.timeline}
+            </p>
           </div>
         ) : null}
 
         {relatedTopics.length > 0 ? (
-          <section className="mt-14">
-            <h2 className="mb-4 text-2xl font-medium text-primary" style={serif}>
-              Related topics
-            </h2>
-            <ul className="space-y-2">
-              {relatedTopics.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <HubSection title="Related topics">
+            <HubLinkList links={relatedTopics} />
+          </HubSection>
         ) : null}
 
-        <div className="mt-16 flex flex-wrap gap-4">
+        <div className="mt-16 flex flex-wrap items-center gap-3">
           <a
             href={venture.url}
             target="_blank"
             rel="noopener noreferrer"
             data-analytics="venture_outbound_click"
             data-venture={venture.slug}
-            className="inline-flex border border-primary/40 px-6 py-3 text-sm uppercase tracking-[0.15em] text-primary transition-colors hover:bg-cream hover:text-black"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-action px-6 text-base font-medium text-on-action transition-colors duration-150 ease-smooth hover:bg-action-hover"
           >
             {venture.urlLabel}
+            <ArrowUpRight className="h-4 w-4" aria-hidden />
           </a>
           <Link
             href="/contact"
             data-analytics="contact_cta_click"
             data-venture={venture.slug}
-            className="inline-flex px-6 py-3 text-sm uppercase tracking-[0.15em] text-primary/70 underline decoration-primary/30 underline-offset-4 hover:text-primary hover:decoration-primary"
+            className="inline-flex min-h-12 items-center rounded-full border border-hairline-strong bg-surface px-6 text-base font-medium text-ink transition-colors duration-150 ease-smooth hover:border-ink/40 hover:bg-surface-tint"
           >
             Contact
           </Link>

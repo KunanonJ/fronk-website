@@ -1,6 +1,6 @@
 # Phase 4: Portfolio and OG images
 
-**Status:** EXECUTED 09-11-26 on `feat/redesign-portfolio` (owner standing approval). No outcome metrics added (none owner-approved); cards show the access badge. Evidence: `../reports/phase-4_portfolio_REPORT_09-11-26.md`.
+**Status:** SHIPPED in #66 (09-11-26), verified live: e2e + axe 100/100 on kunanonj.com; every OG image 200 at 1200x630 (site card plus portfolio, skills, topics and ventures segments); `/icon` 64x64 and `/apple-icon` 180x180. Evidence: `../reports/phase-4_portfolio_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers:** the portfolio index and its 4 detail pages, the illustrative mockups and diagrams, and every generated OG image (shared renderer)

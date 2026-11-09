@@ -112,7 +112,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         />
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
-        <link rel="dns-prefetch" href="https://icons.duckduckgo.com" />
         <link rel="dns-prefetch" href="https://d8j0ntlcm91z4.cloudfront.net" />
         <link rel="dns-prefetch" href="https://images.higgs.ai" />
         {IDENTITY_LINKS.map((href) => (

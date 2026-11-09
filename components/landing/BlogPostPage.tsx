@@ -55,14 +55,14 @@ export default function BlogPostPage({
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <time
                 dateTime={publishedAt}
-                className="text-[10px] uppercase tracking-[0.16em] text-primary/70"
+                className="font-mono text-label uppercase text-ink-2"
               >
                 {formatBlogDate(publishedAt)}
               </time>
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-primary/10 bg-primary/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/70"
+                  className="rounded-chip border border-hairline-strong bg-surface px-2 py-0.5 font-mono text-label uppercase text-ink-2"
                 >
                   {tag}
                 </span>
@@ -93,7 +93,7 @@ export default function BlogPostPage({
             />
           </div>
 
-          <div className="prose prose-invert mt-10 max-w-none prose-headings:font-medium prose-a:text-primary prose-p:text-primary/80">
+          <div className="prose dark:prose-invert mt-10 max-w-none prose-headings:font-medium prose-a:text-primary prose-p:text-primary/80">
             {hasPortable ? (
               <PortableText value={body!} />
             ) : hasParagraphs ? (

@@ -83,4 +83,19 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /Build|Next|In progress|Shipped/i,
   },
   { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },
+  {
+    path: "/topics/ai-transformation-thailand",
+    name: "topic-hub",
+    expectsHeadingPattern: /AI|Thailand/i,
+  },
+  {
+    path: "/th/topics/ai-transformation-thailand",
+    name: "topic-hub-th",
+    expectsHeadingPattern: /\S/,
+  },
+  {
+    path: "/ventures/gogocash",
+    name: "venture-hub",
+    expectsHeadingPattern: /GoGoCash/i,
+  },
 ];

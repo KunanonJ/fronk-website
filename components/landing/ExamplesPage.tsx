@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
+import { LibraryLinkCard } from "@/components/landing/LibraryLinkCard";
+import { cn } from "@/lib/utils/cn";
 import {
   EXAMPLE_PERSONAS,
   examplesByPersona,
@@ -11,6 +11,12 @@ import {
   type ExamplePersona,
 } from "@/lib/content/examples";
 
+/**
+ * Examples by persona (visual-redesign Phase 5). The persona switch is a
+ * filter, so it is a group of toggle buttons (`aria-pressed`) rather than an
+ * ARIA tablist without arrow-key support; a polite live region reports the
+ * new result count.
+ */
 export default function ExamplesPage() {
   const [persona, setPersona] = useState<ExamplePersona>("Builders");
   const cards = examplesByPersona[persona];
@@ -23,9 +29,9 @@ export default function ExamplesPage() {
       navId="examples-mobile-nav"
     >
       <div
-        role="tablist"
-        aria-label="Example personas"
-        className="mb-8 flex flex-wrap gap-2"
+        role="group"
+        aria-label="Show examples for"
+        className="mb-10 flex flex-wrap gap-2"
       >
         {EXAMPLE_PERSONAS.map((item) => {
           const active = item === persona;
@@ -33,13 +39,13 @@ export default function ExamplesPage() {
             <button
               key={item}
               type="button"
-              role="tab"
-              aria-selected={active}
-              className={
+              aria-pressed={active}
+              className={cn(
+                "inline-flex min-h-10 items-center rounded-full border px-4 text-sm font-medium transition-colors duration-150 ease-smooth",
                 active
-                  ? "rounded-full bg-cream px-4 py-2 text-sm font-medium text-black"
-                  : "rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-sm text-primary/75 transition-colors hover:border-primary/30 hover:text-primary"
-              }
+                  ? "border-ink bg-ink text-page"
+                  : "border-hairline-strong bg-surface text-ink-2 hover:border-ink/40 hover:text-ink",
+              )}
               onClick={() => setPersona(item)}
             >
               {item}
@@ -48,29 +54,23 @@ export default function ExamplesPage() {
         })}
       </div>
 
-      <div
-        role="tabpanel"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
+      <p className="sr-only" aria-live="polite">
+        {`${cards.length} examples for ${persona}`}
+      </p>
+
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
-          <Link
-            key={card.title}
-            href={card.href}
-            className="group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6"
-          >
-            <h2 className="text-base font-medium text-primary sm:text-lg">
-              {card.title}
-            </h2>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-primary/65">
-              {card.body}
-            </p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary/70 transition-colors group-hover:text-primary">
-              {card.ctaLabel}
-              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </span>
-          </Link>
+          <li key={card.title}>
+            <LibraryLinkCard
+              href={card.href}
+              title={card.title}
+              description={card.body}
+              cta={card.ctaLabel}
+              headingAs="h2"
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </LibraryPageShell>
   );
 }

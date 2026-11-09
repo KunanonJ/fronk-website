@@ -1,10 +1,6 @@
 import type { ReactNode } from "react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 
-const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
-
 type SkillsPageShellProps = {
   eyebrow: string;
   title: string;
@@ -21,9 +17,9 @@ type SkillsPageShellProps = {
 };
 
 /**
- * Page chrome for `/skills` and `/skills/[slug]`: landing nav plus a header in
- * the LibraryPageShell style. A Server Component (only the nav hydrates), with
- * a 13px eyebrow so no text drops under the 12px floor on phones.
+ * Page chrome for `/skills` and `/skills/[slug]` (visual-redesign Phase 5):
+ * landing nav plus the LibraryPageShell header. A Server Component (only the
+ * nav hydrates); the eyebrow is the 12 px mono label.
  */
 export default function SkillsPageShell({
   eyebrow,
@@ -36,7 +32,7 @@ export default function SkillsPageShell({
   children,
 }: SkillsPageShellProps) {
   return (
-    <div className="relative min-h-[100svh] bg-landing text-primary">
+    <div className="relative min-h-[100svh] bg-page text-ink">
       <LandingTopNav position="fixed" wordmarkHref="/" navId={navId} />
 
       <main
@@ -45,20 +41,19 @@ export default function SkillsPageShell({
       >
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
           {breadcrumb}
-          <p className="mb-3 text-[13px] uppercase tracking-[0.18em] text-primary/75">
+          <p className="mb-3 font-mono text-label uppercase text-ink-2">
             {eyebrow}
           </p>
           <h1
             className={
               monoTitle
-                ? "break-words font-mono text-3xl font-medium tracking-tight text-primary sm:text-5xl"
-                : "text-4xl font-medium tracking-tight text-primary sm:text-5xl md:text-6xl"
+                ? "break-words font-mono text-h2 font-medium tracking-tight text-ink"
+                : "font-display text-h1 text-ink"
             }
-            style={monoTitle ? undefined : serif}
           >
             {title}
           </h1>
-          <div className="mt-4 max-w-2xl text-base leading-relaxed text-primary/75">
+          <div className="mt-5 max-w-2xl text-lead text-ink-2">
             {description}
           </div>
           {meta ? <div className="mt-6">{meta}</div> : null}

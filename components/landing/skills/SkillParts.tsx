@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ArrowUpRight, Download } from "lucide-react";
 import CopyButton from "@/components/landing/skills/CopyButton";
+import { Chip } from "@/components/ui/Chip";
 import {
   formatBytes,
   sourceLabel,
@@ -8,24 +9,22 @@ import {
   type SkillAsset,
 } from "@/lib/content/skills";
 
-export const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
-
-const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-landing";
+/*
+ * Shared Skills styling (visual-redesign Phase 5). Focus uses the site-wide
+ * ring from the base layer, so none of these classes set their own.
+ */
 
 /** Pill-shaped secondary action (link). 36px tall: clears the 24px target floor. */
-export const pillLinkClass = `inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/20 px-3 text-sm text-primary/85 transition-colors hover:border-primary/40 hover:text-primary ${focusRing}`;
+export const pillLinkClass =
+  "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-hairline-strong bg-surface px-3.5 text-sm text-ink transition-colors duration-150 ease-smooth hover:border-ink/40 hover:bg-surface-tint";
 
-/** Primary action (cream fill), matching the nav Contact CTA. */
-export const primaryLinkClass = `inline-flex min-h-10 items-center gap-1.5 rounded-full bg-cream px-4 text-sm font-medium text-black transition-opacity hover:opacity-90 ${focusRing}`;
+/** Primary action (Signal fill, Paper text), the site's primary button. */
+export const primaryLinkClass =
+  "inline-flex min-h-10 items-center gap-1.5 rounded-full bg-action px-4 text-sm font-medium text-on-action transition-colors duration-150 ease-smooth hover:bg-action-hover";
 
 /** Inline text link inside prose. */
-export const textLinkClass = `text-primary underline decoration-primary/35 underline-offset-[3px] transition-colors hover:decoration-primary ${focusRing}`;
-
-const badgeBase =
-  "inline-flex min-h-7 items-center rounded-full border px-2.5 text-[13px] leading-none";
+export const textLinkClass =
+  "text-link underline decoration-link/40 underline-offset-[3px] transition-colors hover:decoration-link";
 
 /**
  * A command (or path) with its copy button. The command wraps instead of
@@ -46,9 +45,9 @@ export function CommandBlock({
 }) {
   return (
     <div>
-      {label ? <p className="mb-2 text-sm text-primary/80">{label}</p> : null}
-      <div className="flex items-start gap-3 rounded-xl border border-primary/12 bg-primary/[0.04] p-3 pl-4">
-        <pre className="min-w-0 flex-1 whitespace-pre-wrap py-1.5 font-mono text-[13px] leading-relaxed text-primary [overflow-wrap:anywhere] sm:text-sm">
+      {label ? <p className="mb-2 text-small text-ink-2">{label}</p> : null}
+      <div className="flex items-start gap-3 rounded-input border border-hairline bg-well p-2 pl-4">
+        <pre className="min-w-0 flex-1 whitespace-pre-wrap py-2 font-mono text-small text-ink [overflow-wrap:anywhere]">
           <code>{command}</code>
         </pre>
         <CopyButton
@@ -63,36 +62,23 @@ export function CommandBlock({
 
 export function OriginBadge({ skill }: { skill: Skill }) {
   if (skill.source) {
-    return (
-      <span className={`${badgeBase} border-primary/20 text-primary/80`}>
-        Adapted from {sourceLabel(skill.source)}
-      </span>
-    );
+    return <Chip>Adapted from {sourceLabel(skill.source)}</Chip>;
   }
-  return (
-    <span
-      className={`${badgeBase} border-primary/35 bg-primary/[0.06] font-medium text-primary`}
-    >
-      Original
-    </span>
-  );
+  return <Chip tone="signal">Original</Chip>;
 }
 
 export function InvocationBadge({ skill }: { skill: Skill }) {
   return skill.userInvoked ? (
-    <span
-      className={`${badgeBase} border-dashed border-primary/30 text-primary/80`}
+    <Chip
+      className="border-dashed"
       title="User-invoked: the agent never loads it on its own"
     >
       You invoke
-    </span>
+    </Chip>
   ) : (
-    <span
-      className={`${badgeBase} border-primary/20 text-primary/80`}
-      title="Model-invoked: the agent loads it when the task matches"
-    >
+    <Chip title="Model-invoked: the agent loads it when the task matches">
       Runs automatically
-    </span>
+    </Chip>
   );
 }
 
@@ -123,7 +109,13 @@ export function DownloadLink({
         {showSize ? "," : `, ${size}`}
       </span>
       {showSize ? (
-        <span className={primary ? "text-black/70" : "text-primary/70"}>
+        <span
+          className={
+            primary
+              ? "font-normal tabular-nums text-on-action/85"
+              : "tabular-nums text-ink-2"
+          }
+        >
           {size}
         </span>
       ) : null}
@@ -156,6 +148,7 @@ export function ExternalLink({
   );
 }
 
+/** h2: a Geist section heading; h3: the smaller stage heading. */
 export function SectionHeading({
   id,
   children,
@@ -170,10 +163,9 @@ export function SectionHeading({
       id={id}
       className={
         Tag === "h2"
-          ? "mb-5 text-2xl font-medium tracking-tight text-primary sm:text-3xl"
-          : "mb-3 text-xl font-medium text-primary"
+          ? "mb-5 font-display text-h3 text-ink"
+          : "mb-3 text-lead font-semibold text-ink"
       }
-      style={serif}
     >
       {children}
     </Tag>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { cn } from "@/lib/utils/cn";
 
 export type InstallTab = {
   /** Stable, URL-safe id, unique within this tab set. */
@@ -21,7 +22,8 @@ type InstallTabsProps = {
  * WAI-ARIA tabs (automatic activation): Left/Right move between tabs and
  * select them, Home/End jump to the ends, Tab moves into the panel. Every
  * panel is server-rendered; inactive ones are `hidden`, so the first panel is
- * already correct before hydration and nothing shifts.
+ * already correct before hydration and nothing shifts. Focus uses the
+ * site-wide ring.
  */
 export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
   const [selected, setSelected] = useState(0);
@@ -54,7 +56,7 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
       <div
         role="tablist"
         aria-label={label}
-        className="flex flex-wrap gap-1.5 border-b border-primary/12 pb-3"
+        className="flex flex-wrap gap-1.5 border-b border-hairline pb-3"
       >
         {tabs.map((tab, index) => {
           const active = index === selected;
@@ -72,11 +74,12 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
               tabIndex={active ? 0 : -1}
               onClick={() => setSelected(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
-              className={`inline-flex min-h-9 items-center rounded-full px-3.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-landing ${
+              className={cn(
+                "inline-flex min-h-9 items-center rounded-full border px-3.5 text-sm transition-colors duration-150 ease-smooth",
                 active
-                  ? "bg-primary font-medium text-landing"
-                  : "border border-primary/15 text-primary/80 hover:border-primary/35 hover:text-primary"
-              }`}
+                  ? "border-ink bg-ink font-medium text-page"
+                  : "border-hairline-strong bg-surface text-ink-2 hover:border-ink/40 hover:text-ink",
+              )}
             >
               {tab.label}
             </button>
@@ -91,7 +94,7 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
           aria-labelledby={`${idBase}-tab-${tab.id}`}
           tabIndex={0}
           hidden={index !== selected}
-          className="pt-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-4 focus-visible:ring-offset-landing"
+          className="rounded-input pt-5"
         >
           {tab.panel}
         </div>

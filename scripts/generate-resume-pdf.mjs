@@ -45,7 +45,21 @@ async function main() {
       );
     }
 
-    // Wait for company logos (DuckDuckGo CDN) to finish loading.
+    // Company logos are lazy <img>s; load them all before printing.
+    await page.evaluate(async () => {
+      const images = Array.from(document.images);
+      for (const img of images) img.loading = "eager";
+      await Promise.all(
+        images.map((img) =>
+          img.complete
+            ? null
+            : new Promise((done) => {
+                img.addEventListener("load", done, { once: true });
+                img.addEventListener("error", done, { once: true });
+              }),
+        ),
+      );
+    });
     await page.waitForLoadState("networkidle");
 
     await page.pdf({

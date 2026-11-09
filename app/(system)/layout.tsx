@@ -1,10 +1,10 @@
-/** Minimal chrome for /resume (and future system pages). No FogLAMP header/footer. */
+/** Minimal chrome for /resume (and future system pages): no nav or footer. */
 export default function SystemLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-[100svh] bg-bg font-sans text-fg">{children}</div>
+    <div className="min-h-[100svh] bg-page font-sans text-ink">{children}</div>
   );
 }

@@ -1,32 +1,26 @@
-"use client";
-
-import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import { companyInitials, companyLogoSrc } from "@/lib/content/companyLogos";
 
 interface CompanyLogoProps {
   name: string;
-  /** Domain to look up via DuckDuckGo's free favicon CDN, e.g. "bitkub.com". */
+  /** Company domain, e.g. "bitkub.com"; looked up in the self-hosted set. */
   domain?: string;
-  /** Local override (e.g. "/logos/binary-holdings.svg"). Wins over `domain`. */
+  /** Explicit image path (a CMS override). Wins over `domain`. */
   src?: string;
-  /** Pixel size — width and height. Defaults to 40. */
+  /** Pixel size (width and height). Defaults to 40. */
   size?: number;
   className?: string;
 }
 
-function initialsFor(name: string): string {
-  const words = name.replace(/[^a-zA-Z0-9\s]/g, " ").trim().split(/\s+/);
-  if (words.length === 0) return "·";
-  if (words.length === 1) return words[0]!.slice(0, 2).toUpperCase();
-  return (words[0]![0]! + words[1]![0]!).toUpperCase();
-}
+const TILE =
+  "flex shrink-0 items-center justify-center overflow-hidden rounded-chip border border-hairline";
 
-function resolveLogoUrl(src: string | undefined, domain: string | undefined): string | undefined {
-  if (src) return src;
-  if (!domain) return undefined;
-  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-}
-
+/**
+ * Company mark for /resume (visual-redesign Phase 5). A Server Component:
+ * logos are self-hosted (lib/content/companyLogos), so there is no
+ * third-party request and no client-side error fallback to hydrate. Unknown
+ * companies get an initials tile. Decorative: the company name is in the text.
+ */
 export function CompanyLogo({
   name,
   domain,
@@ -34,45 +28,44 @@ export function CompanyLogo({
   size = 40,
   className,
 }: CompanyLogoProps) {
-  const initialUrl = resolveLogoUrl(src, domain);
-  const [failed, setFailed] = useState(!initialUrl);
+  const url = src ?? companyLogoSrc(domain);
 
-  if (failed || !initialUrl) {
+  if (!url) {
     return (
-      <div
+      <span
         aria-hidden="true"
+        data-logo="initials"
         style={{ width: size, height: size }}
         className={cn(
-          "flex flex-shrink-0 items-center justify-center border border-border bg-surface-2 text-xs font-semibold text-muted",
+          TILE,
+          "bg-surface-tint font-mono text-label font-medium text-ink-2",
           className,
         )}
       >
-        {initialsFor(name)}
-      </div>
+        {companyInitials(name)}
+      </span>
     );
   }
 
   return (
-    // Using plain <img> (not next/image) because these are small (≤40px),
-    // come from a third-party CDN, and need a graceful fallback that
-    // next/image doesn't expose cleanly. We also catch the case where the
-    // CDN returns a 200 but with an empty image body (naturalWidth === 0).
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={initialUrl}
-      alt=""
-      width={size}
-      height={size}
-      loading="lazy"
-      onError={() => setFailed(true)}
-      onLoad={(e) => {
-        if (e.currentTarget.naturalWidth === 0) setFailed(true);
-      }}
+    <span
+      aria-hidden="true"
+      data-logo="image"
       style={{ width: size, height: size }}
-      className={cn(
-        "flex-shrink-0 border border-border bg-white object-contain p-1",
-        className,
-      )}
-    />
+      // Logos are drawn for light backgrounds, so the tile stays white in dark mode.
+      className={cn(TILE, "bg-white p-1", className)}
+    >
+      {/* Plain <img>: tiny static files, no optimisation needed. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt=""
+        width={size - 8}
+        height={size - 8}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-contain"
+      />
+    </span>
   );
 }

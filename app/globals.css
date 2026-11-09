@@ -652,6 +652,17 @@ a {
   .dark,
   html,
   html.dark {
+    /* Role tokens (visual-redesign): paper white, ink text, darker hairlines. */
+    --page: #ffffff !important;
+    --surface: #ffffff !important;
+    --surface-tint: #ffffff !important;
+    --well: #ffffff !important;
+    --ink: #0b0d17 !important;
+    --ink-2: #4a4e60 !important;
+    --hairline: rgba(11, 13, 23, 0.16) !important;
+    --hairline-strong: rgba(11, 13, 23, 0.3) !important;
+    --link: #0b0d17 !important;
+    /* Legacy aliases, until Phase 6 removes them. */
     --bg: #ffffff !important;
     --fg: #18181b !important;
     --muted: #52525b !important;

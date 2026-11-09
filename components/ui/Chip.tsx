@@ -22,11 +22,14 @@ const STATE_LABEL: Record<ChipState, string> = {
 export function Chip({
   tone = "neutral",
   state,
+  title,
   className,
   children,
 }: {
   tone?: ChipTone;
   state?: ChipState;
+  /** Optional hover hint; never the only place information lives. */
+  title?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -34,6 +37,7 @@ export function Chip({
   return (
     <span
       data-state={state}
+      title={title}
       className={cn(
         "inline-flex min-h-6 items-center gap-1.5 rounded-chip border px-2.5 py-0.5 font-mono text-label uppercase",
         TONES[effectiveTone],

@@ -26,11 +26,11 @@ export default function SkillCard({ skill }: { skill: Skill }) {
     >
       <article
         aria-labelledby={headingId}
-        className="flex h-full flex-col rounded-2xl border border-primary/12 bg-primary/[0.03] p-5"
+        className="flex h-full flex-col rounded-card border border-hairline bg-surface p-6 shadow-card"
       >
         <h4
           id={headingId}
-          className="break-words font-mono text-lg font-medium text-primary"
+          className="break-words font-mono text-lead font-medium text-ink"
         >
           {skill.name}
         </h4>
@@ -38,10 +38,8 @@ export default function SkillCard({ skill }: { skill: Skill }) {
           <OriginBadge skill={skill} />
           <InvocationBadge skill={skill} />
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-primary/80">
-          {skill.description}
-        </p>
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
+        <p className="mt-3 text-small text-ink-2">{skill.description}</p>
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
           <CopyButton
             text={npx}
             label="Copy install"

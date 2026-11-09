@@ -53,7 +53,7 @@ export default function PortfolioWorkflow({
                 )}
               </span>
               <div className="min-w-0 pb-1">
-                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-2">
+                <p className="font-mono text-label uppercase text-ink-2">
                   Step {String(index + 1).padStart(2, "0")}
                 </p>
                 <p className="mt-1 text-sm font-medium text-ink sm:text-base">
