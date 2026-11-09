@@ -8,6 +8,7 @@ import { PageMain } from "@/components/bento/Bento";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
 import type { Metadata } from "@/lib/seo/types";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { buildSkillsPackJsonLd } from "@/lib/seo/skillsJsonLd";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { skillsPage } from "@/lib/content/skills";
@@ -57,12 +58,17 @@ function SkillsRoute() {
       { name: "Skills", path: "/skills" },
     ]),
   );
+  const packLd = serializeJsonLd(buildSkillsPackJsonLd());
 
   return (
     <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: packLd }}
       />
       <SkillsIndexPage
         show={hydrated ? show : SKILLS_SEARCH_DEFAULTS.show}

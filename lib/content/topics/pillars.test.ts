@@ -50,3 +50,27 @@ describe("topic pillars", () => {
     expect(getTopicPillar("nope")).toBeNull();
   });
 });
+
+describe("forward deployed AI engineering pillar", () => {
+  it("states the Superstacks skill count that the snapshot holds", async () => {
+    const { getAllSkills } = await import("@/lib/content/skills");
+    const { SUPERSTACKS_SKILL_COUNT } = await import("./pillars");
+    expect(SUPERSTACKS_SKILL_COUNT).toBe(getAllSkills().length);
+  });
+
+  it("exists in English and Thai and links the evidence pages", async () => {
+    const { getTopicPillar } = await import("./pillars");
+    const en = getTopicPillar("forward-deployed-ai-engineering", "en");
+    const th = getTopicPillar("forward-deployed-ai-engineering", "th");
+    expect(en?.h1).toBe("Forward deployed AI engineering from Bangkok");
+    expect(th).not.toBeNull();
+    const hrefs = en!.relatedLinks.map((l) => l.href);
+    expect(hrefs).toEqual(
+      expect.arrayContaining([
+        "/portfolio/ai-automation",
+        "/portfolio/tbh-intranet",
+        "/skills",
+      ]),
+    );
+  });
+});

@@ -1,4 +1,8 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
+import { OPEN_TO_ROLES, PERSON_CUSTOMER_WORK } from "@/lib/content/identity";
+
+/** Skills in the Superstacks pack (pillars.test.ts checks it against the snapshot). */
+export const SUPERSTACKS_SKILL_COUNT = 20;
 
 export type TopicLocale = "en" | "th";
 
@@ -229,6 +233,67 @@ const EN_PILLARS: readonly TopicPillar[] = [
     ctaLabel: "Get in touch",
     ctaHref: "/contact",
   },
+  {
+    slug: "forward-deployed-ai-engineering",
+    locale: "en",
+    title: "Forward Deployed AI Engineering from Bangkok",
+    description:
+      "Kunanon Jarat builds AI agents and internal tools inside the businesses that use them: integrated with existing systems, with a person on the judgement calls.",
+    h1: "Forward deployed AI engineering from Bangkok",
+    h1Lines: [
+      ["Forward deployed "],
+      ["AI engineering ", { muted: "from" }, " "],
+      ["Bangkok"],
+    ],
+    lede: `A forward deployed engineer builds inside the business that will use the software: next to the people doing the work, against the systems they already run, until the tool is part of the daily routine. Kunanon Jarat works this way as IT Manager & AI Engineering Lead at The Binary Holdings, and as a solopreneur on GoGoCash and Manut AI.`,
+    sections: [
+      {
+        heading: "Built inside the business",
+        body: "The Binary Holdings ran its internal operations on Zoho. The TBH Intranet replaces it with one login-only web app for HR, approvals, Thai accounting, expenses, CRMs and an AI assistant, built around how the group works: several legal entities, Thai accounting requirements and multi-step approvals.",
+      },
+      {
+        heading: "AI with a person on the judgement calls",
+        body: "ARIA, the intranet's assistant, combines Gemini and Claude models with embedding search over internal knowledge. Team-built agents on Google's Agent Development Kit have Gemini check that each sports clip is real match content and write its title and caption, with a Google Sheet as the human approval queue; a recruitment agent scores resumes and grades take-home cases, with human review for borderline candidates.",
+      },
+      {
+        heading: "Integrated with the tools already there",
+        body: "Gmail, Google Sheets, Bank of Thailand exchange rates and PostHog in the intranet; the YouTube Data API and Apify in the content agents; the Avalanche P-Chain over JSON-RPC and Resend in a daily validator health report with four alert rules and a fallback when sending fails.",
+      },
+      {
+        heading: "Close to the people who use it",
+        body: `${PERSON_CUSTOMER_WORK} His working rule is to stay close to the work: review code, sit in support, and ship something most weeks.`,
+      },
+    ],
+    proof: [
+      "IT Manager & AI Engineering Lead at The Binary Holdings since November 2025",
+      `Superstacks: ${SUPERSTACKS_SKILL_COUNT} MIT-licensed agent skills for Claude Code, Codex and Cursor`,
+      OPEN_TO_ROLES.sentence,
+    ],
+    faqs: [
+      {
+        question: "What is a forward deployed AI engineer?",
+        answer:
+          "An engineer who works inside a business's own operations to turn a loosely defined problem into software in daily use: integrating with the systems already there, adding AI where the same judgement repeats, and staying until people rely on it.",
+      },
+      {
+        question: "Does Kunanon Jarat work as a forward deployed engineer?",
+        answer: `He works this way as IT Manager & AI Engineering Lead at The Binary Holdings, where he leads internal AI agents, automations and the intranet's AI assistant. ${OPEN_TO_ROLES.sentence}`,
+      },
+      {
+        question: "Which AI tools has he shipped?",
+        answer:
+          "ARIA, the TBH Intranet's assistant, which combines Gemini and Claude models with embedding search over internal knowledge, and team-built agents on Google's Agent Development Kit for content operations and hiring, each with human review on the judgement calls.",
+      },
+    ],
+    relatedLinks: [
+      { label: "AI Automation", href: "/portfolio/ai-automation" },
+      { label: "TBH Intranet", href: "/portfolio/tbh-intranet" },
+      { label: "Agent skills", href: "/skills" },
+      { label: "About", href: "/about" },
+    ],
+    ctaLabel: "Contact",
+    ctaHref: "/contact",
+  },
 ];
 
 const TH_PILLARS: readonly TopicPillar[] = [
@@ -350,12 +415,57 @@ const TH_PILLARS: readonly TopicPillar[] = [
     ctaLabel: "ติดต่อ",
     ctaHref: "/contact",
   },
+  {
+    slug: "forward-deployed-ai-engineering",
+    locale: "th",
+    title: "วิศวกรรม AI แบบ Forward Deployed จากกรุงเทพฯ",
+    description:
+      "Kunanon Jarat สร้าง AI agents และเครื่องมือภายในองค์กรร่วมกับทีมที่ใช้งานจริง เชื่อมกับระบบเดิม และให้คนเป็นผู้ตัดสินใจในจุดสำคัญ",
+    h1: "วิศวกรรม AI แบบ Forward Deployed จากกรุงเทพฯ",
+    h1Lines: [
+      ["วิศวกรรม AI "],
+      [{ muted: "แบบ" }, " Forward Deployed "],
+      [{ muted: "จาก" }, "กรุงเทพฯ"],
+    ],
+    lede: "Forward deployed engineer คือวิศวกรที่ลงไปสร้างระบบในธุรกิจที่จะใช้งานจริง ทำงานใกล้ชิดกับคนหน้างาน เชื่อมกับระบบที่ใช้อยู่ และอยู่จนเครื่องมือกลายเป็นส่วนหนึ่งของงานประจำวัน Kunanon Jarat ทำงานแบบนี้ในตำแหน่ง IT Manager & AI Engineering Lead ที่ The Binary Holdings และในฐานะ solopreneur ของ GoGoCash และ Manut AI",
+    sections: [
+      {
+        heading: "สร้างจากภายในธุรกิจ",
+        body: "The Binary Holdings เคยใช้ Zoho สำหรับงานภายใน TBH Intranet มาแทนด้วยเว็บแอปเดียวที่ต้องล็อกอิน รวม HR การอนุมัติ บัญชีไทย ค่าใช้จ่าย CRM และผู้ช่วย AI ออกแบบตามวิธีทำงานของกลุ่มบริษัท ทั้งหลายนิติบุคคล ข้อกำหนดบัญชีไทย และการอนุมัติหลายขั้น",
+      },
+      {
+        heading: "AI ที่มีคนตัดสินใจในจุดสำคัญ",
+        body: "ARIA ผู้ช่วยของ intranet ใช้โมเดล Gemini และ Claude ร่วมกับ embedding search บนความรู้ภายใน ส่วน agents ที่ทีมสร้างบน Google Agent Development Kit ให้ Gemini ตรวจว่าคลิปกีฬาเป็นเนื้อหาการแข่งขันจริงและเขียนชื่อกับแคปชัน โดยมี Google Sheet เป็นคิวให้คนอนุมัติ และ agent สรรหาคนที่ให้คะแนนเรซูเม่และตรวจงาน take-home โดยมีคนตรวจกรณีก้ำกึ่ง",
+      },
+    ],
+    proof: [
+      "IT Manager & AI Engineering Lead ที่ The Binary Holdings ตั้งแต่พฤศจิกายน 2025",
+      "เปิดรับตำแหน่ง Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+    ],
+    faqs: [
+      {
+        question: "Kunanon Jarat ทำงานแบบ forward deployed engineer หรือไม่?",
+        answer:
+          "ทำงานแบบนี้ในตำแหน่ง IT Manager & AI Engineering Lead ที่ The Binary Holdings ดูแล AI agents ภายใน งานอัตโนมัติ และผู้ช่วย AI ของ intranet และเปิดรับตำแหน่ง Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+      },
+    ],
+    relatedLinks: [
+      {
+        label: "English version",
+        href: "/topics/forward-deployed-ai-engineering",
+      },
+      { label: "เกี่ยวกับ", href: "/about" },
+    ],
+    ctaLabel: "ติดต่อ",
+    ctaHref: "/contact",
+  },
 ];
 
 export const TOPIC_SLUGS = [
   "ai-transformation-thailand",
   "erp-crm-internal-systems",
   "tech-startup-thailand-sea",
+  "forward-deployed-ai-engineering",
 ] as const;
 
 export type TopicSlug = (typeof TOPIC_SLUGS)[number];

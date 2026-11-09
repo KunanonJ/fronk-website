@@ -179,6 +179,7 @@ export async function GET() {
   textLines.push(`- Skills catalog (JSON): ${base}/skills.json`);
   if (BLOG_PUBLIC) textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
+  textLines.push(`- Full profile (one fetch): ${base}/llms-full.txt`);
   textLines.push("");
 
   if (cards.length > 0) {

@@ -41,3 +41,19 @@ describe("agent docs", () => {
     expect(text).toContain(`**Updated:** ${SITE_UPDATED}`);
   });
 });
+
+describe("llms-full.txt", () => {
+  it("holds the identity, every project, venture and topic, and no hidden blog content", async () => {
+    const { buildLlmsFull } = await import("./llmsFull");
+    const text = buildLlmsFull();
+    expect(text).toContain(PERSON_SUMMARY);
+    for (const p of getAllPortfolioProjects())
+      expect(text).toContain(`/portfolio/${p.slug}`);
+    for (const v of getAllVentures())
+      expect(text).toContain(`/ventures/${v.slug}`);
+    for (const t of getAllTopicPillars("en"))
+      expect(text).toContain(`/topics/${t.slug}`);
+    expect(text).not.toContain("/blog/");
+    expect(text).not.toContain("/press");
+  });
+});

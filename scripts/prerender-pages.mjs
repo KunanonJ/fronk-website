@@ -7,4 +7,5 @@ export const EXTRA_PRERENDER_PATHS = [
   "/th/topics/ai-transformation-thailand",
   "/th/topics/erp-crm-internal-systems",
   "/th/topics/tech-startup-thailand-sea",
+  "/th/topics/forward-deployed-ai-engineering",
 ];
