@@ -42,8 +42,8 @@ describe("aboutPage content", () => {
     ).toBe(true);
   });
 
-  it("anchors Manifesto to the story section", () => {
-    expect(aboutPage.hero.manifestoHref).toBe("#story");
+  it("anchors \"Read my story\" to the story section", () => {
+    expect(aboutPage.hero.storyHref).toBe("#story");
     expect(aboutPage.story.id).toBe("story");
   });
 

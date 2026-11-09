@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AboutPageContent from "@/components/landing/AboutPageContent";
-import AsmeCuriousHero from "@/components/landing/stock/AsmeCuriousHero";
+import AboutHero from "@/components/landing/about/AboutHero";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import {
   buildFaqJsonLd,
@@ -29,7 +29,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqLd }}
       />
-      <AsmeCuriousHero />
+      <AboutHero />
       <AboutPageContent />
     </main>
   );
