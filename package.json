@@ -2,7 +2,7 @@
   "name": "fronk-website",
   "version": "0.3.0",
   "private": true,
-  "description": "KunanonJ personal site \u2014 cinematic landing + showcase on Next.js / Cloudflare Workers. Fintech & AI ventures from Bangkok.",
+  "description": "KunanonJ personal site — cinematic landing + showcase on Next.js / Cloudflare Workers. Fintech & AI ventures from Bangkok.",
   "engines": {
     "node": ">=22.22.2"
   },
@@ -70,9 +70,6 @@
     "ensure:local-env": "node scripts/ensure-local-env.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/geist": "5.3.0",
-    "@fontsource-variable/geist-mono": "5.3.0",
-    "@fontsource-variable/noto-sans-thai": "5.3.0",
     "@portabletext/react": "^8.0.1",
     "@sanity/client": "^8.14.1",
     "@sanity/code-input": "^7.3.14",

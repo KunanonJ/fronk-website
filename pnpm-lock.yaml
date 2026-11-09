@@ -32,15 +32,6 @@ importers:
 
   .:
     dependencies:
-      '@fontsource-variable/geist':
-        specifier: 5.3.0
-        version: 5.3.0
-      '@fontsource-variable/geist-mono':
-        specifier: 5.3.0
-        version: 5.3.0
-      '@fontsource-variable/noto-sans-thai':
-        specifier: 5.3.0
-        version: 5.3.0
       '@portabletext/react':
         specifier: ^8.0.1
         version: 8.0.1(react@19.3.1)
@@ -1484,15 +1475,6 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
-
-  '@fontsource-variable/geist-mono@5.3.0':
-    resolution: {integrity: sha512-vBbuwDEo9AkrqADMXOrlAR3DFcJi4/JxeuU43FoiQERnNwsfXNnvxvReZG02cQKmyk4DZkZdBZX3oTDvy2zBAw==}
-
-  '@fontsource-variable/geist@5.3.0':
-    resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==}
-
-  '@fontsource-variable/noto-sans-thai@5.3.0':
-    resolution: {integrity: sha512-jHEC1vo8gD09GKf8jtH1IMoPqWmQQSKH3gkyD3ibCIMEkVpEqJ9NJ2c181VHKbTHXc7Wu9CbuBU3yjQNvpbEbw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -9573,12 +9555,6 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
 
   '@floating-ui/utils@0.2.12': {}
-
-  '@fontsource-variable/geist-mono@5.3.0': {}
-
-  '@fontsource-variable/geist@5.3.0': {}
-
-  '@fontsource-variable/noto-sans-thai@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

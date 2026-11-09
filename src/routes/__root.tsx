@@ -13,8 +13,8 @@ import { WebVitals } from "@/components/WebVitals";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
-import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import geistMonoLatin from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url";
+import geistLatin from "../fonts/geist-latin.woff2?url";
+import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
 
 const siteJsonLd = JSON.stringify(buildSiteJsonLd());
