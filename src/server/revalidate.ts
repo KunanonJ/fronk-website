@@ -42,3 +42,22 @@ export async function handleSanityWebhook(
   const result = await purgeTags(cache, tags);
   return Response.json({ status: 200, revalidated: result.success, tags, now: Date.now() }, { status: result.success ? 200 : 500 });
 }
+
+/**
+ * GET /api/cron/revalidate with `Authorization: Bearer <CRON_SECRET>`: the
+ * old fronk-website-revalidate-cron Worker calls this hourly. Kept so that
+ * Worker does no harm until it is deleted; scheduled() does the same job.
+ */
+export async function handleCronRequest(
+  request: Request,
+  secret: string | undefined,
+  cache: CachePurger | undefined,
+): Promise<Response> {
+  if (!secret) return Response.json({ message: "Missing CRON_SECRET" }, { status: 500 });
+  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  }
+  const result = await purgeTags(cache, ALL_CONTENT_TAGS);
+  return Response.json({ revalidated: result.success, tags: ALL_CONTENT_TAGS }, { status: result.success ? 200 : 500 });
+}
+

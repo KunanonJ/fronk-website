@@ -1,6 +1,7 @@
+import { DurableObject } from "cloudflare:workers";
 import handler from "@tanstack/react-start/server-entry";
 import { redirectFor } from "./lib/redirects";
-import { ALL_CONTENT_TAGS, handleSanityWebhook, purgeTags, type CachePurger } from "./server/revalidate";
+import { ALL_CONTENT_TAGS, handleCronRequest, handleSanityWebhook, purgeTags, type CachePurger } from "./server/revalidate";
 
 /**
  * Worker entry for the Start build (wrangler.start.jsonc "main"). Start picks
@@ -9,7 +10,7 @@ import { ALL_CONTENT_TAGS, handleSanityWebhook, purgeTags, type CachePurger } fr
  * purge and the hourly cron. Everything else goes to Start.
  */
 
-type Env = { SANITY_REVALIDATE_SECRET?: string };
+type Env = { SANITY_REVALIDATE_SECRET?: string; CRON_SECRET?: string };
 /** ctx.cache exists when wrangler.start.jsonc sets `cache.enabled`. */
 type Ctx = { waitUntil(promise: Promise<unknown>): void; cache?: CachePurger };
 
@@ -24,6 +25,9 @@ const worker = {
     if (url.pathname === "/api/revalidate" && request.method === "POST") {
       return handleSanityWebhook(request, env.SANITY_REVALIDATE_SECRET, ctx.cache);
     }
+    if (url.pathname === "/api/cron/revalidate" && request.method === "GET") {
+      return handleCronRequest(request, env.CRON_SECRET, ctx.cache);
+    }
     return handler.fetch(request);
   },
 
@@ -34,3 +38,12 @@ const worker = {
 };
 
 export default worker;
+
+/**
+ * OpenNext's Durable Object classes, kept as empty classes after the cutover
+ * so the production Worker's v1 migration still matches and a dashboard
+ * rollback to the Next version works. Phase 6 deletes them with a migration.
+ */
+export class DOQueueHandler extends DurableObject {}
+export class DOShardedTagCache extends DurableObject {}
+
