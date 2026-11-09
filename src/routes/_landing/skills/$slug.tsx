@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { PageMain } from "@/components/bento/Bento";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -43,7 +44,7 @@ function SkillRouteView({ slug }: { slug: string }) {
   const codeLd = serializeJsonLd(buildSkillJsonLd(skill));
 
   return (
-    <>
+    <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
@@ -53,7 +54,7 @@ function SkillRouteView({ slug }: { slug: string }) {
         dangerouslySetInnerHTML={{ __html: codeLd }}
       />
       <SkillDetailPage skill={skill} />
-    </>
+    </PageMain>
   );
 }
 

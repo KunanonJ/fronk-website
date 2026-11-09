@@ -267,6 +267,20 @@
   --water2: #070a18;
 }
 
+/* ─── Map art (bento redesign, phase 7c) ───────────────────────────────────
+ * Art-only colours for the small map drawings (the Venture "Related topics"
+ * card): street lines and the river. Never text.
+ * ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --map: #d5d8e3;
+  --river: #c9cefc;
+}
+
+.dark {
+  --map: #2a2f48;
+  --river: #2b3a8f;
+}
+
 html {
   background: var(--page);
   color: var(--ink);
