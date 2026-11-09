@@ -19,7 +19,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     setMounted(true);
   }, []);
 
-  const isDark = mounted ? resolvedTheme === "dark" : true;
+  // Before mount, assume the default theme (light since 09-11-26) so the
+  // label matches what most first-time visitors see.
+  const isDark = mounted ? resolvedTheme === "dark" : false;
   const label = isDark ? "Switch to light theme" : "Switch to dark theme";
 
   return (
@@ -33,7 +35,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         track("theme_change", { theme: next });
       }}
       className={cn(
-        "relative inline-flex h-10 w-10 items-center justify-center rounded-full text-primary transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-95 motion-reduce:active:scale-100 dark:hover:bg-white/10",
+        "relative inline-flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-surface-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:scale-95 motion-reduce:active:scale-100",
         className,
       )}
     >

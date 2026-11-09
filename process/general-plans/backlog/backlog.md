@@ -102,6 +102,8 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 
 ## P3: Dev-only hydration warning on the nav menu button under reduced motion
 
+**Resolved 09-11-26 (visual-redesign Phase 1):** the menu toggle is now a plain `<button>`; `next dev` under reduced motion logs no hydration warning on `/portfolio` or `/about`.
+
 - **Added:** 04-11-26
 - **Problem:** with `prefers-reduced-motion: reduce`, `next dev` logs a hydration mismatch on every landing page: the server HTML has `tabindex="0"` on the `motion.button` menu toggle in `LandingTopNav`, the client does not.
 - **Root cause:** inferred to be framer-motion rendering different attributes for reduced motion on server vs client. Production smoke tests log no error.

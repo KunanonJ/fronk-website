@@ -78,7 +78,7 @@
 | Probe: LCP | No worse | Not comparable yet: the baseline is production and the branch run is the local preview. Re-run against production after deploy. Heroes are unchanged in this phase (video LCP on `/` and `/contact` until Phases 2 and 3) |
 | `/resume` and `pnpm pdf` | Renders; PDF readable | Renders in both themes. The PDF exports (6 pages, same as the committed file); the committed `public/resume.pdf` is left unchanged in this PR |
 | `/design` | 200, `noindex, nofollow`, absent from sitemap and llms | Pass |
-| Production (after an approved deploy) | Light default on a fresh profile; dark toggle works; axe clean | Pending deploy |
+| Production (after #62 deployed) | Light default on a fresh profile; dark toggle works; axe clean | Pass: a fresh visit gets light (`#F5F6FA`, Geist); the toggle switches to dark (`#0B0D17`) and stores it; e2e smoke + a11y 100/100 against kunanonj.com. Probe, production before → after: fonts 9-10 → 2 requests (123-171 → 52 KB); LCP `/` 13.1 → 12.6 s, `/about` 1.94 → 1.99 s, `/contact` 8.6 → 8.0 s, `/portfolio` 2.09 → 2.24 s (no change beyond noise; the video heroes go in Phases 2-3) |
 
 ## Notes for later phases
 

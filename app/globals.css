@@ -262,6 +262,16 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* visual-redesign Phase 1: one visible focus ring, in the focus token (Signal
+ * in light, the lighter blue in dark; both pass 3:1 on page and surface). In
+ * the base layer so components with their own focus utilities keep them. */
+@layer base {
+  :where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
 ::selection {
   background: var(--accent);
   color: var(--accent-fg);

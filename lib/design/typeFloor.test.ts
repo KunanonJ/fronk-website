@@ -6,7 +6,7 @@ import { read, sourceFiles } from "@/lib/design/sourceScan";
  * Counts arbitrary text sizes below 12 px. Each phase lowers MAX as it
  * redesigns pages; Phase 6 must reach 0. Never raise it.
  */
-const MAX_SUB_12PX = 35;
+const MAX_SUB_12PX = 30;
 
 function sub12(source: string): number {
   let n = 0;
