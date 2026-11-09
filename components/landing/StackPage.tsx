@@ -1,6 +1,5 @@
-"use client";
-
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
+import { LibrarySectionHeading } from "@/components/landing/LibraryLinkCard";
 import StackBrandIcon from "@/components/landing/StackBrandIcon";
 import {
   STACK_GROUPS,
@@ -8,6 +7,7 @@ import {
   stackPage,
 } from "@/lib/content/stack";
 
+/** Stack tables (visual-redesign Phase 5): one Paper card per group. */
 export default function StackPage() {
   return (
     <LibraryPageShell
@@ -16,35 +16,35 @@ export default function StackPage() {
       description={stackPage.description}
       navId="stack-mobile-nav"
     >
-      <div className="space-y-12">
+      <div className="space-y-16">
         {STACK_GROUPS.map((group) => {
           const items = stackItemsByGroup(group);
           return (
             <section key={group} aria-labelledby={`stack-${group}`}>
-              <h2
-                id={`stack-${group}`}
-                className="mb-4 text-sm font-medium uppercase tracking-[0.16em] text-primary/70"
-              >
+              <LibrarySectionHeading id={`stack-${group}`} count={items.length}>
                 {group}
-              </h2>
-              <div className="overflow-x-auto rounded-2xl border border-primary/10">
-                <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
+              </LibrarySectionHeading>
+              <div className="overflow-x-auto rounded-card border border-hairline bg-surface shadow-card">
+                <table className="w-full min-w-[36rem] border-collapse text-left text-small">
                   <thead>
-                    <tr className="border-b border-primary/10 text-[10px] uppercase tracking-[0.14em] text-primary/70">
-                      <th className="px-4 py-3 font-medium sm:px-5">Name</th>
-                      <th className="px-4 py-3 font-medium sm:px-5">Purpose</th>
-                      <th className="px-4 py-3 font-medium sm:px-5">Website</th>
+                    <tr className="border-b border-hairline font-mono text-label uppercase text-ink-2">
+                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Name</th>
+                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Purpose</th>
+                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Website</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.map((item) => (
                       <tr
                         key={item.name}
-                        className="border-b border-primary/5 last:border-0"
+                        className="border-b border-hairline last:border-0"
                       >
-                        <td className="px-4 py-3.5 font-medium text-primary sm:px-5">
-                          <span className="inline-flex items-center gap-2.5">
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <th
+                          scope="row"
+                          className="px-5 py-3.5 text-left font-medium text-ink sm:px-6"
+                        >
+                          <span className="inline-flex items-center gap-3">
+                            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-chip bg-surface-tint text-ink">
                               <StackBrandIcon
                                 id={item.icon}
                                 title={item.name}
@@ -53,16 +53,16 @@ export default function StackPage() {
                             </span>
                             {item.name}
                           </span>
-                        </td>
-                        <td className="px-4 py-3.5 text-primary/70 sm:px-5">
+                        </th>
+                        <td className="px-5 py-3.5 text-ink-2 sm:px-6">
                           {item.purpose}
                         </td>
-                        <td className="px-4 py-3.5 sm:px-5">
+                        <td className="px-5 py-3.5 sm:px-6">
                           <a
                             href={item.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary/80 underline-offset-4 transition-colors hover:text-primary hover:underline"
+                            className="inline-flex min-h-6 items-center text-link underline-offset-4 hover:underline"
                           >
                             {item.website.replace(/^https?:\/\//, "")}
                           </a>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 type CopyButtonProps = {
   /** Text to copy. */
@@ -16,6 +17,8 @@ type CopyButtonProps = {
   announcement?: string;
   className?: string;
 };
+
+type Status = "idle" | "copied" | "error";
 
 const RESET_MS = 2000;
 
@@ -45,9 +48,10 @@ async function writeClipboard(value: string): Promise<boolean> {
 }
 
 /**
- * Copy-to-clipboard button. The visible label flips to "Copied" in a slot
- * sized for both words (no layout shift) and a polite live region announces
- * the result for screen readers. A native button, so Enter and Space work.
+ * Copy-to-clipboard button. The visible label flips to "Copied" (or
+ * "Failed", with the Ember failure square) in a slot sized for every word,
+ * so the button never changes width, and a polite live region announces the
+ * result for screen readers. A native button, so Enter and Space work.
  */
 export default function CopyButton({
   text,
@@ -55,9 +59,9 @@ export default function CopyButton({
   label = "Copy",
   accessibleLabel,
   announcement = "Copied",
-  className = "",
+  className,
 }: CopyButtonProps) {
-  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -72,7 +76,11 @@ export default function CopyButton({
     timer.current = window.setTimeout(() => setStatus("idle"), RESET_MS);
   };
 
-  const copied = status === "copied";
+  const words: Record<Status, string> = {
+    idle: label,
+    copied: "Copied",
+    error: "Failed",
+  };
 
   return (
     <>
@@ -80,29 +88,41 @@ export default function CopyButton({
         type="button"
         onClick={onCopy}
         aria-label={accessibleLabel}
-        className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-primary/20 px-3 text-sm text-primary/85 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-landing ${className}`}
+        data-status={status}
+        className={cn(
+          "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-hairline-strong bg-surface px-3 text-sm text-ink transition-colors duration-150 ease-smooth hover:border-ink/40 hover:bg-surface-tint",
+          className,
+        )}
       >
-        {copied ? (
-          <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+        {status === "copied" ? (
+          <Check className="h-3.5 w-3.5 shrink-0 text-success-text" aria-hidden />
+        ) : status === "error" ? (
+          // Ember marks a failure, always next to the word "Failed".
+          <span aria-hidden className="mx-[3px] size-2 shrink-0 bg-ember" />
         ) : (
           <Copy className="h-3.5 w-3.5 shrink-0" aria-hidden />
         )}
-        {/* Both words share one grid cell, so the button keeps its width. */}
+        {/* Every word shares one grid cell, so the button keeps its width. */}
         <span className="grid" aria-hidden>
-          <span
-            className={`col-start-1 row-start-1 ${copied ? "invisible" : ""}`}
-          >
-            {label}
-          </span>
-          <span
-            className={`col-start-1 row-start-1 ${copied ? "" : "invisible"}`}
-          >
-            Copied
-          </span>
+          {(Object.keys(words) as Status[]).map((key) => (
+            <span
+              key={key}
+              className={cn(
+                "col-start-1 row-start-1",
+                key !== status && "invisible",
+              )}
+            >
+              {words[key]}
+            </span>
+          ))}
         </span>
       </button>
       <span role="status" aria-live="polite" className="sr-only">
-        {copied ? announcement : status === "error" ? "Copy failed" : ""}
+        {status === "copied"
+          ? announcement
+          : status === "error"
+            ? "Copy failed"
+            : ""}
       </span>
     </>
   );

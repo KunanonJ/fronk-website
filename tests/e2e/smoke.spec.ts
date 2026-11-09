@@ -75,3 +75,36 @@ test.describe("a11y > keyboard users can reach the skip link", () => {
     expect(focusedHref).toBe("#main");
   });
 });
+
+test.describe("resume > company logos are self-hosted (ux-audit finding 12)", () => {
+  test("logos render and no image request leaves the site", async ({ page, baseURL }) => {
+    const origin = new URL(baseURL ?? "http://localhost:3000").origin;
+    const offsite: string[] = [];
+    page.on("request", (request) => {
+      if (request.resourceType() !== "image") return;
+      const url = new URL(request.url());
+      if (url.protocol === "data:" || url.protocol === "blob:") return;
+      if (url.origin !== origin) offsite.push(request.url());
+    });
+
+    await page.goto("/resume", { waitUntil: "networkidle" });
+    // The logos are lazy; load every one so the whole page is checked.
+    await page.evaluate(() => {
+      for (const img of Array.from(document.images)) img.loading = "eager";
+    });
+    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(() =>
+      Array.from(document.images).every((img) => img.complete),
+    );
+
+    const logos = page.locator('[data-logo="image"] img');
+    expect(await logos.count()).toBeGreaterThan(0);
+    const broken = await logos.evaluateAll((imgs) =>
+      (imgs as HTMLImageElement[])
+        .filter((img) => img.naturalWidth === 0)
+        .map((img) => img.getAttribute("src")),
+    );
+    expect(broken, "logos that failed to load").toEqual([]);
+    expect(offsite, "image requests to other hosts").toEqual([]);
+  });
+});

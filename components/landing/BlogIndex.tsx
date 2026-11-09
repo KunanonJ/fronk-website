@@ -35,14 +35,14 @@ function BlogCardView({ post }: { post: BlogCard }) {
         <div className="flex flex-wrap items-center gap-2">
           <time
             dateTime={post.publishedAt}
-            className="text-[10px] uppercase tracking-[0.16em] text-primary/70"
+            className="font-mono text-label uppercase text-ink-2"
           >
             {formatBlogDate(post.publishedAt)}
           </time>
           {post.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-primary/10 bg-primary/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary/70"
+              className="rounded-chip border border-hairline-strong bg-surface px-2 py-0.5 font-mono text-label uppercase text-ink-2"
             >
               {tag}
             </span>
@@ -112,7 +112,7 @@ export default function BlogIndex({
 
       <main id="main" className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10">
         <header className="mx-auto mb-8 max-w-6xl sm:mb-10">
-          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
+          <p className="mb-3 font-mono text-label uppercase text-ink-2">
             {eyebrow}
           </p>
           <h1
@@ -141,7 +141,7 @@ export default function BlogIndex({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={blogPage.searchPlaceholder}
-              className="w-full rounded-full border border-primary/15 bg-primary/5 py-3 pr-4 pl-11 text-sm text-primary placeholder:text-primary/40 outline-none transition focus:border-primary/35 focus:ring-2 focus:ring-white/10"
+              className="w-full rounded-full border border-primary/15 bg-primary/5 py-3 pr-4 pl-11 text-sm text-primary placeholder:text-ink-2 transition focus:border-ink/40"
             />
           </label>
 
@@ -155,7 +155,7 @@ export default function BlogIndex({
               onClick={() => setActiveTag(null)}
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTag === null
-                  ? "border-cream/40 bg-cream text-black"
+                  ? "border-ink bg-ink text-page"
                   : "border-primary/15 bg-transparent text-primary/70 hover:border-primary/35 hover:text-primary"
               }`}
             >
@@ -170,7 +170,7 @@ export default function BlogIndex({
                   onClick={() => setActiveTag(active ? null : tag)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     active
-                      ? "border-cream/40 bg-cream text-black"
+                      ? "border-ink bg-ink text-page"
                       : "border-primary/15 bg-transparent text-primary/70 hover:border-primary/35 hover:text-primary"
                   }`}
                 >

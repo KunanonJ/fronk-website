@@ -34,7 +34,7 @@ export default function EditorialStubPage({
         id="main"
         className="relative z-10 mx-auto flex min-h-[100svh] max-w-3xl flex-col justify-center px-6 pb-20 pt-28 sm:px-8"
       >
-        <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
+        <p className="mb-4 font-mono text-label uppercase text-ink-2">
           {eyebrow}
         </p>
         <h1

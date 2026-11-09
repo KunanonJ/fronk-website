@@ -1,6 +1,8 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
+import {
+  LibraryLinkCard,
+  LibrarySectionHeading,
+} from "@/components/landing/LibraryLinkCard";
 import type { LearnLink } from "@/lib/content/learn";
 import {
   getLearnTopicLinks,
@@ -9,26 +11,6 @@ import {
   learnPage,
 } from "@/lib/content/learn";
 import type { BlogCard } from "@/lib/content/blog";
-
-function LearnCard({ item }: { item: LearnLink }) {
-  return (
-    <Link
-      href={item.href}
-      className="group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6"
-    >
-      <h3 className="text-base font-medium text-primary sm:text-lg">
-        {item.title}
-      </h3>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-primary/65">
-        {item.description}
-      </p>
-      <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary/70 transition-colors group-hover:text-primary">
-        Open
-        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </span>
-    </Link>
-  );
-}
 
 function LearnSection({
   id,
@@ -41,21 +23,22 @@ function LearnSection({
 }) {
   if (items.length === 0) return null;
   return (
-    <section aria-labelledby={id} className="mb-14 last:mb-0 sm:mb-16">
-      <h2
-        id={id}
-        className="mb-5 text-xl font-medium tracking-tight text-primary sm:text-2xl"
-        style={{
-          fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-        }}
-      >
+    <section aria-labelledby={id} className="mb-16 last:mb-0 sm:mb-20">
+      <LibrarySectionHeading id={id} count={items.length}>
         {title}
-      </h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      </LibrarySectionHeading>
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
-          <LearnCard key={item.href} item={item} />
+          <li key={item.href}>
+            <LibraryLinkCard
+              href={item.href}
+              title={item.title}
+              description={item.description}
+              cta="Open"
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 # Phase 5: Library, Skills, hubs and resume
 
-**Status:** OUTLINE. Re-research at phase entry, then complete the plan before asking for EXECUTE approval.
+**Status:** EXECUTED 09-11-26 on `feat/redesign-library` (owner standing approval). Hubs stay nav-less (restyle only; their 205 KB budget). Evidence: `../reports/phase-5_library-skills-hubs_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers audit findings:** 12 (`/resume` company icons from `icons.duckduckgo.com`, 4 of them 404s), plus the remaining type-floor and tap-target debt on these routes (9, 10)

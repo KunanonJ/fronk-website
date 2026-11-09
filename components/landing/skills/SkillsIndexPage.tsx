@@ -9,7 +9,6 @@ import {
   DownloadLink,
   ExternalLink,
   SectionHeading,
-  serif,
   textLinkClass,
 } from "@/components/landing/skills/SkillParts";
 import {
@@ -88,7 +87,7 @@ export default function SkillsIndexPage() {
       >
         View on GitHub
       </ExternalLink>
-      <p className="px-1 text-[13px] text-primary/75">
+      <p className="px-1 text-small text-ink-2">
         {total} skills · MIT license · {ORIGINAL_COUNT} original,{" "}
         {ADAPTED_COUNT} adapted
       </p>
@@ -113,7 +112,7 @@ export default function SkillsIndexPage() {
             accessibleLabel="Copy the Claude Code plugin install command"
             announcement="Copied the plugin install command"
           />
-          <p className="text-sm text-primary/75">
+          <p className="text-small text-ink-2">
             Installs all {total} skills as one plugin, named{" "}
             <code className="font-mono">superstacks</code>.
           </p>
@@ -137,7 +136,7 @@ export default function SkillsIndexPage() {
       label: "Cursor",
       panel: (
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-primary/80">
+          <p className="text-small text-ink-2">
             Until the public Cursor listing exists, copy the{" "}
             <a
               href={PLUGIN_FOLDER_URL}
@@ -168,7 +167,7 @@ export default function SkillsIndexPage() {
             accessibleLabel="Copy the npx skills command for the whole pack"
             announcement="Copied the npx skills command"
           />
-          <p className="text-sm text-primary/75">
+          <p className="text-small text-ink-2">
             <code className="font-mono">npx skills</code> is a third-party
             installer; <code className="font-mono">DISABLE_TELEMETRY=1</code>{" "}
             turns its telemetry off.
@@ -181,7 +180,7 @@ export default function SkillsIndexPage() {
       label: "ZIP (claude.ai / ChatGPT)",
       panel: (
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-primary/80">
+          <p className="text-small text-ink-2">
             claude.ai and ChatGPT take one skill per ZIP: use the ZIP link on
             any skill below. For the OpenAI plugin portal, upload the whole pack
             as one file.
@@ -216,16 +215,12 @@ export default function SkillsIndexPage() {
 
         <section aria-labelledby="skills-ask">
           <SectionHeading id="skills-ask">Or ask your agent</SectionHeading>
-          <p className="mb-4 text-sm leading-relaxed text-primary/80">
+          <p className="mb-4 text-small text-ink-2">
             Paste this into Claude Code, Codex or Cursor and let it follow the
             README.
           </p>
-          <figure className="rounded-xl border border-primary/12 bg-primary/[0.04] p-4">
-            <p
-              id="skills-ask-prompt"
-              className="text-lg leading-relaxed text-primary"
-              style={serif}
-            >
+          <figure className="rounded-card border border-hairline bg-surface-tint p-5 sm:p-6">
+            <p id="skills-ask-prompt" className="text-lead text-ink">
               {skillsPage.askAgentPrompt}
             </p>
             <figcaption className="mt-4 flex justify-end">
@@ -242,7 +237,7 @@ export default function SkillsIndexPage() {
 
       <section aria-labelledby="skills-pipeline" className="mt-20">
         <SectionHeading id="skills-pipeline">The pipeline</SectionHeading>
-        <p className="mb-5 max-w-2xl text-sm leading-relaxed text-primary/80">
+        <p className="mb-5 max-w-2xl text-small text-ink-2">
           The order the skills run in on a ticket, from the Superstacks README.{" "}
           <Link href="/skills/ticket-pipeline" className={textLinkClass}>
             ticket-pipeline
@@ -257,21 +252,21 @@ export default function SkillsIndexPage() {
               <li key={step.slug} className="flex items-center gap-1">
                 <Link
                   href={`/skills/${skill.slug}`}
-                  className="inline-flex min-h-9 items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.03] px-3 text-sm text-primary transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-landing"
+                  className="inline-flex min-h-9 items-center gap-2 rounded-full border border-hairline-strong bg-surface px-3.5 text-sm text-ink transition-colors duration-150 ease-smooth hover:border-ink/40 hover:bg-surface-tint"
                 >
-                  <span className="text-[13px] tabular-nums text-primary/70">
-                    {index + 1}
+                  <span className="font-mono text-label tabular-nums text-ink-2">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="font-mono">{skill.name}</span>
                   {step.note ? (
-                    <span className="text-[13px] text-primary/70">
+                    <span className="text-small text-ink-2">
                       ({step.note})
                     </span>
                   ) : null}
                 </Link>
                 {index < SKILL_PIPELINE.length - 1 ? (
                   <ArrowRight
-                    className="h-3.5 w-3.5 shrink-0 text-primary/50"
+                    className="h-3.5 w-3.5 shrink-0 text-ink-2"
                     aria-hidden
                   />
                 ) : null}
@@ -288,14 +283,14 @@ export default function SkillsIndexPage() {
         <style>{FILTER_CSS}</style>
         <SectionHeading id="skills-catalog">All {total} skills</SectionHeading>
         <fieldset className="mb-10">
-          <legend className="mb-3 text-[13px] uppercase tracking-[0.16em] text-primary/75">
+          <legend className="mb-3 font-mono text-label uppercase text-ink-2">
             Show
           </legend>
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((filter) => (
               <label
                 key={filter.id}
-                className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-primary/15 px-3.5 text-sm text-primary/85 transition-colors hover:border-primary/35 has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-landing has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/60 has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-landing"
+                className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-hairline-strong bg-surface px-4 text-sm text-ink-2 transition-colors duration-150 ease-smooth hover:border-ink/40 hover:text-ink has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:font-medium has-[:checked]:text-page has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus has-[:focus-visible]:outline-solid"
               >
                 <input
                   type="radio"
@@ -306,7 +301,7 @@ export default function SkillsIndexPage() {
                   className="sr-only"
                 />
                 {filter.label}
-                <span className="tabular-nums opacity-80">{filter.count}</span>
+                <span className="font-mono text-label tabular-nums">{filter.count}</span>
               </label>
             ))}
           </div>
@@ -326,11 +321,11 @@ export default function SkillsIndexPage() {
                 className="skills-stage"
                 data-kinds={[...kinds].sort().join(" ")}
               >
-                <div className="mb-5 flex flex-col gap-1 border-b border-primary/12 pb-3 sm:flex-row sm:items-baseline sm:justify-between">
+                <div className="mb-5 flex flex-col gap-1 border-b border-hairline pb-3 sm:flex-row sm:items-baseline sm:justify-between">
                   <SectionHeading id={`skills-stage-${stage.id}`} as="h3">
                     {stage.label}
                   </SectionHeading>
-                  <p className="text-sm text-primary/75">{stage.blurb}</p>
+                  <p className="text-small text-ink-2">{stage.blurb}</p>
                 </div>
                 <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {skills.map((skill) => (
@@ -345,7 +340,7 @@ export default function SkillsIndexPage() {
 
       <section aria-labelledby="skills-credits" className="mt-20">
         <SectionHeading id="skills-credits">Credits</SectionHeading>
-        <p className="mb-6 max-w-2xl text-sm leading-relaxed text-primary/80">
+        <p className="mb-6 max-w-2xl text-small text-ink-2">
           {ADAPTED_COUNT} skills are adapted from these MIT-licensed projects,
           pinned to a commit and patched where noted. Full notices are in{" "}
           <a
@@ -371,23 +366,23 @@ export default function SkillsIndexPage() {
           {SKILL_SOURCES.map((source) => (
             <li
               key={source.name}
-              className="rounded-2xl border border-primary/12 p-5"
+              className="rounded-card border border-hairline bg-surface p-5 sm:p-6"
             >
-              <p className="font-mono text-base text-primary">
+              <p className="font-mono text-body text-ink">
                 <a
                   href={source.url}
-                  className={textLinkClass}
+                  className={`inline-flex min-h-6 items-center ${textLinkClass}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   {sourceLabel(source)}
                 </a>
               </p>
-              <p className="mt-2 text-sm text-primary/80">
+              <p className="mt-2 text-small text-ink-2">
                 {source.license} · {source.copyright}
               </p>
               {source.sha ? (
-                <p className="mt-1 text-[13px] text-primary/75">
+                <p className="mt-1 text-small text-ink-2">
                   Pinned at{" "}
                   <a
                     href={`${source.url}/tree/${source.sha}`}
@@ -416,7 +411,7 @@ export default function SkillsIndexPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="mt-3 text-sm text-primary/75">
+                <p className="mt-3 text-small text-ink-2">
                   Credited excerpt inside{" "}
                   {getAllSkills()
                     .filter((s) =>

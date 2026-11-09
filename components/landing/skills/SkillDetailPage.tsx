@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ChevronRight, FileText } from "lucide-react";
 import CopyButton from "@/components/landing/skills/CopyButton";
 import InstallTabs from "@/components/landing/skills/InstallTabs";
 import SkillsPageShell from "@/components/landing/skills/SkillsPageShell";
+import { Chip } from "@/components/ui/Chip";
 import {
   CommandBlock,
   DownloadLink,
@@ -49,7 +50,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
 
   const breadcrumb = (
     <nav aria-label="Breadcrumb" className="mb-4">
-      <ol className="flex flex-wrap items-center gap-1 text-sm text-primary/75">
+      <ol className="flex flex-wrap items-center gap-1 text-small text-ink-2">
         <li>
           <Link
             href="/skills"
@@ -62,7 +63,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
           <ChevronRight className="h-3.5 w-3.5" />
         </li>
         <li>
-          <span aria-current="page" className="font-mono text-primary">
+          <span aria-current="page" className="font-mono text-ink">
             {skill.name}
           </span>
         </li>
@@ -74,13 +75,11 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
     <div className="flex flex-wrap items-center gap-1.5">
       <OriginBadge skill={skill} />
       <InvocationBadge skill={skill} />
-      <span className="inline-flex min-h-7 items-center rounded-full border border-primary/20 px-2.5 text-[13px] leading-none text-primary/80">
-        {skill.license}
-      </span>
+      <Chip>{skill.license}</Chip>
       <a
         href={SKILLS_RELEASE_URL}
         {...external}
-        className="inline-flex min-h-7 items-center rounded-full border border-primary/20 px-2.5 font-mono text-[13px] leading-none text-primary/80 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+        className="inline-flex min-h-6 items-center rounded-chip border border-hairline-strong bg-surface px-2.5 py-0.5 font-mono text-label uppercase text-ink-2 transition-colors duration-150 ease-smooth hover:border-ink/40 hover:text-ink"
       >
         Superstacks {SKILLS_TAG}
       </a>
@@ -104,7 +103,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             accessibleLabel={`Copy install command for ${skill.name}`}
             announcement={`Copied the install command for ${skill.name}`}
           />
-          <p className="text-sm text-primary/75">
+          <p className="text-small text-ink-2">
             Third-party installer;{" "}
             <code className="font-mono">DISABLE_TELEMETRY=1</code> turns its
             telemetry off.
@@ -117,7 +116,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       label: "ZIP for Claude Code / Codex",
       panel: (
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-primary/80">
+          <p className="text-small text-ink-2">
             Folder layout (
             <code className="font-mono">{skill.name}/SKILL.md</code>). Unzip it
             into your agent's skills directory.
@@ -133,7 +132,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       label: "ZIP for claude.ai / ChatGPT",
       panel: (
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-primary/80">
+          <p className="text-small text-ink-2">
             Flat layout: <code className="font-mono">SKILL.md</code> sits at the
             zip root, ready to upload as a skill.
           </p>
@@ -174,7 +173,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       label: "Full pack",
       panel: (
         <div className="space-y-4">
-          <p className="text-sm leading-relaxed text-primary/80">
+          <p className="text-small text-ink-2">
             <code className="font-mono">{skill.name}</code> ships in the
             Superstacks plugin with the other skills. In Claude Code:
           </p>
@@ -183,7 +182,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             accessibleLabel="Copy the Claude Code plugin commands"
             announcement="Copied both plugin commands"
           />
-          <p className="text-sm text-primary/75">
+          <p className="text-small text-ink-2">
             Run them one at a time. Codex, Cursor and ZIP steps are on{" "}
             <Link href="/skills" className={textLinkClass}>
               the Skills page
@@ -220,10 +219,10 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
 
           <section aria-labelledby="skill-when">
             <SectionHeading id="skill-when">How it runs</SectionHeading>
-            <p className="text-base leading-relaxed text-primary/80">
+            <p className="text-body text-ink-2">
               {skill.userInvoked ? (
                 <>
-                  <strong className="font-medium text-primary">
+                  <strong className="font-medium text-ink">
                     You invoke it.
                   </strong>{" "}
                   Its frontmatter sets{" "}
@@ -234,7 +233,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
                 </>
               ) : (
                 <>
-                  <strong className="font-medium text-primary">
+                  <strong className="font-medium text-ink">
                     Runs automatically.
                   </strong>{" "}
                   The agent loads it when a task matches the description above.
@@ -248,7 +247,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2
                 id="skill-source"
-                className="font-mono text-xl font-medium text-primary"
+                className="font-mono text-h3 font-medium text-ink"
               >
                 SKILL.md
               </h2>
@@ -268,7 +267,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             </div>
             <pre
               id={sourceId}
-              className="whitespace-pre-wrap rounded-xl border border-primary/12 bg-primary/[0.04] p-4 font-mono text-[13px] leading-relaxed text-primary/90 [overflow-wrap:anywhere] sm:p-5"
+              className="whitespace-pre-wrap rounded-card border border-hairline bg-well p-5 font-mono text-small text-ink [overflow-wrap:anywhere] sm:p-6"
             >
               {skill.content}
             </pre>
@@ -279,21 +278,21 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
           <section aria-labelledby="skill-files">
             <h2
               id="skill-files"
-              className="mb-4 text-[13px] font-medium uppercase tracking-[0.16em] text-primary/75"
+              className="mb-4 font-mono text-label uppercase text-ink-2"
             >
               Files
             </h2>
-            <ul className="divide-y divide-primary/10 border-y border-primary/10">
+            <ul className="divide-y divide-hairline border-y border-hairline">
               {orderedFiles(skill).map((file) => (
                 <li key={file.path}>
                   <a
                     href={file.url}
                     {...external}
-                    className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm text-primary/85 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                    className="flex min-h-11 items-center justify-between gap-3 py-2 text-small text-ink transition-colors hover:text-link"
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <FileText
-                        className="h-3.5 w-3.5 shrink-0 opacity-70"
+                        className="h-3.5 w-3.5 shrink-0 text-ink-2"
                         aria-hidden
                       />
                       <span className="font-mono [overflow-wrap:anywhere]">
@@ -310,7 +309,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
                       </span>
                       <span className="sr-only"> (opens on GitHub)</span>
                     </span>
-                    <span className="shrink-0 text-[13px] tabular-nums text-primary/70">
+                    <span className="shrink-0 font-mono text-label tabular-nums text-ink-2">
                       {formatBytes(file.size)}
                     </span>
                   </a>
@@ -322,12 +321,12 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
           <section aria-labelledby="skill-credit">
             <h2
               id="skill-credit"
-              className="mb-4 text-[13px] font-medium uppercase tracking-[0.16em] text-primary/75"
+              className="mb-4 font-mono text-label uppercase text-ink-2"
             >
               {skill.source ? "Credit" : "Origin"}
             </h2>
             {skill.source ? (
-              <div className="space-y-3 text-sm leading-relaxed text-primary/80">
+              <div className="space-y-3 text-small text-ink-2">
                 <p>
                   Adapted from{" "}
                   <a
@@ -339,22 +338,22 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
                   </a>{" "}
                   by {copyrightHolder(skill.source.copyright)}.
                 </p>
-                <dl className="divide-y divide-primary/10 border-y border-primary/10">
+                <dl className="divide-y divide-hairline border-y border-hairline">
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
-                    <dt className="text-primary/75">License</dt>
-                    <dd className="text-right text-primary">
+                    <dt className="text-ink-2">License</dt>
+                    <dd className="text-right text-ink">
                       {skill.source.license}
                     </dd>
                   </div>
                   <div className="flex items-baseline justify-between gap-4 py-2.5">
-                    <dt className="text-primary/75">Copyright</dt>
-                    <dd className="text-right text-primary">
+                    <dt className="text-ink-2">Copyright</dt>
+                    <dd className="text-right text-ink">
                       {skill.source.copyright.replace(/^Copyright\s*/, "")}
                     </dd>
                   </div>
                   {skill.source.sha ? (
                     <div className="flex items-baseline justify-between gap-4 py-2.5">
-                      <dt className="text-primary/75">Pinned at</dt>
+                      <dt className="text-ink-2">Pinned at</dt>
                       <dd className="text-right">
                         <a
                           href={
@@ -391,7 +390,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
                 ) : null}
               </div>
             ) : (
-              <p className="text-sm leading-relaxed text-primary/80">
+              <p className="text-small text-ink-2">
                 Written for Superstacks;{" "}
                 <code className="font-mono">sources.lock.json</code> credits no
                 upstream. Released under {skill.license} with the rest of the
@@ -401,7 +400,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             {skill.excerpts.map((excerpt) => (
               <p
                 key={excerpt.name}
-                className="mt-3 text-sm leading-relaxed text-primary/80"
+                className="mt-3 text-small text-ink-2"
               >
                 Includes a credited excerpt from{" "}
                 <a href={excerpt.url} {...external} className={textLinkClass}>
@@ -416,7 +415,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             <section aria-labelledby="skill-siblings">
               <h2
                 id="skill-siblings"
-                className="mb-4 text-[13px] font-medium uppercase tracking-[0.16em] text-primary/75"
+                className="mb-4 font-mono text-label uppercase text-ink-2"
               >
                 More in {stage.label}
               </h2>
@@ -440,29 +439,29 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       {prev && next ? (
         <nav
           aria-label="More skills"
-          className="mt-20 grid grid-cols-1 gap-4 border-t border-primary/12 pt-8 sm:grid-cols-2"
+          className="mt-20 grid grid-cols-1 gap-4 border-t border-hairline pt-8 sm:grid-cols-2"
         >
           <Link
             href={`/skills/${prev.slug}`}
-            className="group flex flex-col rounded-2xl border border-primary/12 p-5 transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 shadow-card transition-colors hover:border-hairline-strong"
           >
-            <span className="inline-flex items-center gap-1.5 text-[13px] uppercase tracking-[0.16em] text-primary/75">
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
+              <ArrowLeft className="h-3 w-3" aria-hidden />
               Previous
             </span>
-            <span className="mt-2 font-mono text-lg text-primary">
+            <span className="mt-2 font-mono text-lead text-ink">
               {prev.name}
             </span>
           </Link>
           <Link
             href={`/skills/${next.slug}`}
-            className="group flex flex-col rounded-2xl border border-primary/12 p-5 text-right transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 sm:items-end"
+            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 text-right shadow-card transition-colors hover:border-hairline-strong sm:items-end"
           >
-            <span className="inline-flex items-center gap-1.5 text-[13px] uppercase tracking-[0.16em] text-primary/75">
+            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
               Next
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              <ArrowRight className="h-3 w-3" aria-hidden />
             </span>
-            <span className="mt-2 font-mono text-lg text-primary">
+            <span className="mt-2 font-mono text-lead text-ink">
               {next.name}
             </span>
           </Link>

@@ -1,14 +1,26 @@
-"use client";
-
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
+import { LibraryLinkCard } from "@/components/landing/LibraryLinkCard";
 import {
   getProofCards,
   getProofMetrics,
   proofPage,
 } from "@/lib/content/proof";
+import { cn } from "@/lib/utils/cn";
 
+/**
+ * Columns that fill every row, so no empty cell shows the hairline backdrop:
+ * 2 or 4 per row for even counts, else 3.
+ */
+function statColumns(count: number): string {
+  if (count % 4 === 0) return "sm:grid-cols-2 lg:grid-cols-4";
+  if (count % 2 === 0 && count % 3 !== 0) return "sm:grid-cols-2";
+  return "sm:grid-cols-3";
+}
+
+/**
+ * Proof (visual-redesign Phase 5): published venture metrics as stat tiles
+ * (the home proof strip's pattern), then the evidence cards.
+ */
 export default function ProofPage() {
   const metrics = getProofMetrics();
   const cards = getProofCards();
@@ -21,69 +33,43 @@ export default function ProofPage() {
       navId="proof-mobile-nav"
     >
       {metrics.length > 0 ? (
-        <ul className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <dl
+          className={cn(
+            "mb-14 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-hairline bg-hairline",
+            statColumns(metrics.length),
+          )}
+        >
           {metrics.map((metric) => (
-            <li
+            <div
               key={`${metric.source}-${metric.label}`}
-              className="rounded-2xl border border-primary/10 bg-surface px-4 py-5"
+              className="flex flex-col bg-surface p-5 sm:p-6"
             >
-              <p className="text-2xl font-medium text-primary sm:text-3xl">
+              <dt className="font-mono text-label uppercase text-ink-2">
+                {metric.label} · {metric.source}
+              </dt>
+              <dd className="mt-3 font-display text-h2 tabular-nums text-ink">
                 {metric.value}
-              </p>
-              <p className="mt-1 text-sm text-primary/70">{metric.label}</p>
-              <p className="mt-2 text-[10px] uppercase tracking-[0.14em] text-primary/70">
-                {metric.source}
-              </p>
-            </li>
+              </dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => {
-          const className =
-            "group flex flex-col rounded-2xl border border-primary/10 bg-surface p-5 transition-colors hover:border-primary/25 sm:p-6";
-          const inner = (
-            <>
-              {card.source ? (
-                <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-primary/70">
-                  {card.source}
-                </p>
-              ) : null}
-              <h2 className="text-base font-medium text-primary sm:text-lg">
-                {card.title}
-              </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-primary/65">
-                {card.description}
-              </p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary/70 transition-colors group-hover:text-primary">
-                View
-                <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </span>
-            </>
-          );
-
-          if (card.external) {
-            return (
-              <a
-                key={card.id}
-                href={card.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={className}
-              >
-                {inner}
-              </a>
-            );
-          }
-
-          return (
-            <Link key={card.id} href={card.href} className={className}>
-              {inner}
-            </Link>
-          );
-        })}
-      </div>
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <li key={card.id}>
+            <LibraryLinkCard
+              href={card.href}
+              title={card.title}
+              description={card.description}
+              cta="View"
+              eyebrow={card.source}
+              external={card.external}
+              headingAs="h2"
+            />
+          </li>
+        ))}
+      </ul>
     </LibraryPageShell>
   );
 }

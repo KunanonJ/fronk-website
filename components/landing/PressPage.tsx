@@ -31,7 +31,7 @@ function PressCard({ item }: { item: PressItem }) {
       </a>
 
       <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.16em] text-primary/70">
+        <div className="flex items-center justify-between gap-3 font-mono text-label uppercase text-ink-2">
           <time dateTime={item.date}>{formatPressDate(item.date)}</time>
           {item.source ? <span>{item.source}</span> : null}
         </div>
@@ -83,7 +83,7 @@ export default function PressPage() {
 
       <main id="main" className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10">
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
-          <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
+          <p className="mb-3 font-mono text-label uppercase text-ink-2">
             {pressPage.eyebrow}
           </p>
           <h1
