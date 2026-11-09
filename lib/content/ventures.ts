@@ -12,6 +12,8 @@ export interface Venture {
   url: string;
   /** Display string for the URL CTA (e.g. "gogocash.co"). */
   urlLabel: string;
+  /** Square logo (public path) for the hub h1 and the "Also building" card. */
+  logo: string;
   /**
    * Headline figures for the case-row instrument panel. Honest only — every
    * value must be corroborated by the description / a published claim. Omit
@@ -32,9 +34,21 @@ export interface Venture {
 export interface VentureCaseStudy {
   /** Opening paragraph under the case-page header. */
   intro: string;
+  /**
+   * The tagline as the hub h1 draws it, one string per line: every line but
+   * the last is muted, the last takes the accent colour. Joined with single
+   * spaces the lines are exactly `tagline` (tested).
+   */
+  taglineLines: readonly string[];
   sections: readonly { heading: string; body: string }[];
   /** Display string, e.g. "2023 — present". */
   timeline: string;
+  /**
+   * The product's core loop as ordered stages, only where a section states
+   * one (GoGoCash's "Where it stands"). Drives the hub's loop stepper; omit
+   * it when the venture has no published loop.
+   */
+  loop?: readonly string[];
 }
 
 const VENTURES: readonly Venture[] = [
@@ -50,6 +64,7 @@ const VENTURES: readonly Venture[] = [
     stack: ["Cashback", "E-commerce", "Affiliate"],
     url: "https://gogocash.co",
     urlLabel: "gogocash.co",
+    logo: "/brand/gogocash.svg",
     // Corroborated by the description above — not invented.
     metrics: [
       { value: "1,000+", label: "Users" },
@@ -61,7 +76,10 @@ const VENTURES: readonly Venture[] = [
     caseStudy: {
       intro:
         "GoGoCash is a shopping-to-earn cashback platform: shop at the stores you already use, earn a cut of every purchase back. It has grown to more than a thousand users earning across 220+ merchants.",
+      taglineLines: ["Shopping-to-earn", "cashback."],
       timeline: "2023 — present",
+      // The stages "Where it stands" names: browse, shop, track cashback, withdraw.
+      loop: ["Browse", "Shop", "Track cashback", "Withdraw"],
       sections: [
         {
           heading: "What it is",
@@ -90,11 +108,17 @@ const VENTURES: readonly Venture[] = [
     stack: ["ERP/CRM", "Intelligence AI", "Automotive SME"],
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
+    logo: "/brand/manut-144.webp",
     featured: true,
     featuredOrder: 2,
     caseStudy: {
       intro:
         "Manut AI is an ERP/CRM workspace with Intelligence AI for automotive SMEs — one operator surface for internal systems instead of SaaS sprawl.",
+      taglineLines: [
+        "ERP/CRM workspace",
+        "with Intelligence AI",
+        "for automotive SMEs.",
+      ],
       timeline: "2025 — present",
       sections: [
         {

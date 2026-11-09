@@ -1,104 +1,162 @@
 import Link from "@/components/navigation/Link";
-import { ArrowUpRight } from "lucide-react";
+import { Bento, PageMain } from "@/components/bento/Bento";
+import { ctaClasses } from "@/components/bento/Buttons";
+import { EyebrowChip, LivePill } from "@/components/bento/Chips";
+import { ArrowUpRightIcon } from "@/components/bento/icons";
+import SharePill from "@/components/bento/SharePill";
+import type { ShareTarget } from "@/components/bento/ShareRows";
 import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
+import type { HubLink } from "@/components/landing/discovery/LinkRows";
 import {
-  HubLinkList,
-  HubSection,
-  hubType,
-} from "@/components/landing/discovery/hubParts";
-import type { Venture } from "@/lib/content/ventures";
+  AlsoBuildingCard,
+  CategoryChips,
+  LoopStepper,
+  RelatedTopicsCard,
+  RoleFooter,
+  SectionCard,
+  VentureShareCard,
+  VentureStats,
+} from "@/components/landing/discovery/VentureCards";
+import { getAllVentures, type Venture } from "@/lib/content/ventures";
+import { TITLE_SUFFIX, namedPageTitle } from "@/lib/seo/pageTitle";
+import { siteConfig } from "@/lib/site";
 
 type VentureHubPageProps = {
   venture: Venture;
-  relatedTopics?: readonly { label: string; href: string }[];
+  relatedTopics?: readonly HubLink[];
 };
 
+/** What Share shares: the page's head() title and canonical URL. */
+function shareTarget(venture: Venture): ShareTarget {
+  return {
+    title: `${namedPageTitle(venture.name, venture.tagline)}${TITLE_SUFFIX}`,
+    url: new URL(`/ventures/${venture.slug}`, siteConfig.url).href,
+  };
+}
+
 /**
- * Venture case hub (restyled in visual-redesign Phase 5; copy, metrics,
- * links and JSON-LD unchanged).
+ * The hero: eyebrow, the h1 (logo and name, then the tagline with its last
+ * line in the accent colour) beside the Live pill, the intro and the actions.
+ * The h1 is the LCP element; its lines only slide (`kj-lines`).
+ */
+function VentureHero({ venture }: { venture: Venture }) {
+  const caseStudy = venture.caseStudy;
+  const lines = caseStudy?.taglineLines ?? [venture.tagline];
+  const muted = lines.slice(0, -1);
+  const accent = lines[lines.length - 1];
+
+  return (
+    <section aria-labelledby="hero-title" className="flex flex-col gap-6">
+      <EyebrowChip>Venture</EyebrowChip>
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-5">
+        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+          <span className="block">
+            <img
+              src={venture.logo}
+              alt=""
+              width={62}
+              height={62}
+              decoding="async"
+              className="mr-[0.14em] inline-block size-[1.1em] rounded-[0.28em] border-[3px] border-surface bg-paper object-cover align-[-0.2em] shadow-card"
+            />
+            {venture.name}
+          </span>{" "}
+          {muted.map((line) => (
+            <span key={line} className="block text-ink-3">
+              {line}{" "}
+            </span>
+          ))}
+          <span className="block text-mark">{accent}</span>
+        </h1>
+        {venture.status === "active" && caseStudy ? (
+          <LivePill status={caseStudy.timeline} className="mb-2" />
+        ) : null}
+      </div>
+      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
+        {caseStudy?.intro ?? venture.description}
+      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <a
+          href={venture.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-analytics="venture_outbound_click"
+          data-venture={venture.slug}
+          className={ctaClasses()}
+        >
+          Visit {venture.urlLabel}
+          <ArrowUpRightIcon strokeWidth={2} />
+        </a>
+        <Link
+          href="/contact"
+          data-analytics="contact_cta_click"
+          data-venture={venture.slug}
+          className={ctaClasses("secondary")}
+        >
+          Contact
+        </Link>
+        <SharePill />
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Venture case hub (bento redesign, phase 7c; design spec 4.7). A dense
+ * bento: the stat tiles, the case sections as cards (the first with the
+ * category chips, the second with the core-loop stepper, "My role" with the
+ * founder), related topics, the other venture and Share. Blocks with no data
+ * are left out: Manut has no metrics and no loop.
  */
 export default function VentureHubPage({
   venture,
   relatedTopics = [],
 }: VentureHubPageProps) {
-  const caseStudy = venture.caseStudy;
-  const type = hubType(false);
+  const sections = venture.caseStudy?.sections ?? [];
+  const [what, stands, role, ...more] = sections;
+  const loop = venture.caseStudy?.loop ?? [];
+  const other = getAllVentures().find(
+    (candidate) => candidate.slug !== venture.slug && candidate.caseStudy,
+  );
 
   return (
-    <>
-      <main id="main" className="bg-page text-ink">
-        <DiscoveryAnalytics />
-        <article className="mx-auto max-w-3xl px-4 pb-24 pt-14 sm:px-6 sm:pt-16 md:px-8">
-          <p className={type.eyebrow}>Venture</p>
-          <h1 className={type.h1}>{venture.name}</h1>
-          <p className="mt-3 font-display text-h3 font-medium text-ink-2">
-            {venture.tagline}
-          </p>
-          <p className="mt-6 text-lead text-ink-2">
-            {caseStudy?.intro ?? venture.description}
-          </p>
-
-          {venture.metrics && venture.metrics.length > 0 ? (
-            <dl className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-3">
-              {venture.metrics.map((metric) => (
-                <div
-                  key={metric.label}
-                  className="flex flex-col bg-surface p-5 sm:p-6"
-                >
-                  <dt className="font-mono text-label uppercase text-ink-2">
-                    {metric.label}
-                  </dt>
-                  <dd className="mt-2 font-display text-h2 tabular-nums text-ink">
-                    {metric.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-
-          {caseStudy ? (
-            <div className="mt-14 space-y-12">
-              {caseStudy.sections.map((section) => (
-                <section key={section.heading}>
-                  <h2 className={`mb-3 ${type.h2}`}>{section.heading}</h2>
-                  <p className="text-body text-ink-2">{section.body}</p>
-                </section>
-              ))}
-              <p className="font-mono text-label uppercase text-ink-2">
-                {caseStudy.timeline}
-              </p>
-            </div>
-          ) : null}
-
-          {relatedTopics.length > 0 ? (
-            <HubSection title="Related topics">
-              <HubLinkList links={relatedTopics} />
-            </HubSection>
-          ) : null}
-
-          <div className="mt-16 flex flex-wrap items-center gap-3">
-            <a
-              href={venture.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-analytics="venture_outbound_click"
-              data-venture={venture.slug}
-              className="inline-flex min-h-12 items-center gap-2 rounded-full bg-action px-6 text-base font-medium text-on-action transition-colors duration-150 ease-smooth hover:bg-action-hover"
-            >
-              {venture.urlLabel}
-              <ArrowUpRight className="h-4 w-4" aria-hidden />
-            </a>
-            <Link
-              href="/contact"
-              data-analytics="contact_cta_click"
-              data-venture={venture.slug}
-              className="inline-flex min-h-12 items-center rounded-full border border-hairline-strong bg-surface px-6 text-base font-medium text-ink transition-colors duration-150 ease-smooth hover:border-ink/40 hover:bg-surface-tint"
-            >
-              Contact
-            </Link>
-          </div>
-        </article>
-      </main>
-    </>
+    <PageMain>
+      <DiscoveryAnalytics />
+      <VentureHero venture={venture} />
+      <Bento dense>
+        {venture.metrics && venture.metrics.length > 0 ? (
+          <VentureStats metrics={venture.metrics} />
+        ) : null}
+        {what ? (
+          <SectionCard id="card-s1" section={what}>
+            {venture.stack.length > 0 ? (
+              <CategoryChips items={venture.stack} />
+            ) : null}
+          </SectionCard>
+        ) : null}
+        {stands ? (
+          <SectionCard id="card-s2" section={stands} span={2}>
+            {loop.length > 1 ? <LoopStepper stages={loop} /> : null}
+          </SectionCard>
+        ) : null}
+        {role ? (
+          <SectionCard id="card-s3" section={role}>
+            <RoleFooter />
+          </SectionCard>
+        ) : null}
+        {more.map((section, i) => (
+          <SectionCard
+            key={section.heading}
+            id={`card-s${i + 4}`}
+            section={section}
+          />
+        ))}
+        {relatedTopics.length > 0 ? (
+          <RelatedTopicsCard links={relatedTopics} />
+        ) : null}
+        {other ? <AlsoBuildingCard venture={other} /> : null}
+        <VentureShareCard target={shareTarget(venture)} />
+      </Bento>
+    </PageMain>
   );
 }
