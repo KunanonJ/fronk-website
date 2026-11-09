@@ -715,7 +715,7 @@ The authoritative historical source remains:
 - Prefer spawning subagents for multi-phase work; audit after each completed task before continuing
 - When optional follow-ups are offered, implement them unless told otherwise
 - Prefer verifying with local `pnpm dev` when asked to run on the local machine
-- Public marketing UI follows the prisma-landing cutover (Almarai + Instrument Serif, cream primary `#DEDBC8`); user updates final content themselves
+- Public marketing UI is mid-redesign (`process/features/visual-redesign/`): light by default, the owner's Signal/Glaze/Paper/Ink/Clay/Ember palette as role tokens in `app/globals.css`, Geist + Geist Mono; user updates final content themselves
 - Target breakpoints: mobile 375px, tablet 768px, desktop 1440px; treat mobile as a miniature desktop layout
 - Prefer straightforward, minimized animation on the home shell; Showcase may use richer motion; keep intro loading (Apple-style Hello → Welcome to KunanonJ)
 - Avoid overly complex design systems; keep components readable, use arrays/mapping for repetitive structured data; inline styles are acceptable

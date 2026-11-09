@@ -39,15 +39,49 @@
   --color-neg: var(--neg);
   --color-hero-field: var(--hero-field);
 
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  /* Mono demoted — transitional only until Phase 1 drops HUD chrome. */
-  --font-mono: var(--font-mono-instrument), ui-monospace, "SF Mono", monospace;
-  --font-display: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, "Times New Roman",
-    serif;
+  /* visual-redesign Phase 0: Geist + Geist Mono, Noto Sans Thai for Thai. */
+  --font-sans: var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --font-display: var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif,
+    system-ui, sans-serif;
+  /* Serif retired; kept as an alias until Phase 6 removes its last users. */
+  --font-serif: var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif,
+    system-ui, sans-serif;
 
-  /* landing-cutover — cream CTA fill (stable); primary ink flips with theme */
-  --color-cream: #dedbc8;
+  /* Role colours (visual-redesign Phase 0). */
+  --color-page: var(--page);
+  --color-surface-tint: var(--surface-tint);
+  --color-surface-warm: var(--surface-warm);
+  --color-well: var(--well);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-on-action: var(--on-action);
+  --color-link: var(--link);
+  --color-focus: var(--focus);
+  --color-ember: var(--ember);
+  --color-error: var(--error-text);
+  --color-success: var(--success-text);
+  /* Palette colours for art (pixel grids, diagrams), never for text. */
+  --color-signal: var(--palette-signal);
+  --color-glaze: var(--palette-glaze);
+  --color-clay: var(--palette-clay);
+  --color-paper: var(--palette-paper);
+
+  --shadow-card: var(--elev-card);
+
+  --radius-chip: 8px;
+  --radius-input: 12px;
+  --radius-card: 24px;
+  --radius-panel: 32px;
+
+  /* Legacy cream CTA fill (bg-cream + text-black) now uses Glaze: black on
+   * Glaze is 16.4:1. It must not become Signal (black on Signal is ~3.2:1). */
+  --color-cream: var(--palette-glaze);
   --color-landing: var(--landing-canvas);
   --color-primary: var(--landing-ink);
   --color-showcase-bg: #e4e4e4;
@@ -57,13 +91,43 @@
   --color-showcase-cyan: #75c5de;
   --color-showcase-panel: rgba(17, 17, 17, 0.95);
 
-  /* Fluid type scale for the redesign. */
+  /* Type scale (visual-redesign Phase 0). Nothing below 12 px. */
+  --text-h1: clamp(2.75rem, 2.1rem + 2.6vw, 4rem);
+  --text-h1--line-height: 1.02;
+  --text-h1--letter-spacing: -0.04em;
+  --text-h1--font-weight: 700;
+  --text-h2: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  --text-h2--line-height: 1.08;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h2--font-weight: 600;
+  --text-h3: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h3--font-weight: 600;
+  --text-lead: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.01em;
+  --text-body: clamp(1rem, 0.98rem + 0.1vw, 1.0625rem);
+  --text-body--line-height: 1.6;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.06em;
+  --text-stat: clamp(2.75rem, 2.1rem + 2.6vw, 4rem);
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.04em;
+  --text-stat--font-weight: 600;
+
+  /* Older fluid sizes, kept for existing users (resume, venture rows). */
   --text-hud: 0.75rem;
   --text-hero: clamp(2rem, 1rem + 4vw, 3.25rem);
   --text-display: clamp(2.5rem, 1rem + 6vw, 5.5rem);
   --text-wordmark: clamp(4rem, 2rem + 16vw, 12rem);
 
   --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
+  /* helumi and the intro use this curve; not "--ease-out", which Tailwind already defines. */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Snappy reveals — 150–200ms, no bounce. */
   --animate-fade-up: fade-up 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -79,49 +143,104 @@
   --animate-globe-spin: globe-spin 12s linear infinite;
 }
 
-/* ─── Light portfolio + landing shell ───────────────────────────────────── */
+/* ─── Palette (owner, visual-redesign 09-11-26) ─────────────────────────────
+ * Raw values. Components never use these directly; they use the role tokens
+ * below (or Tailwind colours mapped to them in @theme). Ember only marks
+ * something live or failed, as small squares with a text label, on Paper or
+ * Ink (it fails 3:1 on Glaze, Clay and Mist).
+ * ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --bg: #f0f0ee;
-  --fg: #1c1d20;
-  /* ≥4.5:1 on white (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
-  --muted: rgba(28, 29, 32, 0.7);
-  /* 0.62 measured 4.1:1 on #f0f0ee; 0.7 clears 4.5:1 (axe, 04-11-26). */
-  --subtle: rgba(28, 29, 32, 0.7);
-  --border: rgba(28, 29, 32, 0.14);
-  --border-strong: rgba(28, 29, 32, 0.4);
-  --surface: #ffffff;
-  --surface-2: rgba(28, 29, 32, 0.04);
-  --hero-field: #c8cacb;
-  --accent: #1c1d20;
-  --accent-fg: #ffffff;
-  --pos: #0a7a54;
-  --neg: #c8453b;
-  --grain-opacity: 0.02;
-  /* landing canvas / ink (text-primary resolves to ink) */
-  --landing-canvas: #f0eee6;
-  --landing-ink: #1a1a18;
+  --palette-signal: #2b3bff;
+  --palette-signal-hover: #1e2bd6;
+  --palette-glaze: #e8ebff;
+  --palette-paper: #ffffff;
+  --palette-ink: #0b0d17;
+  --palette-clay: #ffe3d6;
+  --palette-ember: #ff5a1f;
+  --palette-mist: #e9eaf0;
 }
 
-/* ─── Dark portfolio (FogLAMP near-black mood) ───────────────────────────── */
+/* ─── Roles: light (default since 09-11-26) ─────────────────────────────────
+ * Contrast for every text and non-text pair is enforced by
+ * lib/design/contrast.test.ts.
+ * ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --page: #f5f6fa;
+  --surface: var(--palette-paper);
+  --surface-tint: var(--palette-glaze);
+  --surface-warm: var(--palette-clay);
+  --well: var(--palette-mist);
+  --ink: var(--palette-ink);
+  --ink-2: #565b70;
+  --hairline: rgba(11, 13, 23, 0.08);
+  --hairline-strong: rgba(11, 13, 23, 0.16);
+  --action: var(--palette-signal);
+  --action-hover: var(--palette-signal-hover);
+  --on-action: var(--palette-paper);
+  --link: var(--palette-signal);
+  --focus: var(--palette-signal);
+  --ember: var(--palette-ember);
+  --error-text: #b3360a;
+  --success-text: #137036;
+  --elev-card:
+    0 1px 2px rgba(11, 13, 23, 0.04), 0 12px 32px -12px rgba(11, 13, 23, 0.1),
+    0 40px 80px -32px rgba(43, 59, 255, 0.12);
+
+  /* Legacy aliases: pages not yet redesigned keep working on the new palette.
+   * Removed in visual-redesign Phase 6 once nothing references them. */
+  --bg: var(--page);
+  --fg: var(--ink);
+  --muted: var(--ink-2);
+  --subtle: var(--ink-2);
+  --border: rgba(11, 13, 23, 0.14);
+  --border-strong: rgba(11, 13, 23, 0.4);
+  --surface-2: rgba(11, 13, 23, 0.04);
+  --hero-field: var(--well);
+  --accent: var(--ink);
+  --accent-fg: var(--page);
+  --pos: var(--success-text);
+  --neg: var(--error-text);
+  --grain-opacity: 0.02;
+  /* landing shell: bg-landing / text-primary */
+  --landing-canvas: var(--page);
+  --landing-ink: var(--ink);
+  /* Retired font names (Hanken, Almarai, Instrument Serif, Space Mono) now
+   * resolve to Geist / Geist Mono, so inline fontFamily styles keep working. */
+  --font-hanken: var(--font-geist-sans), var(--font-noto-thai);
+  --font-almarai: var(--font-geist-sans), var(--font-noto-thai);
+  --font-instrument-serif: var(--font-geist-sans), var(--font-noto-thai);
+  --font-mono-instrument: var(--font-geist-mono);
+  --font-inter-contact: var(--font-geist-sans), var(--font-noto-thai);
+}
+
+/* ─── Roles: dark (toggle) ─────────────────────────────────────────────────
+ * Signal fails on Ink (2.93), so links and focus use a lighter blue.
+ * ─────────────────────────────────────────────────────────────────────────── */
 .dark {
-  --bg: #0a0a0a;
-  --fg: #ffffff;
-  /* ≥4.5:1 on #0a0a0a (WCAG AA, enforced by tests/e2e/a11y.spec.ts). */
-  --muted: rgba(255, 255, 255, 0.62);
-  /* 0.5 measured 4.48:1 on #0a0a0a; 0.55 clears 4.5:1 (axe, 04-11-26). */
-  --subtle: rgba(255, 255, 255, 0.55);
-  --border: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.3);
-  --surface: #141414;
-  --surface-2: rgba(255, 255, 255, 0.04);
-  --hero-field: #0a0a0a;
-  --accent: #eee;
-  --accent-fg: #0a0a0a;
-  --pos: #34d399;
-  --neg: #f87171;
+  --page: var(--palette-ink);
+  --surface: #151829;
+  --surface-tint: #1d2136;
+  /* Clay at 8% over #151829 */
+  --surface-warm: #282837;
+  --well: #0f1220;
+  --ink: var(--palette-glaze);
+  --ink-2: #a1a6bd;
+  --hairline: rgba(232, 235, 255, 0.08);
+  --hairline-strong: rgba(232, 235, 255, 0.16);
+  --action: var(--palette-signal);
+  --action-hover: var(--palette-signal-hover);
+  --on-action: var(--palette-paper);
+  --link: #8e97ff;
+  --focus: #8e97ff;
+  --ember: var(--palette-ember);
+  --error-text: #ff7a45;
+  --success-text: #4ade80;
+  --elev-card: none;
+
+  --border: rgba(232, 235, 255, 0.12);
+  --border-strong: rgba(232, 235, 255, 0.3);
+  --surface-2: rgba(232, 235, 255, 0.04);
   --grain-opacity: 0.06;
-  --landing-canvas: #000000;
-  --landing-ink: #dedbc8;
 }
 
 html {

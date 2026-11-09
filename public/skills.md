@@ -18,7 +18,7 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 2. **Next.js App Router + Tailwind v4**
    * Server Components by default; `"use client"` only at interactive leaves.
    * Theme via CSS `@theme` tokens, keyframes, and `@utility` — not ad-hoc one-offs.
-   * Landing cream primary: `#dedbc8` (`--color-primary`).
+   * Palette (visual-redesign, 09-11-26): Signal `#2B3BFF`, Glaze `#E8EBFF`, Paper `#FFFFFF`, Ink `#0B0D17`, Clay `#FFE3D6`, Ember `#FF5A1F` (Ember only for live or failed state). Light theme by default. Use the role tokens in `app/globals.css` (`bg-page`, `text-ink`, `bg-action`...), never raw hex. Fonts: Geist + Geist Mono (Noto Sans Thai for Thai).
 
 3. **Motion**
    * Prefer Apple-like easing: `cubic-bezier(0.16, 1, 0.3, 1)` / `cubic-bezier(0.22, 1, 0.36, 1)`.

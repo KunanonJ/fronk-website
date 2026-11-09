@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Instrument_Serif, Space_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Thai } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
@@ -22,25 +22,29 @@ const gscVerification = resolveGscVerification(
 
 const siteJsonLd: string = JSON.stringify(buildSiteJsonLd());
 
-const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-hanken",
+/*
+ * visual-redesign Phase 0: one sans and one mono (both variable fonts), plus
+ * Noto Sans Thai for Thai pages. Thai isn't preloaded; its unicode-range means
+ * only pages with Thai text download it. The retired families (Hanken Grotesk,
+ * Instrument Serif, Space Mono, Almarai) are aliased to these in globals.css.
+ */
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-const spaceMono = Space_Mono({
-  variable: "--font-mono-instrument",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "700"],
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+const notoSansThai = Noto_Sans_Thai({
+  variable: "--font-noto-thai",
+  subsets: ["thai"],
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -82,9 +86,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // Ink (dark) and the light page colour (globals.css --page).
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#f0eee6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0d17" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f6fa" },
   ],
 };
 
@@ -96,7 +101,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={`${hankenGrotesk.variable} ${spaceMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -115,7 +120,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         ))}
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
