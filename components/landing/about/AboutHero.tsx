@@ -1,5 +1,6 @@
-import Link from "@/components/navigation/Link";
-import { ArrowDown } from "lucide-react";
+import { CtaLink } from "@/components/bento/Buttons";
+import { EyebrowChip } from "@/components/bento/Chips";
+import { ArrowDownIcon } from "@/components/bento/icons";
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
@@ -11,99 +12,82 @@ const SOCIAL_ICONS = {
 } as const satisfies Record<(typeof socials)[number]["label"], unknown>;
 
 /**
- * About hero: centered portrait, name (the page h1, so name queries match the
- * heading), role line, two CTAs, socials, and a jump link to the story.
- * Theme-aware; only the text fades in. The portrait is the LCP element and
- * paints at once, served as a pre-sized 480px WebP.
+ * About hero (bento canvas, design spec 4.2): the text column (eyebrow, the
+ * three-line h1, lead, CTAs and the story jump link) beside a portrait panel
+ * with the social links floating on it. The h1 is the LCP candidate with the
+ * portrait: its lines only slide (`kj-lines`), and the portrait loads first.
  */
 export default function AboutHero() {
   const { hero } = aboutPage;
+  const { headline } = hero;
 
   return (
-    <div className="relative bg-page text-ink">
-      <section
-        aria-labelledby="about-hero-title"
-        className="relative overflow-hidden px-4 pt-14 pb-16 sm:px-6 sm:pt-16 sm:pb-24"
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-20 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-surface-tint blur-3xl sm:top-24 sm:h-96 sm:w-96"
-        />
-
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-          {/* Plain <img>: Next's optimizer passes images through unchanged on
-              Workers, and next/image would add ~7 KB of client JS here. */}
-          <img
-            src={hero.portraitSrc}
-            alt={hero.portraitAlt}
-            width={160}
-            height={160}
-            fetchPriority="high"
-            decoding="async"
-            className="h-32 w-32 rounded-full object-cover shadow-card ring-1 ring-hairline-strong ring-offset-4 ring-offset-page sm:h-40 sm:w-40"
-          />
-
-          <h1
-            id="about-hero-title"
-            className="animate-fade-rise-delay mt-8 font-display text-[clamp(2.75rem,1.9rem+3.2vw,4.5rem)] leading-none font-semibold tracking-[-0.045em] text-ink"
-          >
-            {hero.title}
-          </h1>
-
-          <p className="animate-fade-rise-delay mt-3 font-mono text-label uppercase text-ink-2">
-            {hero.nickname} · {hero.location}
-          </p>
-
-          <p className="animate-fade-rise-delay-2 mt-6 max-w-xl text-lead text-ink-2">
-            {hero.role}
-          </p>
-
-          <div className="animate-fade-rise-delay-2 mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href={hero.primaryCta.href}
-              className="inline-flex min-h-12 items-center rounded-full bg-action px-6 text-sm font-medium text-on-action transition-colors hover:bg-action-hover"
-            >
-              {hero.primaryCta.label}
-            </Link>
-            <Link
-              href={hero.secondaryCta.href}
-              className="inline-flex min-h-12 items-center rounded-full border border-hairline-strong bg-surface px-6 text-sm font-medium text-ink transition-colors hover:bg-surface-tint"
-            >
-              {hero.secondaryCta.label}
-            </Link>
-          </div>
-
-          <ul
-            className="animate-fade-rise-delay-2 mt-6 flex gap-2"
-            aria-label="Social profiles"
-          >
-            {socials.map(({ label, href }) => {
-              const Icon = SOCIAL_ICONS[label];
-              return (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="me noopener noreferrer"
-                    aria-label={label}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-hairline-strong bg-surface text-ink-2 transition-colors hover:border-ink/40 hover:text-ink"
-                  >
-                    <Icon size={18} />
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-
+    <section aria-labelledby="hero-title" className="flex flex-wrap gap-5">
+      <div className="flex min-w-0 flex-[2_1_420px] flex-col items-start justify-center gap-6 py-2">
+        <EyebrowChip>
+          {hero.nickname} · {hero.location}
+        </EyebrowChip>
+        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+          <span className="block">
+            <span className="text-ink-3">{headline.muted}</span> {headline.name}
+          </span>{" "}
+          <span className="block">
+            {headline.focus}{" "}
+            <span className="text-ink-3">{headline.joiner}</span>
+          </span>{" "}
+          <span className="block text-mark">{headline.accent}</span>
+        </h1>
+        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
+          {hero.role}
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <CtaLink href={hero.primaryCta.href}>{hero.primaryCta.label}</CtaLink>
+          <CtaLink href={hero.secondaryCta.href} variant="secondary">
+            {hero.secondaryCta.label}
+          </CtaLink>
           <a
             href={hero.storyHref}
-            className="mt-12 inline-flex min-h-11 items-center gap-2 text-sm text-ink-2 transition-colors hover:text-ink"
+            className="inline-flex min-h-11 items-center gap-2 px-2.5 text-card font-medium no-underline"
           >
             {hero.storyLabel}
-            <ArrowDown className="h-4 w-4" aria-hidden />
+            <ArrowDownIcon />
           </a>
         </div>
-      </section>
-    </div>
+      </div>
+
+      <div className="relative min-h-[440px] min-w-0 flex-[1_1_280px] overflow-hidden rounded-bento border border-hairline bg-surface-tint shadow-card">
+        {/* Plain <img>: a pre-sized 480 px WebP, loaded first as a likely LCP. */}
+        <img
+          src={hero.portraitSrc}
+          alt={hero.portraitAlt}
+          width={480}
+          height={480}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover"
+        />
+        <ul
+          aria-label="Social profiles"
+          className="absolute bottom-4 left-1/2 m-0 flex -translate-x-1/2 list-none gap-1 rounded-full border border-hairline bg-surface p-[5px] shadow-pop"
+        >
+          {socials.map(({ label, href }) => {
+            const Icon = SOCIAL_ICONS[label];
+            return (
+              <li key={label}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  aria-label={label}
+                  className="kj-row inline-flex size-11 items-center justify-center rounded-full text-ink"
+                >
+                  <Icon size={18} />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
   );
 }

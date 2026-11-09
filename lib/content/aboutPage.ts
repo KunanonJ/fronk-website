@@ -59,12 +59,23 @@ export const aboutPage = {
   },
 
   /**
-   * Centered portrait hero (09-11-26, owner choice). The email signup was
-   * removed while the blog is hidden; it never submitted anywhere anyway.
+   * Bento hero (phase 7b, canvas): text beside a portrait panel. The email
+   * signup was removed while the blog is hidden; it never submitted anyway.
    */
   hero: {
-    /** The page h1: the person's name, so name queries match the heading. */
-    title: "Kunanon Jarat",
+    /**
+     * The page h1 in three lines: "About Kunanon Jarat: / AI, ERP/CRM and /
+     * startups in Bangkok." It restates the page title, so name queries
+     * still match the heading. `muted` words render in --muted; the last
+     * line takes the accent colour.
+     */
+    headline: {
+      muted: "About",
+      name: "Kunanon Jarat:",
+      focus: "AI, ERP/CRM",
+      joiner: "and",
+      accent: "startups in Bangkok.",
+    },
     nickname: "Fronk",
     location: "Bangkok, Thailand",
     role: "Founder of GoGoCash and Manut AI. IT Manager & AI Engineering Lead at The Binary Holdings.",
@@ -79,7 +90,7 @@ export const aboutPage = {
 
   story: {
     id: "story",
-    eyebrow: "Profile",
+    eyebrow: "Story",
     heading: "Founder, Bangkok.",
     /** ~50-word answer block for name queries / AEO (matches FAQ + llms.txt). */
     whoIs:

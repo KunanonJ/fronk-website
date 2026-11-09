@@ -1,34 +1,36 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import AboutHero from "@/components/landing/about/AboutHero";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
 
-vi.mock("@/lib/router/navigation", () => ({
-  usePathname: () => "/about",
-  useRouter: () => ({ push: vi.fn(), prefetch: vi.fn() }),
-}));
-
 describe("AboutHero", () => {
-  it("leads with the portrait, the name as h1 and the role line", () => {
+  it("leads with the canvas h1 in three lines, the eyebrow and the role", () => {
+    render(<AboutHero />);
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1).toHaveTextContent(
+      "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok.",
+    );
+    expect(h1.className).toMatch(/kj-lines/);
+    expect(h1.children).toHaveLength(3);
+    expect(screen.getByText(aboutPage.hero.role)).toBeInTheDocument();
+    expect(screen.getByText(/Fronk · Bangkok, Thailand/)).toBeInTheDocument();
+  });
+
+  it("shows the portrait panel, loaded first", () => {
     render(<AboutHero />);
     const portrait = screen.getByRole("img", {
       name: aboutPage.hero.portraitAlt,
     });
     expect(portrait.getAttribute("src")).toContain("/profile-portrait.webp");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Kunanon Jarat",
-    );
-    expect(screen.getByText(aboutPage.hero.role)).toBeInTheDocument();
-    expect(screen.getByText(/Fronk · Bangkok, Thailand/)).toBeInTheDocument();
+    expect(portrait).toHaveAttribute("fetchpriority", "high");
   });
 
-  it("offers Contact and work CTAs and a jump to the story", () => {
+  it("offers an ink Contact button, the work and a jump to the story", () => {
     render(<AboutHero />);
-    expect(screen.getByRole("link", { name: "Contact me" })).toHaveAttribute(
-      "href",
-      "/contact",
-    );
+    const contact = screen.getByRole("link", { name: "Contact me" });
+    expect(contact).toHaveAttribute("href", "/contact");
+    expect(contact.className).toMatch(/bg-cta/);
     expect(screen.getByRole("link", { name: "See my work" })).toHaveAttribute(
       "href",
       "/portfolio",

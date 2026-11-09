@@ -16,7 +16,7 @@ function flattenSpans(
 
 describe("aboutPage content", () => {
   it("ships non-empty story, principles, now, path, and CTAs", () => {
-    expect(aboutPage.hero.title.length).toBeGreaterThan(0);
+    expect(aboutPage.hero.headline.name.length).toBeGreaterThan(0);
     expect(aboutPage.story.paragraphs.length).toBeGreaterThanOrEqual(2);
     expect(aboutPage.principles.items.length).toBe(4);
     expect(aboutPage.now.paragraphs.length).toBeGreaterThanOrEqual(1);
@@ -67,8 +67,11 @@ describe("aboutPage content", () => {
     expect(corpus).toMatch(/Bangkok|Bangkok-based/i);
   });
 
-  it("uses the person's name as the page h1", () => {
-    expect(aboutPage.hero.title).toContain("Kunanon Jarat");
+  it("uses the person's name in the page h1, which restates the title", () => {
+    const { muted, name, focus, joiner, accent } = aboutPage.hero.headline;
+    const h1 = [muted, name, focus, joiner, accent].join(" ");
+    expect(h1).toContain("Kunanon Jarat");
+    expect(h1).toBe(`${aboutPage.meta.title}.`);
   });
 
   it("describes Manut the same way as the venture hub", () => {

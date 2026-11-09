@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BentoCard, CardTitle } from "@/components/bento/Bento";
 import {
   GITHUB_CONTRIBUTIONS_LOGIN,
   activityLevelClass,
@@ -6,12 +7,20 @@ import {
   type ContributionCalendar,
 } from "@/lib/github/contributions";
 
+const LEVELS = [0, 1, 2, 3, 4] as const;
+
 function dayTitle(date: string, count: number): string {
-  if (!date) return "No data";
   const noun = count === 1 ? "contribution" : "contributions";
   return `${date} · ${count} ${noun}`;
 }
 
+/**
+ * About "Activity" card (bento canvas, design spec 4.2): the last year of
+ * real GitHub contributions from /api/github/contributions, never the
+ * canvas's illustrative grid. 8 px cells in the accent colour at four
+ * strengths; the grid scrolls sideways in a focusable region on phones.
+ * Until the data arrives (or if GitHub is down) it shows an empty year.
+ */
 export default function ContributionActivity() {
   const [calendar, setCalendar] = useState<ContributionCalendar>(() =>
     emptyContributionCalendar(),
@@ -41,76 +50,74 @@ export default function ContributionActivity() {
     };
   }, []);
 
-  return (
-    <section
-      id="activity"
-      aria-labelledby="about-activity-heading"
-      className="mt-16 border-t border-hairline pt-16 sm:mt-20 sm:pt-20"
-    >
-      <p className="mb-3 font-mono text-label uppercase text-ink-2">Activity</p>
-      <h2
-        id="about-activity-heading"
-        className="mb-3 font-display text-h2 text-ink"
-      >
-        GitHub year
-      </h2>
-      <p className="mb-6 text-small text-ink-2">
-        {loaded
-          ? `${calendar.total.toLocaleString()} contributions · @${GITHUB_CONTRIBUTIONS_LOGIN}`
-          : `Loading @${GITHUB_CONTRIBUTIONS_LOGIN}…`}
-      </p>
+  const login = `@${GITHUB_CONTRIBUTIONS_LOGIN}`;
 
-      {/* role="img": aria-label is prohibited on a role-less div, and with no
-          data (API down, no GITHUB_TOKEN) every day cell is aria-hidden, so the
-          label must sit on a role that takes a name. */}
+  return (
+    <BentoCard
+      id="activity"
+      headingId="card-activity"
+      title="Activity"
+      span={2}
+      minHeight={false}
+      className="scroll-mt-6"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-1">
+        <CardTitle>GitHub year</CardTitle>
+        <p className="m-0 font-mono text-meta text-ink-2">
+          {loaded && calendar.total > 0
+            ? `${calendar.total.toLocaleString("en-US")} contributions · ${login}`
+            : login}
+        </p>
+      </div>
+
       <div
-        role="img"
-        className="activity-scroll overflow-x-auto pb-2"
-        aria-label="GitHub contribution activity for the past year"
+        role="region"
+        aria-label="Contribution grid, scrolls sideways"
+        tabIndex={0}
+        className="flex min-h-[104px] flex-1 items-center overflow-x-auto rounded-well border border-hairline bg-page px-3.5 py-[18px]"
       >
-        <div className="inline-flex gap-1">
+        {/* role="img": with no data every cell is unnamed, so the label sits
+            on a role that takes a name. Days carry a native tooltip. */}
+        <div
+          role="img"
+          aria-label={`GitHub contribution activity for the past year, ${login}`}
+          className="mx-auto flex shrink-0 gap-0.5"
+        >
           {calendar.weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-1">
-              {week.days.map((day, di) => {
-                const tip = day.date
-                  ? dayTitle(day.date, day.count)
-                  : undefined;
-                return (
-                  <span
-                    key={`${wi}-${di}`}
-                    className={`activity-day block h-[11px] w-[11px] rounded-[3px] ${activityLevelClass(day.level)}`}
-                    title={tip}
-                    data-tooltip={tip}
-                    aria-hidden={!day.date}
-                  />
-                );
-              })}
-            </div>
+            <span key={wi} className="flex flex-col gap-0.5">
+              {week.days.map((day, di) => (
+                <span
+                  key={`${wi}-${di}`}
+                  title={day.date ? dayTitle(day.date, day.count) : undefined}
+                  className={`block size-2 rounded-[2px] ${activityLevelClass(day.level)}`}
+                />
+              ))}
+            </span>
           ))}
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-ink-2">
-        <div className="flex items-center gap-1.5">
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((level) => (
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-1">
+        <p className="m-0 flex items-center gap-[5px] text-xs text-ink-2">
+          <span className="mr-[3px]">Less</span>
+          {LEVELS.map((level) => (
             <span
               key={level}
-              className={`inline-block h-2.5 w-2.5 rounded-[2px] ${activityLevelClass(level)}`}
               aria-hidden
+              className={`size-2 rounded-[2px] ${activityLevelClass(level)}`}
             />
           ))}
-          <span>More</span>
-        </div>
+          <span className="ml-[3px]">More</span>
+        </p>
         <a
           href={`https://github.com/${GITHUB_CONTRIBUTIONS_LOGIN}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-8 items-center text-link underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center text-sm font-medium no-underline"
         >
-          github.com/{GITHUB_CONTRIBUTIONS_LOGIN}
+          github.com/{GITHUB_CONTRIBUTIONS_LOGIN} →
         </a>
       </div>
-    </section>
+    </BentoCard>
   );
 }
