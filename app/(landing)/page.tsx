@@ -3,6 +3,8 @@ import About from "@/components/landing/About";
 import Features from "@/components/landing/Features";
 import Hero from "@/components/landing/Hero";
 import IntroLoader from "@/components/landing/IntroLoader";
+import PortfolioStrip from "@/components/landing/home/PortfolioStrip";
+import ProofStrip from "@/components/landing/home/ProofStrip";
 import { site } from "@/lib/content/landing";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
@@ -17,11 +19,13 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main id="main" className="min-h-[100svh] overflow-x-hidden bg-landing">
+    <main id="main" className="min-h-[100svh] overflow-x-hidden bg-page">
       <IntroLoader />
       <Hero />
-      <About />
       <Features />
+      <ProofStrip />
+      <PortfolioStrip />
+      <About />
     </main>
   );
 }

@@ -10,7 +10,7 @@ export interface RouteUnderTest {
 }
 
 export const ROUTES: readonly RouteUnderTest[] = [
-  { path: "/", name: "home", expectsHeadingPattern: /KunanonJ|See ventures|Ventures/i },
+  { path: "/", name: "home", expectsHeadingPattern: /fintech and AI|Ventures|Selected work/i },
   {
     path: "/about",
     name: "about",

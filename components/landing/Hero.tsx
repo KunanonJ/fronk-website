@@ -1,88 +1,59 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { hero } from "@/lib/content/landing";
+import Link from "next/link";
 import LandingTopNav from "@/components/landing/LandingTopNav";
-import WordsPullUp from "@/components/landing/WordsPullUp";
+import { Card } from "@/components/ui/Card";
+import { Chip } from "@/components/ui/Chip";
+import { MonoLabel } from "@/components/ui/MonoLabel";
+import { PixelGrid } from "@/components/ui/PixelGrid";
+import { hero } from "@/lib/content/landing";
 
-const HERO_VIDEO =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-
+/**
+ * Home hero (visual-redesign Phase 2). A text statement is the first thing a
+ * visitor sees and the LCP element: no video, no animation on the heading.
+ * The pixel card's Ember squares sit on Paper next to the "Live" chip label.
+ * Server component; only the nav inside is interactive.
+ */
 export default function Hero() {
-  const prefersReducedMotion = useReducedMotion();
-
   return (
-    <section className="h-[100svh] max-h-[100dvh] min-h-[100svh] p-3 sm:p-4 md:p-6">
-      {/* Fixed to the viewport so nav stays available while scrolling the page. */}
+    <section
+      aria-labelledby="home-hero-title"
+      className="relative px-4 pt-32 pb-16 sm:px-6 md:pt-40 md:pb-24"
+    >
       <LandingTopNav navId="mobile-nav" />
 
-      <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          src={HERO_VIDEO}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-
-        <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
-
-        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 md:p-8 lg:p-10">
-          <div className="grid grid-cols-12 items-end gap-4 sm:gap-5 lg:gap-6">
-            <div className="col-span-12 min-w-0 lg:col-span-8">
-              {/* Sized so the wordmark clears the lede column by about 40 px.
-                  Geist (visual-redesign Phase 0) sets "KunanonJ" about 7% wider
-                  than Almarai, so lg went 14.5vw to 13.5vw and xl 15vw to 14vw
-                  (tightest at 1024 and 1280 px; measured 09-11-26). */}
-              <h1
-                className="max-w-full overflow-visible font-medium leading-[0.85] tracking-[-0.07em] text-[clamp(2.75rem,18vw,9rem)] sm:text-[20vw] md:text-[18vw] lg:text-[13.5vw] xl:text-[14vw]"
-                style={{ color: "#E1E0CC" }}
-              >
-                <WordsPullUp text={hero.wordmark} showAsterisk={false} />
-              </h1>
-            </div>
-
-            <div className="col-span-12 flex max-w-md flex-col gap-3 text-cream sm:gap-4 lg:col-span-4 lg:max-w-none lg:pb-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-cream/60 sm:text-xs">
-                {hero.contextLabel}
-              </p>
-              <motion.p
-                className="text-xs text-cream/70 sm:text-sm md:text-base"
-                style={{ lineHeight: 1.25 }}
-                initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={
-                  prefersReducedMotion
-                    ? { duration: 0 }
-                    : { duration: 0.7, delay: 0.5, ease: EASE }
-                }
-              >
-                {hero.description}
-              </motion.p>
-
-              <motion.a
-                href={hero.ctaHref}
-                className="group inline-flex w-full touch-manipulation items-center justify-between gap-2 rounded-full bg-cream py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:w-fit sm:text-base"
-                initial={prefersReducedMotion ? false : { y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={
-                  prefersReducedMotion
-                    ? { duration: 0 }
-                    : { duration: 0.7, delay: 0.7, ease: EASE }
-                }
-              >
-                {hero.ctaLabel}
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
-                  <ArrowRight className="h-4 w-4 text-cream" />
-                </span>
-              </motion.a>
-            </div>
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-7">
+          <MonoLabel>{hero.eyebrow}</MonoLabel>
+          <h1
+            id="home-hero-title"
+            className="mt-5 font-display text-[clamp(2.5rem,1.4rem+3.2vw,4rem)] leading-[1.04] font-semibold tracking-[-0.045em] text-ink"
+          >
+            <span className="block">{hero.statement}</span>
+            <span className="block text-ink-2">{hero.statementSecondary}</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lead text-ink-2">{hero.lead}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href={hero.primaryCta.href}
+              className="inline-flex min-h-12 items-center rounded-full bg-action px-6 text-sm font-medium text-on-action transition-colors hover:bg-action-hover"
+            >
+              {hero.primaryCta.label}
+            </Link>
+            <Link
+              href={hero.secondaryCta.href}
+              className="inline-flex min-h-12 items-center rounded-full border border-hairline-strong bg-surface px-6 text-sm font-medium text-ink transition-colors hover:bg-surface-tint"
+            >
+              {hero.secondaryCta.label}
+            </Link>
           </div>
+        </div>
+
+        <div className="lg:col-span-5">
+          <Card className="p-6 sm:p-8">
+            <PixelGrid cols={14} rows={9} seed={2026} state="live" />
+            <div className="mt-6">
+              <Chip state="live">{hero.status}</Chip>
+            </div>
+          </Card>
         </div>
       </div>
     </section>
