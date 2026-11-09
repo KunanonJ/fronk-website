@@ -2,12 +2,25 @@ import type { FaqItem } from "@/lib/seo/jsonLd";
 
 export type TopicLocale = "en" | "th";
 
+/** A run of h1 text: plain, or a muted connector word. */
+export type HeadlineSegment = string | { readonly muted: string };
+
+/** One display line of the h1. */
+export type HeadlineLine = readonly HeadlineSegment[];
+
 export type TopicPillar = {
   slug: string;
   locale: TopicLocale;
   title: string;
   description: string;
   h1: string;
+  /**
+   * The h1 as the bento canvas draws it: one entry per line, connector words
+   * muted, the last line in the accent colour. Spaces are written out (Thai
+   * runs words together), so the segments joined are exactly `h1` (tested):
+   * the visible heading and the breadcrumb JSON-LD never drift apart.
+   */
+  h1Lines: readonly HeadlineLine[];
   lede: string;
   sections: readonly { heading: string; body: string }[];
   proof: readonly string[];
@@ -25,6 +38,11 @@ const EN_PILLARS: readonly TopicPillar[] = [
     description:
       "Practical AI transformation for Thai and SEA startups and SMEs — from operator workflows to ERP/CRM with Intelligence AI. Built from Bangkok by Kunanon Jarat.",
     h1: "AI transformation for Thailand and SEA",
+    h1Lines: [
+      ["AI transformation "],
+      [{ muted: "for" }, " Thailand ", { muted: "and" }, " "],
+      ["SEA"],
+    ],
     lede: "AI transformation is not a slide deck. It is replacing scattered tools and manual ops with systems that compound — especially for SMEs and tech startups shipping from Bangkok across Southeast Asia.",
     sections: [
       {
@@ -87,6 +105,11 @@ const EN_PILLARS: readonly TopicPillar[] = [
     description:
       "ERP, CRM, and internal systems for tech startups and SMEs in Thailand — how to escape SaaS sprawl and run ops with Intelligence AI. KunanonJ / Manut.",
     h1: "ERP, CRM, and internal systems for startups",
+    h1Lines: [
+      ["ERP, CRM, "],
+      [{ muted: "and" }, " internal systems "],
+      [{ muted: "for" }, " startups"],
+    ],
     lede: "Most early teams drown in SaaS. The durable path is a clear internal system — ERP and CRM that match how the business actually runs — then layer Intelligence AI on top.",
     sections: [
       {
@@ -149,6 +172,11 @@ const EN_PILLARS: readonly TopicPillar[] = [
     description:
       "Building tech startups from Bangkok across SEA — fintech, AI, ERP/CRM. Operator notes from Kunanon Jarat (KunanonJ).",
     h1: "Tech startups in Thailand and SEA",
+    h1Lines: [
+      ["Tech startups "],
+      [{ muted: "in" }, " Thailand ", { muted: "and" }, " "],
+      ["SEA"],
+    ],
     lede: "Bangkok is a strong base to ship fintech and AI products into Southeast Asia — if you treat operations as seriously as product.",
     sections: [
       {
@@ -211,6 +239,11 @@ const TH_PILLARS: readonly TopicPillar[] = [
     description:
       "แนวทาง AI transformation สำหรับสตาร์ทอัพและ SME ในไทยและ SEA — จากระบบภายในถึง ERP/CRM พร้อม Intelligence AI โดย Kunanon Jarat กรุงเทพฯ",
     h1: "การเปลี่ยนผ่านด้วย AI ในประเทศไทยและ SEA",
+    h1Lines: [
+      [{ muted: "การเปลี่ยนผ่านด้วย" }, " AI "],
+      [{ muted: "ใน" }, "ประเทศไทย"],
+      ["และ SEA"],
+    ],
     lede: "AI transformation ไม่ใช่สไลด์พรีเซนต์ แต่คือการเปลี่ยนงานจริง — ลดเครื่องมือกระจัดกระจาย และใส่ระบบที่ทำงานได้จริงสำหรับ SME และสตาร์ทอัพในไทย",
     sections: [
       {
@@ -254,6 +287,11 @@ const TH_PILLARS: readonly TopicPillar[] = [
     description:
       "ERP CRM และระบบภายในสำหรับสตาร์ทอัพ/SME ในไทย — เลิก sprawl ของ SaaS แล้วใช้ Intelligence AI อย่างมีวินัย",
     h1: "ERP CRM และระบบภายในสำหรับสตาร์ทอัพ",
+    h1Lines: [
+      ["ERP CRM "],
+      [{ muted: "และ" }, "ระบบภายใน"],
+      [{ muted: "สำหรับ" }, "สตาร์ทอัพ"],
+    ],
     lede: "ทีมส่วนใหญ่จมกับ SaaS หลายตัว ทางที่ยั่งยืนคือระบบภายในที่ชัด — ERP/CRM ที่ตรงกับงานจริง แล้วค่อยใส่ AI",
     sections: [
       {
@@ -290,6 +328,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
     description:
       "สร้างสตาร์ทอัพจากกรุงเทพฯ สู่ SEA — ฟินเทค AI ERP/CRM บันทึกจาก Kunanon Jarat",
     h1: "สตาร์ทอัพเทคโนโลยีในไทยและ SEA",
+    h1Lines: [["สตาร์ทอัพเทคโนโลยี"], [{ muted: "ใน" }, "ไทย"], ["และ SEA"]],
     lede: "กรุงเทพฯ เป็นฐานที่ดีในการส่งผลิตภัณฑ์ฟินเทคและ AI สู่ภูมิภาค — ถ้าใส่ใจระบบปฏิบัติการพอ ๆ กับตัวผลิตภัณฑ์",
     sections: [
       {

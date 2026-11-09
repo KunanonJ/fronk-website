@@ -23,6 +23,22 @@ describe("topic pillars", () => {
     }
   });
 
+  it("draws every h1 as its display lines, word for word", () => {
+    for (const locale of ["en", "th"] as const) {
+      for (const slug of TOPIC_SLUGS) {
+        const pillar = getTopicPillar(slug, locale)!;
+        const joined = pillar.h1Lines
+          .flat()
+          .map((segment) =>
+            typeof segment === "string" ? segment : segment.muted,
+          )
+          .join("");
+        expect(joined, `${locale} ${slug}`).toBe(pillar.h1);
+        expect(pillar.h1Lines.length, `${locale} ${slug}`).toBeGreaterThan(1);
+      }
+    }
+  });
+
   it("hreflang pairs en and th paths", () => {
     const langs = topicHreflang("ai-transformation-thailand");
     expect(langs.en).toBe("/topics/ai-transformation-thailand");

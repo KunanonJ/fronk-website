@@ -17,12 +17,26 @@ const BENTO_ROUTES: ReadonlySet<string> = new Set([
   "/resume",
 ]);
 
+/** Route prefixes rebuilt on the canvas layout; each covers its child pages. */
+const BENTO_PREFIXES: readonly string[] = [
+  "/ventures/",
+  "/topics/",
+  "/th/topics/",
+];
+
+function isBentoRoute(pathname: string): boolean {
+  return (
+    BENTO_ROUTES.has(pathname) ||
+    BENTO_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
+}
+
 /** The page column: 24 px gutters (16 px at <=380px). */
 function column(pathname: string): string {
   return cn(
     "mx-auto w-full px-6 max-[381px]:px-4",
     // Older pages put a 1152 px box (max-w-6xl) inside their own gutters.
-    BENTO_ROUTES.has(pathname) ? "max-w-[1000px]" : "max-w-[75rem]",
+    isBentoRoute(pathname) ? "max-w-[1000px]" : "max-w-[75rem]",
   );
 }
 
