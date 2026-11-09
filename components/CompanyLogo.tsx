@@ -9,14 +9,16 @@ interface CompanyLogoProps {
   src?: string;
   /** Pixel size (width and height). Defaults to 40. */
   size?: number;
+  /** The bento résumé's 12 px tile; the printed résumé keeps the 8 px chip. */
+  tile?: boolean;
   className?: string;
 }
 
 const TILE =
-  "flex shrink-0 items-center justify-center overflow-hidden rounded-chip border border-hairline";
+  "flex shrink-0 items-center justify-center overflow-hidden border border-hairline";
 
 /**
- * Company mark for /resume (visual-redesign Phase 5). A Server Component:
+ * Company mark for /resume (visual-redesign Phase 5). No client state:
  * logos are self-hosted (lib/content/companyLogos), so there is no
  * third-party request and no client-side error fallback to hydrate. Unknown
  * companies get an initials tile. Decorative: the company name is in the text.
@@ -26,9 +28,11 @@ export function CompanyLogo({
   domain,
   src,
   size = 40,
+  tile = false,
   className,
 }: CompanyLogoProps) {
   const url = src ?? companyLogoSrc(domain);
+  const radius = tile ? "rounded-tile" : "rounded-chip";
 
   if (!url) {
     return (
@@ -38,6 +42,7 @@ export function CompanyLogo({
         style={{ width: size, height: size }}
         className={cn(
           TILE,
+          radius,
           "bg-surface-tint font-mono text-label font-medium text-ink-2",
           className,
         )}
@@ -53,7 +58,7 @@ export function CompanyLogo({
       data-logo="image"
       style={{ width: size, height: size }}
       // Logos are drawn for light backgrounds, so the tile stays white in dark mode.
-      className={cn(TILE, "bg-paper p-1", className)}
+      className={cn(TILE, radius, "bg-paper p-1", className)}
     >
       {/* Plain <img>: tiny static files, no optimisation needed. */}
       <img

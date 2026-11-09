@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageHead } from "../../lib/head";
-import { Bento } from "@/components/bento/Bento";
+import { Bento, PageMain } from "@/components/bento/Bento";
 import PlaceCard from "@/components/bento/PlaceCard";
 import IntroLoader from "@/components/landing/IntroLoader";
 import {
@@ -29,10 +29,7 @@ const metadata: Metadata = {
  */
 function HomePage() {
   return (
-    <main
-      id="main"
-      className="kj mx-auto flex w-full max-w-[1000px] flex-col gap-14 px-6 pt-14 pb-14 max-[381px]:gap-11 max-[381px]:px-4"
-    >
+    <PageMain>
       <IntroLoader />
       <HomeHero />
       <Bento dense>
@@ -42,7 +39,7 @@ function HomePage() {
         <PlaceCard span={2} />
         <HowIWorkCard />
       </Bento>
-    </main>
+    </PageMain>
   );
 }
 

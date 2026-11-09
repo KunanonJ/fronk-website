@@ -183,3 +183,50 @@ export function TempleIcon({ size = 28, ...rest }: IconProps) {
     </svg>
   );
 }
+
+export function CopyIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Stroke size={size} {...props}>
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+    </Stroke>
+  );
+}
+
+/** "Opens elsewhere" arrow for external rows and CTA links. */
+export function ArrowUpRightIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Stroke size={size} {...props}>
+      <path d="M7 17L17 7" />
+      <path d="M8 7h9v9" />
+    </Stroke>
+  );
+}
+
+export function ArrowDownIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Stroke size={size} {...props}>
+      <path d="M12 5v14" />
+      <path d="M6 13l6 6 6-6" />
+    </Stroke>
+  );
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M12 4v11" />
+      <path d="M7 10l5 5 5-5" />
+      <path d="M5 20h14" />
+    </Stroke>
+  );
+}
+
+/** The FAQ toggle: a plus that turns into a cross when the answer opens. */
+export function PlusIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Stroke size={size} {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </Stroke>
+  );
+}
