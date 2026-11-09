@@ -78,7 +78,14 @@ See §6. It's filled from the repo inventory.
    - The dummy tag cache's `writeTags` is a no-op and its `isStale` always returns false, so `revalidateTag` from the Sanity webhook and the hourly cron purges nothing.
    - Live probe: `/resume` (`revalidate = 60`) returned `x-nextjs-cache: STALE` on all 9 requests over 2+ minutes (05:07:37 to 05:09:55 UTC). Sanity-backed pages (`/resume`, and the blog when public) refresh only on redeploy.
 
-   The migration must design caching explicitly. An interim fix on Next is possible: OpenNext's Durable Object queue plus a D1 or DO tag cache, or rendering `/resume` dynamically.
+   The migration must design caching explicitly. **Interim fix on Next (owner chose the full fix, 09-11-26), on branch `fix/opennext-isr-revalidation`:**
+   - DO queue plus sharded DO tag cache.
+   - Cacheable Sanity fetches (`next.revalidate`), so their tags attach to page entries.
+   - `revalidate = 60` on the blog routes. Sanity is configured only at runtime, so build output carries no Sanity tags.
+   - `NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE=true`: the queue's sync table left pages stuck on STALE.
+   - `keep_names: false`: re-rendered pages shipped "__name is not defined" via next-themes' inline script.
+
+   These are lessons for the Start port: decide the cache model explicitly, make the CMS available at build if prerendering, and test runtime renders, not just prerenders.
 3. **OG images:** a different renderer, so the output must be compared visually.
 4. **Sanity:** `next-sanity` helpers (and `/studio`, if it's embedded) need the framework-agnostic `@sanity/client`. Draft mode needs a custom cookie flow, or should be dropped if unused.
 5. **Library maturity:** pin versions from the registry at phase entry. The docs don't state versions.
