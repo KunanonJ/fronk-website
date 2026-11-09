@@ -2,7 +2,7 @@
 
 **Date:** 06-11-26
 **Complexity:** Phase program (6 phases)
-**Status:** IN PROGRESS. Phase 0 shipped (#53, 08-11-26). Phase 1 shipped (#55, 09-11-26). Phases 2-5 are on hold. On 09-11-26 the owner chose a visual redesign (light default, new palette) to run first, then a TanStack Start migration. Most of Phases 2-5 (speed, type floor and tap targets, IA, cleanup) overlap with the redesign; whether to fold them in is decided when the redesign program is planned. See `process/general-plans/references/visual-redesign-research_REPORT_09-11-26.md`.
+**Status:** CLOSED 09-11-26. Phases 0 and 1 shipped (#53 on 08-11-26, #55 on 09-11-26). Phases 2 to 5 were superseded, not executed: the owner chose a visual redesign (light default, new palette) to run next, and its program absorbs their findings (mapping table in `process/features/visual-redesign/active/visual-redesign_UMBRELLA_PLAN_09-11-26.md`).
 **Feature:** `ux-experience`
 **Evidence:** `../reports/ux-audit_REPORT_06-11-26.md` (live-site audit, findings 1-20)
 **Harness note:** `.claude/` and `process/context/` are absent in this checkout. Phases run directly in the main session under the Harness-Absent Fallback (`process/development-protocols/orchestration.md`), with the same plan files and approval gates.
@@ -81,3 +81,12 @@ After Phase 5 validation:
 1. Archive this umbrella and the phase plans to `completed/`.
 2. Update `process/features/CURRENT_FEATURES.md` and the AGENTS.md workspace facts.
 3. Move anything left open to `backlog/` with the reason.
+
+## Closeout note (09-11-26)
+
+- **Shipped:** Phase 0 (#53): real contact delivery, founder-voice copy, `/showcase` retired. Phase 1 (#55): a 1.45 s skippable intro, a 250 ms route fade, an idle cursor; verified in production.
+- **Superseded:** Phases 2 to 5. Every remaining audit finding (6, 7, 9 to 20) maps to a phase of `visual-redesign`, or is deferred while the blog is hidden (finding 15, the "latest writing" part of 13, the blog index images in 6).
+- **Archived:** this umbrella and all six phase plans moved from `active/` to `completed/`.
+- **Left open:** see `../backlog/open-items_09-11-26.md`:
+  - the owner's production email test for Phase 0;
+  - the blog-dependent items to revisit when `BLOG_PUBLIC` flips back.
