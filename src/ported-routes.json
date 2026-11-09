@@ -4,8 +4,28 @@
   "test": "home"
  },
  {
+  "path": "/.well-known/security.txt",
+  "seed": false
+ },
+ {
   "path": "/about",
   "test": "about"
+ },
+ {
+  "path": "/about/",
+  "seed": false
+ },
+ {
+  "path": "/agents.md",
+  "seed": false
+ },
+ {
+  "path": "/api/github/contributions",
+  "seed": false
+ },
+ {
+  "path": "/apple-icon",
+  "seed": false
  },
  {
   "path": "/blog",
@@ -79,8 +99,32 @@
   "test": "examples"
  },
  {
+  "path": "/feed.xml",
+  "seed": false
+ },
+ {
+  "path": "/icon",
+  "seed": false
+ },
+ {
   "path": "/learn",
   "test": "learn"
+ },
+ {
+  "path": "/llms.txt",
+  "seed": false
+ },
+ {
+  "path": "/manifest.webmanifest",
+  "seed": false
+ },
+ {
+  "path": "/now",
+  "seed": false
+ },
+ {
+  "path": "/opengraph-image",
+  "seed": false
  },
  {
   "path": "/portfolio",
@@ -91,10 +135,22 @@
   "test": "portfolio-diagrams"
  },
  {
+  "path": "/portfolio/ai-automation/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/portfolio/email-signature-generator"
  },
  {
+  "path": "/portfolio/email-signature-generator/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/portfolio/node-validator-automation"
+ },
+ {
+  "path": "/portfolio/node-validator-automation/opengraph-image",
+  "seed": false
  },
  {
   "path": "/portfolio/not-a-project",
@@ -103,6 +159,10 @@
  {
   "path": "/portfolio/tbh-intranet",
   "test": "portfolio-project"
+ },
+ {
+  "path": "/portfolio/tbh-intranet/opengraph-image",
+  "seed": false
  },
  {
   "path": "/press",
@@ -117,38 +177,106 @@
   "test": "resume"
  },
  {
+  "path": "/robots.txt",
+  "seed": false
+ },
+ {
+  "path": "/rss.xml",
+  "seed": false
+ },
+ {
+  "path": "/showcase",
+  "seed": false
+ },
+ {
+  "path": "/sitemap.md",
+  "seed": false
+ },
+ {
+  "path": "/sitemap.xml",
+  "seed": false
+ },
+ {
   "path": "/skills",
   "test": "skills"
+ },
+ {
+  "path": "/skills.json",
+  "seed": false
+ },
+ {
+  "path": "/skills.md",
+  "seed": false
  },
  {
   "path": "/skills/code-review"
  },
  {
+  "path": "/skills/code-review/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/diagnosing-bugs"
+ },
+ {
+  "path": "/skills/diagnosing-bugs/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/domain-modeling"
  },
  {
+  "path": "/skills/domain-modeling/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/gardening"
+ },
+ {
+  "path": "/skills/gardening/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/grill-with-docs"
  },
  {
+  "path": "/skills/grill-with-docs/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/grilling"
+ },
+ {
+  "path": "/skills/grilling/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/how"
  },
  {
+  "path": "/skills/how/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/intake-triage"
+ },
+ {
+  "path": "/skills/intake-triage/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/interrogate"
  },
  {
+  "path": "/skills/interrogate/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/mistake-to-constraint"
+ },
+ {
+  "path": "/skills/mistake-to-constraint/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/not-a-skill",
@@ -158,32 +286,72 @@
   "path": "/skills/pr"
  },
  {
+  "path": "/skills/pr/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/sample-review"
+ },
+ {
+  "path": "/skills/sample-review/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/steer-miner"
  },
  {
+  "path": "/skills/steer-miner/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/test-driven-development"
+ },
+ {
+  "path": "/skills/test-driven-development/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/ticket-pipeline"
  },
  {
+  "path": "/skills/ticket-pipeline/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/verification-before-completion"
+ },
+ {
+  "path": "/skills/verification-before-completion/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/verify-loop",
   "test": "skill-detail"
  },
  {
+  "path": "/skills/verify-loop/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/workflow-profile"
+ },
+ {
+  "path": "/skills/workflow-profile/opengraph-image",
+  "seed": false
  },
  {
   "path": "/skills/writing-for-agents"
  },
  {
+  "path": "/skills/writing-for-agents/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/skills/writing-plans"
+ },
+ {
+  "path": "/skills/writing-plans/opengraph-image",
+  "seed": false
  },
  {
   "path": "/stack",
@@ -192,6 +360,13 @@
  {
   "path": "/stock/asme",
   "seed": false
+ },
+ {
+  "path": "/stock/velorah",
+  "seed": false
+ },
+ {
+  "path": "/studio"
  },
  {
   "path": "/th/topics/ai-transformation-thailand",
@@ -217,7 +392,15 @@
   "test": "topic-hub"
  },
  {
+  "path": "/topics/ai-transformation-thailand/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/topics/erp-crm-internal-systems"
+ },
+ {
+  "path": "/topics/erp-crm-internal-systems/opengraph-image",
+  "seed": false
  },
  {
   "path": "/topics/not-a-topic",
@@ -227,10 +410,38 @@
   "path": "/topics/tech-startup-thailand-sea"
  },
  {
+  "path": "/topics/tech-startup-thailand-sea/opengraph-image",
+  "seed": false
+ },
+ {
+  "path": "/ventures",
+  "seed": false
+ },
+ {
   "path": "/ventures/gogocash",
   "test": "venture-hub"
  },
  {
+  "path": "/ventures/gogocash/opengraph-image",
+  "seed": false
+ },
+ {
   "path": "/ventures/manut"
+ },
+ {
+  "path": "/ventures/manut/opengraph-image",
+  "seed": false
+ },
+ {
+  "path": "/work",
+  "seed": false
+ },
+ {
+  "path": "/writing",
+  "seed": false
+ },
+ {
+  "path": "/writing/some-post",
+  "seed": false
  }
 ]

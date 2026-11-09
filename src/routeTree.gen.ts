@@ -11,6 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LandingRouteImport } from './routes/_landing'
 import { Route as SystemRouteImport } from './routes/_system'
+import { Route as AppleIconRouteImport } from './routes/apple-icon'
+import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
+import { Route as IconRouteImport } from './routes/icon'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
+import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SkillsDotjsonRouteImport } from './routes/skills[.]json'
+import { Route as StudioRouteImport } from './routes/studio'
+import { Route as DotwellKnownSecurityDottxtRouteImport } from './routes/[.]well-known/security[.]txt'
 import { Route as LandingIndexRouteImport } from './routes/_landing/index'
 import { Route as LandingAboutRouteImport } from './routes/_landing/about'
 import { Route as LandingBuildRouteImport } from './routes/_landing/build'
@@ -22,15 +33,21 @@ import { Route as LandingProofRouteImport } from './routes/_landing/proof'
 import { Route as LandingStackRouteImport } from './routes/_landing/stack'
 import { Route as SystemDesignRouteImport } from './routes/_system/design'
 import { Route as SystemResumeRouteImport } from './routes/_system/resume'
+import { Route as ApiContactRouteImport } from './routes/api/contact'
+import { Route as ApiSubscribeRouteImport } from './routes/api/subscribe'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
 import { Route as LandingPortfolioIndexRouteImport } from './routes/_landing/portfolio/index'
 import { Route as LandingPortfolioSlugRouteImport } from './routes/_landing/portfolio/$slug'
 import { Route as LandingSkillsIndexRouteImport } from './routes/_landing/skills/index'
 import { Route as LandingSkillsSlugRouteImport } from './routes/_landing/skills/$slug'
-import { Route as LandingStockAsmeRouteImport } from './routes/_landing/stock/asme'
 import { Route as LandingTopicsSlugRouteImport } from './routes/_landing/topics/$slug'
 import { Route as LandingVenturesSlugRouteImport } from './routes/_landing/ventures/$slug'
+import { Route as ApiGithubContributionsRouteImport } from './routes/api/github/contributions'
+import { Route as PortfolioSlugOpengraphImageRouteImport } from './routes/portfolio.$slug.opengraph-image'
+import { Route as SkillsSlugOpengraphImageRouteImport } from './routes/skills.$slug.opengraph-image'
+import { Route as TopicsSlugOpengraphImageRouteImport } from './routes/topics.$slug.opengraph-image'
+import { Route as VenturesSlugOpengraphImageRouteImport } from './routes/ventures.$slug.opengraph-image'
 import { Route as LandingThTopicsSlugRouteImport } from './routes/_landing/th/topics/$slug'
 
 const LandingRoute = LandingRouteImport.update({
@@ -41,6 +58,62 @@ const SystemRoute = SystemRouteImport.update({
   id: '/_system',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppleIconRoute = AppleIconRouteImport.update({
+  id: '/apple-icon',
+  path: '/apple-icon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
+  id: '/feed.xml',
+  path: '/feed.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IconRoute = IconRouteImport.update({
+  id: '/icon',
+  path: '/icon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
+  id: '/manifest.webmanifest',
+  path: '/manifest.webmanifest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpengraphImageRoute = OpengraphImageRouteImport.update({
+  id: '/opengraph-image',
+  path: '/opengraph-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SkillsDotjsonRoute = SkillsDotjsonRouteImport.update({
+  id: '/skills.json',
+  path: '/skills.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotwellKnownSecurityDottxtRoute =
+  DotwellKnownSecurityDottxtRouteImport.update({
+    id: '/.well-known/security.txt',
+    path: '/.well-known/security.txt',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LandingIndexRoute = LandingIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -96,6 +169,16 @@ const SystemResumeRoute = SystemResumeRouteImport.update({
   path: '/resume',
   getParentRoute: () => SystemRoute,
 } as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSubscribeRoute = ApiSubscribeRouteImport.update({
+  id: '/api/subscribe',
+  path: '/api/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LandingBlogIndexRoute = LandingBlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -126,11 +209,6 @@ const LandingSkillsSlugRoute = LandingSkillsSlugRouteImport.update({
   path: '/skills/$slug',
   getParentRoute: () => LandingRoute,
 } as any)
-const LandingStockAsmeRoute = LandingStockAsmeRouteImport.update({
-  id: '/stock/asme',
-  path: '/stock/asme',
-  getParentRoute: () => LandingRoute,
-} as any)
 const LandingTopicsSlugRoute = LandingTopicsSlugRouteImport.update({
   id: '/topics/$slug',
   path: '/topics/$slug',
@@ -141,6 +219,35 @@ const LandingVenturesSlugRoute = LandingVenturesSlugRouteImport.update({
   path: '/ventures/$slug',
   getParentRoute: () => LandingRoute,
 } as any)
+const ApiGithubContributionsRoute = ApiGithubContributionsRouteImport.update({
+  id: '/api/github/contributions',
+  path: '/api/github/contributions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioSlugOpengraphImageRoute =
+  PortfolioSlugOpengraphImageRouteImport.update({
+    id: '/portfolio/$slug/opengraph-image',
+    path: '/portfolio/$slug/opengraph-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SkillsSlugOpengraphImageRoute =
+  SkillsSlugOpengraphImageRouteImport.update({
+    id: '/skills/$slug/opengraph-image',
+    path: '/skills/$slug/opengraph-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TopicsSlugOpengraphImageRoute =
+  TopicsSlugOpengraphImageRouteImport.update({
+    id: '/topics/$slug/opengraph-image',
+    path: '/topics/$slug/opengraph-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const VenturesSlugOpengraphImageRoute =
+  VenturesSlugOpengraphImageRouteImport.update({
+    id: '/ventures/$slug/opengraph-image',
+    path: '/ventures/$slug/opengraph-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LandingThTopicsSlugRoute = LandingThTopicsSlugRouteImport.update({
   id: '/th/topics/$slug',
   path: '/th/topics/$slug',
@@ -149,6 +256,17 @@ const LandingThTopicsSlugRoute = LandingThTopicsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof LandingIndexRoute
+  '/apple-icon': typeof AppleIconRoute
+  '/feed.xml': typeof FeedDotxmlRoute
+  '/icon': typeof IconRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/opengraph-image': typeof OpengraphImageRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/skills.json': typeof SkillsDotjsonRoute
+  '/studio': typeof StudioRoute
+  '/.well-known/security.txt': typeof DotwellKnownSecurityDottxtRoute
   '/about': typeof LandingAboutRoute
   '/build': typeof LandingBuildRoute
   '/contact': typeof LandingContactRoute
@@ -159,12 +277,18 @@ export interface FileRoutesByFullPath {
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
   '/resume': typeof SystemResumeRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/subscribe': typeof ApiSubscribeRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
-  '/stock/asme': typeof LandingStockAsmeRoute
   '/topics/$slug': typeof LandingTopicsSlugRoute
   '/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
+  '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
+  '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
   '/blog/': typeof LandingBlogIndexRoute
   '/portfolio/': typeof LandingPortfolioIndexRoute
   '/skills/': typeof LandingSkillsIndexRoute
@@ -172,6 +296,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof LandingIndexRoute
+  '/apple-icon': typeof AppleIconRoute
+  '/feed.xml': typeof FeedDotxmlRoute
+  '/icon': typeof IconRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/opengraph-image': typeof OpengraphImageRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/skills.json': typeof SkillsDotjsonRoute
+  '/studio': typeof StudioRoute
+  '/.well-known/security.txt': typeof DotwellKnownSecurityDottxtRoute
   '/about': typeof LandingAboutRoute
   '/build': typeof LandingBuildRoute
   '/contact': typeof LandingContactRoute
@@ -182,12 +317,18 @@ export interface FileRoutesByTo {
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
   '/resume': typeof SystemResumeRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/subscribe': typeof ApiSubscribeRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
-  '/stock/asme': typeof LandingStockAsmeRoute
   '/topics/$slug': typeof LandingTopicsSlugRoute
   '/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
+  '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
+  '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
   '/blog': typeof LandingBlogIndexRoute
   '/portfolio': typeof LandingPortfolioIndexRoute
   '/skills': typeof LandingSkillsIndexRoute
@@ -197,6 +338,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_landing': typeof LandingRouteWithChildren
   '/_system': typeof SystemRouteWithChildren
+  '/apple-icon': typeof AppleIconRoute
+  '/feed.xml': typeof FeedDotxmlRoute
+  '/icon': typeof IconRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/opengraph-image': typeof OpengraphImageRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/skills.json': typeof SkillsDotjsonRoute
+  '/studio': typeof StudioRoute
+  '/.well-known/security.txt': typeof DotwellKnownSecurityDottxtRoute
   '/_landing/about': typeof LandingAboutRoute
   '/_landing/build': typeof LandingBuildRoute
   '/_landing/contact': typeof LandingContactRoute
@@ -207,13 +359,19 @@ export interface FileRoutesById {
   '/_landing/stack': typeof LandingStackRoute
   '/_system/design': typeof SystemDesignRoute
   '/_system/resume': typeof SystemResumeRoute
+  '/api/contact': typeof ApiContactRoute
+  '/api/subscribe': typeof ApiSubscribeRoute
   '/_landing/': typeof LandingIndexRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
   '/_landing/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/_landing/skills/$slug': typeof LandingSkillsSlugRoute
-  '/_landing/stock/asme': typeof LandingStockAsmeRoute
   '/_landing/topics/$slug': typeof LandingTopicsSlugRoute
   '/_landing/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
+  '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
+  '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
   '/_landing/blog/': typeof LandingBlogIndexRoute
   '/_landing/portfolio/': typeof LandingPortfolioIndexRoute
   '/_landing/skills/': typeof LandingSkillsIndexRoute
@@ -223,6 +381,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/apple-icon'
+    | '/feed.xml'
+    | '/icon'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
+    | '/opengraph-image'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/skills.json'
+    | '/studio'
+    | '/.well-known/security.txt'
     | '/about'
     | '/build'
     | '/contact'
@@ -233,12 +402,18 @@ export interface FileRouteTypes {
     | '/stack'
     | '/design'
     | '/resume'
+    | '/api/contact'
+    | '/api/subscribe'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
-    | '/stock/asme'
     | '/topics/$slug'
     | '/ventures/$slug'
+    | '/api/github/contributions'
+    | '/portfolio/$slug/opengraph-image'
+    | '/skills/$slug/opengraph-image'
+    | '/topics/$slug/opengraph-image'
+    | '/ventures/$slug/opengraph-image'
     | '/blog/'
     | '/portfolio/'
     | '/skills/'
@@ -246,6 +421,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/apple-icon'
+    | '/feed.xml'
+    | '/icon'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
+    | '/opengraph-image'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/skills.json'
+    | '/studio'
+    | '/.well-known/security.txt'
     | '/about'
     | '/build'
     | '/contact'
@@ -256,12 +442,18 @@ export interface FileRouteTypes {
     | '/stack'
     | '/design'
     | '/resume'
+    | '/api/contact'
+    | '/api/subscribe'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
-    | '/stock/asme'
     | '/topics/$slug'
     | '/ventures/$slug'
+    | '/api/github/contributions'
+    | '/portfolio/$slug/opengraph-image'
+    | '/skills/$slug/opengraph-image'
+    | '/topics/$slug/opengraph-image'
+    | '/ventures/$slug/opengraph-image'
     | '/blog'
     | '/portfolio'
     | '/skills'
@@ -270,6 +462,17 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_landing'
     | '/_system'
+    | '/apple-icon'
+    | '/feed.xml'
+    | '/icon'
+    | '/llms.txt'
+    | '/manifest.webmanifest'
+    | '/opengraph-image'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/skills.json'
+    | '/studio'
+    | '/.well-known/security.txt'
     | '/_landing/about'
     | '/_landing/build'
     | '/_landing/contact'
@@ -280,13 +483,19 @@ export interface FileRouteTypes {
     | '/_landing/stack'
     | '/_system/design'
     | '/_system/resume'
+    | '/api/contact'
+    | '/api/subscribe'
     | '/_landing/'
     | '/_landing/blog/$slug'
     | '/_landing/portfolio/$slug'
     | '/_landing/skills/$slug'
-    | '/_landing/stock/asme'
     | '/_landing/topics/$slug'
     | '/_landing/ventures/$slug'
+    | '/api/github/contributions'
+    | '/portfolio/$slug/opengraph-image'
+    | '/skills/$slug/opengraph-image'
+    | '/topics/$slug/opengraph-image'
+    | '/ventures/$slug/opengraph-image'
     | '/_landing/blog/'
     | '/_landing/portfolio/'
     | '/_landing/skills/'
@@ -296,6 +505,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   LandingRoute: typeof LandingRouteWithChildren
   SystemRoute: typeof SystemRouteWithChildren
+  AppleIconRoute: typeof AppleIconRoute
+  FeedDotxmlRoute: typeof FeedDotxmlRoute
+  IconRoute: typeof IconRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
+  OpengraphImageRoute: typeof OpengraphImageRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SkillsDotjsonRoute: typeof SkillsDotjsonRoute
+  StudioRoute: typeof StudioRoute
+  DotwellKnownSecurityDottxtRoute: typeof DotwellKnownSecurityDottxtRoute
+  ApiContactRoute: typeof ApiContactRoute
+  ApiSubscribeRoute: typeof ApiSubscribeRoute
+  ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
+  PortfolioSlugOpengraphImageRoute: typeof PortfolioSlugOpengraphImageRoute
+  SkillsSlugOpengraphImageRoute: typeof SkillsSlugOpengraphImageRoute
+  TopicsSlugOpengraphImageRoute: typeof TopicsSlugOpengraphImageRoute
+  VenturesSlugOpengraphImageRoute: typeof VenturesSlugOpengraphImageRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,6 +539,83 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof SystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apple-icon': {
+      id: '/apple-icon'
+      path: '/apple-icon'
+      fullPath: '/apple-icon'
+      preLoaderRoute: typeof AppleIconRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed.xml': {
+      id: '/feed.xml'
+      path: '/feed.xml'
+      fullPath: '/feed.xml'
+      preLoaderRoute: typeof FeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/icon': {
+      id: '/icon'
+      path: '/icon'
+      fullPath: '/icon'
+      preLoaderRoute: typeof IconRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manifest.webmanifest': {
+      id: '/manifest.webmanifest'
+      path: '/manifest.webmanifest'
+      fullPath: '/manifest.webmanifest'
+      preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opengraph-image': {
+      id: '/opengraph-image'
+      path: '/opengraph-image'
+      fullPath: '/opengraph-image'
+      preLoaderRoute: typeof OpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skills.json': {
+      id: '/skills.json'
+      path: '/skills.json'
+      fullPath: '/skills.json'
+      preLoaderRoute: typeof SkillsDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/security.txt': {
+      id: '/.well-known/security.txt'
+      path: '/.well-known/security.txt'
+      fullPath: '/.well-known/security.txt'
+      preLoaderRoute: typeof DotwellKnownSecurityDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_landing/': {
@@ -391,6 +695,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SystemResumeRouteImport
       parentRoute: typeof SystemRoute
     }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/subscribe': {
+      id: '/api/subscribe'
+      path: '/api/subscribe'
+      fullPath: '/api/subscribe'
+      preLoaderRoute: typeof ApiSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_landing/blog/': {
       id: '/_landing/blog/'
       path: '/blog'
@@ -433,13 +751,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingSkillsSlugRouteImport
       parentRoute: typeof LandingRoute
     }
-    '/_landing/stock/asme': {
-      id: '/_landing/stock/asme'
-      path: '/stock/asme'
-      fullPath: '/stock/asme'
-      preLoaderRoute: typeof LandingStockAsmeRouteImport
-      parentRoute: typeof LandingRoute
-    }
     '/_landing/topics/$slug': {
       id: '/_landing/topics/$slug'
       path: '/topics/$slug'
@@ -453,6 +764,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/ventures/$slug'
       preLoaderRoute: typeof LandingVenturesSlugRouteImport
       parentRoute: typeof LandingRoute
+    }
+    '/api/github/contributions': {
+      id: '/api/github/contributions'
+      path: '/api/github/contributions'
+      fullPath: '/api/github/contributions'
+      preLoaderRoute: typeof ApiGithubContributionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio/$slug/opengraph-image': {
+      id: '/portfolio/$slug/opengraph-image'
+      path: '/portfolio/$slug/opengraph-image'
+      fullPath: '/portfolio/$slug/opengraph-image'
+      preLoaderRoute: typeof PortfolioSlugOpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/skills/$slug/opengraph-image': {
+      id: '/skills/$slug/opengraph-image'
+      path: '/skills/$slug/opengraph-image'
+      fullPath: '/skills/$slug/opengraph-image'
+      preLoaderRoute: typeof SkillsSlugOpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/topics/$slug/opengraph-image': {
+      id: '/topics/$slug/opengraph-image'
+      path: '/topics/$slug/opengraph-image'
+      fullPath: '/topics/$slug/opengraph-image'
+      preLoaderRoute: typeof TopicsSlugOpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ventures/$slug/opengraph-image': {
+      id: '/ventures/$slug/opengraph-image'
+      path: '/ventures/$slug/opengraph-image'
+      fullPath: '/ventures/$slug/opengraph-image'
+      preLoaderRoute: typeof VenturesSlugOpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_landing/th/topics/$slug': {
       id: '/_landing/th/topics/$slug'
@@ -477,7 +823,6 @@ interface LandingRouteChildren {
   LandingBlogSlugRoute: typeof LandingBlogSlugRoute
   LandingPortfolioSlugRoute: typeof LandingPortfolioSlugRoute
   LandingSkillsSlugRoute: typeof LandingSkillsSlugRoute
-  LandingStockAsmeRoute: typeof LandingStockAsmeRoute
   LandingTopicsSlugRoute: typeof LandingTopicsSlugRoute
   LandingVenturesSlugRoute: typeof LandingVenturesSlugRoute
   LandingBlogIndexRoute: typeof LandingBlogIndexRoute
@@ -499,7 +844,6 @@ const LandingRouteChildren: LandingRouteChildren = {
   LandingBlogSlugRoute: LandingBlogSlugRoute,
   LandingPortfolioSlugRoute: LandingPortfolioSlugRoute,
   LandingSkillsSlugRoute: LandingSkillsSlugRoute,
-  LandingStockAsmeRoute: LandingStockAsmeRoute,
   LandingTopicsSlugRoute: LandingTopicsSlugRoute,
   LandingVenturesSlugRoute: LandingVenturesSlugRoute,
   LandingBlogIndexRoute: LandingBlogIndexRoute,
@@ -527,6 +871,24 @@ const SystemRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   LandingRoute: LandingRouteWithChildren,
   SystemRoute: SystemRouteWithChildren,
+  AppleIconRoute: AppleIconRoute,
+  FeedDotxmlRoute: FeedDotxmlRoute,
+  IconRoute: IconRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
+  OpengraphImageRoute: OpengraphImageRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SkillsDotjsonRoute: SkillsDotjsonRoute,
+  StudioRoute: StudioRoute,
+  DotwellKnownSecurityDottxtRoute: DotwellKnownSecurityDottxtRoute,
+  ApiContactRoute: ApiContactRoute,
+  ApiSubscribeRoute: ApiSubscribeRoute,
+  ApiGithubContributionsRoute: ApiGithubContributionsRoute,
+  PortfolioSlugOpengraphImageRoute: PortfolioSlugOpengraphImageRoute,
+  SkillsSlugOpengraphImageRoute: SkillsSlugOpengraphImageRoute,
+  TopicsSlugOpengraphImageRoute: TopicsSlugOpengraphImageRoute,
+  VenturesSlugOpengraphImageRoute: VenturesSlugOpengraphImageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -165,6 +165,17 @@ export function metadataToHead(
   return { meta, links };
 }
 
+/** Next's viewport meta content: the four fields this site sets, in Next's order. */
+export function viewportContent(viewport: Viewport): string {
+  const parts = [
+    viewport.width ? `width=${viewport.width}` : "",
+    viewport.initialScale !== undefined ? `initial-scale=${viewport.initialScale}` : "",
+    viewport.viewportFit ? `viewport-fit=${viewport.viewportFit}` : "",
+    viewport.interactiveWidget ? `interactive-widget=${viewport.interactiveWidget}` : "",
+  ];
+  return parts.filter(Boolean).join(", ");
+}
+
 /**
  * Tags every page carries from the root layout and the app/ file
  * conventions: charset, viewport, theme colours, icons, manifest, rel=me.
