@@ -81,7 +81,7 @@ function NavIcon({
 }) {
   if (!id) return null;
   const Icon = NAV_ICONS[id];
-  return <Icon className={`shrink-0 opacity-80 ${className}`} aria-hidden />;
+  return <Icon className={`shrink-0 opacity-60 ${className}`} aria-hidden />;
 }
 
 function MenuToggleIcon({
@@ -186,16 +186,26 @@ function NavItemAnchor({
   );
 }
 
+/*
+ * visual-redesign Phase 1: inactive links are ink-2 and the active one sits on
+ * a Glaze (surface-tint) fill with a small Signal square. Mobile rows are
+ * 48 px tall.
+ */
 function desktopLinkClass(active: boolean) {
   return active
-    ? "inline-flex min-h-9 items-center gap-1.5 rounded-md bg-black/8 px-2.5 py-1 text-sm font-medium text-primary dark:bg-white/15"
-    : "inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 py-1 text-sm text-primary/70 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
+    ? "inline-flex min-h-9 items-center gap-1.5 rounded-full bg-surface-tint px-2.5 py-1 text-sm font-medium text-ink"
+    : "inline-flex min-h-9 items-center gap-1.5 rounded-full px-2.5 py-1 text-sm text-ink-2 transition-colors hover:bg-surface-tint hover:text-ink";
 }
 
 function mobileLinkClass(active: boolean) {
   return active
-    ? "flex min-h-11 items-center gap-2.5 rounded-lg bg-black/8 px-3 text-sm font-medium text-primary dark:bg-white/15"
-    : "flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm text-primary/80 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10";
+    ? "flex min-h-12 items-center gap-2.5 rounded-xl bg-surface-tint px-3 text-sm font-medium text-ink"
+    : "flex min-h-12 items-center gap-2.5 rounded-xl px-3 text-sm text-ink-2 transition-colors hover:bg-surface-tint hover:text-ink";
+}
+
+/** The active-item marker: a 6 px square in the link colour (Signal, or the lighter blue in dark). */
+function ActiveMarker() {
+  return <span aria-hidden className="size-1.5 shrink-0 bg-link" />;
 }
 
 type LandingTopNavProps = {
@@ -358,6 +368,7 @@ export default function LandingTopNav({
           >
             <NavIcon id={item.icon} className={DESKTOP_ICON_CLASS} />
             {item.label}
+            {active ? <ActiveMarker /> : null}
           </NavItemAnchor>
         </li>
       );
@@ -398,7 +409,7 @@ export default function LandingTopNav({
             <motion.div
               role="menu"
               aria-label={item.label}
-              className="absolute left-1/2 top-full z-50 mt-2 min-w-[12rem] -translate-x-1/2 rounded-xl border border-primary/15 bg-landing/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.12)] backdrop-blur-md dark:shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+              className="absolute left-1/2 top-full z-50 mt-2 min-w-[12rem] -translate-x-1/2 rounded-2xl border border-hairline-strong bg-surface p-1.5 shadow-card"
               initial={
                 prefersReducedMotion ? false : { opacity: 0, y: 6, scale: 0.98 }
               }
@@ -427,8 +438,8 @@ export default function LandingTopNav({
                     href={hrefForNav(child.href)}
                     className={
                       active
-                        ? "flex items-center gap-2.5 rounded-lg bg-black/8 px-3 py-2 text-sm font-medium text-primary dark:bg-white/15"
-                        : "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-primary/75 transition-colors hover:bg-black/5 hover:text-primary dark:hover:bg-white/10"
+                        ? "flex min-h-10 items-center gap-2.5 rounded-xl bg-surface-tint px-3 py-2 text-sm font-medium text-ink"
+                        : "flex min-h-10 items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-ink-2 transition-colors hover:bg-surface-tint hover:text-ink"
                     }
                     active={active}
                     reducedMotion={prefersReducedMotion}
@@ -502,7 +513,7 @@ export default function LandingTopNav({
                 }
           }
         >
-          <p className="px-3 pt-2 text-[10px] uppercase tracking-[0.18em] text-primary/70">
+          <p className="px-3 pt-3 font-mono text-label uppercase text-ink-2">
             {item.label}
           </p>
           {item.children.map((child) => {
@@ -548,7 +559,7 @@ export default function LandingTopNav({
         }`}
       >
         <div
-          className={`absolute inset-0 rounded-2xl border border-primary/12 bg-landing/90 shadow-[0_10px_40px_rgba(0,0,0,0.12)] backdrop-blur-md transition-opacity duration-300 dark:shadow-[0_10px_40px_rgba(0,0,0,0.35)] ${
+          className={`absolute inset-0 rounded-[1.75rem] border border-hairline-strong bg-surface/85 shadow-card backdrop-blur-md transition-opacity duration-300 ${
             scrolled || menuOpen || openMenu ? "opacity-100" : "opacity-90"
           }`}
           aria-hidden
@@ -557,9 +568,7 @@ export default function LandingTopNav({
         <header className="relative flex items-center justify-between gap-3 px-3 py-2.5 sm:px-4">
           <Link
             href={wordmarkHref}
-            className={`relative z-10 shrink-0 text-sm font-medium tracking-wide transition-opacity hover:opacity-80 ${
-              wordmarkActive ? "text-primary" : "text-primary/85"
-            }`}
+            className="relative z-10 inline-flex min-h-9 shrink-0 items-center text-sm font-semibold tracking-tight text-ink transition-opacity hover:opacity-80"
             aria-current={wordmarkActive ? "page" : undefined}
           >
             {hero.wordmark}
@@ -581,16 +590,16 @@ export default function LandingTopNav({
             <ThemeToggle />
             <NavItemAnchor
               href={hrefForNav(navCta.href)}
-              className="hidden min-h-9 items-center rounded-full bg-cream px-4 text-sm font-medium text-black transition-opacity hover:opacity-90 md:inline-flex"
+              className="hidden min-h-9 items-center rounded-full bg-ink px-4 text-sm font-medium text-page transition-opacity hover:opacity-90 md:inline-flex"
               active={ctaActive}
               reducedMotion={prefersReducedMotion}
             >
               {navCta.label}
             </NavItemAnchor>
 
-            <motion.button
+            <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-primary hover:bg-black/5 md:hidden dark:hover:bg-white/10"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-ink transition-transform hover:bg-surface-tint motion-safe:active:scale-90 md:hidden"
               aria-expanded={menuOpen}
               aria-controls={navId}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -598,14 +607,12 @@ export default function LandingTopNav({
                 setOpenMenu(null);
                 setMenuOpen((open) => !open);
               }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.92 }}
-              transition={{ duration: 0.15 }}
             >
               <MenuToggleIcon
                 open={menuOpen}
                 reducedMotion={prefersReducedMotion}
               />
-            </motion.button>
+            </button>
           </div>
         </header>
 
@@ -631,7 +638,7 @@ export default function LandingTopNav({
                 <li className="pt-2">
                   <NavItemAnchor
                     href={hrefForNav(navCta.href)}
-                    className="flex min-h-11 items-center justify-center rounded-full bg-cream px-3 text-sm font-medium text-black"
+                    className="flex min-h-12 items-center justify-center rounded-full bg-ink px-3 text-sm font-medium text-page"
                     active={ctaActive}
                     reducedMotion={prefersReducedMotion}
                     onClick={closeAll}

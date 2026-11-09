@@ -1,101 +1,120 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { MonoLabel } from "@/components/ui/MonoLabel";
 import {
   contact,
   footerLibrary,
   footerResources,
+  footerWork,
   socials,
 } from "@/lib/content/landing";
 
+const LINK =
+  "inline-flex min-h-8 min-w-8 items-center text-sm text-ink-2 underline-offset-4 transition-colors hover:text-ink hover:underline";
+
+function FooterColumn({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <MonoLabel className="mb-3">
+        {label}
+      </MonoLabel>
+      <ul className="flex flex-col gap-1">{children}</ul>
+    </div>
+  );
+}
+
 /**
- * Global landing footer — contact, library, and machine-readable indexes.
- * Mounted from the landing layout so every public page shares the same chrome.
+ * Global landing footer (visual-redesign Phase 1): a contact block, three link
+ * columns (Work, Library, Elsewhere) and an oversized name wordmark. Mounted
+ * from the landing layout so every public page shares it. `id="contact"`
+ * stays: older links point at `/#contact`.
  */
 export default function LandingSiteFooter() {
   return (
     <footer
       id="contact"
-      className="scroll-mt-28 border-t border-black/10 bg-landing px-4 py-12 text-center text-primary sm:px-6 md:py-16 dark:border-white/10"
+      className="scroll-mt-28 overflow-hidden border-t border-hairline bg-page text-ink"
     >
-      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
-        {contact.label}
-      </p>
-      <a
-        href={`mailto:${contact.email}`}
-        className="inline-flex min-h-11 items-center text-base text-primary transition-opacity hover:opacity-80 sm:text-lg md:text-xl"
-      >
-        {contact.email}
-      </a>
-      <p className="mx-auto mt-4 max-w-md text-sm text-primary/70">
-        {contact.tagline}
-      </p>
-      <div className="mx-auto mt-6 flex w-full max-w-7xl justify-stretch sm:justify-center">
-        <Link
-          href={contact.ctaHref}
-          className="group inline-flex w-full touch-manipulation items-center justify-between gap-2 rounded-full bg-cream py-1.5 pl-5 pr-1.5 text-sm font-medium text-black transition-[gap] hover:gap-3 sm:w-fit sm:justify-center sm:text-base"
-        >
-          {contact.ctaLabel}
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
-            <ArrowRight className="h-4 w-4 text-cream" />
-          </span>
-        </Link>
-      </div>
-      <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-        {socials.map((item) => (
-          <li key={item.href}>
+      <div className="mx-auto w-full max-w-6xl px-4 pt-16 sm:px-6 md:pt-24">
+        <div className="grid gap-12 md:grid-cols-12 md:gap-8">
+          <div className="md:col-span-5">
+            <MonoLabel>{contact.label}</MonoLabel>
             <a
-              href={item.href}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-primary/70 underline-offset-2 transition-colors hover:text-primary hover:underline"
+              href={`mailto:${contact.email}`}
+              className="mt-3 inline-flex min-h-11 items-center break-all text-h3 text-ink underline-offset-4 hover:underline"
             >
-              {item.label}
+              {contact.email}
             </a>
-          </li>
-        ))}
-      </ul>
+            <p className="mt-3 max-w-sm text-small text-ink-2">{contact.tagline}</p>
+            <Link
+              href={contact.ctaHref}
+              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-page transition-opacity hover:opacity-90"
+            >
+              {contact.ctaLabel}
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
 
-      <nav
-        aria-label="Library"
-        className="mx-auto mt-10 max-w-2xl border-t border-black/10 pt-6 dark:border-white/10"
-      >
-        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70">
-          Library
-        </p>
-        <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5">
-          {footerLibrary.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className="text-sm text-primary/70 underline-offset-2 transition-colors hover:text-primary hover:underline"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+          <nav
+            aria-label="Footer"
+            className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-7"
+          >
+            <FooterColumn label="Work">
+              {footerWork.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={LINK}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </FooterColumn>
+            <FooterColumn label="Library">
+              {footerLibrary.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={LINK}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </FooterColumn>
+            <FooterColumn label="Elsewhere">
+              {socials.map((item) => (
+                <li key={item.href}>
+                  <a href={item.href} target="_blank" rel="noreferrer" className={LINK}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+              {footerResources.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={`${LINK} font-mono`}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </FooterColumn>
+          </nav>
+        </div>
 
-      <nav
-        aria-label="Machine-readable resources"
-        className="mx-auto mt-8 max-w-2xl border-t border-black/10 pt-6 dark:border-white/10"
-      >
-        <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70">
-          For agents &amp; indexes
+        {/* Decorative: the name is already in the page text and the head. */}
+        <p
+          aria-hidden
+          className="mt-16 select-none font-display text-[clamp(4.5rem,18vw,15rem)] leading-[0.8] font-semibold tracking-[-0.06em] text-ink md:mt-24"
+        >
+          Kunanon
         </p>
-        <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-5">
-          {footerResources.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className="font-mono text-xs text-primary/70 underline-offset-2 transition-colors hover:text-primary hover:underline sm:text-sm"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+
+        <div className="flex flex-col gap-2 border-t border-hairline py-6 text-small text-ink-2 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} Kunanon Jarat. Bangkok, Thailand.</p>
+          <p className="font-mono text-label uppercase">Built in Bangkok</p>
+        </div>
+      </div>
     </footer>
   );
 }

@@ -171,6 +171,14 @@ export const socials = [
   { label: "GitHub", href: "https://github.com/KunanonJ" },
 ] as const;
 
+/** Footer "Work" column (visual-redesign Phase 1). */
+export const footerWork = [
+  { label: "About", href: "/about" },
+  { label: "Ventures", href: "/#ventures" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Skills", href: "/skills" },
+] as const;
+
 /** Machine-readable / agent surfaces linked from the home footer */
 export const footerResources = [
   { label: "Agents", href: "/agents.md" },
