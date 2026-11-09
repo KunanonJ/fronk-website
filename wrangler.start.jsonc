@@ -1,0 +1,21 @@
+/**
+ * TanStack Start Worker (tanstack-migration). Local preview and the staging
+ * Worker before the Phase 5 cutover; wrangler.jsonc stays the Next/OpenNext
+ * production config until then.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fronk-website-start",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-06-16",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://kunanonj.com",
+    "NEXT_PUBLIC_SANITY_PROJECT_ID": "nkspfk4b",
+    "NEXT_PUBLIC_SANITY_DATASET": "production",
+    "NEXT_PUBLIC_SANITY_API_VERSION": "2025-01-01",
+    "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
+    "NEXT_PUBLIC_UMAMI_HOST": "https://cloud.umami.is",
+  },
+  "observability": { "enabled": true },
+}

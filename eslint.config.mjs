@@ -28,6 +28,20 @@ const eslintConfig = defineConfig([
       "react/no-unescaped-entities": "off",
     },
   },
+  {
+    // The TanStack Start app (tanstack-migration) is not Next: Next's document
+    // and image rules don't apply, and the next/* shims drop Next-only props
+    // by destructuring them into _-prefixed names.
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "@next/next/no-head-element": "off",
+      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

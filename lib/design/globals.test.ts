@@ -72,8 +72,10 @@ describe("visual-redesign foundation", () => {
   it("defaults to light with the toggle unlocked and palette themeColors", () => {
     expect(layoutTsx).not.toContain("forcedTheme");
     expect(layoutTsx).toContain('defaultTheme="light"');
-    expect(layoutTsx).toMatch(/#0b0d17/i);
-    expect(layoutTsx).toMatch(/#f5f6fa/i);
+    // Theme colours live in the metadata module both frameworks share.
+    const rootMeta = readFileSync(join(process.cwd(), "lib/seo/rootMetadata.ts"), "utf8");
+    expect(rootMeta).toMatch(/#0b0d17/i);
+    expect(rootMeta).toMatch(/#f5f6fa/i);
   });
 
   it("keeps the landing shell wrapper and skip link", () => {
