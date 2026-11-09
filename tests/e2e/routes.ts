@@ -24,7 +24,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/contact",
     name: "contact",
-    expectsHeadingPattern: /Say hello|Send message|Let's talk/i,
+    expectsHeadingPattern: /Say hello|Send message|Let[’']s talk/i,
   },
   {
     path: "/press",
@@ -86,7 +86,11 @@ export const ROUTES: readonly RouteUnderTest[] = [
     name: "build",
     expectsHeadingPattern: /Build|Next|In progress|Shipped/i,
   },
-  { path: "/resume", name: "resume", expectsHeadingPattern: /\S/ },
+  {
+    path: "/resume",
+    name: "resume",
+    expectsHeadingPattern: /Kunanon Jarat|Currently|Experience/i,
+  },
   {
     path: "/topics/ai-transformation-thailand",
     name: "topic-hub",

@@ -10,7 +10,8 @@
   },
   {
     "path": "/about",
-    "test": "about"
+    "test": "about",
+    "intended": ["h1"]
   },
   {
     "path": "/about/",
@@ -86,7 +87,8 @@
   },
   {
     "path": "/contact",
-    "test": "contact"
+    "test": "contact",
+    "intended": ["h1"]
   },
   {
     "path": "/design"
@@ -175,7 +177,8 @@
   },
   {
     "path": "/resume",
-    "test": "resume"
+    "test": "resume",
+    "intended": ["h1"]
   },
   {
     "path": "/robots.txt",

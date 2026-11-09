@@ -11,12 +11,15 @@ export function Segmented({
   options,
   value,
   onChange,
+  tone = "page",
   className,
 }: {
   label: string;
   options: readonly Option[];
   value: string;
   onChange: (value: string) => void;
+  /** The group's fill: the page colour inside cards, surface on the page. */
+  tone?: "page" | "surface";
   className?: string;
 }) {
   return (
@@ -24,7 +27,8 @@ export function Segmented({
       role="group"
       aria-label={label}
       className={cn(
-        "flex flex-wrap gap-1 rounded-full border border-hairline bg-page p-[5px]",
+        "flex flex-wrap gap-1 rounded-full border border-hairline p-[5px]",
+        tone === "page" ? "bg-page" : "bg-surface",
         className,
       )}
     >

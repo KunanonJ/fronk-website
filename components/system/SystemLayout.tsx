@@ -1,4 +1,4 @@
-/** Minimal chrome for /resume (and future system pages): no nav or footer. */
+/** Minimal chrome for system pages (/design): no nav or footer. */
 export default function SystemLayout({
   children,
 }: {

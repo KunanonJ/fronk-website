@@ -9,6 +9,30 @@ import { cn } from "@/lib/utils/cn";
  * The `bento` class hooks the card stagger and hover lift in globals.css.
  */
 
+/**
+ * A redesigned page's <main> (the canvas `.kj-col` body): the 1000 px column,
+ * 56 px between the hero and the bento (44 px and 16 px gutters at <=380px).
+ * LandingLayout puts the header and footer on the same column.
+ */
+export function PageMain({
+  className,
+  children,
+  ...rest
+}: ComponentPropsWithoutRef<"main">) {
+  return (
+    <main
+      id="main"
+      className={cn(
+        "kj mx-auto flex w-full max-w-[1000px] flex-col gap-14 px-6 pt-14 pb-14 max-[381px]:gap-11 max-[381px]:px-4",
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </main>
+  );
+}
+
 export type BentoSpan = 1 | 2 | 3;
 
 const SPAN: Record<BentoSpan, string> = {
@@ -61,6 +85,32 @@ export function BentoPair({
   );
 }
 
+/**
+ * A full-width bento cell holding cards side by side in a wrapping flex row
+ * (About FAQ + Next, Résumé Skills + Share). The cards size by their
+ * `flex` basis, so the row wraps without media queries. The row itself
+ * never lifts on hover; its cards do (`bento-row` in globals.css).
+ */
+export function BentoRow({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "bento-row flex min-w-0 flex-wrap gap-5",
+        bentoSpan(3),
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** Card heading as the canvas kicker: a 13 px pill on the page colour. */
 export function CardKicker({
   id,
@@ -79,11 +129,37 @@ export function CardKicker({
   );
 }
 
+const TITLE_SIZE = {
+  md: "text-[22px] leading-[1.25] tracking-[-0.02em]",
+  lg: "text-[28px] leading-[1.2] tracking-[-0.03em]",
+  xl: "text-[40px] leading-[1.1] tracking-[-0.04em]",
+} as const;
+
+/** In-card title under the kicker (About, Contact): an h3, 22 px by default. */
+export function CardTitle({
+  size = "md",
+  className,
+  children,
+}: {
+  size?: keyof typeof TITLE_SIZE;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <h3 className={cn("m-0 font-semibold", TITLE_SIZE[size], className)}>
+      {children}
+    </h3>
+  );
+}
+
 const GAP = {
   0: "",
+  2: "gap-2",
+  2.5: "gap-2.5",
   3: "gap-3",
   3.5: "gap-3.5",
   4: "gap-4",
+  4.5: "gap-[18px]",
 } as const;
 
 type BentoCardProps = {
@@ -93,6 +169,8 @@ type BentoCardProps = {
   title: ReactNode;
   span?: BentoSpan;
   gap?: keyof typeof GAP;
+  /** The canvas 290 px floor; cards sized by their content turn it off. */
+  minHeight?: boolean;
   className?: string;
   children?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"article">, "title" | "className">;
@@ -106,6 +184,7 @@ export function BentoCard({
   title,
   span = 1,
   gap = 4,
+  minHeight = true,
   className,
   children,
   ...rest
@@ -114,7 +193,8 @@ export function BentoCard({
     <article
       aria-labelledby={headingId}
       className={cn(
-        "relative flex min-h-[290px] flex-col overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card",
+        "relative flex flex-col overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card",
+        minHeight && "min-h-[290px]",
         GAP[gap],
         bentoSpan(span),
         className,

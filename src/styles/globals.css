@@ -105,6 +105,11 @@
   --text-display--line-height: 1.14;
   --text-display--letter-spacing: -0.04em;
   --text-display--font-weight: 600;
+  /* Inner-page h1 (About, Contact, Résumé and the later sub-phases). */
+  --text-title: clamp(2.25rem, 5vw, 3.5rem);
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.04em;
+  --text-title--font-weight: 600;
   --text-meta: 0.8125rem;
   --text-meta--line-height: 1.45;
   --text-card: 0.9375rem;
@@ -573,60 +578,6 @@ a {
   }
 }
 
-/* ─── Contribution heatmap tooltips (About) ─────────────────────────────── */
-
-.activity-day[data-tooltip]::after {
-  /* content only on hover so tips stay out of the a11y tree at rest */
-  content: none;
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 0.55rem);
-  z-index: 40;
-  width: max-content;
-  max-width: 16rem;
-  padding: 0.4rem 0.65rem;
-  border-radius: 0.5rem;
-  /* Inverse bubble: Ink on light pages, Glaze on dark. 12 px floor. */
-  border: 1px solid var(--hairline-strong);
-  background: var(--ink);
-  color: var(--page);
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 400;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
-  text-align: left;
-  text-decoration: none;
-  white-space: normal;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-50%) translateY(4px);
-  transition:
-    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.activity-day[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.activity-day {
-  position: relative;
-}
-
-.activity-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: var(--hairline-strong) transparent;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .activity-day[data-tooltip]::after {
-    transition: none;
-  }
-}
-
 /* ─── Bento redesign: surfaces and motion (phase 7a) ─────────────────────────
  * `.kj` is the canvas root class. Here it marks a redesigned surface: the
  * site header and footer now, each page as Phase 7 restyles it. The rules
@@ -911,10 +862,12 @@ a {
   }
 }
 
-/* Card hover lift and sheen, pointer devices only. */
+/* Card hover lift and sheen, pointer devices only. A `bento-row` (cards side
+ * by side in one bento cell) stays put; the cards in it lift instead. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .bento > *,
-  .bento-2 > * {
+  .bento > :not(.bento-row),
+  .bento-2 > *,
+  .bento-row > * {
     transition:
       transform 0.55s var(--ease),
       box-shadow 0.55s var(--ease),
@@ -922,15 +875,17 @@ a {
       background-color 0.4s var(--ease);
   }
 
-  .bento > :hover,
-  .bento-2 > :hover {
+  .bento > :not(.bento-row):hover,
+  .bento-2 > :hover,
+  .bento-row > :hover {
     transform: translateY(-4px);
     box-shadow: var(--elev-pop);
     border-color: var(--hairline-strong);
   }
 
   .bento > article::after,
-  .bento-2 > article::after {
+  .bento-2 > article::after,
+  .bento-row > article::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -950,7 +905,8 @@ a {
   }
 
   .bento > article:hover::after,
-  .bento-2 > article:hover::after {
+  .bento-2 > article:hover::after,
+  .bento-row > article:hover::after {
     opacity: 0.6;
     transform: translateX(70%);
   }

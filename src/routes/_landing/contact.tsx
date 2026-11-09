@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PageMain } from "@/components/bento/Bento";
 import ContactPage from "@/components/landing/ContactPage";
 import type { Metadata } from "@/lib/seo/types";
 import { contactPage } from "@/lib/content/contact";
@@ -12,7 +13,11 @@ const metadata: Metadata = routeShareMeta({
 });
 
 function ContactRoute() {
-  return <ContactPage />;
+  return (
+    <PageMain>
+      <ContactPage />
+    </PageMain>
+  );
 }
 
 export const Route = createFileRoute("/_landing/contact")({

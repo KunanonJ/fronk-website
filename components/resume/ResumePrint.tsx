@@ -12,11 +12,14 @@ import type {
 export type ResumeProfileView = ReturnType<typeof resolveResumeProfile>;
 
 /**
- * The resume page body; the /resume route loads the profile.
+ * The résumé as a printed document: what `pnpm pdf` renders to
+ * public/resume.pdf. The /resume route shows it only in print (the bento page
+ * is screen-only), so the PDF keeps this layout whatever the screen does.
+ * Change it deliberately, then regenerate the PDF.
  */
-export function ResumeView({ profile }: { profile: ResumeProfileView }) {
+export function ResumePrint({ profile }: { profile: ResumeProfileView }) {
   return (
-    <main id="main">
+    <div>
       <Container size="lg" className="py-14 sm:py-20 lg:py-24">
         <header className="mb-14 flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
@@ -55,7 +58,7 @@ export function ResumeView({ profile }: { profile: ResumeProfileView }) {
           />
         </div>
       </Container>
-    </main>
+    </div>
   );
 }
 

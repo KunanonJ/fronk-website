@@ -1,0 +1,5 @@
+{
+  "schedule": "weekly",
+  "aggressiveCompression": "false",
+  "ignoredFiles": ["tests/e2e/visual.spec.ts-snapshots/*"]
+}

@@ -10,7 +10,12 @@ import SiteHeader from "@/components/bento/SiteHeader";
  * they line up with each page body while the redesign lands route group by
  * route group. Phase 7g, the last sub-phase, removes this switch.
  */
-const BENTO_ROUTES: ReadonlySet<string> = new Set(["/"]);
+const BENTO_ROUTES: ReadonlySet<string> = new Set([
+  "/",
+  "/about",
+  "/contact",
+  "/resume",
+]);
 
 /** The page column: 24 px gutters (16 px at <=380px). */
 function column(pathname: string): string {
@@ -42,11 +47,13 @@ export default function LandingLayout({
         >
           Skip to content
         </a>
-        <div className={cn(column(pathname), "pt-10")}>
+        {/* data-site-chrome: print drops the header and footer with their
+            padding, so the printed résumé (`pnpm pdf`) starts at the top. */}
+        <div data-site-chrome className={cn(column(pathname), "pt-10")}>
           <SiteHeader />
         </div>
         {children}
-        <div className={cn(column(pathname), "pb-24")}>
+        <div data-site-chrome className={cn(column(pathname), "pb-24")}>
           <SiteFooter />
         </div>
       </div>

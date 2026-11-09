@@ -9,26 +9,46 @@ import { cn } from "@/lib/utils/cn";
  */
 
 const CTA_BASE =
-  "btn-cta inline-flex h-14 items-center justify-center rounded-full px-[30px] text-[17px] font-semibold no-underline";
+  "btn-cta inline-flex h-14 items-center justify-center rounded-full font-semibold no-underline";
 
 const CTA_VARIANT = {
   primary: "bg-cta text-on-cta",
   secondary: "border border-hairline-strong bg-surface text-ink",
 } as const;
 
+/** lg: hero actions (17 px); md: form submit and card CTAs (16 px); sm: paired card buttons (15 px). */
+const CTA_SIZE = {
+  lg: "gap-2.5 px-[30px] text-[17px]",
+  md: "gap-2 px-[30px] text-base",
+  sm: "gap-1.5 px-4 text-card",
+} as const;
+
+export type CtaVariant = keyof typeof CTA_VARIANT;
+export type CtaSize = keyof typeof CTA_SIZE;
+
+/** Classes for a CTA, for the few that are <button>s (the contact submit). */
+export function ctaClasses(
+  variant: CtaVariant = "primary",
+  size: CtaSize = "lg",
+): string {
+  return cn(CTA_BASE, CTA_VARIANT[variant], CTA_SIZE[size]);
+}
+
 export function CtaLink({
   href,
   variant = "primary",
+  size = "lg",
   className,
   children,
 }: {
   href: string;
-  variant?: keyof typeof CTA_VARIANT;
+  variant?: CtaVariant;
+  size?: CtaSize;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={cn(CTA_BASE, CTA_VARIANT[variant], className)}>
+    <Link href={href} className={cn(ctaClasses(variant, size), className)}>
       {children}
     </Link>
   );
