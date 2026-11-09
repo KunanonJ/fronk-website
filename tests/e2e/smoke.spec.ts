@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
 
 /**
@@ -252,5 +252,114 @@ test.describe("portfolio > the category filter is a typed search param", () => {
         .getByRole("group", { name: "Filter projects by category" })
         .getByRole("button", { name: "All", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
+  });
+});
+
+test.describe("library > list filters are typed search params", () => {
+  /** Collects uncaught errors and real console errors (hydration mismatches). */
+  function watchErrors(page: Page): string[] {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+    return errors;
+  }
+
+  test("/stack?group=ship narrows the tools, All brings back a clean URL", async ({
+    page,
+  }) => {
+    const errors = watchErrors(page);
+    // /stack is prerendered: the filter applies after hydration, with no
+    // hydration mismatch.
+    await page.goto("/stack?group=ship", { waitUntil: "networkidle" });
+    const group = page.getByRole("group", { name: "Filter tools by group" });
+    await expect(group.getByRole("button", { name: /^Ship/ })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText("Showing 8 of 16 tools · Ship")).toBeVisible();
+    const build = page.getByRole("article", { name: "Build" });
+    await expect(build).toHaveCount(0);
+
+    await group.getByRole("button", { name: /^All/ }).click();
+    await expect(page).toHaveURL(/\/stack$/);
+    await expect(build).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("/build?venture=manut narrows the board and marks emptied columns", async ({
+    page,
+  }) => {
+    const errors = watchErrors(page);
+    await page.goto("/build?venture=manut", { waitUntil: "networkidle" });
+    await expect(page.getByText("2 of 11 tickets · Manut")).toBeVisible();
+    await expect(
+      page
+        .getByRole("article", { name: "In progress" })
+        .getByText("Nothing here for this filter."),
+    ).toBeVisible();
+    await page
+      .getByRole("group", { name: "Filter tickets by venture" })
+      .getByRole("button", { name: /^Site/ })
+      .click();
+    await expect(page).toHaveURL(/\/build\?venture=site$/);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("/examples?persona=founders shows the founders' examples", async ({
+    page,
+  }) => {
+    const errors = watchErrors(page);
+    await page.goto("/examples?persona=founders", {
+      waitUntil: "networkidle",
+    });
+    await expect(page.getByText("3 examples for Founders")).toBeVisible();
+    await expect(
+      page.getByRole("article", { name: "Thin public build board" }),
+    ).toBeVisible();
+    await page
+      .getByRole("group", { name: "Show examples for" })
+      .getByRole("button", { name: /Builders/ })
+      .click();
+    await expect(page).toHaveURL(/\/examples$/);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("/learn?lang=th renders the Thai hubs on the server", async ({
+    page,
+  }) => {
+    const errors = watchErrors(page);
+    await page.goto("/learn?lang=th", { waitUntil: "networkidle" });
+    await expect(page.getByText("Showing 3 hubs in Thai")).toBeVisible();
+    await expect(page.locator('h2[lang="th"]')).toHaveCount(3);
+    await page
+      .getByRole("group", { name: "Hub language" })
+      .getByRole("button", { name: "English" })
+      .click();
+    await expect(page).toHaveURL(/\/learn$/);
+    await expect(page.getByText("Showing 3 hubs in English")).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("unknown values fall back to the defaults without an error", async ({
+    page,
+  }) => {
+    for (const [path, clean, group, pressed] of [
+      ["/stack?group=tools", /\/stack$/, "Filter tools by group", /^All/],
+      ["/build?venture=x", /\/build$/, "Filter tickets by venture", /^All/],
+      ["/examples?persona=ceo", /\/examples$/, "Show examples for", /Builders/],
+      ["/learn?lang=fr", /\/learn$/, "Hub language", /^English/],
+    ] as const) {
+      const response = await page.goto(path, { waitUntil: "networkidle" });
+      expect(response?.ok(), path).toBe(true);
+      await expect(page).toHaveURL(clean);
+      await expect(
+        page
+          .getByRole("group", { name: group })
+          .getByRole("button", { name: pressed }),
+      ).toHaveAttribute("aria-pressed", "true");
+    }
   });
 });

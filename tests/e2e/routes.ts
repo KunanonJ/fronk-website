@@ -64,7 +64,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/learn",
     name: "learn",
-    expectsHeadingPattern: /Learn|Topic hubs|Writing|Operator notes/i,
+    expectsHeadingPattern: /How I think about|Topic hub|Operator notes/i,
   },
   {
     path: "/examples",
