@@ -1,6 +1,6 @@
 # Phase 5: Staging and cutover
 
-**Status:** OUTLINE (finalised at phase entry).
+**Status:** IN PROGRESS 09-11-26: staging verified, cutover PR open.
 **Created:** 09-11-26
 **Umbrella:** `tanstack-migration_UMBRELLA_PLAN_09-11-26.md`
 
@@ -17,4 +17,20 @@ The exit gate in the umbrella table, plus the standard gates (typecheck, lint, u
 - `wrangler.jsonc` drops `r2_buckets`, both `durable_objects` and the self service binding; it adds `cache`, `ratelimits` and `triggers.crons`. Delete the `fronk-website-revalidate-cron` Worker a week after a clean run.
 - Owner checks the Workers plan (Paid) before the cutover, and picks the one product analytics tool to keep next to Cloudflare Web Analytics; GTM is removed.
 - Carried from Phase 4: on staging, send a signed test webhook and confirm the tag purge (`ctx.cache.purge` returns success and the next request misses), check stale-while-revalidate inside `CDN-Cache-Control`, and measure a cold `/resume` render's CPU time. Set `SANITY_REVALIDATE_SECRET` on the Worker and point the Sanity webhook at the Start Worker at cutover.
+
+## Staging results (09-11-26, https://fronk-website-start.myinternal.workers.dev)
+
+- Parity: all 120 reference URLs match (one extra crawled JS asset, not a page).
+- Worker cache: `/resume` and OG images return `cf-cache-status: HIT`.
+- Purge: a signed webhook for `resumeProfile` purges `resume` (next `/resume` MISS, then HIT); `/blog` stays cached; a `post` webhook purges `/blog`. A bad signature gets 401.
+- CPU: a cold `/resume` render takes 60-139 ms CPU (wall 126-289 ms). Prerendered pages never reach the Worker.
+- Secrets reach `process.env` in the shared handlers (contact returned "That didn't send." with a fake Resend key, not "not connected").
+- Not verified: stale-while-revalidate inside `CDN-Cache-Control` (needs a one-day expiry; purges drive freshness here, so the risk is low).
+
+## Cutover design
+
+- `wrangler.jsonc` is the Start production config: `src/server.ts` main, Worker cache, hourly cron, `FORM_RATE_LIMIT`, `run_worker_first` for trailing slashes. The R2 bucket and the self service binding go (bindings are per version, so a rollback restores them).
+- OpenNext's Durable Object classes stay bound and are exported as empty classes, so the v1 migration still matches and a dashboard rollback to the Next version works. Phase 6 deletes them with a migration.
+- `src/server.ts` also answers the old cron Worker's `GET /api/cron/revalidate` (Bearer `CRON_SECRET`) until that Worker is deleted.
+- `build:cloudflare` builds Start (`vite build` between the Sanity steps); `deploy`, `upload` and `preview` use wrangler with the Vite output; `deploy:staging` builds against `wrangler.start.jsonc`.
 

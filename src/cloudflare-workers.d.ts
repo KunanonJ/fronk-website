@@ -1,5 +1,8 @@
-// The Worker env, as the Start server code reads it (bindings and secrets
-// from wrangler.start.jsonc). Narrowed where used.
+// The parts of "cloudflare:workers" the Start server code uses. Bindings and
+// secrets come from wrangler.jsonc and are narrowed where used.
 declare module "cloudflare:workers" {
   export const env: Record<string, unknown>;
+  export abstract class DurableObject {
+    constructor(ctx: unknown, env: unknown);
+  }
 }

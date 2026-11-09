@@ -1,11 +1,12 @@
 /**
- * TanStack Start Worker (tanstack-migration). Local preview and the staging
- * Worker before the Phase 5 cutover; wrangler.jsonc stays the Next/OpenNext
- * production config until then.
+ * Staging Worker (fronk-website-start, tanstack-migration). Same app as
+ * production (wrangler.jsonc) without the legacy Durable Objects. Build and
+ * deploy with `pnpm deploy:staging`.
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fronk-website-start",
+  "account_id": "187ab61ed9dbc6e616cb23e6b95aa8f1",
   "main": "src/server.ts",
   "compatibility_date": "2026-06-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],

@@ -56,7 +56,8 @@ export default defineConfig(({ mode }) => {
       PUBLIC_ENV.map((key) => [`process.env.${key}`, env[key] === undefined ? "undefined" : JSON.stringify(env[key])]),
     ),
     plugins: [
-      cloudflare({ configPath: "wrangler.start.jsonc", viteEnvironment: { name: "ssr" } }),
+      // Production config by default; `pnpm deploy:staging` builds against the staging Worker.
+      cloudflare({ configPath: process.env.START_WRANGLER_CONFIG ?? "wrangler.jsonc", viteEnvironment: { name: "ssr" } }),
       tanstackStart({
         // Pages built from lib/content are rendered once per deploy and served
         // as static assets; Sanity-backed pages render on request (Phase 4
