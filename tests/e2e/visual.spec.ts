@@ -27,6 +27,22 @@ import { ROUTES } from "./routes";
 const CMS_DRIVEN = new Set(["resume", "blog"]);
 const THEMES = ["light", "dark"] as const;
 
+/**
+ * A fixed GitHub year for the About "Activity" card. The page shows the real
+ * calendar from /api/github/contributions, which changes every day, so the
+ * baseline uses this stand-in instead (test data only, never shown live).
+ */
+const CONTRIBUTIONS = {
+  total: 1234,
+  weeks: Array.from({ length: 53 }, (_, week) => ({
+    days: Array.from({ length: 7 }, (_, day) => ({
+      date: `2026-W${week}-${day}`,
+      count: (week * 3 + day * 5) % 7,
+      level: (week * 3 + day * 5) % 5,
+    })),
+  })),
+};
+
 test.skip(
   ({ browserName }) => browserName !== "chromium",
   "visual baselines are captured on Chromium only",
@@ -36,6 +52,9 @@ for (const theme of THEMES) {
   test.describe(`visual (${theme})`, () => {
     test.beforeEach(async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.route("**/api/github/contributions", (route) =>
+        route.fulfill({ json: CONTRIBUTIONS }),
+      );
       // 03:30 UTC = 10:30 AM in Bangkok (GMT+7, no DST).
       await page.clock.setFixedTime(new Date("2026-11-09T03:30:00Z"));
       await page.addInitScript((value) => {

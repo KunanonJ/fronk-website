@@ -116,3 +116,39 @@ test.describe("resume > company logos are self-hosted (ux-audit finding 12)", ()
     expect(offsite, "image requests to other hosts").toEqual([]);
   });
 });
+
+test.describe("resume > the detail view is a typed search param", () => {
+  test("?view=compact hides the bullets, Detailed brings them back on a clean URL", async ({
+    page,
+  }) => {
+    await page.goto("/resume?view=compact", { waitUntil: "networkidle" });
+    const group = page.getByRole("group", { name: "Résumé detail" });
+    await expect(
+      group.getByRole("button", { name: "Compact" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    const currently = page.getByRole("article", { name: "Currently" });
+    await expect(currently.getByText(/^Live at /)).toHaveCount(0);
+
+    await group.getByRole("button", { name: "Detailed" }).click();
+    await expect(page).toHaveURL(/\/resume$/);
+    await expect(
+      group.getByRole("button", { name: "Detailed" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(currently.getByText(/^Live at /).first()).toBeVisible();
+  });
+
+  test("an unknown view falls back to detailed without an error", async ({
+    page,
+  }) => {
+    const response = await page.goto("/resume?view=everything", {
+      waitUntil: "networkidle",
+    });
+    expect(response?.ok()).toBe(true);
+    await expect(page).toHaveURL(/\/resume$/);
+    await expect(
+      page
+        .getByRole("group", { name: "Résumé detail" })
+        .getByRole("button", { name: "Detailed" }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+});
