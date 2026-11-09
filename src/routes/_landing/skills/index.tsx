@@ -1,11 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  stripSearchParams,
+  useHydrated,
+} from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { PageMain } from "@/components/bento/Bento";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
 import type { Metadata } from "@/lib/seo/types";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { skillsPage } from "@/lib/content/skills";
+import {
+  SKILLS_SEARCH_DEFAULTS,
+  skillsSearchSchema,
+  type SkillFilter,
+} from "@/lib/skills/search";
 
 const metadata: Metadata = routeShareMeta({
   title: "Skills",
@@ -13,7 +23,34 @@ const metadata: Metadata = routeShareMeta({
   path: "/skills",
 });
 
+/**
+ * /skills (bento redesign, phase 7d; design spec 4.8). The catalog filter is
+ * the typed `?show=` param (Valibot): original, adapted, auto or user; the
+ * default, all, never shows in the URL and an unknown value falls back to it.
+ */
+export const Route = createFileRoute("/_landing/skills/")({
+  validateSearch: skillsSearchSchema,
+  search: { middlewares: [stripSearchParams(SKILLS_SEARCH_DEFAULTS)] },
+  head: () => pageHead(metadata),
+  component: SkillsRoute,
+});
+
 function SkillsRoute() {
+  const { show } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  // /skills is prerendered, so one static file answers every ?show= and its
+  // HTML lists all skills. Hydrate that same markup, then apply the filter;
+  // client-side navigations are already hydrated and filter at once.
+  const hydrated = useHydrated();
+  const setShow = (next: SkillFilter) => {
+    void navigate({
+      search: (prev) => ({ ...prev, show: next }),
+      replace: true,
+      resetScroll: false,
+      viewTransition: false,
+    });
+  };
+
   const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
@@ -22,17 +59,15 @@ function SkillsRoute() {
   );
 
   return (
-    <>
+    <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
       />
-      <SkillsIndexPage />
-    </>
+      <SkillsIndexPage
+        show={hydrated ? show : SKILLS_SEARCH_DEFAULTS.show}
+        onShowChange={setShow}
+      />
+    </PageMain>
   );
 }
-
-export const Route = createFileRoute("/_landing/skills/")({
-  head: () => pageHead(metadata),
-  component: SkillsRoute,
-});

@@ -1,34 +1,50 @@
-import Link from "@/components/navigation/Link";
+import type { ReactNode } from "react";
 import { ArrowLeft, ArrowRight, ChevronRight, FileText } from "lucide-react";
-import CopyButton from "@/components/landing/skills/CopyButton";
+import Link from "@/components/navigation/Link";
+import { Bento, BentoCard, CardLink } from "@/components/bento/Bento";
+import { ctaClasses } from "@/components/bento/Buttons";
+import { ArrowUpRightIcon } from "@/components/bento/icons";
+import SharePill from "@/components/bento/SharePill";
 import InstallTabs from "@/components/landing/skills/InstallTabs";
-import SkillsPageShell from "@/components/landing/skills/SkillsPageShell";
-import { Chip } from "@/components/ui/Chip";
+import SkillSourceCard from "@/components/landing/skills/SkillSourceCard";
 import {
-  CommandBlock,
-  DownloadLink,
-  ExternalLink,
-  InvocationBadge,
-  OriginBadge,
-  SectionHeading,
-  pillLinkClass,
-  textLinkClass,
+  CODE,
+  CommandRow,
+  DownloadCta,
+  EXTERNAL,
+  INLINE_LINK,
+  NOTE,
+  SkillTags,
 } from "@/components/landing/skills/SkillParts";
 import {
   PACK_INSTALL,
+  SKILLS_RELEASE_DATE,
   SKILLS_RELEASE_URL,
   SKILLS_TAG,
+  SOURCES_LOCK_URL,
   copyrightHolder,
   formatBytes,
   getAdjacentSkills,
+  getAllSkills,
   getSkillStage,
   getStageSiblings,
   skillInstallCommands,
   sourceLabel,
   type Skill,
+  type SkillAsset,
+  type SkillStage,
 } from "@/lib/content/skills";
+import { cn } from "@/lib/utils/cn";
 
-const external = { target: "_blank", rel: "noopener noreferrer" } as const;
+/*
+ * /skills/$slug (bento redesign, phase 7d; design spec 4.9). The canvas
+ * draws verify-loop, an original skill that runs automatically and ships
+ * scripts; every other skill uses the same template with its own data:
+ * adapted skills get an Origin card with the upstream, pinned commit and
+ * patches, user-invoked skills say so in How it runs, and the Files card
+ * lists whatever the folder holds. The canvas's hand-picked loop steps for
+ * verify-loop have no source for the other skills, so no skill shows them.
+ */
 
 /** SKILL.md first, then the rest in path order. */
 function orderedFiles(skill: Skill) {
@@ -41,61 +57,103 @@ function orderedFiles(skill: Skill) {
   );
 }
 
-export default function SkillDetailPage({ skill }: { skill: Skill }) {
-  const stage = getSkillStage(skill.stage);
-  const { prev, next } = getAdjacentSkills(skill.slug);
-  const siblings = getStageSiblings(skill);
-  const { npx, copyPath } = skillInstallCommands(skill);
-  const sourceId = `skill-md-${skill.slug}`;
-
-  const breadcrumb = (
-    <nav aria-label="Breadcrumb" className="mb-4">
-      <ol className="flex flex-wrap items-center gap-1 text-small text-ink-2">
-        <li>
-          <Link
-            href="/skills"
-            className={`inline-flex min-h-6 items-center ${textLinkClass}`}
-          >
-            Skills
-          </Link>
-        </li>
-        <li aria-hidden className="flex items-center">
-          <ChevronRight className="h-3.5 w-3.5" />
-        </li>
-        <li>
-          <span aria-current="page" className="font-mono text-ink">
+function SkillHero({ skill, stage }: { skill: Skill; stage: SkillStage }) {
+  return (
+    <section aria-labelledby="hero-title" className="flex flex-col gap-[26px]">
+      <nav aria-label="Breadcrumb">
+        <ol className="m-0 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0 text-sm text-ink-2">
+          <li>
+            <Link
+              href="/skills"
+              className="inline-flex min-h-11 items-center font-medium no-underline"
+            >
+              Skills
+            </Link>
+          </li>
+          <li aria-hidden className="flex items-center">
+            <ChevronRight size={14} />
+          </li>
+          <li>
+            <span aria-current="page" className="font-mono text-ink">
+              {skill.name}
+            </span>
+          </li>
+        </ol>
+      </nav>
+      <div className="-mt-2.5 flex flex-col items-start gap-5">
+        <p className="m-0 inline-flex items-center gap-2 rounded-full border border-hairline bg-surface px-3 py-[7px] text-meta leading-none font-medium">
+          Skill <span className="text-ink-2">·</span> {stage.label}
+        </p>
+        <h1
+          id="hero-title"
+          className="kj-lines m-0 max-w-[820px] text-title text-ink"
+        >
+          <span className="block font-mono font-medium tracking-[-0.03em] [overflow-wrap:anywhere]">
             {skill.name}
           </span>
-        </li>
-      </ol>
-    </nav>
-  );
-
-  const meta = (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <OriginBadge skill={skill} />
-      <InvocationBadge skill={skill} />
-      <Chip>{skill.license}</Chip>
-      <a
-        href={SKILLS_RELEASE_URL}
-        {...external}
-        className="inline-flex min-h-6 items-center rounded-chip border border-hairline-strong bg-surface px-2.5 py-0.5 font-mono text-label uppercase text-ink-2 transition-colors duration-150 ease-smooth hover:border-ink/40 hover:text-ink"
+        </h1>
+      </div>
+      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
+        {skill.description}
+      </p>
+      <ul
+        aria-label="About this skill"
+        className="m-0 flex list-none flex-wrap items-center gap-2 p-0"
       >
-        Superstacks {SKILLS_TAG}
-      </a>
+        <SkillTags skill={skill} variant="hero" />
+        <li className="inline-flex min-h-[34px] items-center rounded-full border border-hairline-strong bg-surface px-3 font-mono text-xs text-ink-2">
+          {skill.license}
+        </li>
+        <li>
+          <a
+            href={SKILLS_RELEASE_URL}
+            aria-label={`Superstacks ${SKILLS_TAG}, release on GitHub`}
+            {...EXTERNAL}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-hairline-strong bg-surface px-3.5 text-meta font-medium text-ink no-underline"
+          >
+            Superstacks <span className="font-mono text-xs">{SKILLS_TAG}</span>
+            <ArrowUpRightIcon size={12} />
+          </a>
+        </li>
+      </ul>
+      <div className="flex flex-wrap gap-3">
+        <a
+          href={skill.folderUrl}
+          aria-label={`View on GitHub: ${skill.name}`}
+          {...EXTERNAL}
+          className={ctaClasses()}
+        >
+          View on GitHub
+          <ArrowUpRightIcon />
+        </a>
+        <SharePill />
+      </div>
+    </section>
+  );
+}
+
+function ZipPanel({ note, asset }: { note: ReactNode; asset: SkillAsset }) {
+  return (
+    <div className="flex flex-col items-start gap-[18px]">
+      <p className={cn(NOTE, "max-w-[520px] leading-[1.55]")}>{note}</p>
+      <DownloadCta asset={asset} label={`Download ${asset.name}`} />
     </div>
   );
+}
 
+function InstallCard({ skill }: { skill: Skill }) {
+  const { npx, copyPath } = skillInstallCommands(skill);
   const tabs = [
     {
       id: "npx",
       label: "npx skills",
       panel: (
-        <div className="space-y-3">
-          <CommandBlock
+        <div className="flex flex-col gap-4">
+          <CommandRow
             label={
               <>
-                Installs only <code className="font-mono">{skill.name}</code>,
+                Installs only{" "}
+                <code className="font-mono text-ink">{skill.name}</code>,
                 globally, as a copy
               </>
             }
@@ -103,9 +161,9 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
             accessibleLabel={`Copy install command for ${skill.name}`}
             announcement={`Copied the install command for ${skill.name}`}
           />
-          <p className="text-small text-ink-2">
+          <p className={NOTE}>
             Third-party installer;{" "}
-            <code className="font-mono">DISABLE_TELEMETRY=1</code> turns its
+            <code className={CODE}>DISABLE_TELEMETRY=1</code> turns its
             telemetry off.
           </p>
         </div>
@@ -115,76 +173,69 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       id: "zip",
       label: "ZIP for Claude Code / Codex",
       panel: (
-        <div className="space-y-4">
-          <p className="text-small text-ink-2">
-            Folder layout (
-            <code className="font-mono">{skill.name}/SKILL.md</code>). Unzip it
-            into your agent's skills directory.
-          </p>
-          <DownloadLink asset={skill.zip} primary>
-            Download {skill.zip.name}
-          </DownloadLink>
-        </div>
+        <ZipPanel
+          asset={skill.zip}
+          note={
+            <>
+              Folder layout (<code className={CODE}>{skill.name}/SKILL.md</code>
+              ). Unzip it into your agent’s skills directory.
+            </>
+          }
+        />
       ),
     },
     {
       id: "flat",
       label: "ZIP for claude.ai / ChatGPT",
       panel: (
-        <div className="space-y-4">
-          <p className="text-small text-ink-2">
-            Flat layout: <code className="font-mono">SKILL.md</code> sits at the
-            zip root, ready to upload as a skill.
-          </p>
-          <DownloadLink asset={skill.flatZip} primary>
-            Download {skill.flatZip.name}
-          </DownloadLink>
-        </div>
+        <ZipPanel
+          asset={skill.flatZip}
+          note={
+            <>
+              Flat layout: <code className={CODE}>SKILL.md</code> sits at the
+              zip root, ready to upload as a skill.
+            </>
+          }
+        />
       ),
     },
     {
       id: "copy",
       label: "Plain copy",
       panel: (
-        <div className="space-y-3">
-          <CommandBlock
-            label={
-              <>
-                Copy this folder from the{" "}
-                <a
-                  href={skill.folderUrl}
-                  {...external}
-                  className={textLinkClass}
-                >
-                  repo at {SKILLS_TAG}
-                </a>{" "}
-                into your agent's skills directory
-              </>
-            }
-            command={copyPath}
-            accessibleLabel={`Copy the repo path of ${skill.name}`}
-            announcement={`Copied the ${skill.name} folder path`}
-          />
-        </div>
+        <CommandRow
+          label={
+            <>
+              Copy this folder from the{" "}
+              <a href={skill.folderUrl} {...EXTERNAL} className={INLINE_LINK}>
+                repo at {SKILLS_TAG}
+              </a>{" "}
+              into your agent’s skills directory
+            </>
+          }
+          command={copyPath}
+          accessibleLabel={`Copy the repo path of ${skill.name}`}
+          announcement={`Copied the ${skill.name} folder path`}
+        />
       ),
     },
     {
       id: "pack",
       label: "Full pack",
       panel: (
-        <div className="space-y-4">
-          <p className="text-small text-ink-2">
-            <code className="font-mono">{skill.name}</code> ships in the
-            Superstacks plugin with the other skills. In Claude Code:
+        <div className="flex flex-col gap-3.5">
+          <p className={NOTE}>
+            <code className={CODE}>{skill.name}</code> ships in the Superstacks
+            plugin with the other skills. In Claude Code:
           </p>
-          <CommandBlock
+          <CommandRow
             command={PACK_INSTALL.claudeCode.join("\n")}
             accessibleLabel="Copy the Claude Code plugin commands"
             announcement="Copied both plugin commands"
           />
-          <p className="text-small text-ink-2">
+          <p className={NOTE}>
             Run them one at a time. Codex, Cursor and ZIP steps are on{" "}
-            <Link href="/skills" className={textLinkClass}>
+            <Link href="/skills#install" className={INLINE_LINK}>
               the Skills page
             </Link>
             .
@@ -195,274 +246,287 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
   ];
 
   return (
-    <SkillsPageShell
-      eyebrow={`Skill · ${stage.label}`}
-      title={skill.name}
-      monoTitle
-      description={<p>{skill.description}</p>}
-      breadcrumb={breadcrumb}
-      meta={meta}
+    <BentoCard
+      id="install"
+      headingId="card-install"
+      title="Install this skill"
+      span={2}
+      className="scroll-mt-6"
     >
-      <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
-        <div className="min-w-0 space-y-14">
-          <section aria-labelledby="skill-install">
-            <SectionHeading id="skill-install">
-              Install this skill
-            </SectionHeading>
-            <InstallTabs
-              label={`Install ${skill.name} with`}
-              idBase="skill-install"
-              tabs={tabs}
-            />
-          </section>
+      <InstallTabs
+        label={`Install ${skill.name} with`}
+        idBase="skill-install"
+        tabs={tabs}
+        panelClassName="min-h-[196px]"
+      />
+    </BentoCard>
+  );
+}
 
-          <section aria-labelledby="skill-when">
-            <SectionHeading id="skill-when">How it runs</SectionHeading>
-            <p className="text-body text-ink-2">
-              {skill.userInvoked ? (
-                <>
-                  <strong className="font-medium text-ink">
-                    You invoke it.
-                  </strong>{" "}
-                  Its frontmatter sets{" "}
-                  <code className="font-mono">
-                    disable-model-invocation: true
-                  </code>
-                  , so the agent never loads it on its own. Ask for it by name.
-                </>
-              ) : (
-                <>
-                  <strong className="font-medium text-ink">
-                    Runs automatically.
-                  </strong>{" "}
-                  The agent loads it when a task matches the description above.
-                  You can also ask for it by name.
-                </>
-              )}
-            </p>
-          </section>
+/** Who loads the skill. No step list: only verify-loop's was hand-picked. */
+function RunsCard({ skill }: { skill: Skill }) {
+  return (
+    <BentoCard headingId="card-runs" title="How it runs" gap={3.5}>
+      <p className="m-0 mt-1 text-[22px] leading-[1.25] font-semibold tracking-[-0.02em]">
+        {skill.userInvoked ? "You invoke it." : "Runs automatically."}
+      </p>
+      <p className="m-0 text-card leading-[1.55] text-ink-2">
+        {skill.userInvoked ? (
+          <>
+            Its frontmatter sets{" "}
+            <code className={CODE}>disable-model-invocation: true</code>, so the
+            agent never loads it on its own. Ask for it by name.
+          </>
+        ) : (
+          "The agent loads it when a task matches the description above. You can also ask for it by name."
+        )}
+      </p>
+    </BentoCard>
+  );
+}
 
-          <section aria-labelledby="skill-source">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2
-                id="skill-source"
-                className="font-mono text-h3 font-medium text-ink"
-              >
-                SKILL.md
-              </h2>
-              <div className="flex flex-wrap items-center gap-2">
-                <CopyButton
-                  sourceId={sourceId}
-                  accessibleLabel={`Copy the SKILL.md of ${skill.name}`}
-                  announcement={`Copied the SKILL.md of ${skill.name}`}
+function FilesCard({ skill }: { skill: Skill }) {
+  return (
+    <BentoCard headingId="card-files" title="Files" gap={3}>
+      <ul className="m-0 mt-1 flex list-none flex-col p-0">
+        {orderedFiles(skill).map((file) => (
+          <li
+            key={file.path}
+            className="border-b border-hairline last:border-b-0"
+          >
+            <a
+              href={file.url}
+              {...EXTERNAL}
+              className="kj-row -mx-2 flex min-h-12 items-center justify-between gap-3 rounded-tile px-2 py-1 text-ink no-underline"
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <FileText
+                  aria-hidden
+                  size={15}
+                  strokeWidth={1.8}
+                  className="shrink-0 text-ink-2"
                 />
-                <ExternalLink
-                  href={skill.skillMdUrl}
-                  accessibleLabel={`View on GitHub: ${skill.name} SKILL.md at ${SKILLS_TAG}`}
-                >
-                  View on GitHub
-                </ExternalLink>
-              </div>
-            </div>
-            <pre
-              id={sourceId}
-              className="whitespace-pre-wrap rounded-card border border-hairline bg-well p-5 font-mono text-small text-ink [overflow-wrap:anywhere] sm:p-6"
-            >
-              {skill.content}
-            </pre>
-          </section>
-        </div>
-
-        <aside className="space-y-10 lg:pt-1">
-          <section aria-labelledby="skill-files">
-            <h2
-              id="skill-files"
-              className="mb-4 font-mono text-label uppercase text-ink-2"
-            >
-              Files
-            </h2>
-            <ul className="divide-y divide-hairline border-y border-hairline">
-              {orderedFiles(skill).map((file) => (
-                <li key={file.path}>
-                  <a
-                    href={file.url}
-                    {...external}
-                    className="flex min-h-11 items-center justify-between gap-3 py-2 text-small text-ink transition-colors hover:text-link"
-                  >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <FileText
-                        className="h-3.5 w-3.5 shrink-0 text-ink-2"
-                        aria-hidden
-                      />
-                      <span className="font-mono [overflow-wrap:anywhere]">
-                        {file.path.split("/").map((part, i, parts) => (
-                          <span key={`${i}-${part}`}>
-                            {part}
-                            {i < parts.length - 1 ? (
-                              <>
-                                /<wbr />
-                              </>
-                            ) : null}
-                          </span>
-                        ))}
-                      </span>
-                      <span className="sr-only"> (opens on GitHub)</span>
+                <span className="font-mono text-meta [overflow-wrap:anywhere]">
+                  {file.path.split("/").map((part, i, parts) => (
+                    <span key={`${i}-${part}`}>
+                      {part}
+                      {i < parts.length - 1 ? (
+                        <>
+                          /<wbr />
+                        </>
+                      ) : null}
                     </span>
-                    <span className="shrink-0 font-mono text-label tabular-nums text-ink-2">
-                      {formatBytes(file.size)}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="skill-credit">
-            <h2
-              id="skill-credit"
-              className="mb-4 font-mono text-label uppercase text-ink-2"
-            >
-              {skill.source ? "Credit" : "Origin"}
-            </h2>
-            {skill.source ? (
-              <div className="space-y-3 text-small text-ink-2">
-                <p>
-                  Adapted from{" "}
-                  <a
-                    href={skill.source.url}
-                    {...external}
-                    className={textLinkClass}
-                  >
-                    {sourceLabel(skill.source)}
-                  </a>{" "}
-                  by {copyrightHolder(skill.source.copyright)}.
-                </p>
-                <dl className="divide-y divide-hairline border-y border-hairline">
-                  <div className="flex items-baseline justify-between gap-4 py-2.5">
-                    <dt className="text-ink-2">License</dt>
-                    <dd className="text-right text-ink">
-                      {skill.source.license}
-                    </dd>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-4 py-2.5">
-                    <dt className="text-ink-2">Copyright</dt>
-                    <dd className="text-right text-ink">
-                      {skill.source.copyright.replace(/^Copyright\s*/, "")}
-                    </dd>
-                  </div>
-                  {skill.source.sha ? (
-                    <div className="flex items-baseline justify-between gap-4 py-2.5">
-                      <dt className="text-ink-2">Pinned at</dt>
-                      <dd className="text-right">
-                        <a
-                          href={
-                            skill.upstreamUrl ??
-                            `${skill.source.url}/tree/${skill.source.sha}`
-                          }
-                          {...external}
-                          className={`inline-flex min-h-6 items-center font-mono ${textLinkClass}`}
-                        >
-                          {skill.source.sha.slice(0, 7)}
-                          <span className="sr-only"> (upstream SKILL.md)</span>
-                        </a>
-                      </dd>
-                    </div>
-                  ) : null}
-                </dl>
-                {skill.patches.length > 0 ? (
-                  <p>
-                    Patched in Superstacks:{" "}
-                    {skill.patches.map((patch, index) => (
-                      <span key={patch.name}>
-                        {index > 0 ? ", " : null}
-                        <a
-                          href={patch.url}
-                          {...external}
-                          className={`font-mono ${textLinkClass}`}
-                        >
-                          {patch.name}
-                        </a>
-                      </span>
-                    ))}
-                    .
-                  </p>
-                ) : null}
-              </div>
-            ) : (
-              <p className="text-small text-ink-2">
-                Written for Superstacks;{" "}
-                <code className="font-mono">sources.lock.json</code> credits no
-                upstream. Released under {skill.license} with the rest of the
-                pack.
-              </p>
-            )}
-            {skill.excerpts.map((excerpt) => (
-              <p key={excerpt.name} className="mt-3 text-small text-ink-2">
-                Includes a credited excerpt from{" "}
-                <a href={excerpt.url} {...external} className={textLinkClass}>
-                  {sourceLabel(excerpt)}
-                </a>
-                : {excerpt.license}, {excerpt.copyright}.
-              </p>
-            ))}
-          </section>
-
-          {siblings.length > 0 ? (
-            <section aria-labelledby="skill-siblings">
-              <h2
-                id="skill-siblings"
-                className="mb-4 font-mono text-label uppercase text-ink-2"
+                  ))}
+                </span>
+              </span>
+              {/* Read as "SKILL.md, 2.1 KB, opens on GitHub". */}
+              <span className="sr-only">
+                , {formatBytes(file.size)}, opens on GitHub
+              </span>
+              <span
+                aria-hidden
+                className="shrink-0 font-mono text-xs text-ink-2 tabular-nums"
               >
-                More in {stage.label}
-              </h2>
-              <ul className="flex flex-wrap gap-2">
-                {siblings.map((s) => (
-                  <li key={s.slug}>
-                    <Link
-                      href={`/skills/${s.slug}`}
-                      className={`font-mono ${pillLinkClass}`}
-                    >
-                      {s.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </aside>
-      </div>
+                {formatBytes(file.size)}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a
+        href={skill.folderUrl}
+        {...EXTERNAL}
+        className="mt-auto inline-flex min-h-11 items-center self-end text-sm font-medium no-underline"
+      >
+        Folder on GitHub →
+      </a>
+    </BentoCard>
+  );
+}
 
-      {prev && next ? (
-        <nav
-          aria-label="More skills"
-          className="mt-20 grid grid-cols-1 gap-4 border-t border-hairline pt-8 sm:grid-cols-2"
-        >
-          <Link
-            href={`/skills/${prev.slug}`}
-            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 shadow-card transition-colors hover:border-hairline-strong"
+function Fact({ term, children }: { term: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-t border-hairline py-2.5">
+      <dt className="text-ink-2">{term}</dt>
+      <dd className="m-0 text-right font-mono text-meta">{children}</dd>
+    </div>
+  );
+}
+
+/**
+ * Where the skill comes from: written for Superstacks, or adapted from an
+ * upstream at a pinned commit, with the Superstacks patches on top.
+ */
+function OriginCard({ skill }: { skill: Skill }) {
+  const { source } = skill;
+  return (
+    <BentoCard headingId="card-origin" title="Origin" gap={3}>
+      <div className="mt-1.5 flex flex-col gap-1">
+        <p className="m-0 text-[40px] leading-[1.1] font-semibold tracking-[-0.03em]">
+          {source ? "Adapted" : "Original"}
+        </p>
+        <p className="m-0 font-mono text-label text-ink-2 uppercase">
+          {source ? `From ${sourceLabel(source)}` : "Written for Superstacks"}
+        </p>
+      </div>
+      {source ? (
+        <p className="m-0 text-sm leading-[1.55] text-ink-2">
+          Adapted from{" "}
+          <a href={source.url} {...EXTERNAL} className={INLINE_LINK}>
+            {sourceLabel(source)}
+          </a>{" "}
+          by {copyrightHolder(source.copyright)}.
+          {skill.patches.length > 0 ? (
+            <>
+              {" "}
+              Patched in Superstacks:{" "}
+              {skill.patches.map((patch, index) => (
+                <span key={patch.name}>
+                  {index > 0 ? ", " : null}
+                  <a
+                    href={patch.url}
+                    {...EXTERNAL}
+                    className="font-mono text-meta"
+                  >
+                    {patch.name}
+                  </a>
+                </span>
+              ))}
+              .
+            </>
+          ) : null}
+        </p>
+      ) : (
+        <p className="m-0 text-sm leading-[1.55] text-ink-2">
+          Written for Superstacks;{" "}
+          <a
+            href={SOURCES_LOCK_URL}
+            {...EXTERNAL}
+            className="font-mono text-meta"
           >
-            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
-              <ArrowLeft className="h-3 w-3" aria-hidden />
-              Previous
-            </span>
-            <span className="mt-2 font-mono text-lead text-ink">
-              {prev.name}
-            </span>
-          </Link>
-          <Link
-            href={`/skills/${next.slug}`}
-            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 text-right shadow-card transition-colors hover:border-hairline-strong sm:items-end"
-          >
-            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
-              Next
-              <ArrowRight className="h-3 w-3" aria-hidden />
-            </span>
-            <span className="mt-2 font-mono text-lead text-ink">
-              {next.name}
-            </span>
-          </Link>
-        </nav>
+            sources.lock.json
+          </a>{" "}
+          credits no upstream. Released under {skill.license} with the rest of
+          the pack.
+        </p>
+      )}
+      {skill.excerpts.map((excerpt) => (
+        <p key={excerpt.name} className="m-0 text-sm leading-[1.55] text-ink-2">
+          Includes a credited excerpt from{" "}
+          <a href={excerpt.url} {...EXTERNAL} className={INLINE_LINK}>
+            {sourceLabel(excerpt)}
+          </a>
+          : {excerpt.license}, {excerpt.copyright}.
+        </p>
+      ))}
+      <dl className="m-0 mt-auto flex flex-col text-sm">
+        <Fact term="License">{source ? source.license : skill.license}</Fact>
+        {source ? (
+          <Fact term="Copyright">
+            {source.copyright.replace(/^Copyright\s*/, "")}
+          </Fact>
+        ) : null}
+        {source?.sha ? (
+          <Fact term="Pinned at">
+            <a
+              href={skill.upstreamUrl ?? `${source.url}/tree/${source.sha}`}
+              {...EXTERNAL}
+              className="inline-flex min-h-6 items-center"
+            >
+              {source.sha.slice(0, 7)}
+              <span className="sr-only"> (upstream SKILL.md)</span>
+            </a>
+          </Fact>
+        ) : null}
+        <Fact term="Release">
+          {SKILLS_TAG} · {SKILLS_RELEASE_DATE}
+        </Fact>
+      </dl>
+    </BentoCard>
+  );
+}
+
+function MoreCard({ skill, stage }: { skill: Skill; stage: SkillStage }) {
+  const siblings = getStageSiblings(skill);
+  return (
+    <BentoCard headingId="card-more" title={`More in ${stage.label}`} gap={3}>
+      <p className="m-0 mt-1.5 text-lg leading-[1.4] font-medium tracking-[-0.01em]">
+        {stage.blurb}
+      </p>
+      {siblings.length > 0 ? (
+        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+          {siblings.map((s) => (
+            <li key={s.slug} className="max-w-full">
+              <Link
+                href={`/skills/${s.slug}`}
+                className="inline-flex min-h-11 max-w-full items-center rounded-full border border-hairline-strong bg-page px-3.5 font-mono text-meta [overflow-wrap:anywhere] text-ink no-underline"
+              >
+                {s.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
       ) : null}
-    </SkillsPageShell>
+      <CardLink href="/skills#catalog" className="mt-auto self-end">
+        All {getAllSkills().length} skills →
+      </CardLink>
+    </BentoCard>
+  );
+}
+
+const NAV_CARD =
+  "flex min-h-[112px] flex-col gap-2 rounded-bento border border-hairline bg-surface px-[22px] py-5 text-ink no-underline shadow-card";
+
+const NAV_LABEL =
+  "inline-flex items-center gap-1.5 font-mono text-label text-ink-2 uppercase";
+
+const NAV_NAME =
+  "font-mono text-xl font-medium tracking-[-0.02em] [overflow-wrap:anywhere]";
+
+/** Previous and next in catalog order, wrapping around. */
+function SkillPager({ skill }: { skill: Skill }) {
+  const { prev, next } = getAdjacentSkills(skill.slug);
+  if (!prev || !next) return null;
+  return (
+    <nav
+      aria-label="More skills"
+      className="bento-2 grid grid-cols-1 gap-5 min-[641px]:grid-cols-2"
+    >
+      <Link href={`/skills/${prev.slug}`} className={NAV_CARD}>
+        <span className={NAV_LABEL}>
+          <ArrowLeft aria-hidden size={12} />
+          Previous · {getSkillStage(prev.stage).label}
+        </span>
+        <span className={NAV_NAME}>{prev.name}</span>
+      </Link>
+      <Link
+        href={`/skills/${next.slug}`}
+        className={cn(NAV_CARD, "items-end text-right")}
+      >
+        <span className={NAV_LABEL}>
+          Next · {getSkillStage(next.stage).label}
+          <ArrowRight aria-hidden size={12} />
+        </span>
+        <span className={NAV_NAME}>{next.name}</span>
+      </Link>
+    </nav>
+  );
+}
+
+export default function SkillDetailPage({ skill }: { skill: Skill }) {
+  const stage = getSkillStage(skill.stage);
+  return (
+    <>
+      <SkillHero skill={skill} stage={stage} />
+      <Bento>
+        <InstallCard skill={skill} />
+        <RunsCard skill={skill} />
+        <FilesCard skill={skill} />
+        <OriginCard skill={skill} />
+        <MoreCard skill={skill} stage={stage} />
+        <SkillSourceCard skill={skill} />
+      </Bento>
+      <SkillPager skill={skill} />
+    </>
   );
 }

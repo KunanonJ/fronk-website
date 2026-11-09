@@ -14,16 +14,24 @@ type InstallTabsProps = {
   /** Prefix for element ids, unique on the page. */
   idBase: string;
   tabs: readonly InstallTab[];
+  /** Panel floor, so switching tabs does not move the cards below. */
+  panelClassName?: string;
 };
 
 /**
- * WAI-ARIA tabs (automatic activation): Left/Right move between tabs and
- * select them, Home/End jump to the ends, Tab moves into the panel. Every
- * panel is server-rendered; inactive ones are `hidden`, so the first panel is
- * already correct before hydration and nothing shifts. Focus uses the
- * site-wide ring.
+ * The install chooser (bento canvas, design spec 4.8 and 4.9): the canvas
+ * toggle chips (ink when selected) with WAI-ARIA tabs behaviour, automatic
+ * activation: Left/Right move between tabs and select them, Home/End jump to
+ * the ends, Tab moves into the panel. Local state, never the URL. Every panel
+ * is server-rendered; inactive ones are `hidden`, so the first is already
+ * correct before hydration.
  */
-export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
+export default function InstallTabs({
+  label,
+  idBase,
+  tabs,
+  panelClassName,
+}: InstallTabsProps) {
   const [selected, setSelected] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -50,12 +58,8 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
   };
 
   return (
-    <div>
-      <div
-        role="tablist"
-        aria-label={label}
-        className="flex flex-wrap gap-1.5 border-b border-hairline pb-3"
-      >
+    <>
+      <div role="tablist" aria-label={label} className="flex flex-wrap gap-2">
         {tabs.map((tab, index) => {
           const active = index === selected;
           return (
@@ -73,10 +77,10 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
               onClick={() => setSelected(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
               className={cn(
-                "inline-flex min-h-9 items-center rounded-full border px-3.5 text-sm transition-colors duration-150 ease-smooth",
+                "inline-flex min-h-11 items-center rounded-full border px-4 text-left text-sm font-medium",
                 active
-                  ? "border-ink bg-ink font-medium text-page"
-                  : "border-hairline-strong bg-surface text-ink-2 hover:border-ink/40 hover:text-ink",
+                  ? "border-cta bg-cta text-on-cta"
+                  : "border-hairline-strong bg-surface text-ink-2",
               )}
             >
               {tab.label}
@@ -92,11 +96,14 @@ export default function InstallTabs({ label, idBase, tabs }: InstallTabsProps) {
           aria-labelledby={`${idBase}-tab-${tab.id}`}
           tabIndex={0}
           hidden={index !== selected}
-          className="rounded-input pt-5"
+          className={cn(
+            "flex flex-col border-t border-hairline pt-[18px]",
+            panelClassName,
+          )}
         >
           {tab.panel}
         </div>
       ))}
-    </div>
+    </>
   );
 }
