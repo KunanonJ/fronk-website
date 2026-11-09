@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import LearnPage from "@/components/landing/LearnPage";
 import { resolveBlogCards } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { learnPage } from "@/lib/content/learn";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
@@ -14,7 +15,6 @@ export const metadata: Metadata = routeShareMeta({
 export const revalidate = 3600;
 
 export default async function LearnRoute() {
-  const posts = await fetchAllPosts();
-  const cards = resolveBlogCards(posts);
+  const cards = BLOG_PUBLIC ? resolveBlogCards(await fetchAllPosts()) : [];
   return <LearnPage posts={cards} />;
 }

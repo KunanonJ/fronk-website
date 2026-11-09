@@ -1,4 +1,5 @@
 import { resolvePublicSiteUrl } from "@/lib/seo/siteUrl";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
@@ -30,7 +31,7 @@ export const nav = [
   { href: "/about", label: "About" },
   { href: "/now", label: "Now" },
   { href: "/#ventures", label: "Ventures" },
-  { href: "/blog", label: "Blog" },
+  ...(BLOG_PUBLIC ? [{ href: "/blog", label: "Blog" } as const] : []),
   // /resume is intentionally hidden from primary nav for now. The route
   // still works at /resume and the PDF at /resume.pdf for direct sharing.
   { href: "/contact", label: "Contact" },

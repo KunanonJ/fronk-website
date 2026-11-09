@@ -1,4 +1,5 @@
 import { resolveBlogCards } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildRssFeed } from "@/lib/content/rss";
 import { siteConfig } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
@@ -6,9 +7,9 @@ import { fetchAllPosts } from "@/lib/sanity/fetch";
 export const revalidate = 600;
 
 export async function GET(): Promise<Response> {
-  const posts = await fetchAllPosts();
   // Same set as /blog, sitemap.xml and llms.txt: Sanity posts + fallbacks.
-  const cards = resolveBlogCards(posts);
+  // While the blog is hidden (BLOG_PUBLIC) the feed stays valid but has no items.
+  const cards = BLOG_PUBLIC ? resolveBlogCards(await fetchAllPosts()) : [];
 
   const xml = buildRssFeed({
     cards,

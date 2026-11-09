@@ -5,6 +5,7 @@
 **Umbrella:** `ux-experience_UMBRELLA_PLAN_06-11-26.md`
 **Covers audit findings:** 13-18
 **Depends on:** Phase 3 (shared type and spacing)
+**Note (09-11-26):** the owner hid the blog (`BLOG_PUBLIC = false`). While it's hidden, skip finding 15 (blog tag filter) and the home "latest writing" strip; the home portfolio strip still applies.
 
 ## Objective
 

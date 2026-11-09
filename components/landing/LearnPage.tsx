@@ -39,6 +39,7 @@ function LearnSection({
   title: string;
   items: readonly LearnLink[];
 }) {
+  if (items.length === 0) return null;
   return (
     <section aria-labelledby={id} className="mb-14 last:mb-0 sm:mb-16">
       <h2

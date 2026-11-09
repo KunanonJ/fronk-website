@@ -27,9 +27,9 @@ Canonical site: https://kunanonj.com
 | `/portfolio/ai-automation` | AI Automation | AI agents for content ops and hiring |
 | `/skills` | Skills | Superstacks agent skills: install commands, ZIP downloads, credits |
 | `/skills/[slug]` | Skill | One skill: install tabs, SKILL.md source, files, credit (20 pages) |
-| `/blog` | Blog | Searchable post index (Sanity + fallbacks) |
-| `/blog/[slug]` | Blog post | Long-form article |
-| `/learn` | Learn | Hub index → topics, writing, operator notes |
+| `/blog` | Blog | Hidden: reachable by URL but noindex, not in the nav or sitemap |
+| `/blog/[slug]` | Blog post | Hidden: noindex while the posts are being expanded |
+| `/learn` | Learn | Hub index → topics, operator notes |
 | `/examples` | Examples | Persona scenario cards (Builders / Operators / Founders) |
 | `/stack` | Stack | Tools table (Build / Ship / Operate) |
 | `/proof` | Proof | Venture metrics + case studies |
@@ -57,4 +57,4 @@ Canonical site: https://kunanonj.com
 * **Agent guide (coding skills / prompts for this site):** [/skills.md](/skills.md)
 * **Skills catalog (JSON):** [/skills.json](/skills.json)
 * **XML sitemap:** [/sitemap.xml](/sitemap.xml)
-* **RSS:** [/feed.xml](/feed.xml)
+* **RSS:** [/feed.xml](/feed.xml) (empty while the blog is hidden)

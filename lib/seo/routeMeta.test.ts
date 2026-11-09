@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_OG_IMAGE, routeShareMeta } from "./routeMeta";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 
 describe("routeShareMeta", () => {
   it("sets matching canonical, openGraph.url, and twitter title for the route", () => {
@@ -18,11 +19,13 @@ describe("routeShareMeta", () => {
     expect(meta.description).toBe("Founder story from Bangkok.");
   });
 
-  it("advertises the RSS feed, since page alternates replace the layout's", () => {
+  it("advertises the RSS feed only while the blog is public (page alternates replace the layout's)", () => {
     const meta = routeShareMeta({ title: "Blog", description: "Notes", path: "/blog" });
-    expect(meta.alternates?.types).toEqual({
-      "application/rss+xml": "/feed.xml",
-    });
+    if (BLOG_PUBLIC) {
+      expect(meta.alternates?.types).toEqual({ "application/rss+xml": "/feed.xml" });
+    } else {
+      expect(meta.alternates?.types).toBeUndefined();
+    }
   });
 
   it("defaults og:locale to en_US and lets Thai routes pass th_TH", () => {

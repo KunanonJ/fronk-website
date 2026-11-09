@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveBlogCards } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import {
   PACK_INSTALL,
@@ -18,8 +19,8 @@ export const revalidate = 3600;
 export async function GET() {
   const ventures = getAllVentures();
   const portfolio = getAllPortfolioProjects();
-  const posts = await fetchAllPosts();
-  const cards = resolveBlogCards(posts);
+  // While the blog is hidden (BLOG_PUBLIC), llms.txt doesn't list it, its posts or the RSS feed.
+  const cards = BLOG_PUBLIC ? resolveBlogCards(await fetchAllPosts()) : [];
   const topics = getAllTopicPillars("en");
   const base = siteConfig.url.replace(/\/$/, "");
 
@@ -75,7 +76,7 @@ export async function GET() {
   textLines.push(`- Skill pages: ${base}/skills/[slug]`);
   textLines.push(`- Topic hubs (EN): ${base}/topics/[slug]`);
   textLines.push(`- Topic hubs (TH): ${base}/th/topics/[slug]`);
-  textLines.push(`- Blog: ${base}/blog`);
+  if (BLOG_PUBLIC) textLines.push(`- Blog: ${base}/blog`);
   textLines.push(`- Learn: ${base}/learn`);
   textLines.push(`- Examples: ${base}/examples`);
   textLines.push(`- Stack: ${base}/stack`);
@@ -144,15 +145,17 @@ export async function GET() {
   textLines.push(`- XML sitemap: ${base}/sitemap.xml`);
   textLines.push(`- Agent guide (coding skills for this site): ${base}/skills.md`);
   textLines.push(`- Skills catalog (JSON): ${base}/skills.json`);
-  textLines.push(`- RSS: ${base}/feed.xml`);
+  if (BLOG_PUBLIC) textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push("");
 
-  textLines.push("## Blog");
-  textLines.push(
-    "Notes on AI transformation, ERP/CRM, fintech, and shipping from Bangkok:",
-  );
-  textLines.push("");
+  if (cards.length > 0) {
+    textLines.push("## Blog");
+    textLines.push(
+      "Notes on AI transformation, ERP/CRM, fintech, and shipping from Bangkok:",
+    );
+    textLines.push("");
+  }
 
   for (const card of cards) {
     textLines.push(`### ${card.title}`);

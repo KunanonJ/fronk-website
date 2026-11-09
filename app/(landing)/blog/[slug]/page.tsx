@@ -5,6 +5,7 @@ import {
   FALLBACK_BLOG_POSTS,
   mapPostToBlogCard,
 } from "@/lib/content/blog";
+import { BLOG_PUBLIC, HIDDEN_BLOG_ROBOTS } from "@/lib/content/blogVisibility";
 import { fetchAllPostSlugs, fetchPostBySlug } from "@/lib/sanity/fetch";
 import { buildArticleJsonLd } from "@/lib/seo/jsonLd";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
@@ -23,7 +24,13 @@ export async function generateStaticParams() {
   });
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const meta = await postMetadata(props);
+  // Hidden 09-11-26: posts stay reachable by URL but out of search (BLOG_PUBLIC).
+  return BLOG_PUBLIC ? meta : { ...meta, robots: HIDDEN_BLOG_ROBOTS };
+}
+
+async function postMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await fetchPostBySlug(slug);
   if (post) {

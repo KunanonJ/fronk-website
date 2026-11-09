@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
 import type { TopicPillar } from "@/lib/content/topics/pillars";
+import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 
 const serif = {
   fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
@@ -84,7 +85,7 @@ export default function TopicHubPage({ pillar }: TopicHubPageProps) {
             {pillar.locale === "th" ? "อ่านต่อ" : "Keep exploring"}
           </h2>
           <ul className="space-y-2">
-            {pillar.relatedLinks.map((link) => (
+            {withoutHiddenBlogLinks(pillar.relatedLinks).map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
+import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildBoard, buildColumns } from "@/lib/content/buildBoard";
 import {
   EXAMPLE_PERSONAS,
@@ -35,7 +36,9 @@ describe("learn content", () => {
     expect(learnOperatorNotes.every((n) => n.href.startsWith("/about#"))).toBe(
       true,
     );
-    expect(getLearnWritingLinks(FALLBACK_BLOG_POSTS).length).toBeGreaterThan(0);
+    const writing = getLearnWritingLinks(FALLBACK_BLOG_POSTS);
+    if (BLOG_PUBLIC) expect(writing.length).toBeGreaterThan(0);
+    else expect(writing).toHaveLength(0);
   });
 });
 
