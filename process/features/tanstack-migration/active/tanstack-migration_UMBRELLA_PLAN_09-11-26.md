@@ -1,6 +1,6 @@
 # TanStack Start migration: umbrella plan
 
-**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phase 1 (scaffold) and Phase 2 (content routes) executed 09-11-26; Phase 3 (server surface) next.
+**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phases 1 (scaffold), 2 (content routes) and 3 (server surface, forms) executed 09-11-26; Phase 4 (caching and Sanity) next.
 **Created:** 09-11-26
 **Research:** `process/general-plans/references/tanstack-start-migration-research_REPORT_09-11-26.md`. That report covers the API mapping, the inventory, the risks and the parity references.
 **Target architecture:** `../references/target-architecture_09-11-26.md` (approved 09-11-26). It sets which TanStack packages and Cloudflare products each phase adopts.

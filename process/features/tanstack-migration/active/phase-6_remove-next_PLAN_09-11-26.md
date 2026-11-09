@@ -11,3 +11,8 @@ Shared components on Router APIs (Link, useLocation, notFound); shims, app/, nex
 ## Gates
 
 The exit gate in the umbrella table, plus the standard gates (typecheck, lint, unit tests, Next CI unchanged and green).
+
+## Carried from Phase 3 (09-11-26)
+
+- Move the contact form to a POST server function with `@tanstack/react-form-start` (`createServerValidate`, `createCsrfMiddleware`) once Next no longer renders it; drop the `/api/contact` fetch.
+

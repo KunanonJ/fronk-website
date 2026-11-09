@@ -63,6 +63,8 @@ export const contactMessages = {
   notConfigured: "The contact form isn't connected yet.",
   failed: "That didn't send.",
   tooLarge: "That message is too long to send.",
+  rateLimited: "Too many messages from this connection. Wait a minute and try again.",
+  botCheck: "Your browser didn't pass the spam check. Try again.",
 } as const;
 
 export function isContactTopic(value: unknown): value is ContactTopic {
