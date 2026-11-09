@@ -30,9 +30,9 @@ import { Route as LandingExamplesRouteImport } from './routes/_landing/examples'
 import { Route as LandingLearnRouteImport } from './routes/_landing/learn'
 import { Route as LandingPressRouteImport } from './routes/_landing/press'
 import { Route as LandingProofRouteImport } from './routes/_landing/proof'
+import { Route as LandingResumeRouteImport } from './routes/_landing/resume'
 import { Route as LandingStackRouteImport } from './routes/_landing/stack'
 import { Route as SystemDesignRouteImport } from './routes/_system/design'
-import { Route as SystemResumeRouteImport } from './routes/_system/resume'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
@@ -153,6 +153,11 @@ const LandingProofRoute = LandingProofRouteImport.update({
   path: '/proof',
   getParentRoute: () => LandingRoute,
 } as any)
+const LandingResumeRoute = LandingResumeRouteImport.update({
+  id: '/resume',
+  path: '/resume',
+  getParentRoute: () => LandingRoute,
+} as any)
 const LandingStackRoute = LandingStackRouteImport.update({
   id: '/stack',
   path: '/stack',
@@ -161,11 +166,6 @@ const LandingStackRoute = LandingStackRouteImport.update({
 const SystemDesignRoute = SystemDesignRouteImport.update({
   id: '/design',
   path: '/design',
-  getParentRoute: () => SystemRoute,
-} as any)
-const SystemResumeRoute = SystemResumeRouteImport.update({
-  id: '/resume',
-  path: '/resume',
   getParentRoute: () => SystemRoute,
 } as any)
 const ApiContactRoute = ApiContactRouteImport.update({
@@ -268,9 +268,9 @@ export interface FileRoutesByFullPath {
   '/learn': typeof LandingLearnRoute
   '/press': typeof LandingPressRoute
   '/proof': typeof LandingProofRoute
+  '/resume': typeof LandingResumeRoute
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
-  '/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -307,9 +307,9 @@ export interface FileRoutesByTo {
   '/learn': typeof LandingLearnRoute
   '/press': typeof LandingPressRoute
   '/proof': typeof LandingProofRoute
+  '/resume': typeof LandingResumeRoute
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
-  '/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -348,9 +348,9 @@ export interface FileRoutesById {
   '/_landing/learn': typeof LandingLearnRoute
   '/_landing/press': typeof LandingPressRoute
   '/_landing/proof': typeof LandingProofRoute
+  '/_landing/resume': typeof LandingResumeRoute
   '/_landing/stack': typeof LandingStackRoute
   '/_system/design': typeof SystemDesignRoute
-  '/_system/resume': typeof SystemResumeRoute
   '/api/contact': typeof ApiContactRoute
   '/_landing/': typeof LandingIndexRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
@@ -390,9 +390,9 @@ export interface FileRouteTypes {
     | '/learn'
     | '/press'
     | '/proof'
+    | '/resume'
     | '/stack'
     | '/design'
-    | '/resume'
     | '/api/contact'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -429,9 +429,9 @@ export interface FileRouteTypes {
     | '/learn'
     | '/press'
     | '/proof'
+    | '/resume'
     | '/stack'
     | '/design'
-    | '/resume'
     | '/api/contact'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -469,9 +469,9 @@ export interface FileRouteTypes {
     | '/_landing/learn'
     | '/_landing/press'
     | '/_landing/proof'
+    | '/_landing/resume'
     | '/_landing/stack'
     | '/_system/design'
-    | '/_system/resume'
     | '/api/contact'
     | '/_landing/'
     | '/_landing/blog/$slug'
@@ -661,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingProofRouteImport
       parentRoute: typeof LandingRoute
     }
+    '/_landing/resume': {
+      id: '/_landing/resume'
+      path: '/resume'
+      fullPath: '/resume'
+      preLoaderRoute: typeof LandingResumeRouteImport
+      parentRoute: typeof LandingRoute
+    }
     '/_landing/stack': {
       id: '/_landing/stack'
       path: '/stack'
@@ -673,13 +680,6 @@ declare module '@tanstack/react-router' {
       path: '/design'
       fullPath: '/design'
       preLoaderRoute: typeof SystemDesignRouteImport
-      parentRoute: typeof SystemRoute
-    }
-    '/_system/resume': {
-      id: '/_system/resume'
-      path: '/resume'
-      fullPath: '/resume'
-      preLoaderRoute: typeof SystemResumeRouteImport
       parentRoute: typeof SystemRoute
     }
     '/api/contact': {
@@ -798,6 +798,7 @@ interface LandingRouteChildren {
   LandingLearnRoute: typeof LandingLearnRoute
   LandingPressRoute: typeof LandingPressRoute
   LandingProofRoute: typeof LandingProofRoute
+  LandingResumeRoute: typeof LandingResumeRoute
   LandingStackRoute: typeof LandingStackRoute
   LandingIndexRoute: typeof LandingIndexRoute
   LandingBlogSlugRoute: typeof LandingBlogSlugRoute
@@ -819,6 +820,7 @@ const LandingRouteChildren: LandingRouteChildren = {
   LandingLearnRoute: LandingLearnRoute,
   LandingPressRoute: LandingPressRoute,
   LandingProofRoute: LandingProofRoute,
+  LandingResumeRoute: LandingResumeRoute,
   LandingStackRoute: LandingStackRoute,
   LandingIndexRoute: LandingIndexRoute,
   LandingBlogSlugRoute: LandingBlogSlugRoute,
@@ -837,12 +839,10 @@ const LandingRouteWithChildren =
 
 interface SystemRouteChildren {
   SystemDesignRoute: typeof SystemDesignRoute
-  SystemResumeRoute: typeof SystemResumeRoute
 }
 
 const SystemRouteChildren: SystemRouteChildren = {
   SystemDesignRoute: SystemDesignRoute,
-  SystemResumeRoute: SystemResumeRoute,
 }
 
 const SystemRouteWithChildren =

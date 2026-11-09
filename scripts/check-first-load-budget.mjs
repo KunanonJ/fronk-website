@@ -22,7 +22,7 @@ import zlib from "node:zlib";
 // a few KB of each other. Lower these as routes get lighter; raise only
 // deliberately, with the reason here.
 //
-// Default: system pages (/resume, /design) and the discovery hubs, which
+// Default: system pages (/design) and the discovery hubs, which
 // carry the landing nav since Phase 6 (worst 190.1 KB).
 const DEFAULT_BUDGET_KB = 200;
 
@@ -47,6 +47,10 @@ const MARKETING_EXACT = new Set([
   "/portfolio",
   // Skills (2026-11): landing nav + small tabs/copy-button islands.
   "/skills",
+  // Résumé (phase 7b): moved into the site layout with the header, footer
+  // and Share. Rendered on request (Sanity), so this only classifies it;
+  // measured by hand at 202.1 KB on 09-11-26.
+  "/resume",
 ]);
 
 function isMarketingRoute(route) {
