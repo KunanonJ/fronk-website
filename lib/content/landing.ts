@@ -1,11 +1,11 @@
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
+import { PERSON_META_DESCRIPTION } from "@/lib/content/identity";
 
 export const site = {
   wordmark: "KunanonJ",
   contextLabel: "Bangkok 🇹🇭 · Founder",
   title: "Fronk Kunanon Jarat — Building fintech and AI from Bangkok.",
-  description:
-    "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.",
+  description: PERSON_META_DESCRIPTION,
   email: "fronk.kunanon@gmail.com",
   tagline: "Building fintech and digital workspaces from Bangkok.",
 } as const;

@@ -1,4 +1,11 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
+import {
+  OPEN_TO_ROLES,
+  PERSON_CUSTOMER_WORK,
+  PERSON_SOLOPRENEUR,
+  PERSON_SUMMARY,
+} from "@/lib/content/identity";
+import { siteConfig } from "@/lib/site";
 
 /**
  * Owner-approved FAQ — the single source for BOTH the visible /about FAQ and the
@@ -9,8 +16,15 @@ import type { FaqItem } from "@/lib/seo/jsonLd";
 export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "Who is Fronk (Kunanon Jarat)?",
-    answer:
-      'Kunanon Jarat — "Fronk" — is a Bangkok-based founder, builder, and writer. He founded GoGoCash, builds Manut AI, and is IT Manager and AI Engineering Lead at The Binary Holdings.',
+    answer: PERSON_SUMMARY,
+  },
+  {
+    question: "Is Kunanon Jarat open to new roles?",
+    answer: `Yes. ${OPEN_TO_ROLES.sentence} ${PERSON_CUSTOMER_WORK} Email ${siteConfig.email} or use the contact page.`,
+  },
+  {
+    question: "How does Kunanon Jarat build products?",
+    answer: `${PERSON_SOLOPRENEUR} His working principles: ship the smallest thing that proves the bet, stay close to the work, optimise for reversibility, and document as you go.`,
   },
   {
     question: "What is GoGoCash?",

@@ -7,6 +7,7 @@ import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
 import { getAllVentureSlugs } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
+import { SITE_UPDATED } from "@/lib/content/freshness";
 
 const STATIC_ROUTES: readonly {
   path: string;
@@ -56,7 +57,7 @@ const STATIC_ROUTES: readonly {
 
 export default async function sitemap(): Promise<Sitemap> {
   const base = siteConfig.url.replace(/\/$/, "");
-  const staticUpdated = new Date("2026-07-19");
+  const staticUpdated = new Date(`${SITE_UPDATED}T00:00:00Z`);
 
   const staticEntries: Sitemap = STATIC_ROUTES.map((route) => ({
     url: `${base}${route.path}`,

@@ -1,9 +1,9 @@
-# AI Coding Guidelines & Skills — KunanonJ
+# AI Coding Guide: kunanonj.com
 
-Prompts and standards for coding agents (Claude Code, Cursor, Codex, Copilot, Gemini) working on this site and related Fronk projects.
+Standards for coding agents (Claude Code, Codex, Cursor, Copilot, Gemini) working on this site and related Fronk projects. For the agent skills Kunanon Jarat publishes, see [/skills](/skills) and [/skills.json](/skills.json).
 
 Site: https://kunanonj.com  
-Stack: Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Sanity · Cloudflare Workers (OpenNext)
+Stack: TanStack Start (Router, Query, Form) · React 19 · TypeScript · Tailwind CSS 4 · Valibot · Sanity · Cloudflare Workers
 
 Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/sitemap.md)
 
@@ -12,28 +12,33 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 ## 1. Core principles
 
 1. **Deep modules, simple interfaces**
-   * Prefer complete helpers over shallow wrappers.
-   * Keep public APIs small; put complexity inside the module.
+   - Prefer complete helpers over shallow wrappers.
+   - Keep public APIs small; put complexity inside the module.
 
-2. **Next.js App Router + Tailwind v4**
-   * Server Components by default; `"use client"` only at interactive leaves.
-   * Theme via CSS `@theme` tokens, keyframes, and `@utility` — not ad-hoc one-offs.
-   * Palette (visual-redesign, 09-11-26): Signal `#2B3BFF`, Glaze `#E8EBFF`, Paper `#FFFFFF`, Ink `#0B0D17`, Clay `#FFE3D6`, Ember `#FF5A1F` (Ember only for live or failed state). Light theme by default. Use the role tokens in `app/globals.css` (`bg-page`, `text-ink`, `bg-action`...), never raw hex. Fonts: Geist + Geist Mono (Noto Sans Thai for Thai).
+2. **TanStack Start on Workers**
+   - File routes in `src/routes/`; a route owns its `head()`, `headers()`, loader and component.
+   - Typed URL state with Valibot schemas in `validateSearch`; defaults stripped from the URL.
+   - Sanity reads run in server functions through TanStack Query; responses carry `Cache-Tag` and are purged by the Sanity webhook.
+   - Pages built from `lib/content` are prerendered; everything else renders in the Worker.
 
-3. **Motion**
-   * Prefer Apple-like easing: `cubic-bezier(0.16, 1, 0.3, 1)` / `cubic-bezier(0.22, 1, 0.36, 1)`.
-   * Respect `prefers-reduced-motion`.
-   * Route transitions: global `RouteFade`, a ~250 ms opacity fade of `<main>`. Never cover the page with a full-screen wipe or splash.
-   * First-visit intro: at most 1.5 s, skippable on any key, click, tap or scroll (`lib/content/introGreetings.ts`).
+3. **Design system (bento)**
+   - Role tokens in `src/styles/globals.css` (`bg-page`, `bg-surface`, `text-ink`, `text-ink-2`, `border-hairline`, `bg-cta` for ink primary buttons, `text-link`, `bg-mark`); never raw hex (a test enforces it). Light theme by default; nothing under 12 px.
+   - Shared pieces live in `components/bento/` (header, menu, share, cards, chips, segmented controls, the Bangkok card); reuse them before adding new chrome.
+   - Palette: Signal, Glaze, Paper, Ink, Clay, Ember (Ember only for live or failed states).
 
-4. **Content**
-   * Marketing copy lives in `lib/content/` (especially `landing.ts`).
-   * Blog/resume via Sanity with static fallbacks.
-   * Prefer `/blog` over legacy `/writing`.
+4. **Motion**
+   - Entrance stagger, hover lift and panel pop from `globals.css`; reduced motion turns all of it off.
+   - Page changes use view transitions of type `page`; the theme switch uses type `theme`.
+   - The hero h1 is the LCP element: never start it invisible or blurred.
+   - First-visit intro: at most 1.5 s, skippable, ends with a short celebratory burst.
 
-5. **TypeScript**
-   * Strict typing; avoid `any`.
-   * Typecheck uses TypeScript 7; ESLint resolves the TS6 API package side-by-side.
+5. **Content**
+   - Copy lives in `lib/content/`; identity facts in `lib/content/identity.ts`. Never invent claims, numbers or dates.
+   - Blog and résumé come from Sanity with static fallbacks. The blog is hidden (`BLOG_PUBLIC`).
+
+6. **TypeScript**
+   - Strict typing; avoid `any` and `as` casts.
+   - `pnpm typecheck` runs TypeScript 7; ESLint loads the TypeScript 6 API package.
 
 ---
 
@@ -42,12 +47,13 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 ### System alignment
 
 ```markdown
-You are a senior front-end engineer pair-programming on kunanonj.com.
+You are a senior front-end engineer pair-programming on kunanonj.com (TanStack Start on Cloudflare Workers).
 When writing components:
-- Use TypeScript strictly; Server Components by default.
-- Use the design-system role tokens (`bg-page`, `text-ink`, `border-hairline`, `bg-action`) and the type scale; light by default, never below 12 px.
-- Keep SEO metadata, canonical URLs, and ARIA labels intact.
-- Prefer editing lib/content/* for copy changes over hardcoding strings in JSX.
+- TypeScript strictly; reuse components/bento before adding chrome.
+- Role tokens only (bg-page, text-ink, border-hairline, bg-cta); light by default, never below 12 px.
+- Keep head() metadata, canonical URLs, JSON-LD and ARIA labels intact.
+- Edit lib/content/* for copy instead of hardcoding strings in JSX.
+- Run pnpm typecheck, lint, format:check, knip and test before proposing a change.
 ```
 
 ### Commit message
@@ -62,18 +68,14 @@ feat|fix|chore([scope]): [short active-voice summary]
 ### Before proposing UI changes
 
 1. Read [/sitemap.md](/sitemap.md) for current routes.
-2. Check `components/landing/` before inventing parallel chrome.
-3. Keep primary nav: KunanonJ · About · Ventures · Portfolio · Skills · Library · Contact (Press and Blog are hidden; `BLOG_PUBLIC` in `lib/content/blogVisibility.ts` restores Blog).
+2. Check `components/bento/` and `components/landing/` before inventing parallel chrome.
+3. The site menu comes from `siteMenu` in `lib/content/landing.ts`; Press and Blog stay out of it while hidden.
 
 ---
 
 ## 3. Do not
 
-* Scrape or modify `/studio` content via public agents without credentials.
-* Reintroduce FogLAMP multi-page chrome (retired).
-* Break the global route splash or intro loader session behavior.
-* Commit secrets, `.env*`, or Sanity tokens.
-
----
-
-*Last updated: 2026-07-19*
+- Scrape or modify `/studio` content without credentials.
+- Add links to `/blog` or `/press` while they are hidden.
+- Break the intro's session behaviour or the reduced-motion switch.
+- Commit secrets, `.env*` files or Sanity tokens.

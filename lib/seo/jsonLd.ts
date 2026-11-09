@@ -1,4 +1,13 @@
 import { siteConfig } from "@/lib/site";
+import {
+  PERSON_ALTERNATE_NAMES,
+  PERSON_ALUMNI_OF,
+  PERSON_KNOWS_ABOUT,
+  PERSON_MEMBER_OF,
+  PERSON_NAME,
+  PERSON_SUMMARY,
+} from "@/lib/content/identity";
+import { SITE_UPDATED } from "@/lib/content/freshness";
 import { getAllVentures } from "@/lib/content/ventures";
 
 const BASE = siteConfig.url.replace(/\/$/, "");
@@ -7,7 +16,6 @@ const BASE = siteConfig.url.replace(/\/$/, "");
 export const PERSON_ID = `${BASE}/#person`;
 export const WEBSITE_ID = `${BASE}/#website`;
 
-/** Aliases people / AI engines use when searching for this person. */
 /** Alternate site names for Google's site-name display (WebSite.alternateName). */
 export const WEBSITE_ALTERNATE_NAMES = [
   "Kunanon Jarat",
@@ -15,20 +23,8 @@ export const WEBSITE_ALTERNATE_NAMES = [
   "kunanonj.com",
 ] as const;
 
-export const PERSON_ALTERNATE_NAMES = [
-  "KunanonJ",
-  "Kunanon Jarat",
-  "Fronk",
-] as const;
-
-/** Topical expertise for Person.knowsAbout (matches topic pillars). */
-export const PERSON_KNOWS_ABOUT = [
-  "AI transformation Thailand",
-  "ERP CRM internal systems",
-  "Tech startups Southeast Asia",
-  "Fintech",
-  "Automotive SME software",
-] as const;
+/** Identity values live in lib/content/identity.ts; re-exported for existing callers. */
+export { PERSON_ALTERNATE_NAMES, PERSON_KNOWS_ABOUT };
 
 function sameAs(): readonly string[] {
   const s = siteConfig.socials;
@@ -90,21 +86,31 @@ export function buildSiteJsonLd(): Record<string, unknown> {
       {
         "@type": "Person",
         "@id": PERSON_ID,
-        name: siteConfig.name,
+        name: PERSON_NAME,
         alternateName: [...PERSON_ALTERNATE_NAMES],
         url: BASE,
         email: siteConfig.email,
         image: `${BASE}/profile.jpg`,
-        jobTitle: ["Founder", "IT Manager", "AI Engineering Lead"],
+        jobTitle: ["AI Engineering Lead", "IT Manager", "Founder"],
         worksFor: orgs.map((o) => ({ "@id": o["@id"] })),
         knowsAbout: [...PERSON_KNOWS_ABOUT],
+        alumniOf: {
+          "@type": "CollegeOrUniversity",
+          name: PERSON_ALUMNI_OF.name,
+          url: PERSON_ALUMNI_OF.url,
+        },
+        memberOf: {
+          "@type": "Organization",
+          name: PERSON_MEMBER_OF.name,
+          url: PERSON_MEMBER_OF.url,
+        },
         address: {
           "@type": "PostalAddress",
           addressLocality: "Bangkok",
           addressCountry: "TH",
         },
         sameAs: sameAs(),
-        description: siteConfig.description,
+        description: PERSON_SUMMARY,
       },
       {
         "@type": "WebSite",
@@ -132,6 +138,7 @@ export function buildProfilePageJsonLd(): Record<string, unknown> {
     name: `About — ${siteConfig.name}`,
     mainEntity: { "@id": PERSON_ID },
     isPartOf: { "@id": WEBSITE_ID },
+    dateModified: SITE_UPDATED,
   };
 }
 

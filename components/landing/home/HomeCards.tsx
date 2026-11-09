@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BentoCard, CardLink } from "@/components/bento/Bento";
 import { Segmented } from "@/components/bento/Segmented";
+import Link from "@/components/navigation/Link";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { ventures } from "@/lib/content/landing";
 import { getFeaturedPortfolioProjects } from "@/lib/content/portfolio";
@@ -47,6 +48,10 @@ export function ExperienceCard() {
   );
 }
 
+/** A name that links to its page while reading as the card's own text. */
+const NAME_LINK =
+  "text-ink no-underline decoration-hairline-strong underline-offset-4 hover:underline focus-visible:underline";
+
 /**
  * Ventures: both logos, tilted. `id="ventures"` keeps /#ventures (the menu,
  * the 404 page and the /ventures redirect) landing here.
@@ -81,8 +86,16 @@ export function VenturesCard() {
           className="absolute top-1.5 left-1/2 -ml-2 size-28 rotate-7 rounded-[26px] border-4 border-surface object-cover shadow-logo"
         />
       </div>
+      {/* Real links to both case pages, styled as the card's text, so the
+          venture pages get inbound links from Home. */}
       <p className="mt-1.5 text-center text-base font-semibold">
-        {gogocash.title} · {manut.title}
+        <Link href={gogocash.href} className={NAME_LINK}>
+          {gogocash.title}
+        </Link>{" "}
+        ·{" "}
+        <Link href={manut.href} className={NAME_LINK}>
+          {manut.title}
+        </Link>
       </p>
       <p className="mt-1 text-center text-meta text-ink-2">
         {gogocash.items[0]} · {gogocash.items[1]} on {gogocash.title}
@@ -109,7 +122,12 @@ export function SelectedWorkCard() {
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="flex flex-col">
-              <span className="text-card font-medium">{project.name}</span>
+              <Link
+                href={`/portfolio/${project.slug}`}
+                className={cn(NAME_LINK, "text-card font-medium")}
+              >
+                {project.name}
+              </Link>
               <span className="text-meta text-ink-2">{project.tagline}</span>
             </span>
           </li>

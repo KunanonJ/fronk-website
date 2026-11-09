@@ -10,6 +10,27 @@ import {
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
+import { SITE_UPDATED } from "@/lib/content/freshness";
+import {
+  OPEN_TO_ROLES,
+  PERSON_CUSTOMER_WORK,
+  PERSON_SOLOPRENEUR,
+  PERSON_SUMMARY,
+} from "@/lib/content/identity";
+import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
+
+/** Title, organisation and period for the current and past roles (no bullets). */
+function roleLines(): string[] {
+  const sections = RESUME_TIMELINE_FALLBACK.filter((s) =>
+    ["Currently", "Experience"].includes(s.title),
+  );
+  return sections.flatMap((section) =>
+    section.items.map(
+      (item) =>
+        `- ${item.title}, ${item.org.split(" · ")[0]} (${item.period.replace(" — ", " to ")})`,
+    ),
+  );
+}
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 
 export async function GET() {
@@ -25,15 +46,22 @@ export async function GET() {
   textLines.push(`# ${siteConfig.name}`);
   textLines.push(`> ${siteConfig.tagline}`);
   textLines.push("");
-  textLines.push(siteConfig.description);
+  textLines.push(PERSON_SUMMARY);
   textLines.push("");
-  textLines.push(
-    "Kunanon Jarat (Fronk / KunanonJ) builds fintech and AI operator systems from Bangkok, Thailand, for Thailand and SEA: AI transformation, ERP/CRM, internal systems, and tech startups.",
-  );
+  textLines.push(PERSON_CUSTOMER_WORK);
   textLines.push("");
+  textLines.push(PERSON_SOLOPRENEUR);
+  textLines.push("");
+  textLines.push(`- **Availability:** ${OPEN_TO_ROLES.sentence}`);
   textLines.push(`- **Location:** Bangkok, Thailand`);
   textLines.push(`- **Email:** ${siteConfig.email}`);
   textLines.push(`- **Website:** ${base}`);
+  textLines.push(`- **Updated:** ${SITE_UPDATED}`);
+  textLines.push("");
+
+  textLines.push("## Roles");
+  textLines.push("");
+  textLines.push(...roleLines());
   textLines.push("");
 
   textLines.push("## Cite these canonical URLs");
