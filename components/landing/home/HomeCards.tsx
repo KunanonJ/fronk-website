@@ -23,8 +23,9 @@ export function ExperienceCard() {
   return (
     <BentoCard headingId="card-experience" title="Experience">
       {/* The line is a pseudo-element 4 px inside the list box, so the fade
-          mask (which clips to the box) never cuts the dots on it. */}
-      <ol className="relative m-0 -ml-1 flex list-none flex-col gap-[18px] p-0 pl-[27px] [mask-image:linear-gradient(to_bottom,black_72%,transparent)] before:absolute before:inset-y-0 before:left-1 before:w-px before:bg-hairline-strong">
+          mask (which clips to the box) never cuts the dots on it. The bottom
+          margin keeps the faded last role clear of the corner Résumé link. */}
+      <ol className="relative m-0 mb-8 -ml-1 flex list-none flex-col gap-[18px] p-0 pl-[27px] [mask-image:linear-gradient(to_bottom,black_72%,transparent)] before:absolute before:inset-y-0 before:left-1 before:w-px before:bg-hairline-strong">
         {entries.map((entry, index) => (
           <li key={entry.title} className="relative">
             <span
