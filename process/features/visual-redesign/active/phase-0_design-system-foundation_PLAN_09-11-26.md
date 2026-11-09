@@ -1,6 +1,6 @@
 # Phase 0: Design system foundation
 
-**Status:** PLANNED. Waiting for the owner's decisions D1 to D4 and EXECUTE approval.
+**Status:** EXECUTED 09-11-26 on `feat/design-system-foundation`; all local gates green; PR open, waiting on merge approval. Decisions: D1 Geist + Geist Mono (owner), D2 `#F5F6FA` and D4 `#8E97FF` (recommendations applied), D3 light default now (owner). Evidence: `../reports/phase-0_design-system-foundation_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers:** the token system, the light default, fonts, primitives, contrast and type-floor guards, and the probe script. From the ux-audit: finding 9 (12 px floor rule), finding 10 (24 px target rule), finding 7 (font bytes), and the ux-experience Phase 2 probe deliverable.

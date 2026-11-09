@@ -2,7 +2,7 @@
 
 **Date:** 09-11-26
 **Complexity:** Phase program (7 phases, 0 to 6)
-**Status:** PLANNED. No phase has started. Phase 0 waits for the owner's Phase 0 decisions (D1 to D4) and EXECUTE approval.
+**Status:** IN PROGRESS. Phase 0 executed 09-11-26 (PR open). Phase 1 (chrome) is next; owner decision: keep the nav icons, quieter.
 **Feature:** `visual-redesign`
 **Evidence:**
 - `process/general-plans/references/visual-redesign-research_REPORT_09-11-26.md` (Mobbin, helumi.app tokens, palette contrast, ranked changes)

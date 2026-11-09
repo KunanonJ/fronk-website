@@ -16,7 +16,7 @@ Tech:      Next.js 16.4 · React 19.3 · TypeScript 7 (+ TS6 API for ESLint) · 
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
 Runtime:   Node.js ≥22.22 · Cloudflare Workers + OpenNext + R2 cache
-Style:     Dark cinematic landing (Almarai + Instrument Serif, cream `#DEDBC8`)
+Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visual-redesign)
 ```
 
 ## Useful links
