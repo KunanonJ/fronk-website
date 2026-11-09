@@ -32,8 +32,10 @@ export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
   return {
     server: { port: 3000 },
-    // The visual suite runs in the Playwright Docker image against the preview.
-    preview: { allowedHosts: ["host.docker.internal"] },
+    // IPv4 explicitly: in the CI container "localhost" binds ::1 while the
+    // prerender step fetches 127.0.0.1. The visual suite can also run in the
+    // Playwright Docker image against the preview.
+    preview: { host: "127.0.0.1", allowedHosts: ["host.docker.internal"] },
     resolve: {
       alias: [
         { find: /^next\/link$/, replacement: shim("link.tsx") },
