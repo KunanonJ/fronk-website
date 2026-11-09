@@ -13,7 +13,9 @@ import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const PORT = 4173;
-const BASE = `http://localhost:${PORT}`;
+// 127.0.0.1, not localhost: in the CI container Node and vite resolve
+// localhost to different address families, so the probe was refused.
+const BASE = `http://127.0.0.1:${PORT}`;
 const REFERENCE = "process/features/tanstack-migration/references/next-parity_09-11-26.json";
 const routes = JSON.parse(readFileSync("src/ported-routes.json", "utf8"));
 const visual = process.argv.includes("--visual");
@@ -22,7 +24,7 @@ const visual = process.argv.includes("--visual");
 // output off our stdio: a surviving grandchild holding our stderr kept the
 // run open after every gate had finished.
 let previewLog = "";
-const preview = spawn("node_modules/.bin/vite", ["preview", "--port", String(PORT), "--strictPort"], {
+const preview = spawn("node_modules/.bin/vite", ["preview", "--host", "127.0.0.1", "--port", String(PORT), "--strictPort"], {
   stdio: ["ignore", "pipe", "pipe"],
   detached: true,
 });
