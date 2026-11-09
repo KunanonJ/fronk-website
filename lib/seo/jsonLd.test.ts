@@ -9,6 +9,7 @@ import {
   EMPLOYER_ORGANIZATION,
   PERSON_ID,
 } from "./jsonLd";
+import { PERSON_SUMMARY } from "@/lib/content/identity";
 
 type Node = Record<string, unknown> & { "@type"?: string; "@id"?: string };
 
@@ -67,15 +68,22 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     expect(person.sameAs as string[]).toContain(siteSocialsX);
   });
 
-  it("Person alternateName and knowsAbout support name + category discovery", () => {
+  it("Person leads with the AI role and supports name + category discovery", () => {
     const person = byType("Person")!;
+    expect(person.name).toBe("Kunanon Jarat");
+    expect(person.description).toBe(PERSON_SUMMARY);
+    expect((person.jobTitle as string[])[0]).toBe("AI Engineering Lead");
     const aliases = person.alternateName as string[];
     expect(aliases).toEqual(
-      expect.arrayContaining(["KunanonJ", "Kunanon Jarat", "Fronk"]),
+      expect.arrayContaining(["KunanonJ", "Fronk", "Fronk Kunanon Jarat"]),
     );
     expect(person.knowsAbout as string[]).toEqual(
-      expect.arrayContaining(["AI transformation Thailand", "Fintech"]),
+      expect.arrayContaining(["AI engineering", "AI agents", "Fintech"]),
     );
+    expect(person.alumniOf).toMatchObject({ name: "Kasetsart University" });
+    expect(person.memberOf).toMatchObject({
+      name: "Bangkok Startup Association",
+    });
     expect(person.sameAs as string[]).not.toContain("https://gogocash.co");
   });
 });

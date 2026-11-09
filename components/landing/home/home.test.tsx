@@ -38,7 +38,14 @@ describe("Home cards", () => {
     expect(
       screen.getByRole("link", { name: "See both ventures →" }),
     ).toHaveAttribute("href", "/#ventures");
-    expect(screen.getByText("GoGoCash · Manut AI")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "GoGoCash" })).toHaveAttribute(
+      "href",
+      "/ventures/gogocash",
+    );
+    expect(screen.getByRole("link", { name: "Manut AI" })).toHaveAttribute(
+      "href",
+      "/ventures/manut",
+    );
     expect(
       screen.getByText("1,000+ users · 220+ merchants on GoGoCash"),
     ).toBeInTheDocument();

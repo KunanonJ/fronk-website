@@ -46,7 +46,7 @@ const currentlyItems: readonly ResolvedTimelineItem[] = [
     period: "2025 — Present",
     href: "https://manut.xyz",
     bullets: [
-      "Building an AI-augmented, self-hosted knowledge workspace.",
+      "Building an ERP/CRM workspace with Intelligence AI for automotive SMEs.",
       "Live at manut.xyz.",
     ],
   },

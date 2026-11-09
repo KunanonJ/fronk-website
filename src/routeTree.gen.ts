@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LandingRouteImport } from './routes/_landing'
 import { Route as SystemRouteImport } from './routes/_system'
+import { Route as AgentsDotmdRouteImport } from './routes/agents[.]md'
 import { Route as AppleIconRouteImport } from './routes/apple-icon'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as IconRouteImport } from './routes/icon'
@@ -18,6 +19,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotmdRouteImport } from './routes/sitemap[.]md'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SkillsDotjsonRouteImport } from './routes/skills[.]json'
 import { Route as StudioRouteImport } from './routes/studio'
@@ -57,6 +59,11 @@ const SystemRoute = SystemRouteImport.update({
   id: '/_system',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentsDotmdRoute = AgentsDotmdRouteImport.update({
+  id: '/agents.md',
+  path: '/agents.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppleIconRoute = AppleIconRouteImport.update({
   id: '/apple-icon',
   path: '/apple-icon',
@@ -90,6 +97,11 @@ const OpengraphImageRoute = OpengraphImageRouteImport.update({
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotmdRoute = SitemapDotmdRouteImport.update({
+  id: '/sitemap.md',
+  path: '/sitemap.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -250,6 +262,7 @@ const LandingThTopicsSlugRoute = LandingThTopicsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof LandingIndexRoute
+  '/agents.md': typeof AgentsDotmdRoute
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
@@ -257,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
   '/studio': typeof StudioRoute
@@ -289,6 +303,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof LandingIndexRoute
+  '/agents.md': typeof AgentsDotmdRoute
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
@@ -296,6 +311,7 @@ export interface FileRoutesByTo {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
   '/studio': typeof StudioRoute
@@ -330,6 +346,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_landing': typeof LandingRouteWithChildren
   '/_system': typeof SystemRouteWithChildren
+  '/agents.md': typeof AgentsDotmdRoute
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
@@ -337,6 +354,7 @@ export interface FileRoutesById {
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
   '/studio': typeof StudioRoute
@@ -372,6 +390,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/agents.md'
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
@@ -379,6 +398,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/opengraph-image'
     | '/robots.txt'
+    | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
     | '/studio'
@@ -411,6 +431,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/agents.md'
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
@@ -418,6 +439,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/opengraph-image'
     | '/robots.txt'
+    | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
     | '/studio'
@@ -451,6 +473,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_landing'
     | '/_system'
+    | '/agents.md'
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
@@ -458,6 +481,7 @@ export interface FileRouteTypes {
     | '/manifest.webmanifest'
     | '/opengraph-image'
     | '/robots.txt'
+    | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
     | '/studio'
@@ -493,6 +517,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   LandingRoute: typeof LandingRouteWithChildren
   SystemRoute: typeof SystemRouteWithChildren
+  AgentsDotmdRoute: typeof AgentsDotmdRoute
   AppleIconRoute: typeof AppleIconRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IconRoute: typeof IconRoute
@@ -500,6 +525,7 @@ export interface RootRouteChildren {
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   OpengraphImageRoute: typeof OpengraphImageRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotmdRoute: typeof SitemapDotmdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkillsDotjsonRoute: typeof SkillsDotjsonRoute
   StudioRoute: typeof StudioRoute
@@ -526,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof SystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents.md': {
+      id: '/agents.md'
+      path: '/agents.md'
+      fullPath: '/agents.md'
+      preLoaderRoute: typeof AgentsDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apple-icon': {
@@ -575,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/robots.txt'
       fullPath: '/robots.txt'
       preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.md': {
+      id: '/sitemap.md'
+      path: '/sitemap.md'
+      fullPath: '/sitemap.md'
+      preLoaderRoute: typeof SitemapDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -851,6 +891,7 @@ const SystemRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   LandingRoute: LandingRouteWithChildren,
   SystemRoute: SystemRouteWithChildren,
+  AgentsDotmdRoute: AgentsDotmdRoute,
   AppleIconRoute: AppleIconRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   IconRoute: IconRoute,
@@ -858,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   OpengraphImageRoute: OpengraphImageRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotmdRoute: SitemapDotmdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkillsDotjsonRoute: SkillsDotjsonRoute,
   StudioRoute: StudioRoute,

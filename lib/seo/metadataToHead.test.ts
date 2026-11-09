@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://kunanonj.com";
 });
+import { PERSON_META_DESCRIPTION } from "@/lib/content/identity";
 import { headTags } from "@/lib/parity/parity.mjs";
 import { headToHtml, metadataToHead, rootHead } from "@/lib/seo/metadataToHead";
 import { rootMetadata, rootViewport } from "@/lib/seo/rootMetadata";
@@ -22,6 +23,10 @@ const reference = JSON.parse(
   ),
 ) as Record<string, { title: string; tags: string[] }>;
 
+/** The Home description in the Next reference crawl, replaced in EO-1. */
+const OLD_DESCRIPTION =
+  "Personal site of Kunanon Jarat (Fronk) — founder of GoGoCash, building fintech and adjacent infrastructure from Bangkok.";
+
 describe("metadataToHead (parity with the Next build)", () => {
   it.each([
     ["/", HomeRoute],
@@ -36,7 +41,11 @@ describe("metadataToHead (parity with the Next build)", () => {
       const title = head.meta.find((m) => "title" in m)?.title;
       const tags = headTags(html);
       expect(title).toBe(reference[path]!.title);
-      expect(tags).toEqual(reference[path]!.tags);
+      // Intended since EO-1: the Home description leads with the AI role.
+      const expected = reference[path]!.tags.map((tag) =>
+        tag.replace(OLD_DESCRIPTION, PERSON_META_DESCRIPTION),
+      );
+      expect(tags).toEqual(expected);
     },
   );
 

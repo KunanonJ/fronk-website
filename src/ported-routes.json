@@ -2,7 +2,7 @@
   {
     "path": "/",
     "test": "home",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd", "tags"]
   },
   {
     "path": "/.well-known/security.txt",
@@ -11,7 +11,7 @@
   {
     "path": "/about",
     "test": "about",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd"]
   },
   {
     "path": "/about/",
@@ -19,7 +19,8 @@
   },
   {
     "path": "/agents.md",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/api/github/contributions",
@@ -31,67 +32,86 @@
   },
   {
     "path": "/blog",
-    "test": "blog"
+    "test": "blog",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/ai-transformation-thailand-smes"
+    "path": "/blog/ai-transformation-thailand-smes",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/ai-vs-traditional-erp-sea"
+    "path": "/blog/ai-vs-traditional-erp-sea",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/ai-workspace-for-smes"
+    "path": "/blog/ai-workspace-for-smes",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/building-tech-startups-bangkok-sea"
+    "path": "/blog/building-tech-startups-bangkok-sea",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/cashback-loops"
+    "path": "/blog/cashback-loops",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/crm-habits-for-automotive-dealers"
+    "path": "/blog/crm-habits-for-automotive-dealers",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/digital-transformation-budget-sme-thailand"
+    "path": "/blog/digital-transformation-budget-sme-thailand",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/erp-crm-internal-systems-startups"
+    "path": "/blog/erp-crm-internal-systems-startups",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/gogocash-retention-loops"
+    "path": "/blog/gogocash-retention-loops",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/hello-world"
+    "path": "/blog/hello-world",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/hiring-builders-in-bangkok"
+    "path": "/blog/hiring-builders-in-bangkok",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/intelligence-ai-inside-erp"
+    "path": "/blog/intelligence-ai-inside-erp",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/internal-tools-vs-saas-sprawl"
+    "path": "/blog/internal-tools-vs-saas-sprawl",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/manut-ai-erp-crm-automotive"
+    "path": "/blog/manut-ai-erp-crm-automotive",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/sea-founder-ops-stack-2026"
+    "path": "/blog/sea-founder-ops-stack-2026",
+    "intended": ["jsonLd"]
   },
   {
-    "path": "/blog/shipping-from-bangkok"
+    "path": "/blog/shipping-from-bangkok",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/build",
-    "test": "build"
+    "test": "build",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/contact",
     "test": "contact",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd"]
   },
   {
-    "path": "/design"
+    "path": "/design",
+    "intended": ["jsonLd", "tags"]
   },
   {
     "path": "/does-not-exist",
@@ -99,11 +119,13 @@
   },
   {
     "path": "/examples",
-    "test": "examples"
+    "test": "examples",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/feed.xml",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/icon",
@@ -111,15 +133,18 @@
   },
   {
     "path": "/learn",
-    "test": "learn"
+    "test": "learn",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/llms.txt",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/manifest.webmanifest",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/now",
@@ -131,25 +156,29 @@
   },
   {
     "path": "/portfolio",
-    "test": "portfolio"
+    "test": "portfolio",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/portfolio/ai-automation",
-    "test": "portfolio-diagrams"
+    "test": "portfolio-diagrams",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/portfolio/ai-automation/opengraph-image",
     "seed": false
   },
   {
-    "path": "/portfolio/email-signature-generator"
+    "path": "/portfolio/email-signature-generator",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/portfolio/email-signature-generator/opengraph-image",
     "seed": false
   },
   {
-    "path": "/portfolio/node-validator-automation"
+    "path": "/portfolio/node-validator-automation",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/portfolio/node-validator-automation/opengraph-image",
@@ -161,7 +190,8 @@
   },
   {
     "path": "/portfolio/tbh-intranet",
-    "test": "portfolio-project"
+    "test": "portfolio-project",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/portfolio/tbh-intranet/opengraph-image",
@@ -169,16 +199,18 @@
   },
   {
     "path": "/press",
-    "test": "press"
+    "test": "press",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/proof",
-    "test": "proof"
+    "test": "proof",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/resume",
     "test": "resume",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd", "tags"]
   },
   {
     "path": "/robots.txt",
@@ -194,15 +226,18 @@
   },
   {
     "path": "/sitemap.md",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/sitemap.xml",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
     "path": "/skills",
-    "test": "skills"
+    "test": "skills",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills.json",
@@ -210,73 +245,84 @@
   },
   {
     "path": "/skills.md",
-    "seed": false
+    "seed": false,
+    "intended": ["body"]
   },
   {
-    "path": "/skills/code-review"
+    "path": "/skills/code-review",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/code-review/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/diagnosing-bugs"
+    "path": "/skills/diagnosing-bugs",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/diagnosing-bugs/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/domain-modeling"
+    "path": "/skills/domain-modeling",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/domain-modeling/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/gardening"
+    "path": "/skills/gardening",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/gardening/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/grill-with-docs"
+    "path": "/skills/grill-with-docs",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/grill-with-docs/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/grilling"
+    "path": "/skills/grilling",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/grilling/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/how"
+    "path": "/skills/how",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/how/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/intake-triage"
+    "path": "/skills/intake-triage",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/intake-triage/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/interrogate"
+    "path": "/skills/interrogate",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/interrogate/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/mistake-to-constraint"
+    "path": "/skills/mistake-to-constraint",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/mistake-to-constraint/opengraph-image",
@@ -287,42 +333,48 @@
     "seed": false
   },
   {
-    "path": "/skills/pr"
+    "path": "/skills/pr",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/pr/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/sample-review"
+    "path": "/skills/sample-review",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/sample-review/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/steer-miner"
+    "path": "/skills/steer-miner",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/steer-miner/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/test-driven-development"
+    "path": "/skills/test-driven-development",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/test-driven-development/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/ticket-pipeline"
+    "path": "/skills/ticket-pipeline",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/ticket-pipeline/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/verification-before-completion"
+    "path": "/skills/verification-before-completion",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/verification-before-completion/opengraph-image",
@@ -330,28 +382,32 @@
   },
   {
     "path": "/skills/verify-loop",
-    "test": "skill-detail"
+    "test": "skill-detail",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/verify-loop/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/workflow-profile"
+    "path": "/skills/workflow-profile",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/workflow-profile/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/writing-for-agents"
+    "path": "/skills/writing-for-agents",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/writing-for-agents/opengraph-image",
     "seed": false
   },
   {
-    "path": "/skills/writing-plans"
+    "path": "/skills/writing-plans",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/skills/writing-plans/opengraph-image",
@@ -359,7 +415,8 @@
   },
   {
     "path": "/stack",
-    "test": "stack"
+    "test": "stack",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/stock/asme",
@@ -370,32 +427,35 @@
     "seed": false
   },
   {
-    "path": "/studio"
+    "path": "/studio",
+    "intended": ["jsonLd", "tags"]
   },
   {
     "path": "/th/topics/ai-transformation-thailand",
     "test": "topic-hub-th",
-    "intended": ["htmlLang"]
+    "intended": ["htmlLang", "jsonLd"]
   },
   {
     "path": "/th/topics/erp-crm-internal-systems",
-    "intended": ["htmlLang"]
+    "intended": ["htmlLang", "jsonLd"]
   },
   {
     "path": "/th/topics/tech-startup-thailand-sea",
     "test": "topic-hub-th-short",
-    "intended": ["htmlLang"]
+    "intended": ["htmlLang", "jsonLd"]
   },
   {
     "path": "/topics/ai-transformation-thailand",
-    "test": "topic-hub"
+    "test": "topic-hub",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/topics/ai-transformation-thailand/opengraph-image",
     "seed": false
   },
   {
-    "path": "/topics/erp-crm-internal-systems"
+    "path": "/topics/erp-crm-internal-systems",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/topics/erp-crm-internal-systems/opengraph-image",
@@ -406,7 +466,8 @@
     "seed": false
   },
   {
-    "path": "/topics/tech-startup-thailand-sea"
+    "path": "/topics/tech-startup-thailand-sea",
+    "intended": ["jsonLd"]
   },
   {
     "path": "/topics/tech-startup-thailand-sea/opengraph-image",
@@ -419,7 +480,7 @@
   {
     "path": "/ventures/gogocash",
     "test": "venture-hub",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd"]
   },
   {
     "path": "/ventures/gogocash/opengraph-image",
@@ -428,7 +489,7 @@
   {
     "path": "/ventures/manut",
     "test": "venture-hub-manut",
-    "intended": ["h1"]
+    "intended": ["h1", "jsonLd"]
   },
   {
     "path": "/ventures/manut/opengraph-image",

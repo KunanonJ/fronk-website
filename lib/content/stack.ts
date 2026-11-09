@@ -83,7 +83,7 @@ export const stackItems: readonly StackItem[] = [
   },
   {
     name: "Cloudflare Workers",
-    purpose: "Manut edge runtime + kunanonj.com (OpenNext)",
+    purpose: "Manut edge runtime + kunanonj.com (TanStack Start)",
     website: "https://workers.cloudflare.com",
     group: "Ship",
     icon: "cloudflare",
