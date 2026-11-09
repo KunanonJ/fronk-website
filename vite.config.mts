@@ -32,8 +32,10 @@ export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
   return {
     server: { port: 3000 },
-    // The visual suite runs in the Playwright Docker image against the preview.
-    preview: { allowedHosts: ["host.docker.internal"] },
+    // IPv4 explicitly: in the CI container "localhost" binds ::1 while the
+    // prerender step fetches 127.0.0.1. The visual suite can also run in the
+    // Playwright Docker image against the preview.
+    preview: { host: "127.0.0.1", allowedHosts: ["host.docker.internal"] },
     resolve: {
       alias: [
         { find: /^next\/link$/, replacement: shim("link.tsx") },
@@ -41,6 +43,8 @@ export default defineConfig(({ mode }) => {
         { find: /^next\/image$/, replacement: shim("image.tsx") },
         { find: /^next\/script$/, replacement: shim("script.tsx") },
         { find: /^next\/web-vitals$/, replacement: shim("web-vitals.ts") },
+        { find: /^next-sanity$/, replacement: shim("next-sanity.ts") },
+        { find: /^next\/headers$/, replacement: shim("headers.ts") },
         { find: /^@\//, replacement: `${root}/` },
       ],
     },
@@ -49,7 +53,18 @@ export default defineConfig(({ mode }) => {
     ),
     plugins: [
       cloudflare({ configPath: "wrangler.start.jsonc", viteEnvironment: { name: "ssr" } }),
-      tanstackStart(),
+      tanstackStart({
+        // Pages built from lib/content are rendered once per deploy and served
+        // as static assets; Sanity-backed pages render on request (Phase 4
+        // caches them at the edge).
+        prerender: {
+          enabled: true,
+          crawlLinks: true,
+          autoSubfolderIndex: false,
+          // Pages only: Sanity-backed routes and text/API endpoints render on request.
+          filter: ({ path }) => !/^\/(resume|learn|blog|api|studio)(\/|$)/.test(path) && !/\.[a-z0-9]+$/i.test(path),
+        },
+      }),
       react(),
     ],
   };

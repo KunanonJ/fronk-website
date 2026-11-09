@@ -17,3 +17,6 @@ The exit gate in the umbrella table, plus the standard gates (typecheck, lint, u
 - Contact and newsletter on `@tanstack/react-form-start` with one Valibot schema for client and server; POST server functions with `createCsrfMiddleware` and `.validator()`; field errors through `createServerValidate`.
 - Turnstile on both forms (explicit-render widget; `siteverify` on the server) and a `ratelimits` binding keyed by IP and route. These are intended parity differences on `/contact` and the subscribe form; list them in the phase report.
 - Bindings through `import { env } from "cloudflare:workers"`; secrets via `wrangler secret put` with `secrets.required`.
+- Carried from Phase 2: with prerendered pages served as assets, `/about/` gets a 307 from the asset handler; Next sends 308. The redirect map must restore 308 for trailing slashes (check `assets.html_handling` against a Worker-side redirect).
+- Typed search params moved to Phase 7 (see the Phase 2 plan).
+

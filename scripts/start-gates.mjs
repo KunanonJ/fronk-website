@@ -2,7 +2,9 @@
 /**
  * Gates for the TanStack Start build (tanstack-migration). Serves the built
  * Start app with `vite preview` (workerd) and checks the routes listed in
- * src/ported-routes.json:
+ * src/ported-routes.json ({ path, test?, seed?, intended? }: `test` is the
+ * e2e route name, `seed: false` keeps 404/redirect probes out of the crawl
+ * seeds, `intended` lists fields allowed to differ from the reference):
  *   1. parity diff against the Next reference crawl;
  *   2. smoke + axe (both themes), and with --visual the Linux baselines
  *      (run --visual inside the pinned Playwright image only).
@@ -41,6 +43,8 @@ process.on("exit", stop);
 
 async function ready() {
   for (let i = 0; i < 120; i += 1) {
+    // Our preview died (e.g. the port is taken): never test someone else's server.
+    if (preview.exitCode !== null) break;
     try {
       const res = await fetch(`${BASE}/`, { signal: AbortSignal.timeout(3000) });
       if (res.status < 500) return;
@@ -62,9 +66,13 @@ let failed = 0;
 try {
   await ready();
   const crawl = "/tmp/start-parity.json";
-  failed += run("node", ["scripts/parity-crawl.mjs", BASE, crawl]) ? 1 : 0;
-  failed += run("node", ["scripts/parity-diff.mjs", REFERENCE, crawl, "--only", routes.map((r) => r.path).join(",")]) ? 1 : 0;
-  const names = routes.map((r) => r.test).join("|");
+  failed += run("node", ["scripts/parity-crawl.mjs", BASE, crawl], { PARITY_SEEDS: routes.filter((r) => r.seed !== false).map((r) => r.path).join(",") }) ? 1 : 0;
+  // Intended differences (e.g. lang="th" on Thai pages) are listed per route.
+  const ignore = routes.flatMap((r) => (r.intended ?? []).map((field) => `${r.path}:${field}`));
+  const diffArgs = ["scripts/parity-diff.mjs", REFERENCE, crawl, "--only", routes.map((r) => r.path).join(",")];
+  if (ignore.length) diffArgs.push("--ignore", ignore.join(","));
+  failed += run("node", diffArgs) ? 1 : 0;
+  const names = routes.filter((r) => r.test).map((r) => r.test).join("|");
   const specs = ["smoke.spec.ts", "a11y.spec.ts", ...(visual ? ["visual.spec.ts"] : [])];
   failed += run(
     "pnpm",

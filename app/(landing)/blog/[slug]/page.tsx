@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import BlogPostPage from "@/components/landing/BlogPostPage";
+import BlogPostView from "@/components/landing/BlogPostView";
 import {
   FALLBACK_BLOG_POSTS,
   mapPostToBlogCard,
 } from "@/lib/content/blog";
 import { BLOG_PUBLIC, HIDDEN_BLOG_ROBOTS } from "@/lib/content/blogVisibility";
 import { fetchAllPostSlugs, fetchPostBySlug } from "@/lib/sanity/fetch";
-import { buildArticleJsonLd } from "@/lib/seo/jsonLd";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -67,68 +65,5 @@ async function postMetadata({ params }: Props): Promise<Metadata> {
 export default async function BlogPostRoute({ params }: Props) {
   const { slug } = await params;
   const post = await fetchPostBySlug(slug);
-
-  if (post) {
-    const card = mapPostToBlogCard(post);
-    const articleLd = JSON.stringify(
-      buildArticleJsonLd({
-        title: card.title,
-        description: card.excerpt,
-        slug: card.slug,
-        publishedAt: card.publishedAt,
-        imageUrl: card.bannerSrc,
-        tags: card.tags,
-      }),
-    );
-    return (
-      <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: articleLd }}
-        />
-        <BlogPostPage
-          title={card.title}
-          excerpt={card.excerpt}
-          publishedAt={card.publishedAt}
-          tags={card.tags}
-          bannerSrc={card.bannerSrc}
-          bannerAlt={card.bannerAlt}
-          body={post.body}
-        />
-      </>
-    );
-  }
-
-  const fallback = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
-  if (!fallback) notFound();
-
-  const articleLd = JSON.stringify(
-    buildArticleJsonLd({
-      title: fallback.title,
-      description: fallback.excerpt,
-      slug: fallback.slug,
-      publishedAt: fallback.publishedAt,
-      imageUrl: fallback.bannerSrc,
-      tags: fallback.tags,
-    }),
-  );
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: articleLd }}
-      />
-      <BlogPostPage
-        title={fallback.title}
-        excerpt={fallback.excerpt}
-        publishedAt={fallback.publishedAt}
-        tags={fallback.tags}
-        bannerSrc={fallback.bannerSrc}
-        bannerAlt={fallback.bannerAlt}
-        body={null}
-        bodyParagraphs={fallback.bodyParagraphs}
-      />
-    </>
-  );
+  return <BlogPostView slug={slug} post={post} />;
 }
