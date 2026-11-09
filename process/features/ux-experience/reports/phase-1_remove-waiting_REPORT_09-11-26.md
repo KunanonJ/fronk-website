@@ -80,11 +80,23 @@ Cause of the marketing increase (module-level diff of `/about` chunks):
 - No new feature code is in those bytes: the cursor chunk grew 0.1 KB and the intro code is only on `/`.
 - Phase 2's framer-motion work (`LazyMotion`, or CSS for the simple reveals) replaces this chunk anyway, so it isn't worked around here.
 
+## Production check (after #55 deployed, 09-11-26)
+
+The same probe was run against https://kunanonj.com. The live home bundle contains the new intro ("Skip intro") and no `route-splash` code.
+
+| Check | Result |
+|---|---|
+| Intro on screen (unthrottled / throttled phone) | 1457 ms / 1484 ms |
+| Skip by key / tap / button | Exit starts within 0-1 ms; gone after 302 ms |
+| Navigation, h1 at full opacity (unthrottled) | 199-249 ms |
+| Navigation, h1 at full opacity (4x CPU, ~1.6 Mbps, 150 ms RTT) | 234 ms back to `/portfolio`. 461 ms on the first visit to `/portfolio/tbh-intranet`: the route payload arrived at 320 ms over the throttled network, then the 250 ms fade ran. Network-bound, not fade-bound; Phase 2 (payload size) is where to improve it |
+| Reduced motion | No intro; no fade (h1 visible 66-123 ms) |
+| Idle cursor | 0 rAF calls in 1 s |
+
 ## Not checked
 
 - WebKit/Safari and a real screen-reader pass (unchanged from the audit's gaps).
 - Visual baselines: still stale; Phase 5 refreshes them.
-- Production numbers wait for the deploy.
 
 ## Hand-off to Phase 2
 
