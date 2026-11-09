@@ -1,4 +1,4 @@
-import { groq } from "next-sanity";
+import { groq } from "./groq";
 
 const publicPostFilter = groq`
   _type == "post" &&
@@ -93,9 +93,6 @@ export const PREVIEW_POST_QUERY = groq`
   }
 `;
 
-export const PREVIEW_POST_SLUGS_QUERY = groq`
-  *[_type == "post" && defined(slug.current)][].slug.current
-`;
 
 export const WRITING_PAGE_QUERY = groq`
   *[_type == "writingPage"][0] {

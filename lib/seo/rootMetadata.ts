@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "@/lib/seo/types";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { site as landingSite } from "@/lib/content/landing";
 import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";

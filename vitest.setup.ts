@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 
 // jsdom implements neither `matchMedia` nor `IntersectionObserver`. Stub them so
@@ -27,3 +27,33 @@ if (typeof window !== "undefined" && !window.matchMedia) {
 afterEach(() => {
   cleanup();
 });
+
+// Components link with the project's TanStack Router <Link>, which needs a
+// router in context. Unit tests render components on their own, so the jsdom
+// project swaps it for a plain anchor with the same href, and gives the
+// navigation hooks a neutral default (tests override them with vi.mock).
+vi.mock("@/components/navigation/Link", async () => {
+  const React = await import("react");
+  type Props = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
+    href: string | { pathname?: string };
+    prefetch?: unknown;
+    scroll?: unknown;
+    replace?: unknown;
+  };
+  const Link = React.forwardRef<HTMLAnchorElement, Props>(function Link({ href, prefetch: _p, scroll: _s, replace: _r, ...rest }, ref) {
+    return React.createElement("a", { ref, href: typeof href === "string" ? href : (href.pathname ?? ""), ...rest });
+  });
+  return { default: Link };
+});
+
+vi.mock("@/lib/router/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
+  notFound: () => {
+    throw new Error("notFound");
+  },
+  redirect: () => {
+    throw new Error("redirect");
+  },
+}));

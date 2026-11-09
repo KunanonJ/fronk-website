@@ -1,4 +1,4 @@
-import Script from "next/script";
+import Script from "@/components/ui/Script";
 import { productionHost } from "@/components/GoogleAnalytics";
 
 /** GTM container IDs look like "GTM-XXXXXXX". */

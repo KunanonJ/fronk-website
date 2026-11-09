@@ -1,6 +1,6 @@
 # TanStack Start migration: umbrella plan
 
-**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phases 1-4 (scaffold, content routes, server surface and forms, caching and Sanity) executed 09-11-26; Phase 5 (staging and cutover) next, which needs the owner's `wrangler login`.
+**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phases 1-6 executed 09-11-26: production runs on TanStack Start (cutover #76, deploy fix #77) and Next is removed. Next: the owner-requested code review, then Phase 7 (bento redesign).
 **Created:** 09-11-26
 **Research:** `process/general-plans/references/tanstack-start-migration-research_REPORT_09-11-26.md`. That report covers the API mapping, the inventory, the risks and the parity references.
 **Target architecture:** `../references/target-architecture_09-11-26.md` (approved 09-11-26). It sets which TanStack packages and Cloudflare products each phase adopts.

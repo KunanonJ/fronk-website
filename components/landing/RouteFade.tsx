@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/lib/router/navigation";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 
 /** Fade-in length for the incoming page. */

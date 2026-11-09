@@ -1,41 +1,23 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import geistBold from "./fonts/Geist-Bold.ttf?inline";
+import geistRegular from "./fonts/Geist-Regular.ttf?inline";
 
-type FontLoader = (filePath: string) => Uint8Array;
-
-const dir = join(process.cwd(), "lib/og/fonts");
-
-const fontFiles = [
-  {
-    name: "Geist",
-    file: "Geist-Regular.ttf",
-    weight: 400 as const,
-    style: "normal" as const,
-  },
-  {
-    name: "Geist",
-    file: "Geist-Bold.ttf",
-    weight: 800 as const,
-    style: "normal" as const,
-  },
-];
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
+/*
+ * The two Geist faces for OG images (satori). The Worker has no filesystem,
+ * so the TTFs are bundled as data URLs and decoded once per isolate.
+ */
+function decode(dataUrl: string): ArrayBuffer {
+  const binary = atob(dataUrl.slice(dataUrl.indexOf(",") + 1));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
 }
 
-// The real brand faces, loaded lazily for next/og (Satori) so normal page
-// metadata imports do not fail in Worker bundles that omit raw TTF files.
-export function loadOgFonts(readFile: FontLoader = readFileSync) {
-  try {
-    return fontFiles.map(({ file, ...font }) => ({
-      ...font,
-      data: toArrayBuffer(readFile(join(dir, file))),
-    }));
-  } catch {
-    return [];
-  }
+let fonts: { name: string; data: ArrayBuffer; weight: 400 | 800; style: "normal" }[] | null = null;
+
+export function loadOgFonts() {
+  fonts ??= [
+    { name: "Geist", data: decode(geistRegular), weight: 400, style: "normal" },
+    { name: "Geist", data: decode(geistBold), weight: 800, style: "normal" },
+  ];
+  return fonts;
 }

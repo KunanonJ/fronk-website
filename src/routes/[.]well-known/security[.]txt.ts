@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GET } from "@/app/.well-known/security.txt/route";
+import { GET } from "@/src/server/text/securityTxt";
 
-/** The Next route handler, unchanged (next/server is a Vite-only stand-in). */
+/** Shared handler in src/server; this file only maps the URL. */
 export const Route = createFileRoute("/.well-known/security.txt")({
   server: {
     handlers: {

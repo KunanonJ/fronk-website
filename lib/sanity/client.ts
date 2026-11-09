@@ -1,4 +1,4 @@
-import { createClient, type SanityClient } from "next-sanity";
+import { createClient, type SanityClient } from "@sanity/client";
 import {
   createImageUrlBuilder,
   type SanityImageSource,
@@ -30,7 +30,6 @@ export function buildClient(options: BuildClientOptions = {}): SanityClient | nu
   });
 }
 
-export const sanityClient: SanityClient | null = buildClient();
 
 const builder = isSanityConfigured()
   ? createImageUrlBuilder({ projectId, dataset })

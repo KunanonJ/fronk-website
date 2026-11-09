@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withEdgeCache } from "@/src/lib/cache";
-import { GET } from "@/app/llms.txt/route";
+import { GET } from "@/src/server/text/llms";
 
-/** The Next route handler, unchanged (next/server is a Vite-only stand-in). */
+/** Shared handler in src/server; this file only maps the URL. */
 export const Route = createFileRoute("/llms.txt")({
   server: {
     handlers: {

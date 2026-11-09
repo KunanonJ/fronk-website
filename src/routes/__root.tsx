@@ -2,8 +2,8 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
 import type { RouterContext } from "../router";
-import NotFound from "@/app/not-found";
-import appCss from "@/app/globals.css?url";
+import NotFound from "@/components/NotFound";
+import appCss from "@/src/styles/globals.css?url";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";

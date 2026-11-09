@@ -95,7 +95,6 @@ export const SKILLS_REPO_URL = snapshot.repoUrl;
 export const SKILLS_TAG = snapshot.tag;
 export const SKILLS_VERSION = snapshot.version;
 export const SKILLS_RELEASE_URL = snapshot.releaseUrl;
-export const SKILLS_PUBLISHED_AT = snapshot.publishedAt;
 export const SKILLS_ROOT = snapshot.skillsRoot;
 export const SKILLS_LICENSE = "MIT";
 export const PLUGIN_ZIP: SkillAsset = snapshot.pluginZip;
@@ -110,7 +109,6 @@ const tree = (repoPath: string) =>
 export const PLUGIN_FOLDER_URL = tree(PLUGIN_FOLDER);
 export const THIRD_PARTY_URL = blob(`${PLUGIN_FOLDER}/THIRD_PARTY.md`);
 export const SOURCES_LOCK_URL = blob("sources.lock.json");
-export const LICENSE_URL = blob("LICENSE");
 
 export const SKILL_SOURCES: readonly SkillSource[] = snapshot.sources;
 

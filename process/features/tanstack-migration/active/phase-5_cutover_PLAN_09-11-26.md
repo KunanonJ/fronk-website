@@ -1,6 +1,6 @@
 # Phase 5: Staging and cutover
 
-**Status:** IN PROGRESS 09-11-26: staging verified, cutover PR open.
+**Status:** DONE 09-11-26. Production is TanStack Start (version 9f694ce7 from a clean checkout of main, then Workers Builds 3b71dc3f after #77). All 120 reference URLs match on kunanonj.com; 77 Worker invocations during the crawl, all ok.
 **Created:** 09-11-26
 **Umbrella:** `tanstack-migration_UMBRELLA_PLAN_09-11-26.md`
 
@@ -33,4 +33,8 @@ The exit gate in the umbrella table, plus the standard gates (typecheck, lint, u
 - OpenNext's Durable Object classes stay bound and are exported as empty classes, so the v1 migration still matches and a dashboard rollback to the Next version works. Phase 6 deletes them with a migration.
 - `src/server.ts` also answers the old cron Worker's `GET /api/cron/revalidate` (Bearer `CRON_SECRET`) until that Worker is deleted.
 - `build:cloudflare` builds Start (`vite build` between the Sanity steps); `deploy`, `upload` and `preview` use wrangler with the Vite output; `deploy:staging` builds against `wrangler.start.jsonc`.
+
+## Cutover incident (09-11-26)
+
+The Workers Builds production deploy of #76 failed while the PR's `versions upload` had worked. Wrangler 4.156 hands `wrangler deploy` to `opennextjs-cloudflare deploy` when `next.config.*`, `open-next.config.*` and `@opennextjs/cloudflare` all exist. With the owner's go-ahead, production was deployed from a clean worktree of main with `open-next.config.ts` removed; #77 removed it from the repo, and the next Workers Builds deploy succeeded. Production stayed on the last Next version until then.
 

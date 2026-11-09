@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from "@/lib/seo/types";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { FEED_PATH } from "@/lib/content/rss";
 import { OG_SIZE } from "@/lib/og/card";

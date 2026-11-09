@@ -3,7 +3,7 @@ import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 /**
  * Ratchet on raw 6-digit hex colours in components and pages
- * (visual-redesign): colour belongs in app/globals.css tokens. Lower MAX as
+ * (visual-redesign): colour belongs in src/styles/globals.css tokens. Lower MAX as
  * pages are redesigned; the target is 0. Never raise it.
  *
  * Allowlisted: renderers that can't read CSS variables (icons, OG images) and
@@ -13,7 +13,7 @@ const MAX_RAW_HEX = 0;
 const ALLOW = [/^app\/icon\.tsx$/, /^app\/apple-icon\.tsx$/, /opengraph-image\.tsx$/, /^app\/layout\.tsx$/];
 
 describe("raw hex ratchet", () => {
-  const files = sourceFiles(["components/landing", "app"]).filter(
+  const files = sourceFiles(["components/landing", "src/routes"]).filter(
     (f) => !ALLOW.some((re) => re.test(f)),
   );
   const counts = files

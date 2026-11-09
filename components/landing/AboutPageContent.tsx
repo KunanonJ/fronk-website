@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { AnnotatedText } from "@/components/landing/AnnotatedText";
 import ContributionActivity from "@/components/landing/ContributionActivity";

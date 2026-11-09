@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound } from "@/lib/router/navigation";
 import BlogPostPage from "@/components/landing/BlogPostPage";
 import { FALLBACK_BLOG_POSTS, mapPostToBlogCard } from "@/lib/content/blog";
 import type { Post } from "@/lib/sanity/types";

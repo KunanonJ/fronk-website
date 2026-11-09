@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowDown } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import {
@@ -48,7 +48,6 @@ export default function AboutHero() {
         <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
           {/* Plain <img>: Next's optimizer passes images through unchanged on
               Workers, and next/image would add ~7 KB of client JS here. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={hero.portraitSrc}
             alt={hero.portraitAlt}

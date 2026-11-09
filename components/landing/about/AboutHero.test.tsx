@@ -4,7 +4,7 @@ import AboutHero from "@/components/landing/about/AboutHero";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
 
-vi.mock("next/navigation", () => ({
+vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => "/about",
   useRouter: () => ({ push: vi.fn(), prefetch: vi.fn() }),
 }));

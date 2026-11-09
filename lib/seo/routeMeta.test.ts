@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_OG_IMAGE, routeShareMeta } from "./routeMeta";
@@ -104,23 +104,19 @@ describe("routeShareMeta", () => {
     expect(meta.twitter?.images).toBeUndefined();
   });
 
-  it("is told about every route segment with its own opengraph-image file", () => {
-    // In Next.js 16.4 a config-based openGraph.images replaces a segment's
-    // opengraph-image file, so those pages must opt out of the default.
-    const appDir = join(process.cwd(), "app");
-    const segments = readdirSync(appDir, { recursive: true, encoding: "utf8" })
-      .filter((file) => /(^|\/)opengraph-image\.tsx$/.test(file))
-      .map((file) => join(appDir, file, ".."))
-      .filter((dir) => dir !== appDir);
+  it("is told about every route that serves its own OG image file", () => {
+    // A config-based openGraph.images would replace the route's own OG image
+    // (src/server/og), so those routes must opt out of the default.
+    const routesDir = join(process.cwd(), "src/routes");
+    const routes = readdirSync(routesDir, { recursive: true, encoding: "utf8" })
+      .filter((file) => file.endsWith(".tsx"))
+      .map((file) => join(routesDir, file))
+      .filter((file) => readFileSync(file, "utf8").includes("fileOg("));
 
-    expect(segments.length).toBeGreaterThan(0);
-    for (const dir of segments) {
-      const page = join(dir, "page.tsx");
-      if (!existsSync(page)) continue;
-      const source = readFileSync(page, "utf8");
-      if (source.includes("routeShareMeta(")) {
-        expect(source, page).toContain("hasOwnOgImage: true");
-      }
+    expect(routes.length).toBeGreaterThan(0);
+    for (const file of routes) {
+      const source = readFileSync(file, "utf8");
+      if (source.includes("routeShareMeta(")) expect(source, file).toContain("hasOwnOgImage: true");
     }
   });
 

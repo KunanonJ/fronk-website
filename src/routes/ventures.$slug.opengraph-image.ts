@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withEdgeLifetime } from "@/src/lib/cache";
-import render from "@/app/(landing)/ventures/[slug]/opengraph-image";
+import render from "@/src/server/og/ventureOg";
 
 /** Next's file-convention image (next/og is @cf-wasm/og in this build). Edge-cached
  * for a day (the Worker cache key includes the deploy version). Browsers get a

@@ -1,7 +1,63 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { ThaiTopicPillarPageView, generateMetadata } from "@/app/(landing)/th/topics/[slug]/page";
-import { getTopicPillar, isTopicSlug } from "@/lib/content/topics/pillars";
+import TopicHubPage from "@/components/landing/discovery/TopicHubPage";
+import type { Metadata } from "@/lib/seo/types";
+import {
+  getTopicPillar,
+  isTopicSlug,
+  topicHreflang,
+  type TopicSlug,
+} from "@/lib/content/topics/pillars";
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+} from "@/lib/seo/jsonLd";
 import { pageHead } from "@/src/lib/head";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
+
+type Props = { params: Promise<{ slug: string }> };
+
+async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  if (!isTopicSlug(slug)) return { title: "หัวข้อ" };
+  const pillar = getTopicPillar(slug, "th");
+  if (!pillar) return { title: "หัวข้อ" };
+  return routeShareMeta({
+    title: pillar.title,
+    description: pillar.description,
+    path: `/th/topics/${slug}`,
+    languages: topicHreflang(slug),
+    locale: "th_TH",
+  });
+}
+
+/** The page body for one slug; shared with the TanStack Start route. */
+function ThaiTopicPillarPageView({ slug }: { slug: string }) {
+  if (!isTopicSlug(slug)) notFound();
+  const pillar = getTopicPillar(slug, "th");
+  if (!pillar) throw notFound();
+
+  const faqLd = JSON.stringify(buildFaqJsonLd(pillar.faqs));
+  const crumbLd = JSON.stringify(
+    buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: pillar.h1, path: `/th/topics/${slug as TopicSlug}` },
+    ]),
+  );
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      />
+      <TopicHubPage pillar={pillar} />
+    </>
+  );
+}
 
 export const Route = createFileRoute("/_landing/th/topics/$slug")({
   loader: async ({ params }) => {

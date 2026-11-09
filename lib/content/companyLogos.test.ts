@@ -57,7 +57,7 @@ describe("self-hosted company logos (ux-audit finding 12)", () => {
           hits.push(rel);
       }
     };
-    for (const dir of ["app", "components", "lib", "scripts"]) walk(dir);
+    for (const dir of ["src", "components", "lib", "scripts"]) walk(dir);
     expect(hits).toEqual([]);
   });
 });

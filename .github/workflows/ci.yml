@@ -207,12 +207,11 @@ jobs:
             test-results/
           retention-days: 7
 
-  # TanStack Start migration: build the Start app and run its gates (parity
-  # diff, smoke + axe, Linux visual baselines) for the routes in
-  # src/ported-routes.json. Next's jobs above stay the production gate until
-  # the Phase 5 cutover.
-  start:
-    name: start
+  # SEO parity: every URL in the migration reference crawl must keep its
+  # status, redirect, head tags and text bodies (scripts/start-gates.mjs).
+  # Smoke, axe and visual run in the jobs above.
+  parity:
+    name: parity
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container:
@@ -235,21 +234,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build (Start)
+      - name: Build
         env:
           NEXT_PUBLIC_SITE_URL: https://kunanonj.com
           NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
-        run: pnpm start:build
+        run: pnpm build
 
-      - name: Start gates (parity, smoke + axe, visual)
-        run: node scripts/start-gates.mjs --visual
-
-      - name: Upload snapshots and diffs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: start-visual
-          path: test-results/
-          retention-days: 7
+      - name: Parity diff against the reference crawl
+        run: node scripts/start-gates.mjs --parity-only

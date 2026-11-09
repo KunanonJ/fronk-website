@@ -30,7 +30,7 @@ export async function handleSanityWebhook(
     return Response.json({ message: "Invalid signature" }, { status: 401 });
   }
 
-  let body: { _type?: string } | null = null;
+  let body: { _type?: string } | null;
   try {
     body = JSON.parse(payload) as { _type?: string };
   } catch {

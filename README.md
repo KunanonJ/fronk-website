@@ -10,13 +10,13 @@ Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
 and AI workspaces (GoGoCash, Manut AI). The public UI uses the
 visual-redesign system (09-11-26): light by default with a dark toggle, the
 Signal/Glaze/Ink palette and Geist; resume and Sanity Studio remain as system
-surfaces. Built with Next.js and deployed on Cloudflare Workers via OpenNext.
+surfaces. Built with TanStack Start and deployed on Cloudflare Workers.
 
 ```
-Tech:      Next.js 16.4 · React 19.3 · TypeScript 7 (+ TS6 API for ESLint) · Tailwind v4 (CSS-only motion)
+Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
-Runtime:   Node.js ≥22.22 · Cloudflare Workers + OpenNext + R2 cache
+Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache, cron, rate limiting)
 Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visual-redesign)
 ```
 
@@ -34,7 +34,8 @@ Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visua
 - Public marketing cutover: Home (`/`) with an Apple-style multilingual intro
   (“Welcome to KunanonJ”). `/showcase` (06-11-26) and `/stock/velorah` (09-11-26)
   were retired and redirect to `/`.
-- Full-stack Next.js App Router on Cloudflare Workers via OpenNext.
+- TanStack Start on Cloudflare Workers: content pages prerendered at deploy, Sanity pages
+  rendered on request and cached at the edge, purged by tag when Sanity publishes.
 - Landing content is static and owner-editable in `lib/content/landing.ts`.
 - Sanity retained for Studio launcher and `/resume` (with static fallbacks).
 - Primary nav routes: `/`, `/about`, `/ventures` → `/#ventures`, `/press`,
@@ -50,10 +51,10 @@ Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visua
 Visitor / crawler
       |
       v
-Cloudflare Worker custom domains
-  - Next.js app via OpenNext
-  - Static assets through Workers Assets
-  - R2-backed incremental cache
+Cloudflare Worker (fronk-website, custom domains)
+  - Static assets: prerendered pages, hashed JS/CSS, fonts
+  - Worker cache: Sanity-backed pages, Cache-Tag purge (webhook + hourly cron)
+  - TanStack Start: SSR, server functions, server routes (src/server.ts entry)
       |
       +--> Static landing content (lib/content/landing.ts)
       +--> Sanity Content Lake (studio / resume)
@@ -68,8 +69,8 @@ Cloudflare Cron ---> /api/cron/revalidate
 | Path                                       | Source                         | Notes                                              |
 | ------------------------------------------ | ------------------------------ | -------------------------------------------------- |
 | `/`                                        | Static landing                 | Intro loader, Hero, About, Ventures, contact       |
-| `/resume`                                  | Sanity + fallback (ISR)        | CV; noindex                                        |
-| `/studio/[[...tool]]`                      | Sanity Studio launcher         | External Studio URL                                |
+| `/resume`                                  | Sanity + fallback (edge cached) | CV; noindex                                       |
+| `/studio`                                  | Sanity Studio launcher         | External Studio URL                                |
 | `/about`                                   | About page                     | “Built for the curious” (ex-`/stock/asme`)         |
 | `/ventures`, `/work`                       | 308 redirect                   | Into `/#ventures`                                  |
 | `/contact`                                 | Forma contact landing          | Video + contact form (nav Contact target)          |
@@ -77,9 +78,8 @@ Cloudflare Cron ---> /api/cron/revalidate
 | `/blog`, `/blog/[slug]`                    | Sanity-backed blog             | Banner cards, tags, search/filter; edit in Studio  |
 | `/now`, `/writing`, `/writing/[slug]`      | 308 redirect                   | Into `/`                                           |
 | `/work`                                    | 308 redirect                   | Into `/#ventures`                                  |
-| `/api/revalidate`                          | POST                           | Sanity webhook → cache tags                        |
-| `/api/draft`, `/api/draft/disable`         | GET                            | Draft preview mode                                 |
-| `/api/cron/revalidate`                     | GET                            | Scheduled revalidation (Bearer auth)               |
+| `/api/revalidate`                          | POST (src/server.ts)           | Sanity webhook → purge Worker cache tags           |
+| `/api/cron/revalidate`                     | GET (src/server.ts)            | Old cron Worker bridge (Bearer auth)               |
 | `/sitemap.xml`, `/robots.txt`, `/feed.xml`, `/rss.xml` | generated / redirect | XML sitemap + RSS (`/rss.xml` → `/feed.xml`)        |
 | `/agents.md`, `/sitemap.md`, `/skills.md`, `/llms.txt` | static / route         | Agent & LLM discovery surfaces (linked in footer)  |
 
@@ -105,14 +105,14 @@ App boots at http://localhost:3000.
 
 | Command                        | Purpose                                                     |
 | ------------------------------ | ----------------------------------------------------------- |
-| `pnpm dev`                     | Dev server with Turbopack                                   |
-| `pnpm build`                   | Production Next.js build (CI, `pnpm start`)                 |
-| `pnpm build:cloudflare`        | OpenNext Worker build (Workers Builds / deploy)             |
-| `pnpm start`                   | Run the production build locally (port 3000 by default)     |
+| `pnpm dev`                     | Vite dev server (Workers runtime via the Cloudflare plugin) |
+| `pnpm build`                   | Production build: Sanity manifest, `vite build`, prerender  |
+| `pnpm build:cloudflare`        | Same as `pnpm build` (the Workers Builds build command)     |
+| `pnpm start`                   | Serve the production build in workerd (port 3000)           |
 | `pnpm preview`                 | Build and preview the app in the Cloudflare Workers runtime |
 | `pnpm run deploy`              | Build and deploy the app to Cloudflare Workers              |
 | `pnpm upload`                  | Build and upload a Worker version without immediate deploy  |
-| `pnpm cf-typegen`              | Generate Cloudflare binding types from `wrangler.jsonc`     |
+| `pnpm deploy:staging`          | Build and deploy the staging Worker (`fronk-website-start`) |
 | `pnpm cron:preview`            | Preview the separate Cloudflare Cron Worker locally         |
 | `pnpm cron:deploy`             | Deploy the separate Cloudflare Cron Worker                  |
 | `pnpm typecheck`               | `tsc --noEmit`                                              |
@@ -120,6 +120,7 @@ App boots at http://localhost:3000.
 | `pnpm format` / `format:check` | Prettier write / verify                                     |
 | `pnpm test`                    | Vitest (unit + integration)                                 |
 | `pnpm test:watch`              | Vitest watch mode                                           |
+| `pnpm test:coverage`           | Vitest with V8 coverage                                     |
 | `pnpm test:e2e`                | Playwright (configure first; see `tests/e2e/`)              |
 | `pnpm perf:budget`             | First-load JS gzip budget (route-aware)                     |
 
@@ -138,7 +139,7 @@ Edit static copy in:
   greetings and timing (ends on **Welcome to KunanonJ**; whole intro capped at
   1.5 s by a unit test, skippable)
 
-UI lives under `components/landing/` and `app/(landing)/`.
+UI lives under `components/landing/`; each page's metadata and data live in its route file under `src/routes/`.
 
 ### Sanity (system surfaces)
 
@@ -171,20 +172,14 @@ it creates missing documents without overwriting edited content.
 
 ## Deploying to Cloudflare Workers
 
-Cloudflare Workers with OpenNext is the production runtime. Worker config lives
-in `wrangler.jsonc`; OpenNext config lives in `open-next.config.ts`.
+Production is a TanStack Start Worker (`fronk-website`, config in
+`wrangler.jsonc`). `pnpm build` writes `.wrangler/deploy/config.json`, so a
+plain `wrangler deploy` ships the built Worker in `dist/`.
 
 ```bash
-pnpm build:cloudflare
-pnpm run deploy
+pnpm run deploy          # build + wrangler deploy (production)
+pnpm run deploy:staging  # build + deploy fronk-website-start (wrangler.start.jsonc)
 ```
-
-`pnpm preview` builds with OpenNext and runs the app in Wrangler's local Worker
-runtime (default port **8787**).
-
-Production uses Cloudflare Worker custom domains for `kunanonj.com` and
-`www.kunanonj.com`, R2-backed OpenNext cache, and a separate Cron Worker for
-scheduled revalidation.
 
 **Workers Builds** (CI/CD):
 
@@ -193,28 +188,22 @@ scheduled revalidation.
 | Deploy default branch | `main` | `pnpm run build:cloudflare` | `npx wrangler deploy` |
 | Deploy non-production branches | all except `main` | `pnpm run build:cloudflare` | `npx wrangler versions upload` |
 
-`pnpm build` runs Next.js only (used by GitHub Actions and `pnpm start`).
-OpenNext output lives under `.open-next/` and is produced by `build:cloudflare`
-or `pnpm run deploy` / `pnpm preview`. Do **not** use `pnpm build` as a
-Workers Builds build command — Wrangler needs `.open-next/worker.js`.
+How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 
-Cloudflare deployment requirements:
-
-- `wrangler.jsonc` uses `.open-next/worker.js`, Workers static assets, and
-  `nodejs_compat`.
-- R2 binding `NEXT_INC_CACHE_R2_BUCKET` → bucket `fronk-website-opennext-cache`.
-- ISR (see `open-next.config.ts`): Durable Object queue `NEXT_CACHE_DO_QUEUE`
-  (`DOQueueHandler`) re-renders stale pages through `WORKER_SELF_REFERENCE`, and
-  the sharded tag cache `NEXT_TAG_CACHE_DO_SHARDED` (`DOShardedTagCache`) makes
-  `revalidateTag` from the Sanity webhook and hourly cron take effect. Both are
-  created by the `v1` migration in `wrangler.jsonc`; a branch preview build
-  (`wrangler versions upload`) can't apply a new migration, so only the `main`
-  deploy does. `NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE=true` and `keep_names: false`
-  are deliberate; the reasons are commented in `wrangler.jsonc`.
-- Sanity is configured at runtime (wrangler `vars`), not at build, so pages
-  are prerendered from fallback content and pick up Sanity on their first
-  re-render. Sanity-backed routes set `revalidate = 60`.
-- `wrangler.revalidate-cron.jsonc` defines the hourly revalidation Worker.
+- **Static assets:** prerendered content pages, hashed JS/CSS and fonts are served
+  before the Worker runs. Paths ending in `/` reach the Worker (`run_worker_first`)
+  so they get a 308 like the old site.
+- **Worker cache** (`cache.enabled`): Sanity-backed pages and text files send
+  `Cache-Tag` and `CDN-Cache-Control`; `POST /api/revalidate` (Sanity webhook,
+  signature checked with `@sanity/webhook`) purges the document's tags, and the
+  hourly cron (`scheduled()`) purges everything as a safety net.
+- **Forms:** `FORM_RATE_LIMIT` (5 per minute per IP) on contact and subscribe;
+  Turnstile once `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set.
+- **Legacy:** OpenNext's two Durable Object classes stay exported as empty classes
+  so a dashboard rollback to the last Next version still works; remove them with a
+  `deleted_classes` migration once that rollback is no longer needed. The old
+  `fronk-website-revalidate-cron` Worker still calls `/api/cron/revalidate`, which
+  the Start Worker answers until that Worker is deleted.
 - `/studio` launches an external Studio via `NEXT_PUBLIC_SANITY_STUDIO_URL`.
 - Copy `.dev.vars.example` to `.dev.vars` for local Worker-specific values.
   Never commit real secrets.
@@ -229,16 +218,17 @@ Cloudflare deployment requirements:
 | `NEXT_PUBLIC_SANITY_API_VERSION`             | yes\*    | yes     | e.g. `2025-01-01`                                       |
 | `NEXT_PUBLIC_SANITY_STUDIO_URL`              | yes\*    | yes     | Hosted Sanity Studio URL used by `/studio`              |
 | `SANITY_REVALIDATE_SECRET`                   | yes\*    | no      | Webhook HMAC secret                                     |
-| `SANITY_PREVIEW_SECRET`                      | optional | no      | Draft preview links                                     |
-| `SANITY_API_READ_TOKEN`                      | optional | no      | Draft previews                                          |
 | `SANITY_AUTH_TOKEN`                          | optional | no      | Schema deploy on build                                  |
-| `CRON_SECRET`                                | optional | no      | Scheduled revalidation                                  |
+| `CRON_SECRET`                                | optional | no      | Old cron Worker bridge (`/api/cron/revalidate`)         |
+| `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact, subscribe)               |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`             | optional | yes     | Turnstile widget (build-time)                           |
 | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`               | optional | yes     | Umami                                                   |
 | `NEXT_PUBLIC_UMAMI_HOST`                     | optional | yes     | Defaults to `https://cloud.umami.is`                    |
 | `NEXT_PUBLIC_GA_ID`                          | optional | yes     | GA4 measurement ID                                      |
 
-\*Required if you use Studio, resume CMS, webhooks, or draft preview.
+\*Required if you use Studio, the resume CMS or the Sanity webhook. The
+`NEXT_PUBLIC_` names are kept from the Next era; Vite inlines them at build.
 
 Redeploy after setting `NEXT_PUBLIC_SITE_URL` so sitemap and OG URLs are correct.
 
@@ -265,23 +255,22 @@ variables are present.
 ## Project structure
 
 ```
-app/
-  (landing)/             # Public marketing shell (/ and marketing pages)
-  (system)/resume/       # CV utility route
-  api/                   # revalidate, draft, cron, subscribe
-  studio/                # External Sanity Studio launcher
-components/
-  landing/               # IntroLoader, Hero, About, Features, page components
-  layout/                # Legacy FogLAMP chrome (unused on landing)
-  ui/                    # Shared primitives
-lib/
-  content/landing.ts     # Primary public copy
-  content/introGreetings.ts
-  sanity/                # Client, queries, fetchers
-process/features/
-  landing-cutover/       # Active program plans
-wrangler.jsonc           # Cloudflare app Worker
-wrangler.revalidate-cron.jsonc
+src/
+  server.ts              # Worker entry: redirects, Sanity webhook purge, cron, then Start
+  router.tsx             # Router + per-request QueryClient (SSR query integration)
+  routes/                # File routes: each page owns its metadata, loader and component
+    _landing/            # Public site (layout: nav + footer)
+    _system/             # /resume, /design (minimal chrome)
+    api/, *.ts           # Server routes: APIs, feeds, robots, sitemap, OG images
+  server/                # Server-only code: API handlers, text endpoints, OG renderers,
+                         #   server functions (Sanity reads), cache purge, form guard
+  queries/               # TanStack Query options for Sanity content
+  lib/                   # head() from metadata, cache headers, redirects, OG helpers
+  styles/                # globals.css (design tokens), fonts.css (self-hosted fonts)
+components/              # React components (landing, ui, navigation, studio, resume)
+lib/                     # Framework-free content, SEO, Sanity client, utilities
+tests/e2e/               # Playwright smoke, axe and Linux visual baselines
+wrangler.jsonc           # Production Worker; wrangler.start.jsonc = staging
 ```
 
 ## Testing

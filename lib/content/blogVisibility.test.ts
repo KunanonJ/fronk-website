@@ -43,14 +43,14 @@ describe.runIf(!BLOG_PUBLIC)("while the blog is hidden", () => {
   });
 
   it("leaves blog URLs out of sitemap.xml", async () => {
-    const { default: sitemap } = await import("@/app/sitemap");
+    const { default: sitemap } = await import("@/lib/seo/sitemap");
     const urls = (await sitemap()).map((e) => new URL(e.url).pathname);
     expect(urls.some(isBlogHref)).toBe(false);
     expect(urls).toContain("/about");
   });
 
   it("leaves the blog, its posts and the RSS feed out of llms.txt", async () => {
-    const { GET } = await import("@/app/llms.txt/route");
+    const { GET } = await import("@/src/server/text/llms");
     const text = await (await GET()).text();
     expect(text).not.toMatch(/\/blog(\/|\b)/);
     expect(text).not.toContain("/feed.xml");
@@ -58,7 +58,7 @@ describe.runIf(!BLOG_PUBLIC)("while the blog is hidden", () => {
   });
 
   it("serves a valid RSS feed with no items", async () => {
-    const { GET } = await import("@/app/feed.xml/route");
+    const { GET } = await import("@/src/server/text/feed");
     const xml = await (await GET()).text();
     expect(xml).toContain("<channel>");
     expect(xml).not.toContain("<item>");

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight } from "lucide-react";
 import { AnnotatedText } from "@/components/landing/AnnotatedText";
 import { Section } from "@/components/ui/Section";

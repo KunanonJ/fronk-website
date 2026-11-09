@@ -1,41 +1,58 @@
+import js from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+/*
+ * Lint for the TanStack Start app. The rule set is what eslint-config-next
+ * shipped before the move off Next (React + React Hooks recommended, a
+ * jsx-a11y subset, typescript-eslint recommended), with the plugins as direct
+ * dependencies so upgrades are explicit.
+ */
+export default defineConfig([
   globalIgnores([
-    ".next/**",
-    ".open-next/**",
+    "dist/**",
     ".wrangler/**",
     ".sanity/**",
     ".claude/**",
     ".agents/**",
     ".codex/**",
     ".vibecode-backup/**",
-    "out/**",
-    "build/**",
-    "dist/**",
+    ".next/**",
+    ".open-next/**",
     "public/studio/static/**",
-    "next-env.d.ts",
+    "src/routeTree.gen.ts",
     "node_modules/**",
   ]),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
-    rules: {
-      // Personal site: prose includes apostrophes/quotes; the explicit-entity
-      // requirement is noise without an a11y or escaping concern in modern React.
-      "react/no-unescaped-entities": "off",
+    files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts}"],
+    plugins: { react, "react-hooks": reactHooks, "jsx-a11y": jsxA11y },
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+      parserOptions: { ecmaFeatures: { jsx: true } },
     },
-  },
-  {
-    // The TanStack Start app (tanstack-migration) is not Next: Next's document
-    // and image rules don't apply, and the next/* shims drop Next-only props
-    // by destructuring them into _-prefixed names.
-    files: ["src/**/*.{ts,tsx}"],
+    settings: { react: { version: "detect" } },
     rules: {
-      "@next/next/no-head-element": "off",
-      "@next/next/no-img-element": "off",
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react/no-unknown-property": "off",
+      "react/jsx-no-target-blank": "off",
+      // Personal site: prose includes apostrophes and quotes; escaping them adds noise.
+      "react/no-unescaped-entities": "off",
+      "jsx-a11y/alt-text": ["warn", { elements: ["img"], img: ["Image"] }],
+      "jsx-a11y/aria-props": "warn",
+      "jsx-a11y/aria-proptypes": "warn",
+      "jsx-a11y/aria-unsupported-elements": "warn",
+      "jsx-a11y/role-has-required-aria-props": "warn",
+      "jsx-a11y/role-supports-aria-props": "warn",
+      // `_`-prefixed names are deliberate (dropped props, unused args).
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
@@ -43,5 +60,3 @@ const eslintConfig = defineConfig([
     },
   },
 ]);
-
-export default eslintConfig;

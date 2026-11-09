@@ -1,5 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/components/ui/Image";
+import Link from "@/components/navigation/Link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
 import PortfolioCover from "@/components/landing/PortfolioCover";

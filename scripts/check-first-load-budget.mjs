@@ -1,21 +1,16 @@
 #!/usr/bin/env node
 /**
- * Landing-JS perf gate (Phase 5).
+ * Landing-JS perf gate, measured from the SHIPPED output: a prerendered page's
+ * HTML (dist/client/*.html, TanStack Start) references exactly the JS the
+ * browser fetches on first load (module script + modulepreload links). Lazy
+ * chunks are not referenced and so are correctly excluded. Pages rendered on
+ * request (Sanity-backed) are not prerendered and are not measured here.
  *
- * Why this exists: under the default Turbopack `next build`, Next 16 prints no
- * First-Load-JS table, and the classic `@next/bundle-analyzer` is a silent no-op
- * ("not compatible with Turbopack builds"). So the perf gate is measured here
- * directly from the SHIPPED output: a statically-prerendered route's HTML
- * references exactly the JS chunks the browser fetches on first load. Async /
- * dynamic-imported chunks (the Sanity Studio) are not referenced and so are
- * correctly excluded.
+ * Run AFTER a production build:  pnpm build  &&  node scripts/check-first-load-budget.mjs
  *
- * Run AFTER a production build:  next build  &&  node scripts/check-first-load-budget.mjs
- *
- * The budget is the measured React 19 + Next 16 App Router framework floor plus
- * a little headroom. Its job is to catch a REGRESSION — app code leaking a heavy
- * dependency into first load — not to chase a number that predates measuring the
- * framework cost. Treemap detail: `pnpm analyze` (forces the webpack analyzer).
+ * The budget is the measured framework floor plus a little headroom. Its job is
+ * to catch a REGRESSION (app code leaking a heavy dependency into first load),
+ * not to chase a number that predates measuring the framework cost.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -65,20 +60,18 @@ function isMarketingRoute(route) {
 function budgetKbForRoute(route) {
   return isMarketingRoute(route) ? MARKETING_BUDGET_KB : DEFAULT_BUDGET_KB;
 }
-const APP_DIR = ".next/server/app";
+const APP_DIR = "dist/client";
 
 function chunksForHtml(htmlPath) {
   const html = fs.readFileSync(htmlPath, "utf8");
-  const refs = [...html.matchAll(/\/_next\/static\/chunks\/([^"'\\]+?\.js)/g)].map(
-    (m) => m[1],
-  );
+  const refs = [...html.matchAll(/\/assets\/([^"'\\]+?\.js)/g)].map((m) => m[1]);
   return [...new Set(refs)];
 }
 
 function gzipKb(chunkNames) {
   let total = 0;
   for (const name of chunkNames) {
-    const p = path.join(".next/static/chunks", name);
+    const p = path.join("dist/client/assets", name);
     if (!fs.existsSync(p)) continue;
     total += zlib.gzipSync(fs.readFileSync(p)).length;
   }
@@ -88,7 +81,7 @@ function gzipKb(chunkNames) {
 function findRouteHtml() {
   if (!fs.existsSync(APP_DIR)) {
     console.error(
-      `[perf] ${APP_DIR} not found. Run a production build first: pnpm exec next build`,
+      `[perf] ${APP_DIR} not found. Run a production build first: pnpm build`,
     );
     process.exit(2);
   }
@@ -101,10 +94,10 @@ function findRouteHtml() {
     }
   };
   walk(APP_DIR);
-  // Skip framework error boundaries — not user-navigable routes.
-  return out.filter((p) => !/_global-error|_not-found/.test(p));
+  return out;
 }
 
+const seen = new Set();
 const routes = findRouteHtml()
   .map((htmlPath) => {
     const route =
@@ -116,6 +109,8 @@ const routes = findRouteHtml()
     const chunks = chunksForHtml(htmlPath);
     return { route: route === "/" ? "/" : route.replace(/\/$/, ""), chunks, kb: gzipKb(chunks) };
   })
+  // /portfolio.html and /portfolio/index.html are the same route.
+  .filter((r) => (seen.has(r.route) ? false : seen.add(r.route)))
   .sort((a, b) => b.kb - a.kb);
 
 console.log(

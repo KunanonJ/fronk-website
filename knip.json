@@ -1,5 +1,17 @@
 {
-  "entry": ["workers/revalidate-cron.ts", "scripts/*.mjs"],
-  "ignore": [".codex/**", ".claude/**", ".agents/**"],
+  "entry": [
+    "src/router.tsx",
+    "src/routes/**/*.{ts,tsx}",
+    "postcss.config.mjs",
+    "workers/revalidate-cron.ts",
+    "scripts/*.mjs"
+  ],
+  "ignore": [
+    ".codex/**"
+  ],
+  "ignoreDependencies": [
+    "@tailwindcss/postcss",
+    "cloudflare"
+  ],
   "ignoreExportsUsedInFile": true
 }

@@ -8,8 +8,8 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/navigation/Link";
+import { usePathname } from "@/lib/router/navigation";
 import {
   BadgeCheck,
   Blocks,

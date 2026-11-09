@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+import type { Manifest, Robots, Sitemap } from "@/lib/seo/types";
 
 /*
  * Text output of Next's metadata routes (robots.ts, sitemap.ts, manifest.ts),
@@ -8,7 +8,7 @@ import type { MetadataRoute } from "next";
 
 const list = <T,>(value: T | T[] | undefined): T[] => (value === undefined ? [] : Array.isArray(value) ? value : [value]);
 
-export function robotsToText(robots: MetadataRoute.Robots): string {
+export function robotsToText(robots: Robots): string {
   let out = "";
   for (const rule of list(robots.rules)) {
     for (const agent of list(rule.userAgent ?? "*")) out += `User-Agent: ${agent}\n`;
@@ -22,7 +22,7 @@ export function robotsToText(robots: MetadataRoute.Robots): string {
   return out;
 }
 
-export function sitemapToXml(entries: MetadataRoute.Sitemap): string {
+export function sitemapToXml(entries: Sitemap): string {
   let out = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   for (const entry of entries) {
     out += "<url>\n";
@@ -38,6 +38,6 @@ export function sitemapToXml(entries: MetadataRoute.Sitemap): string {
   return `${out}</urlset>\n`;
 }
 
-export function manifestToJson(manifest: MetadataRoute.Manifest): string {
+export function manifestToJson(manifest: Manifest): string {
   return JSON.stringify(manifest);
 }

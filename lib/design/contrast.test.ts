@@ -8,7 +8,7 @@ import {
   parseColor,
 } from "@/lib/design/contrast";
 
-const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+const css = readFileSync(join(process.cwd(), "src/styles/globals.css"), "utf8");
 
 /** Collects custom properties from every top-level block with this selector. */
 function block(selector: ":root" | ".dark"): Record<string, string> {

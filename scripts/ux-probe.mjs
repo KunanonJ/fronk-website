@@ -34,7 +34,9 @@ async function probe(browser, route) {
   await page.addInitScript(() => {
     try {
       sessionStorage.setItem("fronk-intro-seen", "1");
-    } catch {}
+    } catch {
+      // storage blocked: the intro may show, which only affects this probe
+    }
     window.__ux = { lcp: 0, lcpEl: "", cls: 0, tbt: 0 };
     new PerformanceObserver((list) => {
       for (const e of list.getEntries()) {

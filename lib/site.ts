@@ -23,4 +23,3 @@ export const siteConfig = {
   discordHandle: "fronk98",
 } as const;
 
-export type SiteConfig = typeof siteConfig;

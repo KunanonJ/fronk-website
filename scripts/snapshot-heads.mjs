@@ -46,8 +46,8 @@ for (const file of htmlFiles(APP_DIR).sort()) {
       .replace(/\.html$/, "")
       .replace(/(^|\/)index$/, "");
   const html = fs.readFileSync(file, "utf8");
-  const head = (html.match(/<head>([\s\S]*?)<\/head>/) ?? [, ""])[1];
-  const title = (head.match(/<title>([\s\S]*?)<\/title>/) ?? [, null])[1];
+  const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1] ?? "";
+  const title = head.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? null;
   const tags = [...head.matchAll(/<(meta|link)\b[^>]*>/g)]
     .map((m) => m[0])
     .filter((tag) => !FRAMEWORK.test(tag))

@@ -1,4 +1,4 @@
-import Script from "next/script";
+import Script from "@/components/ui/Script";
 
 // GA4 Measurement IDs look like "G-XXXXXXXXXX". Validating the shape also closes
 // any injection surface, since the id is interpolated into the inline gtag init.

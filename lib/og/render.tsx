@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+import { ImageResponse } from "@cf-wasm/og";
 import { loadOgFonts } from "@/lib/og/fonts";
 import { OG_SIZE, OgCard, type OgCardProps } from "@/lib/og/card";
 
