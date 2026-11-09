@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import IntroBurst from "@/components/landing/IntroBurst";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import {
   INTRO_GREETINGS,
@@ -32,8 +33,9 @@ function markSeen(): void {
  * First-visit greeting over the home hero: session-once, skipped under
  * reduced motion, and done within INTRO_MAX_MS (see `introGreetings.ts`).
  * Any key, click, tap or scroll (or the Skip button) ends it immediately.
- * Pure CSS motion; the greeting words are decorative, so they're hidden from
- * assistive tech and only the Skip button is exposed.
+ * The last greeting arrives with a celebratory burst (IntroBurst), which
+ * finishes inside the last hold and exit fade. Pure CSS motion; the words
+ * and the burst are decorative, so only the Skip button is exposed.
  */
 export default function IntroLoader() {
   const reducedMotion = useReducedMotion();
@@ -78,6 +80,7 @@ export default function IntroLoader() {
 
   const greeting = INTRO_GREETINGS[index] ?? INTRO_GREETINGS[0];
   const exiting = phase === "exiting";
+  const arrived = index === INTRO_GREETINGS.length - 1;
 
   return (
     <div
@@ -92,6 +95,7 @@ export default function IntroLoader() {
       >
         {greeting}
       </p>
+      {arrived ? <IntroBurst /> : null}
       <button
         type="button"
         onClick={() => setPhase("exiting")}

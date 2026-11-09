@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { INTRO_BURST_MS } from "@/components/landing/IntroBurst";
 import IntroLoader from "@/components/landing/IntroLoader";
 import {
   INTRO_GREETINGS,
@@ -111,5 +112,21 @@ describe("IntroLoader", () => {
 
     fireEvent.click(skip);
     expect(overlay()).toHaveClass("is-exiting");
+  });
+
+  it("celebrates the last greeting with a decorative burst that fits the timing", () => {
+    render(<IntroLoader />);
+    advance(20);
+    expect(screen.queryByTestId("intro-burst")).toBeNull();
+
+    advance(introExitStartMs() - INTRO_TIMING.lastHoldMs);
+    expect(screen.getByText(INTRO_GREETINGS.at(-1)!)).toBeInTheDocument();
+    const burst = screen.getByTestId("intro-burst");
+    expect(burst).toHaveAttribute("aria-hidden", "true");
+    expect(burst.querySelectorAll(".intro-confetti").length).toBeGreaterThan(
+      20,
+    );
+    expect(burst.querySelectorAll(".intro-sparkle").length).toBeGreaterThan(4);
+    expect(INTRO_BURST_MS).toBeLessThanOrEqual(INTRO_TIMING.burstMs);
   });
 });
