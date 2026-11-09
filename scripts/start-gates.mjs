@@ -10,11 +10,13 @@
  *      (run --visual inside the pinned Playwright image only).
  *
  *   pnpm build && node scripts/start-gates.mjs [--visual | --parity-only]
+ *   (GATES_PORT=4273 to serve on another port)
  */
 import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const PORT = 4173;
+// GATES_PORT lets two checkouts (e.g. git worktrees) run the gates at once.
+const PORT = Number(process.env.GATES_PORT ?? 4173);
 // 127.0.0.1, not localhost: in the CI container Node and vite resolve
 // localhost to different address families, so the probe was refused.
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -77,7 +79,7 @@ function run(cmd, args, env = {}) {
 let failed = 0;
 try {
   await ready();
-  const crawl = "/tmp/start-parity.json";
+  const crawl = `/tmp/start-parity-${PORT}.json`;
   failed += run("node", ["scripts/parity-crawl.mjs", BASE, crawl], {
     PARITY_SEEDS: routes
       .filter((r) => r.seed !== false)
