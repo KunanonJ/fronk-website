@@ -4,7 +4,7 @@
 **Created:** 06-11-26
 **Plan type:** COMPLEX single plan (one PR), general folder
 **Harness note:** `.claude/` and `process/context/` are absent in this checkout. Runs under the Harness-Absent Fallback (`process/development-protocols/orchestration.md`).
-**Runs in parallel with:** `process/features/ux-experience/active/phase-0_fix-broken_PLAN_06-11-26.md` (owner decision). The plans overlap only in `app/sitemap.ts` and `app/llms.txt/route.ts`; whichever PR merges second rebases.
+**Runs in parallel with:** `process/features/ux-experience/completed/phase-0_fix-broken_PLAN_06-11-26.md` (owner decision). The plans overlap only in `app/sitemap.ts` and `app/llms.txt/route.ts`; whichever PR merges second rebases.
 
 ## Overview
 

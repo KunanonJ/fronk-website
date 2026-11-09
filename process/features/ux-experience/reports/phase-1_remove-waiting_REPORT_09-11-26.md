@@ -1,6 +1,6 @@
 # Phase 1 report: Remove waiting (09-11-26)
 
-**Plan:** `../active/phase-1_remove-waiting_PLAN_06-11-26.md`
+**Plan:** `../completed/phase-1_remove-waiting_PLAN_06-11-26.md`
 **Branch:** `perf/shorter-intro-and-transitions`
 **Mode:** EXECUTE under the Harness-Absent Fallback (main session). The owner said "continue the ux-experience plan" after Phase 0 shipped in #53.
 **Covers audit findings:** 4 (8.1 s intro), 5 (1.8 s route wipe), 8 (cursor rAF never idles)

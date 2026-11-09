@@ -1,6 +1,6 @@
 # Phase 0 report: Fix what's broken (06-11-26)
 
-**Plan:** `../active/phase-0_fix-broken_PLAN_06-11-26.md`
+**Plan:** `../completed/phase-0_fix-broken_PLAN_06-11-26.md`
 **Branch:** `fix/contact-delivery-and-showcase` (uncommitted; the owner hasn't asked for commits yet)
 **Mode:** EXECUTE under the Harness-Absent Fallback. Run in the main session, while the Skills hub was built in parallel in an agent worktree (owner chose parallel).
 

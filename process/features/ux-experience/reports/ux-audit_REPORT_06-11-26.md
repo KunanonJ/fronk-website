@@ -96,4 +96,4 @@ Phase 0 is small and urgent: every day the form stays fake, messages are lost.
 2. **Intro loader and route splash:** shorten both. The intro must finish within 1.5 s and be skippable; the route wipe becomes a fade of about 250 ms.
 3. **`/showcase`:** remove the page, permanently redirect it to `/`, and drop it from the sitemap.
 
-Program plans: `process/features/ux-experience/active/ux-experience_UMBRELLA_PLAN_06-11-26.md`.
+Program plans: `process/features/ux-experience/completed/ux-experience_UMBRELLA_PLAN_06-11-26.md` (closed 09-11-26; the remaining findings moved to `process/features/visual-redesign/`).
