@@ -1,7 +1,8 @@
 [
   {
     "path": "/",
-    "test": "home"
+    "test": "home",
+    "intended": ["h1"]
   },
   {
     "path": "/.well-known/security.txt",

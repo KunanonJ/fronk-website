@@ -26,6 +26,14 @@ export function getRouter() {
     defaultPreload: "intent",
     // Nested routes fail inside the site layout; the root has its own errorComponent.
     defaultErrorComponent: RouteError,
+    // Page changes run as view transitions of type "page" (a short cross-fade
+    // in globals.css); the theme toggle's circular reveal keys off its own
+    // "theme" type, so it never plays on navigation. Hash-only changes
+    // (/#ventures on Home) skip the transition. Reduced motion turns the
+    // animation off in CSS.
+    defaultViewTransition: {
+      types: ({ pathChanged }) => (pathChanged ? ["page"] : false),
+    },
   });
   setupRouterSsrQueryIntegration({ router, queryClient });
   return router;

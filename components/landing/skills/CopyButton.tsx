@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { writeClipboard } from "@/lib/utils/clipboard";
 
 type CopyButtonProps = {
   /** Text to copy. */
@@ -19,31 +20,6 @@ type CopyButtonProps = {
 type Status = "idle" | "copied" | "error";
 
 const RESET_MS = 2000;
-
-async function writeClipboard(value: string): Promise<boolean> {
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(value);
-      return true;
-    }
-  } catch {
-    // Fall through to the legacy path (permissions, older browsers).
-  }
-  try {
-    const area = document.createElement("textarea");
-    area.value = value;
-    area.setAttribute("readonly", "");
-    area.style.position = "fixed";
-    area.style.opacity = "0";
-    document.body.appendChild(area);
-    area.select();
-    const ok = document.execCommand("copy");
-    area.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Copy-to-clipboard button. The visible label flips to "Copied" (or

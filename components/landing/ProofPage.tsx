@@ -26,7 +26,6 @@ export default function ProofPage() {
       eyebrow={proofPage.eyebrow}
       title={proofPage.title}
       description={proofPage.description}
-      navId="proof-mobile-nav"
     >
       {metrics.length > 0 ? (
         <dl

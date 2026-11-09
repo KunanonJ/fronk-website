@@ -68,6 +68,21 @@ const TEXT_PAIRS: readonly [string, string][] = [
   ["--success-text", "--surface"],
   ["--success-text", "--surface-tint"],
   ["--success-text", "--surface-warm"],
+  // Bento redesign (phase 7a): ink primary buttons, pressed chips and
+  // segments, and accent text (the Home h1's last line, mono step numbers).
+  ["--oncta", "--cta"],
+  ["--accent", "--page"],
+  ["--accent", "--surface"],
+  ["--accent", "--surface-tint"],
+];
+
+/**
+ * Large-text pairs (3:1): --muted is only for the connector words inside
+ * display headings (36 px and up), never for body copy.
+ */
+const LARGE_TEXT_PAIRS: readonly [string, string][] = [
+  ["--muted", "--page"],
+  ["--muted", "--surface"],
 ];
 
 /** Non-text pairs (focus rings, state markers) that must reach 3:1. */
@@ -78,12 +93,17 @@ const NON_TEXT_PAIRS: Record<keyof typeof themes, readonly [string, string][]> =
       ["--focus", "--surface"],
       // Ember markers sit on Paper only in light mode.
       ["--ember", "--surface"],
+      // Accent marker squares and timeline dots.
+      ["--accent", "--page"],
+      ["--accent", "--surface"],
     ],
     dark: [
       ["--focus", "--page"],
       ["--focus", "--surface"],
       ["--ember", "--page"],
       ["--ember", "--surface"],
+      ["--accent", "--page"],
+      ["--accent", "--surface"],
     ],
   };
 
@@ -102,6 +122,19 @@ describe("design tokens meet WCAG AA in both themes", () => {
         ).toBeGreaterThanOrEqual(AA_TEXT);
       });
     }
+    for (const [fg, bg] of LARGE_TEXT_PAIRS) {
+      it(`${theme}: ${fg} on ${bg} >= 3 (display text only)`, () => {
+        const ratio = contrastRatio(
+          resolve(vars, fg),
+          resolve(vars, bg),
+          resolve(vars, "--page"),
+        );
+        expect(
+          ratio,
+          `${fg} on ${bg} = ${ratio.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
     for (const [fg, bg] of NON_TEXT_PAIRS[theme as keyof typeof themes]) {
       it(`${theme}: ${fg} on ${bg} >= 3`, () => {
         const ratio = contrastRatio(
@@ -113,6 +146,23 @@ describe("design tokens meet WCAG AA in both themes", () => {
           ratio,
           `${fg} on ${bg} = ${ratio.toFixed(2)}`,
         ).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+  }
+});
+
+describe("text on the Bangkok scene (phase 7a)", () => {
+  // The card text sits in the scrim's dense band; the weakest point is the
+  // 0.64 stop over the brightest sky colour, before the 18 px blur helps.
+  for (const [theme, vars] of Object.entries(themes)) {
+    for (const scrim of ["--scene-scrim-2", "--scene-scrim-4"]) {
+      it(`${theme}: --onphoto2 over ${scrim} on the sky >= 4.5`, () => {
+        const ratio = contrastRatio(
+          resolve(vars, "--onphoto2"),
+          resolve(vars, scrim),
+          resolve(vars, "--scene-sky-3"),
+        );
+        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(AA_TEXT);
       });
     }
   }

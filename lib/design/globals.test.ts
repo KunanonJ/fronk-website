@@ -138,3 +138,74 @@ describe("visual-redesign foundation", () => {
     expect(globalsCss).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
   });
 });
+
+/**
+ * Bento redesign (phase 7a) motion contract: the owner's defaults for the
+ * canvas motion, pinned so a later edit cannot quietly undo them.
+ */
+describe("bento motion contract", () => {
+  const keyframes = (name: string) =>
+    globalsCss.match(
+      new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`),
+    )?.[1] ?? "";
+
+  it("defines the new role tokens in both themes", () => {
+    for (const token of ["--cta", "--oncta", "--accent", "--muted"]) {
+      expect(
+        globalsCss.match(new RegExp(`\\s${token}:`, "g"))?.length,
+        token,
+      ).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("never hides or blurs the LCP h1: its lines only move", () => {
+    const line = keyframes("kj-line");
+    expect(line).toContain("transform");
+    expect(line).not.toMatch(/opacity|filter/);
+  });
+
+  it("keeps every entrance and loop behind no-preference", () => {
+    // Drop each no-preference block (brace-matched); nothing left may animate.
+    let rest = globalsCss;
+    for (;;) {
+      const at = rest.search(
+        /@media [^{]*prefers-reduced-motion: no-preference\)/,
+      );
+      if (at === -1) break;
+      let depth = 0;
+      let end = rest.indexOf("{", at);
+      for (; end < rest.length; end += 1) {
+        if (rest[end] === "{") depth += 1;
+        if (rest[end] === "}" && --depth === 0) break;
+      }
+      rest = rest.slice(0, at) + rest.slice(end + 1);
+    }
+    // (The theme reveal is a view transition: the toggle never starts one
+    // under reduced motion, and the reduced-motion block below disables it.)
+    expect(rest).not.toMatch(
+      /animation:\s*(kj-(?!reveal)|intro-(confetti|sparkle|pop|flash))/,
+    );
+    expect(globalsCss).toMatch(/animation: kj-rise/);
+  });
+
+  it("scopes the circular reveal to theme switches and turns view transitions off under reduced motion", () => {
+    expect(globalsCss).toMatch(
+      /:active-view-transition-type\(theme\)::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/,
+    );
+    expect(globalsCss).toMatch(
+      /html\.kj-vt::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/,
+    );
+    expect(globalsCss).not.toMatch(
+      /^::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/m,
+    );
+    expect(globalsCss).toMatch(
+      /prefers-reduced-motion: reduce\)\s*\{\s*::view-transition-group\(\*\),\s*::view-transition-old\(\*\),\s*::view-transition-new\(\*\)\s*\{\s*animation: none !important/,
+    );
+  });
+
+  it("no longer ships the retired cursor or keyword tooltips", () => {
+    expect(globalsCss).not.toContain("smooth-cursor");
+    expect(globalsCss).not.toContain(".keyword");
+    expect(layoutTsx).not.toContain("RouteFade");
+  });
+});

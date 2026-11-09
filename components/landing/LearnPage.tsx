@@ -49,7 +49,6 @@ export default function LearnPage({ posts }: { posts: readonly BlogCard[] }) {
       eyebrow={learnPage.eyebrow}
       title={learnPage.title}
       description={learnPage.description}
-      navId="learn-mobile-nav"
     >
       <LearnSection
         id="learn-topics"

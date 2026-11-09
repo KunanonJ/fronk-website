@@ -679,6 +679,25 @@ export function getAllPortfolioProjects(): readonly PortfolioProject[] {
   return PORTFOLIO_PROJECTS;
 }
 
+/**
+ * Home "Selected work", in this order (bento canvas; owner default 09-11-26).
+ * Separate from the list order above, which drives the portfolio index and
+ * prev/next.
+ */
+export const FEATURED_PORTFOLIO_SLUGS = [
+  "tbh-intranet",
+  "ai-automation",
+  "node-validator-automation",
+] as const;
+
+export function getFeaturedPortfolioProjects(): readonly PortfolioProject[] {
+  return FEATURED_PORTFOLIO_SLUGS.map((slug) => {
+    const project = getPortfolioProjectBySlug(slug);
+    if (!project) throw new Error(`Featured project "${slug}" is missing`);
+    return project;
+  });
+}
+
 export function getPortfolioProjectBySlug(
   slug: string,
 ): PortfolioProject | null {

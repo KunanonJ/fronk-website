@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 import {
   CONTACT_LIMITS,
   CONTACT_TOPICS,
@@ -14,7 +13,6 @@ import {
   type ContactFormValues,
 } from "@/lib/contact/schema";
 import { getTurnstileToken } from "@/lib/turnstile/client";
-import { expandHashHref } from "@/lib/landing/nav";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 
 function TwitterIcon({ size = 13 }: { size?: number }) {
@@ -171,19 +169,13 @@ export default function ContactPage() {
       id="main"
       className="forma-contact relative min-h-[100svh] overflow-hidden bg-page text-ink"
     >
-      <LandingTopNav
-        wordmarkHref="/"
-        resolveHref={expandHashHref}
-        navId="contact-mobile-nav"
-      />
-
       {/* Glaze-to-Clay wash (visual-redesign Phase 3); decorative. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-surface-tint via-page to-surface-warm"
       />
 
-      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 pt-32 pb-20 sm:px-6 md:pt-40 md:pb-28 lg:grid-cols-12 lg:items-start lg:gap-12">
+      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-20 sm:px-6 md:pt-16 md:pb-28 lg:grid-cols-12 lg:items-start lg:gap-12">
         <div className="lg:col-span-5 lg:pt-6">
           <p className="font-mono text-label uppercase text-ink-2">Contact</p>
           <p className="mt-4 font-display text-[clamp(2.25rem,1.6rem+2.4vw,3.5rem)] leading-[1.05] font-semibold tracking-[-0.04em] text-ink">

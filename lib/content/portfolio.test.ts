@@ -6,6 +6,7 @@ import {
   getAdjacentPortfolioProjects,
   getAllPortfolioProjects,
   getAllPortfolioSlugs,
+  getFeaturedPortfolioProjects,
   getPortfolioProjectBySlug,
 } from "@/lib/content/portfolio";
 
@@ -158,5 +159,15 @@ describe("portfolio nav", () => {
       label: "Portfolio",
       href: "/portfolio",
     });
+  });
+});
+
+describe("featured work (Home)", () => {
+  it("lists the canvas order: TBH Intranet, AI Automation, Node Validator", () => {
+    expect(getFeaturedPortfolioProjects().map((p) => p.name)).toEqual([
+      "TBH Intranet",
+      "AI Automation",
+      "Node Validator Automation",
+    ]);
   });
 });

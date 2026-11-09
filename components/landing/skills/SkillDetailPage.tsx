@@ -200,7 +200,6 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
       title={skill.name}
       monoTitle
       description={<p>{skill.description}</p>}
-      navId="skill-mobile-nav"
       breadcrumb={breadcrumb}
       meta={meta}
     >

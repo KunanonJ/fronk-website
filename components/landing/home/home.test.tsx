@@ -1,85 +1,96 @@
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import Features from "@/components/landing/Features";
-import Hero from "@/components/landing/Hero";
-import PortfolioStrip from "@/components/landing/home/PortfolioStrip";
-import ProofStrip from "@/components/landing/home/ProofStrip";
-import { hero, ventures } from "@/lib/content/landing";
-import { getAllPortfolioProjects } from "@/lib/content/portfolio";
-import { getProofMetrics } from "@/lib/content/proof";
-
-vi.mock("@/lib/router/navigation", () => ({
-  usePathname: () => "/",
-  useRouter: () => ({ push: vi.fn(), prefetch: vi.fn() }),
-}));
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import {
+  ExperienceCard,
+  HowIWorkCard,
+  SelectedWorkCard,
+  VenturesCard,
+} from "@/components/landing/home/HomeCards";
+import HomeHero from "@/components/landing/home/HomeHero";
+import { aboutPage } from "@/lib/content/aboutPage";
 
 describe("Home hero", () => {
-  it("leads with the owner's two-line statement as the h1, no video", () => {
-    const { container } = render(<Hero />);
+  it("greets with the canvas h1 in three block lines", () => {
+    render(<HomeHero />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1).toHaveTextContent("Building fintech and AI from Bangkok.");
-    expect(h1).toHaveTextContent("Founder of GoGoCash and Manut AI.");
-    expect(container.querySelector("video")).toBeNull();
+    expect(h1).toHaveTextContent(
+      "Hi, I’m Kunanon Jarat. Founder of GoGoCash and Manut AI.",
+    );
+    expect(h1.className).toMatch(/kj-lines/);
+    expect(h1.children).toHaveLength(3);
+    expect(h1.querySelector("img")).toHaveAttribute("alt", "");
   });
 
-  it("offers Contact and See my work, and labels the live state in words", () => {
-    render(<Hero />);
-    expect(
-      screen.getByRole("link", { name: hero.primaryCta.label }),
-    ).toHaveAttribute("href", "/contact");
-    expect(
-      screen.getByRole("link", { name: hero.secondaryCta.label }),
-    ).toHaveAttribute("href", "/portfolio");
+  it("leads with an ink Contact button and the Live status", () => {
+    render(<HomeHero />);
+    const cta = screen.getByRole("link", { name: "Contact me" });
+    expect(cta).toHaveAttribute("href", "/contact");
+    expect(cta.className).toMatch(/bg-cta/);
     expect(screen.getByText("Live")).toBeInTheDocument();
-    expect(screen.getByText(hero.status)).toBeInTheDocument();
   });
 });
 
-describe("Home ventures", () => {
-  it("shows exactly two ventures, GoGoCash and Manut AI, with no Airplusauto", () => {
-    const { container } = render(<Features />);
-    const titles = screen
-      .getAllByRole("heading", { level: 3 })
-      .map((h) => h.textContent);
-    expect(titles).toEqual(["GoGoCash", "Manut AI"]);
-    expect(container.textContent).not.toMatch(/Airplusauto/i);
-    expect(container.querySelector("video")).toBeNull();
+describe("Home cards", () => {
+  it("anchors the ventures card at #ventures and links there", () => {
+    render(<VenturesCard />);
+    const card = screen.getByRole("article", { name: "Ventures" });
+    expect(card).toHaveAttribute("id", "ventures");
+    expect(
+      screen.getByRole("link", { name: "See both ventures →" }),
+    ).toHaveAttribute("href", "/#ventures");
+    expect(screen.getByText("GoGoCash · Manut AI")).toBeInTheDocument();
+    expect(
+      screen.getByText("1,000+ users · 220+ merchants on GoGoCash"),
+    ).toBeInTheDocument();
   });
 
-  it("gives each venture a unique, descriptive link name", () => {
-    render(<Features />);
-    const names = ventures.cards.map((c) => c.linkLabel);
-    expect(new Set(names).size).toBe(names.length);
-    for (const card of ventures.cards) {
-      expect(
-        screen.getByRole("link", { name: card.linkLabel }),
-      ).toHaveAttribute("href", card.href);
-    }
-    expect(screen.queryByRole("link", { name: /^Learn more$/ })).toBeNull();
-  });
-});
-
-describe("Proof and portfolio strips", () => {
-  it("shows only published metrics", () => {
-    render(<ProofStrip />);
-    for (const metric of getProofMetrics()) {
-      expect(screen.getByText(metric.value)).toBeInTheDocument();
-    }
-  });
-
-  it("links every portfolio project once, numbered, plus All work", () => {
-    render(<PortfolioStrip />);
-    const list = screen.getByRole("list");
-    const links = within(list).getAllByRole("link");
-    const projects = getAllPortfolioProjects();
-    expect(links).toHaveLength(projects.length);
-    projects.forEach((p, i) => {
-      expect(links[i]).toHaveAttribute("href", `/portfolio/${p.slug}`);
-      expect(links[i]).toHaveTextContent(p.name);
-    });
-    expect(screen.getByRole("link", { name: /All work/ })).toHaveAttribute(
+  it("lists the featured work in the canvas order", () => {
+    render(<SelectedWorkCard />);
+    const items = screen.getAllByRole("listitem");
+    expect(items.map((li) => li.textContent)).toEqual([
+      "01TBH IntranetOne back office for a multi-entity group.",
+      "02AI AutomationAI agents for content ops and hiring.",
+      "03Node Validator AutomationDaily health checks for Avalanche L1 validators.",
+    ]);
+    expect(screen.getByRole("link", { name: "All work →" })).toHaveAttribute(
       "href",
       "/portfolio",
     );
+  });
+
+  it("shows four résumé roles and links the résumé", () => {
+    render(<ExperienceCard />);
+    expect(screen.getAllByRole("listitem")).toHaveLength(4);
+    expect(screen.getByText("Founder, GoGoCash")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Résumé →" })).toHaveAttribute(
+      "href",
+      "/resume",
+    );
+  });
+
+  it("steps through the operating principles", () => {
+    render(<HowIWorkCard />);
+    const [first, second] = aboutPage.principles.items;
+    expect(screen.getByText(first!.title)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Step 02" }));
+    expect(screen.getByText(second!.title)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Step 02" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("never links the hidden blog or press", () => {
+    render(
+      <>
+        <HomeHero />
+        <ExperienceCard />
+        <VenturesCard />
+        <SelectedWorkCard />
+        <HowIWorkCard />
+      </>,
+    );
+    for (const a of document.querySelectorAll("a"))
+      expect(a.getAttribute("href")).not.toMatch(/^\/(blog|press)/);
   });
 });

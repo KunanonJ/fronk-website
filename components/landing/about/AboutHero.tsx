@@ -1,10 +1,8 @@
 import Link from "@/components/navigation/Link";
 import { ArrowDown } from "lucide-react";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
-import { expandHashHref } from "@/lib/landing/nav";
 
 const SOCIAL_ICONS = {
   X: XIcon,
@@ -23,16 +21,9 @@ export default function AboutHero() {
 
   return (
     <div className="relative bg-page text-ink">
-      <LandingTopNav
-        position="fixed"
-        wordmarkHref="/"
-        resolveHref={expandHashHref}
-        navId="about-mobile-nav"
-      />
-
       <section
         aria-labelledby="about-hero-title"
-        className="relative overflow-hidden px-4 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24"
+        className="relative overflow-hidden px-4 pt-14 pb-16 sm:px-6 sm:pt-16 sm:pb-24"
       >
         <div
           aria-hidden

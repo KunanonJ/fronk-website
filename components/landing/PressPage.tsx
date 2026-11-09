@@ -1,13 +1,11 @@
 import Image from "@/components/ui/Image";
 import { ArrowUpRight } from "lucide-react";
-import LandingTopNav from "@/components/landing/LandingTopNav";
 import {
   formatPressDate,
   pressItems,
   pressPage,
   type PressItem,
 } from "@/lib/content/press";
-import { expandHashHref } from "@/lib/landing/nav";
 
 function PressCard({ item }: { item: PressItem }) {
   return (
@@ -72,16 +70,9 @@ function PressCard({ item }: { item: PressItem }) {
 export default function PressPage() {
   return (
     <div className="relative min-h-[100svh] bg-page text-ink">
-      <LandingTopNav
-        position="fixed"
-        wordmarkHref="/"
-        resolveHref={expandHashHref}
-        navId="press-mobile-nav"
-      />
-
       <main
         id="main"
-        className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10"
+        className="relative z-10 px-4 pb-20 pt-14 sm:px-6 md:px-10"
       >
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
           <p className="mb-3 font-mono text-label uppercase text-ink-2">

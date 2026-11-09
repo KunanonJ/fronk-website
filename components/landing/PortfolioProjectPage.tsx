@@ -39,7 +39,6 @@ export default function PortfolioProjectPage({
       eyebrow={`Portfolio · ${project.category}`}
       title={project.name}
       description={project.summary}
-      navId="portfolio-project-mobile-nav"
     >
       <Link
         href="/portfolio"
@@ -141,7 +140,7 @@ export default function PortfolioProjectPage({
           ))}
         </div>
 
-        <aside className="space-y-10 lg:sticky lg:top-28 lg:self-start lg:pt-1">
+        <aside className="space-y-10 lg:sticky lg:top-8 lg:self-start lg:pt-1">
           <section aria-labelledby="portfolio-stack">
             <h2
               id="portfolio-stack"

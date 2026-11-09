@@ -10,7 +10,7 @@ export const site = {
   tagline: "Building fintech and digital workspaces from Bangkok.",
 } as const;
 
-/** Icon keys for nav items; mapped to lucide icons in `LandingTopNav`. */
+/** Icon keys for nav items (kept as stable ids for the nav content tests). */
 export type NavIconId =
   | "about"
   | "ventures"
@@ -37,7 +37,7 @@ export type NavItem =
       children: readonly NavChild[];
     };
 
-/** Human library pages (creed-style secondary IA) — home footer + Library nav menu */
+/** Human library pages: the "Library" group of the site menu. */
 export const footerLibrary = [
   { label: "Learn", href: "/learn", icon: "learn" },
   { label: "Examples", href: "/examples", icon: "examples" },
@@ -46,7 +46,7 @@ export const footerLibrary = [
   { label: "Build", href: "/build", icon: "build" },
 ] as const satisfies readonly NavChild[];
 
-/** Primary chrome items (creed-style pill). Flat links + Library menu + Contact CTA. */
+/** Primary site sections: flat links + the Library group (site menu, bento redesign). */
 export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "About", href: "/about", icon: "about" },
   { type: "link", label: "Ventures", href: "/#ventures", icon: "ventures" },
@@ -69,15 +69,44 @@ export const primaryNav: readonly NavItem[] = [
   // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
 
-export const navCta = { label: "Contact", href: "/contact" } as const;
+/** The site menu's closing call to action (canvas: "Contact me"). */
+export const navCta = { label: "Contact me", href: "/contact" } as const;
 
-/** Operator keyword tips (hpbrn-style) for home about / about page. */
-export const aboutKeywords = [
-  { text: "Bangkok", tip: "Base of operations — Thailand first, SEA next" },
-  { text: "GoGoCash", tip: "Shopping-to-earn cashback · 1,000+ users" },
-  { text: "Manut", tip: "ERP/CRM + Intelligence AI for automotive SMEs" },
-  { text: "ERP/CRM", tip: "Internal systems before agent theater" },
-] as const;
+/**
+ * Site menu rows in canvas order (bento redesign, phase 7a): Home, the flat
+ * primary links, then the Library group. `match` lists the path prefixes that
+ * mark a row as the current page (a project marks Portfolio, a skill Skills,
+ * a topic hub Learn, a venture Ventures).
+ */
+export const siteMenu = {
+  rows: [
+    { label: "Home", href: "/", match: [] as readonly string[] },
+    ...primaryNav.flatMap((item) =>
+      item.type === "link"
+        ? [
+            {
+              label: item.label,
+              href: item.href,
+              match:
+                item.href === "/#ventures"
+                  ? (["/ventures/"] as readonly string[])
+                  : ([`${item.href}/`] as readonly string[]),
+            },
+          ]
+        : [],
+    ),
+  ],
+  libraryLabel: "Library",
+  library: footerLibrary.map((item) => ({
+    label: item.label,
+    href: item.href,
+    match:
+      item.href === "/learn"
+        ? (["/topics/", "/th/topics/"] as readonly string[])
+        : ([] as readonly string[]),
+  })),
+  cta: navCta,
+} as const;
 
 /** Home hero (visual-redesign Phase 2; statement chosen by the owner 09-11-26). */
 export const hero = {
@@ -90,15 +119,31 @@ export const hero = {
   secondaryCta: { label: "See my work", href: "/portfolio" },
   /** Shown in a "live" chip: something that is genuinely in progress now. */
   status: "Building GoGoCash and Manut AI",
+  /**
+   * Bento Home h1 (canvas copy, owner-approved 09-11-26): "Hi, I'm [photo]
+   * Kunanon Jarat. / Founder of GoGoCash and / Manut AI." The connector
+   * words render muted; the last line in the accent colour.
+   */
+  greeting: "Hi, I’m",
+  name: "Kunanon Jarat.",
+  founderOf: "Founder of",
+  ventureA: "GoGoCash",
+  joiner: "and",
+  ventureB: "Manut AI.",
+  /** The canvas Home lead, next to the "Contact me" button. */
+  homeLead:
+    "Building fintech and AI from Bangkok. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
+  portraitSrc: "/profile-portrait.webp",
 } as const;
 
-/** Home "About" section. */
-export const about = {
-  label: "About",
-  heading: "I'm Kunanon Jarat, a founder and operator in Bangkok.",
-  body: "Founder of GoGoCash and Manut AI: cashback for shoppers, and an ERP/CRM workspace with Intelligence AI for SMEs in the automotive industry. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
-  ctaLabel: "More about me",
-  ctaHref: "/about",
+/** "Based in Bangkok" card (canvas copy; the llms.txt intro says the same). */
+export const place = {
+  before: "Based in",
+  city: "Bangkok",
+  timeZone: "Asia/Bangkok",
+  utcLabel: "GMT+7",
+  body: "Building fintech and AI operator systems from Bangkok, for Thailand and SEA: AI transformation, ERP/CRM, internal systems, and tech startups.",
+  cta: { label: "Say hello", href: "/contact" },
 } as const;
 
 /**
@@ -137,30 +182,17 @@ export const socials = [
   { label: "GitHub", href: "https://github.com/KunanonJ" },
 ] as const;
 
-/** Footer "Work" column (visual-redesign Phase 1). */
-export const footerWork = [
-  { label: "About", href: "/about" },
-  { label: "Ventures", href: "/#ventures" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Skills", href: "/skills" },
-] as const;
-
-/** Machine-readable / agent surfaces linked from the home footer */
-export const footerResources = [
-  { label: "Agents", href: "/agents.md" },
-  { label: "sitemap.md", href: "/sitemap.md" },
-  { label: "llms.txt", href: "/llms.txt" },
-  // `/skills.md` is the coding guide for agents working on this site, not the
-  // `/skills` catalog, so it is labelled to keep the two apart.
-  { label: "Agent guide", href: "/skills.md" },
-  // The RSS feed only carries blog posts, so it's listed only while the blog is public.
-  ...(BLOG_PUBLIC ? [{ label: "feed.xml", href: "/feed.xml" } as const] : []),
-] as const;
-
-export const contact = {
-  label: "Contact",
-  email: site.email,
-  tagline: site.tagline,
-  ctaLabel: "Contact Me",
-  ctaHref: "/contact",
+/**
+ * The footer's compact "For agents" row (owner, 09-11-26): the machine-
+ * readable surfaces, labelled by file name. `/skills.md` is the coding guide
+ * for agents working on this site, not the `/skills` catalog.
+ */
+export const footerAgents = {
+  label: "For agents",
+  links: [
+    { label: "agents.md", href: "/agents.md" },
+    { label: "llms.txt", href: "/llms.txt" },
+    { label: "sitemap.md", href: "/sitemap.md" },
+    { label: "skills.md", href: "/skills.md" },
+  ],
 } as const;
