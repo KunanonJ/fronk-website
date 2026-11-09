@@ -8,6 +8,13 @@ export const PERSON_ID = `${BASE}/#person`;
 export const WEBSITE_ID = `${BASE}/#website`;
 
 /** Aliases people / AI engines use when searching for this person. */
+/** Alternate site names for Google's site-name display (WebSite.alternateName). */
+export const WEBSITE_ALTERNATE_NAMES = [
+  "Kunanon Jarat",
+  "KunanonJ",
+  "kunanonj.com",
+] as const;
+
 export const PERSON_ALTERNATE_NAMES = [
   "KunanonJ",
   "Kunanon Jarat",
@@ -104,6 +111,8 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         "@id": WEBSITE_ID,
         url: BASE,
         name: siteConfig.name,
+        // Google's site-name system reads WebSite.name + alternateName.
+        alternateName: [...WEBSITE_ALTERNATE_NAMES],
         description: siteConfig.description,
         publisher: { "@id": PERSON_ID },
         inLanguage: "en-US",

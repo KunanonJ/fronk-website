@@ -515,8 +515,3 @@ export function getAdjacentPortfolioProjects(slug: string): {
     next: PORTFOLIO_PROJECTS[(index + 1) % count] ?? null,
   };
 }
-
-/** Page title without a trailing period, e.g. "TBH Intranet: One back office…". */
-export function portfolioProjectTitle(project: PortfolioProject): string {
-  return `${project.name}: ${project.tagline.replace(/\.$/, "")}`;
-}

@@ -11,6 +11,7 @@ import { siteConfig } from "@/lib/site";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
+import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
 import { resolveGscVerification } from "@/lib/seo/searchConsole";
 import { site as landingSite } from "@/lib/content/landing";
 import "./globals.css";
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: landingSite.title,
-    template: `%s — ${siteConfig.name}`,
+    template: `%s${TITLE_SUFFIX}`,
   },
   description: landingSite.description,
   authors: [{ name: siteConfig.name }],

@@ -4,9 +4,9 @@ import PortfolioProjectPage from "@/components/landing/PortfolioProjectPage";
 import {
   getAllPortfolioSlugs,
   getPortfolioProjectBySlug,
-  portfolioProjectTitle,
 } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) return { title: "Portfolio" };
 
   return routeShareMeta({
-    title: portfolioProjectTitle(project),
+    title: namedPageTitle(project.name, project.tagline),
     description: project.summary,
     path: `/portfolio/${slug}`,
     hasOwnOgImage: true,

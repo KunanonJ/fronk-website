@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AboutPageContent from "@/components/landing/AboutPageContent";
 import AboutHero from "@/components/landing/about/AboutHero";
+import { aboutPage } from "@/lib/content/aboutPage";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import {
   buildFaqJsonLd,
@@ -8,12 +9,15 @@ import {
 } from "@/lib/seo/jsonLd";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-export const metadata: Metadata = routeShareMeta({
-  title: "About Kunanon Jarat — AI, ERP/CRM & startups from Bangkok",
-  description:
-    "Kunanon Jarat (Fronk / KunanonJ) — Bangkok founder of GoGoCash and Manut AI. Building AI transformation, ERP/CRM, and tech startups for Thailand and SEA.",
-  path: "/about",
-});
+export const metadata: Metadata = {
+  ...routeShareMeta({
+    title: aboutPage.meta.title,
+    description: aboutPage.meta.description,
+    path: "/about",
+  }),
+  // Already contains the name, so skip the "— Fronk Kunanon Jarat" suffix.
+  title: { absolute: aboutPage.meta.title },
+};
 
 export default function AboutPage() {
   const profileLd = JSON.stringify(buildProfilePageJsonLd());

@@ -9,6 +9,7 @@ import {
   buildBreadcrumbJsonLd,
   buildSoftwareApplicationJsonLd,
 } from "@/lib/seo/jsonLd";
+import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : undefined;
 
   return routeShareMeta({
-    title: `${venture.name} — ${venture.tagline}`,
+    title: namedPageTitle(venture.name, venture.tagline),
     description: venture.description,
     path: `/ventures/${slug}`,
     languages,
