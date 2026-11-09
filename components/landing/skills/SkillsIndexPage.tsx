@@ -198,7 +198,6 @@ export default function SkillsIndexPage() {
       eyebrow={skillsPage.eyebrow}
       title={skillsPage.title}
       description={<p>{skillsPage.description}</p>}
-      navId="skills-mobile-nav"
       meta={meta}
     >
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16">

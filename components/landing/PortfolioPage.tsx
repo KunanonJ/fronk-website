@@ -28,7 +28,6 @@ export default function PortfolioPage() {
       eyebrow={portfolioPage.eyebrow}
       title={portfolioPage.title}
       description={portfolioPage.description}
-      navId="portfolio-mobile-nav"
     >
       <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         {projects.map((project, index) => {

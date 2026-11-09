@@ -3,8 +3,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import ContactPage from "./ContactPage";
 import { contactMessages, contactPage } from "@/lib/content/contact";
 
-vi.mock("@/components/landing/LandingTopNav", () => ({ default: () => null }));
-
 const fetchMock = vi.fn();
 
 function fillAndSubmit() {

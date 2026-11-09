@@ -4,7 +4,7 @@ import {
   isBlogHref,
   withoutHiddenBlogLinks,
 } from "@/lib/content/blogVisibility";
-import { footerResources, primaryNav } from "@/lib/content/landing";
+import { footerAgents, primaryNav, siteMenu } from "@/lib/content/landing";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 
 // Keep the routes off the network: no Sanity in unit tests.
@@ -23,14 +23,16 @@ describe("isBlogHref", () => {
 });
 
 describe.runIf(!BLOG_PUBLIC)("while the blog is hidden", () => {
-  it("keeps Blog out of the nav and the RSS feed out of the footer", () => {
+  it("keeps Blog out of the nav, the site menu and the footer", () => {
     const hrefs = primaryNav.flatMap((item) =>
       item.type === "menu" ? item.children.map((c) => c.href) : [item.href],
     );
     expect(hrefs.some(isBlogHref)).toBe(false);
-    expect(footerResources.some((item) => item.href === "/feed.xml")).toBe(
-      false,
-    );
+    const menu = [...siteMenu.rows, ...siteMenu.library].map((r) => r.href);
+    expect(menu.some(isBlogHref)).toBe(false);
+    const footer = footerAgents.links.map((item) => item.href as string);
+    expect(footer.some(isBlogHref)).toBe(false);
+    expect(footer).not.toContain("/feed.xml");
   });
 
   it("drops blog links from topic-hub related links", () => {

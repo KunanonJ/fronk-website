@@ -24,7 +24,6 @@ export default function ExamplesPage() {
       eyebrow={examplesPage.eyebrow}
       title={examplesPage.title}
       description={examplesPage.description}
-      navId="examples-mobile-nav"
     >
       <div
         role="group"
