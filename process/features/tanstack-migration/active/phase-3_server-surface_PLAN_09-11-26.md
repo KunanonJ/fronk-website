@@ -1,6 +1,6 @@
 # Phase 3: Server surface
 
-**Status:** IN PROGRESS. 3a (server surface at parity) done 09-11-26; 3b (forms: TanStack Form, Turnstile, rate limit) next.
+**Status:** DONE 09-11-26. Reports: `../reports/phase-3a_server-surface_REPORT_09-11-26.md`, `../reports/phase-3b_forms_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `tanstack-migration_UMBRELLA_PLAN_09-11-26.md`
 
@@ -31,4 +31,10 @@ The exit gate in the umbrella table, plus the standard gates (typecheck, lint, u
 - `/api/revalidate` and the cron move to `src/server.ts` in Phase 4 (target architecture), so they are not ported here.
 
 **3b, forms (next):** contact and newsletter on `@tanstack/react-form-start` with Valibot, POST server functions with `createCsrfMiddleware`, Turnstile and the `ratelimits` binding. Turnstile uses Cloudflare's published test keys in CI and staging until the owner creates the production widget.
+
+**3b, forms (done):**
+- The shared contact form runs on `@tanstack/react-form` with the Valibot schema in `lib/contact/schema.ts` (same wording as the server's `validate()`); markup unchanged.
+- Turnstile loads only on submit and only when `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is set (invisible unless Cloudflare needs an interaction).
+- Start's `/api/contact` and `/api/subscribe` run `src/server/formGuard.ts` first: the `FORM_RATE_LIMIT` binding (5 per minute per IP) and Turnstile siteverify once `TURNSTILE_SECRET_KEY` is set.
+- **Deviation:** server functions with `createServerValidate` wait for Phase 6. The form component is shared with production Next until then, and a Start-only server function would break it there; the `/api/contact` POST works in both.
 

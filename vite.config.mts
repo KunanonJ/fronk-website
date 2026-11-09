@@ -26,6 +26,7 @@ const PUBLIC_ENV = [
   "NEXT_PUBLIC_SANITY_DATASET",
   "NEXT_PUBLIC_SANITY_API_VERSION",
   "NEXT_PUBLIC_SANITY_STUDIO_URL",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
 ];
 
 export default defineConfig(({ mode }) => {
