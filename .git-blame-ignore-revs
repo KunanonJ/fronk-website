@@ -1,0 +1,4 @@
+# Commits that only reformat code. Skipped by GitHub's blame view; locally run
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# chore(tooling): CI gates ... one-time Prettier format (#83)
+5096a30712719ddbafcea961da9b5a7ab0124e6d
