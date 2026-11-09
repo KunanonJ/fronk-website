@@ -7,7 +7,6 @@ import {
   getAllPortfolioProjects,
   getAllPortfolioSlugs,
   getPortfolioProjectBySlug,
-  portfolioProjectTitle,
 } from "@/lib/content/portfolio";
 
 const projects = getAllPortfolioProjects();
@@ -140,11 +139,6 @@ describe("portfolio helpers", () => {
     });
   });
 
-  it("builds a title without the tagline's trailing period", () => {
-    const title = portfolioProjectTitle(projects[0]!);
-    expect(title.startsWith(`${projects[0]!.name}: `)).toBe(true);
-    expect(title).not.toMatch(/\.$/);
-  });
 });
 
 describe("portfolio nav", () => {

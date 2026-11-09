@@ -48,6 +48,17 @@ export type AboutStackGroup = {
 
 export const aboutPage = {
   /**
+   * Page <title> and meta description. The title is used as-is (no site
+   * suffix) because it already carries the name; kept under 60 characters
+   * so Google can show it whole and reuse it as a sitelink.
+   */
+  meta: {
+    title: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok",
+    description:
+      "Kunanon Jarat (Fronk / KunanonJ) — Bangkok founder of GoGoCash and Manut AI. Building AI transformation, ERP/CRM, and tech startups for Thailand and SEA.",
+  },
+
+  /**
    * Centered portrait hero (09-11-26, owner choice). The email signup was
    * removed while the blog is hidden; it never submitted anywhere anyway.
    */
