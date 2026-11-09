@@ -17,7 +17,8 @@ declare global {
   }
 }
 
-const SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const SCRIPT_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 let scriptLoad: Promise<Turnstile> | null = null;
 
 function loadTurnstile(): Promise<Turnstile> {
@@ -26,7 +27,10 @@ function loadTurnstile(): Promise<Turnstile> {
     const script = document.createElement("script");
     script.src = SCRIPT_URL;
     script.async = true;
-    script.onload = () => (window.turnstile ? resolve(window.turnstile) : reject(new Error("turnstile missing")));
+    script.onload = () =>
+      window.turnstile
+        ? resolve(window.turnstile)
+        : reject(new Error("turnstile missing"));
     script.onerror = () => reject(new Error("turnstile failed to load"));
     document.head.appendChild(script);
   });
@@ -34,7 +38,11 @@ function loadTurnstile(): Promise<Turnstile> {
 }
 
 /** A one-time token (valid 300 s), or null if the check failed or timed out. */
-export async function getTurnstileToken(container: HTMLElement, siteKey: string, timeoutMs = 20_000): Promise<string | null> {
+export async function getTurnstileToken(
+  container: HTMLElement,
+  siteKey: string,
+  timeoutMs = 20_000,
+): Promise<string | null> {
   try {
     const turnstile = await loadTurnstile();
     return await new Promise<string | null>((resolve) => {

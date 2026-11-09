@@ -23,7 +23,13 @@ export default defineConfig({
   test: {
     globals: false,
     // `.claude/` holds the agent harness and its git worktrees (full repo copies).
-    exclude: ["node_modules", "dist/**", ".claude/**", "tests/e2e/**", "playwright.config.ts"],
+    exclude: [
+      "node_modules",
+      "dist/**",
+      ".claude/**",
+      "tests/e2e/**",
+      "playwright.config.ts",
+    ],
     /*
      * Two projects (Phase 6, dev speed): building a jsdom window per file was
      * about two thirds of the run, so only component tests and the few .ts

@@ -22,4 +22,3 @@ export const siteConfig = {
   },
   discordHandle: "fronk98",
 } as const;
-

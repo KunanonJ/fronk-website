@@ -1,11 +1,7 @@
 import Link from "@/components/navigation/Link";
 import { ArrowDown } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
-import {
-  GithubIcon,
-  LinkedinIcon,
-  XIcon,
-} from "@/components/ui/SocialIcons";
+import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
 import { expandHashHref } from "@/lib/landing/nav";
@@ -86,7 +82,10 @@ export default function AboutHero() {
             </Link>
           </div>
 
-          <ul className="animate-fade-rise-delay-2 mt-6 flex gap-2" aria-label="Social profiles">
+          <ul
+            className="animate-fade-rise-delay-2 mt-6 flex gap-2"
+            aria-label="Social profiles"
+          >
             {socials.map(({ label, href }) => {
               const Icon = SOCIAL_ICONS[label];
               return (

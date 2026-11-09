@@ -52,7 +52,9 @@ export default function IntroLoader() {
     const exit = () => setPhase("exiting");
     const timers: number[] = [];
     for (let i = 1; i < INTRO_GREETINGS.length; i += 1) {
-      timers.push(window.setTimeout(() => setIndex(i), i * INTRO_TIMING.wordMs));
+      timers.push(
+        window.setTimeout(() => setIndex(i), i * INTRO_TIMING.wordMs),
+      );
     }
     timers.push(window.setTimeout(exit, introExitStartMs()));
     for (const type of SKIP_EVENTS) {

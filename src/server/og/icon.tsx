@@ -8,43 +8,41 @@ const size = { width: 64, height: 64 };
  */
 export default function Icon() {
   return new ImageResponse(
-    (
-      <div
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: brand.ink,
+        borderRadius: 14,
+      }}
+    >
+      <span
         style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: brand.ink,
-          borderRadius: 14,
+          color: brand.glaze,
+          fontSize: 40,
+          fontWeight: 800,
+          letterSpacing: "-0.04em",
+          lineHeight: 1,
         }}
       >
-        <span
-          style={{
-            color: brand.glaze,
-            fontSize: 40,
-            fontWeight: 800,
-            letterSpacing: "-0.04em",
-            lineHeight: 1,
-          }}
-        >
-          {brand.monogram}
-        </span>
-        <div
-          style={{
-            position: "absolute",
-            right: 8,
-            bottom: 8,
-            width: 10,
-            height: 10,
-            background: brand.signal,
-            display: "flex",
-          }}
-        />
-      </div>
-    ),
+        {brand.monogram}
+      </span>
+      <div
+        style={{
+          position: "absolute",
+          right: 8,
+          bottom: 8,
+          width: 10,
+          height: 10,
+          background: brand.signal,
+          display: "flex",
+        }}
+      />
+    </div>,
     { ...size },
   );
 }

@@ -10,7 +10,12 @@ import { about } from "@/lib/content/landing";
  */
 export default function About() {
   return (
-    <Section id="about" eyebrow={about.label} heading={about.heading} className="scroll-mt-28 pt-0 md:pt-0 lg:pt-0">
+    <Section
+      id="about"
+      eyebrow={about.label}
+      heading={about.heading}
+      className="scroll-mt-28 pt-0 md:pt-0 lg:pt-0"
+    >
       <div className="max-w-3xl">
         <p className="text-lead text-ink-2">
           <AnnotatedText text={about.body} />

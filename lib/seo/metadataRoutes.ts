@@ -6,12 +6,14 @@ import type { Manifest, Robots, Sitemap } from "@/lib/seo/types";
  * Next's own serialisers byte for byte for the fields this site uses.
  */
 
-const list = <T,>(value: T | T[] | undefined): T[] => (value === undefined ? [] : Array.isArray(value) ? value : [value]);
+const list = <T>(value: T | T[] | undefined): T[] =>
+  value === undefined ? [] : Array.isArray(value) ? value : [value];
 
 export function robotsToText(robots: Robots): string {
   let out = "";
   for (const rule of list(robots.rules)) {
-    for (const agent of list(rule.userAgent ?? "*")) out += `User-Agent: ${agent}\n`;
+    for (const agent of list(rule.userAgent ?? "*"))
+      out += `User-Agent: ${agent}\n`;
     for (const path of list(rule.allow)) out += `Allow: ${path}\n`;
     for (const path of list(rule.disallow)) out += `Disallow: ${path}\n`;
     if (rule.crawlDelay) out += `Crawl-delay: ${rule.crawlDelay}\n`;
@@ -23,16 +25,22 @@ export function robotsToText(robots: Robots): string {
 }
 
 export function sitemapToXml(entries: Sitemap): string {
-  let out = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  let out =
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   for (const entry of entries) {
     out += "<url>\n";
     out += `<loc>${entry.url}</loc>\n`;
     if (entry.lastModified) {
-      const date = entry.lastModified instanceof Date ? entry.lastModified.toISOString() : entry.lastModified;
+      const date =
+        entry.lastModified instanceof Date
+          ? entry.lastModified.toISOString()
+          : entry.lastModified;
       out += `<lastmod>${date}</lastmod>\n`;
     }
-    if (entry.changeFrequency) out += `<changefreq>${entry.changeFrequency}</changefreq>\n`;
-    if (typeof entry.priority === "number") out += `<priority>${entry.priority}</priority>\n`;
+    if (entry.changeFrequency)
+      out += `<changefreq>${entry.changeFrequency}</changefreq>\n`;
+    if (typeof entry.priority === "number")
+      out += `<priority>${entry.priority}</priority>\n`;
     out += "</url>\n";
   }
   return `${out}</urlset>\n`;

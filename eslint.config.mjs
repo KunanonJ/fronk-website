@@ -55,7 +55,11 @@ export default defineConfig([
       // `_`-prefixed names are deliberate (dropped props, unused args).
       "@typescript-eslint/no-unused-vars": [
         "warn",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true },
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
       ],
     },
   },

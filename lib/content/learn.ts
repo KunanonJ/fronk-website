@@ -11,8 +11,7 @@ export type LearnLink = {
 export const learnPage = {
   eyebrow: "Learn",
   title: "Learn",
-  description:
-    `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
+  description: `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
 } as const;
 
 export function getLearnTopicLinks(): readonly LearnLink[] {
@@ -52,7 +51,8 @@ export const learnOperatorNotes: readonly LearnLink[] = [
   },
   {
     title: "Quick FAQ",
-    description: "Who Fronk is, what GoGoCash and Manut are, and how to reach out.",
+    description:
+      "Who Fronk is, what GoGoCash and Manut are, and how to reach out.",
     href: "/about#faq",
   },
 ] as const;

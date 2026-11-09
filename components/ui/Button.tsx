@@ -41,13 +41,23 @@ type CommonProps = {
 };
 
 type ButtonAsButton = CommonProps &
-  Omit<ComponentProps<"button">, "className" | "children"> & { href?: undefined };
+  Omit<ComponentProps<"button">, "className" | "children"> & {
+    href?: undefined;
+  };
 
 type ButtonAsLink = CommonProps &
-  Omit<ComponentProps<typeof Link>, "className" | "children"> & { href: string };
+  Omit<ComponentProps<typeof Link>, "className" | "children"> & {
+    href: string;
+  };
 
 export function Button(props: ButtonAsButton | ButtonAsLink) {
-  const { variant = "primary", size = "md", className, children, ...rest } = props;
+  const {
+    variant = "primary",
+    size = "md",
+    className,
+    children,
+    ...rest
+  } = props;
   const classes = cn(BASE, VARIANTS[variant], SIZES[size], className);
 
   if ("href" in rest && rest.href !== undefined) {

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_RESUME_PROFILE,
-  resolveResumeProfile,
-} from "./resumeProfile";
+import { DEFAULT_RESUME_PROFILE, resolveResumeProfile } from "./resumeProfile";
 import { RESUME_TIMELINE_FALLBACK } from "./resumeTimeline.fallback";
 
 describe("resolveResumeProfile", () => {

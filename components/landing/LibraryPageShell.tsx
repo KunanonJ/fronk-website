@@ -39,12 +39,8 @@ export default function LibraryPageShell({
           <p className="mb-3 font-mono text-label uppercase text-ink-2">
             {eyebrow}
           </p>
-          <h1 className="font-display text-h1 text-ink">
-            {title}
-          </h1>
-          <p className="mt-5 max-w-2xl text-lead text-ink-2">
-            {description}
-          </p>
+          <h1 className="font-display text-h1 text-ink">{title}</h1>
+          <p className="mt-5 max-w-2xl text-lead text-ink-2">{description}</p>
         </header>
 
         <div className={`mx-auto ${width}`}>{children}</div>

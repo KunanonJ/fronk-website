@@ -37,7 +37,10 @@ const TYPE = [
   ["text-h2", "Selected work"],
   ["text-h3", "TBH Intranet"],
   ["text-lead", "One back office for a multi-entity group."],
-  ["text-body", "Founder of GoGoCash and Manut AI. IT Manager & AI Engineering Lead at The Binary Holdings."],
+  [
+    "text-body",
+    "Founder of GoGoCash and Manut AI. IT Manager & AI Engineering Lead at The Binary Holdings.",
+  ],
   ["text-small", "Updated 9 November 2026"],
 ] as const;
 
@@ -56,7 +59,9 @@ function DesignSystemPage() {
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           {SWATCHES.map(([name, cls]) => (
             <li key={name} className="flex flex-col gap-2">
-              <span className={`h-16 rounded-chip border border-hairline ${cls}`} />
+              <span
+                className={`h-16 rounded-chip border border-hairline ${cls}`}
+              />
               <span className="font-mono text-label text-ink-2">{name}</span>
             </li>
           ))}
@@ -73,7 +78,9 @@ function DesignSystemPage() {
           ))}
           <div className="flex flex-col gap-1">
             <span className="font-mono text-label text-ink-2">text-stat</span>
-            <p className="font-display text-stat tabular-nums text-ink">1,000+</p>
+            <p className="font-display text-stat tabular-nums text-ink">
+              1,000+
+            </p>
           </div>
         </div>
       </Section>
@@ -98,9 +105,13 @@ function DesignSystemPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {(["paper", "tint", "warm", "ink"] as const).map((tone) => (
             <Card key={tone} tone={tone} className="p-6">
-              <MonoLabel className={tone === "ink" ? "text-page" : undefined}>{tone}</MonoLabel>
+              <MonoLabel className={tone === "ink" ? "text-page" : undefined}>
+                {tone}
+              </MonoLabel>
               <p className="mt-3 text-h3">Card title</p>
-              <p className={`mt-2 text-small ${tone === "ink" ? "text-page" : "text-ink-2"}`}>
+              <p
+                className={`mt-2 text-small ${tone === "ink" ? "text-page" : "text-ink-2"}`}
+              >
                 Supporting copy on the {tone} surface.
               </p>
             </Card>

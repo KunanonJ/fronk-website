@@ -12,18 +12,31 @@ vi.mock("@/lib/router/navigation", () => ({
 describe("AboutHero", () => {
   it("leads with the portrait, the name as h1 and the role line", () => {
     render(<AboutHero />);
-    const portrait = screen.getByRole("img", { name: aboutPage.hero.portraitAlt });
+    const portrait = screen.getByRole("img", {
+      name: aboutPage.hero.portraitAlt,
+    });
     expect(portrait.getAttribute("src")).toContain("/profile-portrait.webp");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Kunanon Jarat");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Kunanon Jarat",
+    );
     expect(screen.getByText(aboutPage.hero.role)).toBeInTheDocument();
     expect(screen.getByText(/Fronk · Bangkok, Thailand/)).toBeInTheDocument();
   });
 
   it("offers Contact and work CTAs and a jump to the story", () => {
     render(<AboutHero />);
-    expect(screen.getByRole("link", { name: "Contact me" })).toHaveAttribute("href", "/contact");
-    expect(screen.getByRole("link", { name: "See my work" })).toHaveAttribute("href", "/portfolio");
-    expect(screen.getByRole("link", { name: /Read my story/ })).toHaveAttribute("href", "#story");
+    expect(screen.getByRole("link", { name: "Contact me" })).toHaveAttribute(
+      "href",
+      "/contact",
+    );
+    expect(screen.getByRole("link", { name: "See my work" })).toHaveAttribute(
+      "href",
+      "/portfolio",
+    );
+    expect(screen.getByRole("link", { name: /Read my story/ })).toHaveAttribute(
+      "href",
+      "#story",
+    );
   });
 
   it("links every social profile with an accessible name, opening in a new tab", () => {

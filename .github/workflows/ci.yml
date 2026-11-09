@@ -52,6 +52,13 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Format
+        run: pnpm format:check
+
+      # Unused files, exports and dependencies (knip.json).
+      - name: Unused code
+        run: pnpm knip
+
       - name: Test
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
@@ -70,7 +77,7 @@ jobs:
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm build
 
-      # Reuses the .next from the Build step above (same job, repo-root cwd).
+      # Reuses dist/ from the Build step above (same job, repo-root cwd).
       # Fails if any route's first-load JS exceeds its budget (200 KB default;
       # 255 KB marketing; see scripts/check-first-load-budget.mjs).
       - name: Perf budget

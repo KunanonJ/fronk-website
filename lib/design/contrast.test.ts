@@ -27,7 +27,11 @@ function block(selector: ":root" | ".dark"): Record<string, string> {
 const light = block(":root");
 const dark = { ...light, ...block(".dark") };
 
-function resolve(vars: Record<string, string>, name: string, depth = 0): string {
+function resolve(
+  vars: Record<string, string>,
+  name: string,
+  depth = 0,
+): string {
   const value = vars[name];
   if (value === undefined) throw new Error(`Missing token ${name}`);
   const ref = value.match(/^var\((--[\w-]+)\)$/);
@@ -67,33 +71,48 @@ const TEXT_PAIRS: readonly [string, string][] = [
 ];
 
 /** Non-text pairs (focus rings, state markers) that must reach 3:1. */
-const NON_TEXT_PAIRS: Record<keyof typeof themes, readonly [string, string][]> = {
-  light: [
-    ["--focus", "--page"],
-    ["--focus", "--surface"],
-    // Ember markers sit on Paper only in light mode.
-    ["--ember", "--surface"],
-  ],
-  dark: [
-    ["--focus", "--page"],
-    ["--focus", "--surface"],
-    ["--ember", "--page"],
-    ["--ember", "--surface"],
-  ],
-};
+const NON_TEXT_PAIRS: Record<keyof typeof themes, readonly [string, string][]> =
+  {
+    light: [
+      ["--focus", "--page"],
+      ["--focus", "--surface"],
+      // Ember markers sit on Paper only in light mode.
+      ["--ember", "--surface"],
+    ],
+    dark: [
+      ["--focus", "--page"],
+      ["--focus", "--surface"],
+      ["--ember", "--page"],
+      ["--ember", "--surface"],
+    ],
+  };
 
 describe("design tokens meet WCAG AA in both themes", () => {
   for (const [theme, vars] of Object.entries(themes)) {
     for (const [fg, bg] of TEXT_PAIRS) {
       it(`${theme}: ${fg} on ${bg} >= 4.5`, () => {
-        const ratio = contrastRatio(resolve(vars, fg), resolve(vars, bg), resolve(vars, "--page"));
-        expect(ratio, `${fg} on ${bg} = ${ratio.toFixed(2)}`).toBeGreaterThanOrEqual(AA_TEXT);
+        const ratio = contrastRatio(
+          resolve(vars, fg),
+          resolve(vars, bg),
+          resolve(vars, "--page"),
+        );
+        expect(
+          ratio,
+          `${fg} on ${bg} = ${ratio.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
       });
     }
     for (const [fg, bg] of NON_TEXT_PAIRS[theme as keyof typeof themes]) {
       it(`${theme}: ${fg} on ${bg} >= 3`, () => {
-        const ratio = contrastRatio(resolve(vars, fg), resolve(vars, bg), resolve(vars, "--page"));
-        expect(ratio, `${fg} on ${bg} = ${ratio.toFixed(2)}`).toBeGreaterThanOrEqual(AA_NON_TEXT);
+        const ratio = contrastRatio(
+          resolve(vars, fg),
+          resolve(vars, bg),
+          resolve(vars, "--page"),
+        );
+        expect(
+          ratio,
+          `${fg} on ${bg} = ${ratio.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(AA_NON_TEXT);
       });
     }
   }
@@ -106,10 +125,14 @@ describe("palette rules the components rely on", () => {
   });
 
   it("Ember fails 3:1 on the light tints, so markers never sit on them", () => {
-    for (const tint of ["--palette-glaze", "--palette-clay", "--palette-mist"]) {
-      expect(contrastRatio(resolve(light, "--palette-ember"), resolve(light, tint))).toBeLessThan(
-        AA_NON_TEXT,
-      );
+    for (const tint of [
+      "--palette-glaze",
+      "--palette-clay",
+      "--palette-mist",
+    ]) {
+      expect(
+        contrastRatio(resolve(light, "--palette-ember"), resolve(light, tint)),
+      ).toBeLessThan(AA_NON_TEXT);
     }
   });
 });

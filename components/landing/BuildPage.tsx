@@ -40,12 +40,18 @@ export default function BuildPage() {
                   id={`build-${column.id}`}
                   className="inline-flex items-center gap-2.5 font-mono text-label uppercase text-ink"
                 >
-                  <span aria-hidden className={cn("size-2 shrink-0", MARKER[column.id])} />
+                  <span
+                    aria-hidden
+                    className={cn("size-2 shrink-0", MARKER[column.id])}
+                  />
                   {column.label}
                 </h2>
                 <span className="font-mono text-label tabular-nums text-ink-2">
                   {cards.length}
-                  <span className="sr-only"> {cards.length === 1 ? "item" : "items"}</span>
+                  <span className="sr-only">
+                    {" "}
+                    {cards.length === 1 ? "item" : "items"}
+                  </span>
                 </span>
               </div>
               <ul className="space-y-3">

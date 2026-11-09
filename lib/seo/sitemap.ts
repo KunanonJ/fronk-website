@@ -78,7 +78,9 @@ export default async function sitemap(): Promise<Sitemap> {
     const published = new Date(card.publishedAt);
     postEntries.push({
       url: `${base}/blog/${card.slug}`,
-      lastModified: Number.isNaN(published.getTime()) ? staticUpdated : published,
+      lastModified: Number.isNaN(published.getTime())
+        ? staticUpdated
+        : published,
       changeFrequency: "monthly",
       priority: 0.7,
     });

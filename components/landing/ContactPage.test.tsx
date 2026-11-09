@@ -34,7 +34,9 @@ describe("ContactPage", () => {
   it("shows founder-voice copy, not the old agency template", () => {
     const { container } = render(<ContactPage />);
     expect(container.textContent).toContain(contactPage.headlineLead);
-    expect(container.textContent).not.toMatch(/craft bold ideas|Drop us a line|3D & Motion/);
+    expect(container.textContent).not.toMatch(
+      /craft bold ideas|Drop us a line|3D & Motion/,
+    );
   });
 
   it("exposes topic chips as toggle buttons", () => {
@@ -47,12 +49,17 @@ describe("ContactPage", () => {
 
   it("posts the message and shows success only after the server confirms", async () => {
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ ok: true, message: contactMessages.sent }), { status: 200 }),
+      new Response(
+        JSON.stringify({ ok: true, message: contactMessages.sent }),
+        { status: 200 },
+      ),
     );
     render(<ContactPage />);
     fillAndSubmit();
 
-    expect(await screen.findByText(contactPage.successTitle)).toBeInTheDocument();
+    expect(
+      await screen.findByText(contactPage.successTitle),
+    ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("/api/contact");
@@ -68,13 +75,20 @@ describe("ContactPage", () => {
 
   it("keeps the visitor's text and offers email when sending fails", async () => {
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ ok: false, message: contactMessages.failed }), { status: 502 }),
+      new Response(
+        JSON.stringify({ ok: false, message: contactMessages.failed }),
+        { status: 502 },
+      ),
     );
     render(<ContactPage />);
     fillAndSubmit();
 
-    expect(await screen.findByText(new RegExp(contactMessages.failed))).toBeInTheDocument();
-    expect(screen.queryByText(contactPage.successTitle)).not.toBeInTheDocument();
+    expect(
+      await screen.findByText(new RegExp(contactMessages.failed)),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(contactPage.successTitle),
+    ).not.toBeInTheDocument();
     // Ember marks the failure, always beside the words.
     expect(document.querySelector("[aria-live] .bg-ember")).not.toBeNull();
     expect(screen.getByLabelText(contactPage.messagePlaceholder)).toHaveValue(
@@ -82,7 +96,10 @@ describe("ContactPage", () => {
     );
     const fallbacks = screen.getAllByRole("link", { name: contactPage.email });
     expect(fallbacks.length).toBeGreaterThanOrEqual(2);
-    expect(fallbacks.at(-1)).toHaveAttribute("href", expect.stringMatching(/^mailto:/));
+    expect(fallbacks.at(-1)).toHaveAttribute(
+      "href",
+      expect.stringMatching(/^mailto:/),
+    );
   });
 
   it("treats a network error as a failure, not a success", async () => {
@@ -91,9 +108,15 @@ describe("ContactPage", () => {
     fillAndSubmit();
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: contactPage.submit })).not.toBeDisabled(),
+      expect(
+        screen.getByRole("button", { name: contactPage.submit }),
+      ).not.toBeDisabled(),
     );
-    expect(screen.getByText(new RegExp(contactMessages.failed))).toBeInTheDocument();
-    expect(screen.queryByText(contactPage.successTitle)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(contactMessages.failed)),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(contactPage.successTitle),
+    ).not.toBeInTheDocument();
   });
 });

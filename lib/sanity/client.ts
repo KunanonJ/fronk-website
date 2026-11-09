@@ -26,7 +26,6 @@ export function buildClient(): SanityClient | null {
   });
 }
 
-
 const builder = isSanityConfigured()
   ? createImageUrlBuilder({ projectId, dataset })
   : null;

@@ -47,7 +47,9 @@ for (const theme of THEMES) {
       test(`${route.name} matches its baseline`, async ({ page }) => {
         test.skip(CMS_DRIVEN.has(route.name), "content comes from Sanity");
         await page.goto(route.path, { waitUntil: "networkidle" });
-        await expect(page.locator("html")).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`));
+        await expect(page.locator("html")).toHaveClass(
+          new RegExp(`(^|\\s)${theme}(\\s|$)`),
+        );
         // Settle web fonts so glyph metrics are stable across runs.
         await page.evaluate(() => document.fonts.ready);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {

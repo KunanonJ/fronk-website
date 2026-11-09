@@ -1,4 +1,7 @@
-import { notFound as routerNotFound, useLocation } from "@tanstack/react-router";
+import {
+  notFound as routerNotFound,
+  useLocation,
+} from "@tanstack/react-router";
 
 /** The current path, for components that mark the active nav item. */
 export function usePathname(): string {

@@ -1,0 +1,18 @@
+# Formatted by hand or generated: harness folders, process docs, static files,
+# Markdown (tables are aligned by hand) and generated sources.
+dist/
+.wrangler/
+.next/
+.open-next/
+.claude/
+.agents/
+.codex/
+.vibecode-backup/
+process/
+public/
+node_modules/
+pnpm-lock.yaml
+src/routeTree.gen.ts
+lib/content/skills.generated.json
+tests/**/*-snapshots/
+*.md

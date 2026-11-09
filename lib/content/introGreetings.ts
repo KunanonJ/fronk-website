@@ -24,7 +24,9 @@ export const INTRO_TIMING = {
 } as const;
 
 /** When the exit fade starts, measured from the first greeting. */
-export function introExitStartMs(count: number = INTRO_GREETINGS.length): number {
+export function introExitStartMs(
+  count: number = INTRO_GREETINGS.length,
+): number {
   return Math.max(0, count - 1) * INTRO_TIMING.wordMs + INTRO_TIMING.lastHoldMs;
 }
 

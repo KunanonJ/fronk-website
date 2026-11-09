@@ -14,38 +14,65 @@ import { Route as HomeRoute } from "@/src/routes/_landing/index";
 
 const reference = JSON.parse(
   readFileSync(
-    join(process.cwd(), "process/features/tanstack-migration/references/next-parity_09-11-26.json"),
+    join(
+      process.cwd(),
+      "process/features/tanstack-migration/references/next-parity_09-11-26.json",
+    ),
     "utf8",
   ),
 ) as Record<string, { title: string; tags: string[] }>;
-
 
 describe("metadataToHead (parity with the Next build)", () => {
   it.each([
     ["/", HomeRoute],
     ["/about", AboutRoute],
-  ])("the route head() reproduces every head tag Next shipped on %s", (path, route) => {
-    const head = route.options.head!({} as never) as unknown as ReturnType<typeof metadataToHead>;
-    const html = headToHtml(rootHead(rootViewport), head);
-    const title = head.meta.find((m) => "title" in m)?.title;
-    const tags = headTags(html);
-    expect(title).toBe(reference[path]!.title);
-    expect(tags).toEqual(reference[path]!.tags);
-  });
+  ])(
+    "the route head() reproduces every head tag Next shipped on %s",
+    (path, route) => {
+      const head = route.options.head!({} as never) as unknown as ReturnType<
+        typeof metadataToHead
+      >;
+      const html = headToHtml(rootHead(rootViewport), head);
+      const title = head.meta.find((m) => "title" in m)?.title;
+      const tags = headTags(html);
+      expect(title).toBe(reference[path]!.title);
+      expect(tags).toEqual(reference[path]!.tags);
+    },
+  );
 
   it("applies the root title template and noindex robots", () => {
-    const head = metadataToHead(rootMetadata, { title: "Resume", robots: { index: false, follow: false } });
+    const head = metadataToHead(rootMetadata, {
+      title: "Resume",
+      robots: { index: false, follow: false },
+    });
     expect(head.meta).toContainEqual({ title: "Resume — Fronk Kunanon Jarat" });
-    expect(head.meta).toContainEqual({ name: "robots", content: "noindex, nofollow" });
+    expect(head.meta).toContainEqual({
+      name: "robots",
+      content: "noindex, nofollow",
+    });
   });
 
   it("uses the segment's file image when the page has no config image", () => {
     const head = metadataToHead(
       rootMetadata,
       { openGraph: { title: "X" }, twitter: { card: "summary_large_image" } },
-      { fileOgImage: { url: "/x/opengraph-image", width: 1200, height: 630, alt: "X", type: "image/png" } },
+      {
+        fileOgImage: {
+          url: "/x/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: "X",
+          type: "image/png",
+        },
+      },
     );
-    expect(head.meta).toContainEqual({ property: "og:image", content: "https://kunanonj.com/x/opengraph-image" });
-    expect(head.meta).toContainEqual({ name: "twitter:image:type", content: "image/png" });
+    expect(head.meta).toContainEqual({
+      property: "og:image",
+      content: "https://kunanonj.com/x/opengraph-image",
+    });
+    expect(head.meta).toContainEqual({
+      name: "twitter:image:type",
+      content: "image/png",
+    });
   });
 });

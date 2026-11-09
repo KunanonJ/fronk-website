@@ -285,7 +285,12 @@ function coverUrl(image: SanityImage | null, altFallback: string) {
   }
   try {
     return {
-      bannerSrc: urlFor(image).width(1600).height(900).fit("crop").auto("format").url(),
+      bannerSrc: urlFor(image)
+        .width(1600)
+        .height(900)
+        .fit("crop")
+        .auto("format")
+        .url(),
       bannerAlt: image.alt?.trim() || altFallback,
     };
   } catch {
@@ -352,7 +357,8 @@ export function filterBlogPosts(
       return false;
     }
     if (!q) return true;
-    const haystack = `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase();
+    const haystack =
+      `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase();
     return haystack.includes(q);
   });
 }

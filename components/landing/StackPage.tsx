@@ -28,9 +28,24 @@ export default function StackPage() {
                 <table className="w-full min-w-[36rem] border-collapse text-left text-small">
                   <thead>
                     <tr className="border-b border-hairline font-mono text-label uppercase text-ink-2">
-                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Name</th>
-                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Purpose</th>
-                      <th scope="col" className="px-5 py-3.5 font-normal sm:px-6">Website</th>
+                      <th
+                        scope="col"
+                        className="px-5 py-3.5 font-normal sm:px-6"
+                      >
+                        Name
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-5 py-3.5 font-normal sm:px-6"
+                      >
+                        Purpose
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-5 py-3.5 font-normal sm:px-6"
+                      >
+                        Website
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

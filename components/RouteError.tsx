@@ -16,9 +16,12 @@ export default function RouteError({ reset }: ErrorComponentProps) {
     >
       <div className="mx-auto w-full max-w-5xl">
         <MonoLabel>Error · Page didn&apos;t load</MonoLabel>
-        <h1 className="mt-4 font-display text-h1 text-ink">Something went wrong.</h1>
+        <h1 className="mt-4 font-display text-h1 text-ink">
+          Something went wrong.
+        </h1>
         <p className="mt-4 max-w-prose text-body text-ink-2">
-          A service this page depends on didn&apos;t answer. Try again, or come back in a minute.
+          A service this page depends on didn&apos;t answer. Try again, or come
+          back in a minute.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <button

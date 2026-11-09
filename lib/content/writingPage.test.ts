@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  DEFAULT_WRITING_PAGE,
-  resolveWritingPageContent,
-} from "./writingPage";
+import { DEFAULT_WRITING_PAGE, resolveWritingPageContent } from "./writingPage";
 
 describe("resolveWritingPageContent", () => {
   it("returns static defaults when CMS content is missing", () => {

@@ -12,7 +12,9 @@ function decode(dataUrl: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-let fonts: { name: string; data: ArrayBuffer; weight: 400 | 800; style: "normal" }[] | null = null;
+let fonts:
+  | { name: string; data: ArrayBuffer; weight: 400 | 800; style: "normal" }[]
+  | null = null;
 
 export function loadOgFonts() {
   fonts ??= [

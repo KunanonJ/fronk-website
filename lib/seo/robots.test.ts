@@ -15,9 +15,7 @@ describe("robots()", () => {
   it("allows citation bots and blocks training scrapers", () => {
     const doc = robots();
     const rules = Array.isArray(doc.rules) ? doc.rules : [doc.rules];
-    const byUa = new Map(
-      rules.map((r) => [String(r.userAgent), r] as const),
-    );
+    const byUa = new Map(rules.map((r) => [String(r.userAgent), r] as const));
 
     expect(byUa.get("ChatGPT-User")?.allow).toBeDefined();
     expect(byUa.get("PerplexityBot")?.allow).toBeDefined();

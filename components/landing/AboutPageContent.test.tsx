@@ -6,7 +6,12 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
 import { activityLevelClass } from "@/lib/github/contributions";
 
 // ContributionActivity fetches GitHub data on mount; keep tests offline.
-vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ ok: false }), { status: 503 })));
+vi.stubGlobal(
+  "fetch",
+  vi.fn(
+    async () => new Response(JSON.stringify({ ok: false }), { status: 503 }),
+  ),
+);
 
 describe("AboutPageContent", () => {
   it("has an 'On this page' jump list pointing at real section ids", () => {
@@ -22,10 +27,14 @@ describe("AboutPageContent", () => {
 
   it("renders every FAQ item with text identical to FAQ_ITEMS, first one open", () => {
     const { container } = render(<AboutPageContent />);
-    const details = [...container.querySelectorAll(`#${aboutPage.faq.id} details`)];
+    const details = [
+      ...container.querySelectorAll(`#${aboutPage.faq.id} details`),
+    ];
     expect(details).toHaveLength(FAQ_ITEMS.length);
     FAQ_ITEMS.forEach((item, i) => {
-      expect(details[i]!.querySelector("summary")).toHaveTextContent(item.question);
+      expect(details[i]!.querySelector("summary")).toHaveTextContent(
+        item.question,
+      );
       expect(details[i]!.querySelector("p")).toHaveTextContent(item.answer);
     });
     expect(details[0]).toHaveAttribute("open");

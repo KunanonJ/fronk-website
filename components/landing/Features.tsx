@@ -18,7 +18,9 @@ export default function Features() {
       heading={ventures.heading}
       className="scroll-mt-28"
     >
-      <p className="-mt-4 mb-10 max-w-2xl text-lead text-ink-2">{ventures.subheading}</p>
+      <p className="-mt-4 mb-10 max-w-2xl text-lead text-ink-2">
+        {ventures.subheading}
+      </p>
       <ul className="grid gap-4 md:grid-cols-2">
         {ventures.cards.map((card) => (
           <li key={card.href}>
@@ -32,7 +34,9 @@ export default function Features() {
                   height={48}
                   className="h-12 w-12 rounded-chip object-cover"
                 />
-                <span className="font-mono text-label text-ink-2">{card.number}</span>
+                <span className="font-mono text-label text-ink-2">
+                  {card.number}
+                </span>
               </div>
               <h3 className="mt-6 text-h3 text-ink">{card.title}</h3>
               <p className="mt-2 text-body text-ink-2">{card.summary}</p>

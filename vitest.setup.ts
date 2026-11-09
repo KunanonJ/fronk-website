@@ -40,8 +40,15 @@ vi.mock("@/components/navigation/Link", async () => {
     scroll?: unknown;
     replace?: unknown;
   };
-  const Link = React.forwardRef<HTMLAnchorElement, Props>(function Link({ href, prefetch: _p, scroll: _s, replace: _r, ...rest }, ref) {
-    return React.createElement("a", { ref, href: typeof href === "string" ? href : (href.pathname ?? ""), ...rest });
+  const Link = React.forwardRef<HTMLAnchorElement, Props>(function Link(
+    { href, prefetch: _p, scroll: _s, replace: _r, ...rest },
+    ref,
+  ) {
+    return React.createElement("a", {
+      ref,
+      href: typeof href === "string" ? href : (href.pathname ?? ""),
+      ...rest,
+    });
   });
   return { default: Link };
 });

@@ -20,14 +20,19 @@ async function callRoute(body: string, headers: Record<string, string> = {}) {
     body,
   });
   const res = await POST(req);
-  return { status: res.status, json: (await res.json()) as Record<string, unknown> };
+  return {
+    status: res.status,
+    json: (await res.json()) as Record<string, unknown>,
+  };
 }
 
 describe("POST /api/contact", () => {
   beforeEach(() => {
     vi.resetModules();
     fetchMock.mockReset();
-    fetchMock.mockResolvedValue(new Response('{"id":"email_1"}', { status: 200 }));
+    fetchMock.mockResolvedValue(
+      new Response('{"id":"email_1"}', { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchMock);
     process.env.RESEND_API_KEY = "re_test";
     process.env.CONTACT_TO_EMAIL = "owner@example.com";
@@ -46,7 +51,9 @@ describe("POST /api/contact", () => {
     expect(status).toBe(200);
     expect(json).toEqual({ ok: true, message: contactMessages.sent });
     expect(fetchMock).toHaveBeenCalledOnce();
-    expect(String(fetchMock.mock.calls[0]![0])).toBe("https://api.resend.com/emails");
+    expect(String(fetchMock.mock.calls[0]![0])).toBe(
+      "https://api.resend.com/emails",
+    );
   });
 
   it("answers 400 for invalid JSON", async () => {
@@ -57,7 +64,9 @@ describe("POST /api/contact", () => {
   });
 
   it("answers 400 for a missing field without echoing input", async () => {
-    const { status, json } = await callRoute(JSON.stringify({ ...VALID, email: "<b>x</b>" }));
+    const { status, json } = await callRoute(
+      JSON.stringify({ ...VALID, email: "<b>x</b>" }),
+    );
     expect(status).toBe(400);
     expect(json).toEqual({ ok: false, message: contactMessages.invalidEmail });
   });
@@ -80,21 +89,28 @@ describe("POST /api/contact", () => {
   });
 
   it("answers 413 when the body is larger than its Content-Length claims", async () => {
-    const { status } = await callRoute(JSON.stringify({ ...VALID, message: "x".repeat(30_000) }), {
-      "content-length": "100",
-    });
+    const { status } = await callRoute(
+      JSON.stringify({ ...VALID, message: "x".repeat(30_000) }),
+      {
+        "content-length": "100",
+      },
+    );
     expect(status).toBe(413);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("answers 415 for a body that is not JSON", async () => {
-    const { status } = await callRoute(JSON.stringify(VALID), { "content-type": "text/plain" });
+    const { status } = await callRoute(JSON.stringify(VALID), {
+      "content-type": "text/plain",
+    });
     expect(status).toBe(415);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("answers 403 for a cross-site browser post", async () => {
-    const { status } = await callRoute(JSON.stringify(VALID), { "sec-fetch-site": "cross-site" });
+    const { status } = await callRoute(JSON.stringify(VALID), {
+      "sec-fetch-site": "cross-site",
+    });
     expect(status).toBe(403);
     expect(fetchMock).not.toHaveBeenCalled();
   });

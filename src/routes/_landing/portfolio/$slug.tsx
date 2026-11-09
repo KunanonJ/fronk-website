@@ -2,9 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import PortfolioProjectPage from "@/components/landing/PortfolioProjectPage";
 import type { Metadata } from "@/lib/seo/types";
-import {
-  getPortfolioProjectBySlug,
-} from "@/lib/content/portfolio";
+import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { fileOg } from "@/src/lib/og";
 import { namedPageTitle } from "@/lib/seo/pageTitle";
@@ -52,8 +50,15 @@ function PortfolioProjectRouteView({ slug }: { slug: string }) {
 
 export const Route = createFileRoute("/_landing/portfolio/$slug")({
   loader: async ({ params }) => {
-    if (!(getPortfolioProjectBySlug(params.slug))) throw notFound();
-    return { head: pageHead(await generateMetadata({ params: Promise.resolve(params) }), { fileOgImage: fileOg(`/portfolio/${params.slug}`, "Portfolio project") }) };
+    if (!getPortfolioProjectBySlug(params.slug)) throw notFound();
+    return {
+      head: pageHead(
+        await generateMetadata({ params: Promise.resolve(params) }),
+        {
+          fileOgImage: fileOg(`/portfolio/${params.slug}`, "Portfolio project"),
+        },
+      ),
+    };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

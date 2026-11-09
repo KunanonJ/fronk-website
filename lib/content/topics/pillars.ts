@@ -63,10 +63,19 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
     ],
     relatedLinks: [
-      { label: "ERP / CRM / internal systems", href: "/topics/erp-crm-internal-systems" },
+      {
+        label: "ERP / CRM / internal systems",
+        href: "/topics/erp-crm-internal-systems",
+      },
       { label: "Manut case", href: "/ventures/manut" },
-      { label: "AI transformation for Thai SMEs (blog)", href: "/blog/ai-transformation-thailand-smes" },
-      { label: "Tech startups Bangkok & SEA", href: "/topics/tech-startup-thailand-sea" },
+      {
+        label: "AI transformation for Thai SMEs (blog)",
+        href: "/blog/ai-transformation-thailand-smes",
+      },
+      {
+        label: "Tech startups Bangkok & SEA",
+        href: "/topics/tech-startup-thailand-sea",
+      },
     ],
     ctaLabel: "Talk about transformation",
     ctaHref: "/contact",
@@ -116,10 +125,19 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
     ],
     relatedLinks: [
-      { label: "AI transformation Thailand", href: "/topics/ai-transformation-thailand" },
+      {
+        label: "AI transformation Thailand",
+        href: "/topics/ai-transformation-thailand",
+      },
       { label: "Manut venture hub", href: "/ventures/manut" },
-      { label: "ERP/CRM for startups (blog)", href: "/blog/erp-crm-internal-systems-startups" },
-      { label: "Manut automotive case (blog)", href: "/blog/manut-ai-erp-crm-automotive" },
+      {
+        label: "ERP/CRM for startups (blog)",
+        href: "/blog/erp-crm-internal-systems-startups",
+      },
+      {
+        label: "Manut automotive case (blog)",
+        href: "/blog/manut-ai-erp-crm-automotive",
+      },
     ],
     ctaLabel: "Discuss your internal system",
     ctaHref: "/contact",
@@ -171,8 +189,14 @@ const EN_PILLARS: readonly TopicPillar[] = [
     relatedLinks: [
       { label: "About Kunanon Jarat", href: "/about" },
       { label: "GoGoCash case", href: "/ventures/gogocash" },
-      { label: "Building from Bangkok (blog)", href: "/blog/building-tech-startups-bangkok-sea" },
-      { label: "AI transformation hub", href: "/topics/ai-transformation-thailand" },
+      {
+        label: "Building from Bangkok (blog)",
+        href: "/blog/building-tech-startups-bangkok-sea",
+      },
+      {
+        label: "AI transformation hub",
+        href: "/topics/ai-transformation-thailand",
+      },
     ],
     ctaLabel: "Get in touch",
     ctaHref: "/contact",
@@ -310,7 +334,9 @@ export function getTopicPillar(
   return list.find((p) => p.slug === slug) ?? null;
 }
 
-export function getAllTopicPillars(locale: TopicLocale = "en"): readonly TopicPillar[] {
+export function getAllTopicPillars(
+  locale: TopicLocale = "en",
+): readonly TopicPillar[] {
   return locale === "th" ? TH_PILLARS : EN_PILLARS;
 }
 

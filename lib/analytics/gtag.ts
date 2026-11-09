@@ -5,10 +5,7 @@ declare global {
   }
 }
 
-export type GtagParams = Record<
-  string,
-  string | number | boolean | undefined
->;
+export type GtagParams = Record<string, string | number | boolean | undefined>;
 
 /**
  * Send a GA4 event. Safe everywhere: a no-op when `gtag` isn't on the page
@@ -17,7 +14,8 @@ export type GtagParams = Record<
  * infer (which venture was clicked, theme preference, real-user Web Vitals).
  */
 export function track(event: string, params?: GtagParams): void {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  if (typeof window === "undefined" || typeof window.gtag !== "function")
+    return;
   window.gtag("event", event, params ?? {});
 }
 

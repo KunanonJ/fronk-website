@@ -13,8 +13,10 @@ function installMatchMedia(initialMatches: boolean) {
     media: "(pointer: fine)",
     addEventListener: (_type: string, cb: (e: MediaQueryListEvent) => void) =>
       listeners.add(cb),
-    removeEventListener: (_type: string, cb: (e: MediaQueryListEvent) => void) =>
-      listeners.delete(cb),
+    removeEventListener: (
+      _type: string,
+      cb: (e: MediaQueryListEvent) => void,
+    ) => listeners.delete(cb),
   };
 
   vi.stubGlobal(

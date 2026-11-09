@@ -139,8 +139,6 @@ export const stackItems: readonly StackItem[] = [
   },
 ] as const;
 
-export function stackItemsByGroup(
-  group: StackGroup,
-): readonly StackItem[] {
+export function stackItemsByGroup(group: StackGroup): readonly StackItem[] {
   return stackItems.filter((item) => item.group === group);
 }

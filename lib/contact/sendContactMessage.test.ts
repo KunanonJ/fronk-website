@@ -24,7 +24,8 @@ const VALID: ContactInput = {
 
 const okFetch = () =>
   vi.fn<typeof fetch>(
-    async () => new Response(JSON.stringify({ id: "email_1" }), { status: 200 }),
+    async () =>
+      new Response(JSON.stringify({ id: "email_1" }), { status: 200 }),
   );
 
 function sentBody(f: ReturnType<typeof okFetch>) {
@@ -38,7 +39,14 @@ describe("parseContactInput", () => {
   });
 
   it("never throws on junk and yields empty strings", () => {
-    for (const junk of [null, undefined, 42, "x", [], { name: 5, topics: "AI" }]) {
+    for (const junk of [
+      null,
+      undefined,
+      42,
+      "x",
+      [],
+      { name: 5, topics: "AI" },
+    ]) {
       const parsed = parseContactInput(junk);
       expect(parsed.name).toBe("");
       expect(parsed.topics).toEqual([]);
@@ -93,7 +101,9 @@ describe("buildSubject", () => {
   });
 
   it("caps the length", () => {
-    expect(buildSubject({ ...VALID, name: "x".repeat(500) }).length).toBeLessThanOrEqual(150);
+    expect(
+      buildSubject({ ...VALID, name: "x".repeat(500) }).length,
+    ).toBeLessThanOrEqual(150);
   });
 });
 
@@ -107,7 +117,9 @@ describe("sendContactMessage", () => {
     const [url, init] = f.mock.calls[0]!;
     expect(String(url)).toBe("https://api.resend.com/emails");
     expect(init!.method).toBe("POST");
-    expect((init!.headers as Record<string, string>).Authorization).toBe("Bearer re_test");
+    expect((init!.headers as Record<string, string>).Authorization).toBe(
+      "Bearer re_test",
+    );
 
     const body = sentBody(f);
     expect(body).toMatchObject({
@@ -136,11 +148,17 @@ describe("sendContactMessage", () => {
 
   it.each([
     [{ name: "" }, contactMessages.invalidName],
-    [{ name: "x".repeat(CONTACT_LIMITS.nameMax + 1) }, contactMessages.invalidName],
+    [
+      { name: "x".repeat(CONTACT_LIMITS.nameMax + 1) },
+      contactMessages.invalidName,
+    ],
     [{ email: "nope" }, contactMessages.invalidEmail],
     [{ email: `${"a".repeat(250)}@x.com` }, contactMessages.invalidEmail],
     [{ message: "too short" }, contactMessages.messageTooShort],
-    [{ message: "x".repeat(CONTACT_LIMITS.messageMax + 1) }, contactMessages.messageTooLong],
+    [
+      { message: "x".repeat(CONTACT_LIMITS.messageMax + 1) },
+      contactMessages.messageTooLong,
+    ],
   ])("rejects %o with 400 before calling Resend", async (patch, message) => {
     const f = okFetch();
     const r = await sendContactMessage({ ...VALID, ...patch }, CONFIG, f);
@@ -150,7 +168,11 @@ describe("sendContactMessage", () => {
 
   it("silently accepts but drops a filled honeypot", async () => {
     const f = okFetch();
-    const r = await sendContactMessage({ ...VALID, company: "Spam Inc" }, CONFIG, f);
+    const r = await sendContactMessage(
+      { ...VALID, company: "Spam Inc" },
+      CONFIG,
+      f,
+    );
     expect(r).toEqual({ ok: true, status: 200, message: contactMessages.sent });
     expect(f).not.toHaveBeenCalled();
   });
@@ -168,7 +190,11 @@ describe("sendContactMessage", () => {
 
   it("silently drops a submit with no timing (not from the form)", async () => {
     const f = okFetch();
-    const r = await sendContactMessage({ ...VALID, elapsedMs: null }, CONFIG, f);
+    const r = await sendContactMessage(
+      { ...VALID, elapsedMs: null },
+      CONFIG,
+      f,
+    );
     expect(r.ok).toBe(true);
     expect(f).not.toHaveBeenCalled();
   });
@@ -181,14 +207,25 @@ describe("sendContactMessage", () => {
   ])("returns 503 when config %o is missing", async (patch) => {
     const f = okFetch();
     const r = await sendContactMessage(VALID, { ...CONFIG, ...patch }, f);
-    expect(r).toEqual({ ok: false, status: 503, message: contactMessages.notConfigured });
+    expect(r).toEqual({
+      ok: false,
+      status: 503,
+      message: contactMessages.notConfigured,
+    });
     expect(f).not.toHaveBeenCalled();
   });
 
   it("returns 502 on a Resend error response", async () => {
-    const f = vi.fn(async () => new Response('{"message":"domain not verified"}', { status: 403 }));
+    const f = vi.fn(
+      async () =>
+        new Response('{"message":"domain not verified"}', { status: 403 }),
+    );
     const r = await sendContactMessage(VALID, CONFIG, f);
-    expect(r).toEqual({ ok: false, status: 502, message: contactMessages.failed });
+    expect(r).toEqual({
+      ok: false,
+      status: 502,
+      message: contactMessages.failed,
+    });
   });
 
   it("returns 502 when the request throws", async () => {
@@ -196,6 +233,10 @@ describe("sendContactMessage", () => {
       throw new Error("network down");
     });
     const r = await sendContactMessage(VALID, CONFIG, f);
-    expect(r).toEqual({ ok: false, status: 502, message: contactMessages.failed });
+    expect(r).toEqual({
+      ok: false,
+      status: 502,
+      message: contactMessages.failed,
+    });
   });
 });

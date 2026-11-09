@@ -28,5 +28,4 @@ describe("venture case studies", () => {
     expect(getVentureBySlug("gogocash")?.metrics?.length).toBe(3);
     expect(getVentureBySlug("manut")?.metrics).toBeUndefined();
   });
-
 });

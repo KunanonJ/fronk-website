@@ -79,14 +79,15 @@ export default function PressPage() {
         navId="press-mobile-nav"
       />
 
-      <main id="main" className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10">
+      <main
+        id="main"
+        className="relative z-10 px-4 pb-20 pt-28 sm:px-6 md:px-10"
+      >
         <header className="mx-auto mb-10 max-w-6xl sm:mb-14">
           <p className="mb-3 font-mono text-label uppercase text-ink-2">
             {pressPage.eyebrow}
           </p>
-          <h1
-            className="text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl"
-          >
+          <h1 className="text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl">
             {pressPage.title}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink/65 sm:text-base">

@@ -27,7 +27,11 @@ export default function VentureHubPage({
 
   return (
     <>
-      <LandingTopNav position="fixed" wordmarkHref="/" navId="venture-mobile-nav" />
+      <LandingTopNav
+        position="fixed"
+        wordmarkHref="/"
+        navId="venture-mobile-nav"
+      />
       <main id="main" className="bg-page text-ink">
         <DiscoveryAnalytics />
         <article className="mx-auto max-w-3xl px-4 pb-24 pt-28 sm:px-6 sm:pt-32 md:px-8">
@@ -43,7 +47,10 @@ export default function VentureHubPage({
           {venture.metrics && venture.metrics.length > 0 ? (
             <dl className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-card border border-hairline bg-hairline sm:grid-cols-3">
               {venture.metrics.map((metric) => (
-                <div key={metric.label} className="flex flex-col bg-surface p-5 sm:p-6">
+                <div
+                  key={metric.label}
+                  className="flex flex-col bg-surface p-5 sm:p-6"
+                >
                   <dt className="font-mono text-label uppercase text-ink-2">
                     {metric.label}
                   </dt>

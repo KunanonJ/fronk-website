@@ -43,11 +43,7 @@ function LearnSection({
   );
 }
 
-export default function LearnPage({
-  posts,
-}: {
-  posts: readonly BlogCard[];
-}) {
+export default function LearnPage({ posts }: { posts: readonly BlogCard[] }) {
   return (
     <LibraryPageShell
       eyebrow={learnPage.eyebrow}

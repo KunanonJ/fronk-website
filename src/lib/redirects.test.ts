@@ -26,7 +26,10 @@ describe("redirectFor (next.config.ts redirects + trailing slash)", () => {
     expect(redirectFor(from)).toBe(to);
   });
 
-  it.each(["/", "/about", "/writing/a/b", "/ventures/gogocash"])("%s is not redirected", (path) => {
-    expect(redirectFor(path)).toBeNull();
-  });
+  it.each(["/", "/about", "/writing/a/b", "/ventures/gogocash"])(
+    "%s is not redirected",
+    (path) => {
+      expect(redirectFor(path)).toBeNull();
+    },
+  );
 });

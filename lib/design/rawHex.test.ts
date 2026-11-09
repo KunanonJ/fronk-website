@@ -10,7 +10,12 @@ import { read, sourceFiles } from "@/lib/design/sourceScan";
  * app/layout.tsx, whose viewport themeColor metadata must be a literal.
  */
 const MAX_RAW_HEX = 0;
-const ALLOW = [/^app\/icon\.tsx$/, /^app\/apple-icon\.tsx$/, /opengraph-image\.tsx$/, /^app\/layout\.tsx$/];
+const ALLOW = [
+  /^app\/icon\.tsx$/,
+  /^app\/apple-icon\.tsx$/,
+  /opengraph-image\.tsx$/,
+  /^app\/layout\.tsx$/,
+];
 
 describe("raw hex ratchet", () => {
   const files = sourceFiles(["components/landing", "src/routes"]).filter(
@@ -22,12 +27,25 @@ describe("raw hex ratchet", () => {
   const total = counts.reduce((sum, [, n]) => sum + n, 0);
 
   it(`has at most ${MAX_RAW_HEX} raw hex colours`, () => {
-    expect(total, counts.map(([f, n]) => `${n} ${f}`).join("\n")).toBeLessThanOrEqual(MAX_RAW_HEX);
+    expect(
+      total,
+      counts.map(([f, n]) => `${n} ${f}`).join("\n"),
+    ).toBeLessThanOrEqual(MAX_RAW_HEX);
   });
 
   it("design-system primitives use tokens only", () => {
-    for (const f of ["Chip", "MonoLabel", "Section", "PixelGrid", "Button", "Card", "Container"]) {
-      expect(read(`components/ui/${f}.tsx`), f).not.toMatch(/#[0-9a-fA-F]{6}\b/);
+    for (const f of [
+      "Chip",
+      "MonoLabel",
+      "Section",
+      "PixelGrid",
+      "Button",
+      "Card",
+      "Container",
+    ]) {
+      expect(read(`components/ui/${f}.tsx`), f).not.toMatch(
+        /#[0-9a-fA-F]{6}\b/,
+      );
     }
   });
 });

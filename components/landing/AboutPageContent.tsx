@@ -22,7 +22,12 @@ function InlineSpan({ span }: { span: AboutInline }) {
 
   if (span.external) {
     return (
-      <a href={span.href} target="_blank" rel="noopener noreferrer" className={className}>
+      <a
+        href={span.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
         {span.text}
       </a>
     );
@@ -35,7 +40,11 @@ function InlineSpan({ span }: { span: AboutInline }) {
   );
 }
 
-function RichParagraphs({ paragraphs }: { paragraphs: readonly AboutParagraph[] }) {
+function RichParagraphs({
+  paragraphs,
+}: {
+  paragraphs: readonly AboutParagraph[];
+}) {
   return (
     <div className="space-y-5 text-body text-ink-2">
       {paragraphs.map((paragraph, i) => (
@@ -50,7 +59,9 @@ function RichParagraphs({ paragraphs }: { paragraphs: readonly AboutParagraph[] 
 }
 
 function SectionEyebrow({ children }: { children: ReactNode }) {
-  return <p className="mb-3 font-mono text-label uppercase text-ink-2">{children}</p>;
+  return (
+    <p className="mb-3 font-mono text-label uppercase text-ink-2">{children}</p>
+  );
 }
 
 function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
@@ -61,7 +72,8 @@ function SectionHeading({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
-const SECTION = "mt-16 scroll-mt-28 border-t border-hairline pt-16 sm:mt-20 sm:pt-20";
+const SECTION =
+  "mt-16 scroll-mt-28 border-t border-hairline pt-16 sm:mt-20 sm:pt-20";
 const MORE_LINK =
   "group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-link underline-offset-4 hover:underline";
 
@@ -86,7 +98,10 @@ export default function AboutPageContent() {
     <div className="relative border-t border-hairline bg-page text-ink">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24">
         {/* Jump list (ux-audit finding 14): plain anchors, scrolls sideways on phones. */}
-        <nav aria-label="On this page" className="-mx-4 mb-12 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <nav
+          aria-label="On this page"
+          className="-mx-4 mb-12 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+        >
           <ul className="flex w-max gap-2">
             {jumpLinks.map((link) => (
               <li key={link.id}>
@@ -102,17 +117,29 @@ export default function AboutPageContent() {
         </nav>
 
         {/* Story */}
-        <section id={story.id} aria-labelledby="about-story-heading" className="scroll-mt-28">
+        <section
+          id={story.id}
+          aria-labelledby="about-story-heading"
+          className="scroll-mt-28"
+        >
           <SectionEyebrow>{story.eyebrow}</SectionEyebrow>
-          <SectionHeading id="about-story-heading">{story.heading}</SectionHeading>
+          <SectionHeading id="about-story-heading">
+            {story.heading}
+          </SectionHeading>
           <p className="mt-4 mb-5 text-lead text-ink">{story.whoIs}</p>
           <RichParagraphs paragraphs={story.paragraphs} />
         </section>
 
         {/* Principles */}
-        <section id={principles.id} aria-labelledby="about-principles-heading" className={SECTION}>
+        <section
+          id={principles.id}
+          aria-labelledby="about-principles-heading"
+          className={SECTION}
+        >
           <SectionEyebrow>{principles.eyebrow}</SectionEyebrow>
-          <SectionHeading id="about-principles-heading">{principles.heading}</SectionHeading>
+          <SectionHeading id="about-principles-heading">
+            {principles.heading}
+          </SectionHeading>
           <ul className="grid gap-4">
             {principles.items.map((item) => (
               <li
@@ -127,7 +154,11 @@ export default function AboutPageContent() {
         </section>
 
         {/* Now */}
-        <section id={now.id} aria-labelledby="about-now-heading" className={SECTION}>
+        <section
+          id={now.id}
+          aria-labelledby="about-now-heading"
+          className={SECTION}
+        >
           <SectionEyebrow>{now.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-now-heading">{now.heading}</SectionHeading>
           <RichParagraphs paragraphs={now.paragraphs} />
@@ -136,14 +167,22 @@ export default function AboutPageContent() {
         <ContributionActivity />
 
         {/* Tech stack, grounded in public GitHub */}
-        <section id={stack.id} aria-labelledby="about-stack-heading" className={SECTION}>
+        <section
+          id={stack.id}
+          aria-labelledby="about-stack-heading"
+          className={SECTION}
+        >
           <SectionEyebrow>{stack.eyebrow}</SectionEyebrow>
-          <SectionHeading id="about-stack-heading">{stack.heading}</SectionHeading>
+          <SectionHeading id="about-stack-heading">
+            {stack.heading}
+          </SectionHeading>
           <p className="mb-8 text-body text-ink-2">{stack.lede}</p>
           <div className="space-y-8">
             {stack.groups.map((group) => (
               <div key={group.label}>
-                <p className="mb-3 font-mono text-label uppercase text-ink-2">{group.label}</p>
+                <p className="mb-3 font-mono text-label uppercase text-ink-2">
+                  {group.label}
+                </p>
                 <ul className="flex flex-wrap gap-2.5">
                   {group.items.map((item) => (
                     <li
@@ -151,9 +190,15 @@ export default function AboutPageContent() {
                       className="inline-flex items-center gap-2 rounded-full border border-hairline-strong bg-surface py-1.5 pr-4 pl-1.5"
                     >
                       <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface-tint text-ink">
-                        <StackBrandIcon id={item.icon} title={item.name} className="h-3.5 w-3.5" />
+                        <StackBrandIcon
+                          id={item.icon}
+                          title={item.name}
+                          className="h-3.5 w-3.5"
+                        />
                       </span>
-                      <span className="text-small font-medium text-ink">{item.name}</span>
+                      <span className="text-small font-medium text-ink">
+                        {item.name}
+                      </span>
                       <span className="text-xs text-ink-2">{item.detail}</span>
                     </li>
                   ))}
@@ -170,16 +215,24 @@ export default function AboutPageContent() {
         </section>
 
         {/* Path */}
-        <section id={path.id} aria-labelledby="about-path-heading" className={SECTION}>
+        <section
+          id={path.id}
+          aria-labelledby="about-path-heading"
+          className={SECTION}
+        >
           <SectionEyebrow>{path.eyebrow}</SectionEyebrow>
-          <SectionHeading id="about-path-heading">{path.heading}</SectionHeading>
+          <SectionHeading id="about-path-heading">
+            {path.heading}
+          </SectionHeading>
           <ul className="flex flex-wrap gap-2.5">
             {path.chips.map((chip) => (
               <li
                 key={chip.label}
                 className="rounded-full border border-hairline-strong bg-surface px-4 py-2"
               >
-                <span className="text-small font-medium text-ink">{chip.label}</span>
+                <span className="text-small font-medium text-ink">
+                  {chip.label}
+                </span>
                 <span className="ml-2 text-xs text-ink-2">{chip.detail}</span>
               </li>
             ))}
@@ -193,7 +246,11 @@ export default function AboutPageContent() {
         </section>
 
         {/* FAQ: a no-JS accordion; text identical to FAQ_ITEMS (FAQPage JSON-LD). */}
-        <section id={faq.id} aria-labelledby="about-faq-heading" className={SECTION}>
+        <section
+          id={faq.id}
+          aria-labelledby="about-faq-heading"
+          className={SECTION}
+        >
           <SectionEyebrow>{faq.eyebrow}</SectionEyebrow>
           <SectionHeading id="about-faq-heading">{faq.heading}</SectionHeading>
           <div className="border-t border-hairline">
@@ -217,12 +274,20 @@ export default function AboutPageContent() {
         </section>
 
         {/* CTA */}
-        <section aria-labelledby="about-cta-heading" className={`${SECTION} text-center`}>
+        <section
+          aria-labelledby="about-cta-heading"
+          className={`${SECTION} text-center`}
+        >
           <SectionEyebrow>{cta.eyebrow}</SectionEyebrow>
-          <h2 id="about-cta-heading" className="mb-4 font-display text-h2 text-ink">
+          <h2
+            id="about-cta-heading"
+            className="mb-4 font-display text-h2 text-ink"
+          >
             {cta.heading}
           </h2>
-          <p className="mx-auto mb-8 max-w-lg text-body text-ink-2">{cta.body}</p>
+          <p className="mx-auto mb-8 max-w-lg text-body text-ink-2">
+            {cta.body}
+          </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {cta.links.map((link, index) => (
               <Link

@@ -7,7 +7,12 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () =>
-        withEdgeCache(new Response(sitemapToXml(await sitemap()), { headers: { "Content-Type": "application/xml" } }), ["posts"]),
+        withEdgeCache(
+          new Response(sitemapToXml(await sitemap()), {
+            headers: { "Content-Type": "application/xml" },
+          }),
+          ["posts"],
+        ),
     },
   },
 });

@@ -42,7 +42,7 @@ describe("aboutPage content", () => {
     ).toBe(true);
   });
 
-  it("anchors \"Read my story\" to the story section", () => {
+  it('anchors "Read my story" to the story section', () => {
     expect(aboutPage.hero.storyHref).toBe("#story");
     expect(aboutPage.story.id).toBe("story");
   });
@@ -77,6 +77,8 @@ describe("aboutPage content", () => {
       aboutPage.story.whoIs,
     ].join(" ");
     expect(corpus).not.toMatch(/solo entrepreneurs/i);
-    expect(corpus).toMatch(/ERP\/CRM workspace with Intelligence AI for automotive SMEs/);
+    expect(corpus).toMatch(
+      /ERP\/CRM workspace with Intelligence AI for automotive SMEs/,
+    );
   });
 });

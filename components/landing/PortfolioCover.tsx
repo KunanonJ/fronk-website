@@ -79,9 +79,7 @@ export default function PortfolioCover({
         backgroundImage: `radial-gradient(120% 90% at ${glow}, color-mix(in srgb, var(--ink) 16%, transparent), transparent 62%), linear-gradient(180deg, color-mix(in srgb, var(--ink) 4%, transparent), color-mix(in srgb, var(--ink) 8%, transparent))`,
       }}
     >
-      <span
-        className="pointer-events-none absolute -bottom-[0.16em] right-[0.06em] select-none font-display text-[10rem] leading-none font-semibold text-signal/15 sm:text-[12rem]"
-      >
+      <span className="pointer-events-none absolute -bottom-[0.16em] right-[0.06em] select-none font-display text-[10rem] leading-none font-semibold text-signal/15 sm:text-[12rem]">
         {initials(project.name)}
       </span>
     </div>

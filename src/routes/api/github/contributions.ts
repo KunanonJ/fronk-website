@@ -6,7 +6,11 @@ import { GET } from "@/src/server/api/githubContributions";
 export const Route = createFileRoute("/api/github/contributions")({
   server: {
     handlers: {
-      GET: () => withEdgeLifetime(GET(), "public, max-age=3600, stale-while-revalidate=86400"),
+      GET: () =>
+        withEdgeLifetime(
+          GET(),
+          "public, max-age=3600, stale-while-revalidate=86400",
+        ),
     },
   },
 });

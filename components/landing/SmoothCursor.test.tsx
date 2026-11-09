@@ -36,7 +36,8 @@ describe("SmoothCursor", () => {
       frames = [];
     });
     elementFromPoint = vi.fn(() => null);
-    document.elementFromPoint = elementFromPoint as typeof document.elementFromPoint;
+    document.elementFromPoint =
+      elementFromPoint as typeof document.elementFromPoint;
   });
 
   afterEach(() => {

@@ -13,7 +13,10 @@ export function getRouter() {
   // server not at all (the Sanity client already retries).
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { staleTime: Number.POSITIVE_INFINITY, retry: typeof window === "undefined" ? 0 : 1 },
+      queries: {
+        staleTime: Number.POSITIVE_INFINITY,
+        retry: typeof window === "undefined" ? 0 : 1,
+      },
     },
   });
   const router = createRouter({

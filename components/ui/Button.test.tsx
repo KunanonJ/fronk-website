@@ -11,7 +11,9 @@ describe("Button > pill CTA (visual-redesign tokens)", () => {
     expect(btn.className).toMatch(/text-on-action/);
     expect(btn.className).not.toMatch(/font-mono/);
     expect(btn.className).not.toMatch(/uppercase/);
-    expect(container.querySelector('[data-corner-ticks], .tick-armed')).toBeNull();
+    expect(
+      container.querySelector("[data-corner-ticks], .tick-armed"),
+    ).toBeNull();
   });
 
   it("renders secondary as a hairline surface pill", () => {

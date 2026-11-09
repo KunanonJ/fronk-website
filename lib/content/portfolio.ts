@@ -126,22 +126,49 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
       kind: "app-shell",
       title: "Intranet",
       nav: ["Dashboard", "HR", "Approvals", "Accounting", "CRM", "ARIA"],
-      tiles: ["Leave requests", "Pending approvals", "Expenses", "Company news"],
+      tiles: [
+        "Leave requests",
+        "Pending approvals",
+        "Expenses",
+        "Company news",
+      ],
     },
     workflow: {
       title: "Approval flow",
       steps: [
-        { label: "Submit a request", detail: "Leave, travel or expense", icon: "filetext" },
-        { label: "Approval chain", detail: "Each approver signs off in turn", icon: "listchecks" },
-        { label: "Recorded", detail: "Lands in the HR or accounting module", icon: "database" },
-        { label: "Notified", detail: "Requester hears back in the app and by push", icon: "bell" },
+        {
+          label: "Submit a request",
+          detail: "Leave, travel or expense",
+          icon: "filetext",
+        },
+        {
+          label: "Approval chain",
+          detail: "Each approver signs off in turn",
+          icon: "listchecks",
+        },
+        {
+          label: "Recorded",
+          detail: "Lands in the HR or accounting module",
+          icon: "database",
+        },
+        {
+          label: "Notified",
+          detail: "Requester hears back in the app and by push",
+          icon: "bell",
+        },
       ],
     },
     architecture: {
       layers: [
         {
           label: "Users",
-          nodes: [{ label: "Staff", note: "Browser, installable web app", icon: "users" }],
+          nodes: [
+            {
+              label: "Staff",
+              note: "Browser, installable web app",
+              icon: "users",
+            },
+          ],
         },
         {
           label: "Web app",
@@ -155,17 +182,33 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
           label: "API",
           nodes: [
             { label: "Express 5", note: "Zod validation", icon: "express" },
-            { label: "Socket.IO", note: "Real-time features", icon: "socketdotio" },
+            {
+              label: "Socket.IO",
+              note: "Real-time features",
+              icon: "socketdotio",
+            },
           ],
         },
         {
           label: "Services",
           nodes: [
-            { label: "PostgreSQL", note: "On Supabase, via Prisma", icon: "postgresql" },
+            {
+              label: "PostgreSQL",
+              note: "On Supabase, via Prisma",
+              icon: "postgresql",
+            },
             { label: "Supabase Auth + Storage", icon: "supabase" },
-            { label: "Google Gemini", note: "ARIA assistant, embedding search", icon: "googlegemini" },
+            {
+              label: "Google Gemini",
+              note: "ARIA assistant, embedding search",
+              icon: "googlegemini",
+            },
             { label: "Claude", note: "ARIA assistant", icon: "anthropic" },
-            { label: "Integrations", note: "Gmail, Sheets, Bank of Thailand FX rates, PostHog", icon: "network" },
+            {
+              label: "Integrations",
+              note: "Gmail, Sheets, Bank of Thailand FX rates, PostHog",
+              icon: "network",
+            },
           ],
         },
         {
@@ -173,7 +216,11 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
           nodes: [
             { label: "Turborepo", note: "Monorepo", icon: "turborepo" },
             { label: "Vercel", note: "Hosting + cron", icon: "vercel" },
-            { label: "GitHub Actions", note: "CI with Vitest + Playwright", icon: "githubactions" },
+            {
+              label: "GitHub Actions",
+              note: "CI with Vitest + Playwright",
+              icon: "githubactions",
+            },
           ],
         },
       ],
@@ -238,36 +285,88 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     workflow: {
       title: "Daily run",
       steps: [
-        { label: "Scheduled run", detail: "GitHub Actions, every morning Bangkok time", icon: "clock" },
-        { label: "Read validators", detail: "Current set from the P-Chain over JSON-RPC", icon: "server" },
-        { label: "Compare with yesterday", detail: "Burn rate and days of runway", icon: "trendingdown" },
-        { label: "Check alert rules", detail: "Low balance, short runway, inactive, sharp drop", icon: "shieldalert" },
-        { label: "Email the report", detail: "Resend, with a fallback if sending fails", icon: "mail" },
-        { label: "Save the snapshot", detail: "Committed to the repo as an audit trail", icon: "gitcommit" },
+        {
+          label: "Scheduled run",
+          detail: "GitHub Actions, every morning Bangkok time",
+          icon: "clock",
+        },
+        {
+          label: "Read validators",
+          detail: "Current set from the P-Chain over JSON-RPC",
+          icon: "server",
+        },
+        {
+          label: "Compare with yesterday",
+          detail: "Burn rate and days of runway",
+          icon: "trendingdown",
+        },
+        {
+          label: "Check alert rules",
+          detail: "Low balance, short runway, inactive, sharp drop",
+          icon: "shieldalert",
+        },
+        {
+          label: "Email the report",
+          detail: "Resend, with a fallback if sending fails",
+          icon: "mail",
+        },
+        {
+          label: "Save the snapshot",
+          detail: "Committed to the repo as an audit trail",
+          icon: "gitcommit",
+        },
       ],
     },
     architecture: {
       layers: [
         {
           label: "Trigger",
-          nodes: [{ label: "GitHub Actions", note: "Daily cron", icon: "githubactions" }],
+          nodes: [
+            {
+              label: "GitHub Actions",
+              note: "Daily cron",
+              icon: "githubactions",
+            },
+          ],
         },
         {
           label: "Job",
-          nodes: [{ label: "Node.js script", note: "Built-in modules only, no dependencies", icon: "nodedotjs" }],
+          nodes: [
+            {
+              label: "Node.js script",
+              note: "Built-in modules only, no dependencies",
+              icon: "nodedotjs",
+            },
+          ],
         },
         {
           label: "Data in",
           nodes: [
-            { label: "Avalanche P-Chain", note: "JSON-RPC over HTTPS", icon: "network" },
-            { label: "Yesterday's snapshot", note: "JSON file", icon: "filetext" },
+            {
+              label: "Avalanche P-Chain",
+              note: "JSON-RPC over HTTPS",
+              icon: "network",
+            },
+            {
+              label: "Yesterday's snapshot",
+              note: "JSON file",
+              icon: "filetext",
+            },
           ],
         },
         {
           label: "Out",
           nodes: [
-            { label: "Resend", note: "HTML + plain-text email", icon: "resend" },
-            { label: "Git history", note: "Daily JSON snapshots", icon: "github" },
+            {
+              label: "Resend",
+              note: "HTML + plain-text email",
+              icon: "resend",
+            },
+            {
+              label: "Git history",
+              note: "Daily JSON snapshots",
+              icon: "github",
+            },
           ],
         },
       ],
@@ -318,11 +417,31 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     workflow: {
       title: "From form to Gmail",
       steps: [
-        { label: "Pick the company", detail: "Or open a company-specific link", icon: "building" },
-        { label: "Fill in details", detail: "Checked as you type", icon: "pen" },
-        { label: "Live preview", detail: "Email-safe HTML with 2x images", icon: "eye" },
-        { label: "Copy", detail: "Rich text, plain-text fallback, or raw HTML for IT", icon: "copy" },
-        { label: "Paste into Gmail", detail: "Into the signature settings", icon: "mail" },
+        {
+          label: "Pick the company",
+          detail: "Or open a company-specific link",
+          icon: "building",
+        },
+        {
+          label: "Fill in details",
+          detail: "Checked as you type",
+          icon: "pen",
+        },
+        {
+          label: "Live preview",
+          detail: "Email-safe HTML with 2x images",
+          icon: "eye",
+        },
+        {
+          label: "Copy",
+          detail: "Rich text, plain-text fallback, or raw HTML for IT",
+          icon: "copy",
+        },
+        {
+          label: "Paste into Gmail",
+          detail: "Into the signature settings",
+          icon: "mail",
+        },
       ],
     },
     architecture: {
@@ -330,7 +449,11 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
         {
           label: "Browser",
           nodes: [
-            { label: "Single HTML page", note: "Nothing typed leaves the browser", icon: "html5" },
+            {
+              label: "Single HTML page",
+              note: "Nothing typed leaves the browser",
+              icon: "html5",
+            },
             { label: "CSS", icon: "css" },
             { label: "JavaScript", icon: "javascript" },
           ],
@@ -338,15 +461,27 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
         {
           label: "Assets",
           nodes: [
-            { label: "Python build script", note: "Pillow + librsvg render the PNGs", icon: "python" },
-            { label: "Permanent image URLs", note: "Gmail only shows public HTTPS images", icon: "image" },
+            {
+              label: "Python build script",
+              note: "Pillow + librsvg render the PNGs",
+              icon: "python",
+            },
+            {
+              label: "Permanent image URLs",
+              note: "Gmail only shows public HTTPS images",
+              icon: "image",
+            },
           ],
         },
         {
           label: "Hosting",
           nodes: [
             { label: "GitHub Pages", icon: "githubpages" },
-            { label: "GitHub Actions", note: "Deploy + daily image check", icon: "githubactions" },
+            {
+              label: "GitHub Actions",
+              note: "Deploy + daily image check",
+              icon: "githubactions",
+            },
           ],
         },
       ],
@@ -401,12 +536,36 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     workflow: {
       title: "Fando clip pipeline",
       steps: [
-        { label: "Find clips", detail: "YouTube, Instagram, TikTok, Twitch and X", icon: "search" },
-        { label: "Gemini review", detail: "Real match content? Writes title and caption", icon: "sparkles" },
-        { label: "Skip duplicates", detail: "Perceptual image hashing", icon: "layers" },
-        { label: "Human approval", detail: "Approve column in a Google Sheet", icon: "usercheck" },
-        { label: "Trim and store", detail: "ffmpeg, 29-second cap, Cloud Storage", icon: "scissors" },
-        { label: "Publish", detail: "Playwright posts to the CMS and checks it is live", icon: "send" },
+        {
+          label: "Find clips",
+          detail: "YouTube, Instagram, TikTok, Twitch and X",
+          icon: "search",
+        },
+        {
+          label: "Gemini review",
+          detail: "Real match content? Writes title and caption",
+          icon: "sparkles",
+        },
+        {
+          label: "Skip duplicates",
+          detail: "Perceptual image hashing",
+          icon: "layers",
+        },
+        {
+          label: "Human approval",
+          detail: "Approve column in a Google Sheet",
+          icon: "usercheck",
+        },
+        {
+          label: "Trim and store",
+          detail: "ffmpeg, 29-second cap, Cloud Storage",
+          icon: "scissors",
+        },
+        {
+          label: "Publish",
+          detail: "Playwright posts to the CMS and checks it is live",
+          icon: "send",
+        },
       ],
     },
     architecture: {
@@ -422,29 +581,59 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
         {
           label: "Agents",
           nodes: [
-            { label: "Python agents", note: "Google Agent Development Kit", icon: "python" },
-            { label: "Vertex AI Agent Engine", note: "Deployment target", icon: "googlecloud" },
+            {
+              label: "Python agents",
+              note: "Google Agent Development Kit",
+              icon: "python",
+            },
+            {
+              label: "Vertex AI Agent Engine",
+              note: "Deployment target",
+              icon: "googlecloud",
+            },
           ],
         },
         {
           label: "AI",
-          nodes: [{ label: "Gemini", note: "Relevance, titles, captions", icon: "googlegemini" }],
+          nodes: [
+            {
+              label: "Gemini",
+              note: "Relevance, titles, captions",
+              icon: "googlegemini",
+            },
+          ],
         },
         {
           label: "Human in the loop",
-          nodes: [{ label: "Google Sheets", note: "Approval queue", icon: "googlesheets" }],
+          nodes: [
+            {
+              label: "Google Sheets",
+              note: "Approval queue",
+              icon: "googlesheets",
+            },
+          ],
         },
         {
           label: "Media + publishing",
           nodes: [
             { label: "ffmpeg", note: "Trim", icon: "ffmpeg" },
             { label: "Cloud Storage", icon: "googlecloud" },
-            { label: "Playwright", note: "Browser publishing to the CMS", icon: "monitor" },
+            {
+              label: "Playwright",
+              note: "Browser publishing to the CMS",
+              icon: "monitor",
+            },
           ],
         },
         {
           label: "Also in the repo",
-          nodes: [{ label: "Recruitment agent", note: "FastAPI, Supabase, Resend", icon: "fastapi" }],
+          nodes: [
+            {
+              label: "Recruitment agent",
+              note: "FastAPI, Supabase, Resend",
+              icon: "fastapi",
+            },
+          ],
         },
       ],
     },

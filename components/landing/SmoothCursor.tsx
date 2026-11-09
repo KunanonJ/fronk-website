@@ -49,7 +49,10 @@ export default function SmoothCursor() {
     const tick = () => {
       if (moved) {
         moved = false;
-        const el = document.elementFromPoint(target.current.x, target.current.y);
+        const el = document.elementFromPoint(
+          target.current.x,
+          target.current.y,
+        );
         const nextHand = Boolean(el?.closest(INTERACTIVE_SELECTOR));
         if (nextHand !== hand) {
           hand = nextHand;

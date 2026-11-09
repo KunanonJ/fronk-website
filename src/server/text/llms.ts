@@ -64,7 +64,9 @@ export async function GET() {
   textLines.push("## Public routes");
   textLines.push(`- Home: ${base}/`);
   textLines.push(`- About: ${base}/about`);
-  textLines.push(`- Ventures index: ${base}/ventures (redirects to ${base}/#ventures)`);
+  textLines.push(
+    `- Ventures index: ${base}/ventures (redirects to ${base}/#ventures)`,
+  );
   textLines.push(`- Venture hubs: ${base}/ventures/[slug]`);
   textLines.push(`- Portfolio: ${base}/portfolio`);
   textLines.push(`- Portfolio projects: ${base}/portfolio/[slug]`);
@@ -124,11 +126,15 @@ export async function GET() {
   textLines.push(
     `${skills.length} agent skills for Claude Code, Codex and Cursor from ${SKILLS_REPO_URL} (${SKILLS_TAG}). Machine-readable catalog: ${base}/skills.json`,
   );
-  textLines.push(`- **Install (Claude Code):** \`${PACK_INSTALL.claudeCode.join("` then `")}\``);
+  textLines.push(
+    `- **Install (Claude Code):** \`${PACK_INSTALL.claudeCode.join("` then `")}\``,
+  );
   textLines.push(`- **Install (npx):** \`${PACK_INSTALL.npx}\``);
   textLines.push("");
   for (const skill of skills) {
-    const origin = skill.source ? `adapted from ${skill.source.name}` : "original";
+    const origin = skill.source
+      ? `adapted from ${skill.source.name}`
+      : "original";
     textLines.push(
       `- [${skill.name}](${base}/skills/${skill.slug}) (${origin}, ${skill.license}): ${skill.description}`,
     );
@@ -139,7 +145,9 @@ export async function GET() {
   textLines.push(`- Agents: ${base}/agents.md`);
   textLines.push(`- Markdown sitemap: ${base}/sitemap.md`);
   textLines.push(`- XML sitemap: ${base}/sitemap.xml`);
-  textLines.push(`- Agent guide (coding skills for this site): ${base}/skills.md`);
+  textLines.push(
+    `- Agent guide (coding skills for this site): ${base}/skills.md`,
+  );
   textLines.push(`- Skills catalog (JSON): ${base}/skills.json`);
   if (BLOG_PUBLIC) textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);

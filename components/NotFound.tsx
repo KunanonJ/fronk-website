@@ -25,13 +25,18 @@ export default function NotFound() {
       <div className="mx-auto grid w-full max-w-5xl items-center gap-10 md:grid-cols-2">
         <div>
           <MonoLabel>404 · Not found</MonoLabel>
-          <h1 className="mt-4 font-display text-h1 text-ink">Nothing lives here.</h1>
+          <h1 className="mt-4 font-display text-h1 text-ink">
+            Nothing lives here.
+          </h1>
           <p className="mt-4 max-w-prose text-body text-ink-2">
             Either the URL is stale, or this page never existed. Try one of
             these instead.
           </p>
 
-          <nav aria-label="Recovery links" className="mt-8 flex flex-wrap gap-3">
+          <nav
+            aria-label="Recovery links"
+            className="mt-8 flex flex-wrap gap-3"
+          >
             {destinations.map((d, i) => (
               <Link
                 key={d.href}

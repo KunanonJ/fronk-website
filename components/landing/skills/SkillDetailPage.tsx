@@ -398,10 +398,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
               </p>
             )}
             {skill.excerpts.map((excerpt) => (
-              <p
-                key={excerpt.name}
-                className="mt-3 text-small text-ink-2"
-              >
+              <p key={excerpt.name} className="mt-3 text-small text-ink-2">
                 Includes a credited excerpt from{" "}
                 <a href={excerpt.url} {...external} className={textLinkClass}>
                   {sourceLabel(excerpt)}

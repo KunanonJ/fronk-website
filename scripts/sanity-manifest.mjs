@@ -41,7 +41,12 @@ function listFiles(dir) {
     });
 }
 
-const inputs = ["sanity.config.ts", "sanity.cli.ts", "pnpm-lock.yaml", ...listFiles("sanity")];
+const inputs = [
+  "sanity.config.ts",
+  "sanity.cli.ts",
+  "pnpm-lock.yaml",
+  ...listFiles("sanity"),
+];
 const hash = createHash("sha256");
 for (const file of inputs) {
   hash.update(`${file}\0`);
@@ -59,9 +64,13 @@ const upToDate =
 if (upToDate) {
   console.log("[sanity:manifest] inputs unchanged; skipping extract");
 } else {
-  execFileSync("pnpm", ["exec", "sanity", "manifest", "extract", "--path", OUT], {
-    stdio: "inherit",
-  });
+  execFileSync(
+    "pnpm",
+    ["exec", "sanity", "manifest", "extract", "--path", OUT],
+    {
+      stdio: "inherit",
+    },
+  );
   mkdirSync(dirname(STAMP), { recursive: true });
   writeFileSync(STAMP, `${digest}\n`);
 }

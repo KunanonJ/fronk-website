@@ -1,5 +1,10 @@
 import { buildClient } from "./client";
-import { POSTS_QUERY, POST_QUERY, RESUME_PROFILE_QUERY, WRITING_PAGE_QUERY } from "./queries";
+import {
+  POSTS_QUERY,
+  POST_QUERY,
+  RESUME_PROFILE_QUERY,
+  WRITING_PAGE_QUERY,
+} from "./queries";
 import type {
   Post,
   PostSummary,
@@ -39,7 +44,10 @@ export async function fetchPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function fetchWritingPage(): Promise<WritingPageContent | null> {
-  return sanityFetch<WritingPageContent>("fetchWritingPage", WRITING_PAGE_QUERY);
+  return sanityFetch<WritingPageContent>(
+    "fetchWritingPage",
+    WRITING_PAGE_QUERY,
+  );
 }
 
 export async function fetchResumeProfile(): Promise<ResumeProfile | null> {

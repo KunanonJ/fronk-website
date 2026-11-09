@@ -1,0 +1,54 @@
+# Weekly dependency PRs. Every merge to main deploys production, so updates
+# arrive grouped, after a cooldown, and each one still has to pass CI.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Bangkok
+    open-pull-requests-limit: 6
+    # Let new releases settle before they are proposed (security updates skip this).
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    ignore:
+      # Must match the Playwright container image in .github/workflows/ci.yml;
+      # bump both together by hand.
+      - dependency-name: "@playwright/test"
+    groups:
+      tanstack:
+        patterns: ["@tanstack/*"]
+      sanity:
+        patterns: ["sanity", "@sanity/*"]
+      cloudflare-vite:
+        patterns: ["wrangler", "@cloudflare/*", "vite", "@vitejs/*"]
+      lint-test:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
+          - "vitest"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "jsdom"
+          - "knip"
+          - "prettier"
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Bangkok
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

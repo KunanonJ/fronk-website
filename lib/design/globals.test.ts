@@ -2,10 +2,22 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const globalsCss = readFileSync(join(process.cwd(), "src/styles/globals.css"), "utf8");
-const fontsCss = readFileSync(join(process.cwd(), "src/styles/fonts.css"), "utf8");
-const layoutTsx = readFileSync(join(process.cwd(), "src/routes/__root.tsx"), "utf8");
-const landingLayout = readFileSync(join(process.cwd(), "components/landing/LandingLayout.tsx"), "utf8");
+const globalsCss = readFileSync(
+  join(process.cwd(), "src/styles/globals.css"),
+  "utf8",
+);
+const fontsCss = readFileSync(
+  join(process.cwd(), "src/styles/fonts.css"),
+  "utf8",
+);
+const layoutTsx = readFileSync(
+  join(process.cwd(), "src/routes/__root.tsx"),
+  "utf8",
+);
+const landingLayout = readFileSync(
+  join(process.cwd(), "components/landing/LandingLayout.tsx"),
+  "utf8",
+);
 
 /**
  * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
@@ -22,12 +34,23 @@ describe("visual-redesign foundation", () => {
       ["clay", "#ffe3d6"],
       ["ember", "#ff5a1f"],
     ]) {
-      expect(globalsCss).toMatch(new RegExp(`--palette-${name}:\\s*${hex}`, "i"));
+      expect(globalsCss).toMatch(
+        new RegExp(`--palette-${name}:\\s*${hex}`, "i"),
+      );
     }
   });
 
   it("maps role tokens into Tailwind, with no legacy aliases left", () => {
-    for (const role of ["page", "ink", "ink-2", "action", "link", "focus", "ember", "hairline"]) {
+    for (const role of [
+      "page",
+      "ink",
+      "ink-2",
+      "action",
+      "link",
+      "focus",
+      "ember",
+      "hairline",
+    ]) {
       expect(globalsCss).toMatch(new RegExp(`--color-${role}:\\s*var\\(--`));
     }
     for (const legacy of [
@@ -50,15 +73,35 @@ describe("visual-redesign foundation", () => {
   });
 
   it("uses Geist, Geist Mono and Noto Sans Thai, and drops the retired fonts", () => {
-    const families = [...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g)].map((m) => m[1]!.trim());
+    const families = [
+      ...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g),
+    ].map((m) => m[1]!.trim());
     expect(new Set(families)).toEqual(
-      new Set(["Geist", "Geist Fallback", "Geist Mono", "Geist Mono Fallback", "Noto Sans Thai", "Noto Sans Thai Fallback"]),
+      new Set([
+        "Geist",
+        "Geist Fallback",
+        "Geist Mono",
+        "Geist Mono Fallback",
+        "Noto Sans Thai",
+        "Noto Sans Thai Fallback",
+      ]),
     );
-    for (const retired of ["Hanken Grotesk", "Instrument Serif", "Space Mono", "Almarai", "Inter"]) {
+    for (const retired of [
+      "Hanken Grotesk",
+      "Instrument Serif",
+      "Space Mono",
+      "Almarai",
+      "Inter",
+    ]) {
       expect(families).not.toContain(retired);
     }
     // The retired font aliases are gone too.
-    for (const alias of ["--font-instrument-serif", "--font-almarai", "--font-hanken", "--font-serif"]) {
+    for (const alias of [
+      "--font-instrument-serif",
+      "--font-almarai",
+      "--font-hanken",
+      "--font-serif",
+    ]) {
       expect(globalsCss, alias).not.toContain(alias);
     }
   });
@@ -67,7 +110,10 @@ describe("visual-redesign foundation", () => {
     expect(layoutTsx).not.toContain("forcedTheme");
     expect(layoutTsx).toContain('defaultTheme="light"');
     // Theme colours live in the metadata module both frameworks share.
-    const rootMeta = readFileSync(join(process.cwd(), "lib/seo/rootMetadata.ts"), "utf8");
+    const rootMeta = readFileSync(
+      join(process.cwd(), "lib/seo/rootMetadata.ts"),
+      "utf8",
+    );
     expect(rootMeta).toMatch(/#0b0d17/i);
     expect(rootMeta).toMatch(/#f5f6fa/i);
   });

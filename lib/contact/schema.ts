@@ -1,5 +1,9 @@
 import * as v from "valibot";
-import { CONTACT_LIMITS, CONTACT_TOPICS, contactMessages } from "@/lib/content/contact";
+import {
+  CONTACT_LIMITS,
+  CONTACT_TOPICS,
+  contactMessages,
+} from "@/lib/content/contact";
 import { isValidEmail } from "@/lib/contact/email";
 
 /**
@@ -34,5 +38,7 @@ export type ContactFormValues = v.InferInput<typeof contactFormSchema>;
 /** The first problem with a submission, worded for the visitor, or null. */
 export function firstContactError(values: unknown): string | null {
   const result = v.safeParse(contactFormSchema, values);
-  return result.success ? null : (result.issues[0]?.message ?? contactMessages.failed);
+  return result.success
+    ? null
+    : (result.issues[0]?.message ?? contactMessages.failed);
 }

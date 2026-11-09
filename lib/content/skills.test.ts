@@ -243,5 +243,4 @@ describe("skills nav", () => {
       icon: "skills",
     });
   });
-
 });
