@@ -1,6 +1,6 @@
 # Phase 0: Fix what's broken
 
-**Status:** EXECUTED 06-11-26, code-complete and verified locally; waiting on owner actions (Resend secrets, copy review, commit/PR/deploy approval). Evidence: `../reports/phase-0_fix-broken_REPORT_06-11-26.md`.
+**Status:** SHIPPED in #53 (merged 08-11-26). One check is still open: a real message sent in production with the owner's Resend secrets. Evidence: `../reports/phase-0_fix-broken_REPORT_06-11-26.md`.
 **Created:** 06-11-26
 **Umbrella:** `ux-experience_UMBRELLA_PLAN_06-11-26.md`
 **Covers audit findings:** 1 (fake contact submit), 2 (agency template copy), 3 (`/showcase` wellness page)

@@ -7,14 +7,23 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 const INTERACTIVE_SELECTOR =
   "a, button, [role='button'], .keyword, .activity-day, input, textarea, label, summary";
 
+/** Follow strength per frame. Higher = snappier; 0.6 catches up ~50% faster than 0.4. */
+const LERP = 0.6;
+/** Below this distance (px) on both axes the cursor snaps to target and the loop stops. */
+export const CURSOR_SETTLE_PX = 0.1;
+
 /**
  * hpbrn-style smooth cursor — landing only, fine pointer, PRM/coarse off.
+ *
+ * The rAF loop runs only while the cursor is catching up: it starts on
+ * `pointermove` and stops once the cursor settles, so a still pointer costs
+ * no frames. The hand-cursor hit test (`elementFromPoint`) runs at most once
+ * per frame, not once per pointer event.
  */
 export default function SmoothCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const pos = useRef({ x: -100, y: -100 });
   const target = useRef({ x: -100, y: -100 });
-  const vel = useRef({ x: 0, y: 0 });
   const raf = useRef(0);
   const finePointer = useFinePointer();
   const reducedMotion = useReducedMotion();
@@ -26,35 +35,59 @@ export default function SmoothCursor() {
 
     document.documentElement.classList.add("has-smooth-cursor");
 
-    const onMove = (event: PointerEvent) => {
-      target.current.x = event.clientX;
-      target.current.y = event.clientY;
-      const el = document.elementFromPoint(event.clientX, event.clientY);
-      setIsHand(Boolean(el?.closest(INTERACTIVE_SELECTOR)));
+    let running = false;
+    let moved = false;
+    let hand = false;
+
+    const render = (vx: number, vy: number) => {
+      const node = cursorRef.current;
+      if (!node) return;
+      const speed = Math.hypot(vx, vy);
+      const rotate = speed > 0 ? Math.atan2(vy, vx) * (180 / Math.PI) * 0.1 : 0;
+      const scale = Math.min(1.08, 1 + speed * 0.012);
+      node.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) rotate(${rotate}deg) scale(${scale})`;
     };
 
     const tick = () => {
-      // Higher = snappier follow; 0.6 ≈ 50% faster catch-up than 0.4.
-      const lerp = 0.6;
-      const prevX = pos.current.x;
-      const prevY = pos.current.y;
-      pos.current.x += (target.current.x - pos.current.x) * lerp;
-      pos.current.y += (target.current.y - pos.current.y) * lerp;
-      vel.current.x = pos.current.x - prevX;
-      vel.current.y = pos.current.y - prevY;
-
-      const node = cursorRef.current;
-      if (node) {
-        const speed = Math.hypot(vel.current.x, vel.current.y);
-        const rotate = Math.atan2(vel.current.y, vel.current.x) * (180 / Math.PI);
-        const scale = Math.min(1.08, 1 + speed * 0.012);
-        node.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) rotate(${Number.isFinite(rotate) ? rotate * 0.1 : 0}deg) scale(${scale})`;
+      if (moved) {
+        moved = false;
+        const el = document.elementFromPoint(target.current.x, target.current.y);
+        const nextHand = Boolean(el?.closest(INTERACTIVE_SELECTOR));
+        if (nextHand !== hand) {
+          hand = nextHand;
+          setIsHand(nextHand);
+        }
       }
+
+      const dx = target.current.x - pos.current.x;
+      const dy = target.current.y - pos.current.y;
+      if (Math.abs(dx) < CURSOR_SETTLE_PX && Math.abs(dy) < CURSOR_SETTLE_PX) {
+        pos.current.x = target.current.x;
+        pos.current.y = target.current.y;
+        render(0, 0);
+        running = false;
+        return;
+      }
+
+      pos.current.x += dx * LERP;
+      pos.current.y += dy * LERP;
+      render(dx * LERP, dy * LERP);
       raf.current = window.requestAnimationFrame(tick);
     };
 
+    const onMove = (event: PointerEvent) => {
+      target.current.x = event.clientX;
+      target.current.y = event.clientY;
+      moved = true;
+      if (!running) {
+        running = true;
+        raf.current = window.requestAnimationFrame(tick);
+      }
+    };
+
+    // Park the cursor off-screen until the first pointer move.
+    render(0, 0);
     window.addEventListener("pointermove", onMove, { passive: true });
-    raf.current = window.requestAnimationFrame(tick);
 
     return () => {
       document.documentElement.classList.remove("has-smooth-cursor");
