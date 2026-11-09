@@ -267,7 +267,9 @@ function LanguageCard({
               )}
             >
               <span lang={option.id}>{option.label}</span>
-              <span aria-hidden className="font-mono text-xs opacity-80">
+              {/* Full strength: at the canvas's 80% the ink-2 code on the
+                  page fill falls under 4.5:1 by day. */}
+              <span aria-hidden className="font-mono text-xs">
                 {option.code}
               </span>
             </button>
