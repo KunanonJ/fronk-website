@@ -39,6 +39,19 @@
   --color-ember: var(--ember);
   --color-error: var(--error-text);
   --color-success: var(--success-text);
+  /* Bento redesign (phase 7a). Primary buttons are ink (owner, 09-11-26):
+   * --cta is Ink by day and Glaze by night. --accent (utility "mark") is the
+   * theme-aware marker colour; --muted (utility "ink-3") is for the muted
+   * connector words inside display headings only (large text, 3:1). */
+  --color-cta: var(--cta);
+  --color-on-cta: var(--oncta);
+  --color-mark: var(--accent);
+  --color-ink-3: var(--muted);
+  --color-on-photo: var(--onphoto);
+  --color-on-photo-2: var(--onphoto2);
+  --color-glass: var(--glass);
+  --color-glass-2: var(--glass2);
+  --color-water: var(--water2);
   /* Palette colours for art (pixel grids, diagrams), never for text. */
   --color-signal: var(--palette-signal);
   --color-glaze: var(--palette-glaze);
@@ -46,11 +59,19 @@
   --color-paper: var(--palette-paper);
 
   --shadow-card: var(--elev-card);
+  --shadow-pop: var(--elev-pop);
+  --shadow-logo: var(--elev-logo);
 
   --radius-chip: 8px;
   --radius-input: 12px;
   --radius-card: 24px;
   --radius-panel: 32px;
+  /* Bento canvas radii (phase 7a). */
+  --radius-bento: 28px;
+  --radius-sheet: 24px;
+  --radius-well: 20px;
+  --radius-row: 14px;
+  --radius-tile: 12px;
 
   /* Type scale (visual-redesign Phase 0). Nothing below 12 px. */
   --text-h1: clamp(2.75rem, 2.1rem + 2.6vw, 4rem);
@@ -79,9 +100,21 @@
   --text-stat--line-height: 1;
   --text-stat--letter-spacing: -0.04em;
   --text-stat--font-weight: 600;
+  /* Bento canvas display h1 (Home) and the in-card sizes (phase 7a). */
+  --text-display: clamp(2.25rem, 5.6vw, 4rem);
+  --text-display--line-height: 1.14;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--font-weight: 600;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.45;
+  --text-card: 0.9375rem;
+  --text-card--line-height: 1.5;
 
   /* helumi and the intro use this curve; not "--ease-out", which Tailwind already defines. */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Bento canvas curves: "soft" is the canvas --ease, "spring" overshoots. */
+  --ease-soft: var(--ease);
+  --ease-spring: var(--spring);
 }
 
 /* ─── Palette (owner, visual-redesign 09-11-26) ─────────────────────────────
@@ -99,6 +132,9 @@
   --palette-clay: #ffe3d6;
   --palette-ember: #ff5a1f;
   --palette-mist: #e9eaf0;
+  /* Bento canvas motion curves (theme-independent). */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ─── Roles: light (default since 09-11-26) ─────────────────────────────────
@@ -118,14 +154,23 @@
   --action: var(--palette-signal);
   --action-hover: var(--palette-signal-hover);
   --on-action: var(--palette-paper);
-  --link: var(--palette-signal);
-  --focus: var(--palette-signal);
+  /* Theme-aware marker colour (Signal by day); links and focus follow it. */
+  --accent: var(--palette-signal);
+  --link: var(--accent);
+  --focus: var(--accent);
+  --muted: #80859b;
+  /* Primary buttons, pressed chips and active segments: ink. */
+  --cta: var(--palette-ink);
+  --oncta: var(--palette-paper);
   --ember: var(--palette-ember);
   --error-text: #b3360a;
   --success-text: #137036;
   --elev-card:
-    0 1px 2px rgba(11, 13, 23, 0.04), 0 12px 32px -12px rgba(11, 13, 23, 0.1),
-    0 40px 80px -32px rgba(43, 59, 255, 0.12);
+    0 1px 2px rgba(11, 13, 23, 0.04), 0 16px 40px -16px rgba(11, 13, 23, 0.12);
+  --elev-pop: 0 24px 60px -24px rgba(11, 13, 23, 0.28);
+  --elev-logo: 0 14px 30px -12px rgba(11, 13, 23, 0.35);
+  --elev-avatar: 0 8px 24px -8px rgba(11, 13, 23, 0.35);
+  --sheen: rgba(255, 255, 255, 0.5);
 }
 
 /* ─── Roles: dark (toggle) ─────────────────────────────────────────────────
@@ -145,12 +190,76 @@
   --action: var(--palette-signal);
   --action-hover: var(--palette-signal-hover);
   --on-action: var(--palette-paper);
-  --link: #8e97ff;
-  --focus: #8e97ff;
+  --accent: #8e97ff;
+  --link: var(--accent);
+  --focus: var(--accent);
+  --muted: #7d83a0;
+  --cta: var(--palette-glaze);
+  --oncta: var(--palette-ink);
   --ember: var(--palette-ember);
   --error-text: #ff7a45;
   --success-text: #4ade80;
   --elev-card: none;
+  --elev-pop: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
+  --sheen: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Bangkok scene and photo overlays (bento redesign, phase 7a) ─────────
+ * Art-only colours for the "Based in Bangkok" card (components/bento/
+ * BangkokScene.tsx). The sky and water follow the site theme through these
+ * tokens, so no JS picks a gradient and there is no hydration flash. Text on
+ * the scene uses --onphoto / --onphoto2 over the scrim (contrast-tested).
+ * ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --onphoto: #ffffff;
+  --onphoto2: rgba(255, 255, 255, 0.74);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass2: rgba(255, 255, 255, 0.26);
+  --glowop: 0.6;
+  --starop: 0;
+  --scene-sky-1: #56648f;
+  --scene-sky-2: #a9a3bb;
+  --scene-sky-3: #e9c39b;
+  --scene-water-1: #5c6584;
+  --water2: #232a3f;
+  --scene-gold-1: #5e3a1e;
+  --scene-gold-2: #c8904a;
+  --scene-gold-3: #f4d391;
+  --scene-gold-4: #55341b;
+  --scene-tiers: rgba(58, 30, 12, 0.5);
+  --scene-base: #7a5636;
+  --scene-door: #3a2414;
+  --scene-band: #f6dc9c;
+  --scene-spire: #e9c27a;
+  --scene-finial: #f3d79a;
+  --scene-light: #fff1c4;
+  --scene-tree: #121619;
+  --scene-bank: #1c1d26;
+  --scene-hull: #2b1d18;
+  --scene-trim: #b8322a;
+  --scene-cabin: #3a2a24;
+  --scene-halo: rgba(255, 196, 120, 0.55);
+  --scene-halo-0: rgba(255, 196, 120, 0);
+  --scene-mist: rgba(34, 38, 64, 0.55);
+  --scene-reflect: rgba(240, 192, 112, 0.42);
+  --scene-reflect-2: rgba(240, 192, 112, 0.3);
+  --scene-shimmer: rgba(255, 255, 255, 0.1);
+  /* Scrim stops behind the card text (side layout, then stacked layout). */
+  --scene-scrim-1: rgba(9, 11, 24, 0.9);
+  --scene-scrim-2: rgba(9, 11, 24, 0.64);
+  --scene-scrim-3: rgba(9, 11, 24, 0.96);
+  --scene-scrim-4: rgba(9, 11, 24, 0.8);
+  --scene-scrim-0: rgba(9, 11, 24, 0);
+}
+
+.dark {
+  --glowop: 1;
+  --starop: 0.85;
+  --scene-sky-1: #0d1230;
+  --scene-sky-2: #2b2f5a;
+  --scene-sky-3: #7a5a74;
+  --scene-water-1: #1d2244;
+  --water2: #070a18;
 }
 
 html {
@@ -222,9 +331,9 @@ body {
 
 /*
  * First-visit intro (IntroLoader). Never runs under reduced motion; the whole
- * thing finishes within 1.5 s. Exit duration is set inline from INTRO_TIMING.
- * (The 1.8 s route-splash panel wipe was removed 09-11-26; route changes now
- * use a ~250 ms fade of <main>, see components/landing/RouteFade.tsx.)
+ * thing, celebratory burst and exit included, finishes within INTRO_MAX_MS
+ * (lib/content/introGreetings.ts). Exit duration is set inline from
+ * INTRO_TIMING. Route changes use the router's view transition instead.
  */
 .intro-overlay {
   transition-property: opacity;
@@ -250,6 +359,139 @@ body {
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+/* The arrival burst (owner, 09-11-26): a champagne pop (ring + flash), a fan
+ * of confetti that shoots up and falls, and sparkles around the welcome. CSS
+ * only, in palette tokens; each piece reads its path from custom properties
+ * set inline by IntroBurst. */
+.intro-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.intro-burst > * {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-pop {
+    width: 9rem;
+    height: 9rem;
+    border: 2px solid var(--scene-gold-2);
+    border-radius: 999px;
+    animation: intro-pop 520ms var(--ease) both;
+  }
+
+  .intro-flash {
+    width: 16rem;
+    height: 16rem;
+    border-radius: 999px;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--scene-gold-3) 70%, transparent) 0%,
+      transparent 65%
+    );
+    animation: intro-flash 420ms var(--ease) both;
+  }
+
+  .intro-confetti {
+    width: var(--w);
+    height: var(--h);
+    border-radius: 2px;
+    background: var(--c);
+    animation: intro-confetti var(--d) var(--ease) var(--delay) both;
+  }
+
+  .intro-sparkle {
+    width: var(--s);
+    height: var(--s);
+    background: var(--c);
+    clip-path: polygon(
+      50% 0,
+      61% 39%,
+      100% 50%,
+      61% 61%,
+      50% 100%,
+      39% 61%,
+      0 50%,
+      39% 39%
+    );
+    animation: intro-sparkle 560ms var(--ease) var(--delay) both;
+  }
+}
+
+@keyframes intro-pop {
+  0% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.6);
+  }
+}
+
+@keyframes intro-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes intro-confetti {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+      rotate(var(--r)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--x) * 1.2),
+        calc(-50% + var(--y) + var(--fall))
+      )
+      rotate(calc(var(--r) * 2)) scale(0.9);
+  }
+}
+
+@keyframes intro-sparkle {
+  0% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0)
+      rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1)
+      rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+      scale(0.2) rotate(90deg);
   }
 }
 
@@ -331,72 +573,10 @@ a {
   }
 }
 
-/* ─── Landing interactive chrome (custom cursor + keyword tips) ─────────── */
+/* ─── Contribution heatmap tooltips (About) ─────────────────────────────── */
 
-html.has-smooth-cursor,
-html.has-smooth-cursor * {
-  cursor: none !important;
-}
-
-.smooth-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  width: 28px;
-  height: 28px;
-  margin: -2px 0 0 -2px;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.smooth-cursor-arrow,
-.smooth-cursor-hand {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-}
-
-.smooth-cursor-hand {
-  opacity: 0;
-}
-
-.smooth-cursor.is-hand .smooth-cursor-arrow {
-  opacity: 0;
-}
-
-.smooth-cursor.is-hand .smooth-cursor-hand {
-  opacity: 1;
-}
-
-@media (pointer: coarse), (prefers-reduced-motion: reduce) {
-  html.has-smooth-cursor,
-  html.has-smooth-cursor * {
-    cursor: auto !important;
-  }
-
-  .smooth-cursor {
-    display: none !important;
-  }
-}
-
-.keyword {
-  position: relative;
-  text-decoration: underline;
-  text-decoration-color: var(--hairline-strong);
-  text-underline-offset: 0.2em;
-  transition: text-decoration-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.keyword:hover,
-.keyword:focus-visible {
-  text-decoration-color: var(--ink-2);
-}
-
-.keyword[data-tooltip]::after,
 .activity-day[data-tooltip]::after {
-  /* content only on hover/focus so tips stay out of the a11y tree at rest */
+  /* content only on hover so tips stay out of the a11y tree at rest */
   content: none;
   position: absolute;
   left: 50%;
@@ -426,8 +606,6 @@ html.has-smooth-cursor * {
     transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.keyword[data-tooltip]:hover::after,
-.keyword[data-tooltip]:focus-visible::after,
 .activity-day[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   opacity: 1;
@@ -444,8 +622,524 @@ html.has-smooth-cursor * {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .keyword[data-tooltip]::after,
   .activity-day[data-tooltip]::after {
     transition: none;
+  }
+}
+
+/* ─── Bento redesign: surfaces and motion (phase 7a) ─────────────────────────
+ * `.kj` is the canvas root class. Here it marks a redesigned surface: the
+ * site header and footer now, each page as Phase 7 restyles it. The rules
+ * follow the canvas helmet CSS (design spec section 2), with three changes:
+ *   - every animation sits behind prefers-reduced-motion: no-preference;
+ *   - the LCP h1 never starts invisible or blurred: its lines only slide up,
+ *     and only the bento cards below it fade in;
+ *   - cards rise without the blur filter (paint cost on low-end phones).
+ * Bento rules are unlayered so they beat the card's Tailwind utilities, as
+ * the canvas CSS beat its inline styles.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  .kj a {
+    color: var(--link);
+  }
+
+  .kj a:hover {
+    color: var(--ink);
+  }
+
+  .kj :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .kj button {
+    font: inherit;
+    cursor: pointer;
+  }
+}
+
+.kj a,
+.kj button {
+  transition:
+    transform 0.35s var(--spring),
+    background-color 0.3s var(--ease),
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease),
+    box-shadow 0.35s var(--ease),
+    opacity 0.3s var(--ease);
+}
+
+.kj .kj-row {
+  transition:
+    background-color 0.25s var(--ease),
+    transform 0.4s var(--ease);
+}
+
+.kj .kj-row:not([aria-current]):hover {
+  background: var(--page);
+}
+
+.kj .kj-icon:hover {
+  border-color: var(--hairline-strong);
+}
+
+.kj-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Bangkok card: a size container; the scrim and blur keep the text legible. */
+.kj-place {
+  container-type: inline-size;
+}
+
+.kj-place-scrim {
+  background: linear-gradient(
+    90deg,
+    var(--scene-scrim-1) 0%,
+    var(--scene-scrim-2) 40%,
+    var(--scene-scrim-0) 72%
+  );
+}
+
+.kj-place-blur {
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  -webkit-mask-image: linear-gradient(90deg, #000 28%, transparent 60%);
+  mask-image: linear-gradient(90deg, #000 28%, transparent 60%);
+}
+
+.kj-glass:hover {
+  background: var(--glass2);
+}
+
+.kj .kj-glass,
+.kj .kj-glass:hover {
+  color: var(--onphoto);
+}
+
+@container (max-width: 560px) {
+  .kj-place-body {
+    min-height: 680px;
+    justify-content: flex-end;
+    padding: 24px;
+  }
+
+  .kj-place-art {
+    bottom: auto;
+    height: 64%;
+  }
+
+  .kj-place-scrim {
+    background: linear-gradient(
+      0deg,
+      var(--scene-scrim-3) 0%,
+      var(--scene-scrim-4) 44%,
+      var(--scene-scrim-0) 74%
+    );
+  }
+
+  .kj-place-blur {
+    -webkit-mask-image: linear-gradient(0deg, #000 26%, transparent 54%);
+    mask-image: linear-gradient(0deg, #000 26%, transparent 54%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Press feedback and hover nudges. */
+  .kj a:active,
+  .kj button:active {
+    transform: scale(0.97);
+  }
+
+  .kj .kj-row:hover {
+    transform: translateX(4px);
+  }
+
+  .kj .kj-icon:hover {
+    transform: translateY(-2px);
+  }
+
+  .kj .kj-icon svg {
+    animation: kj-spin 0.6s var(--spring) backwards;
+  }
+
+  /* Page entrance: header drop, h1 lines slide (never fade), cards rise. */
+  .kj-header {
+    animation: kj-drop 0.8s var(--ease) backwards;
+  }
+
+  .kj-lines > * {
+    animation: kj-line 1s var(--ease) backwards;
+  }
+
+  .kj-lines > :nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .kj-lines > :nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .kj-lines > :nth-child(n + 4) {
+    animation-delay: 0.3s;
+  }
+
+  .kj-lines img {
+    transition: transform 0.6s var(--spring);
+  }
+
+  .kj-lines img:hover {
+    transform: rotate(-8deg) scale(1.12);
+  }
+
+  .bento > *,
+  .bento-2 > * {
+    animation: kj-rise 0.9s var(--ease) backwards;
+  }
+
+  .bento > :nth-child(1) {
+    animation-delay: 0.16s;
+  }
+
+  .bento > :nth-child(2) {
+    animation-delay: 0.24s;
+  }
+
+  .bento > :nth-child(3) {
+    animation-delay: 0.32s;
+  }
+
+  .bento > :nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  .bento > :nth-child(5) {
+    animation-delay: 0.48s;
+  }
+
+  .bento > :nth-child(6) {
+    animation-delay: 0.56s;
+  }
+
+  .bento > :nth-child(n + 7) {
+    animation-delay: 0.64s;
+  }
+
+  /* Header panels pop from the top right; menu rows slide in. */
+  .kj-panel {
+    transform-origin: top right;
+    animation: kj-pop 0.42s var(--ease) backwards;
+  }
+
+  .kj-menu .kj-row {
+    animation: kj-in 0.5s var(--ease) backwards;
+  }
+
+  .kj-menu .kj-row:nth-child(2) {
+    animation-delay: 0.03s;
+  }
+
+  .kj-menu .kj-row:nth-child(3) {
+    animation-delay: 0.06s;
+  }
+
+  .kj-menu .kj-row:nth-child(4) {
+    animation-delay: 0.09s;
+  }
+
+  .kj-menu .kj-row:nth-child(5) {
+    animation-delay: 0.12s;
+  }
+
+  .kj-menu .kj-row:nth-child(n + 6) {
+    animation-delay: 0.15s;
+  }
+
+  .kj-live {
+    animation: kj-pulse 2.4s var(--ease) infinite;
+  }
+
+  /* Bangkok scene loops. */
+  .kj-place-art svg {
+    transform-origin: 72% 78%;
+    animation: kj-drift 28s ease-in-out infinite alternate;
+  }
+
+  .kj-clouds {
+    animation: kj-clouds 70s linear infinite alternate;
+  }
+
+  .kj-halo {
+    animation: kj-breathe 6s ease-in-out infinite;
+  }
+
+  .kj-stars circle {
+    animation: kj-twinkle 3.4s ease-in-out infinite;
+  }
+
+  .kj-stars circle:nth-child(3n) {
+    animation-delay: 1.1s;
+  }
+
+  .kj-stars circle:nth-child(3n + 1) {
+    animation-delay: 2.2s;
+  }
+
+  .kj-boat {
+    animation: kj-boat 22s ease-in-out infinite alternate;
+  }
+
+  .kj-shimmer {
+    animation: kj-shimmer 7s ease-in-out infinite alternate;
+  }
+
+  .kj-badge {
+    transition: transform 0.6s var(--spring);
+  }
+
+  .kj-place:hover .kj-badge {
+    transform: translateY(-3px) rotate(-6deg);
+  }
+}
+
+/* Card hover lift and sheen, pointer devices only. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .bento > *,
+  .bento-2 > * {
+    transition:
+      transform 0.55s var(--ease),
+      box-shadow 0.55s var(--ease),
+      border-color 0.4s var(--ease),
+      background-color 0.4s var(--ease);
+  }
+
+  .bento > :hover,
+  .bento-2 > :hover {
+    transform: translateY(-4px);
+    box-shadow: var(--elev-pop);
+    border-color: var(--hairline-strong);
+  }
+
+  .bento > article::after,
+  .bento-2 > article::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      110deg,
+      transparent 38%,
+      var(--sheen) 50%,
+      transparent 62%
+    );
+    opacity: 0;
+    transform: translateX(-70%);
+    transition:
+      transform 1.1s var(--ease),
+      opacity 0.5s var(--ease);
+  }
+
+  .bento > article:hover::after,
+  .bento-2 > article:hover::after {
+    opacity: 0.6;
+    transform: translateX(70%);
+  }
+
+  .kj .btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elev-pop);
+  }
+}
+
+@keyframes kj-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Transform only: the h1 is the LCP element and stays visible throughout. */
+@keyframes kj-line {
+  from {
+    transform: translateY(0.3em);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes kj-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kj-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes kj-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kj-spin {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kj-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ember) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 9px color-mix(in srgb, var(--ember) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent);
+  }
+}
+
+@keyframes kj-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07) translateX(-1.5%);
+  }
+}
+
+@keyframes kj-clouds {
+  to {
+    transform: translateX(-70px);
+  }
+}
+
+@keyframes kj-breathe {
+  0%,
+  100% {
+    opacity: var(--glowop);
+  }
+  50% {
+    opacity: calc(var(--glowop) * 0.55);
+  }
+}
+
+@keyframes kj-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes kj-boat {
+  to {
+    transform: translateX(-90px);
+  }
+}
+
+@keyframes kj-shimmer {
+  to {
+    transform: translateX(26px);
+    opacity: 0.45;
+  }
+}
+
+@keyframes kj-reveal {
+  from {
+    clip-path: circle(0 at var(--vtx, 92%) var(--vty, 4%));
+  }
+  to {
+    clip-path: circle(150% at var(--vtx, 92%) var(--vty, 4%));
+  }
+}
+
+/* ─── View transitions ───────────────────────────────────────────────────────
+ * Two kinds, told apart by view-transition types: the router starts page
+ * navigations with type "page" (a short cross-fade, the UA default), and the
+ * theme toggle starts its switch with type "theme" (the circular reveal from
+ * the click point). The toggle also sets html.kj-vt for the duration, which
+ * stops CSS transitions blending into the snapshot and carries the reveal in
+ * browsers that lack view-transition types.
+ * ─────────────────────────────────────────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.28s;
+  animation-timing-function: var(--ease);
+}
+
+html.kj-vt *,
+html.kj-vt *::before,
+html.kj-vt *::after {
+  transition: none !important;
+}
+
+html.kj-vt::view-transition-old(root),
+html.kj-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.kj-vt::view-transition-new(root) {
+  animation: kj-reveal 0.8s var(--ease);
+}
+
+html:active-view-transition-type(theme)::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html:active-view-transition-type(theme)::view-transition-new(root) {
+  animation: kj-reveal 0.8s var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
