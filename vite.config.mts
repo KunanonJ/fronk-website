@@ -4,15 +4,19 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
+import { readWranglerVars } from "./scripts/wrangler-vars.mjs";
 
 /*
- * TanStack Start build (tanstack-migration). Runs next to Next until the
- * Phase 5 cutover: Next keeps `app/` and next.config.ts; Start reads `src/`
- * and the shared `components/` and `lib/` through the `@/` alias.
+ * TanStack Start build for the Cloudflare Worker. `src/` holds the app (routes,
+ * server entry, server code); `components/` and `lib/` are shared through the
+ * `@/` alias.
  */
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-/** Every NEXT_PUBLIC_* the code reads; unset ones become `undefined`, never `process`. */
+/**
+ * Every NEXT_PUBLIC_* the code reads, inlined at build time (client and server
+ * bundles). Unset ones become `undefined`, never a `process` lookup.
+ */
 const PUBLIC_ENV = [
   "NEXT_PUBLIC_SITE_URL",
   "NEXT_PUBLIC_GSC_VERIFICATION",
@@ -28,8 +32,12 @@ const PUBLIC_ENV = [
   "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
 ];
 
+const wranglerConfig = process.env.START_WRANGLER_CONFIG ?? "wrangler.jsonc";
+
 export default defineConfig(({ mode }) => {
-  const env = { ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
+  // Precedence: the shell (CI overrides), then local .env files, then the
+  // Worker's own `vars`, so Workers Builds needs no build variables.
+  const env = { ...readWranglerVars(path.join(root, wranglerConfig)), ...loadEnv(mode, root, "NEXT_PUBLIC_"), ...process.env };
   return {
     server: { port: 3000 },
     // IPv4 explicitly: in the CI container "localhost" binds ::1 while the
@@ -44,7 +52,7 @@ export default defineConfig(({ mode }) => {
     ),
     plugins: [
       // Production config by default; `pnpm deploy:staging` builds against the staging Worker.
-      cloudflare({ configPath: process.env.START_WRANGLER_CONFIG ?? "wrangler.jsonc", viteEnvironment: { name: "ssr" } }),
+      cloudflare({ configPath: wranglerConfig, viteEnvironment: { name: "ssr" } }),
       tanstackStart({
         // Pages built from lib/content are rendered once per deploy and served
         // as static assets; Sanity-backed pages render on request (Phase 4
