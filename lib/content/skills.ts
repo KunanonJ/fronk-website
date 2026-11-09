@@ -95,6 +95,14 @@ export const SKILLS_REPO_URL = snapshot.repoUrl;
 export const SKILLS_TAG = snapshot.tag;
 export const SKILLS_VERSION = snapshot.version;
 export const SKILLS_RELEASE_URL = snapshot.releaseUrl;
+/** Release day, `2026-10-06` (UTC, from the GitHub release). */
+export const SKILLS_RELEASE_DATE = snapshot.publishedAt.slice(0, 10);
+/** Release month for the hero pill, e.g. `Oct 2026`. */
+export const SKILLS_RELEASE_MONTH = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(snapshot.publishedAt));
 export const SKILLS_ROOT = snapshot.skillsRoot;
 export const SKILLS_LICENSE = "MIT";
 export const PLUGIN_ZIP: SkillAsset = snapshot.pluginZip;
@@ -117,6 +125,8 @@ export const SKILL_SOURCES: readonly SkillSource[] = snapshot.sources;
 export const skillsPage = {
   eyebrow: "Skills",
   title: "The agent skills I build with",
+  /** The h1 as the canvas sets it: a muted word, then two lines of `title`. */
+  headline: { muted: "The", rest: "agent skills", accent: "I build with" },
   description:
     "A skill is a folder of instructions an AI coding agent loads when the task calls for it: how to plan, test, review, or open a pull request. These are the twenty I use, packed as Superstacks, free under the MIT license.",
   metaDescription:

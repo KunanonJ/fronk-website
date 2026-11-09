@@ -10,6 +10,8 @@ import {
   SKILL_SOURCES,
   SKILL_STAGES,
   SKILL_STAGE_MEMBERS,
+  SKILLS_RELEASE_DATE,
+  SKILLS_RELEASE_MONTH,
   SKILLS_REPO_URL,
   SKILLS_TAG,
   copyrightHolder,
@@ -21,6 +23,7 @@ import {
   getSkillsByStage,
   getStageSiblings,
   skillInstallCommands,
+  skillsPage,
   sourceLabel,
 } from "@/lib/content/skills";
 
@@ -242,5 +245,18 @@ describe("skills nav", () => {
       href: "/skills",
       icon: "skills",
     });
+  });
+});
+
+describe("skills page copy", () => {
+  it("splits the h1 into the canvas lines without changing its text", () => {
+    const { muted, rest, accent } = skillsPage.headline;
+    expect(`${muted} ${rest} ${accent}`).toBe(skillsPage.title);
+  });
+
+  it("dates the release from the snapshot", () => {
+    expect(SKILLS_RELEASE_DATE).toBe(snapshot.publishedAt.slice(0, 10));
+    expect(SKILLS_RELEASE_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(SKILLS_RELEASE_MONTH).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
   });
 });
