@@ -35,10 +35,18 @@ export const contactFormSchema = v.object({
 
 export type ContactFormValues = v.InferInput<typeof contactFormSchema>;
 
-/** The first problem with a submission, worded for the visitor, or null. */
-export function firstContactError(values: unknown): string | null {
+/**
+ * The first problem with a submission, in form order (name, email,
+ * message), worded for the visitor; null when the values are valid. The
+ * form focuses `field` (its input id is `contact-<field>`).
+ */
+export function firstContactIssue(
+  values: unknown,
+): { field: string; message: string } | null {
   const result = v.safeParse(contactFormSchema, values);
-  return result.success
-    ? null
-    : (result.issues[0]?.message ?? contactMessages.failed);
+  if (result.success) return null;
+  const issue = result.issues[0];
+  return issue
+    ? { field: v.getDotPath(issue) ?? "", message: issue.message }
+    : null;
 }

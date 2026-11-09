@@ -1,4 +1,5 @@
 import { site } from "@/lib/content/landing";
+import { siteConfig } from "@/lib/site";
 
 /**
  * Copy and limits for `/contact`. Shared by the form (client) and
@@ -30,29 +31,65 @@ export const CONTACT_LIMITS = {
   maxBodyBytes: 20_000,
 } as const;
 
+const DESCRIPTION =
+  "Email Kunanon Jarat (Fronk) or send a message about fintech, AI, ERP/CRM or startups in Bangkok and Southeast Asia.";
+
 export const contactPage = {
   metaTitle: "Contact",
-  metaDescription:
-    "Email Kunanon Jarat (Fronk) or send a message about fintech, AI, ERP/CRM or startups in Bangkok and Southeast Asia.",
-  headlineLead: "Building in fintech, AI or ops?",
-  headlineTail: "Let's",
-  headlineAccent: "talk.",
+  metaDescription: DESCRIPTION,
+  eyebrow: "Contact",
+  /**
+   * The page h1 in two lines (bento canvas): "Building in fintech, AI or
+   * ops? / Let's talk." Muted words render in --muted, "talk." in the accent.
+   */
+  headline: {
+    muted: "Building in",
+    focus: "fintech, AI",
+    joiner: "or",
+    focusTail: "ops?",
+    lead: "Let’s",
+    accent: "talk.",
+  },
+  /** The hero lead restates the meta description. */
+  lead: DESCRIPTION,
+  /** The form card's id: "Say hello" links on this page jump to it. */
+  formId: "say-hello",
   cardTitle: "Say hello",
   directLabel: "Email me directly",
   email: site.email,
-  divider: "or",
+  copyEmail: "Copy email",
+  emailCopied: "Copied",
   formLabel: "Or send a message",
   namePlaceholder: "Full name",
   emailPlaceholder: "Email",
   messagePlaceholder: "What are you working on, and how can I help?",
-  topicsLabel: "What's it about?",
+  topicsLabel: "What’s it about?",
   submit: "Send message",
   sending: "Sending...",
-  successTitle: "Thanks, it's in my inbox.",
-  successBody: "I'll reply by email.",
+  successTitle: "Thanks, it’s in my inbox.",
+  successBody: "I’ll reply by email.",
+  sendAnother: "Send another message",
   errorFallbackLead: "You can also email me at",
   mailtoSubject: "Hello from kunanonj.com",
+  elsewhereTitle: "Elsewhere",
+  whoTitle: "Who should write",
 } as const;
+
+/** "Elsewhere" on /contact: every public profile, in the canvas order. */
+export const contactElsewhere = [
+  { label: "X", href: siteConfig.socials.x },
+  { label: "LinkedIn", href: siteConfig.socials.linkedin },
+  { label: "GitHub", href: siteConfig.socials.github },
+  { label: "Telegram", href: siteConfig.socials.telegram },
+  { label: "Farcaster", href: siteConfig.socials.farcaster },
+] as const;
+
+/** The "Who should write" card's links (canvas): About, Ventures, Résumé. */
+export const contactNextLinks = [
+  { label: "About", href: "/about" },
+  { label: "Ventures", href: "/#ventures" },
+  { label: "Résumé", href: "/resume" },
+] as const;
 
 export const contactMessages = {
   sent: "Thanks, it's in my inbox. I'll reply by email.",
