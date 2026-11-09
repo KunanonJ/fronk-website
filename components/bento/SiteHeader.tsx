@@ -99,9 +99,13 @@ export default function SiteHeader() {
       </div>
 
       {shareOpen ? <SharePanel /> : null}
-      {menuOpen ? (
-        <SiteMenu pathname={pathname} onNavigate={() => close()} />
-      ) : null}
+      {/* Always in the HTML, hidden while closed: its links are the only
+          site-wide navigation crawlers that don't run JavaScript can follow. */}
+      <SiteMenu
+        open={menuOpen}
+        pathname={pathname}
+        onNavigate={() => close()}
+      />
     </header>
   );
 }
