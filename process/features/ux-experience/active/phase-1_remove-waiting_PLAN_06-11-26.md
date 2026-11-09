@@ -1,6 +1,6 @@
 # Phase 1: Remove waiting
 
-**Status:** EXECUTED 09-11-26, verified locally on the Workers preview; PR open, waiting on merge/deploy approval. Evidence: `../reports/phase-1_remove-waiting_REPORT_09-11-26.md`.
+**Status:** SHIPPED in #55 (merged 09-11-26) and verified in production (intro 1457 ms, skip 302 ms, route fade 199-249 ms, idle cursor 0 frames). Evidence: `../reports/phase-1_remove-waiting_REPORT_09-11-26.md`.
 **Created:** 06-11-26
 **Umbrella:** `ux-experience_UMBRELLA_PLAN_06-11-26.md`
 **Covers audit findings:** 4 (8.1 s intro), 5 (1.8 s route wipe), 8 (cursor rAF never idles)
