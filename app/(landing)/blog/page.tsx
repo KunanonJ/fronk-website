@@ -6,6 +6,14 @@ import { resolveWritingPageContent } from "@/lib/content/writingPage";
 import { fetchAllPosts, fetchWritingPage } from "@/lib/sanity/fetch";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
+/**
+ * Sanity-backed, so re-render at most every 60 s (via the OpenNext queue).
+ * Sanity is only configured at runtime (wrangler vars), so the build
+ * prerenders fallback content; without a revalidate time this page would
+ * stay on that build output forever and never pick up Sanity edits.
+ */
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const cmsPage = await fetchWritingPage();
   const page = resolveWritingPageContent(cmsPage);

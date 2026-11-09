@@ -5,6 +5,11 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Wrangler's esbuild keep_names wraps functions in __name(...) helpers.
+  // next-themes inlines its theme script via fn.toString(), so pages rendered
+  // inside the Worker (ISR re-renders) shipped "__name is not defined" to the
+  // browser. Build-time prerenders never hit it; runtime renders do.
+  "keep_names": false,
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://kunanonj.com",
     "NEXT_PUBLIC_SANITY_PROJECT_ID": "nkspfk4b",
@@ -12,6 +17,12 @@
     "NEXT_PUBLIC_SANITY_API_VERSION": "2025-01-01",
     "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
     "NEXT_PUBLIC_UMAMI_HOST": "https://cloud.umami.is",
+    // The DO queue's SQLite "sync" table skips a re-render when its last
+    // success (whole seconds) looks newer than the page's lastModified. It
+    // exists to protect OpenNext's regional cache, which this site doesn't
+    // use. Locally it left /blog stuck on STALE for good when a Sanity purge
+    // landed seconds after a re-render; with it off, purges always recovered.
+    "NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE": "true",
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -27,6 +38,21 @@
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "fronk-website-opennext-cache",
+    },
+  ],
+  // OpenNext ISR (see open-next.config.ts): a queue that re-renders stale
+  // pages, and a tag cache that makes revalidateTag (Sanity webhook, hourly
+  // cron) take effect. The classes are exported by .open-next/worker.js.
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" },
+      { "name": "NEXT_TAG_CACHE_DO_SHARDED", "class_name": "DOShardedTagCache" },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"],
     },
   ],
   "observability": {

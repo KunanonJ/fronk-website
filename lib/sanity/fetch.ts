@@ -18,7 +18,11 @@ import {
   VENTURES_QUERY,
   WRITING_PAGE_QUERY,
 } from "./queries";
-import { REVALIDATE_TAGS, type RevalidationTag } from "./revalidation";
+import {
+  REVALIDATE_TAGS,
+  SANITY_FETCH_REVALIDATE_SECONDS,
+  type RevalidationTag,
+} from "./revalidation";
 import type {
   HomePageContent,
   Post,
@@ -43,7 +47,11 @@ function fetchOptions(tags: readonly RevalidationTag[], preview?: boolean) {
   if (preview) {
     return { cache: "no-store" as const };
   }
-  return { next: { tags: [...tags] } };
+  // Cacheable (with a revalidate time) so the tags attach to the page entry
+  // and revalidateTag() from the webhook and cron can invalidate it.
+  return {
+    next: { tags: [...tags], revalidate: SANITY_FETCH_REVALIDATE_SECONDS },
+  };
 }
 
 async function safeFetch<T>(

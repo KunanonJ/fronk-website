@@ -201,6 +201,17 @@ Cloudflare deployment requirements:
 - `wrangler.jsonc` uses `.open-next/worker.js`, Workers static assets, and
   `nodejs_compat`.
 - R2 binding `NEXT_INC_CACHE_R2_BUCKET` → bucket `fronk-website-opennext-cache`.
+- ISR (see `open-next.config.ts`): Durable Object queue `NEXT_CACHE_DO_QUEUE`
+  (`DOQueueHandler`) re-renders stale pages through `WORKER_SELF_REFERENCE`, and
+  the sharded tag cache `NEXT_TAG_CACHE_DO_SHARDED` (`DOShardedTagCache`) makes
+  `revalidateTag` from the Sanity webhook and hourly cron take effect. Both are
+  created by the `v1` migration in `wrangler.jsonc`; a branch preview build
+  (`wrangler versions upload`) can't apply a new migration, so only the `main`
+  deploy does. `NEXT_CACHE_DO_QUEUE_DISABLE_SQLITE=true` and `keep_names: false`
+  are deliberate; the reasons are commented in `wrangler.jsonc`.
+- Sanity is configured at runtime (wrangler `vars`), not at build, so pages
+  are prerendered from fallback content and pick up Sanity on their first
+  re-render. Sanity-backed routes set `revalidate = 60`.
 - `wrangler.revalidate-cron.jsonc` defines the hourly revalidation Worker.
 - `/studio` launches an external Studio via `NEXT_PUBLIC_SANITY_STUDIO_URL`.
 - Copy `.dev.vars.example` to `.dev.vars` for local Worker-specific values.

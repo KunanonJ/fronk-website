@@ -12,6 +12,14 @@ import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/**
+ * Sanity-backed, so re-render at most every 60 s (via the OpenNext queue).
+ * Sanity is only configured at runtime (wrangler vars), so the build
+ * prerenders fallback content; without a revalidate time this page would
+ * stay on that build output forever and never pick up Sanity edits.
+ */
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const slugs = await fetchAllPostSlugs();
   const fromCms = slugs.map((slug) => ({ slug }));

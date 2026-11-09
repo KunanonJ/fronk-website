@@ -8,6 +8,16 @@ export const REVALIDATE_TAGS = {
   writing: "writing",
 } as const;
 
+/**
+ * How long a cached Sanity response stays fresh, in seconds. Sanity reads
+ * must be cacheable for their tags to attach to the page: Next.js only links
+ * a fetch's `next.tags` to the page's cache entry when the fetch itself is
+ * cached. Before 09-11-26 the reads were uncached, so `revalidateTag` from the
+ * webhook and cron matched nothing. 60 s matches `/resume`'s page revalidate,
+ * so content still refreshes within a minute even if the webhook is missed.
+ */
+export const SANITY_FETCH_REVALIDATE_SECONDS = 60;
+
 export type RevalidationTag =
   (typeof REVALIDATE_TAGS)[keyof typeof REVALIDATE_TAGS];
 
