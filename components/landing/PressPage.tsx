@@ -13,7 +13,7 @@ import { expandHashHref } from "@/lib/landing/nav";
 
 function PressCard({ item }: { item: PressItem }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-primary/10 bg-surface transition-colors hover:border-primary/25">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-ink/10 bg-surface transition-colors hover:border-ink/25">
       <a
         href={item.href}
         target="_blank"
@@ -36,7 +36,7 @@ function PressCard({ item }: { item: PressItem }) {
           {item.source ? <span>{item.source}</span> : null}
         </div>
 
-        <h2 className="text-lg font-medium leading-snug tracking-tight text-primary sm:text-xl">
+        <h2 className="text-lg font-medium leading-snug tracking-tight text-ink sm:text-xl">
           <a
             href={item.href}
             target="_blank"
@@ -47,7 +47,7 @@ function PressCard({ item }: { item: PressItem }) {
           </a>
         </h2>
 
-        <p className="line-clamp-2 text-sm leading-relaxed text-primary/65">
+        <p className="line-clamp-2 text-sm leading-relaxed text-ink/65">
           {item.description}
         </p>
 
@@ -56,7 +56,7 @@ function PressCard({ item }: { item: PressItem }) {
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group/cta inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/35 hover:bg-primary/10"
+            className="group/cta inline-flex items-center gap-2 rounded-full border border-ink/15 bg-ink/5 px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink/35 hover:bg-ink/10"
           >
             View
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5" />
@@ -73,7 +73,7 @@ function PressCard({ item }: { item: PressItem }) {
  */
 export default function PressPage() {
   return (
-    <div className="relative min-h-[100svh] bg-landing text-primary">
+    <div className="relative min-h-[100svh] bg-page text-ink">
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
@@ -87,15 +87,11 @@ export default function PressPage() {
             {pressPage.eyebrow}
           </p>
           <h1
-            className="text-4xl font-medium tracking-tight text-primary sm:text-5xl md:text-6xl"
-            style={{
-              fontFamily:
-                "var(--font-instrument-serif), 'Instrument Serif', serif",
-            }}
+            className="text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl"
           >
             {pressPage.title}
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-primary/65 sm:text-base">
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink/65 sm:text-base">
             {pressPage.description}
           </p>
         </header>

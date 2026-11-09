@@ -7,8 +7,8 @@
  * ("not compatible with Turbopack builds"). So the perf gate is measured here
  * directly from the SHIPPED output: a statically-prerendered route's HTML
  * references exactly the JS chunks the browser fetches on first load. Async /
- * dynamic-imported chunks (the Three.js hero field, the Sanity Studio) are not
- * referenced and so are correctly excluded.
+ * dynamic-imported chunks (the Sanity Studio) are not referenced and so are
+ * correctly excluded.
  *
  * Run AFTER a production build:  next build  &&  node scripts/check-first-load-budget.mjs
  *
@@ -21,16 +21,20 @@ import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 
-// Re-baselined 2026-06-13 from the measured floor (~194–197 KB gz, uniform
-// across all routes, hero-independent). Raise deliberately and document why.
-const DEFAULT_BUDGET_KB = 205;
+// Budgets = measured worst route + about 5% (visual-redesign Phase 6,
+// 09-11-26). Removing framer-motion took about 44 KB gz off every page with
+// the landing nav, so pages with the nav and pages without it now sit within
+// a few KB of each other. Lower these as routes get lighter; raise only
+// deliberately, with the reason here.
+//
+// Default: system pages (/resume, /design) and the discovery hubs, which
+// carry the landing nav since Phase 6 (worst 190.1 KB).
+const DEFAULT_BUDGET_KB = 200;
 
-// Landing cutover (2026-07): marketing pages pay framer-motion and landing
-// chrome on first load (~40–80 KB gz above the resume/system floor). The root
-// `RouteSplash` that pulled framer-motion into every route was replaced by the
-// dependency-free `RouteFade` (2026-11, ux-experience Phase 1). Blog/editorial/library routes sit higher because they
-// also ship landing nav + next/image card chrome. Resume/stock stay on DEFAULT.
-const MARKETING_BUDGET_KB = 300;
+// Marketing: pages with the landing nav plus heavier islands (next/image card
+// chrome, forms, the blog's portable text). Worst: the hidden blog posts at
+// 243.0 KB; the public pages are about 190-197 KB.
+const MARKETING_BUDGET_KB = 255;
 
 const MARKETING_EXACT = new Set([
   "/",
@@ -62,8 +66,6 @@ function budgetKbForRoute(route) {
   return isMarketingRoute(route) ? MARKETING_BUDGET_KB : DEFAULT_BUDGET_KB;
 }
 const APP_DIR = ".next/server/app";
-// The Three.js chunk must never appear in the home route's first-load set.
-const HERO_FIELD_HINT = "WebGLRenderer";
 
 function chunksForHtml(htmlPath) {
   const html = fs.readFileSync(htmlPath, "utf8");
@@ -135,27 +137,14 @@ for (const r of routes) {
   console.log(`  ${flag} ${r.kb.toFixed(1).padStart(6)} KB${budgetNote}  ${r.route}`);
 }
 
-// Assert the hero's Three.js chunk is excluded from the home first-load set.
-const home = routes.find((r) => r.route === "/");
-const threeLeaked =
-  home &&
-  home.chunks.some((c) => {
-    const p = path.join(".next/static/chunks", c);
-    return fs.existsSync(p) && fs.readFileSync(p, "utf8").includes(HERO_FIELD_HINT);
-  });
-
-console.log(
-  `\n  Three.js excluded from "/" first-load: ${threeLeaked ? "NO ❌ (leaked!)" : "yes ✅"}`,
-);
-
 const overBudget = worstOver > 0;
-if (overBudget || threeLeaked) {
+if (overBudget) {
   console.error(
-    `\n[perf] FAIL — ${overBudget ? `${worstOverRoute} ${routes.find((r) => r.route === worstOverRoute)?.kb.toFixed(1)}KB > ${worstOverBudget}KB budget` : ""}${overBudget && threeLeaked ? "; " : ""}${threeLeaked ? "Three.js leaked into first load" : ""}`,
+    `\n[perf] FAIL — ${worstOverRoute} ${routes.find((r) => r.route === worstOverRoute)?.kb.toFixed(1)}KB > ${worstOverBudget}KB budget`,
   );
   process.exit(1);
 }
 const worstKb = Math.max(...routes.map((r) => r.kb));
 console.log(
-  `\n[perf] PASS — all routes within budget (worst ${worstKb.toFixed(1)}KB on ${routes[0]?.route}); hero stays async.`,
+  `\n[perf] PASS — all routes within budget (worst ${worstKb.toFixed(1)}KB on ${routes[0]?.route}).`,
 );

@@ -11,8 +11,8 @@ const landingLayout = readFileSync(
 
 /**
  * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
- * palette, light by default, Geist + Geist Mono, and legacy aliases that keep
- * un-migrated pages on the new palette. Supersedes the landing-cutover look.
+ * palette, light by default, Geist + Geist Mono. Phase 6 removed the legacy
+ * aliases, so nothing may bring them back.
  */
 describe("visual-redesign foundation", () => {
   it("defines the owner's palette once", () => {
@@ -28,13 +28,27 @@ describe("visual-redesign foundation", () => {
     }
   });
 
-  it("maps role tokens into Tailwind and keeps the landing shell on them", () => {
+  it("maps role tokens into Tailwind, with no legacy aliases left", () => {
     for (const role of ["page", "ink", "ink-2", "action", "link", "focus", "ember", "hairline"]) {
       expect(globalsCss).toMatch(new RegExp(`--color-${role}:\\s*var\\(--`));
     }
-    expect(globalsCss).toMatch(/--landing-canvas:\s*var\(--page\)/);
-    expect(globalsCss).toMatch(/--landing-ink:\s*var\(--ink\)/);
-    expect(globalsCss).toMatch(/--color-primary:\s*var\(--landing-ink\)/);
+    for (const legacy of [
+      "--landing-canvas",
+      "--landing-ink",
+      "--color-primary",
+      "--color-landing",
+      "--color-cream",
+      "--color-fg",
+      "--color-muted",
+      "--color-accent",
+      "--bg:",
+      "--fg:",
+      "--grain-opacity",
+      "@utility label-mono",
+      "@utility rule-hud",
+    ]) {
+      expect(globalsCss, legacy).not.toContain(legacy);
+    }
   });
 
   it("uses Geist, Geist Mono and Noto Sans Thai, and drops the retired fonts", () => {
@@ -49,9 +63,10 @@ describe("visual-redesign foundation", () => {
       expect(fontImports(layoutTsx)).not.toMatch(new RegExp(`\\b${retired}\\b`));
       expect(fontImports(landingLayout)).not.toMatch(new RegExp(`\\b${retired}\\b`));
     }
-    // Old inline font names still resolve, to the new families.
-    expect(globalsCss).toMatch(/--font-instrument-serif:\s*var\(--font-geist-sans\)/);
-    expect(globalsCss).toMatch(/--font-almarai:\s*var\(--font-geist-sans\)/);
+    // The retired font aliases are gone too.
+    for (const alias of ["--font-instrument-serif", "--font-almarai", "--font-hanken", "--font-serif"]) {
+      expect(globalsCss, alias).not.toContain(alias);
+    }
   });
 
   it("defaults to light with the toggle unlocked and palette themeColors", () => {

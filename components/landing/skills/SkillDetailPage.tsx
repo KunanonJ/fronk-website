@@ -361,7 +361,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
                             `${skill.source.url}/tree/${skill.source.sha}`
                           }
                           {...external}
-                          className={`font-mono ${textLinkClass}`}
+                          className={`inline-flex min-h-6 items-center font-mono ${textLinkClass}`}
                         >
                           {skill.source.sha.slice(0, 7)}
                           <span className="sr-only"> (upstream SKILL.md)</span>

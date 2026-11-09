@@ -16,7 +16,7 @@ import { expandHashHref } from "@/lib/landing/nav";
 
 function BlogCardView({ post }: { post: BlogCard }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-primary/10 bg-surface transition-colors hover:border-primary/25">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-ink/10 bg-surface transition-colors hover:border-ink/25">
       <Link
         href={`/blog/${post.slug}`}
         className="relative block aspect-[16/9] overflow-hidden bg-black/40"
@@ -49,23 +49,23 @@ function BlogCardView({ post }: { post: BlogCard }) {
           ))}
         </div>
 
-        <h2 className="text-lg font-medium leading-snug tracking-tight text-primary sm:text-xl">
+        <h2 className="text-lg font-medium leading-snug tracking-tight text-ink sm:text-xl">
           <Link
             href={`/blog/${post.slug}`}
-            className="transition-opacity hover:opacity-80"
+            className="inline-block py-0.5 transition-opacity hover:opacity-80"
           >
             {post.title}
           </Link>
         </h2>
 
-        <p className="line-clamp-2 text-sm leading-relaxed text-primary/65">
+        <p className="line-clamp-2 text-sm leading-relaxed text-ink/65">
           {post.excerpt}
         </p>
 
         <div className="mt-auto pt-2">
           <Link
             href={`/blog/${post.slug}`}
-            className="group/cta inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-primary/35 hover:bg-primary/10"
+            className="group/cta inline-flex items-center gap-2 rounded-full border border-ink/15 bg-ink/5 px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink/35 hover:bg-ink/10"
           >
             Read
             <ArrowUpRight className="h-4 w-4 transition-transform group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5" />
@@ -102,7 +102,7 @@ export default function BlogIndex({
   );
 
   return (
-    <div className="relative min-h-[100svh] bg-landing text-primary">
+    <div className="relative min-h-[100svh] bg-page text-ink">
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
@@ -116,15 +116,11 @@ export default function BlogIndex({
             {eyebrow}
           </p>
           <h1
-            className="text-4xl font-medium tracking-tight text-primary sm:text-5xl md:text-6xl"
-            style={{
-              fontFamily:
-                "var(--font-instrument-serif), 'Instrument Serif', serif",
-            }}
+            className="text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl"
           >
             {heading}
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-primary/65 sm:text-base">
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink/65 sm:text-base">
             {description}
           </p>
         </header>
@@ -133,7 +129,7 @@ export default function BlogIndex({
           <label className="relative block w-full max-w-xl">
             <span className="sr-only">Search posts</span>
             <Search
-              className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-primary/70"
+              className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-ink/70"
               aria-hidden
             />
             <input
@@ -141,7 +137,7 @@ export default function BlogIndex({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={blogPage.searchPlaceholder}
-              className="w-full rounded-full border border-primary/15 bg-primary/5 py-3 pr-4 pl-11 text-sm text-primary placeholder:text-ink-2 transition focus:border-ink/40"
+              className="w-full rounded-full border border-ink/15 bg-ink/5 py-3 pr-4 pl-11 text-sm text-ink placeholder:text-ink-2 transition focus:border-ink/40"
             />
           </label>
 
@@ -156,7 +152,7 @@ export default function BlogIndex({
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTag === null
                   ? "border-ink bg-ink text-page"
-                  : "border-primary/15 bg-transparent text-primary/70 hover:border-primary/35 hover:text-primary"
+                  : "border-ink/15 bg-transparent text-ink/70 hover:border-ink/35 hover:text-ink"
               }`}
             >
               {blogPage.allTagsLabel}
@@ -171,7 +167,7 @@ export default function BlogIndex({
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     active
                       ? "border-ink bg-ink text-page"
-                      : "border-primary/15 bg-transparent text-primary/70 hover:border-primary/35 hover:text-primary"
+                      : "border-ink/15 bg-transparent text-ink/70 hover:border-ink/35 hover:text-ink"
                   }`}
                 >
                   {tag}
@@ -182,7 +178,7 @@ export default function BlogIndex({
         </div>
 
         {filtered.length === 0 ? (
-          <p className="mx-auto max-w-6xl text-sm text-primary/70">
+          <p className="mx-auto max-w-6xl text-sm text-ink/70">
             {blogPage.emptyLabel}
           </p>
         ) : (

@@ -31,7 +31,8 @@ Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visua
 ## Highlights
 
 - Public marketing cutover: Home (`/`) with an Apple-style multilingual intro
-  (“Welcome to KunanonJ”). `/showcase` was retired on 06-11-26 and redirects to `/`.
+  (“Welcome to KunanonJ”). `/showcase` (06-11-26) and `/stock/velorah` (09-11-26)
+  were retired and redirect to `/`.
 - Full-stack Next.js App Router on Cloudflare Workers via OpenNext.
 - Landing content is static and owner-editable in `lib/content/landing.ts`.
 - Sanity retained for Studio launcher and `/resume` (with static fallbacks).

@@ -20,11 +20,11 @@ const components: PortableTextComponents = {
             alt={value.alt ?? ""}
             width={1600}
             height={900}
-            className="h-auto w-full border border-border bg-surface"
+            className="h-auto w-full border border-hairline-strong bg-surface"
             sizes="(min-width: 768px) 720px, 100vw"
           />
           {value.alt && (
-            <figcaption className="mt-2 text-center text-sm text-muted">
+            <figcaption className="mt-2 text-center text-sm text-ink-2">
               {value.alt}
             </figcaption>
           )}
@@ -36,13 +36,13 @@ const components: PortableTextComponents = {
     }: {
       value: { code: string; language?: string; filename?: string };
     }) => (
-      <div className="my-6 overflow-hidden border border-border bg-surface">
+      <div className="my-6 overflow-hidden border border-hairline-strong bg-surface">
         {value.filename && (
-          <div className="border-b border-border bg-surface-2 px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted">
+          <div className="border-b border-hairline-strong bg-ink/[0.04] px-4 py-2 font-mono text-xs uppercase tracking-widest text-ink-2">
             {value.filename}
           </div>
         )}
-        <pre className="overflow-x-auto bg-surface-2 p-4 text-sm">
+        <pre className="overflow-x-auto bg-ink/[0.04] p-4 text-sm">
           <code className={value.language ? `language-${value.language}` : undefined}>
             {value.code}
           </code>
@@ -56,7 +56,7 @@ const components: PortableTextComponents = {
       if (!href) return <>{children}</>;
       const isExternal = /^https?:\/\//.test(href);
       const className =
-        "text-fg underline decoration-accent decoration-2 underline-offset-4 hover:text-accent";
+        "text-ink underline decoration-ink decoration-2 underline-offset-4 hover:text-ink";
       if (isExternal) {
         return (
           <a href={href} target="_blank" rel="noopener noreferrer" className={className}>

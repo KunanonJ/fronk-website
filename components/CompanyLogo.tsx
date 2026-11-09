@@ -53,7 +53,7 @@ export function CompanyLogo({
       data-logo="image"
       style={{ width: size, height: size }}
       // Logos are drawn for light backgrounds, so the tile stays white in dark mode.
-      className={cn(TILE, "bg-white p-1", className)}
+      className={cn(TILE, "bg-paper p-1", className)}
     >
       {/* Plain <img>: tiny static files, no optimisation needed. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}

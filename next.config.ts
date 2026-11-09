@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
       { source: "/rss.xml", destination: "/feed.xml", permanent: true },
       // Retired 06-11-26: template wellness page, unrelated to the site (ux-experience Phase 0)
       { source: "/showcase", destination: "/", permanent: true },
+      // Retired 09-11-26: template page, unrelated to the site (visual-redesign Phase 6)
+      { source: "/stock/velorah", destination: "/", permanent: true },
     ];
   },
   async headers() {

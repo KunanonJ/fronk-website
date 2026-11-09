@@ -98,7 +98,7 @@ export default function StackBrandIcon({
 
   return (
     <span
-      className={`inline-block shrink-0 rounded-sm bg-primary/25 ${className}`}
+      className={`inline-block shrink-0 rounded-sm bg-ink/25 ${className}`}
       aria-hidden
     />
   );

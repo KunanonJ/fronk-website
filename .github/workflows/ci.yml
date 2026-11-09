@@ -36,6 +36,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The Sanity Studio manifest is re-extracted only when its inputs change
+      # (scripts/sanity-manifest.mjs keeps an input hash next to node_modules).
+      - name: Cache Sanity manifest
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/studio/static
+            node_modules/.cache/sanity-manifest
+          key: sanity-manifest-${{ hashFiles('sanity/**', 'sanity.config.ts', 'sanity.cli.ts', 'pnpm-lock.yaml') }}
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -61,8 +71,8 @@ jobs:
         run: pnpm build
 
       # Reuses the .next from the Build step above (same job, repo-root cwd).
-      # Fails if any route's first-load JS exceeds its budget (205 KB default;
-      # 300 KB marketing) or if Three.js leaks into the home first-load set.
+      # Fails if any route's first-load JS exceeds its budget (200 KB default;
+      # 255 KB marketing; see scripts/check-first-load-budget.mjs).
       - name: Perf budget
         run: pnpm perf:budget
 
@@ -86,6 +96,16 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # The Sanity Studio manifest is re-extracted only when its inputs change
+      # (scripts/sanity-manifest.mjs keeps an input hash next to node_modules).
+      - name: Cache Sanity manifest
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/studio/static
+            node_modules/.cache/sanity-manifest
+          key: sanity-manifest-${{ hashFiles('sanity/**', 'sanity.config.ts', 'sanity.cli.ts', 'pnpm-lock.yaml') }}
 
       # Cache the Chromium binary so warm runs skip the ~120MB download.
       # --with-deps below stays (idempotent) to install system libs on a hit.

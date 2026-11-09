@@ -34,7 +34,7 @@ export default function BlogPostPage({
   const hasParagraphs = Boolean(bodyParagraphs && bodyParagraphs.length > 0);
 
   return (
-    <div className="relative min-h-[100svh] bg-landing text-primary">
+    <div className="relative min-h-[100svh] bg-page text-ink">
       <LandingTopNav
         position="fixed"
         wordmarkHref="/"
@@ -46,7 +46,7 @@ export default function BlogPostPage({
         <article className="mx-auto max-w-3xl">
           <Link
             href="/blog"
-            className="text-xs text-primary/70 transition-colors hover:text-primary"
+            className="text-xs text-ink/70 transition-colors hover:text-ink"
           >
             ← Back to Blog
           </Link>
@@ -69,20 +69,16 @@ export default function BlogPostPage({
               ))}
             </div>
             <h1
-              className="text-4xl font-medium tracking-tight text-primary sm:text-5xl"
-              style={{
-                fontFamily:
-                  "var(--font-instrument-serif), 'Instrument Serif', serif",
-              }}
+              className="text-4xl font-medium tracking-tight text-ink sm:text-5xl"
             >
               {title}
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-primary/70">
+            <p className="mt-4 text-base leading-relaxed text-ink/70">
               {excerpt}
             </p>
           </header>
 
-          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-primary/10">
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-ink/10">
             <Image
               src={bannerSrc}
               alt={bannerAlt}
@@ -93,18 +89,18 @@ export default function BlogPostPage({
             />
           </div>
 
-          <div className="prose dark:prose-invert mt-10 max-w-none prose-headings:font-medium prose-a:text-primary prose-p:text-primary/80">
+          <div className="prose dark:prose-invert mt-10 max-w-none prose-headings:font-medium prose-a:text-ink prose-p:text-ink/80">
             {hasPortable ? (
               <PortableText value={body!} />
             ) : hasParagraphs ? (
               bodyParagraphs!.map((paragraph) => (
-                <p key={paragraph.slice(0, 48)} className="text-base leading-relaxed text-primary/80">
+                <p key={paragraph.slice(0, 48)} className="text-base leading-relaxed text-ink/80">
                   {linkifyInternalPaths(paragraph).map((segment, index) =>
                     segment.type === "link" ? (
                       <Link
                         key={`${segment.href}-${index}`}
                         href={segment.href}
-                        className="text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
+                        className="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
                       >
                         {segment.text}
                       </Link>
@@ -115,7 +111,7 @@ export default function BlogPostPage({
                 </p>
               ))
             ) : (
-              <p className="text-sm text-primary/70">
+              <p className="text-sm text-ink/70">
                 Full article body will appear here once published in Sanity
                 Studio. This fallback preview shows title, banner, tags, and
                 excerpt only.

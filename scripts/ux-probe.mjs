@@ -3,7 +3,8 @@
  * UX probe (visual-redesign Phase 0): the ux-audit and Phase 1 probe as a
  * repeatable tool. Loads each route in system Chrome on a throttled phone
  * profile with a cold cache and prints LCP, CLS, TBT, bytes by type, font
- * requests, text under 12 px and tap targets under 24 px.
+ * requests, text under 12 px and tap targets under 24 px (WCAG 2.5.8:
+ * visually hidden controls and links inside a sentence are exempt).
  *
  *   pnpm probe                       # default routes against the local preview
  *   BASE=https://kunanonj.com pnpm probe / /about
@@ -98,10 +99,20 @@ async function probe(browser, route) {
       if (parseFloat(style.fontSize) < 12) smallText += 1;
     }
 
+    // WCAG 2.5.8 (target size, minimum) with its two exceptions that apply
+    // here: visually hidden controls (sr-only inputs whose <label> is the real
+    // target, the skip link at rest) and inline links inside a sentence.
     let smallTargets = 0;
     for (const el of document.querySelectorAll("a[href], button, [role='button'], input, select, textarea")) {
       const rect = el.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) continue;
+      if (rect.width <= 1 || rect.height <= 1) continue;
+      const style = getComputedStyle(el);
+      // Inline exception: the link sits in running text of its block.
+      let block = el.parentElement;
+      while (block && getComputedStyle(block).display.startsWith("inline")) block = block.parentElement;
+      const blockText = block?.textContent?.trim() ?? "";
+      const ownText = el.textContent?.trim() ?? "";
+      if (style.display === "inline" && blockText.length > ownText.length) continue;
       if (rect.width < 24 || rect.height < 24) smallTargets += 1;
     }
 
