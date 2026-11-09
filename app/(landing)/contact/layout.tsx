@@ -1,16 +1,11 @@
-import { Inter } from "next/font/google";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-inter-contact",
-});
-
+/**
+ * Contact route wrapper. It used to load Inter; since visual-redesign Phase 0
+ * the page uses the site sans (Geist) like every other route.
+ */
 export default function ContactLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={`${inter.variable} ${inter.className}`}>{children}</div>;
+  return <>{children}</>;
 }

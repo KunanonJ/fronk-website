@@ -2,19 +2,29 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "inverse";
 type Size = "sm" | "md" | "lg";
 
+/*
+ * visual-redesign Phase 0. Every size keeps at least a 36 px box (24 px is the
+ * WCAG 2.2 minimum target); md and lg are 44 px and 48 px.
+ */
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-full font-sans text-sm font-medium tracking-tight transition-[color,background-color,border-color,opacity] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full font-sans text-sm font-medium tracking-tight transition-[color,background-color,border-color,opacity] duration-150 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANTS: Record<Variant, string> = {
+  /** Signal fill, Paper text (6.6:1). */
   primary:
-    "border border-transparent bg-accent text-accent-fg hover:opacity-90 active:opacity-80",
+    "border border-transparent bg-action text-on-action hover:bg-action-hover active:bg-action-hover",
+  /** Surface with a hairline. */
   secondary:
-    "border border-border bg-surface text-fg hover:border-border-strong hover:bg-surface-2 active:bg-surface-2",
+    "border border-hairline-strong bg-surface text-ink hover:border-ink/40 hover:bg-surface-tint active:bg-surface-tint",
+  /** Link-style text with an underline. */
   ghost:
-    "border border-transparent text-muted underline decoration-1 underline-offset-4 hover:text-fg active:text-fg",
+    "border border-transparent text-ink-2 underline decoration-1 underline-offset-4 hover:text-ink active:text-ink",
+  /** Ink fill (Glaze in dark mode): the high-contrast Contact pill. */
+  inverse:
+    "border border-transparent bg-ink text-page hover:opacity-90 active:opacity-80",
 };
 
 const SIZES: Record<Size, string> = {
