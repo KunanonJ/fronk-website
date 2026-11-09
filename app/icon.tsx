@@ -5,37 +5,45 @@ export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
 /**
- * Favicon — cream “K” monogram on black, aligned with landing CI.
+ * Glaze "K" on an Ink tile with one Signal pixel (visual-redesign palette).
  */
 export default function Icon() {
   return new ImageResponse(
     (
       <div
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: brand.black,
+          background: brand.ink,
           borderRadius: 14,
-          border: `2px solid ${brand.creamLine}`,
-          fontFamily: "Georgia, 'Times New Roman', serif",
         }}
       >
         <span
           style={{
-            color: brand.cream,
-            fontSize: 36,
-            fontWeight: 400,
-            fontStyle: "italic",
+            color: brand.glaze,
+            fontSize: 40,
+            fontWeight: 800,
             letterSpacing: "-0.04em",
             lineHeight: 1,
-            marginTop: -2,
           }}
         >
           {brand.monogram}
         </span>
+        <div
+          style={{
+            position: "absolute",
+            right: 8,
+            bottom: 8,
+            width: 10,
+            height: 10,
+            background: brand.signal,
+            display: "flex",
+          }}
+        />
       </div>
     ),
     { ...size },

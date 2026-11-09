@@ -18,12 +18,6 @@ const fontFiles = [
     weight: 800 as const,
     style: "normal" as const,
   },
-  {
-    name: "Space Mono",
-    file: "SpaceMono-Regular.ttf",
-    weight: 400 as const,
-    style: "normal" as const,
-  },
 ];
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {

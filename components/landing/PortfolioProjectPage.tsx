@@ -8,14 +8,11 @@ import PortfolioMockup, {
   MockupStage,
 } from "@/components/landing/portfolio/PortfolioMockup";
 import PortfolioWorkflow from "@/components/landing/portfolio/PortfolioWorkflow";
+import { Chip } from "@/components/ui/Chip";
 import {
   getAdjacentPortfolioProjects,
   type PortfolioProject,
 } from "@/lib/content/portfolio";
-
-const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
 
 type PortfolioProjectPageProps = {
   project: PortfolioProject;
@@ -46,7 +43,7 @@ export default function PortfolioProjectPage({
     >
       <Link
         href="/portfolio"
-        className="mb-8 inline-flex items-center gap-1.5 text-sm text-primary/80 transition-colors hover:text-primary"
+        className="mb-8 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-link underline-offset-4 hover:underline"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
         All projects
@@ -63,14 +60,14 @@ export default function PortfolioProjectPage({
         />
       ) : project.mockup ? (
         <figure>
-          <MockupStage className="overflow-hidden rounded-2xl border border-primary/12 px-[6%] py-[5%]">
+          <MockupStage className="overflow-hidden rounded-panel border border-hairline px-[6%] py-[5%]">
             <PortfolioMockup
               mockup={project.mockup}
               label={`Illustrative mockup of ${project.name}`}
-              className="max-w-4xl drop-shadow-[0_16px_40px_rgba(0,0,0,0.2)]"
+              className="max-w-4xl drop-shadow-[0_16px_40px_rgba(11,13,23,0.16)]"
             />
           </MockupStage>
-          <figcaption className="mt-3 text-xs text-primary/70">
+          <figcaption className="mt-3 text-xs text-ink-2">
             Illustrative mockup, not real data.
           </figcaption>
         </figure>
@@ -81,7 +78,7 @@ export default function PortfolioProjectPage({
           {project.gallery.map((shot) => (
             <li
               key={shot.src}
-              className="overflow-hidden rounded-xl border border-primary/12 bg-primary/[0.04]"
+              className="overflow-hidden rounded-2xl border border-hairline bg-surface-tint"
             >
               <Image
                 src={shot.src}
@@ -96,30 +93,33 @@ export default function PortfolioProjectPage({
         </ul>
       ) : null}
 
+      {/* Facts strip (visual-redesign Phase 4). */}
+      <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-hairline bg-hairline md:grid-cols-4">
+        {meta.map((row) => (
+          <div key={row.label} className="flex flex-col gap-1.5 bg-surface p-5">
+            <dt className="font-mono text-label uppercase text-ink-2">{row.label}</dt>
+            <dd className="text-small font-medium text-ink">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+
       <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
         <div className="space-y-12">
-          <p className="text-xl leading-relaxed text-primary/85" style={serif}>
+          <p className="font-display text-h3 font-medium text-ink">
             {project.tagline}
           </p>
 
           <section aria-labelledby="portfolio-highlights">
-            <h2
-              id="portfolio-highlights"
-              className="mb-4 text-2xl font-medium text-primary"
-              style={serif}
-            >
+            <h2 id="portfolio-highlights" className="mb-4 font-display text-h3 text-ink">
               What it does
             </h2>
             <ul className="space-y-3">
               {project.highlights.map((item) => (
                 <li
                   key={item}
-                  className="flex gap-3 text-base leading-relaxed text-primary/80"
+                  className="flex gap-3 text-body text-ink-2"
                 >
-                  <span
-                    className="mt-[0.7em] h-1 w-1 shrink-0 rounded-full bg-primary/60"
-                    aria-hidden="true"
-                  />
+                  <span className="mt-[0.6em] size-1.5 shrink-0 bg-signal" aria-hidden="true" />
                   {item}
                 </li>
               ))}
@@ -128,69 +128,44 @@ export default function PortfolioProjectPage({
 
           {project.sections.map((section) => (
             <section key={section.heading}>
-              <h2
-                className="mb-3 text-2xl font-medium text-primary"
-                style={serif}
-              >
+              <h2 className="mb-3 font-display text-h3 text-ink">
                 {section.heading}
               </h2>
-              <p className="text-base leading-relaxed text-primary/80">
+              <p className="text-body text-ink-2">
                 {section.body}
               </p>
             </section>
           ))}
         </div>
 
-        <aside className="space-y-10 lg:pt-1">
+        <aside className="space-y-10 lg:sticky lg:top-28 lg:self-start lg:pt-1">
           <section aria-labelledby="portfolio-stack">
             <h2
               id="portfolio-stack"
-              className="mb-4 text-xs font-medium uppercase tracking-[0.16em] text-primary/75"
+              className="mb-4 font-mono text-label uppercase text-ink-2"
             >
               Tech stack
             </h2>
             <ul className="flex flex-wrap gap-2">
               {project.stack.map((tech) => (
-                <li
-                  key={tech}
-                  className="rounded-full border border-primary/15 px-3 py-1 text-sm text-primary/85"
-                >
-                  {tech}
+                <li key={tech}>
+                  <Chip>{tech}</Chip>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section aria-labelledby="portfolio-details">
-            <h2
-              id="portfolio-details"
-              className="mb-4 text-xs font-medium uppercase tracking-[0.16em] text-primary/75"
+          {project.access === "public" && project.url ? (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-action px-5 text-sm font-medium text-on-action transition-colors hover:bg-action-hover"
             >
-              Details
-            </h2>
-            <dl className="divide-y divide-primary/10 border-y border-primary/10">
-              {meta.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex items-baseline justify-between gap-4 py-3 text-sm"
-                >
-                  <dt className="text-primary/75">{row.label}</dt>
-                  <dd className="text-right text-primary">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-            {project.access === "public" && project.url ? (
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-cream px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
-              >
-                {project.urlLabel ?? "Visit"}
-                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </a>
-            ) : null}
-          </section>
+              {project.urlLabel ?? "Visit"}
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          ) : null}
         </aside>
       </div>
 
@@ -215,29 +190,29 @@ export default function PortfolioProjectPage({
       {prev && next ? (
         <nav
           aria-label="More projects"
-          className="mt-20 grid grid-cols-1 gap-4 border-t border-primary/12 pt-8 sm:grid-cols-2"
+          className="mt-20 grid grid-cols-1 gap-4 border-t border-hairline pt-8 sm:grid-cols-2"
         >
           <Link
             href={`/portfolio/${prev.slug}`}
-            className="group flex flex-col rounded-2xl border border-primary/12 p-5 transition-colors hover:border-primary/30"
+            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 shadow-card transition-colors hover:border-hairline-strong"
           >
-            <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-primary/75">
+            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
               <ArrowLeft className="h-3 w-3" aria-hidden="true" />
               Previous
             </span>
-            <span className="mt-2 text-xl text-primary" style={serif}>
+            <span className="mt-2 font-display text-h3 text-ink">
               {prev.name}
             </span>
           </Link>
           <Link
             href={`/portfolio/${next.slug}`}
-            className="group flex flex-col rounded-2xl border border-primary/12 p-5 text-right transition-colors hover:border-primary/30 sm:items-end"
+            className="group flex flex-col rounded-card border border-hairline bg-surface p-5 text-right shadow-card transition-colors hover:border-hairline-strong sm:items-end"
           >
-            <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.16em] text-primary/75">
+            <span className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-ink-2">
               Next
               <ArrowRight className="h-3 w-3" aria-hidden="true" />
             </span>
-            <span className="mt-2 text-xl text-primary" style={serif}>
+            <span className="mt-2 font-display text-h3 text-ink">
               {next.name}
             </span>
           </Link>

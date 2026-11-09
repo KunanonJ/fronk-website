@@ -1,6 +1,6 @@
 # Phase 4: Portfolio and OG images
 
-**Status:** OUTLINE. Re-research at phase entry, then complete the plan before asking for EXECUTE approval. Project metrics need owner sign-off.
+**Status:** EXECUTED 09-11-26 on `feat/redesign-portfolio` (owner standing approval). No outcome metrics added (none owner-approved); cards show the access badge. Evidence: `../reports/phase-4_portfolio_REPORT_09-11-26.md`.
 **Created:** 09-11-26
 **Umbrella:** `visual-redesign_UMBRELLA_PLAN_09-11-26.md`
 **Covers:** the portfolio index and its 4 detail pages, the illustrative mockups and diagrams, and every generated OG image (shared renderer)

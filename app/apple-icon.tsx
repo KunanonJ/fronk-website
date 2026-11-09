@@ -5,37 +5,45 @@ export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
 /**
- * Apple touch icon — cream “K” monogram on black brand tile.
+ * Glaze "K" on an Ink tile with one Signal pixel (visual-redesign palette).
  */
 export default function AppleIcon() {
   return new ImageResponse(
     (
       <div
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: brand.black,
+          background: brand.ink,
           borderRadius: 40,
-          border: `5px solid ${brand.creamLine}`,
-          fontFamily: "Georgia, 'Times New Roman', serif",
         }}
       >
         <span
           style={{
-            color: brand.cream,
-            fontSize: 108,
-            fontWeight: 400,
-            fontStyle: "italic",
+            color: brand.glaze,
+            fontSize: 112,
+            fontWeight: 800,
             letterSpacing: "-0.04em",
             lineHeight: 1,
-            marginTop: -4,
           }}
         >
           {brand.monogram}
         </span>
+        <div
+          style={{
+            position: "absolute",
+            right: 22,
+            bottom: 22,
+            width: 26,
+            height: 26,
+            background: brand.signal,
+            display: "flex",
+          }}
+        />
       </div>
     ),
     { ...size },
