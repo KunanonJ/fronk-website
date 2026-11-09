@@ -1,4 +1,4 @@
-import { PERSON_META_DESCRIPTION } from "@/lib/content/identity";
+import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 import { resolvePublicSiteUrl } from "@/lib/seo/siteUrl";
 
 export const siteConfig = {

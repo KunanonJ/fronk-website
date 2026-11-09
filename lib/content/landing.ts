@@ -1,5 +1,5 @@
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
-import { PERSON_META_DESCRIPTION } from "@/lib/content/identity";
+import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 
 export const site = {
   wordmark: "KunanonJ",
