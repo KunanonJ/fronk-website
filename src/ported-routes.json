@@ -157,12 +157,12 @@
   {
     "path": "/portfolio",
     "test": "portfolio",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/ai-automation",
     "test": "portfolio-diagrams",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/ai-automation/opengraph-image",
@@ -170,7 +170,7 @@
   },
   {
     "path": "/portfolio/email-signature-generator",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/email-signature-generator/opengraph-image",
@@ -178,7 +178,7 @@
   },
   {
     "path": "/portfolio/node-validator-automation",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/node-validator-automation/opengraph-image",
@@ -191,7 +191,7 @@
   {
     "path": "/portfolio/tbh-intranet",
     "test": "portfolio-project",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/tbh-intranet/opengraph-image",

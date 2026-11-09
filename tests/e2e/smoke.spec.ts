@@ -197,3 +197,60 @@ test.describe("skills > the catalog filter is a typed search param", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 });
+
+test.describe("portfolio > the category filter is a typed search param", () => {
+  test("?category=ai-agents narrows the projects, All brings back a clean URL", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+
+    // /portfolio is prerendered: the filter applies after hydration, with no
+    // hydration mismatch.
+    await page.goto("/portfolio?category=ai-agents", {
+      waitUntil: "networkidle",
+    });
+    const group = page.getByRole("group", {
+      name: "Filter projects by category",
+    });
+    await expect(
+      group.getByRole("button", { name: "AI agents", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("1 of 4 projects")).toBeVisible();
+    const tbh = page.getByRole("article", { name: "TBH Intranet" });
+    await expect(tbh).toHaveCount(0);
+
+    await group.getByRole("button", { name: "All", exact: true }).click();
+    await expect(page).toHaveURL(/\/portfolio$/);
+    await expect(tbh).toBeVisible();
+
+    await group
+      .getByRole("button", { name: "Ops automation", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/portfolio\?category=ops-automation$/);
+    await expect(
+      page.getByRole("article", { name: "Node Validator Automation" }),
+    ).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("an unknown category falls back to all without an error", async ({
+    page,
+  }) => {
+    const response = await page.goto("/portfolio?category=everything", {
+      waitUntil: "networkidle",
+    });
+    expect(response?.ok()).toBe(true);
+    await expect(page).toHaveURL(/\/portfolio$/);
+    await expect(page.getByText("4 of 4 projects")).toBeVisible();
+    await expect(
+      page
+        .getByRole("group", { name: "Filter projects by category" })
+        .getByRole("button", { name: "All", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+});
