@@ -72,7 +72,13 @@ See §6. It's filled from the repo inventory.
 ## 4. Risks
 
 1. **SEO parity:** every URL, status code, redirect, canonical, hreflang, robots value, JSON-LD block and sitemap entry must match. The official guide's first step is an inventory of exactly these. The crawl baseline from `sea-discovery` is the reference.
-2. **Caching:** ISR has no 1:1 replacement. A naive port either hits Sanity on every request or serves stale content.
+2. **Caching:** ISR has no 1:1 replacement. A naive port either hits Sanity on every request or serves stale content. **Today's ISR is already broken in production (verified 09-11-26):**
+   - `open-next.config.ts` sets only `incrementalCache: r2IncrementalCache`, so `queue` and `tagCache` resolve to OpenNext's `"dummy"` overrides.
+   - The dummy queue's `send` throws "Dummy queue is not implemented". `revalidateIfRequired` and `cacheInterceptor` catch the error and serve the page stale.
+   - The dummy tag cache's `writeTags` is a no-op and its `isStale` always returns false, so `revalidateTag` from the Sanity webhook and the hourly cron purges nothing.
+   - Live probe: `/resume` (`revalidate = 60`) returned `x-nextjs-cache: STALE` on all 9 requests over 2+ minutes (05:07:37 to 05:09:55 UTC). Sanity-backed pages (`/resume`, and the blog when public) refresh only on redeploy.
+
+   The migration must design caching explicitly. An interim fix on Next is possible: OpenNext's Durable Object queue plus a D1 or DO tag cache, or rendering `/resume` dynamically.
 3. **OG images:** a different renderer, so the output must be compared visually.
 4. **Sanity:** `next-sanity` helpers (and `/studio`, if it's embedded) need the framework-agnostic `@sanity/client`. Draft mode needs a custom cookie flow, or should be dropped if unused.
 5. **Library maturity:** pin versions from the registry at phase entry. The docs don't state versions.
