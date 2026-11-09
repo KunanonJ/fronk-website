@@ -2,10 +2,14 @@ import { Link as RouterLink } from "@tanstack/react-router";
 import { forwardRef, type AnchorHTMLAttributes } from "react";
 
 /*
- * `next/link` on TanStack Router (tanstack-migration). Aliased in
- * vite.config.ts so shared components run under Start unchanged; Phase 6
- * moves them to Router's Link and deletes this file.
+ * The site's Link: TanStack Router's Link behind the `next/link` props the
+ * components were written against. Off-site links, files (llms.txt,
+ * resume.pdf), API routes and the Studio are plain anchors: the router would
+ * try to render them as pages.
  */
+
+/** Paths a full page load must handle: a file extension, /api or /studio. */
+const DOCUMENT_PATH = /(\.[a-z0-9]+$)|(^\/(api|studio)(\/|$))/i;
 
 type UrlObject = { pathname?: string; query?: Record<string, string>; hash?: string };
 
@@ -32,11 +36,11 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
   ref,
 ) {
   const url = toHref(href);
+  const parsed = new URL(url, "http://local");
   // Off-site, protocol and fragment-only links stay plain anchors, as in Next.
-  if (!url.startsWith("/") || url.startsWith("//")) {
+  if (!url.startsWith("/") || url.startsWith("//") || DOCUMENT_PATH.test(parsed.pathname)) {
     return <a ref={ref} href={url} {...rest} />;
   }
-  const parsed = new URL(url, "http://local");
   const search = parsed.search ? Object.fromEntries(parsed.searchParams) : undefined;
   return (
     <RouterLink
@@ -48,6 +52,9 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
       resetScroll={scroll === false ? false : undefined}
       replace={replace}
       preload={prefetch === false ? false : "intent"}
+      // Only the exact page counts as current (aria-current="page"); hash
+      // links like /#ventures never do.
+      activeOptions={{ exact: true, includeSearch: false, includeHash: Boolean(parsed.hash) }}
       activeProps={{}}
       {...rest}
     />

@@ -4,6 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
+import { EXTRA_PRERENDER_PATHS } from "./scripts/prerender-pages.mjs";
 import { readWranglerVars } from "./scripts/wrangler-vars.mjs";
 
 /*
@@ -61,9 +62,14 @@ export default defineConfig(({ mode }) => {
           enabled: true,
           crawlLinks: true,
           autoSubfolderIndex: false,
-          // Pages only: Sanity-backed routes and text/API endpoints render on request.
-          filter: ({ path }) => !/^\/(resume|learn|blog|api|studio)(\/|$)/.test(path) && !/\.[a-z0-9]+$/i.test(path),
+          // Pages only: Sanity-backed routes and text/API endpoints render on
+          // request, and /x/ is a 308 to /x (no second copy as x/index.html).
+          filter: ({ path }) =>
+            !/^\/(resume|learn|blog|api|studio)(\/|$)/.test(path) &&
+            !/\.[a-z0-9]+$/i.test(path) &&
+            (path === "/" || !path.endsWith("/")),
         },
+        pages: EXTRA_PRERENDER_PATHS.map((path) => ({ path })),
       }),
       react(),
     ],

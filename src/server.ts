@@ -23,7 +23,11 @@ const worker = {
 
   /** Hourly (triggers.crons): purge every content tag in case a webhook was missed. */
   async scheduled(_controller: unknown, _env: Env, ctx: Ctx): Promise<void> {
-    ctx.waitUntil(purgeTags(ctx.cache, ALL_CONTENT_TAGS));
+    ctx.waitUntil(
+      purgeTags(ctx.cache, ALL_CONTENT_TAGS).then((result) => {
+        if (!result.success) console.error("[cron] cache purge failed", result.errors);
+      }),
+    );
   },
 };
 

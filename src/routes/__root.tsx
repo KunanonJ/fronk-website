@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { lazy, Suspense, type ReactNode } from "react";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
+import { HeadContent, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
 import type { RouterContext } from "../router";
 import NotFound from "@/components/NotFound";
+import RouteError from "@/components/RouteError";
 import appCss from "@/src/styles/globals.css?url";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
@@ -15,6 +16,7 @@ import { WebVitals } from "@/components/WebVitals";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
+import { site as landingSite } from "@/lib/content/landing";
 import geistLatin from "../fonts/geist-latin.woff2?url";
 import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -31,7 +33,8 @@ const Devtools = import.meta.env.DEV ? lazy(() => import("../devtools")) : () =>
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
-    meta: globalMeta as never[],
+    // The default title; every page's head() replaces it (404 and error pages keep it).
+    meta: [...globalMeta, { title: landingSite.title }] as never[],
     links: [
       // Same two Latin faces next/font preloaded; Thai loads on demand.
       { rel: "preload", href: geistLatin, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
@@ -43,17 +46,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       ...global.links,
     ],
   }),
-  component: RootComponent,
+  // The document shell wraps the page, the 404 and the error state alike.
+  shellComponent: RootDocument,
   notFoundComponent: NotFound,
+  errorComponent: RouteError,
 });
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
-  );
-}
 
 function RootDocument({ children }: { children: ReactNode }) {
   // Thai pages declare Thai on <html> (Next only set it on <main>).

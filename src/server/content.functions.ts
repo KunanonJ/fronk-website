@@ -6,6 +6,7 @@ import { resolveResumeProfile } from "@/lib/content/resumeProfile";
 import { resolveWritingPageContent } from "@/lib/content/writingPage";
 import { fetchAllPosts, fetchPostBySlug, fetchResumeProfile, fetchWritingPage } from "@/lib/sanity/fetch";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import type { Post } from "@/lib/sanity/types";
 import type { Metadata } from "@/lib/seo/types";
 
 /*
@@ -24,8 +25,7 @@ async function blogIndexMetadata(): Promise<Metadata> {
 }
 
 /** A post's metadata: the Sanity post when there is one, else its fallback copy. */
-async function blogPostMetadata(slug: string): Promise<Metadata> {
-  const post = await fetchPostBySlug(slug);
+function blogPostMetadata(slug: string, post: Post | null): Metadata {
   const card = post ? mapPostToBlogCard(post) : FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
   if (!card) return { title: "Post" };
   const meta = routeShareMeta({
@@ -65,7 +65,7 @@ export const getBlogPost = createServerFn({ method: "GET" })
   .handler(async ({ data: slug }) => {
     const post = await fetchPostBySlug(slug);
     if (!post && !FALLBACK_BLOG_POSTS.some((p) => p.slug === slug)) return null;
-    const metadata = await blogPostMetadata(slug);
+    const metadata = blogPostMetadata(slug, post);
     // The Sanity post crosses as JSON: its image types carry `unknown` fields.
     return { postJson: post ? JSON.stringify(post) : null, head: pageHead(metadata) };
   });

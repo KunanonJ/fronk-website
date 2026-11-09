@@ -27,6 +27,9 @@ export function buildClient(options: BuildClientOptions = {}): SanityClient | nu
     useCdn: !preview && process.env.NODE_ENV === "production",
     perspective: preview ? "drafts" : "published",
     token: preview ? sanityReadToken : undefined,
+    // Fail fast so a slow Sanity cannot hold a page render: 10 s per try, 2 retries.
+    timeout: 10_000,
+    maxRetries: 2,
   });
 }
 

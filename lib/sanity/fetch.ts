@@ -25,6 +25,12 @@ function getClient(options: FetchOptions = {}) {
 }
 
 
+/**
+ * Run a GROQ query. Null when Sanity is not configured (builds without it use
+ * the bundled fallback content) or nothing matches. A failed request throws:
+ * the route then renders its error state with no-store, instead of fallback
+ * content the edge would keep for a day.
+ */
 async function safeFetch<T>(
   label: string,
   query: string,
@@ -38,10 +44,8 @@ async function safeFetch<T>(
     const result = await client.fetch<T>(query, params);
     return result ?? null;
   } catch (error: unknown) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn(`[sanity] ${label} failed:`, error);
-    }
-    return null;
+    console.error(`[sanity] ${label} failed`, error);
+    throw error;
   }
 }
 

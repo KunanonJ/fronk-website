@@ -16,6 +16,14 @@ export function edgeCacheHeaders(tags: readonly RevalidationTag[]): Record<strin
   };
 }
 
+/** For a route's `headers`: edge-cache a successful render only, never a 404 or an error page. */
+export function routeCacheHeaders(
+  match: { status: string },
+  tags: readonly RevalidationTag[],
+): Record<string, string> {
+  return match.status === "success" ? edgeCacheHeaders(tags) : { "Cache-Control": "no-store" };
+}
+
 /** The same headers on a response another handler built (feed, llms, sitemap). */
 export async function withEdgeCache(response: Response | Promise<Response>, tags: readonly RevalidationTag[]): Promise<Response> {
   const res = await response;

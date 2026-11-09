@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import BlogPostView from "@/components/landing/BlogPostView";
 import type { Post } from "@/lib/sanity/types";
-import { edgeCacheHeaders } from "@/src/lib/cache";
+import { routeCacheHeaders } from "@/src/lib/cache";
 import { blogPostQuery } from "@/src/queries/content";
 
 export const Route = createFileRoute("/_landing/blog/$slug")({
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_landing/blog/$slug")({
     return { head: result.head };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  headers: () => edgeCacheHeaders(["posts"]),
+  headers: ({ match }) => routeCacheHeaders(match, ["posts"]),
   component: BlogPostRoute,
 });
 

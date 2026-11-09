@@ -111,7 +111,8 @@ export default function LandingSiteFooter() {
         </p>
 
         <div className="flex flex-col gap-2 border-t border-hairline py-6 text-small text-ink-2 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} Kunanon Jarat. Bangkok, Thailand.</p>
+          {/* Static pages bake the build year; a visit after New Year shows the new one. */}
+          <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Kunanon Jarat. Bangkok, Thailand.</p>
           <p className="font-mono text-label uppercase">Built in Bangkok</p>
         </div>
       </div>
