@@ -23,5 +23,10 @@
   // Contact and subscribe: 5 posts per minute per IP (approximate, per data
   // centre). TURNSTILE_SECRET_KEY is a secret (wrangler secret put).
   "ratelimits": [{ "name": "FORM_RATE_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }],
+  // Worker cache in front of the Worker: Sanity-backed responses carry
+  // Cache-Tag + CDN-Cache-Control and are purged by tag from src/server.ts
+  // (webhook, hourly cron). Replaces OpenNext's R2 cache and Durable Objects.
+  "cache": { "enabled": true },
+  "triggers": { "crons": ["0 * * * *"] },
   "observability": { "enabled": true },
 }

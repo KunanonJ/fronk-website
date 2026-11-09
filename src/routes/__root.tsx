@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
-import type { ReactNode } from "react";
-import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
+import { lazy, Suspense, type ReactNode } from "react";
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext, useRouterState } from "@tanstack/react-router";
+import type { RouterContext } from "../router";
 import NotFound from "@/app/not-found";
 import appCss from "@/app/globals.css?url";
 import { Analytics } from "@/components/Analytics";
@@ -24,7 +25,10 @@ const global = rootHead(rootViewport);
 const themeColors = global.meta.filter((m) => m.name === "theme-color");
 const globalMeta = global.meta.filter((m) => m.name !== "theme-color");
 
-export const Route = createRootRoute({
+// Router + Query devtools in development only; the import is dropped from builds.
+const Devtools = import.meta.env.DEV ? lazy(() => import("../devtools")) : () => null;
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: globalMeta as never[],
     links: [
@@ -73,6 +77,9 @@ function RootDocument({ children }: { children: ReactNode }) {
         <Analytics />
         <GoogleAnalytics />
         <WebVitals />
+        <Suspense fallback={null}>
+          <Devtools />
+        </Suspense>
         <Scripts />
       </body>
     </html>
