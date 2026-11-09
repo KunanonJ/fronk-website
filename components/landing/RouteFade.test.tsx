@@ -6,7 +6,7 @@ import RouteFade, {
 } from "@/components/landing/RouteFade";
 
 let mockPath = "/";
-vi.mock("next/navigation", () => ({
+vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => mockPath,
 }));
 

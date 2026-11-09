@@ -56,7 +56,6 @@ export function CompanyLogo({
       className={cn(TILE, "bg-paper p-1", className)}
     >
       {/* Plain <img>: tiny static files, no optimisation needed. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url}
         alt=""

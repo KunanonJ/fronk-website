@@ -10,7 +10,9 @@ import { defineConfig, devices } from "@playwright/test";
  */
 
 const PORT = Number(process.env.PORT ?? 3000);
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
+// 127.0.0.1, not localhost: in CI containers Node and the server can resolve
+// localhost to different address families.
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -54,9 +56,9 @@ export default defineConfig({
       use: { ...devices["Desktop Firefox"], viewport: { width: 1440, height: 900 } },
     },
   ],
-  // Reuse a running dev server if present; otherwise start one. Visual baselines
-  // are most stable against `pnpm build && pnpm start`, but dev is fine for
-  // local iteration.
+  // Reuse a running server if present; otherwise start one. Visual baselines
+  // are most stable against `pnpm build && pnpm start` (vite preview, workerd),
+  // but `pnpm dev` is fine for local iteration.
   webServer: {
     command: process.env.PLAYWRIGHT_WEB_SERVER ?? "pnpm dev",
     url: BASE_URL,

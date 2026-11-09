@@ -16,8 +16,6 @@ export const REVALIDATE_TAGS = {
  * webhook and cron matched nothing. 60 s matches `/resume`'s page revalidate,
  * so content still refreshes within a minute even if the webhook is missed.
  */
-export const SANITY_FETCH_REVALIDATE_SECONDS = 60;
-
 export type RevalidationTag =
   (typeof REVALIDATE_TAGS)[keyof typeof REVALIDATE_TAGS];
 

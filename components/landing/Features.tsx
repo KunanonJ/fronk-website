@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -25,7 +25,6 @@ export default function Features() {
             <Card className="flex h-full flex-col p-6 sm:p-8">
               <div className="flex items-center justify-between">
                 {/* Decorative: the venture name is the heading below. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.icon}
                   alt=""

@@ -1,4 +1,4 @@
-import Script from "next/script";
+import Script from "@/components/ui/Script";
 
 /**
  * Umami analytics tracker. No-op unless ALL of these are true:

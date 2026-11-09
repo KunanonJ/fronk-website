@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/ui/Image";
 import PortfolioMockup, {
   MockupStage,
 } from "@/components/landing/portfolio/PortfolioMockup";

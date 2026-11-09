@@ -87,6 +87,7 @@ describe("buildSubject", () => {
       ...VALID,
       name: "Eve\r\nBcc: victim@example.com\u0007",
     });
+    // eslint-disable-next-line no-control-regex -- asserting control characters are gone
     expect(subject).not.toMatch(/[\r\n\u0000-\u001f\u007f]/);
     expect(subject).toContain("Eve Bcc: victim@example.com");
   });

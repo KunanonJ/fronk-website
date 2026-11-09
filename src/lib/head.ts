@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from "@/lib/seo/types";
 import { siteConfig } from "@/lib/site";
 import { metadataToHead, type FileOgImage } from "@/lib/seo/metadataToHead";
 import { rootMetadata } from "@/lib/seo/rootMetadata";

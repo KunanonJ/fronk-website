@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import SystemLayout from "@/app/(system)/layout";
+import SystemLayout from "@/components/system/SystemLayout";
 
 /** Pathless layout for /resume and /design: the (system) route group in Next. */
 export const Route = createFileRoute("/_system")({

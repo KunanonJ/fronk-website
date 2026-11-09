@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import robots from "@/app/robots";
+import robots from "@/lib/seo/robots";
 import { robotsToText } from "@/lib/seo/metadataRoutes";
 
 export const Route = createFileRoute("/robots.txt")({

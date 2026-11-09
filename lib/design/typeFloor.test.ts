@@ -16,7 +16,7 @@ function sub12(source: string): number {
 }
 
 describe("type floor ratchet", () => {
-  const counts = sourceFiles(["components", "app"])
+  const counts = sourceFiles(["components", "src"])
     .map((f) => [f, sub12(read(f))] as const)
     .filter(([, n]) => n > 0);
   const total = counts.reduce((sum, [, n]) => sum + n, 0);

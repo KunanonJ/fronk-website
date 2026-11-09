@@ -66,6 +66,7 @@ export function parseContactInput(raw: unknown): ContactInput {
 
 /** Collapse control characters (CR/LF included) so a subject can't inject headers. */
 const singleLine = (value: string): string =>
+  // eslint-disable-next-line no-control-regex -- stripping control characters is the point
   value.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim();
 
 export function buildSubject(input: Pick<ContactInput, "name" | "topics">): string {

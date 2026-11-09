@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "@/lib/seo/types";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 
 /*
@@ -186,7 +186,12 @@ export function rootHead(viewport: Viewport, iconVersion = ""): HeadTags {
     { charSet: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
   ];
-  for (const entry of toList(viewport.themeColor)) {
+  const themeColors: (string | { color: string; media?: string })[] = Array.isArray(viewport.themeColor)
+    ? viewport.themeColor
+    : viewport.themeColor
+      ? [viewport.themeColor]
+      : [];
+  for (const entry of themeColors) {
     if (!entry) continue;
     if (typeof entry === "string") meta.push({ name: "theme-color", content: entry });
     else meta.push({ name: "theme-color", content: entry.color, ...(entry.media ? { media: entry.media } : {}) });

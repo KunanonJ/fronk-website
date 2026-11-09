@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowRight } from "lucide-react";
 import CopyButton from "@/components/landing/skills/CopyButton";
 import {

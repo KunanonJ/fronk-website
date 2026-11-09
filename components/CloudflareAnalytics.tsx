@@ -1,4 +1,4 @@
-import Script from "next/script";
+import Script from "@/components/ui/Script";
 
 export function resolveCloudflareAnalyticsToken(
   token: string | undefined,

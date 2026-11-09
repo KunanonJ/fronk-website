@@ -2,11 +2,16 @@ import { describe, expect, it } from "vitest";
 import { loadOgFonts } from "./fonts";
 
 describe("loadOgFonts", () => {
-  it("loadOgFonts__given_missing_worker_bundle_files__then_falls_back_without_throwing", () => {
-    const fonts = loadOgFonts(() => {
-      throw new Error("missing font file");
-    });
-
-    expect(fonts).toEqual([]);
+  it("decodes the two bundled Geist faces once and reuses them", () => {
+    const fonts = loadOgFonts();
+    expect(fonts.map((f) => [f.name, f.weight])).toEqual([
+      ["Geist", 400],
+      ["Geist", 800],
+    ]);
+    for (const font of fonts) {
+      // TrueType files start with 0x00010000.
+      expect(new DataView(font.data).getUint32(0)).toBe(0x00010000);
+    }
+    expect(loadOgFonts()).toBe(fonts);
   });
 });

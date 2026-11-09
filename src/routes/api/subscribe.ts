@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { env } from "cloudflare:workers";
-import { POST } from "@/app/api/subscribe/route";
+import { POST } from "@/src/server/api/subscribe";
 import { guardForm, type FormGuardEnv } from "@/src/server/formGuard";
 
 /** Rate limit and Turnstile first, then the shared Next handler unchanged. */

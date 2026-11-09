@@ -1,6 +1,6 @@
 "use client";
 
-import { useReportWebVitals } from "next/web-vitals";
+import { useReportWebVitals } from "@/lib/analytics/useReportWebVitals";
 import { track } from "@/lib/analytics/gtag";
 
 /**

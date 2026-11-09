@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import StudioLayout, { metadata, viewport } from "@/app/studio/layout";
-import StudioPage from "@/app/studio/[[...tool]]/page";
+import StudioLayout, { metadata, viewport } from "@/components/studio/StudioLayout";
+import StudioPage from "@/components/studio/StudioPage";
 import { pageHead } from "@/src/lib/head";
 import { viewportContent } from "@/lib/seo/metadataToHead";
 

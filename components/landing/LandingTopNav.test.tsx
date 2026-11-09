@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/skills" }));
+vi.mock("@/lib/router/navigation", () => ({ usePathname: () => "/skills" }));
 vi.mock("@/components/ThemeToggle", () => ({ ThemeToggle: () => null }));
 
 import LandingTopNav from "@/components/landing/LandingTopNav";

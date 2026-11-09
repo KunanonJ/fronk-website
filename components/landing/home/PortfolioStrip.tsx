@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight } from "lucide-react";
 import { Section } from "@/components/ui/Section";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { withEdgeCache } from "@/src/lib/cache";
-import sitemap from "@/app/sitemap";
+import sitemap from "@/lib/seo/sitemap";
 import { sitemapToXml } from "@/lib/seo/metadataRoutes";
 
 export const Route = createFileRoute("/sitemap.xml")({

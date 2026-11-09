@@ -8,7 +8,7 @@ import { hero, ventures } from "@/lib/content/landing";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getProofMetrics } from "@/lib/content/proof";
 
-vi.mock("next/navigation", () => ({
+vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => "/",
   useRouter: () => ({ push: vi.fn(), prefetch: vi.fn() }),
 }));

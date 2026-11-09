@@ -5,8 +5,8 @@ vi.hoisted(() => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://kunanonj.com";
 });
 
-import manifest from "@/app/manifest";
-import robots from "@/app/robots";
+import manifest from "@/lib/seo/manifest";
+import robots from "@/lib/seo/robots";
 import { manifestToJson, robotsToText, sitemapToXml } from "./metadataRoutes";
 
 const reference = JSON.parse(

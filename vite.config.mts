@@ -11,7 +11,6 @@ import { defineConfig, loadEnv } from "vite";
  * and the shared `components/` and `lib/` through the `@/` alias.
  */
 const root = path.dirname(fileURLToPath(import.meta.url));
-const shim = (file: string) => path.join(root, "src/shims", file);
 
 /** Every NEXT_PUBLIC_* the code reads; unset ones become `undefined`, never `process`. */
 const PUBLIC_ENV = [
@@ -38,19 +37,7 @@ export default defineConfig(({ mode }) => {
     // Playwright Docker image against the preview.
     preview: { host: "127.0.0.1", allowedHosts: ["host.docker.internal"] },
     resolve: {
-      alias: [
-        { find: /^next\/link$/, replacement: shim("link.tsx") },
-        { find: /^next\/navigation$/, replacement: shim("navigation.ts") },
-        { find: /^next\/image$/, replacement: shim("image.tsx") },
-        { find: /^next\/script$/, replacement: shim("script.tsx") },
-        { find: /^next\/web-vitals$/, replacement: shim("web-vitals.ts") },
-        { find: /^next-sanity$/, replacement: shim("next-sanity.ts") },
-        { find: /^next\/headers$/, replacement: shim("headers.ts") },
-        { find: /^next\/server$/, replacement: shim("next-server.ts") },
-        { find: /^next\/og$/, replacement: shim("next-og.ts") },
-        { find: /^@\/lib\/og\/fonts$/, replacement: shim("og-fonts.ts") },
-        { find: /^@\//, replacement: `${root}/` },
-      ],
+      alias: [{ find: /^@\//, replacement: `${root}/` }],
     },
     define: Object.fromEntries(
       PUBLIC_ENV.map((key) => [`process.env.${key}`, env[key] === undefined ? "undefined" : JSON.stringify(env[key])]),

@@ -2,12 +2,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const globalsCss = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
-const layoutTsx = readFileSync(join(process.cwd(), "app/layout.tsx"), "utf8");
-const landingLayout = readFileSync(
-  join(process.cwd(), "app/(landing)/layout.tsx"),
-  "utf8",
-);
+const globalsCss = readFileSync(join(process.cwd(), "src/styles/globals.css"), "utf8");
+const fontsCss = readFileSync(join(process.cwd(), "src/styles/fonts.css"), "utf8");
+const layoutTsx = readFileSync(join(process.cwd(), "src/routes/__root.tsx"), "utf8");
+const landingLayout = readFileSync(join(process.cwd(), "components/landing/LandingLayout.tsx"), "utf8");
 
 /**
  * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
@@ -52,16 +50,12 @@ describe("visual-redesign foundation", () => {
   });
 
   it("uses Geist, Geist Mono and Noto Sans Thai, and drops the retired fonts", () => {
-    expect(layoutTsx).toContain("Geist");
-    expect(layoutTsx).toContain("Geist_Mono");
-    expect(layoutTsx).toContain("Noto_Sans_Thai");
-    const fontImports = (src: string) =>
-      [...src.matchAll(/import\s*\{([^}]*)\}\s*from\s*"next\/font\/google"/g)]
-        .map((m) => m[1]!)
-        .join(",");
-    for (const retired of ["Hanken_Grotesk", "Instrument_Serif", "Space_Mono", "Almarai", "Inter"]) {
-      expect(fontImports(layoutTsx)).not.toMatch(new RegExp(`\\b${retired}\\b`));
-      expect(fontImports(landingLayout)).not.toMatch(new RegExp(`\\b${retired}\\b`));
+    const families = [...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g)].map((m) => m[1]!.trim());
+    expect(new Set(families)).toEqual(
+      new Set(["Geist", "Geist Fallback", "Geist Mono", "Geist Mono Fallback", "Noto Sans Thai", "Noto Sans Thai Fallback"]),
+    );
+    for (const retired of ["Hanken Grotesk", "Instrument Serif", "Space Mono", "Almarai", "Inter"]) {
+      expect(families).not.toContain(retired);
     }
     // The retired font aliases are gone too.
     for (const alias of ["--font-instrument-serif", "--font-almarai", "--font-hanken", "--font-serif"]) {

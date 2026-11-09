@@ -30,7 +30,7 @@ export function AnnotatedText({ text }: { text: string }): ReactNode {
     }
 
     if (!match || earliest < 0) {
-      nodes.push(<span key={key++}>{remaining}</span>);
+      nodes.push(<span key={key}>{remaining}</span>);
       break;
     }
 

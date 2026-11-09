@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/Image";
 import { ArrowUpRight } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import {

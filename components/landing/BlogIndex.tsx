@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/components/ui/Image";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight, Search } from "lucide-react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import {

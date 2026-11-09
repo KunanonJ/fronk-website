@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";

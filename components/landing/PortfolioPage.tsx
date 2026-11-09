@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/navigation/Link";
 import { ArrowUpRight } from "lucide-react";
 import LibraryPageShell from "@/components/landing/LibraryPageShell";
 import PortfolioCover from "@/components/landing/PortfolioCover";

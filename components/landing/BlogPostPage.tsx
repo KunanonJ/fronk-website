@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from "@/components/ui/Image";
+import Link from "@/components/navigation/Link";
 import type { PortableTextBlock } from "@portabletext/react";
 import LandingTopNav from "@/components/landing/LandingTopNav";
 import { PortableText } from "@/components/PortableText";

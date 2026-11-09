@@ -9,7 +9,7 @@
  *   2. smoke + axe (both themes), and with --visual the Linux baselines
  *      (run --visual inside the pinned Playwright image only).
  *
- *   pnpm start:build && node scripts/start-gates.mjs [--visual]
+ *   pnpm build && node scripts/start-gates.mjs [--visual | --parity-only]
  */
 import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -21,6 +21,8 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const REFERENCE = "process/features/tanstack-migration/references/next-parity_09-11-26.json";
 const routes = JSON.parse(readFileSync("src/ported-routes.json", "utf8"));
 const visual = process.argv.includes("--visual");
+// CI runs smoke, axe and visual in their own jobs; --parity-only skips Playwright here.
+const parityOnly = process.argv.includes("--parity-only");
 
 // Run vite directly (no pnpm wrapper) in its own process group, and keep its
 // output off our stdio: a surviving grandchild holding our stderr kept the
@@ -73,6 +75,7 @@ try {
   if (ignore.length) diffArgs.push("--ignore", ignore.join(","));
   failed += run("node", diffArgs) ? 1 : 0;
   const names = routes.filter((r) => r.test).map((r) => r.test).join("|");
+  if (parityOnly) throw new Error("__parity_only__");
   const specs = ["smoke.spec.ts", "a11y.spec.ts", ...(visual ? ["visual.spec.ts"] : [])];
   failed += run(
     "pnpm",
@@ -82,6 +85,8 @@ try {
   )
     ? 1
     : 0;
+} catch (error) {
+  if (!(error instanceof Error && error.message === "__parity_only__")) throw error;
 } finally {
   stop();
 }

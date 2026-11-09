@@ -6,11 +6,11 @@ import { describe, expect, it, vi } from "vitest";
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://kunanonj.com";
 });
-import { metadata as aboutMetadata } from "@/app/(landing)/about/page";
-import { metadata as homeMetadata } from "@/app/(landing)/page";
 import { headTags } from "@/lib/parity/parity.mjs";
 import { headToHtml, metadataToHead, rootHead } from "@/lib/seo/metadataToHead";
 import { rootMetadata, rootViewport } from "@/lib/seo/rootMetadata";
+import { Route as AboutRoute } from "@/src/routes/_landing/about";
+import { Route as HomeRoute } from "@/src/routes/_landing/index";
 
 const reference = JSON.parse(
   readFileSync(
@@ -19,19 +19,16 @@ const reference = JSON.parse(
   ),
 ) as Record<string, { title: string; tags: string[] }>;
 
-function render(page: Parameters<typeof metadataToHead>[1]) {
-  const head = metadataToHead(rootMetadata, page);
-  const html = headToHtml(rootHead(rootViewport), head);
-  const title = head.meta.find((m) => "title" in m)?.title;
-  return { title, tags: headTags(html) };
-}
 
 describe("metadataToHead (parity with the Next build)", () => {
   it.each([
-    ["/", homeMetadata],
-    ["/about", aboutMetadata],
-  ])("reproduces every head tag Next ships on %s", (path, page) => {
-    const { title, tags } = render(page);
+    ["/", HomeRoute],
+    ["/about", AboutRoute],
+  ])("the route head() reproduces every head tag Next shipped on %s", (path, route) => {
+    const head = route.options.head!({} as never) as unknown as ReturnType<typeof metadataToHead>;
+    const html = headToHtml(rootHead(rootViewport), head);
+    const title = head.meta.find((m) => "title" in m)?.title;
+    const tags = headTags(html);
     expect(title).toBe(reference[path]!.title);
     expect(tags).toEqual(reference[path]!.tags);
   });
