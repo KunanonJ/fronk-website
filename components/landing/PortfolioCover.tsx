@@ -4,10 +4,6 @@ import PortfolioMockup, {
 } from "@/components/landing/portfolio/PortfolioMockup";
 import type { PortfolioProject } from "@/lib/content/portfolio";
 
-const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
-
 /** Gradient focal points rotate per project so placeholders don't look cloned. */
 const GLOW_POSITIONS = ["0% 0%", "100% 0%", "0% 100%", "100% 100%"] as const;
 
@@ -43,11 +39,11 @@ export default function PortfolioCover({
   priority = false,
   className = "",
 }: PortfolioCoverProps) {
-  const frame = `relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-primary/12 ${className}`;
+  const frame = `relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-hairline ${className}`;
 
   if (project.cover) {
     return (
-      <div className={`${frame} bg-primary/[0.04]`}>
+      <div className={`${frame} bg-surface-tint`}>
         <Image
           src={project.cover.src}
           alt={project.cover.alt}
@@ -84,8 +80,7 @@ export default function PortfolioCover({
       }}
     >
       <span
-        className="pointer-events-none absolute -bottom-[0.16em] right-[0.06em] select-none text-[10rem] leading-none text-primary/[0.14] sm:text-[12rem]"
-        style={serif}
+        className="pointer-events-none absolute -bottom-[0.16em] right-[0.06em] select-none font-display text-[10rem] leading-none font-semibold text-signal/15 sm:text-[12rem]"
       >
         {initials(project.name)}
       </span>

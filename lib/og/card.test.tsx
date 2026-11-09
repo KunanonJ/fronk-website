@@ -35,11 +35,17 @@ describe("OgCard", () => {
     expect(text).toContain(domain);
   });
 
-  it("uses the landing black + cream brand canvas", () => {
+  it("uses the redesign palette: Paper field, Ink type", () => {
     const tree = OgCard({ title: "x" }) as {
       props: { style: { background: string; color: string } };
     };
-    expect(tree.props.style.background).toBe("#000000");
-    expect(tree.props.style.color).toBe("#dedbc8");
+    expect(tree.props.style.background).toBe("#ffffff");
+    expect(tree.props.style.color).toBe("#0b0d17");
+  });
+
+  it("draws an idle pixel block with no Ember (Ember needs a label)", () => {
+    const json = JSON.stringify(OgCard({ title: "Seeded" }));
+    expect(json).toContain("#2b3bff");
+    expect(json.toLowerCase()).not.toContain("#ff5a1f");
   });
 });

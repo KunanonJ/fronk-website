@@ -109,9 +109,9 @@ function AppShell({ mockup }: { mockup: Extract<Mockup, { kind: "app-shell" }> }
         return (
           <g key={item}>
             {i === 0 ? (
-              <rect x={10} y={y - 17} width={130} height={26} rx={7} className="fill-primary/10" />
+              <rect x={10} y={y - 17} width={130} height={26} rx={7} className="fill-signal/10" />
             ) : null}
-            <rect x={20} y={y - 10} width={10} height={10} rx={2} className="fill-primary/30" />
+            <rect x={20} y={y - 10} width={10} height={10} rx={2} className={i === 0 ? "fill-signal" : "fill-primary/30"} />
             <Label x={38} y={y} size={12} tone={i === 0 ? "fill-primary" : "fill-primary/75"}>
               {item}
             </Label>
@@ -248,8 +248,8 @@ function FormPreview({ mockup }: { mockup: Extract<Mockup, { kind: "form-preview
         <circle key={cx} cx={cx} cy={240} r={6} className="fill-primary/20" />
       ))}
 
-      <rect x={342} y={280} width={274} height={36} rx={18} className="fill-primary" />
-      <Label x={479} y={303} size={13} weight={600} anchor="middle" tone="fill-landing">
+      <rect x={342} y={280} width={274} height={36} rx={18} className="fill-signal" />
+      <Label x={479} y={303} size={13} weight={600} anchor="middle" tone="fill-paper">
         {mockup.action}
       </Label>
       <Label x={479} y={336} size={10} anchor="middle" tone="fill-primary/70">
@@ -360,7 +360,7 @@ export function MockupStage({
       className={`flex items-center justify-center ${className}`}
       style={{
         backgroundImage:
-          "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--landing-ink) 12%, transparent), transparent 60%), linear-gradient(180deg, color-mix(in srgb, var(--landing-ink) 4%, transparent), color-mix(in srgb, var(--landing-ink) 8%, transparent))",
+          "radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--palette-signal) 12%, transparent), transparent 60%), linear-gradient(180deg, var(--surface-tint), color-mix(in srgb, var(--surface-warm) 55%, var(--surface-tint)))",
       }}
     >
       {children}
