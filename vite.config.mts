@@ -41,6 +41,8 @@ export default defineConfig(({ mode }) => {
         { find: /^next\/image$/, replacement: shim("image.tsx") },
         { find: /^next\/script$/, replacement: shim("script.tsx") },
         { find: /^next\/web-vitals$/, replacement: shim("web-vitals.ts") },
+        { find: /^next-sanity$/, replacement: shim("next-sanity.ts") },
+        { find: /^next\/headers$/, replacement: shim("headers.ts") },
         { find: /^@\//, replacement: `${root}/` },
       ],
     },
@@ -49,7 +51,18 @@ export default defineConfig(({ mode }) => {
     ),
     plugins: [
       cloudflare({ configPath: "wrangler.start.jsonc", viteEnvironment: { name: "ssr" } }),
-      tanstackStart(),
+      tanstackStart({
+        // Pages built from lib/content are rendered once per deploy and served
+        // as static assets; Sanity-backed pages render on request (Phase 4
+        // caches them at the edge).
+        prerender: {
+          enabled: true,
+          crawlLinks: true,
+          autoSubfolderIndex: false,
+          // Pages only: Sanity-backed routes and text/API endpoints render on request.
+          filter: ({ path }) => !/^\/(resume|learn|blog|api|studio)(\/|$)/.test(path) && !/\.[a-z0-9]+$/i.test(path),
+        },
+      }),
       react(),
     ],
   };

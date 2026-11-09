@@ -33,8 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function SkillRoute({ params }: Props) {
-  const { slug } = await params;
+/** The page body for one slug; shared with the TanStack Start route. */
+export function SkillRouteView({ slug }: { slug: string }) {
   const skill = getSkillBySlug(slug);
   if (!skill) notFound();
 
@@ -60,4 +60,9 @@ export default async function SkillRoute({ params }: Props) {
       <SkillDetailPage skill={skill} />
     </>
   );
+}
+
+export default async function SkillRoute({ params }: Props) {
+  const { slug } = await params;
+  return <SkillRouteView slug={slug} />;
 }

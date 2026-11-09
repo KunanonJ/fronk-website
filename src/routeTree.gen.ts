@@ -10,11 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LandingRouteImport } from './routes/_landing'
+import { Route as SystemRouteImport } from './routes/_system'
 import { Route as LandingIndexRouteImport } from './routes/_landing/index'
 import { Route as LandingAboutRouteImport } from './routes/_landing/about'
+import { Route as LandingBuildRouteImport } from './routes/_landing/build'
+import { Route as LandingContactRouteImport } from './routes/_landing/contact'
+import { Route as LandingExamplesRouteImport } from './routes/_landing/examples'
+import { Route as LandingLearnRouteImport } from './routes/_landing/learn'
+import { Route as LandingPressRouteImport } from './routes/_landing/press'
+import { Route as LandingProofRouteImport } from './routes/_landing/proof'
+import { Route as LandingStackRouteImport } from './routes/_landing/stack'
+import { Route as SystemDesignRouteImport } from './routes/_system/design'
+import { Route as SystemResumeRouteImport } from './routes/_system/resume'
+import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
+import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
+import { Route as LandingPortfolioIndexRouteImport } from './routes/_landing/portfolio/index'
+import { Route as LandingPortfolioSlugRouteImport } from './routes/_landing/portfolio/$slug'
+import { Route as LandingSkillsIndexRouteImport } from './routes/_landing/skills/index'
+import { Route as LandingSkillsSlugRouteImport } from './routes/_landing/skills/$slug'
+import { Route as LandingStockAsmeRouteImport } from './routes/_landing/stock/asme'
+import { Route as LandingTopicsSlugRouteImport } from './routes/_landing/topics/$slug'
+import { Route as LandingVenturesSlugRouteImport } from './routes/_landing/ventures/$slug'
+import { Route as LandingThTopicsSlugRouteImport } from './routes/_landing/th/topics/$slug'
 
 const LandingRoute = LandingRouteImport.update({
   id: '/_landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SystemRoute = SystemRouteImport.update({
+  id: '/_system',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingIndexRoute = LandingIndexRouteImport.update({
@@ -27,31 +51,251 @@ const LandingAboutRoute = LandingAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => LandingRoute,
 } as any)
+const LandingBuildRoute = LandingBuildRouteImport.update({
+  id: '/build',
+  path: '/build',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingContactRoute = LandingContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingExamplesRoute = LandingExamplesRouteImport.update({
+  id: '/examples',
+  path: '/examples',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingLearnRoute = LandingLearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingPressRoute = LandingPressRouteImport.update({
+  id: '/press',
+  path: '/press',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingProofRoute = LandingProofRouteImport.update({
+  id: '/proof',
+  path: '/proof',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingStackRoute = LandingStackRouteImport.update({
+  id: '/stack',
+  path: '/stack',
+  getParentRoute: () => LandingRoute,
+} as any)
+const SystemDesignRoute = SystemDesignRouteImport.update({
+  id: '/design',
+  path: '/design',
+  getParentRoute: () => SystemRoute,
+} as any)
+const SystemResumeRoute = SystemResumeRouteImport.update({
+  id: '/resume',
+  path: '/resume',
+  getParentRoute: () => SystemRoute,
+} as any)
+const LandingBlogIndexRoute = LandingBlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingBlogSlugRoute = LandingBlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingPortfolioIndexRoute = LandingPortfolioIndexRouteImport.update({
+  id: '/portfolio/',
+  path: '/portfolio/',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingPortfolioSlugRoute = LandingPortfolioSlugRouteImport.update({
+  id: '/portfolio/$slug',
+  path: '/portfolio/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingSkillsIndexRoute = LandingSkillsIndexRouteImport.update({
+  id: '/skills/',
+  path: '/skills/',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingSkillsSlugRoute = LandingSkillsSlugRouteImport.update({
+  id: '/skills/$slug',
+  path: '/skills/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingStockAsmeRoute = LandingStockAsmeRouteImport.update({
+  id: '/stock/asme',
+  path: '/stock/asme',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingTopicsSlugRoute = LandingTopicsSlugRouteImport.update({
+  id: '/topics/$slug',
+  path: '/topics/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingVenturesSlugRoute = LandingVenturesSlugRouteImport.update({
+  id: '/ventures/$slug',
+  path: '/ventures/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingThTopicsSlugRoute = LandingThTopicsSlugRouteImport.update({
+  id: '/th/topics/$slug',
+  path: '/th/topics/$slug',
+  getParentRoute: () => LandingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LandingIndexRoute
   '/about': typeof LandingAboutRoute
+  '/build': typeof LandingBuildRoute
+  '/contact': typeof LandingContactRoute
+  '/examples': typeof LandingExamplesRoute
+  '/learn': typeof LandingLearnRoute
+  '/press': typeof LandingPressRoute
+  '/proof': typeof LandingProofRoute
+  '/stack': typeof LandingStackRoute
+  '/design': typeof SystemDesignRoute
+  '/resume': typeof SystemResumeRoute
+  '/blog/$slug': typeof LandingBlogSlugRoute
+  '/portfolio/$slug': typeof LandingPortfolioSlugRoute
+  '/skills/$slug': typeof LandingSkillsSlugRoute
+  '/stock/asme': typeof LandingStockAsmeRoute
+  '/topics/$slug': typeof LandingTopicsSlugRoute
+  '/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/blog/': typeof LandingBlogIndexRoute
+  '/portfolio/': typeof LandingPortfolioIndexRoute
+  '/skills/': typeof LandingSkillsIndexRoute
+  '/th/topics/$slug': typeof LandingThTopicsSlugRoute
 }
 export interface FileRoutesByTo {
-  '/about': typeof LandingAboutRoute
   '/': typeof LandingIndexRoute
+  '/about': typeof LandingAboutRoute
+  '/build': typeof LandingBuildRoute
+  '/contact': typeof LandingContactRoute
+  '/examples': typeof LandingExamplesRoute
+  '/learn': typeof LandingLearnRoute
+  '/press': typeof LandingPressRoute
+  '/proof': typeof LandingProofRoute
+  '/stack': typeof LandingStackRoute
+  '/design': typeof SystemDesignRoute
+  '/resume': typeof SystemResumeRoute
+  '/blog/$slug': typeof LandingBlogSlugRoute
+  '/portfolio/$slug': typeof LandingPortfolioSlugRoute
+  '/skills/$slug': typeof LandingSkillsSlugRoute
+  '/stock/asme': typeof LandingStockAsmeRoute
+  '/topics/$slug': typeof LandingTopicsSlugRoute
+  '/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/blog': typeof LandingBlogIndexRoute
+  '/portfolio': typeof LandingPortfolioIndexRoute
+  '/skills': typeof LandingSkillsIndexRoute
+  '/th/topics/$slug': typeof LandingThTopicsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_landing': typeof LandingRouteWithChildren
+  '/_system': typeof SystemRouteWithChildren
   '/_landing/about': typeof LandingAboutRoute
+  '/_landing/build': typeof LandingBuildRoute
+  '/_landing/contact': typeof LandingContactRoute
+  '/_landing/examples': typeof LandingExamplesRoute
+  '/_landing/learn': typeof LandingLearnRoute
+  '/_landing/press': typeof LandingPressRoute
+  '/_landing/proof': typeof LandingProofRoute
+  '/_landing/stack': typeof LandingStackRoute
+  '/_system/design': typeof SystemDesignRoute
+  '/_system/resume': typeof SystemResumeRoute
   '/_landing/': typeof LandingIndexRoute
+  '/_landing/blog/$slug': typeof LandingBlogSlugRoute
+  '/_landing/portfolio/$slug': typeof LandingPortfolioSlugRoute
+  '/_landing/skills/$slug': typeof LandingSkillsSlugRoute
+  '/_landing/stock/asme': typeof LandingStockAsmeRoute
+  '/_landing/topics/$slug': typeof LandingTopicsSlugRoute
+  '/_landing/ventures/$slug': typeof LandingVenturesSlugRoute
+  '/_landing/blog/': typeof LandingBlogIndexRoute
+  '/_landing/portfolio/': typeof LandingPortfolioIndexRoute
+  '/_landing/skills/': typeof LandingSkillsIndexRoute
+  '/_landing/th/topics/$slug': typeof LandingThTopicsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/build'
+    | '/contact'
+    | '/examples'
+    | '/learn'
+    | '/press'
+    | '/proof'
+    | '/stack'
+    | '/design'
+    | '/resume'
+    | '/blog/$slug'
+    | '/portfolio/$slug'
+    | '/skills/$slug'
+    | '/stock/asme'
+    | '/topics/$slug'
+    | '/ventures/$slug'
+    | '/blog/'
+    | '/portfolio/'
+    | '/skills/'
+    | '/th/topics/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/'
-  id: '__root__' | '/_landing' | '/_landing/about' | '/_landing/'
+  to:
+    | '/'
+    | '/about'
+    | '/build'
+    | '/contact'
+    | '/examples'
+    | '/learn'
+    | '/press'
+    | '/proof'
+    | '/stack'
+    | '/design'
+    | '/resume'
+    | '/blog/$slug'
+    | '/portfolio/$slug'
+    | '/skills/$slug'
+    | '/stock/asme'
+    | '/topics/$slug'
+    | '/ventures/$slug'
+    | '/blog'
+    | '/portfolio'
+    | '/skills'
+    | '/th/topics/$slug'
+  id:
+    | '__root__'
+    | '/_landing'
+    | '/_system'
+    | '/_landing/about'
+    | '/_landing/build'
+    | '/_landing/contact'
+    | '/_landing/examples'
+    | '/_landing/learn'
+    | '/_landing/press'
+    | '/_landing/proof'
+    | '/_landing/stack'
+    | '/_system/design'
+    | '/_system/resume'
+    | '/_landing/'
+    | '/_landing/blog/$slug'
+    | '/_landing/portfolio/$slug'
+    | '/_landing/skills/$slug'
+    | '/_landing/stock/asme'
+    | '/_landing/topics/$slug'
+    | '/_landing/ventures/$slug'
+    | '/_landing/blog/'
+    | '/_landing/portfolio/'
+    | '/_landing/skills/'
+    | '/_landing/th/topics/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   LandingRoute: typeof LandingRouteWithChildren
+  SystemRoute: typeof SystemRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -61,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof LandingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_system': {
+      id: '/_system'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SystemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_landing/': {
@@ -77,24 +328,205 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingAboutRouteImport
       parentRoute: typeof LandingRoute
     }
+    '/_landing/build': {
+      id: '/_landing/build'
+      path: '/build'
+      fullPath: '/build'
+      preLoaderRoute: typeof LandingBuildRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/contact': {
+      id: '/_landing/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof LandingContactRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/examples': {
+      id: '/_landing/examples'
+      path: '/examples'
+      fullPath: '/examples'
+      preLoaderRoute: typeof LandingExamplesRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/learn': {
+      id: '/_landing/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LandingLearnRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/press': {
+      id: '/_landing/press'
+      path: '/press'
+      fullPath: '/press'
+      preLoaderRoute: typeof LandingPressRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/proof': {
+      id: '/_landing/proof'
+      path: '/proof'
+      fullPath: '/proof'
+      preLoaderRoute: typeof LandingProofRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/stack': {
+      id: '/_landing/stack'
+      path: '/stack'
+      fullPath: '/stack'
+      preLoaderRoute: typeof LandingStackRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_system/design': {
+      id: '/_system/design'
+      path: '/design'
+      fullPath: '/design'
+      preLoaderRoute: typeof SystemDesignRouteImport
+      parentRoute: typeof SystemRoute
+    }
+    '/_system/resume': {
+      id: '/_system/resume'
+      path: '/resume'
+      fullPath: '/resume'
+      preLoaderRoute: typeof SystemResumeRouteImport
+      parentRoute: typeof SystemRoute
+    }
+    '/_landing/blog/': {
+      id: '/_landing/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof LandingBlogIndexRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/blog/$slug': {
+      id: '/_landing/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof LandingBlogSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/portfolio/': {
+      id: '/_landing/portfolio/'
+      path: '/portfolio'
+      fullPath: '/portfolio/'
+      preLoaderRoute: typeof LandingPortfolioIndexRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/portfolio/$slug': {
+      id: '/_landing/portfolio/$slug'
+      path: '/portfolio/$slug'
+      fullPath: '/portfolio/$slug'
+      preLoaderRoute: typeof LandingPortfolioSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/skills/': {
+      id: '/_landing/skills/'
+      path: '/skills'
+      fullPath: '/skills/'
+      preLoaderRoute: typeof LandingSkillsIndexRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/skills/$slug': {
+      id: '/_landing/skills/$slug'
+      path: '/skills/$slug'
+      fullPath: '/skills/$slug'
+      preLoaderRoute: typeof LandingSkillsSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/stock/asme': {
+      id: '/_landing/stock/asme'
+      path: '/stock/asme'
+      fullPath: '/stock/asme'
+      preLoaderRoute: typeof LandingStockAsmeRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/topics/$slug': {
+      id: '/_landing/topics/$slug'
+      path: '/topics/$slug'
+      fullPath: '/topics/$slug'
+      preLoaderRoute: typeof LandingTopicsSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/ventures/$slug': {
+      id: '/_landing/ventures/$slug'
+      path: '/ventures/$slug'
+      fullPath: '/ventures/$slug'
+      preLoaderRoute: typeof LandingVenturesSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/th/topics/$slug': {
+      id: '/_landing/th/topics/$slug'
+      path: '/th/topics/$slug'
+      fullPath: '/th/topics/$slug'
+      preLoaderRoute: typeof LandingThTopicsSlugRouteImport
+      parentRoute: typeof LandingRoute
+    }
   }
 }
 
 interface LandingRouteChildren {
   LandingAboutRoute: typeof LandingAboutRoute
+  LandingBuildRoute: typeof LandingBuildRoute
+  LandingContactRoute: typeof LandingContactRoute
+  LandingExamplesRoute: typeof LandingExamplesRoute
+  LandingLearnRoute: typeof LandingLearnRoute
+  LandingPressRoute: typeof LandingPressRoute
+  LandingProofRoute: typeof LandingProofRoute
+  LandingStackRoute: typeof LandingStackRoute
   LandingIndexRoute: typeof LandingIndexRoute
+  LandingBlogSlugRoute: typeof LandingBlogSlugRoute
+  LandingPortfolioSlugRoute: typeof LandingPortfolioSlugRoute
+  LandingSkillsSlugRoute: typeof LandingSkillsSlugRoute
+  LandingStockAsmeRoute: typeof LandingStockAsmeRoute
+  LandingTopicsSlugRoute: typeof LandingTopicsSlugRoute
+  LandingVenturesSlugRoute: typeof LandingVenturesSlugRoute
+  LandingBlogIndexRoute: typeof LandingBlogIndexRoute
+  LandingPortfolioIndexRoute: typeof LandingPortfolioIndexRoute
+  LandingSkillsIndexRoute: typeof LandingSkillsIndexRoute
+  LandingThTopicsSlugRoute: typeof LandingThTopicsSlugRoute
 }
 
 const LandingRouteChildren: LandingRouteChildren = {
   LandingAboutRoute: LandingAboutRoute,
+  LandingBuildRoute: LandingBuildRoute,
+  LandingContactRoute: LandingContactRoute,
+  LandingExamplesRoute: LandingExamplesRoute,
+  LandingLearnRoute: LandingLearnRoute,
+  LandingPressRoute: LandingPressRoute,
+  LandingProofRoute: LandingProofRoute,
+  LandingStackRoute: LandingStackRoute,
   LandingIndexRoute: LandingIndexRoute,
+  LandingBlogSlugRoute: LandingBlogSlugRoute,
+  LandingPortfolioSlugRoute: LandingPortfolioSlugRoute,
+  LandingSkillsSlugRoute: LandingSkillsSlugRoute,
+  LandingStockAsmeRoute: LandingStockAsmeRoute,
+  LandingTopicsSlugRoute: LandingTopicsSlugRoute,
+  LandingVenturesSlugRoute: LandingVenturesSlugRoute,
+  LandingBlogIndexRoute: LandingBlogIndexRoute,
+  LandingPortfolioIndexRoute: LandingPortfolioIndexRoute,
+  LandingSkillsIndexRoute: LandingSkillsIndexRoute,
+  LandingThTopicsSlugRoute: LandingThTopicsSlugRoute,
 }
 
 const LandingRouteWithChildren =
   LandingRoute._addFileChildren(LandingRouteChildren)
 
+interface SystemRouteChildren {
+  SystemDesignRoute: typeof SystemDesignRoute
+  SystemResumeRoute: typeof SystemResumeRoute
+}
+
+const SystemRouteChildren: SystemRouteChildren = {
+  SystemDesignRoute: SystemDesignRoute,
+  SystemResumeRoute: SystemResumeRoute,
+}
+
+const SystemRouteWithChildren =
+  SystemRoute._addFileChildren(SystemRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   LandingRoute: LandingRouteWithChildren,
+  SystemRoute: SystemRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

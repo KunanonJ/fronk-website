@@ -54,8 +54,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function VentureCasePage({ params }: Props) {
-  const { slug } = await params;
+/** The page body for one slug; shared with the TanStack Start route. */
+export function VentureCasePageView({ slug }: { slug: string }) {
   const venture = getVentureBySlug(slug);
   if (!venture?.caseStudy) notFound();
 
@@ -91,4 +91,9 @@ export default async function VentureCasePage({ params }: Props) {
       />
     </>
   );
+}
+
+export default async function VentureCasePage({ params }: Props) {
+  const { slug } = await params;
+  return <VentureCasePageView slug={slug} />;
 }

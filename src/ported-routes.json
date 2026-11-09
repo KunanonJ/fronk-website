@@ -1,4 +1,236 @@
 [
-  { "path": "/", "test": "home" },
-  { "path": "/about", "test": "about" }
+ {
+  "path": "/",
+  "test": "home"
+ },
+ {
+  "path": "/about",
+  "test": "about"
+ },
+ {
+  "path": "/blog",
+  "test": "blog"
+ },
+ {
+  "path": "/blog/ai-transformation-thailand-smes"
+ },
+ {
+  "path": "/blog/ai-vs-traditional-erp-sea"
+ },
+ {
+  "path": "/blog/ai-workspace-for-smes"
+ },
+ {
+  "path": "/blog/building-tech-startups-bangkok-sea"
+ },
+ {
+  "path": "/blog/cashback-loops"
+ },
+ {
+  "path": "/blog/crm-habits-for-automotive-dealers"
+ },
+ {
+  "path": "/blog/digital-transformation-budget-sme-thailand"
+ },
+ {
+  "path": "/blog/erp-crm-internal-systems-startups"
+ },
+ {
+  "path": "/blog/gogocash-retention-loops"
+ },
+ {
+  "path": "/blog/hello-world"
+ },
+ {
+  "path": "/blog/hiring-builders-in-bangkok"
+ },
+ {
+  "path": "/blog/intelligence-ai-inside-erp"
+ },
+ {
+  "path": "/blog/internal-tools-vs-saas-sprawl"
+ },
+ {
+  "path": "/blog/manut-ai-erp-crm-automotive"
+ },
+ {
+  "path": "/blog/sea-founder-ops-stack-2026"
+ },
+ {
+  "path": "/blog/shipping-from-bangkok"
+ },
+ {
+  "path": "/build",
+  "test": "build"
+ },
+ {
+  "path": "/contact",
+  "test": "contact"
+ },
+ {
+  "path": "/design"
+ },
+ {
+  "path": "/does-not-exist",
+  "seed": false
+ },
+ {
+  "path": "/examples",
+  "test": "examples"
+ },
+ {
+  "path": "/learn",
+  "test": "learn"
+ },
+ {
+  "path": "/portfolio",
+  "test": "portfolio"
+ },
+ {
+  "path": "/portfolio/ai-automation",
+  "test": "portfolio-diagrams"
+ },
+ {
+  "path": "/portfolio/email-signature-generator"
+ },
+ {
+  "path": "/portfolio/node-validator-automation"
+ },
+ {
+  "path": "/portfolio/not-a-project",
+  "seed": false
+ },
+ {
+  "path": "/portfolio/tbh-intranet",
+  "test": "portfolio-project"
+ },
+ {
+  "path": "/press",
+  "test": "press"
+ },
+ {
+  "path": "/proof",
+  "test": "proof"
+ },
+ {
+  "path": "/resume",
+  "test": "resume"
+ },
+ {
+  "path": "/skills",
+  "test": "skills"
+ },
+ {
+  "path": "/skills/code-review"
+ },
+ {
+  "path": "/skills/diagnosing-bugs"
+ },
+ {
+  "path": "/skills/domain-modeling"
+ },
+ {
+  "path": "/skills/gardening"
+ },
+ {
+  "path": "/skills/grill-with-docs"
+ },
+ {
+  "path": "/skills/grilling"
+ },
+ {
+  "path": "/skills/how"
+ },
+ {
+  "path": "/skills/intake-triage"
+ },
+ {
+  "path": "/skills/interrogate"
+ },
+ {
+  "path": "/skills/mistake-to-constraint"
+ },
+ {
+  "path": "/skills/not-a-skill",
+  "seed": false
+ },
+ {
+  "path": "/skills/pr"
+ },
+ {
+  "path": "/skills/sample-review"
+ },
+ {
+  "path": "/skills/steer-miner"
+ },
+ {
+  "path": "/skills/test-driven-development"
+ },
+ {
+  "path": "/skills/ticket-pipeline"
+ },
+ {
+  "path": "/skills/verification-before-completion"
+ },
+ {
+  "path": "/skills/verify-loop",
+  "test": "skill-detail"
+ },
+ {
+  "path": "/skills/workflow-profile"
+ },
+ {
+  "path": "/skills/writing-for-agents"
+ },
+ {
+  "path": "/skills/writing-plans"
+ },
+ {
+  "path": "/stack",
+  "test": "stack"
+ },
+ {
+  "path": "/stock/asme",
+  "seed": false
+ },
+ {
+  "path": "/th/topics/ai-transformation-thailand",
+  "test": "topic-hub-th",
+  "intended": [
+   "htmlLang"
+  ]
+ },
+ {
+  "path": "/th/topics/erp-crm-internal-systems",
+  "intended": [
+   "htmlLang"
+  ]
+ },
+ {
+  "path": "/th/topics/tech-startup-thailand-sea",
+  "intended": [
+   "htmlLang"
+  ]
+ },
+ {
+  "path": "/topics/ai-transformation-thailand",
+  "test": "topic-hub"
+ },
+ {
+  "path": "/topics/erp-crm-internal-systems"
+ },
+ {
+  "path": "/topics/not-a-topic",
+  "seed": false
+ },
+ {
+  "path": "/topics/tech-startup-thailand-sea"
+ },
+ {
+  "path": "/ventures/gogocash",
+  "test": "venture-hub"
+ },
+ {
+  "path": "/ventures/manut"
+ }
 ]

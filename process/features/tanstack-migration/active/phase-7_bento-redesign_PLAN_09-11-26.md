@@ -8,6 +8,7 @@
 ## Scope
 
 - `src/ui`: tokens and motion from the canvas's shared styles (day/night variables, entrance stagger, hover lift, panel pop, reduced-motion off switch); components for the header (share panel, theme toggle, site menu), cards, chips, the share pill and the Bangkok location card with its live GMT+7 clock.
+- Typed search params (Valibot, `validateSearch`) for every redesigned filter: skills stage and origin, press type, examples persona, the English/Thai switch, blog tags.
 - Router `defaultViewTransition` for page changes; the theme switch keeps its circular reveal through the View Transitions API.
 - One route group per PR (landing, hubs, skills, portfolio, system pages, hidden blog/press), each with new Linux visual baselines replacing the parity baselines for that group.
 - Content stays from `lib/content` and Sanity; nothing invented. Press banners need owner-supplied images.

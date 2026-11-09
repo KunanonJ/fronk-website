@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function PortfolioProjectRoute({ params }: Props) {
-  const { slug } = await params;
+/** The page body for one slug; shared with the TanStack Start route. */
+export function PortfolioProjectRouteView({ slug }: { slug: string }) {
   const project = getPortfolioProjectBySlug(slug);
   if (!project) notFound();
 
@@ -50,4 +50,9 @@ export default async function PortfolioProjectRoute({ params }: Props) {
       <PortfolioProjectPage project={project} />
     </>
   );
+}
+
+export default async function PortfolioProjectRoute({ params }: Props) {
+  const { slug } = await params;
+  return <PortfolioProjectRouteView slug={slug} />;
 }

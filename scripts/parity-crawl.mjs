@@ -51,7 +51,9 @@ async function get(path) {
 }
 
 const records = {};
-const queue = new Set([...SEEDS]);
+// Extra seeds (comma-separated paths) for builds that have no sitemap yet.
+const EXTRA = (process.env.PARITY_SEEDS ?? "").split(",").filter(Boolean);
+const queue = new Set([...SEEDS, ...EXTRA]);
 const seen = new Set();
 const assets = new Map(); // normalised path -> real path + query
 

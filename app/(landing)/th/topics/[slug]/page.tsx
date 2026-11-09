@@ -34,8 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ThaiTopicPillarPage({ params }: Props) {
-  const { slug } = await params;
+/** The page body for one slug; shared with the TanStack Start route. */
+export function ThaiTopicPillarPageView({ slug }: { slug: string }) {
   if (!isTopicSlug(slug)) notFound();
   const pillar = getTopicPillar(slug, "th");
   if (!pillar) notFound();
@@ -61,4 +61,9 @@ export default async function ThaiTopicPillarPage({ params }: Props) {
       <TopicHubPage pillar={pillar} />
     </>
   );
+}
+
+export default async function ThaiTopicPillarPage({ params }: Props) {
+  const { slug } = await params;
+  return <ThaiTopicPillarPageView slug={slug} />;
 }

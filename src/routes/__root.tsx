@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import type { ReactNode } from "react";
-import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { HeadContent, Outlet, Scripts, createRootRoute, useRouterState } from "@tanstack/react-router";
 import NotFound from "@/app/not-found";
 import appCss from "@/app/globals.css?url";
 import { Analytics } from "@/components/Analytics";
@@ -51,8 +51,11 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: ReactNode }) {
+  // Thai pages declare Thai on <html> (Next only set it on <main>).
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
   return (
-    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang={lang} className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <HeadContent />
         {themeColors.map((m) => (
