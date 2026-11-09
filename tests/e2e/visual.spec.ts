@@ -2,33 +2,58 @@ import { expect, test } from "@playwright/test";
 import { ROUTES } from "./routes";
 
 /**
- * Full-page visual baseline for every public route. Run with
- * `--update-snapshots` to (re)capture after an intentional redesign phase.
- * Snapshot names are namespaced by project (viewport) automatically.
+ * Full-page visual baselines for every public route, in both themes
+ * (visual-redesign Phase 6). They are the parity reference for the TanStack
+ * Start migration.
  *
- * Reduced motion is forced so the capture is deterministic: the WebGL hero
- * falls back to its static field, the HUD/ticker freeze, and scroll-reveal
- * stays fully visible — otherwise no two runs would match. Baselines are
- * Chromium-only; WebKit/Firefox font rendering differs too much for pixel diffs
- * (those engines are covered behaviorally by smoke.spec).
+ * Baselines are Linux-only, captured in the official Playwright image so CI
+ * and local runs render identically (fonts are self-hosted via next/font):
+ *
+ *   docker run --rm --ipc=host -v "$PWD":/work -w /work \
+ *     mcr.microsoft.com/playwright:v1.64.1-noble \
+ *     npx playwright test visual.spec.ts --project=mobile --project=desktop
+ *
+ * CI runs the same image (the `visual` job). After an intentional visual
+ * change, refresh with `--update-snapshots=changed` and review every image.
+ *
+ * Reduced motion keeps captures deterministic. Chromium only: WebKit and
+ * Firefox rasterise fonts too differently for pixel diffs (smoke.spec covers
+ * them). CMS-driven routes are skipped: an owner edit in Sanity would
+ * otherwise fail unrelated pull requests.
  */
+const CMS_DRIVEN = new Set(["resume", "blog"]);
+const THEMES = ["light", "dark"] as const;
+
 test.skip(
   ({ browserName }) => browserName !== "chromium",
   "visual baselines are captured on Chromium only",
 );
-test.beforeEach(async ({ page }) => {
-  // Deterministic capture: WebGL hero → static field, HUD/ticker freeze,
-  // scroll-reveal stays fully shown — so two runs match pixel-for-pixel.
-  await page.emulateMedia({ reducedMotion: "reduce" });
-});
 
-for (const route of ROUTES) {
-  test(`visual > ${route.name} > matches baseline`, async ({ page }) => {
-    await page.goto(route.path, { waitUntil: "networkidle" });
-    // Settle web fonts so glyph metrics are stable across runs.
-    await page.evaluate(() => document.fonts.ready);
-    await expect(page).toHaveScreenshot(`${route.name}.png`, {
-      fullPage: true,
+for (const theme of THEMES) {
+  test.describe(`visual (${theme})`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.addInitScript((value) => {
+        try {
+          localStorage.setItem("theme", value);
+          sessionStorage.setItem("fronk-intro-seen", "1");
+        } catch {
+          // Storage can be unavailable; the site then uses its default theme.
+        }
+      }, theme);
     });
+
+    for (const route of ROUTES) {
+      test(`${route.name} matches its baseline`, async ({ page }) => {
+        test.skip(CMS_DRIVEN.has(route.name), "content comes from Sanity");
+        await page.goto(route.path, { waitUntil: "networkidle" });
+        await expect(page.locator("html")).toHaveClass(new RegExp(`(^|\\s)${theme}(\\s|$)`));
+        // Settle web fonts so glyph metrics are stable across runs.
+        await page.evaluate(() => document.fonts.ready);
+        await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
+          fullPage: true,
+        });
+      });
+    }
   });
 }

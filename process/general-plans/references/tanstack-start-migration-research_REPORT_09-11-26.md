@@ -101,6 +101,18 @@ See §6. It's filled from the repo inventory.
 | 4 Caching and Sanity | Cache layer with webhook purge, the cron in `src/server.ts`, the Studio decision |
 | 5 Parity and cutover | The parity harness diff is clean; perf budget; switch the Workers route; keep the Next deployment for rollback; then remove Next |
 
+### Parity references (recorded at the end of the redesign, 09-11-26)
+
+Phase 0 of the migration starts from these instead of crawling from scratch:
+- **Head snapshot:** `process/general-plans/references/head-snapshot_09-11-26.json`.
+  - Title, meta, link tags and JSON-LD for all 63 prerendered routes, from a production `next build` of the redesigned site.
+  - Regenerate it with `pnpm build && node scripts/snapshot-heads.mjs`, then build the Start app, snapshot it the same way and diff the two.
+- **Visual baselines:** `tests/e2e/visual.spec.ts-snapshots/`.
+  - Every public route except the CMS-driven `/resume` and `/blog`, at mobile and desktop, in light and dark.
+  - Linux-only, from the pinned Playwright image; the CI `visual` job compares them on every PR.
+- **Behaviour:** `tests/e2e/smoke.spec.ts` and `a11y.spec.ts` (axe in both themes on every route in `tests/e2e/routes.ts`).
+- **Perf:** `scripts/check-first-load-budget.mjs` budgets (200 KB default, 255 KB marketing) and `scripts/ux-probe.mjs` for phone LCP, CLS, text size and target size.
+
 ## 6. Repo inventory (HEAD `a052220`, read-only scan)
 
 ### Size of the Next surface

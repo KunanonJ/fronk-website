@@ -130,9 +130,9 @@ jobs:
 
       # CI=true flips reuseExistingServer off, so Playwright manages its own
       # server via PLAYWRIGHT_WEB_SERVER ("pnpm start" = prod, not dev). The
-      # explicit spec paths exclude the darwin-only visual.spec.ts baselines
-      # (which would fail on Linux); --project=desktop scopes to one Chromium
-      # engine. a11y.spec.ts scans every route in dark and light themes.
+      # explicit spec paths leave visual.spec.ts to the `visual` job below;
+      # --project=desktop scopes to one Chromium engine. a11y.spec.ts scans
+      # every route in dark and light themes.
       - name: Run smoke + a11y e2e (desktop)
         env:
           CI: "true"
@@ -142,3 +142,67 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm exec playwright test smoke.spec.ts a11y.spec.ts --project=desktop
+
+  # Full-page visual baselines (tests/e2e/visual.spec.ts): every public route,
+  # mobile + desktop, light + dark, in the pinned Playwright image so local
+  # Docker runs and CI render identically. Uploads the snapshots and any
+  # diffs as an artifact for review.
+  visual:
+    name: visual
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Sanity manifest
+        uses: actions/cache@v4
+        with:
+          path: |
+            public/studio/static
+            node_modules/.cache/sanity-manifest
+          key: sanity-manifest-${{ hashFiles('sanity/**', 'sanity.config.ts', 'sanity.cli.ts', 'pnpm-lock.yaml') }}
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
+        run: pnpm build
+
+      - name: Visual regression (mobile + desktop, light + dark)
+        env:
+          CI: "true"
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
+        run: pnpm exec playwright test visual.spec.ts --project=mobile --project=desktop --update-snapshots=all
+
+      - name: Upload snapshots and diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-snapshots
+          path: |
+            tests/e2e/visual.spec.ts-snapshots/
+            test-results/
+          retention-days: 7
