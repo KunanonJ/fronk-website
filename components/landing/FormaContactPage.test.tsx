@@ -75,6 +75,8 @@ describe("FormaContactPage", () => {
 
     expect(await screen.findByText(new RegExp(contactMessages.failed))).toBeInTheDocument();
     expect(screen.queryByText(contactPage.successTitle)).not.toBeInTheDocument();
+    // Ember marks the failure, always beside the words.
+    expect(document.querySelector("[aria-live] .bg-ember")).not.toBeNull();
     expect(screen.getByLabelText(contactPage.messagePlaceholder)).toHaveValue(
       "I'd like to talk about Manut AI for our dealership.",
     );

@@ -3,14 +3,10 @@
 import { useEffect, useState } from "react";
 import {
   GITHUB_CONTRIBUTIONS_LOGIN,
-  creamFillForLevel,
+  activityLevelClass,
   emptyContributionCalendar,
   type ContributionCalendar,
 } from "@/lib/github/contributions";
-
-const serif = {
-  fontFamily: "var(--font-instrument-serif), 'Instrument Serif', serif",
-} as const;
 
 function dayTitle(date: string, count: number): string {
   if (!date) return "No data";
@@ -51,19 +47,16 @@ export default function ContributionActivity() {
     <section
       id="activity"
       aria-labelledby="about-activity-heading"
-      className="mt-16 border-t border-primary/10 pt-16 sm:mt-20 sm:pt-20"
+      className="mt-16 border-t border-hairline pt-16 sm:mt-20 sm:pt-20"
     >
-      <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
-        Activity
-      </p>
+      <p className="mb-3 font-mono text-label uppercase text-ink-2">Activity</p>
       <h2
         id="about-activity-heading"
-        className="mb-3 text-3xl font-medium tracking-tight text-primary sm:text-4xl"
-        style={serif}
+        className="mb-3 font-display text-h2 text-ink"
       >
         GitHub year
       </h2>
-      <p className="mb-6 text-sm text-primary/70">
+      <p className="mb-6 text-small text-ink-2">
         {loaded
           ? `${calendar.total.toLocaleString()} contributions · @${GITHUB_CONTRIBUTIONS_LOGIN}`
           : `Loading @${GITHUB_CONTRIBUTIONS_LOGIN}…`}
@@ -85,8 +78,7 @@ export default function ContributionActivity() {
                 return (
                   <span
                     key={`${wi}-${di}`}
-                    className="activity-day block h-[11px] w-[11px] rounded-[3px]"
-                    style={{ backgroundColor: creamFillForLevel(day.level) }}
+                    className={`activity-day block h-[11px] w-[11px] rounded-[3px] ${activityLevelClass(day.level)}`}
                     title={tip}
                     data-tooltip={tip}
                     aria-hidden={!day.date}
@@ -98,14 +90,13 @@ export default function ContributionActivity() {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-primary/70">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-ink-2">
         <div className="flex items-center gap-1.5">
           <span>Less</span>
           {[0, 1, 2, 3, 4].map((level) => (
             <span
               key={level}
-              className="inline-block h-2.5 w-2.5 rounded-[2px]"
-              style={{ backgroundColor: creamFillForLevel(level) }}
+              className={`inline-block h-2.5 w-2.5 rounded-[2px] ${activityLevelClass(level)}`}
               aria-hidden
             />
           ))}
@@ -115,7 +106,7 @@ export default function ContributionActivity() {
           href={`https://github.com/${GITHUB_CONTRIBUTIONS_LOGIN}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary/70 underline-offset-4 transition-colors hover:text-primary hover:underline"
+          className="inline-flex min-h-8 items-center text-link underline-offset-4 hover:underline"
         >
           github.com/{GITHUB_CONTRIBUTIONS_LOGIN}
         </a>
