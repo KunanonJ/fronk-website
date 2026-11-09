@@ -17,6 +17,11 @@ const BENTO_ROUTES: ReadonlySet<string> = new Set([
   "/resume",
   "/skills",
   "/portfolio",
+  "/learn",
+  "/examples",
+  "/stack",
+  "/proof",
+  "/build",
 ]);
 
 /** Route prefixes rebuilt on the canvas layout; each covers its child pages. */

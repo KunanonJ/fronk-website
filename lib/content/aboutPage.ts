@@ -38,7 +38,7 @@ export type AboutPathChip = {
 export type AboutStackItem = {
   name: string;
   detail: string;
-  /** Brand icon key — see StackBrandIcon. */
+  /** Brand icon key (lib/content/stackIcons). */
   icon: StackIconId;
 };
 
