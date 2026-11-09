@@ -1,5 +1,5 @@
 {
-  "entry": ["open-next.config.ts", "workers/revalidate-cron.ts", "scripts/*.mjs"],
+  "entry": ["workers/revalidate-cron.ts", "scripts/*.mjs"],
   "ignore": [".codex/**", ".claude/**", ".agents/**"],
   "ignoreExportsUsedInFile": true
 }
