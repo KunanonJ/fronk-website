@@ -1,9 +1,6 @@
+import { bentoSpan } from "@/components/bento/Bento";
 import { describe, expect, it } from "vitest";
-import {
-  hubSpanClass,
-  splitLead,
-  topicGrid,
-} from "@/components/landing/discovery/hubLayout";
+import { splitLead, topicGrid } from "@/components/landing/discovery/hubLayout";
 
 const lg = (n: number) => {
   const grid = topicGrid(n);
@@ -39,14 +36,14 @@ describe("topicGrid", () => {
   });
 });
 
-describe("hubSpanClass", () => {
+describe("bentoSpan with per-breakpoint spans", () => {
   it("maps spans to the canvas breakpoints", () => {
-    expect(hubSpanClass({ md: 1, lg: 1 })).toBe("");
-    expect(hubSpanClass({ md: 2, lg: 2 })).toBe("min-[641px]:col-span-2");
-    expect(hubSpanClass({ md: 2, lg: 3 })).toBe(
+    expect(bentoSpan({ md: 1, lg: 1 })).toBe("");
+    expect(bentoSpan({ md: 2, lg: 2 })).toBe("min-[641px]:col-span-2");
+    expect(bentoSpan({ md: 2, lg: 3 })).toBe(
       "min-[641px]:col-span-2 lg:col-span-3",
     );
-    expect(hubSpanClass({ md: 2, lg: 1 })).toBe(
+    expect(bentoSpan({ md: 2, lg: 1 })).toBe(
       "min-[641px]:col-span-2 lg:col-span-1",
     );
   });

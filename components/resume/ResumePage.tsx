@@ -20,6 +20,7 @@ import {
 import { resumeHeadline } from "@/lib/resume/view";
 import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
 import { siteConfig } from "@/lib/site";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 const DETAIL_LABELS: Record<ResumeDetail, string> = {
   detailed: "Detailed",
@@ -57,7 +58,7 @@ export default function ResumePage({
         className="flex flex-col gap-6"
       >
         <EyebrowChip>Résumé</EyebrowChip>
-        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+        <PageTitle>
           <span className="block">
             {headline.name}
             {headline.muted ? (
@@ -76,10 +77,8 @@ export default function ResumePage({
           {headline.accent ? (
             <span className="block text-mark"> {headline.accent}</span>
           ) : null}
-        </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {profile.summary ?? RESUME_META.description}
-        </p>
+        </PageTitle>
+        <HeroLead>{profile.summary ?? RESUME_META.description}</HeroLead>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <CtaLink href={RESUME_PDF}>

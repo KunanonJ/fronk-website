@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
-import { Bento, bentoSpan, type BentoSpan } from "@/components/bento/Bento";
+import {
+  Bento,
+  bentoSpan,
+  type BentoSpan,
+  Kicker,
+} from "@/components/bento/Bento";
 import { EyebrowChip } from "@/components/bento/Chips";
 import {
   CARD,
-  Kicker,
-  MONO_LABEL,
   TEXT_LINK,
   WELL,
   countLabel,
@@ -22,6 +25,8 @@ import {
 import type { LearnLang } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { MONO_LABEL } from "@/components/bento/classes";
+import { HeroLead } from "@/components/bento/PageHero";
 
 const LANGS: readonly { id: LearnLang; label: string; code: string }[] = [
   { id: "en", label: "English", code: "EN" },
@@ -402,9 +407,7 @@ export default function LearnPage({
           <span className="text-ink-3">{headline.muted}</span> {headline.rest}{" "}
           <span className="text-mark">{headline.accent}</span>
         </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {learnPage.lede}
-        </p>
+        <HeroLead>{learnPage.lede}</HeroLead>
         <ul
           aria-label="On this page"
           className="m-0 flex list-none flex-wrap gap-2.5 p-0"

@@ -1,17 +1,16 @@
 import Link from "@/components/navigation/Link";
-import { Bento, CardKicker } from "@/components/bento/Bento";
+import {
+  Bento,
+  Kicker,
+  bentoSpan,
+  type BentoSpans,
+} from "@/components/bento/Bento";
 import { EyebrowChip, TechChip } from "@/components/bento/Chips";
 import Image from "@/components/ui/Image";
-import {
-  hubSpanClass,
-  type HubSpan,
-} from "@/components/landing/discovery/hubLayout";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
 import {
   AccessTag,
-  CARD,
   HeroTitle,
-  MONO_LABEL,
 } from "@/components/landing/portfolio/PortfolioParts";
 import { portfolioGrid } from "@/components/landing/portfolio/portfolioLayout";
 import {
@@ -26,6 +25,8 @@ import {
 } from "@/lib/portfolio/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { CARD_SURFACE, MONO_LABEL } from "@/components/bento/classes";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /portfolio (bento redesign, phase 7e; design spec 4.5): the hero, the
@@ -96,7 +97,7 @@ function ProjectCard({
 }: {
   project: PortfolioProject;
   number: number;
-  span: HubSpan;
+  span: BentoSpans;
 }) {
   const nameId = `name-${project.slug}`;
   const shown = project.stack.slice(0, STACK_SHOWN);
@@ -104,12 +105,14 @@ function ProjectCard({
   return (
     <article
       aria-labelledby={nameId}
-      className={cn(CARD, "flex min-w-0 flex-col gap-4", hubSpanClass(span))}
+      className={cn(
+        CARD_SURFACE,
+        "flex min-w-0 flex-col gap-4",
+        bentoSpan(span),
+      )}
     >
       <div className="flex items-center justify-between gap-3">
-        <CardKicker id={`kicker-${project.slug}`}>
-          {project.category}
-        </CardKicker>
+        <Kicker id={`kicker-${project.slug}`}>{project.category}</Kicker>
         <span aria-hidden className="font-mono text-xs text-ink-2">
           {pad2(number)}
         </span>
@@ -183,9 +186,7 @@ export default function PortfolioIndexPage({
       >
         <EyebrowChip>{portfolioPage.eyebrow}</EyebrowChip>
         <HeroTitle lines={portfolioPage.headline} />
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {portfolioPage.description}
-        </p>
+        <HeroLead>{portfolioPage.description}</HeroLead>
       </section>
 
       <section aria-label="Projects" className="flex flex-col gap-5">

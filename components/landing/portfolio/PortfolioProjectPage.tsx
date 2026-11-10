@@ -25,6 +25,7 @@ import {
 } from "@/components/landing/portfolio/ProjectCards";
 import { taglineLines } from "@/components/landing/portfolio/portfolioLayout";
 import { portfolioPage, type PortfolioProject } from "@/lib/content/portfolio";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /portfolio/$slug (bento redesign, phase 7e; design spec 4.6). The canvas
@@ -59,9 +60,7 @@ function ProjectHero({ project }: { project: PortfolioProject }) {
           ...taglineLines(project.tagline),
         ]}
       />
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {project.summary}
-      </p>
+      <HeroLead>{project.summary}</HeroLead>
       {/* The byline names him on every project page (SEO): his role there,
           from the project data, and a link to About. */}
       <p className="m-0 text-card text-ink-2">

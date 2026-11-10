@@ -1,18 +1,12 @@
 import { Fragment, type ReactNode, type SVGProps } from "react";
 import { cn } from "@/lib/utils/cn";
 import type { HeadlineLine, PortfolioProject } from "@/lib/content/portfolio";
+import { PageTitle } from "@/components/bento/PageHero";
 
 /*
  * Pieces the portfolio index and project pages share (bento canvas 4.5,
  * 4.6): the hero h1, the canvas's line icons and the access tag.
  */
-
-/** Bento card shell for cards that lay out their own header row. */
-export const CARD =
-  "relative overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card";
-
-/** Mono uppercase label (12 px, .06em), ink2. */
-export const MONO_LABEL = "m-0 font-mono text-label text-ink-2 uppercase";
 
 /**
  * The hero h1: one block per line, muted words in --muted, the last line in
@@ -20,7 +14,7 @@ export const MONO_LABEL = "m-0 font-mono text-label text-ink-2 uppercase";
  */
 export function HeroTitle({ lines }: { lines: readonly HeadlineLine[] }) {
   return (
-    <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+    <PageTitle>
       {lines.map((line, i) => {
         const accent = i === lines.length - 1;
         return (
@@ -41,7 +35,7 @@ export function HeroTitle({ lines }: { lines: readonly HeadlineLine[] }) {
           </span>
         );
       })}
-    </h1>
+    </PageTitle>
   );
 }
 

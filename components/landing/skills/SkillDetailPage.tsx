@@ -36,6 +36,7 @@ import {
   type SkillStage,
 } from "@/lib/content/skills";
 import { cn } from "@/lib/utils/cn";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /skills/$slug (bento redesign, phase 7d; design spec 4.9). The canvas
@@ -94,9 +95,7 @@ function SkillHero({ skill, stage }: { skill: Skill; stage: SkillStage }) {
           </span>
         </h1>
       </div>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {skill.description}
-      </p>
+      <HeroLead>{skill.description}</HeroLead>
       <p className="m-0 text-card text-ink-2">
         {skill.source ? "Adapted and maintained by" : "Written by"}{" "}
         <Link

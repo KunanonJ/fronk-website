@@ -1,6 +1,7 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Link from "@/components/navigation/Link";
 import { cn } from "@/lib/utils/cn";
+import { CARD_SURFACE } from "@/components/bento/classes";
 
 /*
  * Bento grid and cards (bento canvas, design spec 3.5 and 5). Mobile first:
@@ -35,15 +36,27 @@ export function PageMain({
 
 export type BentoSpan = 1 | 2 | 3;
 
-const SPAN: Record<BentoSpan, string> = {
-  1: "",
-  2: "min-[641px]:col-span-2",
-  3: "min-[641px]:col-span-2 lg:col-span-3",
-};
+/**
+ * A card's column span at two columns (641 px) and at three (1024 px), for
+ * grids that place cards per breakpoint (topic hubs, portfolio).
+ */
+export type BentoSpans = { md: 1 | 2; lg: BentoSpan };
 
-/** Column-span classes for a card in a `Bento` grid. */
-export function bentoSpan(span: BentoSpan): string {
-  return SPAN[span];
+const MD_SPAN = { 1: "", 2: "min-[641px]:col-span-2" } as const;
+const LG_SPAN = {
+  1: "lg:col-span-1",
+  2: "lg:col-span-2",
+  3: "lg:col-span-3",
+} as const;
+
+/**
+ * Column-span classes for a card in a `Bento` grid (one column to 640 px).
+ * A plain span takes two columns at 641 px when it is wider than one.
+ */
+export function bentoSpan(span: BentoSpan | BentoSpans): string {
+  const { md, lg }: BentoSpans =
+    typeof span === "number" ? { md: span === 1 ? 1 : 2, lg: span } : span;
+  return lg === md ? MD_SPAN[md] : cn(MD_SPAN[md], LG_SPAN[lg]);
 }
 
 export function Bento({
@@ -111,21 +124,35 @@ export function BentoRow({
   );
 }
 
-/** Card heading as the canvas kicker: a 13 px pill on the page colour. */
-export function CardKicker({
+/**
+ * Card kicker as a 13 px pill on the page colour. `as` keeps it a heading
+ * when it names the card, or a paragraph when an h2 below does; `marker`
+ * (the square's size and fill classes) puts a square before the text.
+ */
+export function Kicker({
+  as: Tag = "h2",
   id,
+  marker,
+  className,
   children,
 }: {
-  id: string;
+  as?: "h2" | "p";
+  id?: string;
+  marker?: string;
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <h2
+    <Tag
       id={id}
-      className="m-0 self-start rounded-full border border-hairline bg-page px-3 py-[7px] text-meta leading-none font-medium text-ink"
+      className={cn(
+        "m-0 inline-flex items-center gap-2 self-start rounded-full border border-hairline bg-page px-3 py-[7px] text-meta leading-none font-medium text-ink",
+        className,
+      )}
     >
+      {marker ? <span aria-hidden className={cn("shrink-0", marker)} /> : null}
       {children}
-    </h2>
+    </Tag>
   );
 }
 
@@ -193,7 +220,8 @@ export function BentoCard({
     <article
       aria-labelledby={headingId}
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card",
+        CARD_SURFACE,
+        "flex flex-col",
         minHeight && "min-h-[290px]",
         GAP[gap],
         bentoSpan(span),
@@ -201,7 +229,7 @@ export function BentoCard({
       )}
       {...rest}
     >
-      <CardKicker id={headingId}>{title}</CardKicker>
+      <Kicker id={headingId}>{title}</Kicker>
       {children}
     </article>
   );

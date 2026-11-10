@@ -3,6 +3,8 @@ import { EyebrowChip } from "@/components/bento/Chips";
 import type { HeadlineLine } from "@/lib/content/topics/pillars";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { CARD_SURFACE, MONO_LABEL } from "@/components/bento/classes";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /*
  * Shared pieces of the library pages (bento redesign, phase 7f; design spec
@@ -10,12 +12,7 @@ import { pad2 } from "@/lib/utils/pad2";
  */
 
 /** A bento card shell for cards whose header is more than a kicker. */
-export const CARD =
-  "relative flex min-w-0 flex-col overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card";
-
-/** Geist Mono 12 px uppercase label (counts, sources, result lines). */
-export const MONO_LABEL =
-  "m-0 font-mono text-xs tracking-[0.06em] text-ink-2 uppercase";
+export const CARD = `${CARD_SURFACE} flex min-w-0 flex-col`;
 
 /** Inner well inside a card: page fill, hairline, 20 px radius. */
 export const WELL = "rounded-well border border-hairline bg-page";
@@ -33,38 +30,6 @@ export const EXTERNAL = {
 /** "03 tools", "01 ticket". */
 export function countLabel(n: number, one: string, many: string): string {
   return `${pad2(n)} ${n === 1 ? one : many}`;
-}
-
-/**
- * Card kicker as a 13 px pill on the page colour. `as` keeps it a heading
- * when it names the card, or a paragraph when an h2 below does; `marker`
- * (the square's size and fill classes) puts a square before the text.
- */
-export function Kicker({
-  as: Tag = "h2",
-  id,
-  marker,
-  className,
-  children,
-}: {
-  as?: "h2" | "p";
-  id?: string;
-  marker?: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <Tag
-      id={id}
-      className={cn(
-        "m-0 inline-flex items-center gap-2 self-start rounded-full border border-hairline bg-page px-3 py-[7px] text-meta leading-none font-medium text-ink",
-        className,
-      )}
-    >
-      {marker ? <span aria-hidden className={cn("shrink-0", marker)} /> : null}
-      {children}
-    </Tag>
-  );
 }
 
 /** The h1 as the canvas draws it: one block per line, the last in accent. */
@@ -95,7 +60,7 @@ export function LibraryHero({
       className="flex flex-col items-start gap-6"
     >
       <EyebrowChip>{eyebrow}</EyebrowChip>
-      <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+      <PageTitle>
         {headline.lines.map((line, i) => (
           <Fragment key={i}>
             <span className="block">
@@ -112,10 +77,8 @@ export function LibraryHero({
           </Fragment>
         ))}
         <span className="block text-mark">{headline.accent}</span>
-      </h1>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {lede}
-      </p>
+      </PageTitle>
+      <HeroLead>{lede}</HeroLead>
       {children}
     </section>
   );

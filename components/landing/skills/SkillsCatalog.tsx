@@ -1,4 +1,4 @@
-import { CardKicker } from "@/components/bento/Bento";
+import { Kicker } from "@/components/bento/Bento";
 import SkillCard from "@/components/landing/skills/SkillCard";
 import { NOTE } from "@/components/landing/skills/SkillParts";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/lib/content/skills";
 import { matchesSkillFilter, type SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
+import { CARD_SURFACE } from "@/components/bento/classes";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
@@ -22,9 +23,6 @@ const FILTERS: readonly { id: SkillFilter; label: string; count: number }[] = [
   { id: "auto", label: "Runs automatically", count: MODEL_INVOKED_COUNT },
   { id: "user", label: "You invoke", count: USER_INVOKED_COUNT },
 ];
-
-const CARD =
-  "relative overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card";
 
 function skillCount(n: number): string {
   return `${n} ${n === 1 ? "skill" : "skills"}`;
@@ -56,12 +54,12 @@ export default function SkillsCatalog({
         id="catalog"
         aria-labelledby="card-catalog"
         className={cn(
-          CARD,
+          CARD_SURFACE,
           "flex scroll-mt-6 flex-wrap items-center justify-between gap-x-5 gap-y-3.5",
         )}
       >
         <div className="flex flex-col items-start gap-2">
-          <CardKicker id="card-catalog">All {TOTAL} skills</CardKicker>
+          <Kicker id="card-catalog">All {TOTAL} skills</Kicker>
           <p aria-live="polite" className={cn(NOTE, "ml-1")}>
             {show === "all"
               ? `Showing all ${TOTAL} skills`
@@ -110,11 +108,11 @@ export default function SkillsCatalog({
         <article
           key={stage.id}
           aria-labelledby={`stage-${stage.id}`}
-          className={cn(CARD, "flex flex-col gap-[18px]")}
+          className={cn(CARD_SURFACE, "flex flex-col gap-[18px]")}
         >
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5">
             <div className="flex items-center gap-3">
-              <CardKicker id={`stage-${stage.id}`}>{stage.label}</CardKicker>
+              <Kicker id={`stage-${stage.id}`}>{stage.label}</Kicker>
               <span className="font-mono text-xs text-ink-2">
                 {skillCount(skills.length)}
               </span>

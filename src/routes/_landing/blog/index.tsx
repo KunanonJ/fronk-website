@@ -1,3 +1,4 @@
+import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { PageMain } from "@/components/bento/Bento";
@@ -28,9 +29,7 @@ function BlogRoute() {
   const update = (next: { tag?: string; q?: string }) => {
     void navigate({
       search: (prev) => ({ ...prev, ...next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
   return (

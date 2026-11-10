@@ -1,6 +1,7 @@
+import { cn } from "@/lib/utils/cn";
 import {
   Bento,
-  CardKicker,
+  Kicker,
   bentoSpan,
   type BentoSpan,
 } from "@/components/bento/Bento";
@@ -19,6 +20,8 @@ import {
   matchesPressFilter,
   type PressFilter,
 } from "@/lib/press/search";
+import { CARD_SURFACE } from "@/components/bento/classes";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /press (bento canvas Press, design spec 4.19). Hidden: noindex and no
@@ -73,10 +76,14 @@ function PressCard({
   return (
     <article
       aria-labelledby={titleId}
-      className={`relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card ${bentoSpan(span)}`}
+      className={cn(
+        CARD_SURFACE,
+        "flex min-w-0 flex-col gap-4",
+        bentoSpan(span),
+      )}
     >
       <div className="flex items-center justify-between gap-3">
-        <CardKicker id={`press-type-${item.id}`}>{item.source}</CardKicker>
+        <Kicker id={`press-type-${item.id}`}>{item.source}</Kicker>
         <time
           dateTime={item.date}
           className="font-mono text-xs tracking-[0.04em] text-ink-2"
@@ -156,17 +163,15 @@ export default function PressPage({
         className="flex flex-col gap-[22px]"
       >
         <MonoEyebrow>{pressPage.eyebrow}</MonoEyebrow>
-        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+        <PageTitle>
           <span className="block">
             <span className="text-ink-3">{headline.muted}</span>{" "}
             {headline.middle}{" "}
             <span className="text-ink-3">{headline.joiner}</span>
           </span>{" "}
           <span className="block text-mark">{headline.accent}</span>
-        </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {pressPage.lead}
-        </p>
+        </PageTitle>
+        <HeroLead>{pressPage.lead}</HeroLead>
       </section>
 
       <section aria-label="Coverage" className="flex flex-col gap-5">

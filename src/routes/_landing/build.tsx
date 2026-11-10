@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  stripSearchParams,
-  useHydrated,
-} from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { PageMain } from "@/components/bento/Bento";
 import BuildPage from "@/components/landing/library/BuildPage";
 import type { Metadata } from "@/lib/seo/types";
@@ -11,6 +7,7 @@ import {
   buildSearchSchema,
   type BuildFilter,
 } from "@/lib/library/search";
+import { FILTER_NAVIGATION, usePrerenderedParam } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { PAGE_META } from "@/lib/content/pageMeta";
@@ -34,27 +31,21 @@ export const Route = createFileRoute("/_landing/build")({
 });
 
 function BuildRoute() {
-  const { venture } = Route.useSearch();
+  const venture = usePrerenderedParam(
+    Route.useSearch().venture,
+    BUILD_SEARCH_DEFAULTS.venture,
+  );
   const navigate = Route.useNavigate();
-  // /build is prerendered, so one static file answers every ?venture= and its
-  // HTML shows the whole board. Hydrate that same markup, then apply the
-  // filter; client-side navigations are already hydrated and filter at once.
-  const hydrated = useHydrated();
   const setVenture = (next: BuildFilter) => {
     void navigate({
       search: (prev) => ({ ...prev, venture: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 
   return (
     <PageMain>
-      <BuildPage
-        venture={hydrated ? venture : BUILD_SEARCH_DEFAULTS.venture}
-        onVentureChange={setVenture}
-      />
+      <BuildPage venture={venture} onVentureChange={setVenture} />
     </PageMain>
   );
 }

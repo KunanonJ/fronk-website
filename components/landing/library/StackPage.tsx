@@ -1,11 +1,14 @@
-import { Bento, bentoSpan, type BentoSpan } from "@/components/bento/Bento";
+import {
+  Bento,
+  bentoSpan,
+  type BentoSpan,
+  Kicker,
+} from "@/components/bento/Bento";
 import {
   CARD,
   EXTERNAL,
   FilterBar,
-  Kicker,
   LibraryHero,
-  MONO_LABEL,
   TEXT_LINK,
   WELL,
   countLabel,
@@ -20,6 +23,7 @@ import {
 } from "@/lib/content/stack";
 import type { StackFilter, StackGroupId } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
+import { MONO_LABEL } from "@/components/bento/classes";
 
 /** Group markers: ink, accent, outline (decorative; the name carries it). */
 const MARKER: Record<StackGroupId, string> = {

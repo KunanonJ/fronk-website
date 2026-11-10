@@ -1,5 +1,5 @@
 import type { BentoSpan } from "@/components/bento/Bento";
-import type { HubSpan } from "@/components/landing/discovery/hubLayout";
+import type { BentoSpans } from "@/components/bento/Bento";
 import type { HeadlineLine } from "@/lib/content/portfolio";
 
 /*
@@ -15,7 +15,7 @@ import type { HeadlineLine } from "@/lib/content/portfolio";
  * card widens to close a short row. At two columns a wide card takes the
  * row, and a narrow one that would sit alone widens too.
  */
-export function portfolioGrid(count: number): HubSpan[] {
+export function portfolioGrid(count: number): BentoSpans[] {
   if (count <= 0) return [];
   if (count === 1) return [{ md: 2, lg: 3 }];
 

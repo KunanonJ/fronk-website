@@ -38,6 +38,7 @@ import {
 import type { SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
@@ -57,13 +58,13 @@ function SkillsHero() {
           <p className="m-0 rounded-full border border-hairline bg-surface px-3 py-[7px] text-meta leading-none font-medium">
             {skillsPage.eyebrow}
           </p>
-          <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+          <PageTitle>
             <span className="block">
               <span className="text-ink-3">{headline.muted}</span>{" "}
               {headline.rest}
             </span>{" "}
             <span className="block text-mark">{headline.accent}</span>
-          </h1>
+          </PageTitle>
         </div>
         <a
           href={SKILLS_RELEASE_URL}
@@ -79,9 +80,7 @@ function SkillsHero() {
           <ArrowUpRightIcon size={14} />
         </a>
       </div>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {skillsPage.description}
-      </p>
+      <HeroLead>{skillsPage.description}</HeroLead>
       <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
         <div className="flex flex-wrap gap-3">
           <a

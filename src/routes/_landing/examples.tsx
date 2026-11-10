@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  stripSearchParams,
-  useHydrated,
-} from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { PageMain } from "@/components/bento/Bento";
 import ExamplesPage from "@/components/landing/library/ExamplesPage";
 import type { Metadata } from "@/lib/seo/types";
@@ -11,6 +7,7 @@ import {
   examplesSearchSchema,
   type ExamplePersonaId,
 } from "@/lib/library/search";
+import { FILTER_NAVIGATION, usePrerenderedParam } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { PAGE_META } from "@/lib/content/pageMeta";
@@ -34,27 +31,21 @@ export const Route = createFileRoute("/_landing/examples")({
 });
 
 function ExamplesRoute() {
-  const { persona } = Route.useSearch();
+  const persona = usePrerenderedParam(
+    Route.useSearch().persona,
+    EXAMPLES_SEARCH_DEFAULTS.persona,
+  );
   const navigate = Route.useNavigate();
-  // /examples is prerendered, so one static file answers every ?persona= and
-  // its HTML shows the default. Hydrate that same markup, then apply the
-  // param; client-side navigations are already hydrated and apply it at once.
-  const hydrated = useHydrated();
   const setPersona = (next: ExamplePersonaId) => {
     void navigate({
       search: (prev) => ({ ...prev, persona: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 
   return (
     <PageMain>
-      <ExamplesPage
-        persona={hydrated ? persona : EXAMPLES_SEARCH_DEFAULTS.persona}
-        onPersonaChange={setPersona}
-      />
+      <ExamplesPage persona={persona} onPersonaChange={setPersona} />
     </PageMain>
   );
 }

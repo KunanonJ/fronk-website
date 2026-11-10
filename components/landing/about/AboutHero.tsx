@@ -4,6 +4,7 @@ import { ArrowDownIcon } from "@/components/bento/icons";
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { socials } from "@/lib/content/landing";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 const SOCIAL_ICONS = {
   X: XIcon,
@@ -27,7 +28,7 @@ export default function AboutHero() {
         <EyebrowChip>
           {hero.nickname} · {hero.location}
         </EyebrowChip>
-        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+        <PageTitle>
           <span className="block">
             <span className="text-ink-3">{headline.muted}</span> {headline.name}
           </span>{" "}
@@ -36,10 +37,8 @@ export default function AboutHero() {
             <span className="text-ink-3">{headline.joiner}</span>
           </span>{" "}
           <span className="block text-mark">{headline.accent}</span>
-        </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {hero.role}
-        </p>
+        </PageTitle>
+        <HeroLead>{hero.role}</HeroLead>
         <div className="flex flex-wrap items-center gap-3">
           <CtaLink href={hero.primaryCta.href}>{hero.primaryCta.label}</CtaLink>
           <CtaLink href={hero.secondaryCta.href} variant="secondary">

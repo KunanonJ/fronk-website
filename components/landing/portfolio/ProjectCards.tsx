@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "@/components/navigation/Link";
-import { BentoCard, CardKicker, bentoSpan } from "@/components/bento/Bento";
+import { BentoCard, Kicker, bentoSpan } from "@/components/bento/Bento";
 import { TechChip } from "@/components/bento/Chips";
 import Image from "@/components/ui/Image";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
-import {
-  ArrowDownSmallIcon,
-  CARD,
-  MONO_LABEL,
-} from "@/components/landing/portfolio/PortfolioParts";
+import { ArrowDownSmallIcon } from "@/components/landing/portfolio/PortfolioParts";
 import VisualIcon from "@/components/landing/portfolio/VisualIcon";
 import {
   getAdjacentPortfolioProjects,
@@ -19,6 +15,7 @@ import {
 } from "@/lib/content/portfolio";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { CARD_SURFACE, MONO_LABEL } from "@/components/bento/classes";
 
 /*
  * Project page cards (bento canvas, design spec 4.6). Every value comes from
@@ -202,10 +199,10 @@ export function FlowCard({ workflow }: { workflow: PortfolioWorkflow }) {
   return (
     <article
       aria-labelledby="card-flow"
-      className={cn(CARD, "flex flex-col gap-5", bentoSpan(3))}
+      className={cn(CARD_SURFACE, "flex flex-col gap-5", bentoSpan(3))}
     >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <CardKicker id="card-flow">How it works</CardKicker>
+        <Kicker id="card-flow">How it works</Kicker>
         <p className={MONO_LABEL}>{workflow.title}</p>
       </div>
       <div className="relative pt-1" style={line}>
@@ -337,10 +334,10 @@ export function ArchitectureCard({
   return (
     <article
       aria-labelledby="card-arch"
-      className={cn(CARD, "flex flex-col gap-4", bentoSpan(2))}
+      className={cn(CARD_SURFACE, "flex flex-col gap-4", bentoSpan(2))}
     >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <CardKicker id="card-arch">Architecture</CardKicker>
+        <Kicker id="card-arch">Architecture</Kicker>
         <p className={MONO_LABEL}>Top to bottom</p>
       </div>
       <ol
