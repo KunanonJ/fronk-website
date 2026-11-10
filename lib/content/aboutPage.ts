@@ -5,7 +5,7 @@
 
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import type { StackIconId } from "@/lib/content/stackIcons";
-import { PERSON_SUMMARY } from "@/lib/content/identity";
+import { OPEN_TO_ROLES, PERSON_SUMMARY } from "@/lib/content/identity";
 import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type AboutInlineLink = {
@@ -202,14 +202,23 @@ export const aboutPage = {
     paragraphs: [
       {
         spans: [
-          { type: "text", text: "Building " },
+          {
+            type: "text",
+            text: "Leading AI engineering at The Binary Holdings as IT Manager and AI Engineering Lead: ARIA, the intranet's assistant, and agents that keep a person in the loop. More on how I work in ",
+          },
+          {
+            type: "link",
+            text: "AI engineering",
+            href: "/topics/forward-deployed-ai-engineering",
+          },
+          { type: "text", text: ". Building " },
           {
             type: "link",
             text: "GoGoCash",
             href: "https://gogocash.co",
             external: true,
           },
-          { type: "text", text: " as my main focus, with " },
+          { type: "text", text: " and " },
           {
             type: "link",
             text: "Manut AI",
@@ -218,7 +227,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: " as a parallel build. Helping the broader Binary Holdings group run smoother as IT Manager and AI Engineering Lead. Participating in ",
+            text: ` alongside it as a solopreneur. ${OPEN_TO_ROLES.sentence} Participating in `,
           },
           {
             type: "link",

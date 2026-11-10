@@ -82,7 +82,7 @@ export const learnOperatorNotes: readonly LearnLink[] = [
   {
     title: "What I’m doing now",
     description:
-      "GoGoCash, Manut, and operator work from Bangkok — current focus without the fluff.",
+      "AI engineering at The Binary Holdings, plus GoGoCash and Manut AI as a solopreneur, from Bangkok.",
     href: "/about#now",
   },
   {
