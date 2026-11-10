@@ -68,7 +68,12 @@ export function buildLlmsFull(): string {
   for (const v of getAllVentures()) {
     push(`### ${v.name} (${v.year})`, "");
     push(`${base}/ventures/${v.slug} · ${v.url}  `);
-    push(`Role: ${v.role}  `, `Stack: ${v.stack.join(", ")}`, "");
+    push(
+      `Role: ${v.role}  `,
+      ...(v.offer ? [`Pricing: ${v.offer.label}  `] : []),
+      `Stack: ${v.stack.join(", ")}`,
+      "",
+    );
     push(v.description, "");
     for (const m of v.metrics ?? []) push(`- ${m.value} ${m.label}`);
     if (v.metrics?.length) push("");

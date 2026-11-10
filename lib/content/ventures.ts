@@ -20,6 +20,11 @@ export interface Venture {
    * entirely when a venture has no real numbers yet (no fabricated metrics).
    */
   metrics?: readonly { value: string; label: string }[];
+  /**
+   * How people start using it, as the owner stated it (10-11-26). Shown on
+   * the case page and in the SoftwareApplication `offers`.
+   */
+  offer?: VentureOffer;
   featured?: boolean;
   /** Lower sorts earlier in the home featured list (flagship-first). */
   featuredOrder?: number;
@@ -30,6 +35,21 @@ export interface Venture {
    */
   caseStudy?: VentureCaseStudy;
 }
+
+export interface VentureOffer {
+  /** Visible wording, e.g. "Free to start". */
+  label: string;
+  /** schema.org Offer price as a string ("0" for free). */
+  price: string;
+  priceCurrency: string;
+}
+
+/** Owner-confirmed 10-11-26: both products are free to start. */
+const FREE_TO_START: VentureOffer = {
+  label: "Free to start",
+  price: "0",
+  priceCurrency: "THB",
+};
 
 export interface VentureCaseStudy {
   /** Opening paragraph under the case-page header. */
@@ -71,6 +91,7 @@ const VENTURES: readonly Venture[] = [
       { value: "220+", label: "Merchants" },
       { value: "30%", label: "Max cashback" },
     ],
+    offer: FREE_TO_START,
     featured: true,
     featuredOrder: 1,
     caseStudy: {
@@ -109,6 +130,7 @@ const VENTURES: readonly Venture[] = [
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
     logo: "/brand/manut-144.webp",
+    offer: FREE_TO_START,
     featured: true,
     featuredOrder: 2,
     caseStudy: {

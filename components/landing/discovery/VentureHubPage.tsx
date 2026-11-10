@@ -5,7 +5,6 @@ import { EyebrowChip, LivePill } from "@/components/bento/Chips";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
 import type { ShareTarget } from "@/components/bento/ShareRows";
-import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
 import type { HubLink } from "@/components/landing/discovery/LinkRows";
 import {
   AlsoBuildingCard,
@@ -79,22 +78,20 @@ function VentureHero({ venture }: { venture: Venture }) {
           href={venture.url}
           target="_blank"
           rel="noopener noreferrer"
-          data-analytics="venture_outbound_click"
-          data-venture={venture.slug}
           className={ctaClasses()}
         >
           Visit {venture.urlLabel}
           <ArrowUpRightIcon strokeWidth={2} />
         </a>
-        <Link
-          href="/contact"
-          data-analytics="contact_cta_click"
-          data-venture={venture.slug}
-          className={ctaClasses("secondary")}
-        >
+        <Link href="/contact" className={ctaClasses("secondary")}>
           Contact
         </Link>
         <SharePill />
+        {venture.offer ? (
+          <p className="m-0 text-sm font-medium text-ink-2">
+            {venture.offer.label}
+          </p>
+        ) : null}
       </div>
     </section>
   );
@@ -120,7 +117,6 @@ export default function VentureHubPage({
 
   return (
     <PageMain>
-      <DiscoveryAnalytics />
       <VentureHero venture={venture} />
       <Bento dense>
         {venture.metrics && venture.metrics.length > 0 ? (

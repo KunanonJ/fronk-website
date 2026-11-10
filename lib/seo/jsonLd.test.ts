@@ -186,6 +186,26 @@ describe("buildSoftwareApplicationJsonLd > product hub entity", () => {
     expect(String(app["@id"])).toContain("/ventures/manut");
     expect((app.author as Node)["@id"]).toBe(PERSON_ID);
   });
+
+  it("adds an Offer only when one is stated", () => {
+    const base = {
+      name: "Manut AI",
+      description: "ERP/CRM.",
+      url: "https://manut.xyz",
+      pagePath: "/ventures/manut",
+    };
+    expect(buildSoftwareApplicationJsonLd(base).offers).toBeUndefined();
+    const offers = buildSoftwareApplicationJsonLd({
+      ...base,
+      offer: { label: "Free to start", price: "0", priceCurrency: "THB" },
+    }).offers as Node;
+    expect(offers).toMatchObject({
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "THB",
+      description: "Free to start",
+    });
+  });
 });
 
 describe("buildBreadcrumbJsonLd > ordered trail", () => {

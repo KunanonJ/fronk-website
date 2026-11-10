@@ -150,6 +150,7 @@ export async function GET() {
     textLines.push(`- **Tagline:** ${v.tagline}`);
     textLines.push(`- **Role:** ${v.role}`);
     textLines.push(`- **Status:** ${v.status.toUpperCase()}`);
+    if (v.offer) textLines.push(`- **Pricing:** ${v.offer.label}`);
     textLines.push(`- **Stack:** ${v.stack.join(", ")}`);
     textLines.push(`- **Summary:** ${v.description}`);
     textLines.push("");
