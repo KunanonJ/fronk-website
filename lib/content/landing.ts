@@ -136,7 +136,8 @@ export const siteMenu = {
     href: item.href,
     match:
       item.href === "/learn"
-        ? (["/topics/", "/th/topics/"] as readonly string[])
+        ? // Thai hubs (/th/topics/...) match too: isCurrentRow drops the /th.
+          (["/topics/"] as readonly string[])
         : ([] as readonly string[]),
   })),
   cta: navCta,

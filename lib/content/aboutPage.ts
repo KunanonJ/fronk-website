@@ -132,7 +132,7 @@ export const aboutPage = {
         spans: [
           {
             type: "text",
-            text: "My background is technical — I trained as an electrical engineer at Kasetsart University and started my career writing smart contracts at Bitkub and architecting blockchain systems at KK Venture Global. From there I spent several years inside the room where fintech, Web3, and AI products actually get built — as a project manager at ",
+            text: "My background is technical — I trained as an electrical engineer at Kasetsart University and started my career writing smart contracts at Bitkub and building blockchain systems at KK Venture Global. From there I spent several years inside the room where fintech, Web3, and AI products actually get built — as a project manager at ",
           },
           {
             type: "link",

@@ -51,6 +51,9 @@ export default function SiteHeader() {
   return (
     <header
       ref={ref}
+      // Every label in the header, its menu and its share panel is English,
+      // also on the Thai pages, whose <html> says lang="th".
+      lang="en"
       data-site-chrome
       className="kj kj-header relative z-20 flex items-center justify-between gap-4"
     >

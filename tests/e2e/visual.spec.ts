@@ -32,9 +32,12 @@ import { ROUTES } from "./routes";
  * intro is marked as seen so it never covers a capture. Chromium only: WebKit and
  * Firefox rasterise fonts too differently for pixel diffs (smoke.spec covers
  * them). CMS-driven routes are skipped: an owner edit in Sanity would
- * otherwise fail unrelated pull requests.
+ * otherwise fail unrelated pull requests. The résumé is not one of them:
+ * Sanity holds no résumé document, so the page draws the repo's own data
+ * (lib/content/resumeTimeline.fallback.ts). If a document is ever created,
+ * add "resume" back to this set.
  */
-const CMS_DRIVEN = new Set(["resume", "blog"]);
+const CMS_DRIVEN = new Set(["blog"]);
 const THEMES = ["light", "dark"] as const;
 
 /**

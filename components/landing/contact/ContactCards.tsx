@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BentoCard, CardLink } from "@/components/bento/Bento";
+import { BentoCard, CardLink, bentoSpan } from "@/components/bento/Bento";
 import {
   ArrowUpRightIcon,
   CheckIcon,
@@ -183,6 +183,10 @@ export function RecruiterCard() {
       headingId="card-recruiters"
       title={contactPage.recruiterTitle}
       gap={3}
+      // One column beside "Who should write" at three columns. At two
+      // (641 to 1023 px) that card fills its row, so this one takes a full
+      // row too: one column would leave an empty cell beside it.
+      className={bentoSpan({ md: 2, lg: 1 })}
     >
       <RecruiterLines />
       <RecruiterLinks links={contactRecruiterLinks} className="mt-auto" />

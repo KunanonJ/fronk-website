@@ -527,17 +527,34 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       await expect(
         page.getByRole("navigation", { name: "Primary" }),
       ).toBeHidden();
+      // Tap one opens the menu. Tap two is this row: a plain link, on screen.
       await page.getByRole("button", { name: "Open menu" }).click();
-      await page
+      const row = page
         .getByRole("navigation", { name: "Site" })
-        .getByRole("link", { name: "Résumé" })
-        .click();
-      await expect(page).toHaveURL(/\/resume$/);
-      await expect(page.getByRole("heading", { level: 1 })).toContainText(
-        "AI Engineering Lead.",
-      );
+        .getByRole("link", { name: "Résumé" });
+      await expect(row).toBeInViewport();
+      await expect(row).toHaveAttribute("href", "/resume");
     });
   }
+
+  // The tap-through runs once, not once per route. The résumé reads Sanity
+  // on every client navigation, so 23 of these made the suite depend on 23
+  // live requests; one failed run showed "Something went wrong." on each.
+  test("on a phone the menu's Résumé row opens the résumé", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/portfolio", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await page
+      .getByRole("navigation", { name: "Site" })
+      .getByRole("link", { name: "Résumé" })
+      .click();
+    await expect(page).toHaveURL(/\/resume$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "AI Engineering Lead.",
+    );
+  });
 
   test("the header links appear at 1024 px, on one row, and not below it", async ({
     page,
@@ -598,7 +615,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("article", { name: "For recruiters" }),
+      page.getByRole("article", { name: "For recruiters", exact: true }),
     ).toBeVisible();
   });
 
@@ -626,7 +643,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
 
   test("About answers a recruiter in its closing card", async ({ page }) => {
     await page.goto("/about", { waitUntil: "networkidle" });
-    const card = page.getByRole("article", { name: "Next" });
+    const card = page.getByRole("article", { name: "Next", exact: true });
     await expect(
       card.getByRole("heading", { name: "For recruiters" }),
     ).toBeVisible();
@@ -639,6 +656,39 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     ).toHaveAttribute("href", "/contact");
   });
 
+  test("Contact leaves no empty cell beside the recruiter card", async ({
+    page,
+  }) => {
+    // Cards rise into place as they enter; measure them at rest.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/contact", { waitUntil: "networkidle" });
+    const who = page.getByRole("article", {
+      name: "Who should write",
+      exact: true,
+    });
+    const recruiters = page.getByRole("article", {
+      name: "For recruiters",
+      exact: true,
+    });
+    const box = async (card: Locator) => {
+      const found = await card.boundingBox();
+      if (!found) throw new Error("a card has no box");
+      return found;
+    };
+    // Three columns: the two cards share a row.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const wideWho = await box(who);
+    const wideRecruiters = await box(recruiters);
+    expect(Math.abs(wideWho.y - wideRecruiters.y)).toBeLessThan(2);
+    expect(wideRecruiters.x).toBeGreaterThan(wideWho.x + wideWho.width);
+    // Two columns: each takes a whole row, so neither sits beside a gap.
+    await page.setViewportSize({ width: 800, height: 900 });
+    const midWho = await box(who);
+    const midRecruiters = await box(recruiters);
+    expect(midRecruiters.y).toBeGreaterThanOrEqual(midWho.y + midWho.height);
+    expect(Math.abs(midRecruiters.width - midWho.width)).toBeLessThan(2);
+  });
+
   test("an unknown contact topic falls back to the general form without an error", async ({
     page,
   }) => {
@@ -646,6 +696,9 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       waitUntil: "networkidle",
     });
     expect(response?.ok()).toBe(true);
+    await expect(page).toHaveURL(/\/contact$/);
+    // The default is never written into the URL either.
+    await page.goto("/contact?topic=general", { waitUntil: "networkidle" });
     await expect(page).toHaveURL(/\/contact$/);
     await expect(page.getByRole("button", { name: "Hiring" })).toHaveAttribute(
       "aria-pressed",
@@ -703,7 +756,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     page,
   }) => {
     await page.goto("/portfolio/tbh-intranet", { waitUntil: "networkidle" });
-    const card = page.getByRole("article", { name: "Hiring" });
+    const card = page.getByRole("article", { name: "Hiring", exact: true });
     await expect(card.getByRole("link", { name: "Résumé" })).toHaveAttribute(
       "href",
       "/resume",

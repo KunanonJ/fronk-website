@@ -120,7 +120,10 @@ describe("AboutPageContent", () => {
     const pdf = within(next).getByRole("link", { name: "Download PDF →" });
     expect(pdf).toHaveAttribute("href", "/resume.pdf");
     expect(pdf).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
-    const linkedin = within(next).getByRole("link", { name: "LinkedIn →" });
+    // It leaves the site, and says so to a screen reader.
+    const linkedin = within(next).getByRole("link", {
+      name: "LinkedIn → (opens in a new tab)",
+    });
     expect(linkedin).toHaveAttribute(
       "href",
       "https://www.linkedin.com/in/kunanonj",

@@ -62,6 +62,20 @@ describe("llms-full.txt", () => {
     expect(text).not.toContain("/blog/");
     expect(text).not.toContain("/press");
   });
+
+  it("prints the note that explains a concurrent role, and the availability", async () => {
+    const { buildLlmsFull } = await import("./llmsFull");
+    const { RESUME_TIMELINE_FALLBACK } =
+      await import("@/lib/content/resumeTimeline.fallback");
+    const { OPEN_TO_ROLES } = await import("@/lib/content/availability");
+    const text = buildLlmsFull();
+    const notes = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items)
+      .map((item) => item.note)
+      .filter((note): note is string => Boolean(note));
+    expect(notes.length).toBeGreaterThan(0);
+    for (const note of notes) expect(text).toContain(`  - ${note}`);
+    expect(text).toContain(`Availability: ${OPEN_TO_ROLES.sentence}`);
+  });
 });
 
 describe("operating-model.md", () => {

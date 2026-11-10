@@ -60,7 +60,9 @@ export function RecruiterLinks({
             rel="me noopener noreferrer"
             className={LINK}
           >
-            {link.label} →
+            {link.label} →{" "}
+            {/* Last, so the label and its arrow stay one run of text. */}
+            <span className="sr-only">(opens in a new tab)</span>
           </a>
         ) : (
           <CardLink key={link.href} href={link.href}>

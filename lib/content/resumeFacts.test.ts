@@ -1,8 +1,13 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { CURRENT_ROLE, PERSON_SUMMARY } from "@/lib/content/identity";
-import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
+import {
+  RESUME_SKILLS_FALLBACK,
+  RESUME_TIMELINE_FALLBACK,
+} from "@/lib/content/resumeTimeline.fallback";
 import {
   getAllTopicPillars,
   getTopicPillar,
@@ -97,6 +102,24 @@ describe("employers", () => {
     ]);
   });
 
+  it("carry the CV's start and end months", () => {
+    // Checked against the CV on 10-11-26. These periods reach the résumé,
+    // Home, /llms-full.txt and the PDF, so a changed month has to be a
+    // decision made here, not a slip in the data file.
+    expect(roles.map((item) => [item.title, item.period])).toEqual([
+      ["IT Manager & AI Engineering Lead", "Sep 2025 — Present"],
+      ["AI Project Manager", "Jan 2025 — Oct 2025"],
+      ["Advisor", "Nov 2024 — Dec 2024"],
+      ["Technical Project Manager", "Sep 2024 — Dec 2024"],
+      ["Project Manager", "Nov 2023 — Sep 2024"],
+      ["IT Project Manager", "Apr 2023 — Oct 2023"],
+      ["Business Development Executive", "Feb 2023 — Apr 2023"],
+      ["Business System Analyst", "Mar 2022 — Feb 2023"],
+      ["Blockchain Developer", "Feb 2022 — Apr 2022"],
+      ["Smart Contract Intern", "Nov 2021 — Jan 2022"],
+    ]);
+  });
+
   it("names VaporFund only as a launch inside the Playbux role", () => {
     const mentions = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items).filter(
       (item) => JSON.stringify(item).includes("VaporFund"),
@@ -168,6 +191,44 @@ describe("employers", () => {
     ].join(" ");
     expect(prose).toContain("KK Venture Global");
     expect(prose).not.toMatch(/\bFICO\b/);
+  });
+});
+
+/** Every .ts and .tsx source file under a folder, tests left out. */
+function sources(dir: string): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) return sources(path);
+    return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
+  });
+}
+
+describe("the wording rule", () => {
+  it('says "RAG" only where the CV does: the knowledge platform and the skills line', () => {
+    // The CV names RAG twice: in the knowledge-platform bullet of the current
+    // role and in its Core Skills line (checked 10-11-26). The site may say
+    // it in those two places and nowhere else.
+    const files = ["lib", "components", "src"]
+      .flatMap(sources)
+      .filter((file) => /\bRAG\b/.test(readFileSync(file, "utf8")));
+    expect(files).toEqual(["lib/content/resumeTimeline.fallback.ts"]);
+
+    const said = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items).flatMap(
+      (item) => (item.bullets ?? []).filter((bullet) => /\bRAG\b/.test(bullet)),
+    );
+    expect(said).toHaveLength(1);
+    expect(said[0]).toMatch(/knowledge platform/);
+    expect(section("Currently")[0]!.bullets).toContain(said[0]);
+
+    const skilled = RESUME_SKILLS_FALLBACK.filter((group) =>
+      group.items.some((item) => /\bRAG\b/.test(item)),
+    );
+    expect(skilled.map((group) => group.label)).toEqual(["AI & Cloud"]);
+    expect(
+      readFileSync("lib/content/resumeTimeline.fallback.ts", "utf8").match(
+        /\bRAG\b/g,
+      ),
+    ).toHaveLength(2);
   });
 });
 

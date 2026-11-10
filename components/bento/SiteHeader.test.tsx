@@ -213,6 +213,24 @@ describe("isCurrentRow", () => {
       isCurrentRow("/topics/erp-crm-internal-systems", rows[1]!, rows),
     ).toBe(true);
   });
+
+  it("treats a Thai page as its English twin", () => {
+    const rows = [
+      { href: "/topics/forward-deployed-ai-engineering", match: [] },
+      { href: "/learn", match: ["/topics/"] },
+    ];
+    // The Thai FDE hub marks its own row, not the Learn section.
+    const fde = "/th/topics/forward-deployed-ai-engineering";
+    expect(isCurrentRow(fde, rows[0]!, rows)).toBe(true);
+    expect(isCurrentRow(fde, rows[1]!, rows)).toBe(false);
+    // Any other Thai hub still marks Learn.
+    expect(
+      isCurrentRow("/th/topics/tech-startup-thailand-sea", rows[1]!, rows),
+    ).toBe(true);
+    // Only a /th segment is dropped: "/the..." paths are left alone.
+    expect(isCurrentRow("/themes", { href: "/themes", match: [] })).toBe(true);
+    expect(isCurrentRow("/th", { href: "/", match: [] })).toBe(true);
+  });
 });
 
 describe("SiteHeader inline links (1024 px and wider)", () => {
@@ -230,6 +248,14 @@ describe("SiteHeader inline links (1024 px and wider)", () => {
       ["Résumé", "/resume"],
       ["AI engineering", "/topics/forward-deployed-ai-engineering"],
     ]);
+  });
+
+  it("declares its English, for the Thai pages it also sits on", () => {
+    // Thai routes set <html lang="th">; the header's labels are English.
+    renderHeader();
+    const header = primary().closest("header")!;
+    expect(header).toHaveAttribute("lang", "en");
+    expect(header).toContainElement(document.getElementById("site-menu"));
   });
 
   it("shows only at desktop width and keeps the menu as its own landmark", () => {
@@ -252,6 +278,23 @@ describe("SiteHeader inline links (1024 px and wider)", () => {
     // (the tint alone is about 1.1:1 against the page).
     expect(primary().querySelectorAll(".bg-mark")).toHaveLength(1);
     expect(current[0]!.querySelector("[aria-hidden].bg-mark")).not.toBeNull();
+  });
+
+  it("marks AI engineering on the Thai FDE hub, as on the English one", () => {
+    for (const path of [
+      "/topics/forward-deployed-ai-engineering",
+      "/th/topics/forward-deployed-ai-engineering",
+    ]) {
+      location.pathname = path;
+      const { unmount } = renderHeader();
+      expect(
+        [...primary().querySelectorAll("[aria-current]")].map(
+          (a) => a.textContent,
+        ),
+        path,
+      ).toEqual(["AI engineering"]);
+      unmount();
+    }
   });
 
   it("marks the résumé on the résumé page and nothing on Home", () => {

@@ -6,9 +6,14 @@ import {
   OPEN_TO_ROLES,
   RESUME_HREF,
 } from "@/lib/content/availability";
+import { aboutPage } from "@/lib/content/aboutPage";
 import { CONTACT_TOPICS, HIRING_TOPIC } from "@/lib/content/contact";
+import { FAQ_ITEMS } from "@/lib/content/faq";
 import { OPEN_TO_ROLES as FROM_IDENTITY } from "@/lib/content/identity";
-import { getTopicPillar } from "@/lib/content/topics/pillars";
+import {
+  getAllTopicPillars,
+  getTopicPillar,
+} from "@/lib/content/topics/pillars";
 
 /*
  * The availability line is shown on Home, About, the résumé, both FDE hubs,
@@ -33,6 +38,15 @@ describe("availability", () => {
     expect(JSON.stringify(OPEN_TO_ROLES)).not.toMatch(
       /relocat|travel|on-?site/i,
     );
+    // Nor do the pages that speak for him: About, the FAQ and every hub.
+    // (The résumé's "On-site, Bangkok" is where past jobs were, not an offer.)
+    const spoken = JSON.stringify([
+      aboutPage,
+      FAQ_ITEMS,
+      getAllTopicPillars("en"),
+      getAllTopicPillars("th"),
+    ]);
+    expect(spoken).not.toMatch(/relocat|\btravel/i);
   });
 
   it("says the same in Thai, the pill being the sentence split in two", () => {
@@ -49,9 +63,12 @@ describe("availability", () => {
     const en = getTopicPillar("forward-deployed-ai-engineering", "en")!;
     expect(en.availability).toBe(OPEN_TO_ROLES.pill);
     expect(en.proof).toContain(OPEN_TO_ROLES.sentence);
-    expect(
-      getTopicPillar("ai-transformation-thailand", "en")!.availability,
-    ).toBeUndefined();
+    for (const locale of ["en", "th"] as const) {
+      const withPill = getAllTopicPillars(locale)
+        .filter((pillar) => pillar.availability)
+        .map((pillar) => pillar.slug);
+      expect(withPill, locale).toEqual(["forward-deployed-ai-engineering"]);
+    }
   });
 });
 

@@ -14,11 +14,16 @@ import { routeCacheHeaders } from "@/src/lib/cache";
 import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { resumeQuery } from "@/src/queries/content";
+import { routeShareMeta } from "@/lib/seo/routeMeta";
 
+// The share tags are the page's own, so a résumé link pasted into a chat
+// previews as the résumé and not as the homepage. It stays out of search.
 const metadata: Metadata = {
-  title: RESUME_META.title,
-  description: RESUME_META.description,
-  alternates: { canonical: RESUME_META.path },
+  ...routeShareMeta({
+    title: RESUME_META.title,
+    description: RESUME_META.description,
+    path: RESUME_META.path,
+  }),
   robots: { index: false, follow: false },
 };
 

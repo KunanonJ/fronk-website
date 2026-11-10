@@ -25,6 +25,9 @@ describe("ResumePrint", () => {
     expect(screen.getByText(profile.headline)).toBeInTheDocument();
     expect(screen.getByText(OPEN_TO_ROLES.sentence)).toBeInTheDocument();
     expect(screen.getByText(profile.summary)).toBeInTheDocument();
+    // The languages line is the CV's (the owner cleared its figures).
+    expect(profile.languages.length).toBeGreaterThan(0);
+    expect(screen.getByText(profile.languages.join(" | "))).toBeInTheDocument();
   });
 
   it("carries the contact details as real links with readable labels", () => {
@@ -131,6 +134,23 @@ describe("ResumePrint", () => {
     expect(
       screen.getByText("Anthropic Academy").closest("p"),
     ).toHaveTextContent(/Building with the Claude API.* \| May 2026$/);
+  });
+
+  it("prints only the parts a line has, with no bar left over", () => {
+    // An entry from the CMS can lack its period; the repo's data never does.
+    const sections = profile.sections.map((section) =>
+      section.title === "Education"
+        ? {
+            ...section,
+            items: section.items.map((item) => ({ ...item, period: "" })),
+          }
+        : section,
+    );
+    render(<ResumePrint profile={{ ...profile, sections }} />);
+    expect(
+      screen.getByText("Kasetsart University · Bangkok").closest("p")!
+        .textContent,
+    ).toBe("Kasetsart University · Bangkok | B.Eng. Electrical Engineering");
   });
 
   it("lists the skills by group as plain text", () => {

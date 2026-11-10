@@ -228,7 +228,9 @@ describe("ContactPage", () => {
     expect(pdf).toHaveAttribute("href", "/resume.pdf");
     expect(pdf).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
     expect(
-      within(card).getByRole("link", { name: "LinkedIn →" }),
+      within(card).getByRole("link", {
+        name: "LinkedIn → (opens in a new tab)",
+      }),
     ).toHaveAttribute("href", "https://www.linkedin.com/in/kunanonj");
     // Nothing the owner has not approved: no notice period, no visa status.
     expect(card).not.toHaveTextContent(/notice|visa|authori[sz]/i);
@@ -237,9 +239,15 @@ describe("ContactPage", () => {
     const who = screen.getByRole("article", { name: contactPage.whoTitle });
     expect(who.className).toMatch(/col-span-2/);
     expect(who.nextElementSibling).toBe(card);
+    // At two columns it takes the whole row, and one column again at three
+    // (the browser test measures both; these are only the classes).
+    expect(card.className).toMatch(/min-\[641px\]:col-span-2/);
+    expect(card.className).toMatch(/lg:col-span-1/);
     // LinkedIn leaves the site, as it does in the Elsewhere card.
     expect(
-      within(card).getByRole("link", { name: "LinkedIn →" }),
+      within(card).getByRole("link", {
+        name: "LinkedIn → (opens in a new tab)",
+      }),
     ).toHaveAttribute("target", "_blank");
   });
 

@@ -406,7 +406,8 @@
     "path": "/th/topics/erp-crm-internal-systems"
   },
   {
-    "path": "/th/topics/forward-deployed-ai-engineering"
+    "path": "/th/topics/forward-deployed-ai-engineering",
+    "test": "topic-hub-fde-th"
   },
   {
     "path": "/th/topics/tech-startup-thailand-sea",
@@ -428,7 +429,8 @@
     "seed": false
   },
   {
-    "path": "/topics/forward-deployed-ai-engineering"
+    "path": "/topics/forward-deployed-ai-engineering",
+    "test": "topic-hub-fde"
   },
   {
     "path": "/topics/forward-deployed-ai-engineering/opengraph-image",

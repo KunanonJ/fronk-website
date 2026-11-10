@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
@@ -30,6 +31,11 @@ describe("about.md", () => {
     expect(md.startsWith("# About Kunanon Jarat (Fronk)")).toBe(true);
     expect(md).toContain(`Updated: ${SITE_UPDATED}`);
     expect(md).toContain(aboutPage.story.whoIs);
+    // The availability the page shows in its hero, before the story.
+    expect(md.indexOf(OPEN_TO_ROLES.sentence)).toBeGreaterThan(0);
+    expect(md.indexOf(OPEN_TO_ROLES.sentence)).toBeLessThan(
+      md.indexOf(`## ${aboutPage.story.heading}`),
+    );
     const order = [
       aboutPage.story.heading,
       aboutPage.path.heading,

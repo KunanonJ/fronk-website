@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { OPEN_TO_ROLES } from "@/lib/content/identity";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import type {
   ResolvedTimelineItem,
   resolveResumeProfile,
@@ -101,15 +101,21 @@ export function ResumePrint({ profile }: { profile: ResumeProfileView }) {
         .filter((group) => group.kind === "lines")
         .map((group) => (
           <PrintSection key={group.title} title={group.title}>
-            {group.items.map((item) => (
-              <p key={itemKey(item)} className="m-0">
-                <strong className="font-semibold">{item.org}</strong>
-                {" | "}
-                {item.title}
-                {" | "}
-                {printPeriod(item.period)}
-              </p>
-            ))}
+            {group.items.map((item) => {
+              // A CMS entry may lack a part (no period, say): print the
+              // parts there are, with a bar only between two of them.
+              const [first, ...rest] = [
+                item.org,
+                item.title,
+                printPeriod(item.period),
+              ].filter(Boolean);
+              return (
+                <p key={itemKey(item)} className="m-0">
+                  <strong className="font-semibold">{first}</strong>
+                  {rest.map((part) => ` | ${part}`).join("")}
+                </p>
+              );
+            })}
           </PrintSection>
         ))}
     </div>
