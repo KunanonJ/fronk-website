@@ -207,4 +207,5 @@ annotations too: one `mailto:` and the site, LinkedIn and GitHub.
   in `process/general-plans/backlog/backlog.md`, item 1 of
   `process/features/visual-redesign/backlog/open-items_09-11-26.md` is marked
   resolved, and four workspace facts are in `AGENTS.md`.
-- **Next phase:** `../active/phase-2_recruiter-path_PLAN_10-11-26.md`.
+- **Next phase:** `../completed/phase-2_recruiter-path_PLAN_10-11-26.md`
+  (complete).
