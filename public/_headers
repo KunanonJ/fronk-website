@@ -13,3 +13,7 @@
 
 /studio/static/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# The résumé page is noindex; its PDF follows suit.
+/resume.pdf
+  X-Robots-Tag: noindex

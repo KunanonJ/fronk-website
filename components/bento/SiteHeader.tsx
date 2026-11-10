@@ -9,9 +9,8 @@ import SiteMenu from "@/components/bento/SiteMenu";
 import { site } from "@/lib/content/landing";
 import { usePathname } from "@/lib/router/navigation";
 
-/** Share pills elsewhere on the page also control the share panel. */
-const PANEL_TRIGGERS =
-  '[aria-controls="share-panel"], [aria-controls="site-menu"]';
+/** Buttons that open a header panel, including share pills elsewhere on the page. */
+const PANEL_TRIGGERS = "[data-panel-trigger]";
 
 /**
  * Site header (bento canvas, design spec 3.2): the K mark and email on the
@@ -79,8 +78,10 @@ export default function SiteHeader() {
           type="button"
           className={ICON_BUTTON}
           aria-label="Share this page"
+          data-panel-trigger
           aria-expanded={shareOpen}
-          aria-controls="share-panel"
+          // The share panel mounts only while open; point at it only then.
+          aria-controls={shareOpen ? "share-panel" : undefined}
           onClick={(event) => toggle("share", event.currentTarget)}
         >
           <ShareIcon />
@@ -92,6 +93,7 @@ export default function SiteHeader() {
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           aria-controls="site-menu"
+          data-panel-trigger
           onClick={(event) => toggle("menu", event.currentTarget)}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}

@@ -50,10 +50,11 @@ describe("VentureHubPage (GoGoCash, the drawn venture)", () => {
       "data-analytics",
       "contact_cta_click",
     );
-    expect(screen.getByRole("button", { name: "Share" })).toHaveAttribute(
-      "aria-controls",
-      "share-panel",
-    );
+    // The pill opens the shared header panel; aria-controls appears only
+    // while the panel exists.
+    const share = screen.getByRole("button", { name: "Share" });
+    expect(share).toHaveAttribute("data-panel-trigger");
+    expect(share).toHaveAttribute("aria-expanded", "false");
   });
 
   it("shows the published metrics as stat tiles", () => {

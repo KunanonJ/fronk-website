@@ -54,13 +54,18 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
   ref,
 ) {
   const url = toHref(href);
-  const parsed = new URL(url, "http://local");
   // Off-site, protocol and fragment-only links stay plain anchors, as in Next.
-  if (
-    !url.startsWith("/") ||
-    url.startsWith("//") ||
-    DOCUMENT_PATH.test(parsed.pathname)
-  ) {
+  // Checked before parsing: a malformed CMS URL must not throw during render.
+  if (!url.startsWith("/") || url.startsWith("//")) {
+    return <a ref={ref} href={url} {...rest} />;
+  }
+  let parsed: URL;
+  try {
+    parsed = new URL(url, "http://local");
+  } catch {
+    return <a ref={ref} href={url} {...rest} />;
+  }
+  if (DOCUMENT_PATH.test(parsed.pathname)) {
     return <a ref={ref} href={url} {...rest} />;
   }
   const search = parsed.search

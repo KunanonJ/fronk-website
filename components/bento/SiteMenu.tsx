@@ -6,13 +6,24 @@ import { cn } from "@/lib/utils/cn";
 
 type MenuRow = { href: string; match: readonly string[] };
 
-/** True when `pathname` is the row's page or one of its children. */
-export function isCurrentRow(pathname: string, row: MenuRow): boolean {
+/**
+ * True when `pathname` is the row's page or one of its children. A row whose
+ * href is the page itself wins: on a page with its own row (the AI
+ * engineering hub), the section that merely contains it (Learn) stays unmarked.
+ */
+export function isCurrentRow(
+  pathname: string,
+  row: MenuRow,
+  rows: readonly MenuRow[] = [],
+): boolean {
   const path =
     pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname;
   if (row.href === path) return true;
+  if (rows.some((other) => other.href === path)) return false;
   return row.match.some((prefix) => path.startsWith(prefix));
 }
+
+const ALL_ROWS: readonly MenuRow[] = [...siteMenu.rows, ...siteMenu.library];
 
 function Row({
   label,
@@ -25,7 +36,7 @@ function Row({
   pathname: string;
   onNavigate: () => void;
 }) {
-  const current = isCurrentRow(pathname, row);
+  const current = isCurrentRow(pathname, row, ALL_ROWS);
   return (
     <Link
       href={row.href}

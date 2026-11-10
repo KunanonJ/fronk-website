@@ -41,7 +41,7 @@ export function buildOperatingModelMd(): string {
     }
     out.push("");
     out.push(
-      `Shipped: ${stage.evidence.map((e) => `[${e.label}](${base}${e.href})`).join(", ")}`,
+      `Seen in: ${stage.evidence.map((e) => `[${e.label}](${base}${e.href})`).join(", ")}`,
       "",
     );
   });

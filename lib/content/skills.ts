@@ -132,6 +132,8 @@ export const skillsPage = {
     "A skill is a folder of instructions an AI coding agent loads when the task calls for it: how to plan, test, review, or open a pull request. These are the twenty I use, packed as Superstacks, free under the MIT license.",
   metaDescription: PAGE_META.skills.description,
   askAgentPrompt: `Install the Superstacks skills from github.com/${SKILLS_REPO} using the steps in its README.`,
+  /** Named on /skills and every skill page so engines tie the pack to him. */
+  maintainer: { name: "Kunanon Jarat", href: "/about" },
 } as const;
 
 export const SKILL_STAGES: readonly SkillStage[] = [

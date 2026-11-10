@@ -100,6 +100,7 @@ describe("SiteHeader", () => {
       ["Ventures", "/#ventures"],
       ["Portfolio", "/portfolio"],
       ["Skills", "/skills"],
+      ["AI engineering", "/topics/forward-deployed-ai-engineering"],
       ["Learn", "/learn"],
       ["Examples", "/examples"],
       ["Stack", "/stack"],
@@ -194,5 +195,21 @@ describe("isCurrentRow", () => {
       }),
     ).toBe(true);
     expect(isCurrentRow("/skills/", { href: "/skills", match: [] })).toBe(true);
+  });
+});
+
+describe("isCurrentRow", () => {
+  it("marks only the row whose page it is when a section also matches", async () => {
+    const { isCurrentRow } = await import("@/components/bento/SiteMenu");
+    const rows = [
+      { href: "/topics/forward-deployed-ai-engineering", match: [] },
+      { href: "/learn", match: ["/topics/"] },
+    ];
+    const path = "/topics/forward-deployed-ai-engineering";
+    expect(isCurrentRow(path, rows[0]!, rows)).toBe(true);
+    expect(isCurrentRow(path, rows[1]!, rows)).toBe(false);
+    expect(
+      isCurrentRow("/topics/erp-crm-internal-systems", rows[1]!, rows),
+    ).toBe(true);
   });
 });

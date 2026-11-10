@@ -97,7 +97,15 @@ function SkillsHero() {
         <p className="m-0 text-card text-ink-2">
           <span className="font-mono">{TOTAL}</span> skills · MIT license ·{" "}
           <span className="font-mono">{ORIGINAL_COUNT}</span> original,{" "}
-          <span className="font-mono">{ADAPTED_COUNT}</span> adapted
+          <span className="font-mono">{ADAPTED_COUNT}</span> adapted ·
+          maintained by{" "}
+          <Link
+            href={skillsPage.maintainer.href}
+            rel="author"
+            className="font-medium text-ink underline underline-offset-4"
+          >
+            {skillsPage.maintainer.name}
+          </Link>
         </p>
       </div>
     </section>

@@ -89,7 +89,7 @@ export const aboutPage = {
   story: {
     id: "story",
     eyebrow: "Story",
-    heading: "Founder, Bangkok.",
+    heading: "AI engineering lead and founder, Bangkok.",
     /** ~50-word answer block for name queries / AEO (matches FAQ + llms.txt). */
     whoIs: PERSON_SUMMARY,
     paragraphs: [
@@ -251,7 +251,7 @@ export const aboutPage = {
         spans: [
           {
             type: "text",
-            text: "If you're a founder, builder, or operator with an interesting problem in fintech, AI, or Web3 — especially in Southeast Asia — ",
+            text: "If you're a founder, builder, or operator with an interesting problem in fintech, AI, or Web3 — especially in Southeast Asia — or you're hiring for forward deployed or AI engineering roles, ",
           },
           { type: "link", text: "say hello", href: "/contact" },
           { type: "text", text: ". I read everything." },
@@ -396,6 +396,10 @@ export const aboutPage = {
       { label: "Coins / Playbux", detail: "Fintech PM" },
       { label: "Aiden Labs", detail: "AI + tokenomics" },
       { label: "GoGoCash", detail: "Founder · 2023—" },
+      {
+        label: "The Binary Holdings",
+        detail: "AI Engineering Lead · 2025—",
+      },
     ] satisfies readonly AboutPathChip[],
     resumeHref: "/resume",
     resumeLabel: "Full resume",
@@ -415,7 +419,10 @@ export const aboutPage = {
       { label: "Contact", href: "/contact" },
       { label: "Portfolio", href: "/portfolio" },
       { label: "Skills", href: "/skills" },
-      { label: "Ventures", href: "/#ventures" },
+      {
+        label: "AI engineering",
+        href: "/topics/forward-deployed-ai-engineering",
+      },
       { label: "Resume", href: "/resume" },
     ],
   },

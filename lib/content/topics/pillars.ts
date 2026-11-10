@@ -76,7 +76,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is Kunanon Jarat in this space?",
         answer:
-          "Kunanon Jarat (Fronk) is a Bangkok founder building GoGoCash (fintech cashback) and Manut (ERP/CRM with Intelligence AI for automotive SMEs).",
+          "Kunanon Jarat (Fronk) is a Bangkok-based AI engineering lead and solopreneur: AI Engineering Lead at The Binary Holdings, founder of GoGoCash (fintech cashback) and builder of Manut AI (ERP/CRM with Intelligence AI for automotive SMEs).",
       },
       {
         question: "Where should a startup begin?",
@@ -205,7 +205,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is the founder behind KunanonJ?",
         answer:
-          "Kunanon Jarat (Fronk) — Bangkok founder of GoGoCash and Manut AI.",
+          "Kunanon Jarat (Fronk) — Bangkok-based AI Engineering Lead at The Binary Holdings, founder of GoGoCash and builder of Manut AI.",
       },
       {
         question: "What markets do you focus on?",
@@ -215,7 +215,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Where can I read more?",
         answer:
-          "Start with the AI transformation and ERP/CRM hubs, then the blog cluster posts linked from those pages.",
+          "Start with the AI transformation and ERP/CRM hubs, then the venture case pages for GoGoCash and Manut AI.",
       },
     ],
     relatedLinks: [
@@ -334,7 +334,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
       {
         question: "Kunanon Jarat คือใคร?",
         answer:
-          "ผู้ก่อตั้ง GoGoCash และ Manut AI จากกรุงเทพฯ (KunanonJ / Fronk)",
+          "IT Manager & AI Engineering Lead ที่ The Binary Holdings ผู้ก่อตั้ง GoGoCash และผู้สร้าง Manut AI จากกรุงเทพฯ (KunanonJ / Fronk)",
       },
     ],
     relatedLinks: [

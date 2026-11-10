@@ -27,11 +27,15 @@ function loadTurnstile(): Promise<Turnstile> {
     const script = document.createElement("script");
     script.src = SCRIPT_URL;
     script.async = true;
+    // A failed load must not stick: forget it so the next submit retries.
+    const fail = (message: string) => {
+      scriptLoad = null;
+      script.remove();
+      reject(new Error(message));
+    };
     script.onload = () =>
-      window.turnstile
-        ? resolve(window.turnstile)
-        : reject(new Error("turnstile missing"));
-    script.onerror = () => reject(new Error("turnstile failed to load"));
+      window.turnstile ? resolve(window.turnstile) : fail("turnstile missing");
+    script.onerror = () => fail("turnstile failed to load");
     document.head.appendChild(script);
   });
   return scriptLoad;

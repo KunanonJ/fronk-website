@@ -1,7 +1,7 @@
 # Phase 7 design spec: bento canvas to live site
 
 **Created:** 09-11-26
-**Feature:** tanstack-migration (Phase 7, `active/phase-7_bento-redesign_PLAN_09-11-26.md`)
+**Feature:** tanstack-migration (Phase 7, `completed/phase-7_bento-redesign_PLAN_09-11-26.md`)
 **Source:** Design canvas "KunanonJ bento site", https://claude.ai/artifact/X9f4PqkFMM4sxCw3pnDeNu (version `1794224603-99c8`, read 09-11-26).
 **Status:** Reference (read-only extraction). Nothing here is implemented yet.
 

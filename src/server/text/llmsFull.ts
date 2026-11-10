@@ -47,7 +47,7 @@ export function buildLlmsFull(): string {
   push("## Solopreneur operating model", "", operatingModel.intro, "");
   for (const stage of operatingModel.stages) {
     push(
-      `- **${stage.label}.** ${stage.principle} ${stage.practice} Skills: ${stage.skills.join(", ")}. Shipped: ${stage.evidence.map((e) => `${e.label} (${base}${e.href})`).join(", ")}.`,
+      `- **${stage.label}.** ${stage.principle} ${stage.practice} Skills: ${stage.skills.join(", ")}. Seen in: ${stage.evidence.map((e) => `${e.label} (${base}${e.href})`).join(", ")}.`,
     );
   }
   push("", `Reusable version: ${base}/operating-model.md`, "");

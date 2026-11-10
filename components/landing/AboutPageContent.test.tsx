@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AboutPageContent from "@/components/landing/AboutPageContent";
 import ContributionActivity from "@/components/landing/ContributionActivity";
@@ -62,32 +62,30 @@ describe("AboutPageContent", () => {
   it("renders every FAQ answer with text identical to FAQ_ITEMS, only the first open", () => {
     render(<AboutPageContent />);
     const faq = screen.getByRole("article", { name: aboutPage.faq.eyebrow });
-    const buttons = within(faq).getAllByRole("button");
-    expect(buttons).toHaveLength(FAQ_ITEMS.length);
+    const items = faq.querySelectorAll("details");
+    expect(items).toHaveLength(FAQ_ITEMS.length);
     FAQ_ITEMS.forEach((item, i) => {
-      expect(buttons[i]).toHaveTextContent(item.question);
-      const answer = document.getElementById(
-        buttons[i]!.getAttribute("aria-controls")!,
-      )!;
-      // Closed answers stay in the HTML, so the page matches the FAQPage JSON-LD.
+      const details = items[i]!;
+      expect(details.querySelector("summary")).toHaveTextContent(item.question);
+      // Every answer is in the HTML with no hidden attribute, so the page
+      // matches the FAQPage JSON-LD and text extractors read all of them.
+      const answer = details.querySelector("p")!;
       expect(answer).toHaveTextContent(item.answer);
-      expect(buttons[i]).toHaveAttribute("aria-expanded", String(i === 0));
-      expect(answer.hidden).toBe(i !== 0);
+      expect(answer.closest("[hidden]")).toBeNull();
+      expect(details.open).toBe(i === 0);
     });
   });
 
-  it("opens and closes an answer from its question", () => {
+  it("opens an answer from its question (native details)", () => {
     render(<AboutPageContent />);
-    const question = screen.getByRole("button", {
-      name: FAQ_ITEMS[1]!.question,
-    });
-    fireEvent.click(question);
-    expect(question).toHaveAttribute("aria-expanded", "true");
-    expect(
-      document.getElementById(question.getAttribute("aria-controls")!)!.hidden,
-    ).toBe(false);
-    fireEvent.click(question);
-    expect(question).toHaveAttribute("aria-expanded", "false");
+    const faq = screen.getByRole("article", { name: aboutPage.faq.eyebrow });
+    const second = faq.querySelectorAll("details")[1]!;
+    expect(second.open).toBe(false);
+    second.open = true;
+    expect(second.open).toBe(true);
+    expect(second.querySelector("summary h4")).toHaveTextContent(
+      FAQ_ITEMS[1]!.question,
+    );
   });
 
   it("leads the Next card with an ink Contact button", () => {

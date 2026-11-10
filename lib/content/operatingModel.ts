@@ -25,9 +25,9 @@ export type OperatingStage = {
 
 export const operatingModel = {
   eyebrow: "Solopreneur",
-  heading: "How I ship, solo.",
+  heading: "How I ship.",
   intro:
-    "One person can take a product from idea to production when every stage has a principle, a repeatable skill and a check. These are the stages, the agent skills that run them, and the work that shows each one.",
+    "One person can take a product from idea to production when every stage has a principle, a repeatable skill and a check. I run this loop solo on GoGoCash and Manut AI, and inside teams at The Binary Holdings. These are the stages, the agent skills that run them, and work where each one shows.",
   markdownHref: "/operating-model.md",
   stages: [
     {
@@ -55,7 +55,7 @@ export const operatingModel = {
       skills: ["verify-loop", "test-driven-development", "diagnosing-bugs"],
       evidence: [
         { label: "TBH Intranet", href: "/portfolio/tbh-intranet" },
-        { label: "AI Automation", href: "/portfolio/ai-automation" },
+        { label: "AI Automation (team)", href: "/portfolio/ai-automation" },
       ],
     },
     {
