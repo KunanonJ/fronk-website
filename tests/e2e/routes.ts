@@ -13,7 +13,8 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/",
     name: "home",
-    expectsHeadingPattern: /fintech and AI|Ventures|Selected work/i,
+    expectsHeadingPattern:
+      /Forward deployed AI engineering|Ventures|Selected work/i,
   },
   {
     path: "/about",
@@ -113,6 +114,13 @@ export const ROUTES: readonly RouteUnderTest[] = [
     path: "/topics/forward-deployed-ai-engineering",
     name: "topic-hub-fde",
     expectsHeadingPattern: /Forward deployed/i,
+  },
+  {
+    // The Thai FDE hub: two sections, with the availability pill and the
+    // hiring buttons in Thai (recruiter-fit phase 2).
+    path: "/th/topics/forward-deployed-ai-engineering",
+    name: "topic-hub-fde-th",
+    expectsHeadingPattern: /\S/,
   },
   {
     path: "/th/topics/ai-transformation-thailand",

@@ -5,7 +5,7 @@ export type ExperienceEntry = { title: string; meta: string };
 /** Short titles take the company ("Founder, GoGoCash") when both fit. */
 const COMBINED_TITLE_MAX = 32;
 
-/** "Nov 2025 — Present" -> "Nov 2025 – Present"; "Jan 2025 — Oct 2025" -> "Jan – Oct 2025". */
+/** "Sep 2025 — Present" -> "Sep 2025 – Present"; "Jan 2025 — Oct 2025" -> "Jan – Oct 2025". */
 export function compactPeriod(period: string): string {
   const [from = "", to = ""] = period.split(/\s+[—–-]\s+/);
   if (!to) return period.trim();

@@ -5,18 +5,21 @@ import { useChrome } from "@/components/bento/ChromeContext";
 import { ICON_BUTTON } from "@/components/bento/classes";
 import { CloseIcon, MenuIcon, ShareIcon } from "@/components/bento/icons";
 import SharePanel from "@/components/bento/SharePanel";
-import SiteMenu from "@/components/bento/SiteMenu";
-import { site } from "@/lib/content/landing";
+import SiteMenu, { isCurrentRow } from "@/components/bento/SiteMenu";
+import { headerLinks, site } from "@/lib/content/landing";
 import { usePathname } from "@/lib/router/navigation";
+import { cn } from "@/lib/utils/cn";
 
 /** Buttons that open a header panel, including share pills elsewhere on the page. */
 const PANEL_TRIGGERS = "[data-panel-trigger]";
 
 /**
  * Site header (bento canvas, design spec 3.2): the K mark and email on the
- * left; share, theme and menu buttons on the right. One panel opens at a
- * time. Escape closes it and returns focus to its button; a click outside
- * the header closes it; navigating closes it.
+ * left; share, theme and menu buttons on the right. At 1024 px and wider,
+ * three text links sit before the buttons (owner, 10-11-26): the work, the
+ * résumé and the AI engineering page, one click from anywhere. One panel
+ * opens at a time. Escape closes it and returns focus to its button; a click
+ * outside the header closes it; navigating closes it.
  */
 export default function SiteHeader() {
   const { panel, toggle, close } = useChrome();
@@ -48,6 +51,10 @@ export default function SiteHeader() {
   return (
     <header
       ref={ref}
+      // The header's own labels, its menu and its share rows are English,
+      // also on the Thai pages, whose <html> says lang="th". The share
+      // panel's title is the page's, and keeps the page's language.
+      lang="en"
       data-site-chrome
       className="kj kj-header relative z-20 flex items-center justify-between gap-4"
     >
@@ -74,6 +81,36 @@ export default function SiteHeader() {
       </div>
 
       <div className="flex items-center gap-2">
+        {/* "Primary", beside the menu's "Site": two landmarks, two names. */}
+        <nav
+          aria-label="Primary"
+          className="mr-1 hidden items-center gap-0.5 lg:flex"
+        >
+          {headerLinks.map((link) => {
+            const current = isCurrentRow(pathname, link, headerLinks);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={current ? "page" : undefined}
+                className={cn(
+                  "kj-row relative inline-flex min-h-11 items-center rounded-full px-3.5 text-card font-medium whitespace-nowrap text-ink no-underline",
+                  current && "bg-surface-tint",
+                )}
+              >
+                {link.label}
+                {/* The tint alone is faint: the mark's square says "here",
+                    under the label so no link moves when it appears. */}
+                {current ? (
+                  <span
+                    aria-hidden
+                    className="absolute bottom-[7px] left-1/2 size-[5px] -translate-x-1/2 bg-mark"
+                  />
+                ) : null}
+              </Link>
+            );
+          })}
+        </nav>
         <button
           type="button"
           className={ICON_BUTTON}

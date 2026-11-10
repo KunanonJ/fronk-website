@@ -9,6 +9,7 @@ import {
 } from "@/components/bento/Bento";
 import { CtaLink, GlassLink } from "@/components/bento/Buttons";
 import {
+  AvailabilityPill,
   EyebrowChip,
   LivePill,
   MetaTag,
@@ -66,6 +67,22 @@ describe("chips and buttons", () => {
     expect(
       screen.getByText("· Building GoGoCash and Manut AI"),
     ).toBeInTheDocument();
+  });
+
+  it("marks availability with the accent square and lets the pill wrap", () => {
+    const { container } = render(
+      <AvailabilityPill label="Open to roles" detail="Somewhere or remote" />,
+    );
+    const pill = container.querySelector("p")!;
+    expect(pill).toHaveTextContent("Open to roles · Somewhere or remote");
+    const marker = pill.querySelector("[aria-hidden]")!;
+    expect(marker.className).toMatch(/bg-mark/);
+    expect(marker.className).not.toMatch(/bg-ember|kj-live/);
+    // Two lines on a phone: a fixed radius, never a full pill, and room to shrink.
+    expect(pill.className).not.toMatch(
+      /rounded-full|leading-none|whitespace-nowrap/,
+    );
+    expect(pill.className).toMatch(/max-w-full/);
   });
 
   it("renders eyebrow, meta and tech chips with decorative markers only", () => {

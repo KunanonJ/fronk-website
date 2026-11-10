@@ -9,6 +9,8 @@
  * would sit in the future for crawlers.
  *
  * 2026-11-10: the bento redesign (Phase 7) finished and the FDE positioning
- * pass (EO-1 to EO-3) and the final review fixes shipped.
+ * pass (EO-1 to EO-3) and the final review fixes shipped. Same day: career
+ * facts synced to the owner's CV (recruiter-fit phase 1), then the recruiter
+ * path: the role-first Home hero and the hiring contact (phase 2).
  */
 export const SITE_UPDATED = "2026-11-10";

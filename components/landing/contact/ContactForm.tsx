@@ -1,11 +1,19 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { revalidateLogic, useForm } from "@tanstack/react-form";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { BentoCard } from "@/components/bento/Bento";
 import { ctaClasses } from "@/components/bento/Buttons";
 import { CheckIcon } from "@/components/bento/icons";
+import type { ContactIntent } from "@/lib/contact/search";
 import {
   CONTACT_LIMITS,
   CONTACT_TOPICS,
+  HIRING_TOPIC,
   contactMessages,
   contactPage,
 } from "@/lib/content/contact";
@@ -104,8 +112,17 @@ function invalidProps(id: string, error?: string) {
  * - Failed: the server's message (not connected, rate limited, spam check,
  *   too large, or failed) with the email address as a fallback; the
  *   visitor's text stays in the form.
+ * - Intent: `hiring` (from `/contact?topic=hiring`) chooses the Hiring topic
+ *   on arrival and again after "Send another message". It only ever adds
+ *   the topic: the chips stay the visitor's to change.
+ * - Prompt: the message label follows the Hiring chip, not the URL, so it
+ *   asks about the role exactly while Hiring is chosen.
  */
-export default function ContactForm() {
+export default function ContactForm({
+  intent = "general",
+}: {
+  intent?: ContactIntent;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const mountedAt = useRef<number | null>(null);
@@ -179,6 +196,23 @@ export default function ContactForm() {
     },
   });
 
+  // The page is prerendered with the general form, so the intent arrives
+  // after hydration: choose Hiring then, without touching other choices.
+  const hiring = intent === "hiring";
+  const chooseHiring = useCallback(() => {
+    form.setFieldValue("topics", (topics) =>
+      topics.includes(HIRING_TOPIC) ? topics : [HIRING_TOPIC, ...topics],
+    );
+  }, [form]);
+  useEffect(() => {
+    if (hiring) chooseHiring();
+  }, [hiring, chooseHiring]);
+
+  // What the message field asks follows the chip the visitor sees pressed.
+  const hiringChosen = useStore(form.store, (state) =>
+    state.values.topics.includes(HIRING_TOPIC),
+  );
+
   const sending = status === "sending";
 
   return (
@@ -216,6 +250,8 @@ export default function ContactForm() {
             type="button"
             onClick={() => {
               form.reset();
+              // A recruiter who writes again is still a recruiter.
+              if (hiring) chooseHiring();
               setError("");
               focusNameNext.current = true;
               setStatus("idle");
@@ -301,7 +337,11 @@ export default function ContactForm() {
               return (
                 <Field
                   id="contact-message"
-                  label={contactPage.messagePlaceholder}
+                  label={
+                    hiringChosen
+                      ? contactPage.hiringPlaceholder
+                      : contactPage.messagePlaceholder
+                  }
                   error={fieldError}
                 >
                   <textarea

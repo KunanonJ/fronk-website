@@ -1,5 +1,10 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
-import { OPEN_TO_ROLES, PERSON_CUSTOMER_WORK } from "@/lib/content/identity";
+import { HIRING_CONTACT_HREF, RESUME_HREF } from "@/lib/content/availability";
+import {
+  CURRENT_ROLE,
+  OPEN_TO_ROLES,
+  PERSON_CUSTOMER_WORK,
+} from "@/lib/content/identity";
 
 /** Skills in the Superstacks pack (pillars.test.ts checks it against the snapshot). */
 export const SUPERSTACKS_SKILL_COUNT = 20;
@@ -32,6 +37,10 @@ export type TopicPillar = {
   relatedLinks: readonly { label: string; href: string }[];
   ctaLabel: string;
   ctaHref: string;
+  /** A pill in the hero saying who he is open to hearing from (the FDE hub). */
+  availability?: { readonly label: string; readonly detail: string };
+  /** A second button beside the CTA: the résumé, on the FDE hub. */
+  secondaryCta?: { readonly label: string; readonly href: string };
 };
 
 const EN_PILLARS: readonly TopicPillar[] = [
@@ -265,7 +274,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      "IT Manager & AI Engineering Lead at The Binary Holdings since November 2025",
+      `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}`,
       `Superstacks: ${SUPERSTACKS_SKILL_COUNT} MIT-licensed agent skills for Claude Code, Codex and Cursor`,
       OPEN_TO_ROLES.sentence,
     ],
@@ -288,11 +297,15 @@ const EN_PILLARS: readonly TopicPillar[] = [
     relatedLinks: [
       { label: "AI Automation", href: "/portfolio/ai-automation" },
       { label: "TBH Intranet", href: "/portfolio/tbh-intranet" },
+      { label: "Résumé", href: RESUME_HREF },
       { label: "Agent skills", href: "/skills" },
       { label: "About", href: "/about" },
     ],
     ctaLabel: "Contact",
-    ctaHref: "/contact",
+    // The page a recruiter lands on: its buttons open the hiring path.
+    ctaHref: HIRING_CONTACT_HREF,
+    availability: OPEN_TO_ROLES.pill,
+    secondaryCta: { label: "Résumé", href: RESUME_HREF },
   },
 ];
 
@@ -439,8 +452,8 @@ const TH_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      "IT Manager & AI Engineering Lead ที่ The Binary Holdings ตั้งแต่พฤศจิกายน 2025",
-      "เปิดรับตำแหน่ง Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+      `${CURRENT_ROLE.title} ที่ ${CURRENT_ROLE.organization} ตั้งแต่${CURRENT_ROLE.sinceThai}`,
+      OPEN_TO_ROLES.th.sentence,
     ],
     faqs: [
       {
@@ -454,10 +467,13 @@ const TH_PILLARS: readonly TopicPillar[] = [
         label: "English version",
         href: "/topics/forward-deployed-ai-engineering",
       },
+      { label: "เรซูเม่", href: RESUME_HREF },
       { label: "เกี่ยวกับ", href: "/about" },
     ],
     ctaLabel: "ติดต่อ",
-    ctaHref: "/contact",
+    ctaHref: HIRING_CONTACT_HREF,
+    availability: OPEN_TO_ROLES.th.pill,
+    secondaryCta: { label: "เรซูเม่", href: RESUME_HREF },
   },
 ];
 

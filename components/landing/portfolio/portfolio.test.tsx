@@ -306,3 +306,33 @@ describe("PortfolioProjectPage (the projects the canvas does not draw)", () => {
     ).not.toMatch(/sr-only/);
   });
 });
+
+describe("PortfolioProjectPage (where a hiring reader goes next)", () => {
+  it.each([
+    "tbh-intranet",
+    "ai-automation",
+    "node-validator-automation",
+    "email-signature-generator",
+  ])(
+    "closes %s with the availability, the résumé and the hiring contact",
+    (slug) => {
+      renderProject(slug);
+      const card = screen.getByRole("article", { name: "Hiring" });
+      expect(within(card).getByRole("heading", { level: 3 })).toHaveTextContent(
+        "Want work like this on your team?",
+      );
+      expect(card).toHaveTextContent(
+        "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
+      );
+      const resume = within(card).getByRole("link", { name: "Résumé" });
+      expect(resume).toHaveAttribute("href", "/resume");
+      expect(resume.className).toMatch(/bg-cta/);
+      expect(
+        within(card).getByRole("link", { name: "Contact" }),
+      ).toHaveAttribute("href", "/contact?topic=hiring");
+      // After the case study's cards, and not one of the grid's cells.
+      expect(card.previousElementSibling?.className).toMatch(/(^| )bento( |$)/);
+      expect(card.closest(".bento")).toBeNull();
+    },
+  );
+});

@@ -733,4 +733,8 @@ The authoritative historical source remains:
 - Landing content is static in `lib/content/landing.ts`; blog/editorial via hosted Sanity Studio at `https://fronk-website.sanity.studio/` (`/studio` on-site is a launcher only); Learn/topic hubs are code-driven (`lib/content/learn.ts`); portrait at `public/profile.jpg`
 - Public contact email is fronk.kunanon@gmail.com; the site lists two ventures, GoGoCash and Manut AI (Airplusauto dropped by the owner on 09-11-26); landing socials omit Telegram
 - Bangkok is the site location signal; wordmark KunanonJ
-- Reference Prisma Vite prototype lives at sibling `/Users/kunanonjarat/Developer/prisma-landing`
+- Active program: `process/features/recruiter-fit/` (fit the site for recruiters hiring Forward Deployed Engineers and AI engineers; phase 1 complete 10-11-26, phases 2 and 3 in `active/`)
+- Career facts follow the owner's CV. `lib/content/currentRole.ts` and `lib/content/resumeTimeline.fallback.ts` are what production renders (Sanity has no `resumeProfile` document); `/llms-full.txt` prints every résumé bullet; `lib/content/resumeFacts.test.ts` keeps the résumé, the identity summary, both FDE hubs, About and the FAQ on one set of facts. Check Thai strings as well as English
+- The printed résumé (`components/resume/ResumePrint.tsx`) must stay plain: no opacity, no letter-spacing, a static system font, no decorative text. `pnpm pdf` needs the production build and refuses a PDF over two pages; read the PDF's text layer back after any layout change
+- Visual baselines tolerate 1% of pixels, so a passing suite does not mean current baselines. To refresh them from a Mac, copy the repo into `mcr.microsoft.com/playwright:v1.64.1-noble`, install and build there (the host `node_modules` are macOS builds), re-render with `--update-snapshots=all` and copy back the pages that changed
+- Reference Prisma Vite prototype lives in a sibling local checkout named `prisma-landing`

@@ -12,18 +12,12 @@
 export const COMPANY_LOGOS: Readonly<Record<string, string>> = {
   "3bb.co.th": "/brand/companies/3bb.webp",
   "bitkub.com": "/brand/companies/bitkub.webp",
-  "buffalo.edu": "/brand/companies/buffalo.webp",
   "coins.co.th": "/brand/companies/coins.webp",
-  "fico.com": "/brand/companies/fico.webp",
   "gogocash.co": "/brand/gogocash.svg",
   "ku.ac.th": "/brand/companies/kasetsart.webp",
   "manut.xyz": "/brand/manut-144.webp",
-  "moralis.io": "/brand/companies/moralis.webp",
   "playbux.co": "/brand/companies/playbux.webp",
   "ted.com": "/brand/companies/ted.webp",
-  "themonkstudios.com": "/brand/companies/the-monk-studios.webp",
-  "udemy.com": "/brand/companies/udemy.webp",
-  "vaporfund.com": "/brand/companies/vaporfund.webp",
 };
 
 /** The local logo path for a company domain, if one is self-hosted. */

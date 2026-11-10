@@ -10,7 +10,17 @@ export type TopicGrid = {
   sections: readonly BentoSpans[];
   proof: BentoSpans;
   faq: BentoSpans;
+  /**
+   * True when the sections sit two by two in their own full-width row
+   * instead of taking grid cells. `sections` is then empty.
+   */
+  paired: boolean;
 };
+
+/** An even number of sections from four up is set in pairs. */
+function pairsSections(sectionCount: number): boolean {
+  return sectionCount >= 4 && sectionCount % 2 === 0;
+}
 
 /**
  * Spans for a topic hub's cards. At three columns the first section leads at
@@ -20,15 +30,23 @@ export type TopicGrid = {
  * (TH) give s1 2 | s2, proof | FAQ 2, as the canvas draws them. At two
  * columns a one-cell card that would sit alone before a full-width card (or
  * at the end) widens to fill its row.
+ *
+ * Four sections (the FDE hub, which the canvas does not draw) would give
+ * s1 2 | s2: a short lead card stretched beside a long one, with an empty
+ * band above its number. They are set as two equal pairs instead, each card
+ * beside one of similar length, and Operator proof and the FAQ then share a
+ * row as with no sections: proof | FAQ 2.
  */
 export function topicGrid(sectionCount: number): TopicGrid {
+  const paired = pairsSections(sectionCount);
+  const cells = paired ? 0 : sectionCount;
   const lg: BentoSpan[] = [];
   let used = 0;
   const place = (span: BentoSpan) => {
     lg.push(span);
     used = (used + span) % 3;
   };
-  for (let i = 0; i < sectionCount; i += 1) place(i === 0 ? 2 : 1);
+  for (let i = 0; i < cells; i += 1) place(i === 0 ? 2 : 1);
   place(used === 0 ? 1 : ((3 - used) as BentoSpan));
   place((3 - used) as BentoSpan);
 
@@ -41,9 +59,10 @@ export function topicGrid(sectionCount: number): TopicGrid {
 
   const spans = lg.map((span, i): BentoSpans => ({ md: md[i], lg: span }));
   return {
-    sections: spans.slice(0, sectionCount),
-    proof: spans[sectionCount],
-    faq: spans[sectionCount + 1],
+    sections: spans.slice(0, cells),
+    proof: spans[cells],
+    faq: spans[cells + 1],
+    paired,
   };
 }
 

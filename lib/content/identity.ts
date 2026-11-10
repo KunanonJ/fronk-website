@@ -11,6 +11,11 @@
  * Never add a claim here that the repo or the owner has not provided.
  */
 
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { CURRENT_ROLE } from "@/lib/content/currentRole";
+
+export { CURRENT_ROLE };
+
 export const PERSON_NAME = "Kunanon Jarat";
 
 /** Names people and AI engines use for him. */
@@ -28,8 +33,7 @@ export const PERSON_HEADLINE =
  * The canonical who-is summary (about 60 words). Leads with the AI role, then
  * the ventures; the Manut wording is the owner-confirmed one.
  */
-export const PERSON_SUMMARY =
-  "Kunanon Jarat (Fronk / KunanonJ) is a Bangkok-based AI engineering lead and solopreneur. As IT Manager & AI Engineering Lead at The Binary Holdings since November 2025, he leads internal AI agents, automations and the intranet's AI assistant. He founded GoGoCash, a shopping-to-earn cashback platform, in 2023 and builds Manut AI, an ERP/CRM workspace with Intelligence AI for automotive SMEs.";
+export const PERSON_SUMMARY = `Kunanon Jarat (Fronk / KunanonJ) is a Bangkok-based AI engineering lead and solopreneur. As ${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}, he leads internal AI agents, automations and the intranet's AI assistant. He founded GoGoCash, a shopping-to-earn cashback platform, in 2023 and builds Manut AI, an ERP/CRM workspace with Intelligence AI for automotive SMEs.`;
 
 /** How he works with the people who use what he builds (owner-confirmed, general terms only). */
 export const PERSON_CUSTOMER_WORK =
@@ -39,13 +43,8 @@ export const PERSON_CUSTOMER_WORK =
 export const PERSON_SOLOPRENEUR =
   "He works as a solopreneur: he owns GoGoCash end to end, from merchant partnerships to the cashback engine, and designs and builds Manut AI himself, from the ERP/CRM structure to its AI workflows.";
 
-/** Availability, as approved by the owner. */
-export const OPEN_TO_ROLES = {
-  roles: ["Forward Deployed Engineer", "AI engineering"],
-  location: "Bangkok or remote",
-  sentence:
-    "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
-} as const;
+/** Availability, as approved by the owner (lib/content/availability.ts). */
+export { OPEN_TO_ROLES };
 
 /** Education and memberships for Person.alumniOf / Person.memberOf (from the resume). */
 export const PERSON_ALUMNI_OF = {

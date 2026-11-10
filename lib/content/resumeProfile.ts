@@ -5,18 +5,26 @@ import type {
 } from "@/lib/sanity/types";
 import { pickString } from "@/lib/utils/pickString";
 import {
+  RESUME_LANGUAGES_FALLBACK,
   RESUME_SKILLS_FALLBACK,
+  RESUME_SUMMARY_FALLBACK,
   RESUME_TIMELINE_FALLBACK,
   type ResolvedTimelineItem,
   type ResolvedTimelineSection,
+  type ResumeSkillGroup,
 } from "./resumeTimeline.fallback";
 
-export type { ResolvedTimelineItem, ResolvedTimelineSection };
+export type { ResolvedTimelineItem, ResolvedTimelineSection, ResumeSkillGroup };
 
+/**
+ * The header when Sanity holds no résumé document (today's state). The
+ * headline is approved identity wording and leads with the AI role.
+ */
 export const DEFAULT_RESUME_PROFILE = {
   name: "Kunanon Jarat",
-  headline: "Founder. IT Manager & AI Engineering Lead. Based in Bangkok.",
-  summary: null as string | null,
+  headline:
+    "AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
+  summary: RESUME_SUMMARY_FALLBACK,
 } as const;
 
 function mapCmsTimelineItem(item: ResumeTimelineItem): ResolvedTimelineItem {
@@ -66,8 +74,10 @@ export function resolveResumeProfile(cms: ResumeProfile | null) {
   return {
     name: pickString(cms?.name, DEFAULT_RESUME_PROFILE.name),
     headline: pickString(cms?.headline, DEFAULT_RESUME_PROFILE.headline),
-    summary: cms?.summary?.trim() ? cms.summary.trim() : null,
+    summary: cms?.summary?.trim() || DEFAULT_RESUME_PROFILE.summary,
     sections,
+    // Skills and languages live in the repo only; the CMS has no field for them.
     skills: RESUME_SKILLS_FALLBACK,
+    languages: RESUME_LANGUAGES_FALLBACK,
   };
 }

@@ -10,6 +10,7 @@ import { ChromeProvider } from "@/components/bento/ChromeContext";
 import SharePill from "@/components/bento/SharePill";
 import SiteHeader from "@/components/bento/SiteHeader";
 import { isCurrentRow } from "@/components/bento/SiteMenu";
+import { siteMenu } from "@/lib/content/landing";
 
 function renderHeader(extra?: React.ReactNode) {
   return render(
@@ -99,7 +100,8 @@ describe("SiteHeader", () => {
       ["About", "/about"],
       ["Ventures", "/#ventures"],
       ["Portfolio", "/portfolio"],
-      ["Skills", "/skills"],
+      ["Résumé", "/resume"],
+      ["Agent skills", "/skills"],
       ["AI engineering", "/topics/forward-deployed-ai-engineering"],
       ["Learn", "/learn"],
       ["Examples", "/examples"],
@@ -170,6 +172,23 @@ describe("share panel", () => {
     expect(screen.getByText("Link copied")).toBeInTheDocument();
   });
 
+  it("keeps the page's language on the shared title, inside the English header", () => {
+    // A Thai hub: <html lang="th"> and a Thai title, in a header that says
+    // lang="en" for its own labels.
+    document.documentElement.lang = "th";
+    document.title = "วิศวกรรม AI แบบ Forward Deployed";
+    try {
+      renderHeader();
+      fireEvent.click(shareButton());
+      const title = screen.getByText("วิศวกรรม AI แบบ Forward Deployed");
+      expect(title).toHaveAttribute("lang", "th");
+      expect(title.closest("header")).toHaveAttribute("lang", "en");
+    } finally {
+      document.documentElement.removeAttribute("lang");
+      document.title = "";
+    }
+  });
+
   it("offers More options only where the share sheet exists", () => {
     renderHeader();
     fireEvent.click(shareButton());
@@ -211,5 +230,105 @@ describe("isCurrentRow", () => {
     expect(
       isCurrentRow("/topics/erp-crm-internal-systems", rows[1]!, rows),
     ).toBe(true);
+  });
+
+  it("treats a Thai hub as its English twin, on the site's real rows", () => {
+    const rows = [...siteMenu.rows, ...siteMenu.library];
+    const current = (path: string) =>
+      rows
+        .filter((row) => isCurrentRow(path, row, rows))
+        .map((row) => row.href);
+    const fde = "/topics/forward-deployed-ai-engineering";
+    // The Thai FDE hub marks its own row, not the Learn section.
+    expect(current(`/th${fde}`)).toEqual([fde]);
+    expect(current(fde)).toEqual([fde]);
+    // Any other Thai hub still marks Learn, as its English twin does.
+    expect(current("/th/topics/tech-startup-thailand-sea")).toEqual(["/learn"]);
+    expect(current("/topics/tech-startup-thailand-sea")).toEqual(["/learn"]);
+    // Nothing else lives under /th: those are not-found pages and mark
+    // nothing, like any other not-found page.
+    expect(current("/th")).toEqual([]);
+    expect(current("/th/resume")).toEqual([]);
+    expect(current("/does-not-exist")).toEqual([]);
+  });
+});
+
+describe("SiteHeader inline links (1024 px and wider)", () => {
+  const primary = () => screen.getByRole("navigation", { name: "Primary" });
+  const names = () =>
+    [...primary().querySelectorAll("a")].map((a) => [
+      a.textContent,
+      a.getAttribute("href"),
+    ]);
+
+  it("puts the work, the résumé and the AI engineering page one click away", () => {
+    renderHeader();
+    expect(names()).toEqual([
+      ["Work", "/portfolio"],
+      ["Résumé", "/resume"],
+      ["AI engineering", "/topics/forward-deployed-ai-engineering"],
+    ]);
+  });
+
+  it("declares its English, for the Thai pages it also sits on", () => {
+    // Thai routes set <html lang="th">; the header's labels are English.
+    renderHeader();
+    const header = primary().closest("header")!;
+    expect(header).toHaveAttribute("lang", "en");
+    expect(header).toContainElement(document.getElementById("site-menu"));
+  });
+
+  it("shows only at desktop width and keeps the menu as its own landmark", () => {
+    renderHeader();
+    expect(primary().className).toMatch(/(^| )hidden( |$)/);
+    expect(primary().className).toMatch(/lg:flex/);
+    // Two navigation landmarks need two names. The menu is in the HTML even
+    // while closed (hidden), so crawlers always find every page.
+    const menu = document.getElementById("site-menu")!;
+    expect(menu).toHaveAttribute("aria-label", "Site");
+    expect(menu).not.toBe(primary());
+  });
+
+  it("marks the current section, a project page counting as Work", () => {
+    location.pathname = "/portfolio/tbh-intranet";
+    renderHeader();
+    const current = [...primary().querySelectorAll("[aria-current]")];
+    expect(current.map((a) => a.textContent)).toEqual(["Work"]);
+    // Seen as well as announced: the mark's square, on the current link only
+    // (the tint alone is about 1.1:1 against the page).
+    expect(primary().querySelectorAll(".bg-mark")).toHaveLength(1);
+    expect(current[0]!.querySelector("[aria-hidden].bg-mark")).not.toBeNull();
+  });
+
+  it("marks AI engineering on the Thai FDE hub, as on the English one", () => {
+    for (const path of [
+      "/topics/forward-deployed-ai-engineering",
+      "/th/topics/forward-deployed-ai-engineering",
+    ]) {
+      location.pathname = path;
+      const { unmount } = renderHeader();
+      expect(
+        [...primary().querySelectorAll("[aria-current]")].map(
+          (a) => a.textContent,
+        ),
+        path,
+      ).toEqual(["AI engineering"]);
+      unmount();
+    }
+  });
+
+  it("marks the résumé on the résumé page and nothing on Home", () => {
+    location.pathname = "/resume";
+    const { unmount } = renderHeader();
+    expect(
+      [...primary().querySelectorAll("[aria-current]")].map(
+        (a) => a.textContent,
+      ),
+    ).toEqual(["Résumé"]);
+    unmount();
+    location.pathname = "/";
+    renderHeader();
+    expect(primary().querySelectorAll("[aria-current]")).toHaveLength(0);
+    expect(primary().querySelector(".bg-mark")).toBeNull();
   });
 });

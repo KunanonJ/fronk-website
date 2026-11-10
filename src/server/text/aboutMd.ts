@@ -1,4 +1,5 @@
 import { aboutPage } from "@/lib/content/aboutPage";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_NAME } from "@/lib/content/identity";
@@ -25,6 +26,8 @@ export function buildAboutMd(): string {
   push(`# About ${PERSON_NAME} (${hero.nickname})`, "");
   push(`Source: ${SITE_BASE}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
   push(`${hero.role} ${hero.location}.`, "");
+  // The page shows this in its hero pill and in "Let's talk".
+  push(OPEN_TO_ROLES.sentence, "");
 
   push(`## ${story.heading}`, "", story.whoIs, "");
   for (const p of story.paragraphs) push(paragraphToMarkdown(p, PAGE), "");

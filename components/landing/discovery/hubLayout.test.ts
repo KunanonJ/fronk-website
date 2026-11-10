@@ -72,3 +72,25 @@ describe("splitLead", () => {
     );
   });
 });
+
+describe("topicGrid with four sections (the FDE hub)", () => {
+  it("sets the sections in pairs and gives proof and the FAQ the next row", () => {
+    const grid = topicGrid(4);
+    expect(grid.paired).toBe(true);
+    // The pair row holds the cards, so none of them takes a grid cell.
+    expect(grid.sections).toEqual([]);
+    expect([grid.proof.lg, grid.faq.lg]).toEqual([1, 2]);
+    // At two columns a lone proof card would sit beside nothing: it widens.
+    expect([grid.proof.md, grid.faq.md]).toEqual([2, 2]);
+  });
+
+  it("pairs only an even count from four up, and leaves the drawn hubs alone", () => {
+    expect([1, 2, 3, 5].map((n) => topicGrid(n).paired)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect([4, 6].map((n) => topicGrid(n).paired)).toEqual([true, true]);
+  });
+});

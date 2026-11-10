@@ -39,6 +39,7 @@ export function buildLlmsFull(): string {
     push(`### ${section.title}`, "");
     for (const item of section.items) {
       push(`- **${item.title}**, ${item.org} (${item.period})`);
+      if (item.note) push(`  - ${item.note}`);
       for (const bullet of item.bullets ?? []) push(`  - ${bullet}`);
     }
     push("");

@@ -132,7 +132,7 @@ export const aboutPage = {
         spans: [
           {
             type: "text",
-            text: "My background is technical — I trained as an electrical engineer at Kasetsart University and started my career writing smart contracts at Bitkub and architecting blockchain systems at FICO. From there I spent several years inside the room where fintech, Web3, and AI products actually get built — as a project manager at ",
+            text: "My background is technical — I trained as an electrical engineer at Kasetsart University and started my career writing smart contracts at Bitkub and building blockchain systems at KK Venture Global. From there I spent several years inside the room where fintech, Web3, and AI products actually get built — as a project manager at ",
           },
           {
             type: "link",
@@ -401,7 +401,7 @@ export const aboutPage = {
     chips: [
       { label: "Kasetsart", detail: "Electrical Engineering" },
       { label: "Bitkub", detail: "Smart contracts" },
-      { label: "FICO", detail: "Blockchain systems" },
+      { label: "KK Venture Global", detail: "Blockchain systems" },
       { label: "Coins / Playbux", detail: "Fintech PM" },
       { label: "Aiden Labs", detail: "AI + tokenomics" },
       { label: "GoGoCash", detail: "Founder · 2023—" },
@@ -427,7 +427,7 @@ export const aboutPage = {
     links: [
       { label: "Contact", href: "/contact" },
       { label: "Portfolio", href: "/portfolio" },
-      { label: "Skills", href: "/skills" },
+      { label: "Agent skills", href: "/skills" },
       {
         label: "AI engineering",
         href: "/topics/forward-deployed-ai-engineering",

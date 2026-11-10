@@ -1,16 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { BentoCard, CardLink } from "@/components/bento/Bento";
+import { BentoCard, CardLink, bentoSpan } from "@/components/bento/Bento";
 import {
   ArrowUpRightIcon,
   CheckIcon,
   CopyIcon,
 } from "@/components/bento/icons";
 import { contactMailto } from "@/components/landing/contact/ContactForm";
+import {
+  RecruiterLines,
+  RecruiterLinks,
+} from "@/components/landing/RecruiterFacts";
 import { aboutPage } from "@/lib/content/aboutPage";
 import {
   contactElsewhere,
   contactNextLinks,
   contactPage,
+  contactRecruiterLinks,
 } from "@/lib/content/contact";
 import { writeClipboard } from "@/lib/utils/clipboard";
 import { pad2 } from "@/lib/utils/pad2";
@@ -141,7 +146,7 @@ export function ElsewhereCard() {
 export function WhoCard() {
   const spans = aboutPage.now.paragraphs[1].spans;
   return (
-    <BentoCard headingId="card-who" title={contactPage.whoTitle} span={3}>
+    <BentoCard headingId="card-who" title={contactPage.whoTitle} span={2}>
       <p className="m-0 mt-auto max-w-[600px] px-1 text-2xl leading-[1.35] font-semibold tracking-[-0.02em]">
         {spans.map((span, index) =>
           span.type === "link" ? (
@@ -164,6 +169,27 @@ export function WhoCard() {
           </CardLink>
         ))}
       </div>
+    </BentoCard>
+  );
+}
+
+/**
+ * For recruiters: what they ask first, answered before they write (the
+ * lines and links are shared with About's "Let's talk" card).
+ */
+export function RecruiterCard() {
+  return (
+    <BentoCard
+      headingId="card-recruiters"
+      title={contactPage.recruiterTitle}
+      gap={3}
+      // One column beside "Who should write" at three columns. At two
+      // (641 to 1023 px) that card fills its row, so this one takes a full
+      // row too: one column would leave an empty cell beside it.
+      className={bentoSpan({ md: 2, lg: 1 })}
+    >
+      <RecruiterLines />
+      <RecruiterLinks links={contactRecruiterLinks} className="mt-auto" />
     </BentoCard>
   );
 }

@@ -10,34 +10,65 @@ import HomeHero from "@/components/landing/home/HomeHero";
 import { aboutPage } from "@/lib/content/aboutPage";
 
 describe("Home hero", () => {
-  it("greets with the canvas h1 in three block lines", () => {
+  it("leads the h1 with the role, in block lines, the last in the accent colour", () => {
     render(<HomeHero />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent(
-      "Hi, I’m Kunanon Jarat. Founder of GoGoCash and Manut AI.",
+      "Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok.",
     );
+    expect(h1).not.toHaveTextContent(/Founder/);
     expect(h1.className).toMatch(/kj-lines/);
-    expect(h1.children).toHaveLength(3);
+    expect(h1.children).toHaveLength(4);
+    expect(h1.lastElementChild).toHaveTextContent("from Bangkok.");
+    expect(h1.lastElementChild?.className).toMatch(/text-mark/);
     expect(h1.querySelector("img")).toHaveAttribute("alt", "");
   });
 
-  it("leads with an ink Contact button and the Live status", () => {
+  it("says who he is open to hearing from, with the accent square", () => {
+    const { container } = render(<HomeHero />);
+    const pill = screen
+      .getByText("Open to roles", { exact: false })
+      .closest("p")!;
+    expect(pill).toHaveTextContent(
+      "Open to roles · Forward Deployed Engineer and AI engineering · Bangkok or remote",
+    );
+    expect(pill.querySelector("[aria-hidden]")?.className).toMatch(/bg-mark/);
+    // "Live" and the Ember square mean live; this is availability.
+    expect(screen.queryByText("Live")).toBeNull();
+    expect(container.querySelector(".bg-ember")).toBeNull();
+  });
+
+  it("offers Contact and the résumé side by side", () => {
     render(<HomeHero />);
     const cta = screen.getByRole("link", { name: "Contact me" });
     expect(cta).toHaveAttribute("href", "/contact");
     expect(cta.className).toMatch(/bg-cta/);
-    expect(screen.getByText("Live")).toBeInTheDocument();
+    const resume = screen.getByRole("link", { name: "Résumé" });
+    expect(resume).toHaveAttribute("href", "/resume");
+    expect(resume.className).not.toMatch(/bg-cta/);
+    expect(cta.parentElement).toBe(resume.parentElement);
+  });
+
+  it("names the employed role before the ventures in the lead", () => {
+    render(<HomeHero />);
+    expect(
+      screen.getByText(
+        "IT Manager & AI Engineering Lead at The Binary Holdings. Also building GoGoCash and Manut AI.",
+      ),
+    ).toBeInTheDocument();
   });
 });
 
 describe("Home cards", () => {
-  it("anchors the ventures card at #ventures and links there", () => {
+  it("anchors the ventures card at #ventures and never links to itself", () => {
     render(<VenturesCard />);
     const card = screen.getByRole("article", { name: "Ventures" });
     expect(card).toHaveAttribute("id", "ventures");
     expect(
       screen.getByRole("link", { name: "See both ventures →" }),
-    ).toHaveAttribute("href", "/#ventures");
+    ).toHaveAttribute("href", "/proof");
+    for (const a of card.querySelectorAll("a"))
+      expect(a.getAttribute("href")).not.toMatch(/#ventures$/);
     expect(screen.getByRole("link", { name: "GoGoCash" })).toHaveAttribute(
       "href",
       "/ventures/gogocash",
@@ -51,14 +82,18 @@ describe("Home cards", () => {
     ).toBeInTheDocument();
   });
 
-  it("lists the featured work in the canvas order", () => {
+  it("lists the featured work in the canvas order, each with its kind", () => {
     render(<SelectedWorkCard />);
     const items = screen.getAllByRole("listitem");
     expect(items.map((li) => li.textContent)).toEqual([
-      "01TBH IntranetOne back office for a multi-entity group.",
-      "02AI AutomationAI agents for content ops and hiring.",
-      "03Node Validator AutomationDaily health checks for Avalanche L1 validators.",
+      "01TBH IntranetOne back office for a multi-entity group.Internal platform",
+      "02AI AutomationAI agents for content ops and hiring.AI agents",
+      "03Node Validator AutomationDaily health checks for Avalanche L1 validators.Ops automation",
     ]);
+    // The widest card on Home: the evidence a hiring reader looks for.
+    expect(
+      screen.getByRole("article", { name: "Selected work" }).className,
+    ).toMatch(/col-span-2/);
     expect(screen.getByRole("link", { name: "All work →" })).toHaveAttribute(
       "href",
       "/portfolio",
@@ -68,7 +103,9 @@ describe("Home cards", () => {
   it("shows four résumé roles and links the résumé", () => {
     render(<ExperienceCard />);
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
-    expect(screen.getByText("Founder, GoGoCash")).toBeInTheDocument();
+    expect(
+      screen.getByText("AI Project Manager, Aiden Labs"),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Résumé →" })).toHaveAttribute(
       "href",
       "/resume",

@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AboutPageContent from "@/components/landing/AboutPageContent";
 import ContributionActivity from "@/components/landing/ContributionActivity";
 import { aboutPage } from "@/lib/content/aboutPage";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { aboutRecruiterLinks } from "@/lib/content/contact";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { learnOperatorNotes } from "@/lib/content/learn";
 import {
@@ -88,14 +90,47 @@ describe("AboutPageContent", () => {
     );
   });
 
-  it("leads the Next card with an ink Contact button", () => {
+  it("leads the Next card's buttons with an ink Contact button", () => {
     render(<AboutPageContent />);
     const next = screen.getByRole("article", { name: aboutPage.cta.eyebrow });
     const links = within(next).getAllByRole("link");
-    expect(links.map((a) => a.getAttribute("href"))).toEqual(
-      aboutPage.cta.links.map((l) => l.href),
+    // In reading order: the recruiter block's links, then the buttons.
+    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+      ...aboutRecruiterLinks.map((l) => l.href),
+      ...aboutPage.cta.links.map((l) => l.href),
+    ]);
+    // The ink button serves every reader, so it opens the general form.
+    const contact = within(next).getByRole("link", { name: "Contact" });
+    expect(contact).toHaveAttribute("href", "/contact");
+    expect(contact.className).toMatch(/bg-cta/);
+  });
+
+  it("answers a recruiter's first questions in the Next card", () => {
+    render(<AboutPageContent />);
+    const next = screen.getByRole("article", { name: aboutPage.cta.eyebrow });
+    expect(
+      within(next).getByRole("heading", { level: 4, name: "For recruiters" }),
+    ).toBeInTheDocument();
+    expect(next).toHaveTextContent(OPEN_TO_ROLES.sentence);
+    expect(next).toHaveTextContent("Bangkok time, GMT+7.");
+    // A recruiter's own link opens the form with Hiring chosen.
+    expect(
+      within(next).getByRole("link", { name: "Contact about a role →" }),
+    ).toHaveAttribute("href", "/contact?topic=hiring");
+    const pdf = within(next).getByRole("link", { name: "Download PDF →" });
+    expect(pdf).toHaveAttribute("href", "/resume.pdf");
+    expect(pdf).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
+    // It leaves the site, and says so to a screen reader.
+    const linkedin = within(next).getByRole("link", {
+      name: "LinkedIn → (opens in a new tab)",
+    });
+    expect(linkedin).toHaveAttribute(
+      "href",
+      "https://www.linkedin.com/in/kunanonj",
     );
-    expect(links[0]!.className).toMatch(/bg-cta/);
+    expect(linkedin).toHaveAttribute("target", "_blank");
+    // Nothing the owner has not approved: no notice period, no visa status.
+    expect(next).not.toHaveTextContent(/notice|visa|authori[sz]/i);
   });
 });
 

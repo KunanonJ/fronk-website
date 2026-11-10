@@ -1,17 +1,22 @@
 import { Bento, BentoRow } from "@/components/bento/Bento";
 import { CtaLink } from "@/components/bento/Buttons";
-import { EyebrowChip } from "@/components/bento/Chips";
+import { AvailabilityPill, EyebrowChip } from "@/components/bento/Chips";
 import { DownloadIcon } from "@/components/bento/icons";
 import { Segmented } from "@/components/bento/Segmented";
 import SharePill from "@/components/bento/SharePill";
 import type { ShareTarget } from "@/components/bento/ShareRows";
 import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import {
-  RESUME_PDF,
   ResumeSectionCard,
   ShareCard,
   SkillsCard,
 } from "@/components/resume/ResumeCards";
+import {
+  HIRING_CONTACT_HREF,
+  OPEN_TO_ROLES,
+  RESUME_PDF_HREF,
+  RESUME_PDF_NAME,
+} from "@/lib/content/availability";
 import {
   RESUME_DETAILS,
   RESUME_META,
@@ -35,9 +40,10 @@ const SHARE_TARGET: ShareTarget = {
 
 /**
  * Résumé on screen (bento redesign, phase 7b; design spec 4.4): the hero
- * with Download PDF, Share and the Detailed / Compact control, then one dense
- * bento of the CMS sections, Skills and Share. Both parts are hidden in
- * print; ResumePrint is what `pnpm pdf` renders.
+ * with the summary, the availability line, Download PDF, Contact, Share and
+ * the Detailed / Compact control, then one dense bento of the sections,
+ * Skills and Share. Both parts are hidden in print; ResumePrint is what
+ * `pnpm pdf` renders.
  */
 export default function ResumePage({
   profile,
@@ -78,12 +84,20 @@ export default function ResumePage({
             <span className="block text-mark"> {headline.accent}</span>
           ) : null}
         </PageTitle>
-        <HeroLead>{profile.summary ?? RESUME_META.description}</HeroLead>
+        <HeroLead>{profile.summary}</HeroLead>
+        <AvailabilityPill
+          label={OPEN_TO_ROLES.pill.label}
+          detail={OPEN_TO_ROLES.pill.detail}
+          className="self-start"
+        />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <CtaLink href={RESUME_PDF}>
+            <CtaLink href={RESUME_PDF_HREF} download={RESUME_PDF_NAME}>
               <DownloadIcon />
               <span>Download PDF</span>
+            </CtaLink>
+            <CtaLink href={HIRING_CONTACT_HREF} variant="secondary">
+              Contact
             </CtaLink>
             <SharePill />
           </div>

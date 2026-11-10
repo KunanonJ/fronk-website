@@ -27,11 +27,11 @@ Wire the Next.js app so landing pages can render without FogLAMP chrome, with pr
 - Port prisma colors into Tailwind v4 theme (or scoped `@theme` / utility classes):
   - `primary` `#DEDBC8`
   - showcase palette from prisma `tailwind.config.js`
-- Port noise overlays + keyframe animations used by Showcase from [prisma-landing/src/index.css](file:///Users/kunanonjarat/Developer/prisma-landing/src/index.css) and [prisma-landing/tailwind.config.js](file:///Users/kunanonjarat/Developer/prisma-landing/tailwind.config.js) into [app/globals.css](app/globals.css) under a clear `/* landing-cutover */` section (avoid breaking remaining system pages)
+- Port noise overlays + keyframe animations used by Showcase from `prisma-landing/src/index.css` and `prisma-landing/tailwind.config.js` into [app/globals.css](app/globals.css) under a clear `/* landing-cutover */` section (avoid breaking remaining system pages)
 
 ### WP-0.4 — Content module
 
-- Copy [prisma-landing/src/content/fronk.ts](file:///Users/kunanonjarat/Developer/prisma-landing/src/content/fronk.ts) → `lib/content/landing.ts` (or `lib/landing/content.ts`)
+- Copy `prisma-landing/src/content/fronk.ts` → `lib/content/landing.ts` (or `lib/landing/content.ts`)
 - Copy intro greetings (including final **Welcome to KunanonJ**) → `lib/content/introGreetings.ts` (replace/extend existing if present)
 - Ensure `profile.jpg` exists under `public/` (copy from prisma `public/profile.jpg` if missing)
 

@@ -50,6 +50,37 @@ export function LivePill({
   );
 }
 
+/**
+ * Availability pill: the accent square, a label, then the detail in ink-2
+ * ("Open to roles · Forward Deployed Engineer and AI engineering · Bangkok
+ * or remote"). Unlike the live pill it may wrap: at 375 px it runs to three
+ * lines and its corners stay round. The accent square, not Ember: Ember
+ * means live or failed.
+ */
+export function AvailabilityPill({
+  label,
+  detail,
+  className,
+}: {
+  label: string;
+  detail: string;
+  className?: string;
+}) {
+  return (
+    <p
+      className={cn(
+        "m-0 inline-flex max-w-full items-baseline gap-2.5 rounded-[22px] border border-hairline-strong bg-surface px-4 py-2.5 text-card leading-[1.35] font-medium text-ink",
+        className,
+      )}
+    >
+      <span aria-hidden className="size-2 shrink-0 -translate-y-px bg-mark" />
+      <span className="min-w-0">
+        {label} <span className="text-ink-2">· {detail}</span>
+      </span>
+    </p>
+  );
+}
+
 /** Meta tag (26 px): `marked` adds the accent square ("Original"). */
 export function MetaTag({
   children,

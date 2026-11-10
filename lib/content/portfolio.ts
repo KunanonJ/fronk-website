@@ -122,6 +122,13 @@ export const portfolioPage = {
   ] satisfies readonly HeadlineLine[],
   /** Every project is his work: the byline on each project page. */
   author: { name: "Kunanon Jarat", href: "/about" },
+  /** The card that closes each project page: where a hiring reader goes next. */
+  hire: {
+    kicker: "Hiring",
+    heading: "Want work like this on your team?",
+    resumeLabel: "Résumé",
+    contactLabel: "Contact",
+  },
   description: PAGE_META.portfolio.description,
 } as const;
 

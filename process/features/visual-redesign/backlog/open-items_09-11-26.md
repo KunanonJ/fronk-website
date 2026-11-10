@@ -4,7 +4,10 @@ Left open when the program closed. Each says why.
 
 ## Owner actions
 
-1. **Regenerate `public/resume.pdf` from production.**
+1. **Regenerate `public/resume.pdf` from production.** RESOLVED 10-11-26 by
+   recruiter-fit Phase 1 (`29c835e`): the print layout was rebuilt and the PDF
+   regenerated from the local production build, which equals production
+   because Sanity holds no résumé document. Original note:
    - The committed PDF predates the redesign.
    - Command: `RESUME_URL=https://kunanonj.com/resume pnpm pdf`. Print styles were checked in Phase 5: light palette, Geist, no Download button.
    - Not done automatically because the PDF is the owner's document and carries live CMS content, so it should be reviewed before committing.

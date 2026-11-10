@@ -7,8 +7,30 @@ describe("resolveResumeProfile", () => {
     expect(resolveResumeProfile(null)).toMatchObject({
       name: DEFAULT_RESUME_PROFILE.name,
       headline: DEFAULT_RESUME_PROFILE.headline,
-      summary: null,
+      summary: DEFAULT_RESUME_PROFILE.summary,
     });
+  });
+
+  it("leads the default headline with the AI role, not a founder title", () => {
+    expect(DEFAULT_RESUME_PROFILE.headline).toMatch(/^AI Engineering Lead\./);
+    expect(DEFAULT_RESUME_PROFILE.headline).not.toMatch(/Founder/);
+  });
+
+  it("prefers a CMS summary and keeps the repo's skill groups", () => {
+    const profile = resolveResumeProfile({
+      name: "Test",
+      headline: "Headline.",
+      summary: "  From the CMS.  ",
+      sections: null,
+    });
+    expect(profile.summary).toBe("From the CMS.");
+    expect(profile.skills.map((group) => group.label)).toEqual([
+      "AI & Cloud",
+      "Transformation & Delivery",
+      "Engineering",
+      "Tools",
+    ]);
+    expect(profile.skills[0]?.items).toContain("AI agents");
   });
 
   it("uses static timeline sections when CMS sections are absent", () => {

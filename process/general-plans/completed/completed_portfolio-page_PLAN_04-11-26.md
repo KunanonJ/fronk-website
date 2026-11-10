@@ -26,7 +26,7 @@ Portfolio is separate from Ventures. It lists four projects built at The Binary 
 Honesty rule: the site only states facts the source shows. No invented numbers, clients or outcomes. No live links, because all four are internal tools.
 
 ### 1. TBH Intranet (`tbh-intranet`)
-- Source: `/Users/kunanonjarat/Developer/new-tbh-intranet-dev`
+- Source: a local checkout named `new-tbh-intranet-dev`
 - Tagline: "One back office for a multi-entity group."
 - Summary: An internal operations platform built to replace Zoho at The Binary Holdings. It brings HR and payroll, approval chains, Thai accounting, expenses, several CRMs and an AI assistant into one login-only web app.
 - Highlights: HR (leave, payroll, attendance, benefits); approval chains for leave, travel and expenses; Thai accounting suite (GL, AR/AP, withholding tax, bank reconciliation, fixed assets); expenses and cash advances with Bank of Thailand FX rates; sales, partner and investor CRMs; ARIA, an AI assistant that reads attachments and searches internal knowledge; projects, surveys, chat and company news.
@@ -35,7 +35,7 @@ Honesty rule: the site only states facts the source shows. No invented numbers, 
 - Kept off the page: staff and entity counts (the source docs disagree), hostnames, Supabase project ID, partner names, finance, HR and cap-table details, security internals, the AWS migration doc.
 
 ### 2. Node Validator Automation (`node-validator-automation`)
-- Source: `/Users/kunanonjarat/Developer/bnry-validator-monitor-main`
+- Source: a local checkout named `bnry-validator-monitor-main`
 - Tagline: "Daily health checks for Avalanche L1 validators."
 - Summary: A dependency-free Node.js job. Every morning it reads validator balances from the Avalanche P-Chain, works out burn rate and remaining runway, and emails a red/green report before any validator runs dry.
 - Highlights: validator list pulled live over P-Chain JSON-RPC; burn rate and runway from day-over-day comparison; four alert rules (low balance, runway under 7 days, inactive validator, sharp daily drop); HTML, text and JSON reports; email delivery via Resend, with exit codes for a fallback path; daily GitHub Actions schedule that commits each run's data as an audit trail.
@@ -44,7 +44,7 @@ Honesty rule: the site only states facts the source shows. No invented numbers, 
 - Kept off the page: subnet, node and validation IDs; balances and alert state; the owner's email address; wallet and top-up workflow; local paths.
 
 ### 3. Email Signature Generator (`email-signature-generator`)
-- Source: `/Users/kunanonjarat/Developer/email signature`
+- Source: a local checkout named `email signature`
 - Tagline: "Branded Gmail signatures, self-serve."
 - Summary: A single-page tool. Staff at The Binary Holdings and The Binary Labs fill in a form, see a live preview and copy a Gmail-ready signature in one click.
 - Highlights: company picker with deep links; live preview; rich copy with a plain-text fallback; "Copy HTML" for IT; field checks (email domain match, phone hints); email-safe table markup with 2x images; runs entirely in the browser; image URLs never change, enforced by a deploy check and a daily image-health job.
@@ -53,7 +53,7 @@ Honesty rule: the site only states facts the source shows. No invented numbers, 
 - Kept off the page: the live URL (internal, noindex); the office address; git history containing a real signature; handwriting images, unless the user approves them.
 
 ### 4. AI Automation (`ai-automation`)
-- Source: `/Users/kunanonjarat/Developer/AI-Automation`
+- Source: a local checkout named `AI-Automation`
 - Tagline: "AI agents for content ops and hiring."
 - Summary: A team-built set of internal AI agents at The Binary Holdings. The main one, Fando, finds sports clips across five platforms, has Gemini judge and caption them, queues them in Google Sheets for human approval, then trims, stores and publishes the approved clips. A second agent screens job applicants and sends take-home tasks and interview invites.
 - Highlights: clip sourcing from YouTube, Instagram, TikTok, Twitch and X; Gemini relevance check plus title and caption writing; duplicate detection with perceptual image hashing; Google Sheets approval queue; trim (29-second cap), Cloud Storage upload and CMS publish through a Playwright browser flow; recruitment agent with resume scoring, case grading and human review for borderline cases.

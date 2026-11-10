@@ -17,6 +17,8 @@ function fill({
   name = "Ada Lovelace",
   email = "ada@example.com",
   message = MESSAGE,
+  // The message field's label depends on whether Hiring is chosen.
+  messageLabel = contactPage.messagePlaceholder as string,
 } = {}) {
   fireEvent.change(screen.getByLabelText(contactPage.namePlaceholder), {
     target: { value: name },
@@ -24,7 +26,7 @@ function fill({
   fireEvent.change(screen.getByLabelText(contactPage.emailPlaceholder), {
     target: { value: email },
   });
-  fireEvent.change(screen.getByLabelText(contactPage.messagePlaceholder), {
+  fireEvent.change(screen.getByLabelText(messageLabel), {
     target: { value: message },
   });
 }
@@ -116,12 +118,137 @@ describe("ContactPage", () => {
     expect(writeText).toHaveBeenCalledWith(contactPage.email);
   });
 
-  it("exposes topic chips as toggle buttons", () => {
+  it("exposes topic chips as toggle buttons, Hiring first", () => {
     render(<ContactPage />);
     const chip = screen.getByRole("button", { name: "Hiring" });
     expect(chip).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(chip);
     expect(chip).toHaveAttribute("aria-pressed", "true");
+    const chips = chip.parentElement!.querySelectorAll("button");
+    expect(chips[0]).toBe(chip);
+    expect(chips).toHaveLength(8);
+  });
+
+  it("readies the form for a recruiter who arrives through a hiring button", async () => {
+    render(<ContactPage intent="hiring" />);
+    const chip = screen.getByRole("button", { name: "Hiring" });
+    await waitFor(() => expect(chip).toHaveAttribute("aria-pressed", "true"));
+    // The question changes with the visitor; the general one is gone.
+    expect(
+      screen.getByLabelText(contactPage.hiringPlaceholder),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(contactPage.messagePlaceholder)).toBeNull();
+    // Chosen for them, not locked: they can still take it off, and the
+    // question follows the chip back to the general one.
+    fireEvent.click(chip);
+    expect(chip).toHaveAttribute("aria-pressed", "false");
+    expect(
+      screen.getByLabelText(contactPage.messagePlaceholder),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(contactPage.hiringPlaceholder)).toBeNull();
+  });
+
+  it("asks about the role whenever Hiring is chosen, also by hand", () => {
+    render(<ContactPage />);
+    fireEvent.click(screen.getByRole("button", { name: "Hiring" }));
+    expect(
+      screen.getByLabelText(contactPage.hiringPlaceholder),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(contactPage.messagePlaceholder)).toBeNull();
+  });
+
+  it("only ever adds Hiring: a later general visit leaves the chip alone", async () => {
+    const { rerender } = render(<ContactPage intent="hiring" />);
+    const chip = screen.getByRole("button", { name: "Hiring" });
+    await waitFor(() => expect(chip).toHaveAttribute("aria-pressed", "true"));
+    // The same form, now under /contact: what the visitor sees pressed stays
+    // pressed, and the question still matches it.
+    rerender(<ContactPage />);
+    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(
+      screen.getByLabelText(contactPage.hiringPlaceholder),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the form ready for a recruiter who sends another message", async () => {
+    respond(200, { ok: true, message: contactMessages.sent });
+    render(<ContactPage intent="hiring" />);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      ),
+    );
+    fill({ messageLabel: contactPage.hiringPlaceholder });
+    fireEvent.click(submitButton());
+    await screen.findByRole("status");
+    const [, init] = fetchMock.mock.calls[0]!;
+    expect(JSON.parse(init.body as string).topics).toEqual(["Hiring"]);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: contactPage.sendAnother }),
+    );
+    // An empty form again, still a hiring one.
+    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByLabelText(contactPage.hiringPlaceholder)).toHaveValue(
+      "",
+    );
+  });
+
+  it("leaves the general form alone without the hiring intent", () => {
+    render(<ContactPage />);
+    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(
+      screen.getByLabelText(contactPage.messagePlaceholder),
+    ).toBeInTheDocument();
+  });
+
+  it("answers a recruiter's first questions in their own card", () => {
+    render(<ContactPage />);
+    const card = screen.getByRole("article", {
+      name: contactPage.recruiterTitle,
+    });
+    expect(card).toHaveTextContent(
+      "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
+    );
+    expect(card).toHaveTextContent("Bangkok time, GMT+7.");
+    expect(
+      within(card).getByRole("link", { name: "Résumé →" }),
+    ).toHaveAttribute("href", "/resume");
+    const pdf = within(card).getByRole("link", { name: "Download PDF →" });
+    expect(pdf).toHaveAttribute("href", "/resume.pdf");
+    expect(pdf).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
+    expect(
+      within(card).getByRole("link", {
+        name: "LinkedIn → (opens in a new tab)",
+      }),
+    ).toHaveAttribute("href", "https://www.linkedin.com/in/kunanonj");
+    // Nothing the owner has not approved: no notice period, no visa status.
+    expect(card).not.toHaveTextContent(/notice|visa|authori[sz]/i);
+    // It shares its row with "Who should write": that card takes two of the
+    // three columns and this one follows it.
+    const who = screen.getByRole("article", { name: contactPage.whoTitle });
+    expect(who.className).toMatch(/col-span-2/);
+    expect(who.nextElementSibling).toBe(card);
+    // At two columns it takes the whole row, and one column again at three
+    // (the browser test measures both; these are only the classes).
+    expect(card.className).toMatch(/min-\[641px\]:col-span-2/);
+    expect(card.className).toMatch(/lg:col-span-1/);
+    // LinkedIn leaves the site, as it does in the Elsewhere card.
+    expect(
+      within(card).getByRole("link", {
+        name: "LinkedIn → (opens in a new tab)",
+      }),
+    ).toHaveAttribute("target", "_blank");
   });
 
   it("shows each problem under its field and focuses the first, sending nothing", async () => {

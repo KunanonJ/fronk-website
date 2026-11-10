@@ -1,251 +1,183 @@
-import Link from "@/components/navigation/Link";
-import { Download } from "lucide-react";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { CompanyLogo } from "@/components/CompanyLogo";
+import type { ReactNode } from "react";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import type {
   ResolvedTimelineItem,
-  ResolvedTimelineSection,
   resolveResumeProfile,
 } from "@/lib/content/resumeProfile";
-import { pad2 } from "@/lib/utils/pad2";
+import { isLiveBullet, linkLabel, printGroups } from "@/lib/resume/view";
+import { siteConfig } from "@/lib/site";
 
 export type ResumeProfileView = ReturnType<typeof resolveResumeProfile>;
 
 /**
  * The résumé as a printed document: what `pnpm pdf` renders to
  * public/resume.pdf. The /resume route shows it only in print (the bento page
- * is screen-only), so the PDF keeps this layout whatever the screen does.
- * Change it deliberately, then regenerate the PDF.
+ * is screen-only).
+ *
+ * Recruiters forward this file and applicant-tracking systems parse its text
+ * layer, so the layout is deliberately plain. Keep it that way:
+ *   - no opacity below 1: Chromium then draws the element as a transparency
+ *     group, and its text comes out of the PDF in fragments and out of order;
+ *   - no letter-spacing: extractors split or join words on it;
+ *   - a static system font, not the site's variable Geist: Chromium writes
+ *     Geist's medium and semibold text so that extractors split words after
+ *     an "m" ("Sum m ary"); kerning and ligature settings do not change it;
+ *   - nothing decorative as text (logo initials, running numbers): it would
+ *     join the job titles in the text layer, whatever `aria-hidden` says;
+ *   - contact details as real links, in the header.
+ * ResumePrint.test.tsx guards these. Change the layout deliberately, then
+ * regenerate the PDF and read its text layer back.
  */
+
+/** Static fonts every desktop has; the PDF embeds the one it prints with. */
+export const PRINT_FONT = "Arial, Helvetica, sans-serif";
+
 export function ResumePrint({ profile }: { profile: ResumeProfileView }) {
+  const groups = printGroups(profile.sections);
+  const contacts = [
+    { label: siteConfig.email, href: `mailto:${siteConfig.email}` },
+    { label: linkLabel(siteConfig.url), href: siteConfig.url },
+    {
+      label: linkLabel(siteConfig.socials.linkedin),
+      href: siteConfig.socials.linkedin,
+    },
+    {
+      label: linkLabel(siteConfig.socials.github),
+      href: siteConfig.socials.github,
+    },
+  ];
+
   return (
-    <div>
-      <Container size="lg" className="py-14 sm:py-20 lg:py-24">
-        <header className="mb-14 flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
-          <div className="max-w-2xl">
-            <p className="font-mono text-label uppercase text-ink-2">Résumé</p>
-            <h1 className="mt-4 font-display text-h1 text-ink">
-              {profile.name}
-              <span className="text-link">.</span>
-            </h1>
-            <p className="mt-4 text-lead font-medium text-ink">
-              {profile.headline}
-            </p>
-            {profile.summary ? (
-              <p className="mt-4 text-body text-ink-2">{profile.summary}</p>
-            ) : null}
-          </div>
-          <div data-print-hide className="shrink-0">
-            <Button href="/resume.pdf" variant="secondary">
-              <Download className="h-4 w-4" aria-hidden />
-              Download PDF
-            </Button>
-          </div>
-        </header>
-
-        <div className="space-y-16">
-          {profile.sections.map((section, sectionIndex) => (
-            <TimelineSection
-              key={section.title}
-              section={section}
-              sectionIndex={sectionIndex}
-            />
+    <div
+      data-resume-print
+      style={{ fontFamily: PRINT_FONT }}
+      className="text-[13px] leading-[1.35] text-ink"
+    >
+      <header>
+        <h1 className="m-0 text-[28px] leading-[1.15] font-bold">
+          {profile.name}
+        </h1>
+        <p className="mt-1 mb-0 text-[15px] font-medium">{profile.headline}</p>
+        <p data-resume-contact className="mt-2 mb-0 text-ink-2">
+          Bangkok, Thailand
+          {contacts.map((contact) => (
+            <span key={contact.href}>
+              {" | "}
+              <a href={contact.href}>{contact.label}</a>
+            </span>
           ))}
+        </p>
+        {profile.languages.length > 0 ? (
+          <p className="m-0 text-ink-2">{profile.languages.join(" | ")}</p>
+        ) : null}
+        <p className="mt-1 mb-0 font-medium">{OPEN_TO_ROLES.sentence}</p>
+      </header>
 
-          <SkillsSection
-            skills={profile.skills}
-            sectionIndex={profile.sections.length}
-          />
-        </div>
-      </Container>
+      <PrintSection title="Summary">
+        <p className="m-0">{profile.summary}</p>
+      </PrintSection>
+
+      {groups
+        .filter((group) => group.kind === "entries")
+        .map((group) => (
+          <PrintSection key={group.title} title={group.title}>
+            {group.items.map((item) => (
+              <PrintEntry key={itemKey(item)} item={item} />
+            ))}
+          </PrintSection>
+        ))}
+
+      <PrintSection title="Core skills">
+        {profile.skills.map((group) => (
+          <p key={group.label} className="m-0">
+            {/* The space sits inside the label, so the PDF keeps it. */}
+            <strong className="font-semibold">{`${group.label}: `}</strong>
+            {group.items.join(", ")}.
+          </p>
+        ))}
+      </PrintSection>
+
+      {groups
+        .filter((group) => group.kind === "lines")
+        .map((group) => (
+          <PrintSection key={group.title} title={group.title}>
+            {group.items.map((item) => {
+              // A CMS entry may lack a part (no period, say): print the
+              // parts there are, with a bar only between two of them.
+              const [first, ...rest] = [
+                item.org,
+                item.title,
+                printPeriod(item.period),
+              ].filter(Boolean);
+              return (
+                <p key={itemKey(item)} className="m-0">
+                  <strong className="font-semibold">{first}</strong>
+                  {rest.map((part) => ` | ${part}`).join("")}
+                </p>
+              );
+            })}
+          </PrintSection>
+        ))}
     </div>
   );
 }
 
-function isExternalHref(href: string): boolean {
-  return /^https?:\/\//.test(href);
+/** "Sep 2025 — Present" -> "Sep 2025 - Present": the plain hyphen every parser reads. */
+function printPeriod(period: string): string {
+  return period.replace(/\s[—–]\s/, " - ");
 }
 
-/**
- * Faintness for the "fade-out tail": entries stay full-strength near the top of
- * a section and dim toward the oldest, so depth reads as recency. Clamped so the
- * tail never drops below readable contrast (and so print stays legible).
- */
-function tailOpacity(position: number, total: number): number {
-  if (total <= 1) return 1;
-  const t = position / (total - 1);
-  // Floor at 0.9: any deeper fade pushes ink-2 text below WCAG AA 4.5:1 on
-  // the page colour (4.9:1 at 0.9; enforced by tests/e2e/a11y.spec.ts).
-  return 1 - t * 0.1;
+function itemKey(item: ResolvedTimelineItem): string {
+  return `${item.title}-${item.org}-${item.period}`;
 }
 
-function SectionHeader({
-  id,
-  index,
+function PrintSection({
   title,
+  children,
 }: {
-  id: string;
-  index: number;
   title: string;
+  children: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex items-baseline gap-3 border-t border-hairline pt-6">
-      <span
-        aria-hidden="true"
-        className="font-mono text-label tabular-nums text-ink-2"
-      >
-        {pad2(index + 1)}
-      </span>
-      <h2 id={id} className="font-display text-h3 text-ink">
+    <section className="mt-3">
+      <h2 className="m-0 mb-1.5 break-after-avoid border-b border-hairline-strong pb-1 text-[14px] leading-[1.3] font-semibold">
         {title}
       </h2>
-    </div>
-  );
-}
-
-function TimelineSection({
-  section,
-  sectionIndex,
-}: {
-  section: ResolvedTimelineSection;
-  sectionIndex: number;
-}) {
-  const headingId = `resume-section-${sectionIndex}`;
-  return (
-    <section aria-labelledby={headingId}>
-      <SectionHeader
-        id={headingId}
-        index={sectionIndex}
-        title={section.title}
-      />
-
-      <div>
-        {section.items.map((item, itemIndex) => (
-          <TimelineEntry
-            key={`${item.title}-${item.org}-${item.period}`}
-            item={item}
-            index={itemIndex}
-            opacity={tailOpacity(itemIndex, section.items.length)}
-          />
-        ))}
-      </div>
+      {children}
     </section>
   );
 }
 
-function TimelineEntry({
-  item,
-  index,
-  opacity,
-}: {
-  item: ResolvedTimelineItem;
-  index: number;
-  opacity: number;
-}) {
+/** A role or a project: title and period, organisation, note, bullets. */
+function PrintEntry({ item }: { item: ResolvedTimelineItem }) {
+  // "Live at gogocash.co." repeats the link the organisation line prints.
+  const bullets = (item.bullets ?? []).filter(
+    (bullet) => !(item.href && isLiveBullet(bullet)),
+  );
   return (
-    <article
-      style={{ opacity }}
-      className="flex gap-4 border-t border-hairline py-6 first:border-t-0 first:pt-0"
-    >
-      <CompanyLogo
-        name={item.logoName ?? item.org}
-        domain={item.logoDomain}
-        src={item.logoSrc}
-      />
-
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h3 className="min-w-0 break-words text-body font-medium text-ink">
-            <EntryTitle item={item} />
-            <span className="mt-0.5 block text-small font-normal text-ink-2">
-              {item.org}
-            </span>
-          </h3>
-          <span className="shrink-0 font-mono text-label tabular-nums text-ink-2">
-            {item.period}
-          </span>
-        </div>
-
-        {item.bullets && item.bullets.length > 0 ? (
-          <ul className="mt-3 space-y-1.5 text-small text-ink-2">
-            {item.bullets.map((bullet) => (
-              <li key={bullet} className="flex gap-2.5">
-                <span
-                  aria-hidden="true"
-                  className="mt-[0.6em] size-1 shrink-0 bg-ink-2"
-                />
-                <span>{bullet}</span>
-              </li>
-            ))}
-          </ul>
+    // An <article>, so the print stylesheet keeps the entry on one page.
+    <article className="mt-2 first:mt-0">
+      <div className="flex items-baseline justify-between gap-4">
+        <h3 className="m-0 font-semibold">{item.title}</h3>
+        <span className="shrink-0 text-ink-2">{printPeriod(item.period)}</span>
+      </div>
+      <p className="m-0 text-ink-2">
+        {item.org}
+        {item.href ? (
+          <>
+            {" | "}
+            <a href={item.href}>{linkLabel(item.href)}</a>
+          </>
         ) : null}
-      </div>
-
-      {/* Faint right-aligned running index. */}
-      <span
-        aria-hidden="true"
-        className="font-mono text-label tabular-nums text-ink-2"
-      >
-        {pad2(index + 1)}
-      </span>
+      </p>
+      {item.note ? <p className="m-0 text-ink-2">{item.note}</p> : null}
+      {bullets.length > 0 ? (
+        <ul className="mt-1 mb-0 list-disc pl-[18px]">
+          {bullets.map((bullet) => (
+            <li key={bullet}>{bullet}</li>
+          ))}
+        </ul>
+      ) : null}
     </article>
-  );
-}
-
-function EntryTitle({ item }: { item: ResolvedTimelineItem }) {
-  if (!item.href) return <>{item.title}</>;
-
-  const className =
-    "text-ink underline decoration-link/50 underline-offset-4 transition-colors hover:text-link hover:decoration-link";
-
-  if (isExternalHref(item.href)) {
-    return (
-      <a
-        href={item.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-      >
-        {item.title}
-      </a>
-    );
-  }
-
-  return (
-    <Link href={item.href} className={className}>
-      {item.title}
-    </Link>
-  );
-}
-
-function SkillsSection({
-  skills,
-  sectionIndex,
-}: {
-  skills: readonly string[];
-  sectionIndex: number;
-}) {
-  return (
-    <section aria-labelledby="resume-skills">
-      <SectionHeader id="resume-skills" index={sectionIndex} title="Skills" />
-
-      <ul className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-        {skills.map((skill, i) => (
-          <li
-            key={skill}
-            className="flex items-baseline gap-3 border-t border-hairline pt-3 text-small text-ink"
-          >
-            <span
-              aria-hidden="true"
-              className="font-mono text-label tabular-nums text-ink-2"
-            >
-              {pad2(i + 1)}
-            </span>
-            <span>{skill}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }

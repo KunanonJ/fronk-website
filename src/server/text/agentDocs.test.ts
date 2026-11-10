@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { SITE_UPDATED } from "@/lib/content/freshness";
-import { OPEN_TO_ROLES, PERSON_SUMMARY } from "@/lib/content/identity";
+import {
+  CURRENT_ROLE,
+  OPEN_TO_ROLES,
+  PERSON_SUMMARY,
+} from "@/lib/content/identity";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
@@ -36,8 +40,10 @@ describe("agent docs", () => {
     expect(text).toContain(OPEN_TO_ROLES.sentence);
     expect(text).toContain("## Roles");
     expect(text).toContain(
-      "- IT Manager & AI Engineering Lead, The Binary Holdings (Nov 2025 to Present)",
+      `- ${CURRENT_ROLE.title}, ${CURRENT_ROLE.organization} (${CURRENT_ROLE.sinceShort} to Present)`,
     );
+    // Employment only: the independent projects are not roles.
+    expect(text).not.toMatch(/^- Founder,/m);
     expect(text).toContain(`**Updated:** ${SITE_UPDATED}`);
   });
 });
@@ -55,6 +61,20 @@ describe("llms-full.txt", () => {
       expect(text).toContain(`/topics/${t.slug}`);
     expect(text).not.toContain("/blog/");
     expect(text).not.toContain("/press");
+  });
+
+  it("prints the note that explains a concurrent role, and the availability", async () => {
+    const { buildLlmsFull } = await import("./llmsFull");
+    const { RESUME_TIMELINE_FALLBACK } =
+      await import("@/lib/content/resumeTimeline.fallback");
+    const { OPEN_TO_ROLES } = await import("@/lib/content/availability");
+    const text = buildLlmsFull();
+    const notes = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items)
+      .map((item) => item.note)
+      .filter((note): note is string => Boolean(note));
+    expect(notes.length).toBeGreaterThan(0);
+    for (const note of notes) expect(text).toContain(`  - ${note}`);
+    expect(text).toContain(`Availability: ${OPEN_TO_ROLES.sentence}`);
   });
 });
 

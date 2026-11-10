@@ -94,7 +94,8 @@ const resumeProfile = {
   _id: "resumeProfile",
   _type: "resumeProfile",
   name: "Kunanon Jarat",
-  headline: "Founder. IT Manager. Based in Bangkok.",
+  headline:
+    "AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
 };
 
 const standardPages = [

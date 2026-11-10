@@ -1,8 +1,9 @@
 import { CtaLink } from "@/components/bento/Buttons";
-import { EyebrowChip } from "@/components/bento/Chips";
+import { AvailabilityPill, EyebrowChip } from "@/components/bento/Chips";
 import { ArrowDownIcon } from "@/components/bento/icons";
 import { GithubIcon, LinkedinIcon, XIcon } from "@/components/ui/SocialIcons";
 import { aboutPage } from "@/lib/content/aboutPage";
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import { socials } from "@/lib/content/landing";
 import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
@@ -39,6 +40,10 @@ export default function AboutHero() {
           <span className="block text-mark">{headline.accent}</span>
         </PageTitle>
         <HeroLead>{hero.role}</HeroLead>
+        <AvailabilityPill
+          label={OPEN_TO_ROLES.pill.label}
+          detail={OPEN_TO_ROLES.pill.detail}
+        />
         <div className="flex flex-wrap items-center gap-3">
           <CtaLink href={hero.primaryCta.href}>{hero.primaryCta.label}</CtaLink>
           <CtaLink href={hero.secondaryCta.href} variant="secondary">

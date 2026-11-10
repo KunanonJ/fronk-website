@@ -235,15 +235,22 @@ describe("skills helpers", () => {
 });
 
 describe("skills nav", () => {
-  it("is a top-level link right after Portfolio", () => {
+  it("is a top-level link named for what it is, after Portfolio and the résumé", () => {
     const labels = primaryNav.map((item) => item.label);
-    const index = labels.indexOf("Skills");
-    expect(index).toBe(labels.indexOf("Portfolio") + 1);
+    // "Skills" alone read as a list of abilities; the page is the catalogue.
+    expect(labels).not.toContain("Skills");
+    const index = labels.indexOf("Agent skills");
+    expect(labels.slice(index - 2, index)).toEqual(["Portfolio", "Résumé"]);
     expect(primaryNav[index]).toMatchObject({
       type: "link",
-      label: "Skills",
+      label: "Agent skills",
       href: "/skills",
       icon: "skills",
+    });
+    expect(primaryNav[index - 1]).toMatchObject({
+      type: "link",
+      label: "Résumé",
+      href: "/resume",
     });
   });
 });

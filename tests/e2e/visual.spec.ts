@@ -6,15 +6,25 @@ import { ROUTES } from "./routes";
  * (visual-redesign Phase 6). They are the parity reference for the TanStack
  * Start migration.
  *
- * Baselines are Linux-only, captured in the official Playwright image so CI
- * and local runs render identically (fonts are self-hosted via next/font):
+ * Baselines are Linux-only, captured in the official Playwright image
+ * (mcr.microsoft.com/playwright:v1.64.1-noble) so CI and local runs render
+ * identically (fonts are self-hosted). CI runs the same image (the `visual`
+ * job): install, build, then
  *
- *   docker run --rm --ipc=host -v "$PWD":/work -w /work \
- *     mcr.microsoft.com/playwright:v1.64.1-noble \
- *     npx playwright test visual.spec.ts --project=mobile --project=desktop
+ *   pnpm exec playwright test visual.spec.ts --project=mobile --project=desktop
  *
- * CI runs the same image (the `visual` job). After an intentional visual
- * change, refresh with `--update-snapshots=changed` and review every image.
+ * To run it locally, do the same inside the container. Do not mount a
+ * macOS checkout's node_modules: its native binaries are macOS builds. Copy
+ * the repo into the container without node_modules, dist and .git, run
+ * `pnpm install --frozen-lockfile` and `pnpm build` there, then the command
+ * above.
+ *
+ * The suite tolerates 1% of pixels (playwright.config.ts), so a small text
+ * change passes against the old image and `--update-snapshots=changed`
+ * refreshes nothing. After an intentional visual change, re-render with
+ * `--update-snapshots=all`, copy back the baselines of the pages you changed
+ * and review each image. Other files may differ too: some baselines are
+ * older than the code, and Press varies from run to run.
  *
  * Reduced motion keeps captures deterministic (it also turns off every
  * entrance animation and the Bangkok scene loops), the clock is frozen so the
@@ -22,7 +32,11 @@ import { ROUTES } from "./routes";
  * intro is marked as seen so it never covers a capture. Chromium only: WebKit and
  * Firefox rasterise fonts too differently for pixel diffs (smoke.spec covers
  * them). CMS-driven routes are skipped: an owner edit in Sanity would
- * otherwise fail unrelated pull requests.
+ * otherwise fail unrelated pull requests. The résumé is one of them, though
+ * Sanity holds no résumé document today and the page draws the repo's data
+ * (lib/content/resumeTimeline.fallback.ts): Studio can hold one (`pnpm seed`
+ * creates it), and every render reads Sanity, so a failed read would fail
+ * these tests too. Its layout therefore has no visual baseline.
  */
 const CMS_DRIVEN = new Set(["resume", "blog"]);
 const THEMES = ["light", "dark"] as const;

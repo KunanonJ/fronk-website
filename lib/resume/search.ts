@@ -25,6 +25,6 @@ export const resumeSearchSchema = v.object({
 export const RESUME_META = {
   title: "Resume",
   description:
-    "Kunanon Jarat (Fronk) — Founder, IT manager, AI engineering lead, and project leader across fintech, AI, and Web3.",
+    "Résumé of Kunanon Jarat (Fronk): AI engineering lead in Bangkok, with experience in AI product delivery, internal platforms and fintech.",
   path: "/resume",
 } as const;
