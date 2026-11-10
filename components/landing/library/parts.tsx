@@ -2,6 +2,7 @@ import { Fragment, type ReactNode } from "react";
 import { EyebrowChip } from "@/components/bento/Chips";
 import type { HeadlineLine } from "@/lib/content/topics/pillars";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Shared pieces of the library pages (bento redesign, phase 7f; design spec
@@ -28,11 +29,6 @@ export const EXTERNAL = {
   target: "_blank",
   rel: "noopener noreferrer",
 } as const;
-
-/** Two digits, as the canvas counts ("03 tools"). */
-export function pad2(n: number): string {
-  return String(n).padStart(2, "0");
-}
 
 /** "03 tools", "01 ticket". */
 export function countLabel(n: number, one: string, many: string): string {

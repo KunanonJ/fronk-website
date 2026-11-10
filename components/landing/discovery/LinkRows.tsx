@@ -1,7 +1,7 @@
 import Link from "@/components/navigation/Link";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
-import { twoDigits } from "@/components/landing/discovery/hubLayout";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 export type HubLink = {
   label: string;
@@ -52,7 +52,7 @@ export default function LinkRows({
             )}
           >
             <span className="font-mono text-xs font-normal text-ink-2">
-              {twoDigits(i + 1)}
+              {pad2(i + 1)}
             </span>
             <span className="min-w-0">{link.label}</span>
             <ArrowUpRightIcon

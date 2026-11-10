@@ -9,7 +9,6 @@ import {
   TEXT_LINK,
   WELL,
   countLabel,
-  pad2,
 } from "@/components/landing/library/parts";
 import type { BlogCard } from "@/lib/content/blog";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@/lib/content/learn";
 import type { LearnLang } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 const LANGS: readonly { id: LearnLang; label: string; code: string }[] = [
   { id: "en", label: "English", code: "EN" },

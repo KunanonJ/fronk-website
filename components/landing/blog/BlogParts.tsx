@@ -2,6 +2,7 @@ import Link from "@/components/navigation/Link";
 import Image from "@/components/ui/Image";
 import { formatBlogDate, type BlogCard } from "@/lib/content/blog";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Pieces shared by the bento Blog index and Post (design spec 4.17-4.18).
@@ -89,9 +90,7 @@ export function PostRow({
     >
       <div className="flex flex-[0_0_104px] flex-col gap-0.5 pt-1">
         {index !== undefined ? (
-          <span className="font-mono text-xs text-ink-2">
-            {String(index).padStart(2, "0")}
-          </span>
+          <span className="font-mono text-xs text-ink-2">{pad2(index)}</span>
         ) : null}
         {date}
       </div>

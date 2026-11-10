@@ -37,6 +37,7 @@ import {
 } from "@/lib/content/skills";
 import type { SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
@@ -244,7 +245,7 @@ function PipelineCard() {
                 aria-hidden
                 className="flex items-center gap-2.5 font-mono text-xs text-ink-2"
               >
-                {String(index + 1).padStart(2, "0")}
+                {pad2(index + 1)}
                 <span className="h-px flex-1 bg-hairline-strong" />
                 {index < steps.length - 1 ? (
                   <ArrowRight size={14} />

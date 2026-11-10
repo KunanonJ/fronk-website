@@ -4,7 +4,6 @@ import { EyebrowChip, TechChip } from "@/components/bento/Chips";
 import Image from "@/components/ui/Image";
 import {
   hubSpanClass,
-  twoDigits,
   type HubSpan,
 } from "@/components/landing/discovery/hubLayout";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
@@ -26,6 +25,7 @@ import {
   type PortfolioFilter,
 } from "@/lib/portfolio/search";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * /portfolio (bento redesign, phase 7e; design spec 4.5): the hero, the
@@ -111,7 +111,7 @@ function ProjectCard({
           {project.category}
         </CardKicker>
         <span aria-hidden className="font-mono text-xs text-ink-2">
-          {twoDigits(number)}
+          {pad2(number)}
         </span>
       </div>
       <CardVisual project={project} wide={span.lg > 1} />

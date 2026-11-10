@@ -13,6 +13,7 @@ import {
   contactPage,
 } from "@/lib/content/contact";
 import { writeClipboard } from "@/lib/utils/clipboard";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Contact bento cards around the form (bento canvas, design spec 4.3).
@@ -114,7 +115,7 @@ export function ElsewhereCard() {
                 aria-hidden
                 className="pt-[3px] font-mono text-xs text-ink-2"
               >
-                {String(index + 1).padStart(2, "0")}
+                {pad2(index + 1)}
               </span>
               <span className="flex min-w-0 flex-col">
                 <span className="text-card font-medium text-ink">

@@ -7,6 +7,7 @@ import {
 } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity/client";
 import type { SanityImage } from "@/lib/sanity/types";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Post body styles (bento redesign, phase 7g). The canvas draws only
@@ -72,7 +73,7 @@ const components: PortableTextComponents = {
           aria-hidden
           className="min-w-[2ch] shrink-0 pt-[3px] font-mono text-meta text-ink-2 tabular-nums"
         >
-          {String(index + 1).padStart(2, "0")}
+          {pad2(index + 1)}
         </span>
         <span className="min-w-0">{children}</span>
       </li>

@@ -5,7 +5,6 @@ import {
   LibraryHero,
   MONO_LABEL,
   TEXT_LINK,
-  pad2,
 } from "@/components/landing/library/parts";
 import {
   EXAMPLE_PERSONAS,
@@ -14,6 +13,7 @@ import {
 } from "@/lib/content/examples";
 import type { ExamplePersonaId } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /** The persona picker: a tile per persona, the pressed one in ink. */
 function PersonaPicker({

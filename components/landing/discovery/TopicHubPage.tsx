@@ -14,7 +14,6 @@ import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnal
 import {
   hubSpanClass,
   topicGrid,
-  twoDigits,
   type HubSpan,
 } from "@/components/landing/discovery/hubLayout";
 import LinkRows, {
@@ -24,6 +23,7 @@ import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 import type { TopicPillar } from "@/lib/content/topics/pillars";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /** Card labels (canvas microcopy) in each language. */
 const COPY = {
@@ -184,7 +184,7 @@ function SectionCard({
         aria-hidden
         className="m-0 mt-auto px-1 font-mono text-[40px] leading-none font-medium tracking-[-0.03em] text-mark"
       >
-        {twoDigits(index)}
+        {pad2(index)}
       </p>
       <p
         className={cn(
@@ -285,7 +285,7 @@ function FaqCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
                   th ? "pt-[5px]" : "pt-1",
                 )}
               >
-                {twoDigits(i + 1)}
+                {pad2(i + 1)}
               </span>
               <span className="min-w-0">{faq.question}</span>
             </dt>
