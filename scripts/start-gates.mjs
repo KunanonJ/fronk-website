@@ -124,7 +124,9 @@ try {
       "--project=desktop",
       "--project=mobile",
       "--grep",
-      `(^| )(${names})( |$)`,
+      // A name ends at a space, at a colon ("home: the résumé is one click
+      // away") or at the end of the title.
+      `(^| )(${names})(:| |$)`,
     ],
     // Reuse this preview instead of letting Playwright start a server.
     { PLAYWRIGHT_BASE_URL: BASE, CI: "" },

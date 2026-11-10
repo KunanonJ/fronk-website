@@ -103,9 +103,10 @@ describe("employers", () => {
   });
 
   it("carry the CV's start and end months", () => {
-    // Checked against the CV on 10-11-26. These periods reach the résumé,
-    // Home, /llms-full.txt and the PDF, so a changed month has to be a
-    // decision made here, not a slip in the data file.
+    // The periods were checked against the CV on 10-11-26; the titles are
+    // the site's wording (the CV writes the current one with a slash). These
+    // periods reach the résumé, Home, /llms-full.txt and the PDF, so a
+    // changed month has to be a decision made here, not a slip in the data.
     expect(roles.map((item) => [item.title, item.period])).toEqual([
       ["IT Manager & AI Engineering Lead", "Sep 2025 — Present"],
       ["AI Project Manager", "Jan 2025 — Oct 2025"],
@@ -194,41 +195,38 @@ describe("employers", () => {
   });
 });
 
-/** Every .ts and .tsx source file under a folder, tests left out. */
+/** Every source and content file under a folder (code, JSON, Markdown), tests left out. */
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return sources(path);
-    return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
+    return /\.(tsx?|json|mdx?)$/.test(name) && !/\.test\.tsx?$/.test(name)
+      ? [path]
+      : [];
   });
 }
 
 describe("the wording rule", () => {
-  it('says "RAG" only where the CV does: the knowledge platform and the skills line', () => {
-    // The CV names RAG twice: in the knowledge-platform bullet of the current
-    // role and in its Core Skills line (checked 10-11-26). The site may say
-    // it in those two places and nowhere else.
-    const files = ["lib", "components", "src"]
-      .flatMap(sources)
-      .filter((file) => /\bRAG\b/.test(readFileSync(file, "utf8")));
-    expect(files).toEqual(["lib/content/resumeTimeline.fallback.ts"]);
-
+  it('says "RAG" once, for the knowledge platform', () => {
+    // The program's rule: "RAG" only for the knowledge platform. The CV's
+    // Core Skills line lists it too; it stays off the site's skills until
+    // the owner clears that use (umbrella plan, hard constraints).
     const said = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items).flatMap(
       (item) => (item.bullets ?? []).filter((bullet) => /\bRAG\b/.test(bullet)),
     );
     expect(said).toHaveLength(1);
     expect(said[0]).toMatch(/knowledge platform/);
     expect(section("Currently")[0]!.bullets).toContain(said[0]);
+    expect(JSON.stringify(RESUME_SKILLS_FALLBACK)).not.toMatch(/\bRAG\b/);
 
-    const skilled = RESUME_SKILLS_FALLBACK.filter((group) =>
-      group.items.some((item) => /\bRAG\b/.test(item)),
-    );
-    expect(skilled.map((group) => group.label)).toEqual(["AI & Cloud"]);
-    expect(
-      readFileSync("lib/content/resumeTimeline.fallback.ts", "utf8").match(
-        /\bRAG\b/g,
-      ),
-    ).toHaveLength(2);
+    // And in no other file the site is built from, comments included: a
+    // note about the rule belongs in the résumé data file.
+    const files = ["lib", "components", "src"]
+      .flatMap(sources)
+      .filter((file) => /\bRAG\b/.test(readFileSync(file, "utf8")));
+    expect(files, 'only the résumé data may say "RAG"').toEqual([
+      "lib/content/resumeTimeline.fallback.ts",
+    ]);
   });
 });
 

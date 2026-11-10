@@ -10,6 +10,7 @@ import { ChromeProvider } from "@/components/bento/ChromeContext";
 import SharePill from "@/components/bento/SharePill";
 import SiteHeader from "@/components/bento/SiteHeader";
 import { isCurrentRow } from "@/components/bento/SiteMenu";
+import { siteMenu } from "@/lib/content/landing";
 
 function renderHeader(extra?: React.ReactNode) {
   return render(
@@ -171,6 +172,23 @@ describe("share panel", () => {
     expect(screen.getByText("Link copied")).toBeInTheDocument();
   });
 
+  it("keeps the page's language on the shared title, inside the English header", () => {
+    // A Thai hub: <html lang="th"> and a Thai title, in a header that says
+    // lang="en" for its own labels.
+    document.documentElement.lang = "th";
+    document.title = "วิศวกรรม AI แบบ Forward Deployed";
+    try {
+      renderHeader();
+      fireEvent.click(shareButton());
+      const title = screen.getByText("วิศวกรรม AI แบบ Forward Deployed");
+      expect(title).toHaveAttribute("lang", "th");
+      expect(title.closest("header")).toHaveAttribute("lang", "en");
+    } finally {
+      document.documentElement.removeAttribute("lang");
+      document.title = "";
+    }
+  });
+
   it("offers More options only where the share sheet exists", () => {
     renderHeader();
     fireEvent.click(shareButton());
@@ -214,22 +232,24 @@ describe("isCurrentRow", () => {
     ).toBe(true);
   });
 
-  it("treats a Thai page as its English twin", () => {
-    const rows = [
-      { href: "/topics/forward-deployed-ai-engineering", match: [] },
-      { href: "/learn", match: ["/topics/"] },
-    ];
+  it("treats a Thai hub as its English twin, on the site's real rows", () => {
+    const rows = [...siteMenu.rows, ...siteMenu.library];
+    const current = (path: string) =>
+      rows
+        .filter((row) => isCurrentRow(path, row, rows))
+        .map((row) => row.href);
+    const fde = "/topics/forward-deployed-ai-engineering";
     // The Thai FDE hub marks its own row, not the Learn section.
-    const fde = "/th/topics/forward-deployed-ai-engineering";
-    expect(isCurrentRow(fde, rows[0]!, rows)).toBe(true);
-    expect(isCurrentRow(fde, rows[1]!, rows)).toBe(false);
-    // Any other Thai hub still marks Learn.
-    expect(
-      isCurrentRow("/th/topics/tech-startup-thailand-sea", rows[1]!, rows),
-    ).toBe(true);
-    // Only a /th segment is dropped: "/the..." paths are left alone.
-    expect(isCurrentRow("/themes", { href: "/themes", match: [] })).toBe(true);
-    expect(isCurrentRow("/th", { href: "/", match: [] })).toBe(true);
+    expect(current(`/th${fde}`)).toEqual([fde]);
+    expect(current(fde)).toEqual([fde]);
+    // Any other Thai hub still marks Learn, as its English twin does.
+    expect(current("/th/topics/tech-startup-thailand-sea")).toEqual(["/learn"]);
+    expect(current("/topics/tech-startup-thailand-sea")).toEqual(["/learn"]);
+    // Nothing else lives under /th: those are not-found pages and mark
+    // nothing, like any other not-found page.
+    expect(current("/th")).toEqual([]);
+    expect(current("/th/resume")).toEqual([]);
+    expect(current("/does-not-exist")).toEqual([]);
   });
 });
 

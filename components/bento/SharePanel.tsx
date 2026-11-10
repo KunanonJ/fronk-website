@@ -22,6 +22,9 @@ export function readShareTarget(): ShareTarget {
  */
 export default function SharePanel() {
   const [target] = useState(readShareTarget);
+  // The title is the page's own, in the page's language (Thai on a Thai
+  // hub), while the header around this panel declares English.
+  const [pageLang] = useState(() => document.documentElement.lang || undefined);
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -38,7 +41,10 @@ export default function SharePanel() {
       className={cn(PANEL, "w-[340px]")}
     >
       <p className="mx-3 mt-1 text-meta text-ink-2">Share</p>
-      <p className="mx-3 mt-0.5 mb-2.5 text-card leading-[1.35] font-semibold">
+      <p
+        lang={pageLang}
+        className="mx-3 mt-0.5 mb-2.5 text-card leading-[1.35] font-semibold"
+      >
         {target.title}
       </p>
       <ShareRows target={target} showUrl />

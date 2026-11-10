@@ -304,10 +304,12 @@ const trainingItems: readonly ResolvedTimelineItem[] = [
 const skills: readonly ResumeSkillGroup[] = [
   {
     label: "AI & Cloud",
+    // The CV's line also lists RAG. The program's wording rule keeps that
+    // word to the knowledge platform (the current role's bullet), so it is
+    // left out here until the owner clears it as a skill.
     items: [
       "Generative AI",
       "Large language models (LLMs)",
-      "RAG",
       "AI agents",
       "Google ADK",
       "Grok Bot",

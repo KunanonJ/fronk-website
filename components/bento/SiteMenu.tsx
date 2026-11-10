@@ -16,13 +16,13 @@ export function isCurrentRow(
   row: MenuRow,
   rows: readonly MenuRow[] = [],
 ): boolean {
-  // A Thai page (/th/...) counts as its English twin: no row links to /th,
-  // so the Thai FDE hub marks "AI engineering" as the English one does.
-  const path =
-    (pathname.length > 1
-      ? pathname.replace(/\/+$/, "") || "/"
-      : pathname
-    ).replace(/^\/th(?=\/|$)/, "") || "/";
+  // A Thai hub (/th/topics/...) counts as its English twin: no row links to
+  // /th, so the Thai FDE hub marks "AI engineering" as the English one does.
+  // Only hubs exist under /th; anything else there is a not-found page and
+  // marks nothing.
+  const path = (
+    pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname
+  ).replace(/^\/th(?=\/topics\/)/, "");
   if (row.href === path) return true;
   if (rows.some((other) => other.href === path)) return false;
   return row.match.some((prefix) => path.startsWith(prefix));

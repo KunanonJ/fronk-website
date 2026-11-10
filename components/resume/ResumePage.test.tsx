@@ -156,7 +156,9 @@ describe("ResumePage (screen)", () => {
       "Engineering",
       "Tools",
     ]);
-    expect(within(skills).getByText("RAG")).toBeInTheDocument();
+    expect(within(skills).getByText("Google ADK")).toBeInTheDocument();
+    // "RAG" is kept to the knowledge-platform bullet (the wording rule).
+    expect(within(skills).queryByText("RAG")).toBeNull();
   });
 
   it("hides the bullet lists in the compact view", () => {

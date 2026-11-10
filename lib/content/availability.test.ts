@@ -39,6 +39,7 @@ describe("availability", () => {
       /relocat|travel|on-?site/i,
     );
     // Nor do the pages that speak for him: About, the FAQ and every hub.
+    // Only an offer counts: a sentence that merely mentions travel is fine.
     // (The résumé's "On-site, Bangkok" is where past jobs were, not an offer.)
     const spoken = JSON.stringify([
       aboutPage,
@@ -46,7 +47,9 @@ describe("availability", () => {
       getAllTopicPillars("en"),
       getAllTopicPillars("th"),
     ]);
-    expect(spoken).not.toMatch(/relocat|\btravel/i);
+    expect(spoken).not.toMatch(
+      /relocat|(willing|open|able|happy|available|ready) to travel|travel(ling|ing)? (for|to) (work|a role|roles|clients)/i,
+    );
   });
 
   it("says the same in Thai, the pill being the sentence split in two", () => {
