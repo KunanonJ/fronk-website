@@ -148,8 +148,30 @@ function RiverArt() {
 }
 
 /** A topic hub in the chosen language. Thai opens its line heights (spec 1.6). */
-function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
-  const layout = HUB_LAYOUT[index] ?? HUB_LAYOUT[1];
+/**
+ * The layout for hub `index` of `count`. The first three follow the canvas;
+ * later hubs continue the one-then-two rhythm, and a hub left alone on its row
+ * spans the full width, so no row ends in an empty gap.
+ */
+export function hubLayout(index: number, count: number) {
+  if (index < HUB_LAYOUT.length) return HUB_LAYOUT[index]!;
+  const position = index - HUB_LAYOUT.length;
+  const base = HUB_LAYOUT[1]!;
+  if (position % 2 === 1) return { ...base, span: 2 as BentoSpan };
+  const last = index === count - 1;
+  return last ? { ...base, span: 3 as BentoSpan } : base;
+}
+
+function HubCard({
+  hub,
+  index,
+  count,
+}: {
+  hub: LearnHub;
+  index: number;
+  count: number;
+}) {
+  const layout = hubLayout(index, count);
   const th = hub.lang === "th";
   const id = `hub-${hub.slug}`;
   return (
@@ -398,10 +420,10 @@ export default function LearnPage({
         </ul>
       </section>
       <Bento>
-        {first ? <HubCard hub={first} index={0} /> : null}
+        {first ? <HubCard hub={first} index={0} count={hubs.length} /> : null}
         <LanguageCard lang={lang} count={hubs.length} onChange={onLangChange} />
         {rest.map((hub, i) => (
-          <HubCard key={hub.slug} hub={hub} index={i + 1} />
+          <HubCard key={hub.slug} hub={hub} index={i + 1} count={hubs.length} />
         ))}
         {writing.length > 0 ? (
           <LinkListCard

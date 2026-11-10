@@ -8,7 +8,7 @@ import StackPage from "@/components/landing/library/StackPage";
 import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { examplesByPersona } from "@/lib/content/examples";
-import { getTopicPillar } from "@/lib/content/topics/pillars";
+import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
 
 /** Every href on the page: none may point at the hidden blog or press. */
 function expectNoHiddenLinks(container: HTMLElement) {
@@ -43,22 +43,22 @@ describe("LearnPage", () => {
     expect(
       within(card).getByRole("link", { name: "อ่านภาษาไทย →" }),
     ).toHaveAttribute("href", "/th/topics/ai-transformation-thailand");
-    expect(screen.getByText("Showing 3 hubs in English")).toBeInTheDocument();
+    expect(
+      screen.getByText(`Showing ${TOPIC_SLUGS.length} hubs in English`),
+    ).toBeInTheDocument();
     expectNoHiddenLinks(container);
   });
 
   it("shows the hubs in Thai under ?lang=th", () => {
     renderLearn("th");
-    for (const slug of [
-      "ai-transformation-thailand",
-      "erp-crm-internal-systems",
-      "tech-startup-thailand-sea",
-    ]) {
+    for (const slug of TOPIC_SLUGS) {
       const th = getTopicPillar(slug, "th");
       const heading = screen.getByRole("heading", { level: 2, name: th?.h1 });
       expect(heading).toHaveAttribute("lang", "th");
     }
-    expect(screen.getByText("Showing 3 hubs in Thai")).toBeInTheDocument();
+    expect(
+      screen.getByText(`Showing ${TOPIC_SLUGS.length} hubs in Thai`),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "ไทย" })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -210,5 +210,16 @@ describe("BuildPage", () => {
     render(<BuildPage venture="all" onVentureChange={onVentureChange} />);
     fireEvent.click(screen.getByRole("button", { name: /^GoGoCash/ }));
     expect(onVentureChange).toHaveBeenCalledWith("gogocash");
+  });
+});
+
+describe("hubLayout", () => {
+  it("keeps the canvas layout for three hubs and fills every row after", async () => {
+    const { hubLayout } =
+      await import("@/components/landing/library/LearnPage");
+    expect([0, 1, 2].map((i) => hubLayout(i, 3).span)).toEqual([2, 1, 2]);
+    expect(hubLayout(3, 4).span).toBe(3);
+    expect([3, 4].map((i) => hubLayout(i, 5).span)).toEqual([1, 2]);
+    expect(hubLayout(5, 6).span).toBe(3);
   });
 });
