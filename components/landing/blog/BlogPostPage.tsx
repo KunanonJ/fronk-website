@@ -5,7 +5,7 @@ import {
   Bento,
   BentoCard,
   BentoPair,
-  CardKicker,
+  Kicker,
   CardLink,
   bentoSpan,
 } from "@/components/bento/Bento";
@@ -16,7 +16,6 @@ import {
   ArrowLeftIcon,
   BODY_LINK,
   BannerFigure,
-  MONO_LABEL,
   PostRow,
 } from "@/components/landing/blog/BlogParts";
 import { PortableText } from "@/components/PortableText";
@@ -31,6 +30,8 @@ import type { NoteLink } from "@/lib/content/noteLinks";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { MONO_LABEL } from "@/components/bento/classes";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * One post (bento canvas Post, design spec 4.18): the hero, the note beside
@@ -79,9 +80,7 @@ function PostHero({ post }: { post: BlogCard }) {
       <h1 id="hero-title" className="m-0 text-title text-ink">
         {post.title}
       </h1>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {post.excerpt}
-      </p>
+      <HeroLead>{post.excerpt}</HeroLead>
       <SharePill />
     </section>
   );
@@ -258,7 +257,7 @@ function RelatedCard({
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <CardKicker id="card-more">More on this tag</CardKicker>
+        <Kicker id="card-more">More on this tag</Kicker>
         <div
           role="group"
           aria-label="Related posts by tag"

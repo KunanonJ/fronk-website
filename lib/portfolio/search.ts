@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { enumParam } from "@/lib/search/enumParam";
 
 /*
  * /portfolio route options that run on every navigation (so they ship in the
@@ -37,13 +38,7 @@ export const PORTFOLIO_SEARCH_DEFAULTS = { category: "all" } as const;
  * projects without an error.
  */
 export const portfolioSearchSchema = v.object({
-  category: v.optional(
-    v.fallback(
-      v.picklist(PORTFOLIO_FILTERS),
-      PORTFOLIO_SEARCH_DEFAULTS.category,
-    ),
-    PORTFOLIO_SEARCH_DEFAULTS.category,
-  ),
+  category: enumParam(PORTFOLIO_FILTERS, PORTFOLIO_SEARCH_DEFAULTS.category),
 });
 
 /** Whether a project with this category label shows under `filter`. */

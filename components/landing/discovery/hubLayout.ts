@@ -1,5 +1,4 @@
-import type { BentoSpan } from "@/components/bento/Bento";
-import { cn } from "@/lib/utils/cn";
+import type { BentoSpan, BentoSpans } from "@/components/bento/Bento";
 
 /*
  * Layout rules for the discovery hubs (bento canvas 4.7, 4.15, 4.16). The
@@ -7,25 +6,10 @@ import { cn } from "@/lib/utils/cn";
  * variants it leaves out (Manut, the other topics) from the same template.
  */
 
-/** A card's column span at two columns (641 px) and at three (1024 px). */
-export type HubSpan = { md: 1 | 2; lg: BentoSpan };
-
-const MD_SPAN = { 1: "", 2: "min-[641px]:col-span-2" } as const;
-const LG_SPAN = {
-  1: "lg:col-span-1",
-  2: "lg:col-span-2",
-  3: "lg:col-span-3",
-} as const;
-
-/** Grid classes for a `HubSpan` inside a `Bento` (one column to 640 px). */
-export function hubSpanClass({ md, lg }: HubSpan): string {
-  return lg === md ? MD_SPAN[md] : cn(MD_SPAN[md], LG_SPAN[lg]);
-}
-
 export type TopicGrid = {
-  sections: readonly HubSpan[];
-  proof: HubSpan;
-  faq: HubSpan;
+  sections: readonly BentoSpans[];
+  proof: BentoSpans;
+  faq: BentoSpans;
 };
 
 /**
@@ -55,7 +39,7 @@ export function topicGrid(sectionCount: number): TopicGrid {
     column = (column + md[i]) % 2;
   });
 
-  const spans = lg.map((span, i): HubSpan => ({ md: md[i], lg: span }));
+  const spans = lg.map((span, i): BentoSpans => ({ md: md[i], lg: span }));
   return {
     sections: spans.slice(0, sectionCount),
     proof: spans[sectionCount],

@@ -3,6 +3,7 @@ import Image from "@/components/ui/Image";
 import { formatBlogDate, type BlogCard } from "@/lib/content/blog";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { MONO_LABEL } from "@/components/bento/classes";
 
 /*
  * Pieces shared by the bento Blog index and Post (design spec 4.17-4.18).
@@ -11,10 +12,6 @@ import { pad2 } from "@/lib/utils/pad2";
 /** Body links: the link colour, underlined, as in the canvas post body. */
 export const BODY_LINK =
   "text-link underline decoration-1 underline-offset-4 [overflow-wrap:anywhere] hover:text-ink";
-
-/** Mono label: 12 px, .06em, uppercase, ink-2. */
-export const MONO_LABEL =
-  "font-mono text-xs tracking-[0.06em] text-ink-2 uppercase";
 
 /**
  * A post banner in the canvas figure frame (tint well, 20 px radius). The

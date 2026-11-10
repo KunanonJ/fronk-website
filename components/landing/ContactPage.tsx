@@ -8,6 +8,7 @@ import {
 } from "@/components/landing/contact/ContactCards";
 import ContactForm from "@/components/landing/contact/ContactForm";
 import { contactPage } from "@/lib/content/contact";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /** Contact hero: eyebrow, the two-line h1 (LCP, lines only slide) and lead. */
 function ContactHero() {
@@ -15,7 +16,7 @@ function ContactHero() {
   return (
     <section aria-labelledby="hero-title" className="flex flex-col gap-6">
       <EyebrowChip>{contactPage.eyebrow}</EyebrowChip>
-      <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+      <PageTitle>
         <span className="block">
           <span className="text-ink-3">{headline.muted}</span> {headline.focus}{" "}
           <span className="text-ink-3">{headline.joiner}</span>{" "}
@@ -24,10 +25,8 @@ function ContactHero() {
         <span className="block">
           {headline.lead} <span className="text-mark">{headline.accent}</span>
         </span>
-      </h1>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {contactPage.lead}
-      </p>
+      </PageTitle>
+      <HeroLead>{contactPage.lead}</HeroLead>
     </section>
   );
 }

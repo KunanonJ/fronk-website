@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { enumParam } from "@/lib/search/enumParam";
 
 /*
  * /skills route options that run on every navigation (so they ship in the
@@ -28,10 +29,7 @@ export const SKILLS_SEARCH_DEFAULTS = { show: "all" } as const;
  * unknown value falls back to all skills without an error.
  */
 export const skillsSearchSchema = v.object({
-  show: v.optional(
-    v.fallback(v.picklist(SKILL_FILTERS), SKILLS_SEARCH_DEFAULTS.show),
-    SKILLS_SEARCH_DEFAULTS.show,
-  ),
+  show: enumParam(SKILL_FILTERS, SKILLS_SEARCH_DEFAULTS.show),
 });
 
 /** Whether a skill shows under `filter`. */

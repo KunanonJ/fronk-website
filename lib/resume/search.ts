@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { enumParam } from "@/lib/search/enumParam";
 
 /*
  * /resume route options that run on every navigation (so they ship in the
@@ -17,10 +18,7 @@ export const RESUME_SEARCH_DEFAULTS = { view: "detailed" } as const;
  * back to detailed without an error.
  */
 export const resumeSearchSchema = v.object({
-  view: v.optional(
-    v.fallback(v.picklist(RESUME_DETAILS), RESUME_SEARCH_DEFAULTS.view),
-    RESUME_SEARCH_DEFAULTS.view,
-  ),
+  view: enumParam(RESUME_DETAILS, RESUME_SEARCH_DEFAULTS.view),
 });
 
 /** /resume head() copy; the description is also the page lead when the CMS has no summary. */

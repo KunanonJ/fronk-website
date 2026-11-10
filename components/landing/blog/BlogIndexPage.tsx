@@ -2,11 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { Bento, BentoCard, CardLink } from "@/components/bento/Bento";
 import { EyebrowChip } from "@/components/bento/Chips";
-import {
-  BannerFigure,
-  MONO_LABEL,
-  PostRow,
-} from "@/components/landing/blog/BlogParts";
+import { BannerFigure, PostRow } from "@/components/landing/blog/BlogParts";
 import {
   BLOG_VENTURE_TAGS,
   blogPage,
@@ -21,6 +17,8 @@ import {
 } from "@/lib/content/blog";
 import { getVentureBySlug } from "@/lib/content/ventures";
 import { cn } from "@/lib/utils/cn";
+import { MONO_LABEL } from "@/components/bento/classes";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /blog (bento canvas Blog, design spec 4.17). Hidden while BLOG_PUBLIC is
@@ -41,7 +39,7 @@ function BlogHero({ eyebrow }: { eyebrow: string }) {
     >
       <EyebrowChip>{eyebrow}</EyebrowChip>
       {/* Each line is a block child, so `kj-lines` slides them in turn. */}
-      <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+      <PageTitle>
         {blogPage.headline.map((line, i) => (
           <Fragment key={i}>
             {i > 0 ? " " : null}
@@ -59,10 +57,8 @@ function BlogHero({ eyebrow }: { eyebrow: string }) {
             </span>
           </Fragment>
         ))}
-      </h1>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {blogPage.lead}
-      </p>
+      </PageTitle>
+      <HeroLead>{blogPage.lead}</HeroLead>
     </section>
   );
 }

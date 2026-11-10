@@ -6,6 +6,7 @@ import CopyButton from "@/components/landing/skills/CopyButton";
 import { EXTERNAL } from "@/components/landing/skills/SkillParts";
 import { SKILLS_TAG, type Skill } from "@/lib/content/skills";
 import { cn } from "@/lib/utils/cn";
+import { CARD_SURFACE } from "@/components/bento/classes";
 
 /** Lines shown before "Show all": the canvas shows the first fifteen. */
 const HEAD_LINES = 15;
@@ -30,7 +31,8 @@ export default function SkillSourceCard({ skill }: { skill: Skill }) {
       id="skill-source"
       aria-labelledby="card-source"
       className={cn(
-        "relative flex scroll-mt-6 flex-col gap-4 overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card",
+        CARD_SURFACE,
+        "flex scroll-mt-6 flex-col gap-4",
         bentoSpan(3),
       )}
     >

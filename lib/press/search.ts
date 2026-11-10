@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { enumParam } from "@/lib/search/enumParam";
 import { PRESS_TYPES, type PressType } from "@/lib/content/press";
 
 /*
@@ -22,13 +23,7 @@ export const PRESS_SEARCH_DEFAULTS = { type: "all" } as const;
  * value falls back to all without an error.
  */
 export const pressSearchSchema = v.object({
-  type: v.optional(
-    v.fallback(
-      v.picklist(PRESS_FILTERS as readonly PressFilter[]),
-      PRESS_SEARCH_DEFAULTS.type,
-    ),
-    PRESS_SEARCH_DEFAULTS.type,
-  ),
+  type: enumParam(PRESS_FILTERS, PRESS_SEARCH_DEFAULTS.type),
 });
 
 /** Whether an item shows under `filter`. */

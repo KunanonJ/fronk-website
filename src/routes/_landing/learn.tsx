@@ -10,6 +10,7 @@ import {
   learnSearchSchema,
   type LearnLang,
 } from "@/lib/library/search";
+import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { PAGE_META } from "@/lib/content/pageMeta";
@@ -43,9 +44,7 @@ function LearnRoute() {
   const setLang = (next: LearnLang) => {
     void navigate({
       search: (prev) => ({ ...prev, lang: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 

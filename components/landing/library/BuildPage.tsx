@@ -1,10 +1,8 @@
-import { Bento } from "@/components/bento/Bento";
+import { Bento, Kicker } from "@/components/bento/Bento";
 import {
   CARD,
   FilterBar,
-  Kicker,
   LibraryHero,
-  MONO_LABEL,
   countLabel,
   type FilterOption,
 } from "@/components/landing/library/parts";
@@ -18,6 +16,7 @@ import {
 } from "@/lib/content/buildBoard";
 import type { BuildFilter } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
+import { MONO_LABEL } from "@/components/bento/classes";
 
 /** Column markers (decorative; the column name carries the meaning). */
 const MARKER: Record<BuildColumn, string> = {

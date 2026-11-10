@@ -11,6 +11,7 @@ import {
   type ResumeDetail,
 } from "@/lib/resume/search";
 import { routeCacheHeaders } from "@/src/lib/cache";
+import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { resumeQuery } from "@/src/queries/content";
 
@@ -43,9 +44,7 @@ function ResumeRoute() {
   const setView = (next: ResumeDetail) => {
     void navigate({
       search: (prev) => ({ ...prev, view: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 

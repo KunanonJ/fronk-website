@@ -20,6 +20,7 @@ import {
 import { getAllVentures, type Venture } from "@/lib/content/ventures";
 import { TITLE_SUFFIX, namedPageTitle } from "@/lib/seo/pageTitle";
 import { siteConfig } from "@/lib/site";
+import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 type VentureHubPageProps = {
   venture: Venture;
@@ -49,7 +50,7 @@ function VentureHero({ venture }: { venture: Venture }) {
     <section aria-labelledby="hero-title" className="flex flex-col gap-6">
       <EyebrowChip>Venture</EyebrowChip>
       <div className="flex flex-wrap items-end gap-x-6 gap-y-5">
-        <h1 id="hero-title" className="kj-lines m-0 text-title text-ink">
+        <PageTitle>
           <span className="block">
             <img
               src={venture.logo}
@@ -67,14 +68,12 @@ function VentureHero({ venture }: { venture: Venture }) {
             </span>
           ))}
           <span className="block text-mark">{accent}</span>
-        </h1>
+        </PageTitle>
         {venture.status === "active" && caseStudy ? (
           <LivePill status={caseStudy.timeline} className="mb-2" />
         ) : null}
       </div>
-      <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-        {caseStudy?.intro ?? venture.description}
-      </p>
+      <HeroLead>{caseStudy?.intro ?? venture.description}</HeroLead>
       <div className="flex flex-wrap items-center gap-3">
         <a
           href={venture.url}

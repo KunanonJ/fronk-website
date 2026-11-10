@@ -1,12 +1,11 @@
+import { Kicker } from "@/components/bento/Bento";
 import { useState } from "react";
 import Link from "@/components/navigation/Link";
 import { TechChip } from "@/components/bento/Chips";
 import {
   CARD,
   EXTERNAL,
-  Kicker,
   LibraryHero,
-  MONO_LABEL,
   TEXT_LINK,
   WELL,
 } from "@/components/landing/library/parts";
@@ -19,6 +18,7 @@ import {
 import type { Venture } from "@/lib/content/ventures";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { MONO_LABEL } from "@/components/bento/classes";
 
 /**
  * Venture metrics: a tile per published figure; picking one shows the

@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  stripSearchParams,
-  useHydrated,
-} from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { PageMain } from "@/components/bento/Bento";
 import PortfolioIndexPage from "@/components/landing/portfolio/PortfolioIndexPage";
@@ -10,6 +6,7 @@ import type { Metadata } from "@/lib/seo/types";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { buildPortfolioCollectionJsonLd } from "@/lib/seo/portfolioJsonLd";
+import { FILTER_NAVIGATION, usePrerenderedParam } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import {
   PORTFOLIO_SEARCH_DEFAULTS,
@@ -38,18 +35,15 @@ export const Route = createFileRoute("/_landing/portfolio/")({
 });
 
 function PortfolioRoute() {
-  const { category } = Route.useSearch();
+  const category = usePrerenderedParam(
+    Route.useSearch().category,
+    PORTFOLIO_SEARCH_DEFAULTS.category,
+  );
   const navigate = Route.useNavigate();
-  // /portfolio is prerendered, so one static file answers every ?category=
-  // and its HTML lists all projects. Hydrate that same markup, then apply
-  // the filter; client-side navigations are already hydrated.
-  const hydrated = useHydrated();
   const setCategory = (next: PortfolioFilter) => {
     void navigate({
       search: (prev) => ({ ...prev, category: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 
@@ -73,10 +67,7 @@ function PortfolioRoute() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: collectionLd }}
       />
-      <PortfolioIndexPage
-        category={hydrated ? category : PORTFOLIO_SEARCH_DEFAULTS.category}
-        onCategoryChange={setCategory}
-      />
+      <PortfolioIndexPage category={category} onCategoryChange={setCategory} />
     </PageMain>
   );
 }

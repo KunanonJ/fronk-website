@@ -6,16 +6,13 @@ import {
   BentoPair,
   PageMain,
   bentoSpan,
+  type BentoSpans,
 } from "@/components/bento/Bento";
 import { ctaClasses } from "@/components/bento/Buttons";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
 import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
-import {
-  hubSpanClass,
-  topicGrid,
-  type HubSpan,
-} from "@/components/landing/discovery/hubLayout";
+import { topicGrid } from "@/components/landing/discovery/hubLayout";
 import LinkRows, {
   type HubLink,
 } from "@/components/landing/discovery/LinkRows";
@@ -169,7 +166,7 @@ function SectionCard({
 }: {
   index: number;
   section: { heading: string; body: string };
-  span: HubSpan;
+  span: BentoSpans;
   th: boolean;
 }) {
   const lead = span.lg > 1;
@@ -178,7 +175,7 @@ function SectionCard({
       headingId={`card-s${index}`}
       title={kicker(section.heading, th)}
       minHeight={false}
-      className={cn(hubSpanClass(span), th ? "min-h-[260px]" : "min-h-[280px]")}
+      className={cn(bentoSpan(span), th ? "min-h-[260px]" : "min-h-[280px]")}
     >
       <p
         aria-hidden
@@ -200,7 +197,13 @@ function SectionCard({
 }
 
 /** Operator proof: accent-marked lines under hairlines. */
-function ProofCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
+function ProofCard({
+  pillar,
+  span,
+}: {
+  pillar: TopicPillar;
+  span: BentoSpans;
+}) {
   const th = pillar.locale === "th";
   return (
     <BentoCard
@@ -208,7 +211,7 @@ function ProofCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
       title={kicker(COPY[pillar.locale].proof, th)}
       gap={3}
       minHeight={false}
-      className={cn(hubSpanClass(span), th ? "min-h-[300px]" : "min-h-[280px]")}
+      className={cn(bentoSpan(span), th ? "min-h-[300px]" : "min-h-[280px]")}
     >
       <ul className="m-0 mt-auto flex list-none flex-col px-1">
         {pillar.proof.map((item, i) => {
@@ -249,7 +252,7 @@ function ProofCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
  * FAQPage JSON-LD carries the same pairs). Full width sets question and
  * answer side by side; narrower, the answer sits under its question.
  */
-function FaqCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
+function FaqCard({ pillar, span }: { pillar: TopicPillar; span: BentoSpans }) {
   const th = pillar.locale === "th";
   const wide = span.lg === 3;
   return (
@@ -259,7 +262,7 @@ function FaqCard({ pillar, span }: { pillar: TopicPillar; span: HubSpan }) {
       title="FAQ"
       gap={3}
       minHeight={false}
-      className={cn(hubSpanClass(span), "pb-3", !wide && "min-h-[300px]")}
+      className={cn(bentoSpan(span), "pb-3", !wide && "min-h-[300px]")}
     >
       <dl className={cn("m-0 flex flex-col px-1", !wide && "mt-auto")}>
         {pillar.faqs.map((faq, i) => (

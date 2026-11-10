@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  stripSearchParams,
-  useHydrated,
-} from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { PageMain } from "@/components/bento/Bento";
 import StackPage from "@/components/landing/library/StackPage";
 import type { Metadata } from "@/lib/seo/types";
@@ -11,6 +7,7 @@ import {
   stackSearchSchema,
   type StackFilter,
 } from "@/lib/library/search";
+import { FILTER_NAVIGATION, usePrerenderedParam } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { PAGE_META } from "@/lib/content/pageMeta";
@@ -34,27 +31,21 @@ export const Route = createFileRoute("/_landing/stack")({
 });
 
 function StackRoute() {
-  const { group } = Route.useSearch();
+  const group = usePrerenderedParam(
+    Route.useSearch().group,
+    STACK_SEARCH_DEFAULTS.group,
+  );
   const navigate = Route.useNavigate();
-  // /stack is prerendered, so one static file answers every ?group= and its
-  // HTML lists every tool. Hydrate that same markup, then apply the filter;
-  // client-side navigations are already hydrated and filter at once.
-  const hydrated = useHydrated();
   const setGroup = (next: StackFilter) => {
     void navigate({
       search: (prev) => ({ ...prev, group: next }),
-      replace: true,
-      resetScroll: false,
-      viewTransition: false,
+      ...FILTER_NAVIGATION,
     });
   };
 
   return (
     <PageMain>
-      <StackPage
-        group={hydrated ? group : STACK_SEARCH_DEFAULTS.group}
-        onGroupChange={setGroup}
-      />
+      <StackPage group={group} onGroupChange={setGroup} />
     </PageMain>
   );
 }

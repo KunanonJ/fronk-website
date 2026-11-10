@@ -20,6 +20,7 @@ import CopyButton from "@/components/landing/skills/CopyButton";
 import { PixelGrid } from "@/components/ui/PixelGrid";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils/cn";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * /design (bento redesign, phase 7g; no canvas page, design spec 6): the
@@ -92,10 +93,10 @@ function Hero() {
         <h1 id="hero-title" className="m-0 text-title text-ink">
           Design system
         </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
+        <HeroLead>
           The bento canvas as built: tokens, type, buttons, chips, cards and
           motion. Switch the theme to review night.
-        </p>
+        </HeroLead>
       </div>
       <ThemeToggle />
     </section>

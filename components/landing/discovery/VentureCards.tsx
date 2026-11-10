@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from "react";
 import {
   BentoCard,
-  CardKicker,
+  Kicker,
   CardLink,
   bentoSpan,
   type BentoSpan,
 } from "@/components/bento/Bento";
-import { ICON_BUTTON } from "@/components/bento/classes";
+import { ICON_BUTTON, CARD_SURFACE } from "@/components/bento/classes";
 import {
   CheckIcon,
   LinkIcon,
@@ -362,12 +362,13 @@ export function VentureShareCard({ target }: { target: ShareTarget }) {
     <article
       aria-labelledby="card-share"
       className={cn(
-        "relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4 overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card",
+        CARD_SURFACE,
+        "flex flex-wrap items-end justify-between gap-x-6 gap-y-4",
         bentoSpan(3),
       )}
     >
       <div className="flex min-w-0 flex-[1_1_320px] flex-col items-start gap-2.5">
-        <CardKicker id="card-share">Share</CardKicker>
+        <Kicker id="card-share">Share</Kicker>
         <p className="mx-1 mt-0.5 mb-0 text-base leading-[1.35] font-semibold">
           {target.title}
         </p>

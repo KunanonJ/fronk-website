@@ -7,6 +7,7 @@ import { PixelGrid } from "@/components/ui/PixelGrid";
 import { siteConfig } from "@/lib/site";
 import { writeClipboard } from "@/lib/utils/clipboard";
 import { pad2 } from "@/lib/utils/pad2";
+import { HeroLead } from "@/components/bento/PageHero";
 
 /*
  * The 404 page and the route error state (bento canvas NotFound, design spec
@@ -128,9 +129,7 @@ export default function StatusPage({
           <span className="text-ink-3">{headline.muted}</span> {headline.middle}{" "}
           <span className="text-mark">{headline.accent}</span>
         </h1>
-        <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
-          {copy.lead}
-        </p>
+        <HeroLead>{copy.lead}</HeroLead>
         {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
       </section>
       <BentoPair>

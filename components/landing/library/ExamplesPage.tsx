@@ -1,9 +1,8 @@
+import { Kicker } from "@/components/bento/Bento";
 import Link from "@/components/navigation/Link";
 import {
   CARD,
-  Kicker,
   LibraryHero,
-  MONO_LABEL,
   TEXT_LINK,
 } from "@/components/landing/library/parts";
 import {
@@ -14,6 +13,7 @@ import {
 import type { ExamplePersonaId } from "@/lib/library/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
+import { MONO_LABEL } from "@/components/bento/classes";
 
 /** The persona picker: a tile per persona, the pressed one in ink. */
 function PersonaPicker({
