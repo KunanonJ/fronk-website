@@ -61,7 +61,7 @@ Cloudflare Worker (fronk-website, custom domains)
       +--> Optional analytics providers
 
 Sanity webhook ----> /api/revalidate
-Cloudflare Cron ---> /api/cron/revalidate
+Hourly cron -------> scheduled() purge of every content tag
 ```
 
 ## Routes
@@ -79,7 +79,6 @@ Cloudflare Cron ---> /api/cron/revalidate
 | `/now`, `/writing`, `/writing/[slug]`      | 308 redirect                   | Into `/`                                           |
 | `/work`                                    | 308 redirect                   | Into `/#ventures`                                  |
 | `/api/revalidate`                          | POST (src/server.ts)           | Sanity webhook → purge Worker cache tags           |
-| `/api/cron/revalidate`                     | GET (src/server.ts)            | Old cron Worker bridge (Bearer auth)               |
 | `/sitemap.xml`, `/robots.txt`, `/feed.xml`, `/rss.xml` | generated / redirect | XML sitemap + RSS (`/rss.xml` → `/feed.xml`)        |
 | `/agents.md`, `/sitemap.md`, `/skills.md`, `/llms.txt` | static / route         | Agent & LLM discovery surfaces (linked in footer)  |
 
@@ -112,8 +111,6 @@ App boots at http://localhost:3000.
 | `pnpm run deploy`              | Build and deploy the app to Cloudflare Workers              |
 | `pnpm upload`                  | Build and upload a Worker version without immediate deploy  |
 | `pnpm deploy:staging`          | Build and deploy the staging Worker (`fronk-website-start`) |
-| `pnpm cron:preview`            | Preview the separate Cloudflare Cron Worker locally         |
-| `pnpm cron:deploy`             | Deploy the separate Cloudflare Cron Worker                  |
 | `pnpm typecheck`               | `tsc --noEmit` with TypeScript 7 (see Toolchain below)      |
 | `pnpm lint`                    | ESLint, failing on any warning                              |
 | `pnpm format` / `format:check` | Prettier write / verify                                     |
@@ -205,11 +202,9 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 - **Forms:** `/api/contact` accepts only same-site JSON POSTs under 20 KB, with
   `FORM_RATE_LIMIT` (5 per minute per IP);
   Turnstile once `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set.
-- **Legacy:** OpenNext's two Durable Object classes stay exported as empty classes
-  so a dashboard rollback to the last Next version still works; remove them with a
-  `deleted_classes` migration once that rollback is no longer needed. The old
-  `fronk-website-revalidate-cron` Worker still calls `/api/cron/revalidate`, which
-  the Start Worker answers until that Worker is deleted.
+- **Migrations:** the old Next.js build's two Durable Object classes were created
+  in migration `v1` and deleted in `v2`. Migrations are append-only: add a new tag,
+  never edit an old one.
 - `/studio` launches an external Studio via `NEXT_PUBLIC_SANITY_STUDIO_URL`.
 - Copy `.dev.vars.example` to `.dev.vars` for local Worker-specific values.
   Never commit real secrets.
@@ -225,13 +220,11 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 | `NEXT_PUBLIC_SANITY_STUDIO_URL`              | yes\*    | yes     | Hosted Sanity Studio URL used by `/studio`              |
 | `SANITY_REVALIDATE_SECRET`                   | yes\*    | no      | Webhook HMAC secret                                     |
 | `SANITY_AUTH_TOKEN`                          | optional | no      | Schema deploy on build                                  |
-| `CRON_SECRET`                                | optional | no      | Old cron Worker bridge (`/api/cron/revalidate`)         |
 | `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact form)                      |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`             | optional | yes     | Turnstile widget (build-time)                           |
 | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`               | optional | yes     | Umami                                                   |
 | `NEXT_PUBLIC_UMAMI_HOST`                     | optional | yes     | Defaults to `https://cloud.umami.is`                    |
-| `NEXT_PUBLIC_GA_ID`                          | optional | yes     | GA4 measurement ID                                      |
 
 \*Required if you use Studio, the resume CMS or the Sanity webhook. The
 `NEXT_PUBLIC_` names are kept from the Next era; Vite inlines them at build.
@@ -248,15 +241,17 @@ curl -sS "https://kunanonj.com/studio" -o /dev/null -w "%{http_code}\n"     # 20
 
 ## Analytics
 
-Analytics are optional and disabled by default unless their public environment
-variables are present.
+Analytics are optional, cookieless and off unless their public environment
+variables are present. There is no Google Analytics or Tag Manager.
 
 | Adapter                  | Component                 | Env var                                                           |
 | ------------------------ | ------------------------- | ----------------------------------------------------------------- |
 | Cloudflare Web Analytics | `<CloudflareAnalytics />` | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`                      |
 | Umami                    | `<Analytics />`           | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, optional `NEXT_PUBLIC_UMAMI_HOST` |
-| Google Analytics 4       | `<GoogleAnalytics />`     | `NEXT_PUBLIC_GA_ID`                                               |
-| Web Vitals               | `<WebVitals />`           | Uses the active client analytics bridge                           |
+
+Custom events go through `track()` in `lib/analytics/track.ts` (a no-op until
+the Umami script has loaded): theme changes and the conversion clicks in
+`ConversionEvents` (contact CTA, venture outbound, topic hub CTA).
 
 ## Project structure
 

@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DOM_TS_TESTS = [
   "lib/hooks/useReducedMotion.test.ts",
   "lib/hooks/useFinePointer.test.ts",
-  "lib/analytics/gtag.test.ts",
+  "lib/analytics/track.test.ts",
   "lib/motion/motionRuntime.test.ts",
 ];
 

@@ -1,6 +1,11 @@
 import { cn } from "@/lib/utils/cn";
 
-type Option = { label: string; value: string };
+type Option = {
+  label: string;
+  value: string;
+  /** Accessible name when the visible label is shortened; must contain it. */
+  ariaLabel?: string;
+};
 
 /**
  * Segmented control (bento canvas, design spec 3.6): pressed buttons in a
@@ -12,6 +17,7 @@ export function Segmented({
   value,
   onChange,
   tone = "page",
+  layout = "wrap",
   className,
 }: {
   label: string;
@@ -20,6 +26,12 @@ export function Segmented({
   onChange: (value: string) => void;
   /** The group's fill: the page colour inside cards, surface on the page. */
   tone?: "page" | "surface";
+  /**
+   * "wrap" lets segments flow onto more lines (pass a radius that suits it);
+   * "row" keeps them on one line in equal columns, for short labels in a
+   * narrow card.
+   */
+  layout?: "wrap" | "row";
   className?: string;
 }) {
   return (
@@ -27,7 +39,8 @@ export function Segmented({
       role="group"
       aria-label={label}
       className={cn(
-        "flex flex-wrap gap-1 rounded-full border border-hairline p-[5px]",
+        "gap-1 rounded-full border border-hairline p-[5px]",
+        layout === "row" ? "grid auto-cols-fr grid-flow-col" : "flex flex-wrap",
         tone === "page" ? "bg-page" : "bg-surface",
         className,
       )}
@@ -39,6 +52,7 @@ export function Segmented({
             key={option.value}
             type="button"
             aria-pressed={on}
+            aria-label={option.ariaLabel}
             onClick={() => onChange(option.value)}
             className={cn(
               "min-h-11 flex-auto rounded-full border-0 px-[18px] text-sm font-medium",

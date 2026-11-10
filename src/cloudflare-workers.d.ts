@@ -2,7 +2,4 @@
 // secrets come from wrangler.jsonc and are narrowed where used.
 declare module "cloudflare:workers" {
   export const env: Record<string, unknown>;
-  export abstract class DurableObject {
-    constructor(ctx: unknown, env: unknown);
-  }
 }

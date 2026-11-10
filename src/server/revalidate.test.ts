@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 import {
   ALL_CONTENT_TAGS,
   WEBHOOK_MAX_AGE_MS,
-  handleCronRequest,
   handleSanityWebhook,
 } from "./revalidate";
 
@@ -91,30 +90,5 @@ describe("handleSanityWebhook", () => {
 
   it("knows every content tag for the hourly purge", () => {
     expect(ALL_CONTENT_TAGS).toEqual(["resume", "posts", "writing"]);
-  });
-});
-
-describe("handleCronRequest (bridge for the old cron Worker)", () => {
-  const get = (auth?: string) =>
-    new Request("https://kunanonj.com/api/cron/revalidate", {
-      headers: auth ? { authorization: auth } : {},
-    });
-
-  it("purges every content tag with the right bearer secret", async () => {
-    const purge = vi.fn().mockResolvedValue({ success: true });
-    const res = await handleCronRequest(get("Bearer s3"), "s3", { purge });
-    expect(res.status).toBe(200);
-    expect(purge).toHaveBeenCalledWith({ tags: ALL_CONTENT_TAGS });
-  });
-
-  it("rejects a wrong or missing secret", async () => {
-    const purge = vi.fn();
-    expect(
-      (await handleCronRequest(get("Bearer nope"), "s3", { purge })).status,
-    ).toBe(401);
-    expect((await handleCronRequest(get(), undefined, { purge })).status).toBe(
-      500,
-    );
-    expect(purge).not.toHaveBeenCalled();
   });
 });
