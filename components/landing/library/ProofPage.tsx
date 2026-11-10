@@ -9,7 +9,6 @@ import {
   MONO_LABEL,
   TEXT_LINK,
   WELL,
-  pad2,
 } from "@/components/landing/library/parts";
 import {
   getProofCases,
@@ -19,6 +18,7 @@ import {
 } from "@/lib/content/proof";
 import type { Venture } from "@/lib/content/ventures";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /**
  * Venture metrics: a tile per published figure; picking one shows the

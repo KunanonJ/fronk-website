@@ -8,6 +8,7 @@ import type {
   ResolvedTimelineSection,
   resolveResumeProfile,
 } from "@/lib/content/resumeProfile";
+import { pad2 } from "@/lib/utils/pad2";
 
 export type ResumeProfileView = ReturnType<typeof resolveResumeProfile>;
 
@@ -66,11 +67,6 @@ function isExternalHref(href: string): boolean {
   return /^https?:\/\//.test(href);
 }
 
-/** Right-aligned monospace running index, e.g. 01, 02, 03 … */
-function formatIndex(n: number): string {
-  return String(n + 1).padStart(2, "0");
-}
-
 /**
  * Faintness for the "fade-out tail": entries stay full-strength near the top of
  * a section and dim toward the oldest, so depth reads as recency. Clamped so the
@@ -99,7 +95,7 @@ function SectionHeader({
         aria-hidden="true"
         className="font-mono text-label tabular-nums text-ink-2"
       >
-        {formatIndex(index)}
+        {pad2(index + 1)}
       </span>
       <h2 id={id} className="font-display text-h3 text-ink">
         {title}
@@ -191,7 +187,7 @@ function TimelineEntry({
         aria-hidden="true"
         className="font-mono text-label tabular-nums text-ink-2"
       >
-        {formatIndex(index)}
+        {pad2(index + 1)}
       </span>
     </article>
   );
@@ -244,7 +240,7 @@ function SkillsSection({
               aria-hidden="true"
               className="font-mono text-label tabular-nums text-ink-2"
             >
-              {formatIndex(i)}
+              {pad2(i + 1)}
             </span>
             <span>{skill}</span>
           </li>

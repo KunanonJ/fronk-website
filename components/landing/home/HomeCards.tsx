@@ -8,9 +8,7 @@ import { getFeaturedPortfolioProjects } from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { homeExperience } from "@/lib/landing/experience";
 import { cn } from "@/lib/utils/cn";
-
-/** "01", "02": the canvas numbers lists and steps with two digits. */
-const pad2 = (n: number) => String(n).padStart(2, "0");
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Home bento cards (bento canvas, design spec 4.1). Copy comes from the

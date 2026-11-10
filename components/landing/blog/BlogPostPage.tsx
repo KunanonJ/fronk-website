@@ -30,6 +30,7 @@ import { linkifyInternalPaths } from "@/lib/content/linkify";
 import type { NoteLink } from "@/lib/content/noteLinks";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * One post (bento canvas Post, design spec 4.18): the hero, the note beside
@@ -219,9 +220,7 @@ function LinksCard({ links }: { links: readonly NoteLink[] }) {
                 : { target: "_blank", rel: "noopener noreferrer" })}
               className="flex min-h-[52px] items-center gap-3 py-1.5 font-mono text-meta no-underline"
             >
-              <span className="shrink-0 text-ink-2">
-                {String(i + 1).padStart(2, "0")}
-              </span>
+              <span className="shrink-0 text-ink-2">{pad2(i + 1)}</span>
               <span className="min-w-0 [overflow-wrap:anywhere]">
                 {link.label} →
               </span>

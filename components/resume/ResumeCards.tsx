@@ -22,6 +22,7 @@ import {
 } from "@/lib/resume/view";
 import type { ResumeDetail } from "@/lib/resume/search";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Résumé bento cards (bento canvas, design spec 4.4). Every section comes
@@ -33,10 +34,6 @@ import { cn } from "@/lib/utils/cn";
  */
 
 export const RESUME_PDF = "/resume.pdf";
-
-function index(n: number): string {
-  return String(n + 1).padStart(2, "0");
-}
 
 function Bullets({
   bullets,
@@ -157,7 +154,7 @@ function RoleList({
             className="flex w-10 shrink-0 flex-col items-center gap-2"
           >
             <Logo item={item} size={40} />
-            <span className={PERIOD}>{index(start + i)}</span>
+            <span className={PERIOD}>{pad2(start + i + 1)}</span>
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
@@ -204,7 +201,7 @@ function CredentialList({
             className="flex w-10 shrink-0 flex-col items-center gap-2"
           >
             <Logo item={item} size={40} />
-            <span className={PERIOD}>{index(start + i)}</span>
+            <span className={PERIOD}>{pad2(start + i + 1)}</span>
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <h3 className="m-0 text-card leading-[1.35] font-semibold">

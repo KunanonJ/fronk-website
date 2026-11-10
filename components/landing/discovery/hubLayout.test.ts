@@ -3,7 +3,6 @@ import {
   hubSpanClass,
   splitLead,
   topicGrid,
-  twoDigits,
 } from "@/components/landing/discovery/hubLayout";
 
 const lg = (n: number) => {
@@ -74,12 +73,5 @@ describe("splitLead", () => {
     expect(splitLead("Live at manut.xyz today. More soon.").lead).toBe(
       "Live at manut.xyz today.",
     );
-  });
-});
-
-describe("twoDigits", () => {
-  it("pads indexes to two digits", () => {
-    expect(twoDigits(1)).toBe("01");
-    expect(twoDigits(12)).toBe("12");
   });
 });

@@ -92,7 +92,7 @@ export default function ResumePage({
             label="Résumé detail"
             tone="surface"
             value={detail}
-            onChange={(value) => onDetailChange(value as ResumeDetail)}
+            onChange={onDetailChange}
             options={RESUME_DETAILS.map((value) => ({
               value,
               label: DETAIL_LABELS[value],

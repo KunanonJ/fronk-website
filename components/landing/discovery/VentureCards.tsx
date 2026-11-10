@@ -21,7 +21,7 @@ import {
   useCanShare,
   type ShareTarget,
 } from "@/components/bento/ShareRows";
-import { splitLead, twoDigits } from "@/components/landing/discovery/hubLayout";
+import { splitLead } from "@/components/landing/discovery/hubLayout";
 import LinkRows, {
   type HubLink,
 } from "@/components/landing/discovery/LinkRows";
@@ -29,6 +29,7 @@ import { hero } from "@/lib/content/landing";
 import type { Venture } from "@/lib/content/ventures";
 import { writeClipboard } from "@/lib/utils/clipboard";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Venture hub cards (bento canvas, design spec 4.7). Every value comes from
@@ -188,7 +189,7 @@ export function LoopStepper({ stages }: { stages: readonly string[] }) {
                   on ? "bg-cta text-on-cta" : "bg-transparent text-ink-2",
                 )}
               >
-                <span className="font-mono text-xs">{twoDigits(i + 1)}</span>
+                <span className="font-mono text-xs">{pad2(i + 1)}</span>
                 <span>{label}</span>
               </button>
             );
@@ -231,7 +232,7 @@ export function LoopStepper({ stages }: { stages: readonly string[] }) {
             className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-9 text-center"
           >
             <p className="m-0 font-mono text-xs text-ink-2">
-              {twoDigits(stage + 1)} / {twoDigits(count)}
+              {pad2(stage + 1)} / {pad2(count)}
             </p>
             <p className="m-0 text-xl leading-[1.2] font-semibold tracking-[-0.02em]">
               {stages[stage]}

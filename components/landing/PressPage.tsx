@@ -175,7 +175,7 @@ export default function PressPage({
             label="Filter coverage by type"
             options={options}
             value={type}
-            onChange={(next) => onTypeChange(next as PressFilter)}
+            onChange={onTypeChange}
             tone="surface"
             className="max-w-full shadow-card"
           />

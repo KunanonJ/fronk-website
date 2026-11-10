@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils/cn";
 
-type Option = {
+type Option<T extends string> = {
   label: string;
-  value: string;
+  value: T;
   /** Accessible name when the visible label is shortened; must contain it. */
   ariaLabel?: string;
 };
@@ -12,8 +12,9 @@ type Option = {
  * labelled group, not tabs. The pressed segment is ink (--cta). The track
  * is 56 px tall, so the 28 px bento radius reads as a pill on one line and
  * as a rounded card when the segments wrap (rounded-full would make an oval).
+ * Generic over the value, so a typed filter needs no cast in `onChange`.
  */
-export function Segmented({
+export function Segmented<T extends string>({
   label,
   options,
   value,
@@ -23,9 +24,9 @@ export function Segmented({
   className,
 }: {
   label: string;
-  options: readonly Option[];
-  value: string;
-  onChange: (value: string) => void;
+  options: readonly Option<T>[];
+  value: T;
+  onChange: (value: T) => void;
   /** The group's fill: the page colour inside cards, surface on the page. */
   tone?: "page" | "surface";
   /**

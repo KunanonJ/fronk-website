@@ -76,8 +76,3 @@ export function splitLead(body: string): { lead?: string; rest: string } {
   if (!match || match[1].length > LEAD_MAX_CHARS) return { rest: body };
   return { lead: match[1], rest: match[2] };
 }
-
-/** "01", "02", ...: the canvas's two-digit indexes. */
-export function twoDigits(n: number): string {
-  return String(n).padStart(2, "0");
-}

@@ -3,7 +3,6 @@ import Link from "@/components/navigation/Link";
 import { BentoCard, CardKicker, bentoSpan } from "@/components/bento/Bento";
 import { TechChip } from "@/components/bento/Chips";
 import Image from "@/components/ui/Image";
-import { twoDigits } from "@/components/landing/discovery/hubLayout";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
 import {
   ArrowDownSmallIcon,
@@ -19,6 +18,7 @@ import {
   type PortfolioWorkflow,
 } from "@/lib/content/portfolio";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Project page cards (bento canvas, design spec 4.6). Every value comes from
@@ -246,7 +246,7 @@ export function FlowCard({ workflow }: { workflow: PortfolioWorkflow }) {
                           : "border-hairline-strong bg-surface text-ink-2",
                     )}
                   >
-                    {twoDigits(i + 1)}
+                    {pad2(i + 1)}
                   </span>
                   <span
                     className={cn(
@@ -277,7 +277,7 @@ export function FlowCard({ workflow }: { workflow: PortfolioWorkflow }) {
           className="flex min-w-0 flex-[1_1_220px] flex-col gap-1"
         >
           <p className={MONO_LABEL}>
-            Step {twoDigits(step + 1)} of {twoDigits(count)}
+            Step {pad2(step + 1)} of {pad2(count)}
           </p>
           <p className="m-0 text-[22px] leading-[1.25] font-semibold tracking-[-0.02em]">
             {current.label}
@@ -361,7 +361,7 @@ export function ArchitectureCard({
               </span>
             ) : null}
             <h3 className={cn(MONO_LABEL, "flex-[0_0_132px] font-medium")}>
-              {twoDigits(i + 1)} · {layer.label}
+              {pad2(i + 1)} · {layer.label}
             </h3>
             <ul className="m-0 flex min-w-0 flex-[1_1_280px] list-none flex-wrap gap-2 p-0">
               {layer.nodes.map((node) => (

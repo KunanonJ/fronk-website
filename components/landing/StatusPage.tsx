@@ -6,6 +6,7 @@ import { MonoEyebrow } from "@/components/bento/MonoEyebrow";
 import { PixelGrid } from "@/components/ui/PixelGrid";
 import { siteConfig } from "@/lib/site";
 import { writeClipboard } from "@/lib/utils/clipboard";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * The 404 page and the route error state (bento canvas NotFound, design spec
@@ -50,7 +51,7 @@ function RecoveryCard() {
             className="flex min-h-[60px] items-center gap-3.5 border-hairline px-1 text-lg font-semibold tracking-[-0.01em] text-ink no-underline [&:not(:last-child)]:border-b"
           >
             <span className="font-mono text-xs font-normal tracking-normal text-ink-2">
-              {String(i + 1).padStart(2, "0")}
+              {pad2(i + 1)}
             </span>
             {link.label}
             <span

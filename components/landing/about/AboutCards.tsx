@@ -11,6 +11,7 @@ import {
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { operatingModel } from "@/lib/content/operatingModel";
 import { cn } from "@/lib/utils/cn";
+import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * About bento cards (bento canvas, design spec 4.2). Copy comes from
@@ -146,7 +147,7 @@ export function PrinciplesCard() {
             className="flex flex-col gap-2.5 rounded-well border border-hairline bg-page px-5 pt-[18px] pb-5"
           >
             <span className="font-mono text-meta text-mark">
-              {String(index + 1).padStart(2, "0")}
+              {pad2(index + 1)}
             </span>
             <p className="m-0 text-[17px] leading-[1.35] font-semibold tracking-[-0.01em]">
               {item.title}
@@ -190,7 +191,7 @@ export function OperatingModelCard() {
             className="flex flex-col gap-2.5 rounded-well border border-hairline bg-page px-5 pt-[18px] pb-5"
           >
             <p className="m-0 font-mono text-meta text-mark">
-              {String(index + 1).padStart(2, "0")} · {stage.label}
+              {pad2(index + 1)} · {stage.label}
             </p>
             <p className="m-0 text-[17px] leading-[1.35] font-semibold tracking-[-0.01em]">
               {stage.principle}
