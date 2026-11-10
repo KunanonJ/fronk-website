@@ -44,20 +44,10 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
   const venture = getVentureBySlug(slug);
   if (!venture) return { title: "Venture" };
 
-  const languages =
-    slug === "manut"
-      ? {
-          en: "/ventures/manut",
-          th: "/th/topics/erp-crm-internal-systems",
-          "x-default": "/ventures/manut",
-        }
-      : undefined;
-
   return routeShareMeta({
     title: namedPageTitle(venture.name, venture.tagline),
     description: venture.description,
     path: `/ventures/${slug}`,
-    languages,
     hasOwnOgImage: true,
   });
 }

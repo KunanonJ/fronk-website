@@ -20,8 +20,11 @@ const PORT = Number(process.env.GATES_PORT ?? 4173);
 // 127.0.0.1, not localhost: in the CI container Node and vite resolve
 // localhost to different address families, so the probe was refused.
 const BASE = `http://127.0.0.1:${PORT}`;
-const REFERENCE =
-  "process/features/tanstack-migration/references/next-parity_09-11-26.json";
+// The site as it stood after the bento redesign and the FDE positioning pass
+// (10-11-26). Re-crawl it with scripts/parity-crawl.mjs when a change to
+// titles, meta, JSON-LD or text endpoints is intended. The original Next.js
+// reference stays in process/features/tanstack-migration/references/.
+const REFERENCE = "tests/fixtures/site-parity.json";
 const routes = JSON.parse(readFileSync("src/ported-routes.json", "utf8"));
 const visual = process.argv.includes("--visual");
 // CI runs smoke, axe and visual in their own jobs; --parity-only skips Playwright here.

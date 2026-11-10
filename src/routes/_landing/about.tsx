@@ -9,12 +9,14 @@ import { buildFaqJsonLd, buildProfilePageJsonLd } from "@/lib/seo/jsonLd";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { fileOg } from "@/src/lib/og";
 
 const metadata: Metadata = {
   ...routeShareMeta({
     title: aboutPage.meta.title,
     description: aboutPage.meta.description,
     path: "/about",
+    hasOwnOgImage: true,
   }),
   // Already contains the name, so skip the "— Fronk Kunanon Jarat" suffix.
   title: { absolute: aboutPage.meta.title },
@@ -46,6 +48,12 @@ function AboutPage() {
 }
 
 export const Route = createFileRoute("/_landing/about")({
-  head: () => pageHead(metadata),
+  head: () =>
+    pageHead(metadata, {
+      fileOgImage: fileOg(
+        "/about",
+        "Kunanon Jarat: AI Engineering Lead in Bangkok",
+      ),
+    }),
   component: AboutPage,
 });

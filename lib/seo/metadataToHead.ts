@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "@/lib/seo/types";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
+import { clampDescription } from "@/lib/seo/metaDescription";
 
 /*
  * Next.js Metadata -> TanStack Start head() (tanstack-migration Phase 1).
@@ -121,7 +122,8 @@ export function metadataToHead(
   if (title) meta.push({ title });
 
   const description = page.description ?? root.description;
-  if (description) meta.push({ name: "description", content: description });
+  if (description)
+    meta.push({ name: "description", content: clampDescription(description) });
 
   for (const author of toList(page.authors ?? root.authors)) {
     if (!author) continue;

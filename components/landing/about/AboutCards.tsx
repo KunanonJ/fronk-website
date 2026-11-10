@@ -9,6 +9,7 @@ import {
   type AboutParagraph,
 } from "@/lib/content/aboutPage";
 import { FAQ_ITEMS } from "@/lib/content/faq";
+import { operatingModel } from "@/lib/content/operatingModel";
 import { cn } from "@/lib/utils/cn";
 
 /*
@@ -156,6 +157,82 @@ export function PrinciplesCard() {
           </li>
         ))}
       </ol>
+    </BentoCard>
+  );
+}
+
+/**
+ * Solopreneur operating model: four stages, each with its principle, the
+ * skills that run it and the shipped work that shows it. The same model is
+ * published as /operating-model.md for reuse in other projects.
+ */
+export function OperatingModelCard() {
+  const model = operatingModel;
+  return (
+    <BentoCard
+      id="how-i-ship"
+      headingId="card-operating-model"
+      title={model.eyebrow}
+      span={3}
+      minHeight={false}
+      className="scroll-mt-6"
+    >
+      <div className="flex flex-col gap-2.5 px-1">
+        <CardTitle>{model.heading}</CardTitle>
+        <p className="m-0 max-w-[620px] text-card leading-[1.6] text-ink-2">
+          {model.intro}
+        </p>
+      </div>
+      <ol className="bento-2 m-0 grid list-none grid-cols-1 gap-3 p-0 min-[641px]:grid-cols-2">
+        {model.stages.map((stage, index) => (
+          <li
+            key={stage.id}
+            className="flex flex-col gap-2.5 rounded-well border border-hairline bg-page px-5 pt-[18px] pb-5"
+          >
+            <p className="m-0 font-mono text-meta text-mark">
+              {String(index + 1).padStart(2, "0")} · {stage.label}
+            </p>
+            <p className="m-0 text-[17px] leading-[1.35] font-semibold tracking-[-0.01em]">
+              {stage.principle}
+            </p>
+            <p className="m-0 text-card leading-[1.55] text-ink-2">
+              {stage.practice}
+            </p>
+            <ul
+              aria-label={`${stage.label} skills`}
+              className="m-0 flex list-none flex-wrap gap-1.5 p-0"
+            >
+              {stage.skills.map((slug) => (
+                <li key={slug}>
+                  <Link
+                    href={`/skills/${slug}`}
+                    className="inline-flex min-h-7 items-center rounded-full border border-hairline-strong bg-surface px-2.5 font-mono text-xs text-ink no-underline hover:border-ink"
+                  >
+                    {slug}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="m-0 mt-auto text-meta text-ink-2">
+              Shipped:{" "}
+              {stage.evidence.map((link, i) => (
+                <span key={link.href}>
+                  {i > 0 ? ", " : null}
+                  <Link
+                    href={link.href}
+                    className="text-link underline underline-offset-4"
+                  >
+                    {link.label}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          </li>
+        ))}
+      </ol>
+      <CardLink href={model.markdownHref} className="self-end">
+        Reuse the model (Markdown) →
+      </CardLink>
     </BentoCard>
   );
 }

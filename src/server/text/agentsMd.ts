@@ -62,6 +62,7 @@ export function buildAgentsMd(): string {
     "| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, roles, topic hubs, ventures, portfolio, skills |",
     "| Full profile | [/llms-full.txt](/llms-full.txt) | Every fact on the site in one fetch: career, projects, ventures, topics, skills, FAQ |",
     "| Markdown sitemap | [/sitemap.md](/sitemap.md) | Human- and agent-readable route map |",
+    "| Operating model | [/operating-model.md](/operating-model.md) | The solopreneur operating model, reusable in other projects |",
     "| XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |",
     "| Skills catalog | [/skills.json](/skills.json) | The Superstacks agent skills as JSON |",
     "| Coding guide | [/skills.md](/skills.md) | Standards for coding agents working on this stack |",

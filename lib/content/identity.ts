@@ -20,9 +20,6 @@ export const PERSON_ALTERNATE_NAMES = [
   "Fronk Kunanon Jarat",
 ] as const;
 
-/** Meta description for Home and the site; lives in identityMeta.ts for bundle size. */
-export { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
-
 /** Short headline for profile cards and agent docs. */
 export const PERSON_HEADLINE =
   "AI Engineering Lead and solopreneur in Bangkok: builds AI tools inside the businesses that use them.";

@@ -19,6 +19,7 @@ import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
+import { Route as OperatingModelDotmdRouteImport } from './routes/operating-model[.]md'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotmdRouteImport } from './routes/sitemap[.]md'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -36,6 +37,7 @@ import { Route as LandingProofRouteImport } from './routes/_landing/proof'
 import { Route as LandingResumeRouteImport } from './routes/_landing/resume'
 import { Route as LandingStackRouteImport } from './routes/_landing/stack'
 import { Route as SystemDesignRouteImport } from './routes/_system/design'
+import { Route as AboutOpengraphImageRouteImport } from './routes/about.opengraph-image'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
@@ -98,6 +100,11 @@ const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
 const OpengraphImageRoute = OpengraphImageRouteImport.update({
   id: '/opengraph-image',
   path: '/opengraph-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperatingModelDotmdRoute = OperatingModelDotmdRouteImport.update({
+  id: '/operating-model.md',
+  path: '/operating-model.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -185,6 +192,11 @@ const SystemDesignRoute = SystemDesignRouteImport.update({
   id: '/design',
   path: '/design',
   getParentRoute: () => SystemRoute,
+} as any)
+const AboutOpengraphImageRoute = AboutOpengraphImageRouteImport.update({
+  id: '/about/opengraph-image',
+  path: '/about/opengraph-image',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiContactRoute = ApiContactRouteImport.update({
   id: '/api/contact',
@@ -276,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
+  '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -292,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/resume': typeof LandingResumeRoute
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
+  '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -318,6 +332,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
+  '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -334,6 +349,7 @@ export interface FileRoutesByTo {
   '/resume': typeof LandingResumeRoute
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
+  '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -362,6 +378,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
+  '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -378,6 +395,7 @@ export interface FileRoutesById {
   '/_landing/resume': typeof LandingResumeRoute
   '/_landing/stack': typeof LandingStackRoute
   '/_system/design': typeof SystemDesignRoute
+  '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/_landing/': typeof LandingIndexRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
@@ -407,6 +425,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
+    | '/operating-model.md'
     | '/robots.txt'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -423,6 +442,7 @@ export interface FileRouteTypes {
     | '/resume'
     | '/stack'
     | '/design'
+    | '/about/opengraph-image'
     | '/api/contact'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -449,6 +469,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
+    | '/operating-model.md'
     | '/robots.txt'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -465,6 +486,7 @@ export interface FileRouteTypes {
     | '/resume'
     | '/stack'
     | '/design'
+    | '/about/opengraph-image'
     | '/api/contact'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -492,6 +514,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
+    | '/operating-model.md'
     | '/robots.txt'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -508,6 +531,7 @@ export interface FileRouteTypes {
     | '/_landing/resume'
     | '/_landing/stack'
     | '/_system/design'
+    | '/about/opengraph-image'
     | '/api/contact'
     | '/_landing/'
     | '/_landing/blog/$slug'
@@ -537,12 +561,14 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   OpengraphImageRoute: typeof OpengraphImageRoute
+  OperatingModelDotmdRoute: typeof OperatingModelDotmdRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotmdRoute: typeof SitemapDotmdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkillsDotjsonRoute: typeof SkillsDotjsonRoute
   StudioRoute: typeof StudioRoute
   DotwellKnownSecurityDottxtRoute: typeof DotwellKnownSecurityDottxtRoute
+  AboutOpengraphImageRoute: typeof AboutOpengraphImageRoute
   ApiContactRoute: typeof ApiContactRoute
   ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
   PortfolioSlugOpengraphImageRoute: typeof PortfolioSlugOpengraphImageRoute
@@ -621,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/opengraph-image'
       fullPath: '/opengraph-image'
       preLoaderRoute: typeof OpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operating-model.md': {
+      id: '/operating-model.md'
+      path: '/operating-model.md'
+      fullPath: '/operating-model.md'
+      preLoaderRoute: typeof OperatingModelDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -741,6 +774,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/design'
       preLoaderRoute: typeof SystemDesignRouteImport
       parentRoute: typeof SystemRoute
+    }
+    '/about/opengraph-image': {
+      id: '/about/opengraph-image'
+      path: '/about/opengraph-image'
+      fullPath: '/about/opengraph-image'
+      preLoaderRoute: typeof AboutOpengraphImageRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/contact': {
       id: '/api/contact'
@@ -919,12 +959,14 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   OpengraphImageRoute: OpengraphImageRoute,
+  OperatingModelDotmdRoute: OperatingModelDotmdRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotmdRoute: SitemapDotmdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkillsDotjsonRoute: SkillsDotjsonRoute,
   StudioRoute: StudioRoute,
   DotwellKnownSecurityDottxtRoute: DotwellKnownSecurityDottxtRoute,
+  AboutOpengraphImageRoute: AboutOpengraphImageRoute,
   ApiContactRoute: ApiContactRoute,
   ApiGithubContributionsRoute: ApiGithubContributionsRoute,
   PortfolioSlugOpengraphImageRoute: PortfolioSlugOpengraphImageRoute,

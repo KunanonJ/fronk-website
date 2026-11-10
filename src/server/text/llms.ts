@@ -180,6 +180,7 @@ export async function GET() {
   if (BLOG_PUBLIC) textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push(`- Full profile (one fetch): ${base}/llms-full.txt`);
+  textLines.push(`- Solopreneur operating model: ${base}/operating-model.md`);
   textLines.push("");
 
   if (cards.length > 0) {
