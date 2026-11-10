@@ -147,7 +147,7 @@ Run locally on 2026-11-02 with Node 26.12.0, pnpm 10.34.9 and CI's env vars:
 
 ### CI on Node 22.23.4 (PR #32, 02-11-26)
 
-Ported to the git clone (`~/Developer/fronk-website`, branch `chore/deps-upgrade-2026-11`) and verified by PR #32:
+Ported to the git clone (`fronk-website`, branch `chore/deps-upgrade-2026-11`) and verified by PR #32:
 
 | Check | Result |
 |---|---|
@@ -177,7 +177,7 @@ Restore `package.json`, `pnpm-lock.yaml` and `.node-version` from the pre-upgrad
 
 ## Resume and Execution Handoff
 
-This work was done in `~/Developer/fronk-website-main`, which is not a git repo. To land it:
+This work was done in a local copy named `fronk-website-main`, which is not a git repo. To land it:
 
 1. Copy `package.json`, `pnpm-lock.yaml` and `.node-version` (plus the `README.md` version lines) into the git clone as one execution commit.
 2. Copy the process changes as a separate commit: this archived plan, `AGENTS.md`, `CLAUDE.md`, `process/development-protocols/orchestration.md`, `process/features/CURRENT_FEATURES.md`, and `process/general-plans/backlog/`.

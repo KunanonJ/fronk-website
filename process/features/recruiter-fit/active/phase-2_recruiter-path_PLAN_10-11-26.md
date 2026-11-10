@@ -1,6 +1,9 @@
 # Phase 2: Recruiter path
 
-**Status:** APPROVED FOR EXECUTION (10-11-26)
+**Status:** EXECUTED AND VERIFIED on the local production build (10-11-26).
+In pull request #109 with Phase 1. UPDATE PROCESS has not run yet, so this
+plan is still in `active/`. Report:
+`../reports/phase-2_recruiter-path_REPORT_10-11-26.md`
 **Created:** 10-11-26, at `6d31e16`
 **Umbrella:** `recruiter-fit_UMBRELLA_PLAN_10-11-26.md`
 **Research:** `../references/recruiter-ux-review_10-11-26.md` (findings 3, 4,
@@ -184,17 +187,19 @@ Tests:
 
 ## Verification Evidence
 
-To be filled during EXECUTE and copied into the report.
+Final run, after the pre-merge review fixes (10-11-26), on Node 26 and on
+Node 22.23.4. Details and deviations are in the report.
 
 | Gate | Command or check | Result |
 | --- | --- | --- |
-| 1 | typecheck, lint, format, knip, unit tests | pending |
-| 2 | build, first-load budget | pending |
-| 3 | smoke and axe; full smoke once | pending |
-| 4 | Linux baselines regenerated and reviewed | pending |
-| 5 | parity re-crawl and 0 differences | pending |
-| 6 | acceptance checks | pending |
-| Regression | Phase 1: the PDF text-layer read-back (recipe in the Phase 1 report) and `lib/content/resumeFacts.test.ts` | pending |
+| 1 | typecheck, lint, format, knip, unit tests | Pass: 102 files, 847 tests |
+| 2 | build, first-load budget | Pass: worst route 186.5 KB of 200 KB; entry chunk 107.5 KB of 120 KB |
+| 3 | smoke and axe; full smoke once | Pass: 153 tests, desktop project, both themes; also in CI mode |
+| 4 | Linux baselines regenerated and reviewed | Pass: 62 differ from `main` (54 refreshed, 8 added for the résumé and the Thai FDE hub). A compare-only run passes 96 of 96. Nine other mobile baselines differ in bytes; all predate this phase |
+| 5 | parity re-crawl and 0 differences | Pass: 132 URLs, 0 differences; three reference fields changed (the Home h1, the `/resume` share tags, the About FAQ JSON-LD) |
+| 6 | acceptance checks | Pass: all six, as tests in `tests/e2e/smoke.spec.ts`; the mobile check covers all 24 routes with a header |
+| Regression | Phase 1: the PDF text-layer read-back (recipe in the Phase 1 report) and `lib/content/resumeFacts.test.ts` | Pass: a fresh PDF matches the committed one (2 pages, 844 words, 6 links); fact tests in the unit run |
+| Review | One reviewer before the commit; then six lenses and three skeptics on the whole branch before the pull request | No blocker stood once the CV was read. 58 findings on the branch: 46 confirmed, 23 of them older than it. Fifteen fixed here, the rest recorded in the report. Eighteen deliberate breaks each failed a unit test |
 
 ## Blockers that justify BLOCKED
 

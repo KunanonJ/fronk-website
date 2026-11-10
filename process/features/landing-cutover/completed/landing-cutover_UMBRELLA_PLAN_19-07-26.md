@@ -4,7 +4,7 @@
 **Complexity**: Phase program  
 **Status**: ✅ COMPLETE (shipped; verified live 02-11-26 by plan audit)  
 **Feature**: `landing-cutover`  
-**Source prototype**: `/Users/kunanonjarat/Developer/prisma-landing` (Vite SPA at `:5173`)  
+**Source prototype**: `prisma-landing`, a sibling local checkout (Vite SPA at `:5173`)  
 **Deploy**: keep Next.js + OpenNext + Cloudflare Workers (`pnpm run build:cloudflare`)  
 **User locks**: **1C** full public UI cutover · **2A** port into existing Next stack
 
