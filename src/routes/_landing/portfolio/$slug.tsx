@@ -5,6 +5,7 @@ import PortfolioProjectPage from "@/components/landing/portfolio/PortfolioProjec
 import type { Metadata } from "@/lib/seo/types";
 import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { buildPortfolioProjectJsonLd } from "@/lib/seo/portfolioJsonLd";
 import { fileOg } from "@/src/lib/og";
 import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { pageHead } from "@/src/lib/head";
@@ -37,12 +38,17 @@ function PortfolioProjectRouteView({ slug }: { slug: string }) {
       { name: project.name, path: `/portfolio/${slug}` },
     ]),
   );
+  const workLd = serializeJsonLd(buildPortfolioProjectJsonLd(project));
 
   return (
     <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: workLd }}
       />
       <PortfolioProjectPage project={project} />
     </PageMain>

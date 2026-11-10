@@ -193,7 +193,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
       {
         heading: "How to follow the work",
-        body: "Read the topic hubs, venture case pages, and blog notes. Contact when you want an operator conversation — not a slideware agency pitch.",
+        body: "Read the topic hubs and venture case pages. Contact when you want an operator conversation — not a slideware agency pitch.",
       },
     ],
     proof: [
@@ -405,7 +405,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
     faqs: [
       {
         question: "ติดตามงานได้ที่ไหน?",
-        answer: "อ่าน topic hubs, หน้า venture และบล็อก — หรือติดต่อโดยตรง",
+        answer: "อ่าน topic hubs และหน้า venture — หรือติดต่อโดยตรง",
       },
     ],
     relatedLinks: [

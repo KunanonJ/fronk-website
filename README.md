@@ -298,6 +298,21 @@ budget (200 KB gzip by default, 255 KB on marketing routes), Playwright smoke
 and axe checks, the visual baselines (in the Playwright container) and the
 parity crawl.
 
+### Parity reference
+
+`node scripts/start-gates.mjs` crawls the build and compares status, titles,
+meta tags, JSON-LD and text endpoints with `tests/fixtures/site-parity.json`
+(the routes come from `src/ported-routes.json`). When a change to those is
+intended, re-crawl the reference from a fresh build:
+
+```bash
+pnpm build && pnpm exec vite preview --port 4374 --host 127.0.0.1 &
+PARITY_SEEDS=$(node -e "console.log(require('./src/ported-routes.json').filter(r=>r.seed!==false).map(r=>r.path).join(','))") \
+  node scripts/parity-crawl.mjs http://127.0.0.1:4374 tests/fixtures/site-parity.json
+```
+
+Review the diff of the JSON before committing it.
+
 ### Toolchain and dependency policy
 
 - **TypeScript:** `typescript` is TypeScript 6 (`@typescript/typescript6`), the

@@ -7,7 +7,9 @@ import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { PageMain } from "@/components/bento/Bento";
 import PortfolioIndexPage from "@/components/landing/portfolio/PortfolioIndexPage";
 import type { Metadata } from "@/lib/seo/types";
+import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
+import { buildPortfolioCollectionJsonLd } from "@/lib/seo/portfolioJsonLd";
 import { pageHead } from "@/src/lib/head";
 import { portfolioPage } from "@/lib/content/portfolio";
 import {
@@ -57,12 +59,19 @@ function PortfolioRoute() {
       { name: "Portfolio", path: "/portfolio" },
     ]),
   );
+  const collectionLd = serializeJsonLd(
+    buildPortfolioCollectionJsonLd(getAllPortfolioProjects()),
+  );
 
   return (
     <PageMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: collectionLd }}
       />
       <PortfolioIndexPage
         category={hydrated ? category : PORTFOLIO_SEARCH_DEFAULTS.category}

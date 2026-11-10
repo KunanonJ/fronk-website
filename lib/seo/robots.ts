@@ -5,14 +5,25 @@ import {
   resolvePublicSiteUrl,
 } from "@/lib/seo/siteUrl";
 
-/** Citation / search bots — allow explicitly so managed rules are easier to audit. */
+/**
+ * Search, citation and model crawlers, allowed explicitly so managed rules
+ * are easy to audit. The site's goal is to be cited and known by AI answer
+ * engines (FDE positioning), so the model crawlers are allowed too.
+ */
 const CITATION_USER_AGENTS = [
   "Googlebot",
+  "Bingbot",
   "ChatGPT-User",
   "OAI-SearchBot",
+  "GPTBot",
   "PerplexityBot",
+  "Perplexity-User",
   "Claude-User",
   "Claude-SearchBot",
+  "ClaudeBot",
+  "Google-Extended",
+  "Applebot",
+  "Applebot-Extended",
 ] as const;
 
 /** Training / aggressive scrapers — keep blocked at the app layer. */

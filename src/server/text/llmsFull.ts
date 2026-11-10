@@ -7,6 +7,7 @@ import {
   PERSON_SOLOPRENEUR,
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
+import { operatingModel } from "@/lib/content/operatingModel";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import {
@@ -42,6 +43,14 @@ export function buildLlmsFull(): string {
     }
     push("");
   }
+
+  push("## Solopreneur operating model", "", operatingModel.intro, "");
+  for (const stage of operatingModel.stages) {
+    push(
+      `- **${stage.label}.** ${stage.principle} ${stage.practice} Skills: ${stage.skills.join(", ")}. Shipped: ${stage.evidence.map((e) => `${e.label} (${base}${e.href})`).join(", ")}.`,
+    );
+  }
+  push("", `Reusable version: ${base}/operating-model.md`, "");
 
   push("## AI engineering and internal tools (The Binary Holdings)", "");
   for (const p of getAllPortfolioProjects()) {

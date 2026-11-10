@@ -57,3 +57,17 @@ describe("llms-full.txt", () => {
     expect(text).not.toContain("/press");
   });
 });
+
+describe("operating-model.md", () => {
+  it("lists every stage, its skills with links and how to adopt it", async () => {
+    const { buildOperatingModelMd } = await import("./operatingModelMd");
+    const { operatingModel } = await import("@/lib/content/operatingModel");
+    const md = buildOperatingModelMd();
+    for (const stage of operatingModel.stages) {
+      expect(md).toContain(`. ${stage.label}`);
+      expect(md).toContain(stage.principle);
+      for (const slug of stage.skills) expect(md).toContain(`/skills/${slug})`);
+    }
+    expect(md).toContain("## Use it in another project");
+  });
+});

@@ -201,7 +201,8 @@ export function buildSoftwareApplicationJsonLd(
     applicationCategory: input.applicationCategory ?? "BusinessApplication",
     operatingSystem: input.operatingSystem ?? "Web",
     author: { "@id": PERSON_ID },
-    provider: { "@id": PERSON_ID },
+    // The venture's Organization node in the site graph (foundedOrganizations).
+    provider: { "@id": orgId(input.url) },
     isPartOf: { "@id": WEBSITE_ID },
     mainEntityOfPage: pageUrl,
   };

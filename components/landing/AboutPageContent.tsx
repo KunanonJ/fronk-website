@@ -4,6 +4,7 @@ import {
   FaqCard,
   NextCard,
   NowCard,
+  OperatingModelCard,
   PathCard,
   PrinciplesCard,
   StackCard,
@@ -25,6 +26,7 @@ export default function AboutPageContent() {
       <NowCard />
       <ContributionActivity />
       <StackCard />
+      <OperatingModelCard />
       <BentoRow>
         <FaqCard className="min-w-0 flex-[2_1_400px]" />
         <NextCard className="min-w-0 flex-[1_1_260px]" />
