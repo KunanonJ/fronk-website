@@ -13,7 +13,8 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/",
     name: "home",
-    expectsHeadingPattern: /fintech and AI|Ventures|Selected work/i,
+    expectsHeadingPattern:
+      /Forward deployed AI engineering|Ventures|Selected work/i,
   },
   {
     path: "/about",

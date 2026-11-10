@@ -36,7 +36,11 @@ describe("ResumePage (screen)", () => {
   it("states the summary and the availability under the h1", () => {
     renderPage();
     expect(screen.getByText(profile.summary)).toBeInTheDocument();
-    expect(screen.getByText(OPEN_TO_ROLES.sentence)).toBeInTheDocument();
+    expect(
+      screen.getByText(OPEN_TO_ROLES.pill.label, { exact: false }).closest("p"),
+    ).toHaveTextContent(
+      `${OPEN_TO_ROLES.pill.label} · ${OPEN_TO_ROLES.pill.detail}`,
+    );
   });
 
   it("offers the PDF under a findable name, Contact, Share and the detail control", () => {
@@ -45,9 +49,10 @@ describe("ResumePage (screen)", () => {
       expect(link).toHaveAttribute("href", "/resume.pdf");
       expect(link).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
     }
+    // A recruiter's Contact opens the form with Hiring already chosen.
     expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
       "href",
-      "/contact",
+      "/contact?topic=hiring",
     );
     expect(screen.getByRole("button", { name: "Share" })).toHaveAttribute(
       "data-panel-trigger",

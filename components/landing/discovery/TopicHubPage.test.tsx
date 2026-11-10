@@ -172,3 +172,93 @@ describe("TopicHubPage (every pillar)", () => {
     }
   });
 });
+
+describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
+  const SLUG = "forward-deployed-ai-engineering";
+
+  it("says who he is open to hearing from, under the lede", () => {
+    renderTopic(SLUG, "en");
+    expect(
+      screen.getByText("Open to roles", { exact: false }).closest("p"),
+    ).toHaveTextContent(
+      "Open to roles · Forward Deployed Engineer and AI engineering · Bangkok or remote",
+    );
+  });
+
+  it("offers the hiring contact and the résumé side by side", () => {
+    renderTopic(SLUG, "en");
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section")!;
+    expect(within(hero).getByRole("link", { name: "Contact" })).toHaveAttribute(
+      "href",
+      "/contact?topic=hiring",
+    );
+    const resume = within(hero).getByRole("link", { name: "Résumé" });
+    expect(resume).toHaveAttribute("href", "/resume");
+    expect(resume.className).not.toMatch(/bg-cta/);
+    // The card at the foot of the page leads to the same form.
+    const card = screen.getByRole("article", { name: "Contact" });
+    expect(within(card).getByRole("link", { name: "Contact" })).toHaveAttribute(
+      "href",
+      "/contact?topic=hiring",
+    );
+  });
+
+  it("lists the résumé among the pages to explore", () => {
+    renderTopic(SLUG, "en");
+    const explore = screen.getByRole("article", { name: "Keep exploring" });
+    expect(
+      within(explore)
+        .getAllByRole("link")
+        .map((link) => link.getAttribute("href")),
+    ).toContain("/resume");
+  });
+
+  it("sets its four sections two by two, none stretched across the grid", () => {
+    const pillar = renderTopic(SLUG, "en");
+    expect(pillar.sections).toHaveLength(4);
+    const cards = pillar.sections.map((section) =>
+      screen.getByRole("article", { name: section.heading }),
+    );
+    const row = cards[0]!.parentElement!;
+    expect(row.className).toMatch(/bento-2/);
+    expect(row.className).toMatch(/lg:col-span-3/);
+    for (const card of cards) {
+      expect(card.parentElement).toBe(row);
+      expect(card.className).not.toMatch(/col-span/);
+    }
+    expect(screen.getByRole("article", { name: "FAQ" }).className).not.toMatch(
+      /lg:col-span-3/,
+    );
+  });
+
+  it("does the same in Thai, in Thai", () => {
+    renderTopic(SLUG, "th");
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section")!;
+    // The same words are in the proof list and the FAQ; this is the hero's pill.
+    expect(
+      within(hero).getByText("เปิดรับตำแหน่ง").closest("p"),
+    ).toHaveTextContent(
+      "เปิดรับตำแหน่ง · Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+    );
+    expect(within(hero).getByRole("link", { name: "ติดต่อ" })).toHaveAttribute(
+      "href",
+      "/contact?topic=hiring",
+    );
+    expect(within(hero).getByRole("link", { name: "เรซูเม่" })).toHaveAttribute(
+      "href",
+      "/resume",
+    );
+    const explore = screen.getByRole("article", { name: "อ่านต่อ" });
+    expect(
+      within(explore)
+        .getAllByRole("link")
+        .map((link) => link.getAttribute("href")),
+    ).toContain("/resume");
+  });
+
+  it("keeps the pill and the second button off the other hubs", () => {
+    renderTopic("ai-transformation-thailand", "en");
+    expect(screen.queryByText("Open to roles", { exact: false })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Résumé" })).toBeNull();
+  });
+});

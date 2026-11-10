@@ -1,3 +1,8 @@
+import {
+  HIRING_CONTACT_HREF,
+  RESUME_HREF,
+  RESUME_PDF_HREF,
+} from "@/lib/content/availability";
 import { site } from "@/lib/content/landing";
 import { siteConfig } from "@/lib/site";
 import { PAGE_META } from "@/lib/content/pageMeta";
@@ -7,16 +12,20 @@ import { PAGE_META } from "@/lib/content/pageMeta";
  * `/api/contact` (server) so the topic whitelist and length limits can't drift.
  */
 
+/** Hiring leads: it is the topic a recruiter looks for (recruiter-fit phase 2). */
 export const CONTACT_TOPICS = [
+  "Hiring",
   "GoGoCash",
   "Manut AI",
   "Partnership",
   "Investment",
   "AI / ERP advice",
   "Speaking or press",
-  "Hiring",
   "Something else",
 ] as const;
+
+/** The topic `/contact?topic=hiring` chooses for the visitor. */
+export const HIRING_TOPIC = "Hiring" satisfies (typeof CONTACT_TOPICS)[number];
 
 export type ContactTopic = (typeof CONTACT_TOPICS)[number];
 
@@ -61,6 +70,9 @@ export const contactPage = {
   namePlaceholder: "Full name",
   emailPlaceholder: "Email",
   messagePlaceholder: "What are you working on, and how can I help?",
+  /** The message label when the visitor arrives through a hiring button. */
+  hiringPlaceholder:
+    "Tell me about the role: the team, the scope and the location",
   topicsLabel: "What’s it about?",
   submit: "Send message",
   sending: "Sending...",
@@ -71,7 +83,48 @@ export const contactPage = {
   mailtoSubject: "Hello from kunanonj.com",
   elsewhereTitle: "Elsewhere",
   whoTitle: "Who should write",
+  recruiterTitle: "For recruiters",
 } as const;
+
+/**
+ * A link in the recruiter block: a page on the site, the résumé file
+ * (`download`) or a profile on another site (`external`).
+ */
+export type RecruiterLink = {
+  readonly label: string;
+  readonly href: string;
+  readonly download?: true;
+  readonly external?: true;
+};
+
+const RESUME_FILE: RecruiterLink = {
+  label: "Download PDF",
+  href: RESUME_PDF_HREF,
+  download: true,
+};
+
+const LINKEDIN: RecruiterLink = {
+  label: "LinkedIn",
+  href: siteConfig.socials.linkedin,
+  external: true,
+};
+
+/** The "For recruiters" card's links: the résumé on screen, as a file, and LinkedIn. */
+export const contactRecruiterLinks: readonly RecruiterLink[] = [
+  { label: "Résumé", href: RESUME_HREF },
+  RESUME_FILE,
+  LINKEDIN,
+];
+
+/**
+ * The same block in About's "Let's talk" card. The résumé already has a
+ * button there, so the hiring form leads instead.
+ */
+export const aboutRecruiterLinks: readonly RecruiterLink[] = [
+  { label: "Contact about a role", href: HIRING_CONTACT_HREF },
+  RESUME_FILE,
+  LINKEDIN,
+];
 
 /** "Elsewhere" on /contact: every public profile, in the canvas order. */
 export const contactElsewhere = [

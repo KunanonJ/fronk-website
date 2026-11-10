@@ -1,19 +1,22 @@
 import { Bento, BentoRow } from "@/components/bento/Bento";
 import { CtaLink } from "@/components/bento/Buttons";
-import { EyebrowChip } from "@/components/bento/Chips";
+import { AvailabilityPill, EyebrowChip } from "@/components/bento/Chips";
 import { DownloadIcon } from "@/components/bento/icons";
 import { Segmented } from "@/components/bento/Segmented";
 import SharePill from "@/components/bento/SharePill";
 import type { ShareTarget } from "@/components/bento/ShareRows";
 import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import {
-  RESUME_PDF,
-  RESUME_PDF_NAME,
   ResumeSectionCard,
   ShareCard,
   SkillsCard,
 } from "@/components/resume/ResumeCards";
-import { OPEN_TO_ROLES } from "@/lib/content/identity";
+import {
+  HIRING_CONTACT_HREF,
+  OPEN_TO_ROLES,
+  RESUME_PDF_HREF,
+  RESUME_PDF_NAME,
+} from "@/lib/content/availability";
 import {
   RESUME_DETAILS,
   RESUME_META,
@@ -82,21 +85,18 @@ export default function ResumePage({
           ) : null}
         </PageTitle>
         <HeroLead>{profile.summary}</HeroLead>
-        {/* The availability line, marked like a card's accent line. */}
-        <p className="m-0 flex max-w-[620px] items-baseline gap-2.5 text-card leading-[1.45] font-medium text-ink">
-          <span
-            aria-hidden
-            className="size-1.5 shrink-0 -translate-y-0.5 bg-mark"
-          />
-          {OPEN_TO_ROLES.sentence}
-        </p>
+        <AvailabilityPill
+          label={OPEN_TO_ROLES.pill.label}
+          detail={OPEN_TO_ROLES.pill.detail}
+          className="self-start"
+        />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <CtaLink href={RESUME_PDF} download={RESUME_PDF_NAME}>
+            <CtaLink href={RESUME_PDF_HREF} download={RESUME_PDF_NAME}>
               <DownloadIcon />
               <span>Download PDF</span>
             </CtaLink>
-            <CtaLink href="/contact" variant="secondary">
+            <CtaLink href={HIRING_CONTACT_HREF} variant="secondary">
               Contact
             </CtaLink>
             <SharePill />

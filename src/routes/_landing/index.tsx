@@ -24,8 +24,10 @@ const metadata: Metadata = {
 };
 
 /**
- * Home (bento redesign, phase 7a; design spec 4.1): the hero, then one dense
- * bento: Experience | Ventures | Selected work / Bangkok (2) | How I work.
+ * Home (bento redesign, phase 7a; reweighted in recruiter-fit phase 2): the
+ * hero, then one dense bento that leads with the evidence:
+ * Selected work (2) | Experience / Ventures | How I work (2) / Bangkok (3).
+ * The Bangkok card closes the page, as it does on Contact.
  */
 function HomePage() {
   return (
@@ -33,11 +35,11 @@ function HomePage() {
       <IntroLoader />
       <HomeHero />
       <Bento dense>
+        <SelectedWorkCard />
         <ExperienceCard />
         <VenturesCard />
-        <SelectedWorkCard />
-        <PlaceCard span={2} />
         <HowIWorkCard />
+        <PlaceCard span={3} />
       </Bento>
     </PageMain>
   );

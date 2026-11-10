@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from "react";
 import { BentoCard, CardLink } from "@/components/bento/Bento";
+import { MetaTag } from "@/components/bento/Chips";
 import { Segmented } from "@/components/bento/Segmented";
 import Link from "@/components/navigation/Link";
 import { aboutPage } from "@/lib/content/aboutPage";
@@ -55,7 +56,8 @@ const NAME_LINK =
 
 /**
  * Ventures: both logos, tilted. `id="ventures"` keeps /#ventures (the menu,
- * the 404 page and the /ventures redirect) landing here.
+ * the 404 page and the /ventures redirect) landing here; the card's own link
+ * goes on to the metrics and case studies on /proof.
  */
 export function VenturesCard() {
   const [gogocash, manut] = ventures.cards;
@@ -101,35 +103,44 @@ export function VenturesCard() {
       <p className="mt-1 text-center text-meta text-ink-2">
         {gogocash.items[0]} · {gogocash.items[1]} on {gogocash.title}
       </p>
-      <CardLink href="/#ventures" className="mt-auto self-center">
+      {/* /proof holds both ventures' metrics and case studies; the card's
+          own anchor (/#ventures) would link to itself. */}
+      <CardLink href="/proof" className="mt-auto self-center">
         See both ventures →
       </CardLink>
     </BentoCard>
   );
 }
 
-/** Selected work: the featured projects, numbered, in the canvas order. */
+/**
+ * Selected work: the featured projects, numbered, in the canvas order. The
+ * first and widest card on Home (recruiter-fit phase 2): it is the evidence
+ * a hiring reader looks for, so each row also says what kind of work it was.
+ */
 export function SelectedWorkCard() {
   const projects = getFeaturedPortfolioProjects();
   return (
-    <BentoCard headingId="card-work" title="Selected work" gap={3}>
+    <BentoCard headingId="card-work" title="Selected work" span={2} gap={3}>
       <ul className="m-0 mt-1 flex list-none flex-col p-0">
         {projects.map((project, index) => (
           <li
             key={project.slug}
-            className="flex gap-3 border-b border-hairline py-[9px] last:border-b-0"
+            className="flex gap-3 border-b border-hairline py-3 last:border-b-0"
           >
             <span className="pt-[3px] font-mono text-xs text-ink-2">
               {pad2(index + 1)}
             </span>
-            <span className="flex flex-col">
-              <Link
-                href={`/portfolio/${project.slug}`}
-                className={cn(NAME_LINK, "text-card font-medium")}
-              >
-                {project.name}
-              </Link>
-              <span className="text-meta text-ink-2">{project.tagline}</span>
+            <span className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <span className="flex min-w-0 flex-col">
+                <Link
+                  href={`/portfolio/${project.slug}`}
+                  className={cn(NAME_LINK, "text-card font-medium")}
+                >
+                  {project.name}
+                </Link>
+                <span className="text-meta text-ink-2">{project.tagline}</span>
+              </span>
+              <MetaTag>{project.category}</MetaTag>
             </span>
           </li>
         ))}
@@ -147,7 +158,7 @@ export function HowIWorkCard() {
   const [step, setStep] = useState(0);
   const current = principles[step] ?? principles[0]!;
   return (
-    <BentoCard headingId="card-how" title="How I work" gap={3.5}>
+    <BentoCard headingId="card-how" title="How I work" span={2} gap={3.5}>
       {/* Every principle shares one grid cell, so the card keeps the longest
           one's height and the step buttons never move under a tap; the text
           sits on the buttons. */}

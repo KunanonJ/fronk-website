@@ -427,7 +427,7 @@ export const aboutPage = {
     links: [
       { label: "Contact", href: "/contact" },
       { label: "Portfolio", href: "/portfolio" },
-      { label: "Skills", href: "/skills" },
+      { label: "Agent skills", href: "/skills" },
       {
         label: "AI engineering",
         href: "/topics/forward-deployed-ai-engineering",

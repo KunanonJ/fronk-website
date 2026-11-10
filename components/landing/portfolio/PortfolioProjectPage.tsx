@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
-import { Bento } from "@/components/bento/Bento";
-import { ctaClasses } from "@/components/bento/Buttons";
+import { Bento, BentoCard, CardTitle } from "@/components/bento/Bento";
+import { CtaLink, ctaClasses } from "@/components/bento/Buttons";
 import { EyebrowChip } from "@/components/bento/Chips";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
@@ -24,6 +24,11 @@ import {
   ProjectPager,
 } from "@/components/landing/portfolio/ProjectCards";
 import { taglineLines } from "@/components/landing/portfolio/portfolioLayout";
+import {
+  HIRING_CONTACT_HREF,
+  OPEN_TO_ROLES,
+  RESUME_HREF,
+} from "@/lib/content/availability";
 import { portfolioPage, type PortfolioProject } from "@/lib/content/portfolio";
 import { HeroLead } from "@/components/bento/PageHero";
 
@@ -124,6 +129,34 @@ function MetaStrip({ project }: { project: PortfolioProject }) {
   );
 }
 
+/**
+ * The card that closes the case study (recruiter-fit phase 2): the page used
+ * to end on previous and next links, with nowhere to go for someone hiring.
+ */
+function HireCard() {
+  const { hire } = portfolioPage;
+  return (
+    <BentoCard headingId="card-hire" title={hire.kicker} minHeight={false}>
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5 px-1">
+        <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-2">
+          <CardTitle>{hire.heading}</CardTitle>
+          <p className="m-0 max-w-[560px] text-card leading-[1.55] text-ink-2">
+            {OPEN_TO_ROLES.sentence}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <CtaLink href={RESUME_HREF} size="md">
+            {hire.resumeLabel}
+          </CtaLink>
+          <CtaLink href={HIRING_CONTACT_HREF} variant="secondary" size="md">
+            {hire.contactLabel}
+          </CtaLink>
+        </div>
+      </div>
+    </BentoCard>
+  );
+}
+
 export default function PortfolioProjectPage({
   project,
 }: {
@@ -147,6 +180,7 @@ export default function PortfolioProjectPage({
           ) : null}
           <BuiltColumn sections={more} stack={project.stack} />
         </Bento>
+        <HireCard />
       </div>
       <ProjectPager slug={project.slug} />
     </>

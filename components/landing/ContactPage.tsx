@@ -4,9 +4,11 @@ import PlaceCard from "@/components/bento/PlaceCard";
 import {
   ElsewhereCard,
   EmailCard,
+  RecruiterCard,
   WhoCard,
 } from "@/components/landing/contact/ContactCards";
 import ContactForm from "@/components/landing/contact/ContactForm";
+import type { ContactIntent } from "@/lib/contact/search";
 import { contactPage } from "@/lib/content/contact";
 import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
@@ -34,17 +36,24 @@ function ContactHero() {
 /**
  * Contact (bento redesign, phase 7b; design spec 4.3). Dense bento: Email
  * over Elsewhere beside the form (two columns, two rows), then Who should
- * write and the Bangkok card, whose "Say hello" jumps to the form.
+ * write beside For recruiters, and the Bangkok card, whose "Say hello" jumps
+ * to the form. `intent` comes from `?topic=`: `hiring` readies the form for
+ * a recruiter.
  */
-export default function ContactPage() {
+export default function ContactPage({
+  intent = "general",
+}: {
+  intent?: ContactIntent;
+}) {
   return (
     <>
       <ContactHero />
       <Bento dense>
         <EmailCard />
-        <ContactForm />
+        <ContactForm intent={intent} />
         <ElsewhereCard />
         <WhoCard />
+        <RecruiterCard />
         <PlaceCard span={3} ctaHref={`#${contactPage.formId}`} />
       </Bento>
     </>

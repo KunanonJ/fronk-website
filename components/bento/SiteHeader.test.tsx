@@ -99,7 +99,8 @@ describe("SiteHeader", () => {
       ["About", "/about"],
       ["Ventures", "/#ventures"],
       ["Portfolio", "/portfolio"],
-      ["Skills", "/skills"],
+      ["Résumé", "/resume"],
+      ["Agent skills", "/skills"],
       ["AI engineering", "/topics/forward-deployed-ai-engineering"],
       ["Learn", "/learn"],
       ["Examples", "/examples"],
@@ -211,5 +212,60 @@ describe("isCurrentRow", () => {
     expect(
       isCurrentRow("/topics/erp-crm-internal-systems", rows[1]!, rows),
     ).toBe(true);
+  });
+});
+
+describe("SiteHeader inline links (1024 px and wider)", () => {
+  const primary = () => screen.getByRole("navigation", { name: "Primary" });
+  const names = () =>
+    [...primary().querySelectorAll("a")].map((a) => [
+      a.textContent,
+      a.getAttribute("href"),
+    ]);
+
+  it("puts the work, the résumé and the AI engineering page one click away", () => {
+    renderHeader();
+    expect(names()).toEqual([
+      ["Work", "/portfolio"],
+      ["Résumé", "/resume"],
+      ["AI engineering", "/topics/forward-deployed-ai-engineering"],
+    ]);
+  });
+
+  it("shows only at desktop width and keeps the menu as its own landmark", () => {
+    renderHeader();
+    expect(primary().className).toMatch(/(^| )hidden( |$)/);
+    expect(primary().className).toMatch(/lg:flex/);
+    // Two navigation landmarks need two names. The menu is in the HTML even
+    // while closed (hidden), so crawlers always find every page.
+    const menu = document.getElementById("site-menu")!;
+    expect(menu).toHaveAttribute("aria-label", "Site");
+    expect(menu).not.toBe(primary());
+  });
+
+  it("marks the current section, a project page counting as Work", () => {
+    location.pathname = "/portfolio/tbh-intranet";
+    renderHeader();
+    const current = [...primary().querySelectorAll("[aria-current]")];
+    expect(current.map((a) => a.textContent)).toEqual(["Work"]);
+    // Seen as well as announced: the mark's square, on the current link only
+    // (the tint alone is about 1.1:1 against the page).
+    expect(primary().querySelectorAll(".bg-mark")).toHaveLength(1);
+    expect(current[0]!.querySelector("[aria-hidden].bg-mark")).not.toBeNull();
+  });
+
+  it("marks the résumé on the résumé page and nothing on Home", () => {
+    location.pathname = "/resume";
+    const { unmount } = renderHeader();
+    expect(
+      [...primary().querySelectorAll("[aria-current]")].map(
+        (a) => a.textContent,
+      ),
+    ).toEqual(["Résumé"]);
+    unmount();
+    location.pathname = "/";
+    renderHeader();
+    expect(primary().querySelectorAll("[aria-current]")).toHaveLength(0);
+    expect(primary().querySelector(".bg-mark")).toBeNull();
   });
 });

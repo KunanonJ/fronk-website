@@ -2,12 +2,18 @@ import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
 import { BentoCard, CardLink, CardTitle } from "@/components/bento/Bento";
 import { CtaLink } from "@/components/bento/Buttons";
+import { MONO_LABEL } from "@/components/bento/classes";
 import { ArrowUpRightIcon, PlusIcon } from "@/components/bento/icons";
+import {
+  RecruiterLines,
+  RecruiterLinks,
+} from "@/components/landing/RecruiterFacts";
 import {
   aboutPage,
   type AboutInline,
   type AboutParagraph,
 } from "@/lib/content/aboutPage";
+import { aboutRecruiterLinks, contactPage } from "@/lib/content/contact";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { operatingModel } from "@/lib/content/operatingModel";
 import { cn } from "@/lib/utils/cn";
@@ -366,7 +372,11 @@ function CtaArrow({ children }: { children: ReactNode }) {
   );
 }
 
-/** Next: where to go from here, Contact first. */
+/**
+ * Next: where to go from here, Contact first. Between the invitation and
+ * the buttons, what a recruiter asks first (recruiter-fit phase 2): beside
+ * the tall FAQ card this one had room to spare.
+ */
 export function NextCard({ className }: { className?: string }) {
   const { cta } = aboutPage;
   const [primary, ...others] = cta.links;
@@ -380,6 +390,11 @@ export function NextCard({ className }: { className?: string }) {
       <div className="flex flex-col gap-3 px-1">
         <CardTitle size="xl">{cta.heading}</CardTitle>
         <p className="m-0 text-card leading-[1.6] text-ink-2">{cta.body}</p>
+      </div>
+      <div className="flex flex-col gap-2 border-t border-hairline pt-4">
+        <h4 className={cn(MONO_LABEL, "px-1")}>{contactPage.recruiterTitle}</h4>
+        <RecruiterLines />
+        <RecruiterLinks links={aboutRecruiterLinks} />
       </div>
       <div className="mt-auto flex flex-col gap-2.5 pt-3">
         <CtaLink href={primary.href} size="md">

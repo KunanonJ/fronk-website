@@ -11,6 +11,7 @@
  * Never add a claim here that the repo or the owner has not provided.
  */
 
+import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import { CURRENT_ROLE } from "@/lib/content/currentRole";
 
 export { CURRENT_ROLE };
@@ -42,13 +43,8 @@ export const PERSON_CUSTOMER_WORK =
 export const PERSON_SOLOPRENEUR =
   "He works as a solopreneur: he owns GoGoCash end to end, from merchant partnerships to the cashback engine, and designs and builds Manut AI himself, from the ERP/CRM structure to its AI workflows.";
 
-/** Availability, as approved by the owner. */
-export const OPEN_TO_ROLES = {
-  roles: ["Forward Deployed Engineer", "AI engineering"],
-  location: "Bangkok or remote",
-  sentence:
-    "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
-} as const;
+/** Availability, as approved by the owner (lib/content/availability.ts). */
+export { OPEN_TO_ROLES };
 
 /** Education and memberships for Person.alumniOf / Person.memberOf (from the resume). */
 export const PERSON_ALUMNI_OF = {

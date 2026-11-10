@@ -8,6 +8,7 @@ import ShareRows, {
   type ShareTarget,
 } from "@/components/bento/ShareRows";
 import { CompanyLogo } from "@/components/CompanyLogo";
+import { RESUME_PDF_HREF, RESUME_PDF_NAME } from "@/lib/content/availability";
 import type {
   ResolvedTimelineItem,
   ResolvedTimelineSection,
@@ -35,11 +36,6 @@ import { pad2 } from "@/lib/utils/pad2";
  * `detail` "compact" hides the bullet lists. Screen only: print uses
  * ResumePrint.
  */
-
-export const RESUME_PDF = "/resume.pdf";
-
-/** The name a download saves under, so a recruiter can find the file again. */
-export const RESUME_PDF_NAME = "Kunanon-Jarat-Resume.pdf";
 
 /** One line under the organisation: a project's description, or an overlap. */
 function Note({
@@ -459,7 +455,11 @@ export function ShareCard({
       <div className="flex flex-col gap-0.5">
         <ShareRows target={target} />
       </div>
-      <CtaLink href={RESUME_PDF} download={RESUME_PDF_NAME} className="mt-auto">
+      <CtaLink
+        href={RESUME_PDF_HREF}
+        download={RESUME_PDF_NAME}
+        className="mt-auto"
+      >
         <DownloadIcon />
         <span>Download PDF</span>
       </CtaLink>

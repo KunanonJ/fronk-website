@@ -1,4 +1,6 @@
+import { RESUME_HREF } from "@/lib/content/availability";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
+import { CURRENT_ROLE } from "@/lib/content/currentRole";
 import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 
 export const site = {
@@ -46,12 +48,18 @@ export const footerLibrary = [
   { label: "Build", href: "/build", icon: "build" },
 ] as const satisfies readonly NavChild[];
 
-/** Primary site sections: flat links + the Library group (site menu, bento redesign). */
+/**
+ * Primary site sections: flat links + the Library group (site menu, bento
+ * redesign). The résumé has its own row (recruiter-fit phase 2): it used to
+ * be reachable only through three text links. "Agent skills", not "Skills":
+ * the page is the catalogue of coding-agent skills, not a list of abilities.
+ */
 export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "About", href: "/about", icon: "about" },
   { type: "link", label: "Ventures", href: "/#ventures", icon: "ventures" },
   { type: "link", label: "Portfolio", href: "/portfolio", icon: "portfolio" },
-  { type: "link", label: "Skills", href: "/skills", icon: "skills" },
+  { type: "link", label: "Résumé", href: "/resume" },
+  { type: "link", label: "Agent skills", href: "/skills", icon: "skills" },
   // The FDE positioning hub: a site-wide, crawlable link to it (EO review).
   {
     type: "link",
@@ -74,6 +82,26 @@ export const primaryNav: readonly NavItem[] = [
     : []),
   // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
+
+/**
+ * The links the header shows inline at 1024 px and wider (owner, 10-11-26):
+ * what a recruiter opens first, one click from every page. `match` lists the
+ * path prefixes that mark a link as the current section. The menu still
+ * holds every page.
+ */
+export const headerLinks = [
+  { label: "Work", href: "/portfolio", match: ["/portfolio/"] },
+  { label: "Résumé", href: "/resume", match: [] },
+  {
+    label: "AI engineering",
+    href: "/topics/forward-deployed-ai-engineering",
+    match: [],
+  },
+] as const satisfies readonly {
+  label: string;
+  href: string;
+  match: readonly string[];
+}[];
 
 /** The site menu's closing call to action (canvas: "Contact me"). */
 export const navCta = { label: "Contact me", href: "/contact" } as const;
@@ -114,31 +142,22 @@ export const siteMenu = {
   cta: navCta,
 } as const;
 
-/** Home hero (visual-redesign Phase 2; statement chosen by the owner 09-11-26). */
+/**
+ * Home hero. The h1 leads with the role, not the ventures (owner, 10-11-26,
+ * recruiter-fit phase 2): "Hi, I'm [photo] Kunanon Jarat. / Forward deployed
+ * / AI engineering / from Bangkok." The role lines are the FDE hub's own h1,
+ * so the two pages say one thing; the last line takes the accent colour.
+ * The owner edits these lines here.
+ */
 export const hero = {
-  wordmark: site.wordmark,
-  eyebrow: "Kunanon Jarat (Fronk) · Bangkok",
-  statement: "Building fintech and AI from Bangkok.",
-  statementSecondary: "Founder of GoGoCash and Manut AI.",
-  lead: "Cashback for shoppers, and an ERP/CRM workspace with Intelligence AI for automotive SMEs. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
-  primaryCta: { label: "Contact me", href: "/contact" },
-  secondaryCta: { label: "See my work", href: "/portfolio" },
-  /** Shown in a "live" chip: something that is genuinely in progress now. */
-  status: "Building GoGoCash and Manut AI",
-  /**
-   * Bento Home h1 (canvas copy, owner-approved 09-11-26): "Hi, I'm [photo]
-   * Kunanon Jarat. / Founder of GoGoCash and / Manut AI." The connector
-   * words render muted; the last line in the accent colour.
-   */
   greeting: "Hi, I’m",
   name: "Kunanon Jarat.",
-  founderOf: "Founder of",
-  ventureA: "GoGoCash",
-  joiner: "and",
-  ventureB: "Manut AI.",
-  /** The canvas Home lead, next to the "Contact me" button. */
-  homeLead:
-    "Building fintech and AI from Bangkok. Also IT Manager & AI Engineering Lead at The Binary Holdings.",
+  headline: ["Forward deployed", "AI engineering"],
+  headlineAccent: "from Bangkok.",
+  /** Beside the buttons: the employed role first, then the ventures. */
+  homeLead: `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization}. Also building GoGoCash and Manut AI.`,
+  primaryCta: { label: "Contact me", href: "/contact" },
+  resumeCta: { label: "Résumé", href: RESUME_HREF },
   portraitSrc: "/profile-portrait.webp",
 } as const;
 

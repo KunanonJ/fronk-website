@@ -8,7 +8,8 @@ import {
   bentoSpan,
   type BentoSpans,
 } from "@/components/bento/Bento";
-import { ctaClasses } from "@/components/bento/Buttons";
+import { CtaLink, ctaClasses } from "@/components/bento/Buttons";
+import { AvailabilityPill } from "@/components/bento/Chips";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
 import { topicGrid } from "@/components/landing/discovery/hubLayout";
@@ -140,18 +141,33 @@ function TopicHero({ pillar }: { pillar: TopicPillar }) {
       >
         {pillar.lede}
       </p>
+      {pillar.availability ? (
+        <AvailabilityPill
+          label={pillar.availability.label}
+          detail={pillar.availability.detail}
+          className={cn("self-start", th && "leading-[1.6]")}
+        />
+      ) : null}
       <div className="flex flex-wrap items-center gap-3">
         <Link href={pillar.ctaHref} className={ctaClasses()}>
           {pillar.ctaLabel}
           <ArrowUpRightIcon strokeWidth={2} className="shrink-0" />
         </Link>
+        {pillar.secondaryCta ? (
+          <CtaLink href={pillar.secondaryCta.href} variant="secondary">
+            {pillar.secondaryCta.label}
+          </CtaLink>
+        ) : null}
         <SharePill labelLang={th ? "en" : undefined} />
       </div>
     </section>
   );
 }
 
-/** A section as a card: its heading as the kicker, a big index, the body. */
+/**
+ * A section as a card: its heading as the kicker, a big index, the body.
+ * With no `span` the card is one of a pair and takes half the row.
+ */
 function SectionCard({
   index,
   section,
@@ -160,16 +176,19 @@ function SectionCard({
 }: {
   index: number;
   section: { heading: string; body: string };
-  span: BentoSpans;
+  span?: BentoSpans;
   th: boolean;
 }) {
-  const lead = span.lg > 1;
+  const lead = !span || span.lg > 1;
   return (
     <BentoCard
       headingId={`card-s${index}`}
       title={kicker(section.heading, th)}
       minHeight={false}
-      className={cn(bentoSpan(span), th ? "min-h-[260px]" : "min-h-[280px]")}
+      className={cn(
+        span && bentoSpan(span),
+        th ? "min-h-[260px]" : "min-h-[280px]",
+      )}
     >
       <p
         aria-hidden
@@ -373,15 +392,29 @@ export default function TopicHubPage({ pillar }: { pillar: TopicPillar }) {
     <PageMain lang={th ? "th" : undefined}>
       <TopicHero pillar={pillar} />
       <Bento>
-        {pillar.sections.map((section, i) => (
-          <SectionCard
-            key={section.heading}
-            index={i + 1}
-            section={section}
-            span={grid.sections[i]}
-            th={th}
-          />
-        ))}
+        {grid.paired ? (
+          // Two equal pairs: no card is stretched by a longer neighbour.
+          <BentoPair className={cn("bento-row", bentoSpan(3))}>
+            {pillar.sections.map((section, i) => (
+              <SectionCard
+                key={section.heading}
+                index={i + 1}
+                section={section}
+                th={th}
+              />
+            ))}
+          </BentoPair>
+        ) : (
+          pillar.sections.map((section, i) => (
+            <SectionCard
+              key={section.heading}
+              index={i + 1}
+              section={section}
+              span={grid.sections[i]}
+              th={th}
+            />
+          ))
+        )}
         <ProofCard pillar={pillar} span={grid.proof} />
         <FaqCard pillar={pillar} span={grid.faq} />
         {/* bento-row: the pair holds still on hover; its cards lift. */}

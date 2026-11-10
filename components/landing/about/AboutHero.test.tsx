@@ -17,6 +17,24 @@ describe("AboutHero", () => {
     expect(screen.getByText(/Fronk · Bangkok, Thailand/)).toBeInTheDocument();
   });
 
+  it("says who he is open to hearing from, between the role and the buttons", () => {
+    render(<AboutHero />);
+    const pill = screen
+      .getByText("Open to roles", { exact: false })
+      .closest("p")!;
+    expect(pill).toHaveTextContent(
+      "Open to roles · Forward Deployed Engineer and AI engineering · Bangkok or remote",
+    );
+    const role = screen.getByText(aboutPage.hero.role);
+    const contact = screen.getByRole("link", { name: "Contact me" });
+    expect(
+      role.compareDocumentPosition(pill) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      pill.compareDocumentPosition(contact) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("shows the portrait panel, loaded first", () => {
     render(<AboutHero />);
     const portrait = screen.getByRole("img", {
