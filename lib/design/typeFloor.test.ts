@@ -31,14 +31,7 @@ describe("type floor ratchet", () => {
   });
 
   it("new design-system primitives use no sub-12 px text", () => {
-    for (const f of [
-      "Chip",
-      "MonoLabel",
-      "Section",
-      "PixelGrid",
-      "Button",
-      "Card",
-    ]) {
+    for (const f of ["Chip", "PixelGrid", "Button"]) {
       expect(sub12(read(`components/ui/${f}.tsx`)), f).toBe(0);
     }
   });

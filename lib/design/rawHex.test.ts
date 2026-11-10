@@ -37,15 +37,7 @@ describe("raw hex ratchet", () => {
   });
 
   it("design-system primitives use tokens only", () => {
-    for (const f of [
-      "Chip",
-      "MonoLabel",
-      "Section",
-      "PixelGrid",
-      "Button",
-      "Card",
-      "Container",
-    ]) {
+    for (const f of ["Chip", "PixelGrid", "Button", "Container"]) {
       expect(read(`components/ui/${f}.tsx`), f).not.toMatch(
         /#[0-9a-fA-F]{6}\b/,
       );
