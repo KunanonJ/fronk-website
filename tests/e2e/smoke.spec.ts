@@ -332,14 +332,20 @@ test.describe("library > list filters are typed search params", () => {
   }) => {
     const errors = watchErrors(page);
     await page.goto("/learn?lang=th", { waitUntil: "networkidle" });
-    await expect(page.getByText("Showing 3 hubs in Thai")).toBeVisible();
-    await expect(page.locator('h2[lang="th"]')).toHaveCount(3);
+    // The hub count comes from the content, so read it rather than pin it.
+    const thai = page.getByText(/^Showing \d+ hubs in Thai$/);
+    await expect(thai).toBeVisible();
+    const count = Number((await thai.textContent())?.match(/\d+/)?.[0]);
+    expect(count).toBeGreaterThan(0);
+    await expect(page.locator('h2[lang="th"]')).toHaveCount(count);
     await page
       .getByRole("group", { name: "Hub language" })
       .getByRole("button", { name: "English" })
       .click();
     await expect(page).toHaveURL(/\/learn$/);
-    await expect(page.getByText("Showing 3 hubs in English")).toBeVisible();
+    await expect(
+      page.getByText(`Showing ${count} hubs in English`),
+    ).toBeVisible();
     expect(errors, errors.join("\n")).toEqual([]);
   });
 
