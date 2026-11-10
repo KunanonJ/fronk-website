@@ -87,11 +87,6 @@ describe("TopicHubPage (English, the drawn topic)", () => {
     expect(ctas).toHaveLength(2);
     for (const cta of ctas) {
       expect(cta).toHaveAttribute("href", "/contact");
-      expect(cta).toHaveAttribute("data-analytics", "topic_hub_cta");
-      expect(cta).toHaveAttribute(
-        "data-topic-slug",
-        "ai-transformation-thailand",
-      );
     }
   });
 

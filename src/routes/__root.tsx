@@ -11,7 +11,6 @@ import type { RouterContext } from "../router";
 import NotFound from "@/components/NotFound";
 import RouteError from "@/components/RouteError";
 import appCss from "@/src/styles/globals.css?url";
-import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { ThemeProvider } from "next-themes";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
@@ -103,7 +102,6 @@ function RootDocument({ children }: { children: ReactNode }) {
           {children}
         </ThemeProvider>
         <CloudflareAnalytics />
-        <Analytics />
         <Suspense fallback={null}>
           <Devtools />
         </Suspense>

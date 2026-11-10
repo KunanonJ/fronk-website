@@ -5,11 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** .ts tests that use browser APIs (matchMedia, window, dataLayer). */
+/** .ts tests that use browser APIs (matchMedia, window). */
 const DOM_TS_TESTS = [
   "lib/hooks/useReducedMotion.test.ts",
   "lib/hooks/useFinePointer.test.ts",
-  "lib/analytics/track.test.ts",
   "lib/motion/motionRuntime.test.ts",
 ];
 

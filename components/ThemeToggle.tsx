@@ -3,7 +3,6 @@ import { flushSync } from "react-dom";
 import { useTheme } from "next-themes";
 import { ICON_BUTTON } from "@/components/bento/classes";
 import { MoonIcon, SunIcon } from "@/components/bento/icons";
-import { track } from "@/lib/analytics/track";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 import { cn } from "@/lib/utils/cn";
 
@@ -47,7 +46,6 @@ export function ThemeToggle({ className }: { className?: string }) {
   const onClick = (event: MouseEvent<HTMLButtonElement>) => {
     const root = document.documentElement;
     const next: Theme = root.classList.contains("dark") ? "light" : "dark";
-    track("theme_change", { theme: next });
 
     if (
       typeof document.startViewTransition !== "function" ||

@@ -11,7 +11,6 @@ import {
 import { ctaClasses } from "@/components/bento/Buttons";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
-import { DiscoveryAnalytics } from "@/components/landing/discovery/DiscoveryAnalytics";
 import { topicGrid } from "@/components/landing/discovery/hubLayout";
 import LinkRows, {
   type HubLink,
@@ -142,12 +141,7 @@ function TopicHero({ pillar }: { pillar: TopicPillar }) {
         {pillar.lede}
       </p>
       <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href={pillar.ctaHref}
-          data-analytics="topic_hub_cta"
-          data-topic-slug={pillar.slug}
-          className={ctaClasses()}
-        >
+        <Link href={pillar.ctaHref} className={ctaClasses()}>
           {pillar.ctaLabel}
           <ArrowUpRightIcon strokeWidth={2} className="shrink-0" />
         </Link>
@@ -345,12 +339,7 @@ function ContactCard({ pillar }: { pillar: TopicPillar }) {
         {pillar.description}
       </p>
       <div className="flex flex-wrap items-center gap-x-[18px] gap-y-1">
-        <Link
-          href={pillar.ctaHref}
-          data-analytics="topic_hub_cta"
-          data-topic-slug={pillar.slug}
-          className={ctaClasses("primary", "md")}
-        >
+        <Link href={pillar.ctaHref} className={ctaClasses("primary", "md")}>
           {pillar.ctaLabel}
           <ArrowUpRightIcon strokeWidth={2} className="shrink-0" />
         </Link>
@@ -382,7 +371,6 @@ export default function TopicHubPage({ pillar }: { pillar: TopicPillar }) {
 
   return (
     <PageMain lang={th ? "th" : undefined}>
-      <DiscoveryAnalytics />
       <TopicHero pillar={pillar} />
       <Bento>
         {pillar.sections.map((section, i) => (

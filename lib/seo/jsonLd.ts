@@ -184,6 +184,8 @@ export type SoftwareAppJsonLdInput = {
   pagePath: string;
   applicationCategory?: string;
   operatingSystem?: string;
+  /** Only a stated offer; never a guessed price. */
+  offer?: { label: string; price: string; priceCurrency: string };
 };
 
 /** SoftwareApplication for product hubs (/ventures/[slug]). */
@@ -203,6 +205,17 @@ export function buildSoftwareApplicationJsonLd(
     author: { "@id": PERSON_ID },
     // The venture's Organization node in the site graph (foundedOrganizations).
     provider: { "@id": orgId(input.url) },
+    ...(input.offer
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: input.offer.price,
+            priceCurrency: input.offer.priceCurrency,
+            description: input.offer.label,
+            url: input.url,
+          },
+        }
+      : {}),
     isPartOf: { "@id": WEBSITE_ID },
     mainEntityOfPage: pageUrl,
   };

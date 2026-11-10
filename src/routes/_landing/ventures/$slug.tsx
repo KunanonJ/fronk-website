@@ -63,6 +63,7 @@ function VentureCasePageView({ slug }: { slug: string }) {
       description: venture.description,
       url: venture.url,
       pagePath: `/ventures/${slug}`,
+      offer: venture.offer,
     }),
   );
   const crumbLd = serializeJsonLd(

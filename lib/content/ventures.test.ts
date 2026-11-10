@@ -41,3 +41,15 @@ describe("ventures > getAllVentureSlugs", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 });
+
+describe("ventures > offer", () => {
+  it("states the owner-confirmed free start for both products", () => {
+    for (const slug of ["gogocash", "manut"]) {
+      expect(getVentureBySlug(slug)?.offer).toEqual({
+        label: "Free to start",
+        price: "0",
+        priceCurrency: "THB",
+      });
+    }
+  });
+});

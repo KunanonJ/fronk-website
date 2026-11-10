@@ -337,8 +337,6 @@ export function AlsoBuildingCard({ venture }: { venture: Venture }) {
           href={venture.url}
           target="_blank"
           rel="noopener noreferrer"
-          data-analytics="venture_outbound_click"
-          data-venture={venture.slug}
           className="inline-flex min-h-11 items-center text-sm font-medium no-underline"
         >
           {venture.urlLabel} →
