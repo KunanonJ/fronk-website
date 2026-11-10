@@ -40,4 +40,19 @@ From the query targets in `fde-positioning-seo-aeo-geo_REPORT_09-11-26.md` secti
 | | ChatGPT | Solopreneur building fintech and AI in Bangkok [/about#how-i-ship, /operating-model.md] | | |
 | | Gemini | วิศวกร AI กรุงเทพ (AI engineer Bangkok, Thai) [/th/topics/forward-deployed-ai-engineering] | | |
 
+## Search-index baseline (10-11-26)
+
+Run by Claude with its web search tool (a US search index, not Perplexity, ChatGPT or Gemini), right after PRs #99-#106 shipped. It measures whether a search index surfaces the site at all, which is what the answer engines retrieve from.
+
+| Date | Engine | Prompt | Cited? | URL / notes |
+|------|--------|--------|--------|-------------|
+| 10-11-26 | Web search (US index) | Kunanon Jarat | No | Only near-miss place names; kunanonj.com not returned |
+| 10-11-26 | Web search (US index) | Kunanon Jarat AI engineering lead The Binary Holdings | No | Returns The Binary Holdings coverage without him |
+| 10-11-26 | Web search (US index) | forward deployed AI engineer Bangkok | No | Job listings only (BCG, Salesforce, Google Cloud) |
+| 10-11-26 | Web search (US index) | GoGoCash founder Thailand cashback | Partly | gogocash.gitbook.io whitepaper names "Fronk Kunanon" as founder and CEO; dappradar.com/dapp/gogocash; not kunanonj.com |
+| 10-11-26 | Web search (US index) | Manut AI ERP CRM automotive SME | No | Manut AI not found |
+| 10-11-26 | Web search (US index) | Superstacks agent skills Claude Code | No | Superstacks not found |
+
+Read: the bottleneck is indexing and off-site signals, not on-page content. Next: verify Google Search Console and submit the sitemap (#40, Bing imports from GSC), then update LinkedIn from `references/entity-offsite-drafts.md`, and rerun this table plus the engine rows above at 2 and 6 weeks.
+
 Update this table after Phase 5/8/10 go-live and monthly thereafter (see `operating-loop.md`).
