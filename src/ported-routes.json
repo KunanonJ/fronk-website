@@ -33,7 +33,7 @@
   {
     "path": "/blog",
     "test": "blog",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/blog/ai-transformation-thailand-smes",
@@ -111,10 +111,12 @@
   },
   {
     "path": "/design",
-    "intended": ["jsonLd", "tags"]
+    "intended": ["jsonLd", "tags"],
+    "test": "design"
   },
   {
     "path": "/does-not-exist",
+    "test": "not-found",
     "seed": false
   },
   {
@@ -200,7 +202,7 @@
   {
     "path": "/press",
     "test": "press",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/proof",

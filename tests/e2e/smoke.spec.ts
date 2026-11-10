@@ -363,3 +363,88 @@ test.describe("library > list filters are typed search params", () => {
     }
   });
 });
+
+test.describe("not-found > unknown paths answer 404 with the bento page", () => {
+  test("status 404, the recovery links and no hidden pages", async ({
+    page,
+  }) => {
+    const response = await page.goto("/does-not-exist", {
+      waitUntil: "networkidle",
+    });
+    expect(response?.status()).toBe(404);
+    await expect(page.locator("h1")).toHaveText("Nothing lives here.");
+    const recovery = page.getByRole("navigation", { name: "Recovery links" });
+    await expect(recovery.getByRole("link")).toHaveCount(4);
+    await expect(
+      page.locator('a[href^="/blog"], a[href^="/press"]'),
+    ).toHaveCount(0);
+  });
+});
+
+test.describe("press > the type filter is a typed search param", () => {
+  test("?type=product narrows the coverage, All brings back a clean URL", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+
+    // /press is prerendered: the filter applies after hydration.
+    await page.goto("/press?type=product", { waitUntil: "networkidle" });
+    const group = page.getByRole("group", { name: "Filter coverage by type" });
+    await expect(
+      group.getByRole("button", { name: "Product · 2" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("Showing 2 of 4")).toBeVisible();
+
+    await group.getByRole("button", { name: /^All/ }).click();
+    await expect(page).toHaveURL(/\/press$/);
+    await expect(page.getByText("Showing 4 of 4")).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("an unknown type falls back to all without an error", async ({
+    page,
+  }) => {
+    const response = await page.goto("/press?type=video", {
+      waitUntil: "networkidle",
+    });
+    expect(response?.ok()).toBe(true);
+    await expect(page).toHaveURL(/\/press$/);
+    await expect(page.getByText("Showing 4 of 4")).toBeVisible();
+  });
+});
+
+test.describe("blog > tag and search are typed search params", () => {
+  test("?tag= narrows the posts; the chips and the search box write the URL", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+
+    // /blog renders on request, so the server already applies ?tag=.
+    await page.goto("/blog?tag=SME", { waitUntil: "networkidle" });
+    const tags = page.getByRole("group", { name: "Filter by tag" });
+    await expect(
+      tags.getByRole("button", { name: /^SME \d+$/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      page.getByText(/^Showing \d+ of \d+ posts tagged SME$/),
+    ).toBeVisible();
+
+    await tags.getByRole("button", { name: /^All \d+$/ }).click();
+    await expect(page).toHaveURL(/\/blog$/);
+
+    await page.getByRole("searchbox", { name: "Search posts" }).fill("loops");
+    await expect(page).toHaveURL(/\/blog\?q=loops$/);
+    await expect(page.getByText(/^Showing \d+ of \d+ posts$/)).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
