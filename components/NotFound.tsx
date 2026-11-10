@@ -23,7 +23,7 @@ const COPY: StatusPageCopy = {
  */
 export default function NotFound() {
   return (
-    <LandingLayout canvas>
+    <LandingLayout>
       <StatusPage copy={COPY} />
     </LandingLayout>
   );
