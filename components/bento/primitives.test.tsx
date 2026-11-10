@@ -118,9 +118,11 @@ describe("chips and buttons", () => {
         ]}
       />,
     );
-    expect(
-      screen.getByRole("group", { name: "Operating principles" }),
-    ).toBeInTheDocument();
+    const group = screen.getByRole("group", { name: "Operating principles" });
+    // A wrapped rounded-full track turns into an oval; the bento radius
+    // (28 px, half the 56 px track) is a pill on one line and a card on two.
+    expect(group.className).toMatch(/\brounded-bento\b/);
+    expect(group.className).not.toMatch(/\brounded-full\b/);
     expect(screen.getByRole("button", { name: "Step 01" })).toHaveAttribute(
       "aria-pressed",
       "true",

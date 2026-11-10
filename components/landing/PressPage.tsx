@@ -177,7 +177,7 @@ export default function PressPage({
             value={type}
             onChange={(next) => onTypeChange(next as PressFilter)}
             tone="surface"
-            className="max-w-full rounded-bento shadow-card"
+            className="max-w-full shadow-card"
           />
           <p
             aria-live="polite"

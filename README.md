@@ -185,6 +185,11 @@ pnpm run deploy:staging  # build + deploy fronk-website-start (wrangler.start.js
 | Deploy default branch | `main` | `pnpm run build:cloudflare` | `npx wrangler deploy` |
 | Deploy non-production branches | all except `main` | `pnpm run build:cloudflare` | `npx wrangler versions upload` |
 
+A PR that adds a Durable Object migration fails the non-production build by
+design: Cloudflare will not upload a version that carries an unapplied
+migration. The check is not required; `wrangler deploy` on `main` applies the
+migration, and later previews upload again (as in #99, migration `v2`).
+
 How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 
 - **Static assets:** prerendered content pages, hashed JS/CSS and fonts are served
