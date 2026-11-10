@@ -5,10 +5,15 @@ import type { Metadata } from "@/lib/seo/types";
 import {
   getTopicPillar,
   isTopicSlug,
+  TOPIC_PUBLISHED,
   topicHreflang,
   type TopicSlug,
 } from "@/lib/content/topics/pillars";
-import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/jsonLd";
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+  buildTopicArticleJsonLd,
+} from "@/lib/seo/jsonLd";
 import { fileOg } from "@/src/lib/og";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
@@ -35,6 +40,16 @@ function TopicPillarPageView({ slug }: { slug: string }) {
   const pillar = getTopicPillar(slug, "en");
   if (!pillar) throw notFound();
 
+  const articleLd = serializeJsonLd(
+    buildTopicArticleJsonLd({
+      path: `/topics/${slug}`,
+      headline: pillar.h1,
+      description: pillar.description,
+      inLanguage: "en",
+      datePublished: TOPIC_PUBLISHED[slug],
+      image: `/topics/${slug}/opengraph-image`,
+    }),
+  );
   const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
   const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
@@ -45,6 +60,10 @@ function TopicPillarPageView({ slug }: { slug: string }) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: articleLd }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqLd }}
