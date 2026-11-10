@@ -294,7 +294,8 @@ test.describe("library > list filters are typed search params", () => {
   }) => {
     const errors = watchErrors(page);
     await page.goto("/build?venture=manut", { waitUntil: "networkidle" });
-    await expect(page.getByText("2 of 11 tickets · Manut")).toBeVisible();
+    // The board's size changes with the content; the Manut count is the point.
+    await expect(page.getByText(/^2 of \d+ tickets · Manut$/)).toBeVisible();
     await expect(
       page
         .getByRole("article", { name: "In progress" })
