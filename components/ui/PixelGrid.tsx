@@ -53,17 +53,22 @@ export function pixelCells({
   return cells;
 }
 
+/*
+ * Bento canvas tones (phase 7g): the theme-aware accent, the soft --river
+ * blue (art only) and Ember. The canvas 404 art is exactly this grid at
+ * 12 x 8, seed 404, state "failed".
+ */
 const FILL: Record<Cell["tone"], string> = {
-  signal: "fill-signal",
-  // Glaze is bright on dark surfaces, so dark mode uses a faint hairline tint.
-  glaze: "fill-glaze dark:fill-hairline-strong",
+  signal: "fill-mark",
+  glaze: "fill-(--river)",
   ember: "fill-ember",
 };
 
 /**
- * Deterministic pixel-square motif (visual-redesign Phase 0). Decorative by
- * default (`aria-hidden`); pass `label` to expose it as an image. The `live`
- * state gently pulses its Ember squares, unless reduced motion is on.
+ * Deterministic pixel-square motif (visual-redesign Phase 0; bento tones in
+ * 7g). Decorative by default (`aria-hidden`); pass `label` to expose it as an
+ * image. The `live` state gently pulses its Ember squares, unless reduced
+ * motion is on.
  */
 export function PixelGrid({
   cols = 16,

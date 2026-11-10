@@ -33,7 +33,7 @@
   {
     "path": "/blog",
     "test": "blog",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/blog/ai-transformation-thailand-smes",
@@ -102,7 +102,7 @@
   {
     "path": "/build",
     "test": "build",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/contact",
@@ -111,16 +111,18 @@
   },
   {
     "path": "/design",
-    "intended": ["jsonLd", "tags"]
+    "intended": ["jsonLd", "tags"],
+    "test": "design"
   },
   {
     "path": "/does-not-exist",
+    "test": "not-found",
     "seed": false
   },
   {
     "path": "/examples",
     "test": "examples",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/feed.xml",
@@ -134,7 +136,7 @@
   {
     "path": "/learn",
     "test": "learn",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/llms.txt",
@@ -157,12 +159,12 @@
   {
     "path": "/portfolio",
     "test": "portfolio",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/ai-automation",
     "test": "portfolio-diagrams",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/ai-automation/opengraph-image",
@@ -170,7 +172,7 @@
   },
   {
     "path": "/portfolio/email-signature-generator",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/email-signature-generator/opengraph-image",
@@ -178,7 +180,7 @@
   },
   {
     "path": "/portfolio/node-validator-automation",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/node-validator-automation/opengraph-image",
@@ -191,7 +193,7 @@
   {
     "path": "/portfolio/tbh-intranet",
     "test": "portfolio-project",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/portfolio/tbh-intranet/opengraph-image",
@@ -200,12 +202,12 @@
   {
     "path": "/press",
     "test": "press",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/proof",
     "test": "proof",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/resume",
@@ -416,7 +418,7 @@
   {
     "path": "/stack",
     "test": "stack",
-    "intended": ["jsonLd"]
+    "intended": ["jsonLd", "h1"]
   },
   {
     "path": "/stock/asme",

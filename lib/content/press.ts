@@ -1,3 +1,7 @@
+/** Coverage types, in filter order (bento canvas Press, design spec 4.19). */
+export const PRESS_TYPES = ["Feature", "Product", "Profile"] as const;
+export type PressType = (typeof PRESS_TYPES)[number];
+
 export type PressItem = {
   id: string;
   title: string;
@@ -7,7 +11,8 @@ export type PressItem = {
   href: string;
   bannerSrc: string;
   bannerAlt: string;
-  source?: string;
+  /** The coverage type: the card's kicker and the page's filter. */
+  source: PressType;
 };
 
 export const pressPage = {
@@ -15,6 +20,14 @@ export const pressPage = {
   title: "Press",
   description:
     "Selected coverage and mentions. Click through to read the full piece.",
+  /** The description's two sentences as the canvas hero draws them. */
+  headline: {
+    muted: "Selected",
+    middle: "coverage",
+    joiner: "and",
+    accent: "mentions.",
+  },
+  lead: "Click through to read the full piece.",
 } as const;
 
 /** Static press stock — replace / extend as coverage lands. */

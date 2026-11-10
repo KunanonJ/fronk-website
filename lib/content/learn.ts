@@ -1,6 +1,7 @@
 import type { BlogCard } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
+import type { LearnLang } from "@/lib/library/search";
 
 export type LearnLink = {
   title: string;
@@ -12,13 +13,47 @@ export const learnPage = {
   eyebrow: "Learn",
   title: "Learn",
   description: `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
+  /** The h1 as the bento canvas draws it: muted opener, accent close. */
+  headline: {
+    muted: "How I think about",
+    rest: "AI transformation, internal systems,",
+    accent: "and shipping from Bangkok.",
+  },
+  lede: BLOG_PUBLIC
+    ? "Topic hubs, writing, and operator notes."
+    : "Topic hubs and operator notes.",
 } as const;
 
-export function getLearnTopicLinks(): readonly LearnLink[] {
-  return getAllTopicPillars("en").map((topic) => ({
+/** A topic hub as a /learn card, in one language. */
+export type LearnHub = {
+  slug: string;
+  lang: LearnLang;
+  title: string;
+  lede: string;
+  /** The hub's path in this language, e.g. /th/topics/<slug>. */
+  href: string;
+  /** The same hub in the other language. */
+  alt: { lang: LearnLang; href: string; label: string };
+};
+
+function hubPath(slug: string, lang: LearnLang): string {
+  return lang === "th" ? `/th/topics/${slug}` : `/topics/${slug}`;
+}
+
+/** The topic hubs in `lang`: each pillar's h1 and lede, in TOPIC_SLUGS order. */
+export function getLearnHubs(lang: LearnLang): readonly LearnHub[] {
+  const other: LearnLang = lang === "th" ? "en" : "th";
+  return getAllTopicPillars(lang).map((topic) => ({
+    slug: topic.slug,
+    lang,
     title: topic.h1,
-    description: topic.lede,
-    href: `/topics/${topic.slug}`,
+    lede: topic.lede,
+    href: hubPath(topic.slug, lang),
+    alt: {
+      lang: other,
+      href: hubPath(topic.slug, other),
+      label: other === "th" ? "อ่านภาษาไทย" : "Read in English",
+    },
   }));
 }
 

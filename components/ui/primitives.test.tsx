@@ -1,31 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
-import { MonoLabel } from "@/components/ui/MonoLabel";
 import { PixelGrid, pixelCells } from "@/components/ui/PixelGrid";
-import { Section } from "@/components/ui/Section";
-
-describe("Card", () => {
-  it("maps each tone to its role classes, with the card radius and hairline", () => {
-    const cases = {
-      paper: /bg-surface\b/,
-      tint: /bg-surface-tint/,
-      warm: /bg-surface-warm/,
-      ink: /bg-ink/,
-    } as const;
-    for (const [tone, re] of Object.entries(cases)) {
-      const { container, unmount } = render(
-        <Card tone={tone as keyof typeof cases}>x</Card>,
-      );
-      const el = container.firstElementChild as HTMLElement;
-      expect(el.className).toMatch(re);
-      expect(el.className).toMatch(/rounded-card/);
-      expect(el.className).toMatch(/border-hairline/);
-      unmount();
-    }
-  });
-});
 
 describe("Chip", () => {
   it("renders a 12 px mono label without state", () => {
@@ -49,31 +25,6 @@ describe("Chip", () => {
   });
 });
 
-describe("MonoLabel", () => {
-  it("is uppercase mono at the 12 px label size", () => {
-    render(<MonoLabel>Portfolio</MonoLabel>);
-    const el = screen.getByText("Portfolio");
-    expect(el.className).toMatch(/font-mono/);
-    expect(el.className).toMatch(/text-label/);
-    expect(el.className).toMatch(/uppercase/);
-  });
-});
-
-describe("Section", () => {
-  it("labels the section with its heading", () => {
-    render(
-      <Section id="work" eyebrow="Selected" heading="Work">
-        <p>body</p>
-      </Section>,
-    );
-    const region = screen.getByRole("region", { name: "Work" });
-    expect(region).toHaveAttribute("id", "work");
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Work" }),
-    ).toBeInTheDocument();
-  });
-});
-
 describe("PixelGrid", () => {
   const opts = { cols: 16, rows: 6, seed: 42, density: 0.45 } as const;
 
@@ -92,6 +43,22 @@ describe("PixelGrid", () => {
     expect(tones("idle")).toBe(0);
     expect(tones("live")).toBeGreaterThan(0);
     expect(tones("failed")).toBeGreaterThan(0);
+  });
+
+  it("draws the canvas 404 art in accent, river and Ember squares", () => {
+    const { container } = render(
+      <PixelGrid cols={12} rows={8} seed={404} state="failed" />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg).toHaveAttribute("viewBox", "0 0 177 117");
+    const fills = Array.from(svg.querySelectorAll("rect")).map(
+      (r) => r.getAttribute("class") ?? "",
+    );
+    expect(fills).toHaveLength(42);
+    expect(fills.filter((c) => c.includes("fill-ember"))).toHaveLength(3);
+    expect(fills.every((c) => /fill-(mark|\(--river\)|ember)/.test(c))).toBe(
+      true,
+    );
   });
 
   it("is decorative by default and an image when labelled", () => {

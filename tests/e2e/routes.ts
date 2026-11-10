@@ -32,6 +32,18 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /Press|View|GoGoCash|Manut/i,
   },
   {
+    // Any unknown path: the root's 404 page (status 404), with the site chrome.
+    path: "/does-not-exist",
+    name: "not-found",
+    expectsHeadingPattern: /Nothing lives here/i,
+  },
+  {
+    // Unlinked and noindex: the bento system on one page.
+    path: "/design",
+    name: "design",
+    expectsHeadingPattern: /Design system/i,
+  },
+  {
     path: "/portfolio",
     name: "portfolio",
     expectsHeadingPattern: /Selected work|Portfolio|TBH Intranet/i,
@@ -64,7 +76,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/learn",
     name: "learn",
-    expectsHeadingPattern: /Learn|Topic hubs|Writing|Operator notes/i,
+    expectsHeadingPattern: /How I think about|Topic hub|Operator notes/i,
   },
   {
     path: "/examples",

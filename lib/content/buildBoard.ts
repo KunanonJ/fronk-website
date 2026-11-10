@@ -1,10 +1,12 @@
+import type { BuildVentureId } from "@/lib/library/search";
+
 export type BuildColumn = "next" | "inProgress" | "shipped";
 
 export type BuildCard = {
   id: string;
   title: string;
   body: string;
-  venture?: "gogocash" | "manut" | "site";
+  venture: BuildVentureId;
 };
 
 export const buildPage = {
@@ -12,7 +14,23 @@ export const buildPage = {
   title: "Build",
   description:
     "A thin public board of what’s next, in flight, and recently shipped — not roadmap theater.",
+  /** The description as the bento canvas draws the h1: one entry per line. */
+  headline: {
+    lines: [
+      [{ muted: "A thin public board of" }],
+      ["what’s next, in flight, ", { muted: "and" }],
+    ],
+    accent: "recently shipped.",
+  },
 } as const;
+
+/** Ticket tags and the venture filter, in filter order. */
+export const BUILD_VENTURES: readonly { id: BuildVentureId; label: string }[] =
+  [
+    { id: "site", label: "Site" },
+    { id: "gogocash", label: "GoGoCash" },
+    { id: "manut", label: "Manut" },
+  ] as const;
 
 export const buildColumns: readonly {
   id: BuildColumn;
@@ -54,16 +72,16 @@ export const buildBoard: Record<BuildColumn, readonly BuildCard[]> = {
     },
     {
       id: "KJ-29",
-      title: "Landing chrome",
-      body: "Floating pill nav, Activity heatmap, and keyword tips on the public shell.",
+      title: "Bento rollout",
+      body: "The last pages move onto the bento layout, one route group at a time.",
       venture: "site",
     },
   ],
   shipped: [
     {
       id: "KJ-21",
-      title: "Prisma-style landing cutover",
-      body: "Home + showcase cinematic shell with KunanonJ brand tokens.",
+      title: "Bento redesign",
+      body: "Public pages rebuilt as bento cards, with a new header, site menu, share panel, and footer.",
       venture: "site",
     },
     {
