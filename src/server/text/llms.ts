@@ -123,6 +123,7 @@ export async function GET() {
   for (const p of portfolio) {
     textLines.push(`### ${p.name} (${p.year})`);
     textLines.push(`- **Project page:** ${base}/portfolio/${p.slug}`);
+    textLines.push(`- **Markdown:** ${base}/portfolio/${p.slug}.md`);
     textLines.push(`- **Tagline:** ${p.tagline}`);
     textLines.push(`- **Role:** ${p.role}, ${p.organization}`);
     textLines.push(`- **Stack:** ${p.stack.join(", ")}`);
@@ -187,6 +188,9 @@ export async function GET() {
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push(`- Full profile (one fetch): ${base}/llms-full.txt`);
   textLines.push(`- Solopreneur operating model: ${base}/operating-model.md`);
+  textLines.push(
+    `- Markdown versions of pages: ${base}/about.md and ${base}/portfolio/[slug].md (also linked from each page as rel="alternate" type="text/markdown")`,
+  );
   textLines.push("");
 
   if (cards.length > 0) {

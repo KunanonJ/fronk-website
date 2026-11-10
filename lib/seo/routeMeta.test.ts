@@ -34,6 +34,19 @@ describe("routeShareMeta", () => {
     }
   });
 
+  it("advertises a page's Markdown twin as text/markdown", () => {
+    const meta = routeShareMeta({
+      title: "About",
+      description: "Bio",
+      path: "/about",
+      markdownPath: "/about.md",
+    });
+    expect(meta.alternates?.types).toEqual({
+      ...(BLOG_PUBLIC ? { "application/rss+xml": "/feed.xml" } : {}),
+      "text/markdown": "/about.md",
+    });
+  });
+
   it("defaults og:locale to en_US and lets Thai routes pass th_TH", () => {
     const en = routeShareMeta({ title: "A", description: "B", path: "/about" });
     const th = routeShareMeta({

@@ -17,6 +17,7 @@ const metadata: Metadata = {
     description: PAGE_META.about.description,
     path: "/about",
     hasOwnOgImage: true,
+    markdownPath: "/about.md",
   }),
   // Already contains the name, so skip the "— Fronk Kunanon Jarat" suffix.
   title: { absolute: PAGE_META.about.title },

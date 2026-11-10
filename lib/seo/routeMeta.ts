@@ -41,6 +41,11 @@ type RouteShareInput = {
   hasOwnOgImage?: boolean;
   /** `og:locale`. Thai routes pass `th_TH`. */
   locale?: "en_US" | "th_TH";
+  /**
+   * The page's Markdown twin (e.g. `/about.md`), advertised as
+   * rel="alternate" type="text/markdown" for agents that prefer text.
+   */
+  markdownPath?: string;
 };
 
 /**
@@ -56,6 +61,7 @@ export function routeShareMeta({
   languages,
   hasOwnOgImage = false,
   locale = "en_US",
+  markdownPath,
 }: RouteShareInput): Metadata {
   const url = path.startsWith("http")
     ? path
@@ -78,7 +84,14 @@ export function routeShareMeta({
       // A page-level `alternates` replaces the root layout's wholesale, so
       // the feed link has to be repeated here to reach every page's <head>.
       // Not advertised while the blog is hidden (the feed is empty then).
-      ...(BLOG_PUBLIC ? { types: { "application/rss+xml": FEED_PATH } } : {}),
+      ...(BLOG_PUBLIC || markdownPath
+        ? {
+            types: {
+              ...(BLOG_PUBLIC ? { "application/rss+xml": FEED_PATH } : {}),
+              ...(markdownPath ? { "text/markdown": markdownPath } : {}),
+            },
+          }
+        : {}),
     },
     openGraph: {
       type,
