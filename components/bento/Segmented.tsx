@@ -9,7 +9,9 @@ type Option = {
 
 /**
  * Segmented control (bento canvas, design spec 3.6): pressed buttons in a
- * labelled group, not tabs. The pressed segment is ink (--cta).
+ * labelled group, not tabs. The pressed segment is ink (--cta). The track
+ * is 56 px tall, so the 28 px bento radius reads as a pill on one line and
+ * as a rounded card when the segments wrap (rounded-full would make an oval).
  */
 export function Segmented({
   label,
@@ -27,7 +29,7 @@ export function Segmented({
   /** The group's fill: the page colour inside cards, surface on the page. */
   tone?: "page" | "surface";
   /**
-   * "wrap" lets segments flow onto more lines (pass a radius that suits it);
+   * "wrap" lets segments flow onto more lines;
    * "row" keeps them on one line in equal columns, for short labels in a
    * narrow card.
    */
@@ -39,7 +41,7 @@ export function Segmented({
       role="group"
       aria-label={label}
       className={cn(
-        "gap-1 rounded-full border border-hairline p-[5px]",
+        "gap-1 rounded-bento border border-hairline p-[5px]",
         layout === "row" ? "grid auto-cols-fr grid-flow-col" : "flex flex-wrap",
         tone === "page" ? "bg-page" : "bg-surface",
         className,
