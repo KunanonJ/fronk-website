@@ -1,4 +1,5 @@
 import type { StackGroupId } from "@/lib/library/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type StackItem = {
   name: string;
@@ -12,8 +13,7 @@ export type StackItem = {
 export const stackPage = {
   eyebrow: "Stack",
   title: "Stack",
-  description:
-    "Tools evidenced in public GitHub — @KunanonJ and @mygogocash — not a wishlist. TypeScript is the through-line.",
+  description: PAGE_META.stack.description,
   /** The description as the bento canvas draws the h1: one entry per line. */
   headline: {
     lines: [

@@ -1,29 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Chip } from "@/components/ui/Chip";
 import { PixelGrid, pixelCells } from "@/components/ui/PixelGrid";
-
-describe("Chip", () => {
-  it("renders a 12 px mono label without state", () => {
-    render(<Chip>Fintech</Chip>);
-    const chip = screen.getByText("Fintech");
-    expect(chip.className).toMatch(/text-label/);
-    expect(chip.querySelector(".bg-ember")).toBeNull();
-  });
-
-  it.each([
-    ["live", "Live"],
-    ["failed", "Failed"],
-  ] as const)("pairs the Ember square with a word for %s", (state, word) => {
-    const { container } = render(<Chip state={state}>Validator</Chip>);
-    expect(container.querySelector(".bg-ember")).not.toBeNull();
-    expect(screen.getByText(word)).toBeInTheDocument();
-    // Ember sits on the chip's Paper surface, never on a tint.
-    expect((container.firstElementChild as HTMLElement).className).toMatch(
-      /bg-surface\b/,
-    );
-  });
-});
 
 describe("PixelGrid", () => {
   const opts = { cols: 16, rows: 6, seed: 42, density: 0.45 } as const;

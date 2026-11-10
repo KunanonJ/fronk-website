@@ -294,7 +294,7 @@ node scripts/start-gates.mjs   # parity crawl + Playwright smoke and axe on the 
 
 CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint (no
 warnings), Prettier, knip, unit tests, the production build, the first-load JS
-budget (200 KB gzip by default, 255 KB on marketing routes), Playwright smoke
+budget (165 KB gzip by default, 200 KB on marketing routes, 120 KB for the shared entry chunk), Playwright smoke
 and axe checks, the visual baselines (in the Playwright container) and the
 parity crawl.
 

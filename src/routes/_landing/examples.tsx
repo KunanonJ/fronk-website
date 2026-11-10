@@ -6,7 +6,6 @@ import {
 import { PageMain } from "@/components/bento/Bento";
 import ExamplesPage from "@/components/landing/library/ExamplesPage";
 import type { Metadata } from "@/lib/seo/types";
-import { examplesPage } from "@/lib/content/examples";
 import {
   EXAMPLES_SEARCH_DEFAULTS,
   examplesSearchSchema,
@@ -14,10 +13,11 @@ import {
 } from "@/lib/library/search";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Examples",
-  description: examplesPage.description,
+  title: PAGE_META.examples.title,
+  description: PAGE_META.examples.description,
   path: "/examples",
 });
 

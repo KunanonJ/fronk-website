@@ -3,12 +3,12 @@ import { PageMain } from "@/components/bento/Bento";
 import ProofPage from "@/components/landing/library/ProofPage";
 import type { Metadata } from "@/lib/seo/types";
 import { pageHead } from "@/src/lib/head";
-import { proofPage } from "@/lib/content/proof";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Proof",
-  description: proofPage.description,
+  title: PAGE_META.proof.title,
+  description: PAGE_META.proof.description,
   path: "/proof",
 });
 

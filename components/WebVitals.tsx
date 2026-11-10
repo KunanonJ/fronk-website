@@ -5,8 +5,8 @@ import { track } from "@/lib/analytics/gtag";
  * Reports real-user Core Web Vitals (LCP, INP, CLS, FCP, TTFB) to GA4 as
  * `web_vitals` events — GA does not collect these on its own. Surfaces the
  * performance your actual visitors experience, sliceable by page/device/country
- * in GA. No-op until GA is loaded (the track() helper guards), so it costs
- * nothing in dev/CI.
+ * in GA. Loads web-vitals only when a GA ID is configured at build time, and
+ * track() no-ops until gtag is ready.
  */
 export function WebVitals() {
   useReportWebVitals((metric) => {
@@ -21,7 +21,7 @@ export function WebVitals() {
       page_path:
         typeof window !== "undefined" ? window.location.pathname : undefined,
     });
-  });
+  }, Boolean(process.env.NEXT_PUBLIC_GA_ID));
 
   return null;
 }

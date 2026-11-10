@@ -20,6 +20,7 @@
  */
 
 import snapshot from "@/lib/content/skills.generated.json";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 /* ─── Snapshot types ──────────────────────────────────────────────────────── */
 
@@ -129,8 +130,7 @@ export const skillsPage = {
   headline: { muted: "The", rest: "agent skills", accent: "I build with" },
   description:
     "A skill is a folder of instructions an AI coding agent loads when the task calls for it: how to plan, test, review, or open a pull request. These are the twenty I use, packed as Superstacks, free under the MIT license.",
-  metaDescription:
-    "Twenty MIT-licensed agent skills for Claude Code, Codex and Cursor: planning, TDD, verify loops, code review and draft PRs. Install the whole pack or one skill.",
+  metaDescription: PAGE_META.skills.description,
   askAgentPrompt: `Install the Superstacks skills from github.com/${SKILLS_REPO} using the steps in its README.`,
 } as const;
 

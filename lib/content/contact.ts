@@ -1,5 +1,6 @@
 import { site } from "@/lib/content/landing";
 import { siteConfig } from "@/lib/site";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 /**
  * Copy and limits for `/contact`. Shared by the form (client) and
@@ -31,12 +32,9 @@ export const CONTACT_LIMITS = {
   maxBodyBytes: 20_000,
 } as const;
 
-const DESCRIPTION =
-  "Email Kunanon Jarat (Fronk) or send a message about fintech, AI, ERP/CRM or startups in Bangkok and Southeast Asia.";
-
 export const contactPage = {
-  metaTitle: "Contact",
-  metaDescription: DESCRIPTION,
+  metaTitle: PAGE_META.contact.title,
+  metaDescription: PAGE_META.contact.description,
   eyebrow: "Contact",
   /**
    * The page h1 in two lines (bento canvas): "Building in fintech, AI or
@@ -51,7 +49,7 @@ export const contactPage = {
     accent: "talk.",
   },
   /** The hero lead restates the meta description. */
-  lead: DESCRIPTION,
+  lead: PAGE_META.contact.description,
   /** The form card's id: "Say hello" links on this page jump to it. */
   formId: "say-hello",
   cardTitle: "Say hello",

@@ -13,11 +13,11 @@ import {
 } from "@/lib/library/search";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
-import { stackPage } from "@/lib/content/stack";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Stack",
-  description: stackPage.description,
+  title: PAGE_META.stack.title,
+  description: PAGE_META.stack.description,
   path: "/stack",
 });
 

@@ -1,4 +1,5 @@
 import type { BuildVentureId } from "@/lib/library/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type BuildColumn = "next" | "inProgress" | "shipped";
 
@@ -12,8 +13,7 @@ export type BuildCard = {
 export const buildPage = {
   eyebrow: "Build",
   title: "Build",
-  description:
-    "A thin public board of what’s next, in flight, and recently shipped — not roadmap theater.",
+  description: PAGE_META.build.description,
   /** The description as the bento canvas draws the h1: one entry per line. */
   headline: {
     lines: [

@@ -1,4 +1,5 @@
 import { getAllVentures, type Venture } from "@/lib/content/ventures";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 /** A published venture metric with the sentence that states it. */
 export type ProofMetric = {
@@ -17,8 +18,7 @@ export type ProofMetric = {
 export const proofPage = {
   eyebrow: "Proof",
   title: "Proof",
-  description:
-    "Honest signals — venture metrics and case studies. No invented scores.",
+  description: PAGE_META.proof.description,
   /** The description as the bento canvas draws the h1: one entry per line. */
   headline: {
     lines: [

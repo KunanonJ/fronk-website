@@ -7,19 +7,19 @@ import AboutPageContent from "@/components/landing/AboutPageContent";
 import type { Metadata } from "@/lib/seo/types";
 import { buildFaqJsonLd, buildProfilePageJsonLd } from "@/lib/seo/jsonLd";
 import { FAQ_ITEMS } from "@/lib/content/faq";
-import { aboutPage } from "@/lib/content/aboutPage";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { fileOg } from "@/src/lib/og";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = {
   ...routeShareMeta({
-    title: aboutPage.meta.title,
-    description: aboutPage.meta.description,
+    title: PAGE_META.about.title,
+    description: PAGE_META.about.description,
     path: "/about",
     hasOwnOgImage: true,
   }),
   // Already contains the name, so skip the "— Fronk Kunanon Jarat" suffix.
-  title: { absolute: aboutPage.meta.title },
+  title: { absolute: PAGE_META.about.title },
 };
 
 /**

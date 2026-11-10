@@ -11,17 +11,17 @@ import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { buildPortfolioCollectionJsonLd } from "@/lib/seo/portfolioJsonLd";
 import { pageHead } from "@/src/lib/head";
-import { portfolioPage } from "@/lib/content/portfolio";
 import {
   PORTFOLIO_SEARCH_DEFAULTS,
   portfolioSearchSchema,
   type PortfolioFilter,
 } from "@/lib/portfolio/search";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Portfolio",
-  description: portfolioPage.description,
+  title: PAGE_META.portfolio.title,
+  description: PAGE_META.portfolio.description,
   path: "/portfolio",
 });
 

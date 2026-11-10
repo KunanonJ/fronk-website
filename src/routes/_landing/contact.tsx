@@ -2,13 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageMain } from "@/components/bento/Bento";
 import ContactPage from "@/components/landing/ContactPage";
 import type { Metadata } from "@/lib/seo/types";
-import { contactPage } from "@/lib/content/contact";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: contactPage.metaTitle,
-  description: contactPage.metaDescription,
+  title: PAGE_META.contact.title,
+  description: PAGE_META.contact.description,
   path: "/contact",
 });
 
