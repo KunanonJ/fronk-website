@@ -187,19 +187,19 @@ Tests:
 
 ## Verification Evidence
 
-Final run, after the pre-merge review fixes (10-11-26), on Node 26 and on
-Node 22.23.4. Details and deviations are in the report.
+Final run, after both rounds of pre-merge review fixes (10-11-26). The first
+round also ran on Node 22.23.4 and in CI. Details are in the report.
 
 | Gate | Command or check | Result |
 | --- | --- | --- |
-| 1 | typecheck, lint, format, knip, unit tests | Pass: 102 files, 847 tests |
-| 2 | build, first-load budget | Pass: worst route 186.5 KB of 200 KB; entry chunk 107.5 KB of 120 KB |
-| 3 | smoke and axe; full smoke once | Pass: 153 tests, desktop project, both themes; also in CI mode |
-| 4 | Linux baselines regenerated and reviewed | Pass: 62 differ from `main` (54 refreshed, 8 added for the résumé and the Thai FDE hub). A compare-only run passes 96 of 96. Nine other mobile baselines differ in bytes; all predate this phase |
+| 1 | typecheck, lint, format, knip, unit tests | Pass: 102 files, 848 tests |
+| 2 | build, first-load budget | Pass: worst route 186.6 KB of 200 KB; entry chunk 107.5 KB of 120 KB |
+| 3 | smoke and axe; full smoke once | Pass: 153 tests, desktop project, both themes. Also 60 recruiter-path tests against the Cloudflare preview of the branch |
+| 4 | Linux baselines regenerated and reviewed | Pass: 58 differ from `main` (54 refreshed, 4 added for the Thai FDE hub). A compare-only run passes 92 of 92. Nine other mobile baselines differ in bytes; all predate this phase |
 | 5 | parity re-crawl and 0 differences | Pass: 132 URLs, 0 differences; three reference fields changed (the Home h1, the `/resume` share tags, the About FAQ JSON-LD) |
 | 6 | acceptance checks | Pass: all six, as tests in `tests/e2e/smoke.spec.ts`; the mobile check covers all 24 routes with a header |
-| Regression | Phase 1: the PDF text-layer read-back (recipe in the Phase 1 report) and `lib/content/resumeFacts.test.ts` | Pass: a fresh PDF matches the committed one (2 pages, 844 words, 6 links); fact tests in the unit run |
-| Review | One reviewer before the commit; then six lenses and three skeptics on the whole branch before the pull request | No blocker stood once the CV was read. 58 findings on the branch: 46 confirmed, 23 of them older than it. Fifteen fixed here, the rest recorded in the report. Eighteen deliberate breaks each failed a unit test |
+| Regression | Phase 1: the PDF text-layer read-back (recipe in the Phase 1 report) and `lib/content/resumeFacts.test.ts` | Pass: the PDF was regenerated after one word left the skills line: 2 pages, 843 of 843 words whole and in order, 6 links; fact tests in the unit run |
+| Review | One reviewer before the commit; six lenses and three skeptics on the whole branch; then three skeptics on the fix commits | 58 findings on the branch: 46 confirmed, 23 of them older than it. The one blocker, "RAG" as a skill, is resolved by the stricter reading of the rule. The second check found a regression and other defects in the fixes and in the report; all corrected. Twenty-two deliberate breaks each failed a unit test |
 
 ## Blockers that justify BLOCKED
 

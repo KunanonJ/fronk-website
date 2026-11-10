@@ -2,9 +2,11 @@
 
 **Plan:** `../active/phase-2_recruiter-path_PLAN_10-11-26.md`
 **Status:** VERIFIED on the local production build (10-11-26), on Node 26 and
-on CI's Node 22.23.4. In pull request #109 with Phase 1; the branch commits
-are `cfeee8b` (the phase) and `862a328` (the review fixes), squashed on merge.
-Not deployed. The live site is checked after the owner deploys.
+on CI's Node 22.23.4, and on the Cloudflare preview of the branch. In pull
+request #109 with Phase 1: the phase is commit `cfeee8b` on the branch,
+followed by review-fix commits; a squash merge replaces them all with one
+commit on `main`. Not deployed to production. The live site is checked after
+the owner deploys.
 **Base:** `b86cfe8`
 
 ## Owner answers used (10-11-26)
@@ -38,10 +40,11 @@ Not deployed. The live site is checked after the owner deploys.
   Résumé and AI engineering, in a `nav` labelled "Primary". The menu's `nav`
   is labelled "Site" and stays in the HTML on every page.
 - The current link carries `aria-current`, a tint and the mark's 5 px square.
-  A Thai page counts as its English twin, so the Thai FDE hub marks
-  "AI engineering" too.
+  A Thai hub (`/th/topics/...`) counts as its English twin, so the Thai FDE
+  hub marks "AI engineering" too.
 - The header declares `lang="en"`: its labels are English on the Thai pages
-  as well, where `<html>` says `lang="th"`.
+  as well, where `<html>` says `lang="th"`. The share panel's title is the
+  page's own and keeps the page's language.
 
 **2c. Home weighting**
 
@@ -92,18 +95,19 @@ Not deployed. The live site is checked after the owner deploys.
 ## Gates
 
 Local run on Node v26.12.0, repeated on Node 22.23.4, which CI pins, with the
-environment values CI uses. The results below are the final run, after the
-pre-merge review fixes.
+environment values CI uses. The results below are the final run, after both
+rounds of review fixes.
 
 | Gate | Command or check | Result |
 | --- | --- | --- |
-| 1 | `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm knip`, `pnpm test` | Pass on both Node versions: 0 lint issues, 102 files, 847 tests |
-| 2 | `pnpm build`, `pnpm perf:budget` | Pass on both: worst route 186.5 KB of 200 KB, entry chunk 107.5 KB of 120 KB |
-| 3 | `smoke.spec.ts` and `a11y.spec.ts`, desktop project, both themes, full run | Pass: 153 tests. Also in CI mode on Node 22.23.4, where Playwright starts its own server |
-| 4 | Linux baselines in `mcr.microsoft.com/playwright:v1.64.1-noble`, re-rendered with `--update-snapshots=all` and compared by bytes; then a compare-only run, as CI's `visual` job does | Pass: 62 baselines differ from `main` (54 refreshed, 8 added). The compare-only run passes 96 of 96, with 4 skipped (the blog) |
+| 1 | `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm knip`, `pnpm test` | Pass: 0 lint issues, 102 files, 848 tests |
+| 2 | `pnpm build`, `pnpm perf:budget` | Pass: worst route 186.6 KB of 200 KB, entry chunk 107.5 KB of 120 KB |
+| 3 | `smoke.spec.ts` and `a11y.spec.ts`, desktop project, both themes, full run | Pass: 153 tests. The first round also passed in CI mode on Node 22.23.4, where Playwright starts its own server, and in CI itself |
+| 4 | Linux baselines in `mcr.microsoft.com/playwright:v1.64.1-noble`, re-rendered with `--update-snapshots=all` and compared by bytes; then a compare-only run, as CI's `visual` job does | Pass: 58 baselines differ from `main` (54 refreshed, 4 added for the Thai FDE hub). The compare-only run passes 92 of 92, with 8 skipped (the résumé and the blog) |
 | 5 | Parity re-crawl with the README command, then `node scripts/start-gates.mjs --parity-only` | Pass: 132 URLs, 0 differences. The reference changed in three fields: the Home h1, the `/resume` share tags and the About FAQ JSON-LD |
 | 6 | Acceptance checks as Playwright tests (below) | Pass |
-| Regression | Phase 1: a fresh PDF from this build, read back with pypdf and compared with the committed file; `lib/content/resumeFacts.test.ts` | Pass: 2 pages, 844 words identical and in order, 6 identical links. `public/resume.pdf` is unchanged. The fact tests are in the unit run |
+| Preview | The 60 recruiter-path tests against the Cloudflare preview of the branch (first round of fixes) | Pass: 60 of 60 on the real Workers runtime, including the in-browser visit to the résumé |
+| Regression | Phase 1: the PDF read back with pypdf, word by word against the printed page; `lib/content/resumeFacts.test.ts` | Pass. The skills line lost one word in the second round (below), so `public/resume.pdf` was regenerated: 2 pages, 843 of 843 words whole and in order, 6 link annotations. The only difference from the Phase 1 file is that word |
 
 **Acceptance checks, all in `tests/e2e/smoke.spec.ts`:**
 
@@ -111,7 +115,7 @@ pre-merge review fixes.
   1440 x 900 and at 375 x 812.
 - From each of the 24 routes with a site header, the résumé is one click
   away at desktop width. At 375 px one tap opens the menu and its Résumé row
-  is on screen; one test taps through to the résumé.
+  is on screen; one test taps it and lands on `/resume`.
 - The header links are hidden at 1023 px and visible at 1024 px, on one row,
   touching neither the email nor the buttons, with no horizontal overflow.
 - `/contact?topic=hiring` presses the Hiring chip, as a click and as a direct
@@ -126,7 +130,7 @@ pre-merge review fixes.
 - A case study ends with the résumé and the hiring contact.
 - About's closing card answers a recruiter and keeps the general Contact.
 
-**Do the tests notice a break?** Eighteen behaviours were broken one at a
+**Do the tests notice a break?** Twenty-two behaviours were broken one at a
 time and the files restored byte for byte. A unit test failed for each.
 
 - Phase work (8): the label following the URL instead of the chip; "Send
@@ -134,9 +138,11 @@ time and the files restored byte for byte. A unit test failed for each.
   chip; the header square removed; About's recruiter link opening the general
   form; LinkedIn opening in the same tab; the ventures link pointing at its
   own card; a three-section hub getting the pair layout.
-- Review fixes (10): "RAG" said in a third place; a past role's end month
-  changed; the header's language removed; the recruiter card one column at
-  tablet width; the FAQ offering relocation; `about.md` without the
+- Review fixes (14): "RAG" back in the skills list; "RAG" said in another
+  file; a past role's end month changed; the header's language removed; the
+  share panel's title losing the page's language; any path under `/th`
+  treated as a twin; Thai hubs not treated as twins; the recruiter card one
+  column at tablet width; the FAQ offering relocation; `about.md` without the
   availability line; `llms-full.txt` without the role notes; a printed
   education line keeping its bar; the printed languages line dropped; the
   new-tab cue removed.
@@ -148,8 +154,7 @@ time and the files restored byte for byte. A unit test failed for each.
 - The 1% tolerance still hides real changes. After the About card gained the
   recruiter block, both desktop About tests passed against the old image;
   only the mobile ones failed. The bytes were compared instead.
-- The résumé and the Thai FDE hub now have baselines (8 files). The résumé
-  rendered byte-identically in two separate runs.
+- The Thai FDE hub now has baselines (4 files).
 - Nine mobile baselines differ in bytes and were not refreshed: design,
   learn, not-found and topic-hub-th-short in both themes, and press-light.
   All nine are in the drift recorded at the base commit in Phase 1. This
@@ -184,12 +189,13 @@ time and the files restored byte for byte. A unit test failed for each.
   1.1:1 against the page.
 - **Touchpoints the plan listed and this phase did not need to change:**
   `PlaceCard.test.tsx`.
-- **Beyond the plan, from the pre-merge review** (each small, each tested):
-  the `/resume` share tags; `lang="en"` on the header; the Thai hub counting
-  as its English twin for the current marker; baselines for the résumé and
-  the Thai FDE hub; "built" for "architected" in About and the FAQ; the
-  availability line in `about.md`; and the local paths scrubbed from
-  `AGENTS.md` and four completed plans.
+- **Beyond the plan, from the pre-merge reviews** (each small, each tested):
+  the `/resume` share tags; `lang="en"` on the header; a Thai hub counting as
+  its English twin for the current marker; baselines for the Thai FDE hub;
+  "built" for "architected" in the FAQ and "building" for "architecting" in
+  About; "RAG" taken off the résumé's skills list; the availability line in
+  `about.md`; the local gate's test filter; and the local paths scrubbed
+  from `AGENTS.md` and four completed plans.
 
 ## First review, before the phase commit
 
@@ -217,54 +223,71 @@ the privacy lens had reported, because the repository is public.
 **Result:** 58 findings. 46 confirmed, 8 refuted, 4 uncertain. 23 of the
 confirmed ones predate this branch.
 
-**The two "blocker" verdicts were settled by the CV, which the reviewers
-could not read.** They flagged "RAG" in the résumé's skills list, because the
-umbrella plan limits the word to the knowledge platform. The CV's Core Skills
-line lists RAG, and the Phase 1 plan the owner approved sets the skills as
-"four groups, as in the CV". The site says "RAG" in exactly the two places
-the CV does: the knowledge-platform bullet and the skills line. It stays; a
-test now pins both uses and fails on a third. The owner is asked to confirm.
+**One item was rated a blocker, by two lenses: "RAG" in the résumé's skills
+list.** The umbrella plan limits that word to the knowledge platform. The
+CV's Core Skills line lists RAG, and the Phase 1 plan sets the skills as
+"four groups, as in the CV", so I first kept it. The second check (below)
+rejected that: a hard constraint is not mine to reinterpret, and its default
+is the stricter reading. "RAG" is now off the skills list and stays in the
+knowledge-platform bullet, where the rule allows it. A test pins that single
+use. The owner can restore the skill; it is one line.
 
 **Fixed in this pull request:**
 
 | Finding | Fix |
 | --- | --- |
-| `/resume` shared the homepage's Open Graph and Twitter tags (older than the branch) | The route uses `routeShareMeta`, and stays noindex |
+| `/resume` shared the homepage's Open Graph and Twitter tags (older than the branch) | The route uses `routeShareMeta`, and stays noindex. Like every other page that uses it, it no longer states the share image's type |
 | Contact at 641 to 1023 px left an empty cell beside the recruiter card | The card takes a full row at two columns. A browser test measures it |
-| English header labels on Thai pages had no `lang` | The header declares `lang="en"` |
-| On the Thai FDE hub the header marked nothing and the menu marked Learn | A Thai path counts as its English twin |
-| "Architected" was attached to KK Venture Global; the CV says built | About and the FAQ say built |
+| English header labels on Thai pages had no `lang` | The header declares `lang="en"`; the share panel's title keeps the page's language |
+| On the Thai FDE hub the header marked nothing and the menu marked Learn | A Thai hub counts as its English twin |
+| "Architected" was attached to KK Venture Global; the CV says built | The FAQ says built, and About says building |
 | The Thai FDE hub changed in this phase but had no axe scan and no baseline | It is in `tests/e2e/routes.ts`, with four baselines |
-| `/resume` was excluded from visual regression "because content comes from Sanity", but Sanity holds no résumé document | It has four baselines; the comment says when to exclude it again |
-| The local gate script skipped the English FDE hub's tests (older than the branch) | Both FDE hubs have a `test` name in `src/ported-routes.json` |
+| The local gate script skipped the English FDE hub's tests (older than the branch) | Both FDE hubs have a `test` name in `src/ported-routes.json`, and the script's filter also selects the per-route recruiter tests |
 | Past-role dates were never checked | A test pins all ten periods; each was checked against the CV |
 | A printed education line without a period kept a trailing bar | The line prints only the parts it has |
 | `about.md` left out the availability line | It carries it under the title |
 | Three behaviours had no assertion: role notes in `llms-full.txt`, the default topic stripped from the URL, the printed languages line | Each has one |
 | The relocation guard checked one object; the "no other hub" test checked one hub | Both scan About, the FAQ and every hub in both languages |
 | LinkedIn in the recruiter block opened a new tab without saying so | It says so to a screen reader |
-| Local paths with the owner's username in `AGENTS.md` and four completed plans (older than the branch) | Eleven lines scrubbed. Git history still holds them |
+| Local paths with the owner's username in `AGENTS.md` and four completed plans (older than the branch) | Ten lines scrubbed. Git history still holds them |
 
 **One finding came from my own run, not from the reviewers.** A CI-mode run
 failed 24 browser tests because the local Workers runtime could not reach
-Sanity or GitHub for a while. All 23 of the new phone tests tapped through to
-the résumé, and each needed a live Sanity read, so they all failed together.
+Sanity or GitHub for a while. The 23 new phone tests each tapped through to
+the résumé, which needs a live Sanity read, so they failed together.
 `e2e-smoke` is a required check. Now each route's test checks that the menu
-row is on screen, and one test taps through.
+row is on screen, and one test taps it and stops at the URL.
 
-**Recorded, not changed:** see "Open, for the owner" and "Findings outside
-this phase".
+### Second check, on the fix commits
+
+The fixes above were written after the six-lens review, so three more
+skeptics read only those commits. They found real problems:
+
+| Finding | Outcome |
+| --- | --- |
+| Keeping "RAG" in the skills list was my interpretation of a hard constraint, with no recorded owner answer | Reversed: removed from the list (above). The PDF is regenerated |
+| Regression: the share panel sits inside the header, which now says `lang="en"`, and shows the page's title, Thai on a Thai hub | The title carries the page's language |
+| Not-found pages under `/th` marked a menu row as current | Only `/th/topics/...` counts as a twin |
+| I had added visual baselines for the résumé. Studio can hold a résumé document (`pnpm seed` creates one) that would then drive the page, and every render reads Sanity | Backed out. The résumé stays excluded, and the spec's comment now gives these reasons |
+| The one remaining tap-through test asserted the résumé's content, so a required job still depended on a live Sanity read | It stops at the URL; the résumé's own tests load the page |
+| Seven statements in the two reports were wrong or overstated: that the merge had happened; that two blocker verdicts were settled, with only one described; that the résumé reads Sanity on every visit; that no career wording changed; two counts; and one quotation | Corrected |
+| Three tests were weaker or stricter than they claimed: the twin test used invented rows, the relocation guard failed on any mention of travel, the "RAG" scan skipped JSON and Markdown | The twin test uses the site's real rows; the guard matches offers only; the scan covers code, JSON and Markdown |
 
 ## Findings outside this phase
 
-- **The résumé page depends on Sanity for every in-browser visit.** A direct
-  visit is usually served from the edge cache. A click on a Résumé link navigates in
-  the browser, which calls a server function that reads Sanity; a failed read
-  shows "Something went wrong." by design (`lib/sanity/fetch.ts`). Sanity
-  holds no résumé document, so the read always returns nothing and the page
-  draws the repo's data. The new header link makes this path the common one.
-  Options: fall back to the repo's data when the read fails, or stop reading
-  Sanity for the résumé until a document exists.
+- **The résumé page depends on Sanity for its first in-browser visit.** A
+  direct visit is usually served from the edge cache. A click on a Résumé
+  link navigates in the browser; the first such visit in a page load calls a
+  server function that reads Sanity, and a failed read shows "Something went
+  wrong." by design (`lib/sanity/fetch.ts`). Later visits in the same page
+  load reuse the result. Sanity holds no résumé document today, so the read
+  returns nothing and the page draws the repo's data. The new header link
+  makes this path the common one. Options: fall back to the repo's data when
+  the read fails, or stop reading Sanity for the résumé until a document
+  exists.
+- **The résumé has no visual baseline.** It is excluded as a CMS-driven
+  route, for the reasons in the table above. Both phases changed it, and it
+  was checked by eye, by its unit and browser tests and by the PDF read-back.
 - **I dropped eight URLs from the parity reference, and caught it.** The
   first re-crawl ran without `PARITY_SEEDS`, so the markdown mirrors and
   `/llms-full.txt` vanished from the file (132 URLs became 124). The README
@@ -281,7 +304,7 @@ this phase".
   Ventures card.
 - **Nine mobile baselines are stale** (listed above). They predate this
   program.
-- **Smaller points the review confirmed, all older than the branch:** the
+- **Smaller points the reviews confirmed, all older than the branch:** the
   résumé PDF has no tags or document language; the PDF script accepts an
   empty page and checks links only in the contact block; a résumé section
   from Sanity with a missing or repeated title would break the page; the
@@ -302,16 +325,22 @@ LinkedIn link resolves.
 
 ## Open, for the owner
 
-- **"RAG" in the résumé's skills.** Kept, because the CV lists it. Say if it
-  should go; it is one line and one test.
+- **"RAG" as a skill.** The CV's Core Skills line lists it; the site's skills
+  list does not, because the wording rule keeps the word to the knowledge
+  platform. Say if the skill should be listed as in the CV. It is one line in
+  `lib/content/resumeTimeline.fallback.ts`, one test and a new PDF.
 - **"Founder".** About, the venture pages, the JSON-LD, the page meta and two
-  text endpoints call the owner the founder of GoGoCash and Manut AI. The CV and the résumé
-  call both independent projects. The research file lists this as a
-  disagreement with the CV, and Phase 1 changed only the résumé and, through
-  Phase 2, Home. Which framing should the rest of the site use?
+  text endpoints call the owner the founder of GoGoCash and Manut AI. The CV
+  and the résumé call both independent projects. The research file lists this
+  as a disagreement with the CV, and Phase 1 changed only the résumé and,
+  through Phase 2, Home. Which framing should the rest of the site use?
 - **The GoGoCash user count.** The résumé says "1,000 registered users", as
-  the CV does. Home, the venture page, the FAQ and two hubs say "1,000+
-  users". Phase 3 settles it with the figure's as-of month.
+  the CV does. Home, the venture page and two hubs say "1,000+ users", and
+  the FAQ says "Over 1,000 users". Phase 3 settles it with the figure's as-of
+  month.
+- **The current title's punctuation.** The CV writes "IT Manager / AI
+  Engineering Lead"; the site writes it with "&", as it did before this
+  program.
 - **The printed languages line,** "English: TOEIC 725 (2026)". O3 cleared the
   figure. O6, how to state languages, is still unanswered; the line follows
   the CV until it is.
@@ -320,7 +349,7 @@ LinkedIn link resolves.
   The wording rule bans it as a named practice. Does this sentence count?
 - **"The Binary Labs"** is named once, on the email signature case study, and
   nowhere in the CV-derived résumé. Phase 3 can keep or cut it.
-- **Local paths in git history.** The eleven scrubbed lines remain in earlier
+- **Local paths in git history.** The ten scrubbed lines remain in earlier
   commits. Rewriting public history is the owner's decision; I do not
   recommend it for this.
 - **LinkedIn:** settle the differences given on 10-11-26, on LinkedIn or in
@@ -340,8 +369,12 @@ LinkedIn link resolves.
 - **Proves:** on the local production build, a visitor to Home, the FDE hub,
   a case study, About or the résumé sees the role and the availability, and
   reaches the résumé in one click (two taps on a phone) and a hiring contact
-  in one. The contact form's chip, label and URL agree. No career fact or
-  résumé PDF content changed in this phase, and every past role's dates match
-  the CV.
+  in one. The contact form's chip, label and URL agree. Every past role's
+  dates match the CV.
+- **What changed in career wording in this phase:** "architected" became
+  "built" for KK Venture Global in the FAQ, and "architecting" became
+  "building" in About; "RAG" left the résumé's skills list and its PDF. No
+  date, employer or title changed.
 - **Does not prove:** that recruiters find the path clearer, which needs a
-  person; the live site; the nine stale mobile baselines.
+  person; the live site; the résumé's layout by image; the nine stale mobile
+  baselines.

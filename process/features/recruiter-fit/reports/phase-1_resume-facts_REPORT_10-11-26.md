@@ -2,9 +2,11 @@
 
 **Plan:** `../completed/phase-1_resume-facts_PLAN_10-11-26.md`
 **Status:** VERIFIED on the local production build (10-11-26). Committed on
-the branch as `29c835e` and merged through pull request #109, which squashes
-the branch, so that hash is not on `main`. Not deployed. The live site is
-checked after the owner deploys.
+the branch as `29c835e`. It reaches `main` through pull request #109, a
+squash merge, so that hash is not on `main`. Not deployed. The live site is
+checked after the owner deploys. Phase 2 regenerated the PDF once: one word
+left its skills line (see the Phase 2 report), so the word counts below
+describe the file as Phase 1 left it.
 **Base:** `6d31e16`
 
 ## Owner answers used (10-11-26)
