@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { SITE_UPDATED } from "@/lib/content/freshness";
 import {
+  TOPIC_PUBLISHED,
   TOPIC_SLUGS,
   getTopicPillar,
   isTopicSlug,
@@ -72,5 +74,17 @@ describe("forward deployed AI engineering pillar", () => {
         "/skills",
       ]),
     );
+  });
+});
+
+describe("TOPIC_PUBLISHED", () => {
+  it("dates every hub with an ISO day no later than the site's content date", () => {
+    expect(Object.keys(TOPIC_PUBLISHED).sort()).toEqual(
+      [...TOPIC_SLUGS].sort(),
+    );
+    for (const date of Object.values(TOPIC_PUBLISHED)) {
+      expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(date <= SITE_UPDATED).toBe(true);
+    }
   });
 });

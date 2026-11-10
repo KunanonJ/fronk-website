@@ -5,10 +5,15 @@ import type { Metadata } from "@/lib/seo/types";
 import {
   getTopicPillar,
   isTopicSlug,
+  TOPIC_PUBLISHED,
   topicHreflang,
   type TopicSlug,
 } from "@/lib/content/topics/pillars";
-import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/jsonLd";
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+  buildTopicArticleJsonLd,
+} from "@/lib/seo/jsonLd";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
@@ -34,6 +39,17 @@ function ThaiTopicPillarPageView({ slug }: { slug: string }) {
   const pillar = getTopicPillar(slug, "th");
   if (!pillar) throw notFound();
 
+  const articleLd = serializeJsonLd(
+    buildTopicArticleJsonLd({
+      path: `/th/topics/${slug}`,
+      headline: pillar.h1,
+      description: pillar.description,
+      inLanguage: "th",
+      datePublished: TOPIC_PUBLISHED[slug],
+      // The Thai hubs share the English hub's OG card.
+      image: `/topics/${slug}/opengraph-image`,
+    }),
+  );
   const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
   const crumbLd = serializeJsonLd(
     buildBreadcrumbJsonLd([
@@ -44,6 +60,10 @@ function ThaiTopicPillarPageView({ slug }: { slug: string }) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: articleLd }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqLd }}

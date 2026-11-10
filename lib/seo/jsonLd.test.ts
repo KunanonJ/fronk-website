@@ -6,9 +6,11 @@ import {
   buildProfilePageJsonLd,
   buildSiteJsonLd,
   buildSoftwareApplicationJsonLd,
+  buildTopicArticleJsonLd,
   EMPLOYER_ORGANIZATION,
   PERSON_ID,
 } from "./jsonLd";
+import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_SUMMARY } from "@/lib/content/identity";
 
 type Node = Record<string, unknown> & { "@type"?: string; "@id"?: string };
@@ -136,6 +138,39 @@ describe("buildArticleJsonLd > emits BlogPosting for a post", () => {
     expect(String(article.url)).toContain("/blog/shipping-from-bangkok");
     expect((article.author as Node)["@id"]).toBe(PERSON_ID);
     expect(article.headline).toBe("Shipping from Bangkok");
+  });
+});
+
+describe("buildTopicArticleJsonLd > dated, authored topic hub", () => {
+  const article = buildTopicArticleJsonLd({
+    path: "/th/topics/erp-crm-internal-systems",
+    headline: "ERP/CRM",
+    description: "Internal systems.",
+    inLanguage: "th",
+    datePublished: "2026-07-19",
+    image: "/topics/erp-crm-internal-systems/opengraph-image",
+  });
+
+  it("names the Person as author and publisher", () => {
+    expect(article["@type"]).toBe("Article");
+    expect((article.author as Node)["@id"]).toBe(PERSON_ID);
+    expect((article.publisher as Node)["@id"]).toBe(PERSON_ID);
+  });
+
+  it("dates the page with the site's content date as dateModified", () => {
+    expect(article.datePublished).toBe("2026-07-19");
+    expect(article.dateModified).toBe(SITE_UPDATED);
+  });
+
+  it("uses absolute URLs for the page and the image", () => {
+    expect(String(article.url)).toMatch(
+      /^https?:\/\/[^/]+\/th\/topics\/erp-crm-internal-systems$/,
+    );
+    expect(article["@id"]).toBe(`${String(article.url)}/#article`);
+    expect((article.image as string[])[0]).toMatch(
+      /^https?:\/\/[^/]+\/topics\/erp-crm-internal-systems\/opengraph-image$/,
+    );
+    expect(article.inLanguage).toBe("th");
   });
 });
 

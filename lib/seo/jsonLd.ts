@@ -226,6 +226,48 @@ export function buildBreadcrumbJsonLd(
   };
 }
 
+export type TopicArticleJsonLdInput = {
+  /** Site path of the hub, e.g. `/topics/ai-engineering` or `/th/topics/…`. */
+  path: string;
+  headline: string;
+  description: string;
+  inLanguage: "en" | "th";
+  /** ISO date the hub first shipped. */
+  datePublished: string;
+  /** Absolute or site-relative image (the hub's OG card). */
+  image: string;
+};
+
+/**
+ * Article for the topic hubs: names the Person as author and publisher and
+ * dates the page, so engines can attribute and age it. dateModified is the
+ * site's content date, the same value the sitemap gives as `lastmod`.
+ */
+export function buildTopicArticleJsonLd(
+  input: TopicArticleJsonLdInput,
+): Record<string, unknown> {
+  const url = `${BASE}${input.path.startsWith("/") ? input.path : `/${input.path}`}`;
+  const image = input.image.startsWith("http")
+    ? input.image
+    : `${BASE}${input.image.startsWith("/") ? input.image : `/${input.image}`}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${url}/#article`,
+    headline: input.headline,
+    description: input.description,
+    inLanguage: input.inLanguage,
+    datePublished: input.datePublished,
+    dateModified: SITE_UPDATED,
+    url,
+    mainEntityOfPage: url,
+    image: [image],
+    isPartOf: { "@id": WEBSITE_ID },
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": PERSON_ID },
+  };
+}
+
 /** BlogPosting for /blog/[slug] — pairs with visible post chrome. */
 export function buildArticleJsonLd(
   input: ArticleJsonLdInput,

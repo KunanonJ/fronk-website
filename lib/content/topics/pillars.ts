@@ -470,6 +470,18 @@ export const TOPIC_SLUGS = [
 
 export type TopicSlug = (typeof TOPIC_SLUGS)[number];
 
+/**
+ * When each hub first shipped, from git history (both locales together):
+ * `datePublished` in the hub's Article JSON-LD. Never later than SITE_UPDATED
+ * (pillars.test.ts). Add the date when you add a slug.
+ */
+export const TOPIC_PUBLISHED: Readonly<Record<TopicSlug, string>> = {
+  "ai-transformation-thailand": "2026-07-19",
+  "erp-crm-internal-systems": "2026-07-19",
+  "tech-startup-thailand-sea": "2026-07-19",
+  "forward-deployed-ai-engineering": "2026-11-10",
+};
+
 export function isTopicSlug(slug: string): slug is TopicSlug {
   return (TOPIC_SLUGS as readonly string[]).includes(slug);
 }
