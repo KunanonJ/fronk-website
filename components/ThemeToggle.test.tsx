@@ -6,7 +6,6 @@ const theme = vi.hoisted(() => ({
   setTheme: vi.fn(),
 }));
 vi.mock("next-themes", () => ({ useTheme: () => theme }));
-vi.mock("@/lib/analytics/track", () => ({ track: vi.fn() }));
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 

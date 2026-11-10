@@ -41,7 +41,7 @@ Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visua
 - Primary nav routes: `/`, `/about`, `/ventures` → `/#ventures`, `/press`,
   `/blog`, `/contact`. Legacy `/stock/asme` and `/writing` redirect into them.
 - SEO surfaces: metadata, sitemap, robots, JSON-LD, Open Graph, `rel="me"`.
-- Optional analytics: Cloudflare Web Analytics, Umami, GA4, Web Vitals.
+- Optional analytics: Cloudflare Web Analytics (cookieless, no custom events).
 - CI: typecheck, lint, unit tests, production build, first-load perf budget,
   Playwright smoke.
 
@@ -228,8 +228,6 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 | `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact form)                      |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`             | optional | yes     | Turnstile widget (build-time)                           |
 | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
-| `NEXT_PUBLIC_UMAMI_WEBSITE_ID`               | optional | yes     | Umami                                                   |
-| `NEXT_PUBLIC_UMAMI_HOST`                     | optional | yes     | Defaults to `https://cloud.umami.is`                    |
 
 \*Required if you use Studio, the resume CMS or the Sanity webhook. The
 `NEXT_PUBLIC_` names are kept from the Next era; Vite inlines them at build.
@@ -246,17 +244,12 @@ curl -sS "https://kunanonj.com/studio" -o /dev/null -w "%{http_code}\n"     # 20
 
 ## Analytics
 
-Analytics are optional, cookieless and off unless their public environment
-variables are present. There is no Google Analytics or Tag Manager.
-
-| Adapter                  | Component                 | Env var                                                           |
-| ------------------------ | ------------------------- | ----------------------------------------------------------------- |
-| Cloudflare Web Analytics | `<CloudflareAnalytics />` | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN`                      |
-| Umami                    | `<Analytics />`           | `NEXT_PUBLIC_UMAMI_WEBSITE_ID`, optional `NEXT_PUBLIC_UMAMI_HOST` |
-
-Custom events go through `track()` in `lib/analytics/track.ts` (a no-op until
-the Umami script has loaded): theme changes and the conversion clicks in
-`ConversionEvents` (contact CTA, venture outbound, topic hub CTA).
+Cloudflare Web Analytics only: cookieless, page views and Core Web Vitals,
+off unless `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` is set
+(`<CloudflareAnalytics />`). There is no Google Analytics, Tag Manager or
+Umami (removed 10-11-26), so there are no custom events or cookies to consent
+to. Search performance comes from Google Search Console and Bing Webmaster
+Tools.
 
 ## Project structure
 

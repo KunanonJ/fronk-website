@@ -16,7 +16,6 @@
     "NEXT_PUBLIC_SANITY_DATASET": "production",
     "NEXT_PUBLIC_SANITY_API_VERSION": "2025-01-01",
     "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
-    "NEXT_PUBLIC_UMAMI_HOST": "https://cloud.umami.is",
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next;
   // otherwise the asset handler answers /about/ itself with a 307.

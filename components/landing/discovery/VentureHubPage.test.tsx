@@ -40,16 +40,16 @@ describe("VentureHubPage (GoGoCash, the drawn venture)", () => {
     expect(screen.getByText("· 2023 — present")).toBeInTheDocument();
   });
 
-  it("keeps the outbound and contact CTAs tagged for analytics", () => {
+  it("links out and to contact, and states the free start", () => {
     renderVenture("gogocash", GOGOCASH_TOPICS);
     const visit = screen.getByRole("link", { name: "Visit gogocash.co" });
     expect(visit).toHaveAttribute("href", "https://gogocash.co");
-    expect(visit).toHaveAttribute("data-analytics", "venture_outbound_click");
     expect(visit).toHaveAttribute("rel", "noopener noreferrer");
     expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
-      "data-analytics",
-      "contact_cta_click",
+      "href",
+      "/contact",
     );
+    expect(screen.getByText("Free to start")).toBeInTheDocument();
     // The pill opens the shared header panel; aria-controls appears only
     // while the panel exists.
     const share = screen.getByRole("button", { name: "Share" });
