@@ -97,6 +97,12 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /AI|Thailand/i,
   },
   {
+    // Four sections: the FDE positioning hub (EO-2).
+    path: "/topics/forward-deployed-ai-engineering",
+    name: "topic-hub-fde",
+    expectsHeadingPattern: /Forward deployed/i,
+  },
+  {
     path: "/th/topics/ai-transformation-thailand",
     name: "topic-hub-th",
     expectsHeadingPattern: /\S/,

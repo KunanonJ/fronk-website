@@ -27,6 +27,16 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     answer: `${PERSON_SOLOPRENEUR} His working principles: ship the smallest thing that proves the bet, stay close to the work, optimise for reversibility, and document as you go.`,
   },
   {
+    question: "What AI systems has Kunanon Jarat worked on?",
+    answer:
+      "As AI Engineering Lead at The Binary Holdings: ARIA, the TBH Intranet's assistant, which combines Gemini and Claude models with embedding search over internal knowledge; and a team-built set of agents on Google's Agent Development Kit. Fando has Gemini check and caption sports clips and queues them in a Google Sheet for human approval, and a recruitment agent scores resumes and grades take-home cases, with human review for borderline candidates.",
+  },
+  {
+    question: "What is Superstacks?",
+    answer:
+      "Superstacks is Kunanon Jarat's MIT-licensed pack of 20 agent skills for Claude Code, Codex and Cursor, covering planning, test-driven development, verify loops, code review and draft pull requests. Eight are original and twelve are adapted, with credit, from other MIT-licensed packs.",
+  },
+  {
     question: "What is GoGoCash?",
     answer:
       "GoGoCash is a shopping-to-earn cashback platform Fronk founded in 2023. Over 1,000 users earn up to 30% cashback across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",

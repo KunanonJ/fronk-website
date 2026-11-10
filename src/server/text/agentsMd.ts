@@ -60,6 +60,7 @@ export function buildAgentsMd(): string {
     "| Resource | URL | Purpose |",
     "|---|---|---|",
     "| Plain-text site brief | [/llms.txt](/llms.txt) | Identity, roles, topic hubs, ventures, portfolio, skills |",
+    "| Full profile | [/llms-full.txt](/llms-full.txt) | Every fact on the site in one fetch: career, projects, ventures, topics, skills, FAQ |",
     "| Markdown sitemap | [/sitemap.md](/sitemap.md) | Human- and agent-readable route map |",
     "| XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |",
     "| Skills catalog | [/skills.json](/skills.json) | The Superstacks agent skills as JSON |",

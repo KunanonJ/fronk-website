@@ -413,9 +413,11 @@ export const aboutPage = {
   cta: {
     eyebrow: "Next",
     heading: "Let's talk.",
-    body: "Founders, builders, and operators working on fintech, AI, or Web3 in Southeast Asia — reach out.",
+    body: "Founders and operators in Southeast Asia, and teams hiring for forward deployed or AI engineering roles in Bangkok or remote: reach out.",
     links: [
       { label: "Contact", href: "/contact" },
+      { label: "Portfolio", href: "/portfolio" },
+      { label: "Skills", href: "/skills" },
       { label: "Ventures", href: "/#ventures" },
       { label: "Resume", href: "/resume" },
     ],

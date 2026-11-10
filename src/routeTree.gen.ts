@@ -15,6 +15,7 @@ import { Route as AgentsDotmdRouteImport } from './routes/agents[.]md'
 import { Route as AppleIconRouteImport } from './routes/apple-icon'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as IconRouteImport } from './routes/icon'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
@@ -77,6 +78,11 @@ const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
 const IconRoute = IconRouteImport.update({
   id: '/icon',
   path: '/icon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/opengraph-image': typeof OpengraphImageRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
@@ -477,6 +488,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
     | '/opengraph-image'
@@ -521,6 +533,7 @@ export interface RootRouteChildren {
   AppleIconRoute: typeof AppleIconRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IconRoute: typeof IconRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   OpengraphImageRoute: typeof OpengraphImageRoute
@@ -580,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/icon'
       fullPath: '/icon'
       preLoaderRoute: typeof IconRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llms.txt': {
@@ -895,6 +915,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppleIconRoute: AppleIconRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   IconRoute: IconRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   OpengraphImageRoute: OpengraphImageRoute,

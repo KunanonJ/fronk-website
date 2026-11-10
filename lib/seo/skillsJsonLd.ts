@@ -1,6 +1,9 @@
 import {
+  SKILLS_LICENSE,
+  SKILLS_RELEASE_DATE,
   SKILLS_REPO_URL,
   SKILLS_VERSION,
+  getAllSkills,
   type Skill,
 } from "@/lib/content/skills";
 import { PERSON_ID, WEBSITE_ID } from "@/lib/seo/jsonLd";
@@ -44,5 +47,34 @@ export function buildSkillJsonLd(skill: Skill): Record<string, unknown> {
           },
         }
       : { author: { "@id": PERSON_ID } }),
+  };
+}
+
+/**
+ * The Superstacks pack on `/skills`: one SoftwareSourceCode authored by the
+ * site's Person, with every skill page as a part, so "agent skills for Claude
+ * Code" answers can cite the pack and its author.
+ */
+export function buildSkillsPackJsonLd(): Record<string, unknown> {
+  const url = `${BASE}/skills`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "@id": `${url}/#pack`,
+    name: "Superstacks",
+    description:
+      "Agent skills for Claude Code, Codex and Cursor: planning, test-driven development, verify loops, code review and draft pull requests.",
+    url,
+    mainEntityOfPage: url,
+    codeRepository: SKILLS_REPO_URL,
+    programmingLanguage: "Markdown",
+    version: SKILLS_VERSION,
+    datePublished: SKILLS_RELEASE_DATE,
+    license: spdx(SKILLS_LICENSE),
+    author: { "@id": PERSON_ID },
+    isPartOf: { "@id": WEBSITE_ID },
+    hasPart: getAllSkills().map((skill) => ({
+      "@id": `${BASE}/skills/${skill.slug}/#code`,
+    })),
   };
 }

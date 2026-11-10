@@ -22,9 +22,12 @@ import zlib from "node:zlib";
 // a few KB of each other. Lower these as routes get lighter; raise only
 // deliberately, with the reason here.
 //
-// Default: system pages (/design) and the discovery hubs, which
-// carry the landing nav since Phase 6 (worst 190.1 KB).
-const DEFAULT_BUDGET_KB = 200;
+// Default: system pages (/design) and the discovery hubs. Raised from 200 on
+// 10-11-26, deliberately: the bento chrome (share panel, the server-rendered
+// site menu, typed view transitions) now ships on every page, and the hubs
+// measure 199.9 KB (venture) with the loaders already split out of the entry
+// chunk. 210 is that floor plus the usual ~5%.
+const DEFAULT_BUDGET_KB = 210;
 
 // Marketing: pages with the landing nav plus heavier islands (next/image card
 // chrome, forms, the blog's portable text). Worst: the hidden blog posts at

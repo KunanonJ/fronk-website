@@ -335,14 +335,13 @@ export function NextCard({ className }: { className?: string }) {
         <CtaLink href={primary.href} size="md">
           <CtaArrow>{primary.label}</CtaArrow>
         </CtaLink>
-        <div className="flex gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {others.map((link) => (
             <CtaLink
               key={link.href}
               href={link.href}
               variant="secondary"
               size="sm"
-              className="flex-1 basis-0"
             >
               <CtaArrow>{link.label}</CtaArrow>
             </CtaLink>
