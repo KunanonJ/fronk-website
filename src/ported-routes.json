@@ -12,6 +12,9 @@
     "test": "about"
   },
   {
+    "path": "/about.md"
+  },
+  {
     "path": "/about/",
     "seed": false
   },
@@ -147,6 +150,9 @@
     "test": "portfolio-diagrams"
   },
   {
+    "path": "/portfolio/ai-automation.md"
+  },
+  {
     "path": "/portfolio/ai-automation/opengraph-image",
     "seed": false
   },
@@ -154,11 +160,17 @@
     "path": "/portfolio/email-signature-generator"
   },
   {
+    "path": "/portfolio/email-signature-generator.md"
+  },
+  {
     "path": "/portfolio/email-signature-generator/opengraph-image",
     "seed": false
   },
   {
     "path": "/portfolio/node-validator-automation"
+  },
+  {
+    "path": "/portfolio/node-validator-automation.md"
   },
   {
     "path": "/portfolio/node-validator-automation/opengraph-image",
@@ -169,8 +181,14 @@
     "seed": false
   },
   {
+    "path": "/portfolio/not-a-project.md"
+  },
+  {
     "path": "/portfolio/tbh-intranet",
     "test": "portfolio-project"
+  },
+  {
+    "path": "/portfolio/tbh-intranet.md"
   },
   {
     "path": "/portfolio/tbh-intranet/opengraph-image",

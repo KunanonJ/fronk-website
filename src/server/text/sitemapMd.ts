@@ -103,6 +103,7 @@ export function buildSitemapMd(): string {
     "",
     "- Agents index: [/agents.md](/agents.md)",
     "- Solopreneur operating model: [/operating-model.md](/operating-model.md)",
+    "- About as Markdown: [/about.md](/about.md); each portfolio project at `/portfolio/[slug].md`",
     "- Plain text for LLMs: [/llms.txt](/llms.txt)",
     "- Coding guide: [/skills.md](/skills.md)",
     "- Skills catalog (JSON): [/skills.json](/skills.json)",

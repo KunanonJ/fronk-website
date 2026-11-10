@@ -23,6 +23,7 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: project.summary,
     path: `/portfolio/${slug}`,
     hasOwnOgImage: true,
+    markdownPath: `/portfolio/${slug}.md`,
   });
 }
 
