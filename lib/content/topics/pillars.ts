@@ -1,5 +1,9 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
-import { OPEN_TO_ROLES, PERSON_CUSTOMER_WORK } from "@/lib/content/identity";
+import {
+  CURRENT_ROLE,
+  OPEN_TO_ROLES,
+  PERSON_CUSTOMER_WORK,
+} from "@/lib/content/identity";
 
 /** Skills in the Superstacks pack (pillars.test.ts checks it against the snapshot). */
 export const SUPERSTACKS_SKILL_COUNT = 20;
@@ -265,7 +269,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      "IT Manager & AI Engineering Lead at The Binary Holdings since November 2025",
+      `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}`,
       `Superstacks: ${SUPERSTACKS_SKILL_COUNT} MIT-licensed agent skills for Claude Code, Codex and Cursor`,
       OPEN_TO_ROLES.sentence,
     ],
@@ -439,7 +443,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      "IT Manager & AI Engineering Lead ที่ The Binary Holdings ตั้งแต่พฤศจิกายน 2025",
+      `${CURRENT_ROLE.title} ที่ ${CURRENT_ROLE.organization} ตั้งแต่${CURRENT_ROLE.sinceThai}`,
       "เปิดรับตำแหน่ง Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
     ],
     faqs: [

@@ -11,11 +11,13 @@ import { CompanyLogo } from "@/components/CompanyLogo";
 import type {
   ResolvedTimelineItem,
   ResolvedTimelineSection,
+  ResumeSkillGroup,
 } from "@/lib/content/resumeProfile";
 import {
   isLiveBullet,
   linkLabel,
   resumeSectionKind,
+  rowWeight,
   sectionSlug,
   splitColumns,
   visibleBullets,
@@ -26,14 +28,34 @@ import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * Résumé bento cards (bento canvas, design spec 4.4). Every section comes
- * from Sanity (or the fallback in the repo) and is drawn by its title:
- * Currently, Experience, University-era, Education, Affiliations and
- * Certifications have canvas cards; any other section reads as roles.
+ * from the résumé data in the repo (or from Sanity, if a résumé document is
+ * ever created) and is drawn by its title: Currently, Experience,
+ * Independent projects, University-era, Education, Affiliations and Training
+ * (or Certifications) have canvas cards; any other section reads as roles.
  * `detail` "compact" hides the bullet lists. Screen only: print uses
  * ResumePrint.
  */
 
 export const RESUME_PDF = "/resume.pdf";
+
+/** The name a download saves under, so a recruiter can find the file again. */
+export const RESUME_PDF_NAME = "Kunanon-Jarat-Resume.pdf";
+
+/** One line under the organisation: a project's description, or an overlap. */
+function Note({
+  item,
+  className,
+}: {
+  item: ResolvedTimelineItem;
+  className: string;
+}) {
+  if (!item.note) return null;
+  return (
+    <p className={cn("mb-0 leading-[1.45] text-ink-2", className)}>
+      {item.note}
+    </p>
+  );
+}
 
 function Bullets({
   bullets,
@@ -93,7 +115,10 @@ function ItemTitle({ item }: { item: ResolvedTimelineItem }) {
 
 const PERIOD = "font-mono text-xs text-ink-2";
 
-/** Currently: the present roles as wells, with logo, period and site link. */
+/**
+ * Currently and Independent projects: wells with a logo, the period, bullets
+ * and links (the entry's own site, and its page on this site).
+ */
 function CurrentRoles({
   items,
   detail,
@@ -119,12 +144,18 @@ function CurrentRoles({
             <p className="mt-1 mb-0 text-meta leading-[1.45] text-ink-2">
               {item.org}
             </p>
+            <Note item={item} className="mt-2 text-meta" />
           </div>
           <Bullets bullets={visibleBullets(item, detail)} />
-          {item.href ? (
-            <CardLink href={item.href} className="mt-auto self-start">
-              {linkLabel(item.href)} →
-            </CardLink>
+          {item.href || item.more ? (
+            <div className="mt-auto flex flex-wrap gap-x-5">
+              {item.href ? (
+                <CardLink href={item.href}>{linkLabel(item.href)} →</CardLink>
+              ) : null}
+              {item.more ? (
+                <CardLink href={item.more.href}>{item.more.label} →</CardLink>
+              ) : null}
+            </div>
           ) : null}
         </li>
       ))}
@@ -168,6 +199,7 @@ function RoleList({
             <p className="mt-0.5 mb-0 text-sm leading-[1.45] text-ink-2">
               {item.org}
             </p>
+            <Note item={item} className="mt-0.5 text-sm" />
             <Bullets
               bullets={visibleBullets(item, detail)}
               className="mt-2.5"
@@ -217,7 +249,10 @@ function CredentialList({
   );
 }
 
-/** Two list columns side by side from 641px (not a bento-2: they never lift). */
+/**
+ * Two list columns side by side from 641px (not a bento-2: they never lift),
+ * split where their heights are closest.
+ */
 function TwoColumns({
   items,
   detail,
@@ -229,7 +264,7 @@ function TwoColumns({
   List: typeof RoleList;
   gap: string;
 }) {
-  const [left, right] = splitColumns(items);
+  const [left, right] = splitColumns(items, (item) => rowWeight(item, detail));
   return (
     <div className={cn("grid grid-cols-1 min-[641px]:grid-cols-2", gap)}>
       <List items={left} start={0} detail={detail} />
@@ -359,12 +394,12 @@ export function ResumeSectionCard({
   );
 }
 
-/** Skills: one chip per skill. */
+/** Skills: the labelled groups, one chip per skill. */
 export function SkillsCard({
   skills,
   className,
 }: {
-  skills: readonly string[];
+  skills: readonly ResumeSkillGroup[];
   className?: string;
 }) {
   return (
@@ -374,16 +409,25 @@ export function SkillsCard({
       minHeight={false}
       className={className}
     >
-      <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {skills.map((skill) => (
-          <li
-            key={skill}
-            className="inline-flex min-h-10 items-center rounded-full border border-hairline-strong bg-page px-4 text-sm font-medium"
-          >
-            {skill}
-          </li>
+      <div className="flex flex-col gap-4">
+        {skills.map((group) => (
+          <div key={group.label} className="flex flex-col gap-2">
+            <h3 className="m-0 font-mono text-label uppercase text-ink-2">
+              {group.label}
+            </h3>
+            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+              {group.items.map((skill) => (
+                <li
+                  key={skill}
+                  className="inline-flex min-h-10 items-center rounded-full border border-hairline-strong bg-page px-4 text-sm font-medium"
+                >
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </BentoCard>
   );
 }
@@ -415,7 +459,7 @@ export function ShareCard({
       <div className="flex flex-col gap-0.5">
         <ShareRows target={target} />
       </div>
-      <CtaLink href={RESUME_PDF} className="mt-auto">
+      <CtaLink href={RESUME_PDF} download={RESUME_PDF_NAME} className="mt-auto">
         <DownloadIcon />
         <span>Download PDF</span>
       </CtaLink>

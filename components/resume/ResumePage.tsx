@@ -8,10 +8,12 @@ import type { ShareTarget } from "@/components/bento/ShareRows";
 import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import {
   RESUME_PDF,
+  RESUME_PDF_NAME,
   ResumeSectionCard,
   ShareCard,
   SkillsCard,
 } from "@/components/resume/ResumeCards";
+import { OPEN_TO_ROLES } from "@/lib/content/identity";
 import {
   RESUME_DETAILS,
   RESUME_META,
@@ -35,9 +37,10 @@ const SHARE_TARGET: ShareTarget = {
 
 /**
  * Résumé on screen (bento redesign, phase 7b; design spec 4.4): the hero
- * with Download PDF, Share and the Detailed / Compact control, then one dense
- * bento of the CMS sections, Skills and Share. Both parts are hidden in
- * print; ResumePrint is what `pnpm pdf` renders.
+ * with the summary, the availability line, Download PDF, Contact, Share and
+ * the Detailed / Compact control, then one dense bento of the sections,
+ * Skills and Share. Both parts are hidden in print; ResumePrint is what
+ * `pnpm pdf` renders.
  */
 export default function ResumePage({
   profile,
@@ -78,12 +81,23 @@ export default function ResumePage({
             <span className="block text-mark"> {headline.accent}</span>
           ) : null}
         </PageTitle>
-        <HeroLead>{profile.summary ?? RESUME_META.description}</HeroLead>
+        <HeroLead>{profile.summary}</HeroLead>
+        {/* The availability line, marked like a card's accent line. */}
+        <p className="m-0 flex max-w-[620px] items-baseline gap-2.5 text-card leading-[1.45] font-medium text-ink">
+          <span
+            aria-hidden
+            className="size-1.5 shrink-0 -translate-y-0.5 bg-mark"
+          />
+          {OPEN_TO_ROLES.sentence}
+        </p>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <CtaLink href={RESUME_PDF}>
+            <CtaLink href={RESUME_PDF} download={RESUME_PDF_NAME}>
               <DownloadIcon />
               <span>Download PDF</span>
+            </CtaLink>
+            <CtaLink href="/contact" variant="secondary">
+              Contact
             </CtaLink>
             <SharePill />
           </div>

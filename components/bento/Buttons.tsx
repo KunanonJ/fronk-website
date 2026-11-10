@@ -38,17 +38,24 @@ export function CtaLink({
   href,
   variant = "primary",
   size = "lg",
+  download,
   className,
   children,
 }: {
   href: string;
   variant?: CtaVariant;
   size?: CtaSize;
+  /** For a file link: the name the browser saves it under. */
+  download?: string;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={cn(ctaClasses(variant, size), className)}>
+    <Link
+      href={href}
+      download={download}
+      className={cn(ctaClasses(variant, size), className)}
+    >
       {children}
     </Link>
   );

@@ -126,15 +126,17 @@ test.describe("resume > the detail view is a typed search param", () => {
     await expect(
       group.getByRole("button", { name: "Compact" }),
     ).toHaveAttribute("aria-pressed", "true");
-    const currently = page.getByRole("article", { name: "Currently" });
-    await expect(currently.getByText(/^Live at /)).toHaveCount(0);
+    const projects = page.getByRole("article", {
+      name: "Independent projects",
+    });
+    await expect(projects.getByText(/^Live at /)).toHaveCount(0);
 
     await group.getByRole("button", { name: "Detailed" }).click();
     await expect(page).toHaveURL(/\/resume$/);
     await expect(
       group.getByRole("button", { name: "Detailed" }),
     ).toHaveAttribute("aria-pressed", "true");
-    await expect(currently.getByText(/^Live at /).first()).toBeVisible();
+    await expect(projects.getByText(/^Live at /).first()).toBeVisible();
   });
 
   test("an unknown view falls back to detailed without an error", async ({

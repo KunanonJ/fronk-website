@@ -49,7 +49,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "What is Fronk's background?",
     answer:
-      "He trained as an electrical engineer at Kasetsart University, wrote smart contracts at Bitkub, and architected blockchain systems at FICO. He then worked on fintech and Web3 products as a project manager at Coins.co.th, Playbux, and Aiden Labs — running ICO process design and tokenomics alongside the engineering roadmap.",
+      "He trained as an electrical engineer at Kasetsart University, wrote smart contracts at Bitkub, and architected blockchain systems at KK Venture Global. He then worked on fintech and Web3 products as a project manager at Coins.co.th, Playbux, and Aiden Labs — running ICO process design and tokenomics alongside the engineering roadmap.",
   },
   {
     question: "How can I contact Fronk?",

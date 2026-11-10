@@ -68,7 +68,9 @@ describe("Home cards", () => {
   it("shows four résumé roles and links the résumé", () => {
     render(<ExperienceCard />);
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
-    expect(screen.getByText("Founder, GoGoCash")).toBeInTheDocument();
+    expect(
+      screen.getByText("AI Project Manager, Aiden Labs"),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Résumé →" })).toHaveAttribute(
       "href",
       "/resume",

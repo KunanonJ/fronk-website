@@ -22,7 +22,7 @@ describe("self-hosted company logos (ux-audit finding 12)", () => {
 
   it("looks domains up case- and www-insensitively", () => {
     expect(companyLogoSrc("Bitkub.com")).toBe(COMPANY_LOGOS["bitkub.com"]);
-    expect(companyLogoSrc("www.udemy.com")).toBe(COMPANY_LOGOS["udemy.com"]);
+    expect(companyLogoSrc("www.playbux.co")).toBe(COMPANY_LOGOS["playbux.co"]);
     expect(companyLogoSrc("unknown.example")).toBeUndefined();
     expect(companyLogoSrc(undefined)).toBeUndefined();
   });
