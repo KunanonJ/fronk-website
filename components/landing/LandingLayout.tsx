@@ -22,6 +22,8 @@ const BENTO_ROUTES: ReadonlySet<string> = new Set([
   "/stack",
   "/proof",
   "/build",
+  "/blog",
+  "/press",
 ]);
 
 /** Route prefixes rebuilt on the canvas layout; each covers its child pages. */
@@ -31,6 +33,7 @@ const BENTO_PREFIXES: readonly string[] = [
   "/th/topics/",
   "/skills/",
   "/portfolio/",
+  "/blog/",
 ];
 
 function isBentoRoute(pathname: string): boolean {
@@ -41,11 +44,11 @@ function isBentoRoute(pathname: string): boolean {
 }
 
 /** The page column: 24 px gutters (16 px at <=380px). */
-function column(pathname: string): string {
+function column(canvas: boolean): string {
   return cn(
     "mx-auto w-full px-6 max-[381px]:px-4",
     // Older pages put a 1152 px box (max-w-6xl) inside their own gutters.
-    isBentoRoute(pathname) ? "max-w-[1000px]" : "max-w-[75rem]",
+    canvas ? "max-w-[1000px]" : "max-w-[75rem]",
   );
 }
 
@@ -53,14 +56,19 @@ function column(pathname: string): string {
  * Public site shell (bento redesign, phase 7a): skip link, the canvas header
  * and footer around every page. Pages render their own <main id="main">;
  * redesigned pages use the same 1000 px column, older ones keep their width
- * until their sub-phase restyles them. Also wraps the 404 page.
+ * until their sub-phase restyles them. Also wraps the 404 page, which answers
+ * any path, so it asks for the canvas column with `canvas` (goes with the
+ * switch above).
  */
 export default function LandingLayout({
   children,
+  canvas = false,
 }: {
   children: React.ReactNode;
+  canvas?: boolean;
 }) {
   const pathname = usePathname();
+  const onCanvas = canvas || isBentoRoute(pathname);
   return (
     <ChromeProvider>
       <div className="landing-root min-h-[100svh] bg-page font-sans text-ink antialiased">
@@ -72,11 +80,11 @@ export default function LandingLayout({
         </a>
         {/* data-site-chrome: print drops the header and footer with their
             padding, so the printed résumé (`pnpm pdf`) starts at the top. */}
-        <div data-site-chrome className={cn(column(pathname), "pt-10")}>
+        <div data-site-chrome className={cn(column(onCanvas), "pt-10")}>
           <SiteHeader />
         </div>
         {children}
-        <div data-site-chrome className={cn(column(pathname), "pb-24")}>
+        <div data-site-chrome className={cn(column(onCanvas), "pb-24")}>
           <SiteFooter />
         </div>
       </div>
