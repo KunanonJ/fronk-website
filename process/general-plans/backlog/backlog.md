@@ -81,3 +81,22 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Problem:** the four `/portfolio` projects show placeholder tiles; none of the source folders has product screenshots.
 - **Why deferred:** the owner chose to supply images.
 - **Fix options:** drop files in `public/portfolio/<slug>/` and register `cover`/`gallery` in `lib/content/portfolio.ts` (instructions at the top of that file; a test checks the files exist). Use internal screenshots only after redacting data.
+
+## P2: Visual baselines go stale under the 1% tolerance
+
+- **Added:** 10-11-26, from `process/features/recruiter-fit/reports/phase-1_resume-facts_REPORT_10-11-26.md`
+- **Problem:** at `6d31e16`, 28 of the 88 committed Linux baselines differed from a fresh render in the pinned Playwright image, and the suite still passed. One example: the Home desktop baseline drew the "How I work" steps as "Step 01" in two rows, where the code renders "01" to "04" in one. Press pages also vary from run to run.
+- **Root cause:** `playwright.config.ts` sets `maxDiffPixelRatio: 0.01`, so a small text or layout change passes against the old image and `--update-snapshots=changed` refreshes nothing.
+- **Why deferred:** outside the recruiter-fit scope. Its Phase 2 re-renders every desktop baseline (the header changes), which clears the desktop half.
+- **Fix options:**
+  1. One housekeeping change: re-render every baseline with `--update-snapshots=all` and review the images.
+  2. Lower the tolerance, or add `maxDiffPixels`, so that text changes fail. Find out first why Press varies between runs.
+  3. Keep the tolerance and treat "re-render and compare bytes" as the step after any visible change (the header comment in `tests/e2e/visual.spec.ts` describes it).
+
+## P3: `components/ui/Button.tsx` is used only by tests
+
+- **Added:** 10-11-26, from the recruiter-fit Phase 1 report
+- **Problem:** the old printed résumé was the last production user of `Button`. `components/ui/Button.test.tsx` and two design ratchets (`lib/design/typeFloor.test.ts`, `lib/design/rawHex.test.ts`) still read the file, so knip does not flag it.
+- **Root cause:** the bento redesign moved every page to `components/bento/Buttons.tsx`.
+- **Why deferred:** deleting it means editing two ratchet tests, and it has no user-facing effect.
+- **Fix options:** delete `Button.tsx` and its test and drop "Button" from the two ratchet lists, or keep it if `/design` should show it again.
