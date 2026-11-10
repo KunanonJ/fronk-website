@@ -82,6 +82,21 @@ export default defineConfig(({ command, mode }) => {
         viteEnvironment: { name: "ssr" },
       }),
       tanstackStart({
+        router: {
+          // Loaders and their content imports (topics, skills, portfolio
+          // data) get their own chunks instead of the entry chunk every page
+          // loads. Client navigations fetch the loader chunk first; intent
+          // preloading (router defaultPreload) hides that on hover.
+          codeSplittingOptions: {
+            defaultBehavior: [
+              ["loader"],
+              ["component"],
+              ["pendingComponent"],
+              ["errorComponent"],
+              ["notFoundComponent"],
+            ],
+          },
+        },
         // Pages built from lib/content are rendered once per deploy and served
         // as static assets; Sanity-backed pages render on request (Phase 4
         // caches them at the edge).
