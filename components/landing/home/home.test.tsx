@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   ExperienceCard,
@@ -76,15 +76,37 @@ describe("Home cards", () => {
   });
 
   it("steps through the operating principles", () => {
-    render(<HowIWorkCard />);
+    const { container } = render(<HowIWorkCard />);
     const [first, second] = aboutPage.principles.items;
-    expect(screen.getByText(first!.title)).toBeInTheDocument();
+    const live = () => container.querySelector("[aria-live]");
+    expect(live()).toHaveTextContent(first!.title);
     fireEvent.click(screen.getByRole("button", { name: "Step 02" }));
-    expect(screen.getByText(second!.title)).toBeInTheDocument();
+    expect(live()).toHaveTextContent(second!.title);
     expect(screen.getByRole("button", { name: "Step 02" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
+  });
+
+  it("keeps the four steps on one row with short visible labels", () => {
+    render(<HowIWorkCard />);
+    const group = screen.getByRole("group", { name: "Operating principles" });
+    expect(group.className).toMatch(/\bgrid-flow-col\b/);
+    expect(group.className).not.toMatch(/\bflex(-wrap)?\b/);
+    const buttons = within(group).getAllByRole("button");
+    expect(buttons.map((b) => b.textContent)).toEqual(["01", "02", "03", "04"]);
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual([
+      "Step 01",
+      "Step 02",
+      "Step 03",
+      "Step 04",
+    ]);
+  });
+
+  it("reserves the longest principle's height with hidden copies", () => {
+    const { container } = render(<HowIWorkCard />);
+    const hidden = container.querySelectorAll('[aria-hidden="true"].invisible');
+    expect(hidden).toHaveLength(aboutPage.principles.items.length - 1);
   });
 
   it("never links the hidden blog or press", () => {

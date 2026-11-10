@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import { BentoCard, CardLink } from "@/components/bento/Bento";
 import { Segmented } from "@/components/bento/Segmented";
 import Link from "@/components/navigation/Link";
@@ -8,6 +8,9 @@ import { getFeaturedPortfolioProjects } from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { homeExperience } from "@/lib/landing/experience";
 import { cn } from "@/lib/utils/cn";
+
+/** "01", "02": the canvas numbers lists and steps with two digits. */
+const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /*
  * Home bento cards (bento canvas, design spec 4.1). Copy comes from the
@@ -119,7 +122,7 @@ export function SelectedWorkCard() {
             className="flex gap-3 border-b border-hairline py-[9px] last:border-b-0"
           >
             <span className="pt-[3px] font-mono text-xs text-ink-2">
-              {String(index + 1).padStart(2, "0")}
+              {pad2(index + 1)}
             </span>
             <span className="flex flex-col">
               <Link
@@ -145,27 +148,59 @@ export function HowIWorkCard() {
   const principles = aboutPage.principles.items;
   const [step, setStep] = useState(0);
   const current = principles[step] ?? principles[0]!;
-  const number = String(step + 1).padStart(2, "0");
   return (
     <BentoCard headingId="card-how" title="How I work" gap={3.5}>
-      <div aria-live="polite" className="mt-auto flex flex-col gap-2.5 px-1">
-        <p className="m-0 text-[22px] leading-snug font-semibold tracking-[-0.02em]">
-          <span className="mr-2.5 font-mono text-mark">{number}</span>
-          {current.title}
-        </p>
-        <p className="m-0 max-w-[560px] text-card leading-[1.55] text-ink-2">
-          {current.body}
-        </p>
+      {/* Every principle shares one grid cell, so the card keeps the longest
+          one's height and the step buttons never move under a tap; the text
+          sits on the buttons. */}
+      <div className="mt-auto grid items-end px-1 *:[grid-area:1/1]">
+        {principles.map((principle, index) =>
+          index === step ? null : (
+            <PrincipleText
+              key={principle.title}
+              index={index}
+              principle={principle}
+              aria-hidden
+              className="invisible"
+            />
+          ),
+        )}
+        <PrincipleText index={step} principle={current} aria-live="polite" />
       </div>
       <Segmented
         label="Operating principles"
         value={String(step)}
         onChange={(value) => setStep(Number(value))}
+        layout="row"
         options={principles.map((_, index) => ({
-          label: `Step ${String(index + 1).padStart(2, "0")}`,
+          label: pad2(index + 1),
+          ariaLabel: `Step ${pad2(index + 1)}`,
           value: String(index),
         }))}
       />
     </BentoCard>
+  );
+}
+
+function PrincipleText({
+  index,
+  principle,
+  className,
+  ...rest
+}: {
+  index: number;
+  principle: { title: string; body: string };
+  className?: string;
+} & Omit<ComponentProps<"div">, "children">) {
+  return (
+    <div className={cn("flex flex-col gap-2.5", className)} {...rest}>
+      <p className="m-0 text-[22px] leading-snug font-semibold tracking-[-0.02em]">
+        <span className="mr-2.5 font-mono text-mark">{pad2(index + 1)}</span>
+        {principle.title}
+      </p>
+      <p className="m-0 max-w-[560px] text-card leading-[1.55] text-ink-2">
+        {principle.body}
+      </p>
+    </div>
   );
 }
