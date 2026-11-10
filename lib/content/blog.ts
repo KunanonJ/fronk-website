@@ -16,15 +16,45 @@ export type BlogCard = {
   bodyParagraphs?: readonly string[];
 };
 
+/** One run of words in a display h1: plain, muted (connector) or accent. */
+type HeadlinePart = { text: string; tone?: "muted" | "accent" };
+
+/** The writing page's line as the canvas hero draws it, one array per line. */
+const BLOG_HEADLINE: readonly (readonly HeadlinePart[])[] = [
+  [{ text: "Notes on", tone: "muted" }, { text: "fintech," }],
+  [{ text: "AI workspaces," }, { text: "and", tone: "muted" }],
+  [{ text: "shipping from Bangkok.", tone: "accent" }],
+];
+
+/**
+ * Blog copy (bento canvas Blog and Post, design spec 4.17-4.18). The hero
+ * draws three h1 lines (muted connector words, accent last line) under the
+ * CMS eyebrow.
+ */
 export const blogPage = {
-  eyebrow: "Blog",
-  title: "Blog",
-  description:
-    "Notes on fintech, AI workspaces, and shipping from Bangkok. Search or filter by tag.",
+  headline: BLOG_HEADLINE,
+  lead: "Writing and notes from KunanonJ — fintech, AI, and building from Bangkok.",
+  searchLabel: "Search posts",
   searchPlaceholder: "Search posts…",
   allTagsLabel: "All",
   emptyLabel: "No posts match your filters.",
+  /** The "Keep reading" card on a post. */
+  keepReading: "Notes on fintech, AI workspaces, and shipping from Bangkok.",
+  /** Byline when a post names no author. */
+  author: "Kunanon Jarat",
 } as const;
+
+/**
+ * The post the index features as its Cornerstone (the canvas pick); the
+ * newest post stands in if it is ever missing.
+ */
+export const BLOG_CORNERSTONE_SLUG = "ai-transformation-thailand-smes";
+
+/** Venture tags the index offers as filter rows ("In these notes"). */
+export const BLOG_VENTURE_TAGS = [
+  { tag: "GoGoCash", venture: "gogocash" },
+  { tag: "Manut", venture: "manut" },
+] as const;
 
 const STOCK_BANNER =
   "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80";
@@ -361,4 +391,50 @@ export function filterBlogPosts(
       `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase();
     return haystack.includes(q);
   });
+}
+
+/** How many posts carry each tag (trimmed), for the filter chips. */
+export function countBlogTags(posts: readonly BlogCard[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of new Set(post.tags.map((t) => t.trim()))) {
+      if (tag) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+/** `tag` as the posts spell it (case-insensitive), or null if none carries it. */
+export function matchBlogTag(
+  tags: readonly string[],
+  tag: string,
+): string | null {
+  const wanted = tag.trim().toLowerCase();
+  if (!wanted) return null;
+  return tags.find((t) => t.toLowerCase() === wanted) ?? null;
+}
+
+/** Newest first, whatever order the posts came in. */
+export function sortBlogPosts(posts: readonly BlogCard[]): BlogCard[] {
+  return [...posts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+}
+
+/** The index's featured post: the cornerstone, else the newest post. */
+export function pickCornerstone(posts: readonly BlogCard[]): BlogCard | null {
+  return (
+    posts.find((p) => p.slug === BLOG_CORNERSTONE_SLUG) ??
+    sortBlogPosts(posts)[0] ??
+    null
+  );
+}
+
+/** The other posts tagged `tag` (case-insensitive), newest first. */
+export function relatedBlogPosts(
+  posts: readonly BlogCard[],
+  slug: string,
+  tag: string,
+): BlogCard[] {
+  return sortBlogPosts(
+    filterBlogPosts(posts, { tag }).filter((p) => p.slug !== slug),
+  );
 }

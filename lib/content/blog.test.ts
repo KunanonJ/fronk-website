@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
+  BLOG_CORNERSTONE_SLUG,
+  BLOG_VENTURE_TAGS,
   collectBlogTags,
+  countBlogTags,
   FALLBACK_BLOG_POSTS,
   filterBlogPosts,
   formatBlogDate,
+  matchBlogTag,
+  pickCornerstone,
+  relatedBlogPosts,
   resolveBlogCards,
 } from "@/lib/content/blog";
 
@@ -86,5 +92,51 @@ describe("filterBlogPosts > given search and tag", () => {
     });
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result.every((p) => p.tags.includes("Founding"))).toBe(true);
+  });
+});
+
+describe("bento blog helpers (phase 7g)", () => {
+  const posts = resolveBlogCards([]);
+
+  it("counts each tag once per post, matching the canvas archive", () => {
+    const counts = countBlogTags(posts);
+    expect(posts).toHaveLength(15);
+    expect(counts.size).toBe(17);
+    expect(counts.get("AI")).toBe(6);
+    expect(counts.get("GoGoCash")).toBe(2);
+    expect(counts.get("Manut")).toBe(3);
+  });
+
+  it("matches a tag whatever its case, and rejects unknown or empty tags", () => {
+    const tags = collectBlogTags(posts);
+    expect(matchBlogTag(tags, "sme")).toBe("SME");
+    expect(matchBlogTag(tags, " GoGoCash ")).toBe("GoGoCash");
+    expect(matchBlogTag(tags, "crypto")).toBeNull();
+    expect(matchBlogTag(tags, "")).toBeNull();
+  });
+
+  it("features the cornerstone, else the newest post", () => {
+    expect(pickCornerstone(posts)?.slug).toBe(BLOG_CORNERSTONE_SLUG);
+    const others = posts.filter((p) => p.slug !== BLOG_CORNERSTONE_SLUG);
+    expect(pickCornerstone(others)?.slug).toBe("intelligence-ai-inside-erp");
+    expect(pickCornerstone([])).toBeNull();
+  });
+
+  it("lists the other posts on a tag, newest first", () => {
+    const related = relatedBlogPosts(posts, BLOG_CORNERSTONE_SLUG, "ai");
+    expect(related.map((p) => p.slug)).toEqual([
+      "intelligence-ai-inside-erp",
+      "digital-transformation-budget-sme-thailand",
+      "ai-vs-traditional-erp-sea",
+      "manut-ai-erp-crm-automotive",
+      "ai-workspace-for-smes",
+    ]);
+  });
+
+  it("offers a filter row for every venture tag the posts carry", () => {
+    const tags = collectBlogTags(posts);
+    for (const { tag } of BLOG_VENTURE_TAGS) {
+      expect(matchBlogTag(tags, tag), tag).toBe(tag);
+    }
   });
 });
