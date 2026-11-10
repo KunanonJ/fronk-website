@@ -1,17 +1,18 @@
 import { useEffect } from "react";
-import { ConversionEvents, trackConversion } from "@/lib/analytics/gtag";
+import {
+  ConversionEvents,
+  track,
+  type ConversionEvent,
+} from "@/lib/analytics/track";
 
-const EVENT_MAP: Record<
-  string,
-  (typeof ConversionEvents)[keyof typeof ConversionEvents]
-> = {
+const EVENT_MAP: Record<string, ConversionEvent> = {
   contact_cta_click: ConversionEvents.contactCta,
   venture_outbound_click: ConversionEvents.ventureOutbound,
   topic_hub_cta: ConversionEvents.topicHubCta,
 };
 
 /**
- * Delegates clicks on `[data-analytics]` CTAs to GA4/GTM conversion events.
+ * Delegates clicks on `[data-analytics]` CTAs to Umami conversion events.
  * Mount once on discovery hub pages.
  */
 export function DiscoveryAnalytics() {
@@ -23,7 +24,7 @@ export function DiscoveryAnalytics() {
       if (!el) return;
       const name = el.dataset.analytics;
       if (!name || !(name in EVENT_MAP)) return;
-      trackConversion(EVENT_MAP[name]!, {
+      track(EVENT_MAP[name]!, {
         topic_slug: el.dataset.topicSlug,
         venture: el.dataset.venture,
       });

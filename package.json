@@ -45,8 +45,6 @@
     "deploy": "pnpm build && wrangler deploy",
     "deploy:staging": "START_WRANGLER_CONFIG=wrangler.start.jsonc pnpm build && wrangler deploy",
     "upload": "pnpm build && wrangler versions upload",
-    "cron:preview": "wrangler dev --config wrangler.revalidate-cron.jsonc --env local --test-scheduled --port 8789",
-    "cron:deploy": "wrangler deploy --config wrangler.revalidate-cron.jsonc --env=\"\"",
     "lint": "eslint --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "knip": "knip",
@@ -63,8 +61,7 @@
     "probe": "node scripts/ux-probe.mjs",
     "skills:sync": "node scripts/sync-skills.mjs",
     "seed": "node scripts/seed-content.mjs",
-    "pdf": "node scripts/generate-resume-pdf.mjs",
-    "cron:revalidate": "node scripts/cron-revalidate.mjs"
+    "pdf": "node scripts/generate-resume-pdf.mjs"
   },
   "dependencies": {
     "@cf-wasm/og": "0.5.0",
@@ -85,8 +82,7 @@
     "react-dom": "19.3.1",
     "sanity": "^6.21.0",
     "styled-components": "^6.6.0",
-    "valibot": "1.5.0",
-    "web-vitals": "6.2.3"
+    "valibot": "1.5.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

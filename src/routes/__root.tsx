@@ -13,10 +13,7 @@ import RouteError from "@/components/RouteError";
 import appCss from "@/src/styles/globals.css?url";
 import { Analytics } from "@/components/Analytics";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { GoogleTagManager } from "@/components/GoogleTagManager";
 import { ThemeProvider } from "next-themes";
-import { WebVitals } from "@/components/WebVitals";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
@@ -105,11 +102,8 @@ function RootDocument({ children }: { children: ReactNode }) {
         >
           {children}
         </ThemeProvider>
-        <GoogleTagManager />
         <CloudflareAnalytics />
         <Analytics />
-        <GoogleAnalytics />
-        <WebVitals />
         <Suspense fallback={null}>
           <Devtools />
         </Suspense>

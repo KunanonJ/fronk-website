@@ -1,25 +1,23 @@
-import { DurableObject } from "cloudflare:workers";
 import handler from "@tanstack/react-start/server-entry";
 import { redirectFor } from "./lib/redirects";
 import { withSecurityHeaders } from "./server/http";
 import {
   ALL_CONTENT_TAGS,
-  handleCronRequest,
   handleSanityWebhook,
   purgeTags,
   type CachePurger,
 } from "./server/revalidate";
 
 /**
- * Worker entry for the Start build (wrangler.start.jsonc "main"). Start picks
- * this file up as its server entry. It owns what needs the Worker's env and
- * ctx, which Start does not pass to routes: redirects, the Sanity webhook
- * purge and the hourly cron. Everything else goes to Start. Every response it
- * returns carries the security headers (public/_headers covers static files).
+ * Worker entry (wrangler.jsonc "main"). Start picks this file up as its
+ * server entry. It owns what needs the Worker's env and ctx, which Start does
+ * not pass to routes: redirects, the Sanity webhook purge and the hourly
+ * cache purge. Everything else goes to Start. Every response it returns
+ * carries the security headers (public/_headers covers static files).
  */
 
-type Env = { SANITY_REVALIDATE_SECRET?: string; CRON_SECRET?: string };
-/** ctx.cache exists when wrangler.start.jsonc sets `cache.enabled`. */
+type Env = { SANITY_REVALIDATE_SECRET?: string };
+/** ctx.cache exists when the wrangler config sets `cache.enabled`. */
 type Ctx = { waitUntil(promise: Promise<unknown>): void; cache?: CachePurger };
 
 const worker = {
@@ -38,7 +36,7 @@ const worker = {
   },
 };
 
-/** Redirects and the Worker-only endpoints; everything else is Start. */
+/** Redirects and the Worker-only endpoint; everything else is Start. */
 async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
   const url = new URL(request.url);
   const to = redirectFor(url.pathname);
@@ -53,19 +51,7 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
       ctx.cache,
     );
   }
-  if (url.pathname === "/api/cron/revalidate" && request.method === "GET") {
-    return handleCronRequest(request, env.CRON_SECRET, ctx.cache);
-  }
   return handler.fetch(request);
 }
 
 export default worker;
-
-/**
- * The Durable Object classes of the old Next.js (OpenNext) build, kept as
- * empty classes so the production Worker's v1 migration still matches and a
- * dashboard rollback to a Next version works. Remove them with a
- * `deleted_classes` migration once that rollback is no longer wanted.
- */
-export class DOQueueHandler extends DurableObject {}
-export class DOShardedTagCache extends DurableObject {}

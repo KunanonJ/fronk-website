@@ -22,7 +22,7 @@
   // Paths ending in "/" reach the Worker so it can 308 them like Next did.
   "assets": { "run_worker_first": ["/*/"] },
   // Worker cache: Sanity-backed responses carry Cache-Tag and are purged by
-  // tag from src/server.ts (Sanity webhook, hourly cron).
+  // tag from src/server.ts (Sanity webhook, hourly scheduled()).
   "cache": { "enabled": true },
   "triggers": { "crons": ["0 * * * *"] },
   // Contact and subscribe: 5 posts per minute per IP.
@@ -33,23 +33,17 @@
       "simple": { "limit": 5, "period": 60 },
     },
   ],
-  // OpenNext's two Durable Object classes stay declared (as empty classes
-  // exported from src/server.ts) so a dashboard rollback to the Next version
-  // still finds them. Remove them, with a deleted_classes migration, once the
-  // cutover has held (tanstack-migration Phase 6).
-  "durable_objects": {
-    "bindings": [
-      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" },
-      {
-        "name": "NEXT_TAG_CACHE_DO_SHARDED",
-        "class_name": "DOShardedTagCache",
-      },
-    ],
-  },
+  // The old Next.js (OpenNext) build's two Durable Object classes: created in
+  // v1, deleted in v2 once the TanStack Start cutover had held. Migrations are
+  // append-only history; never edit or reuse a tag.
   "migrations": [
     {
       "tag": "v1",
       "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache"],
+    },
+    {
+      "tag": "v2",
+      "deleted_classes": ["DOQueueHandler", "DOShardedTagCache"],
     },
   ],
   "observability": {

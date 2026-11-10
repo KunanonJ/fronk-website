@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { useTheme } from "next-themes";
 import { ICON_BUTTON } from "@/components/bento/classes";
 import { MoonIcon, SunIcon } from "@/components/bento/icons";
-import { track } from "@/lib/analytics/gtag";
+import { track } from "@/lib/analytics/track";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 import { cn } from "@/lib/utils/cn";
 
