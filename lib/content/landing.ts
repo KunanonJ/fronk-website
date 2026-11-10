@@ -4,7 +4,7 @@ import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 export const site = {
   wordmark: "KunanonJ",
   contextLabel: "Bangkok 🇹🇭 · Founder",
-  title: "Fronk Kunanon Jarat — Building fintech and AI from Bangkok.",
+  title: "Kunanon Jarat: AI Engineering Lead and Solopreneur, Bangkok",
   description: PERSON_META_DESCRIPTION,
   email: "fronk.kunanon@gmail.com",
   tagline: "Building fintech and digital workspaces from Bangkok.",
@@ -52,6 +52,12 @@ export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "Ventures", href: "/#ventures", icon: "ventures" },
   { type: "link", label: "Portfolio", href: "/portfolio", icon: "portfolio" },
   { type: "link", label: "Skills", href: "/skills", icon: "skills" },
+  // The FDE positioning hub: a site-wide, crawlable link to it (EO review).
+  {
+    type: "link",
+    label: "AI engineering",
+    href: "/topics/forward-deployed-ai-engineering",
+  },
   {
     type: "menu",
     label: "Library",

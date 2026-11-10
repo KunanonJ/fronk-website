@@ -90,30 +90,31 @@ async function fetchViaPublicHtml(): Promise<ContributionCalendar | null> {
   return calendar;
 }
 
-async function fetchCalendar(): Promise<ContributionCalendar> {
-  const fromGraphql = await fetchViaGraphql();
-  if (fromGraphql) return fromGraphql;
+async function fetchCalendar(): Promise<ContributionCalendar | null> {
+  return (await fetchViaGraphql()) ?? (await fetchViaPublicHtml());
+}
 
-  const fromHtml = await fetchViaPublicHtml();
-  if (fromHtml) return fromHtml;
-
-  return emptyContributionCalendar();
+/**
+ * GitHub unreachable: a 503 the edge won't cache (withEdgeLifetime leaves
+ * failures alone), so the next visit retries; the card falls back to empty.
+ */
+function unavailable(): Response {
+  return Response.json(emptyContributionCalendar(), {
+    status: 503,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 export async function GET() {
   try {
     const calendar = await fetchCalendar();
+    if (!calendar) return unavailable();
     return Response.json(calendar, {
       headers: {
         "Cache-Control": "s-maxage=3600, stale-while-revalidate=86400",
       },
     });
   } catch {
-    return Response.json(emptyContributionCalendar(), {
-      status: 200,
-      headers: {
-        "Cache-Control": "s-maxage=300, stale-while-revalidate=3600",
-      },
-    });
+    return unavailable();
   }
 }

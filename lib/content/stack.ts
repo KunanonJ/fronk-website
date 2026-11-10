@@ -49,7 +49,7 @@ export const stackItems: readonly StackItem[] = [
   },
   {
     name: "Next.js",
-    purpose: "Web apps, admin dashboards, marketing sites, personal site",
+    purpose: "Web apps, admin dashboards, marketing sites",
     website: "https://nextjs.org",
     group: "build",
     badge: "NJ",

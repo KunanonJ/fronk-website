@@ -47,10 +47,14 @@ function mapCmsTimelineItem(item: ResumeTimelineItem): ResolvedTimelineItem {
 function mapCmsSections(
   sections: readonly ResumeTimelineSection[],
 ): readonly ResolvedTimelineSection[] {
-  return sections.map((section) => ({
-    title: section.title,
-    items: section.items.map(mapCmsTimelineItem),
-  }));
+  // GROQ returns null for a section whose items were never set; skip it
+  // instead of failing the whole page.
+  return sections
+    .map((section) => ({
+      title: section.title,
+      items: (section.items ?? []).map(mapCmsTimelineItem),
+    }))
+    .filter((section) => section.items.length > 0);
 }
 
 export function resolveResumeProfile(cms: ResumeProfile | null) {

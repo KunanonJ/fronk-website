@@ -39,8 +39,7 @@ describe("ResumePage (screen)", () => {
       screen.getAllByRole("link", { name: "Download PDF" })[0],
     ).toHaveAttribute("href", "/resume.pdf");
     expect(screen.getByRole("button", { name: "Share" })).toHaveAttribute(
-      "aria-controls",
-      "share-panel",
+      "data-panel-trigger",
     );
     const group = screen.getByRole("group", { name: "Résumé detail" });
     expect(

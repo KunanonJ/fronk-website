@@ -29,6 +29,7 @@ import {
   getSkillStage,
   getStageSiblings,
   skillInstallCommands,
+  skillsPage,
   sourceLabel,
   type Skill,
   type SkillAsset,
@@ -95,6 +96,16 @@ function SkillHero({ skill, stage }: { skill: Skill; stage: SkillStage }) {
       </div>
       <p className="m-0 max-w-[620px] text-lg leading-[1.55] text-ink-2">
         {skill.description}
+      </p>
+      <p className="m-0 text-card text-ink-2">
+        {skill.source ? "Adapted and maintained by" : "Written by"}{" "}
+        <Link
+          href={skillsPage.maintainer.href}
+          rel="author"
+          className="font-medium text-ink underline underline-offset-4"
+        >
+          {skillsPage.maintainer.name}
+        </Link>
       </p>
       <ul
         aria-label="About this skill"

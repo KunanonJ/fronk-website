@@ -62,7 +62,10 @@ export const Route = createFileRoute("/_landing/portfolio/$slug")({
       head: pageHead(
         await generateMetadata({ params: Promise.resolve(params) }),
         {
-          fileOgImage: fileOg(`/portfolio/${params.slug}`, "Portfolio project"),
+          fileOgImage: fileOg(
+            `/portfolio/${params.slug}`,
+            `${getPortfolioProjectBySlug(params.slug)?.name ?? "Portfolio project"}: by Kunanon Jarat`,
+          ),
         },
       ),
     };

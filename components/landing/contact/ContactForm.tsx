@@ -325,18 +325,21 @@ export default function ContactForm() {
             }}
           </form.Field>
 
-          {/* Honeypot: hidden from people and assistive tech, tempting to bots. */}
+          {/* Honeypot: hidden from people and assistive tech, tempting to bots.
+              Its name and label avoid anything browser autofill recognises
+              (a "company" field got filled from address profiles, silently
+              dropping real messages); it still maps to `company`. */}
           <div
             aria-hidden
             className="absolute -left-[9999px] h-px w-px overflow-hidden"
           >
-            <label htmlFor="contact-company">Company</label>
+            <label htmlFor="contact-hp">Leave this field empty</label>
             <form.Field name="company">
               {(field) => (
                 <input
-                  id="contact-company"
+                  id="contact-hp"
                   type="text"
-                  name="company"
+                  name="hp_field"
                   tabIndex={-1}
                   autoComplete="off"
                   value={field.state.value}

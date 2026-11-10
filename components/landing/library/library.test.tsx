@@ -9,6 +9,7 @@ import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { examplesByPersona } from "@/lib/content/examples";
 import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
+import { buildBoard } from "@/lib/content/buildBoard";
 
 /** Every href on the page: none may point at the hidden blog or press. */
 function expectNoHiddenLinks(container: HTMLElement) {
@@ -188,8 +189,11 @@ describe("BuildPage", () => {
     const { container } = render(
       <BuildPage venture="all" onVentureChange={() => {}} />,
     );
-    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(11);
-    expect(screen.getByText("11 tickets on the board")).toBeInTheDocument();
+    const total = Object.values(buildBoard).flat().length;
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(total);
+    expect(
+      screen.getByText(`${total} tickets on the board`),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Nothing here for this filter.")).toBeNull();
     expectNoHiddenLinks(container);
   });
@@ -197,7 +201,10 @@ describe("BuildPage", () => {
   it("narrows to one venture and marks emptied columns", () => {
     render(<BuildPage venture="manut" onVentureChange={() => {}} />);
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(2);
-    expect(screen.getByText("2 of 11 tickets · Manut")).toBeInTheDocument();
+    const total = Object.values(buildBoard).flat().length;
+    expect(
+      screen.getByText(`2 of ${total} tickets · Manut`),
+    ).toBeInTheDocument();
     const inProgress = screen.getByRole("article", { name: "In progress" });
     expect(
       within(inProgress).getByText("Nothing here for this filter."),

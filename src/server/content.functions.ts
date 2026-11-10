@@ -25,8 +25,9 @@ import type { Metadata } from "@/lib/seo/types";
  */
 
 /** /blog metadata from the CMS writing page; hidden from search while BLOG_PUBLIC is off. */
-async function blogIndexMetadata(): Promise<Metadata> {
-  const page = resolveWritingPageContent(await fetchWritingPage());
+function blogIndexMetadata(
+  page: ReturnType<typeof resolveWritingPageContent>,
+): Metadata {
   return {
     ...routeShareMeta({
       title: page.metadata.title,
@@ -66,13 +67,14 @@ export const getLearnCards = createServerFn({ method: "GET" }).handler(
 
 export const getBlogIndex = createServerFn({ method: "GET" }).handler(
   async () => {
-    const [posts, cmsPage, metadata] = await Promise.all([
+    // One read of the writing page feeds both the page and its metadata.
+    const [posts, cmsPage] = await Promise.all([
       fetchAllPosts(),
       fetchWritingPage(),
-      blogIndexMetadata(),
     ]);
     // Head tags, not Metadata: Metadata may hold URL objects, which don't serialise.
     const page = resolveWritingPageContent(cmsPage);
+    const metadata = blogIndexMetadata(page);
     return {
       cards: resolveBlogCards(posts),
       eyebrow: page.eyebrow,

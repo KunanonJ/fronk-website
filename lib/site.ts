@@ -4,7 +4,7 @@ import { resolvePublicSiteUrl } from "@/lib/seo/siteUrl";
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
   shortName: "KunanonJ",
-  tagline: "Building fintech and AI from Bangkok.",
+  tagline: "AI engineering lead and solopreneur in Bangkok.",
   description: PERSON_META_DESCRIPTION,
   /** Fail-closed via resolvePublicSiteUrl — never emit fronk.example.com in production. */
   url: resolvePublicSiteUrl(),

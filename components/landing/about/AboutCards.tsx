@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
 import { BentoCard, CardLink, CardTitle } from "@/components/bento/Bento";
 import { CtaLink } from "@/components/bento/Buttons";
@@ -214,7 +214,7 @@ export function OperatingModelCard() {
               ))}
             </ul>
             <p className="m-0 mt-auto text-meta text-ink-2">
-              Shipped:{" "}
+              Seen in:{" "}
               {stage.evidence.map((link, i) => (
                 <span key={link.href}>
                   {i > 0 ? ", " : null}
@@ -322,15 +322,6 @@ export function StackCard() {
  */
 export function FaqCard({ className }: { className?: string }) {
   const { faq } = aboutPage;
-  const [open, setOpen] = useState<ReadonlySet<number>>(() => new Set([0]));
-  const toggle = (index: number) =>
-    setOpen((current) => {
-      const next = new Set(current);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-
   return (
     <BentoCard
       id={faq.id}
@@ -340,45 +331,26 @@ export function FaqCard({ className }: { className?: string }) {
       className={cn("scroll-mt-6", className)}
     >
       <CardTitle className="px-1">{faq.heading}</CardTitle>
+      {/* Native disclosures: every answer stays in the HTML (no `hidden`), so
+          answer engines and text extractors read all of them. */}
       <div className="border-t border-hairline">
-        {FAQ_ITEMS.map((item, index) => {
-          const expanded = open.has(index);
-          const questionId = `faq-q${index + 1}`;
-          const answerId = `faq-a${index + 1}`;
-          return (
-            <div key={item.question} className="border-b border-hairline">
-              <h4 className="m-0 text-base font-medium">
-                <button
-                  type="button"
-                  id={questionId}
-                  aria-expanded={expanded}
-                  aria-controls={answerId}
-                  onClick={() => toggle(index)}
-                  className="flex min-h-14 w-full items-center justify-between gap-4 border-0 bg-transparent px-1 py-3.5 text-left text-base leading-[1.4] font-medium text-ink"
-                >
-                  <span>{item.question}</span>
-                  <PlusIcon
-                    className={cn(
-                      "shrink-0 transition-transform duration-200",
-                      expanded && "rotate-45",
-                    )}
-                  />
-                </button>
-              </h4>
-              <div
-                id={answerId}
-                role="region"
-                aria-labelledby={questionId}
-                hidden={!expanded}
-                className="pt-0 pr-10 pb-[18px] pl-1"
-              >
-                <p className="m-0 text-card leading-[1.6] [overflow-wrap:anywhere] text-ink-2">
-                  {item.answer}
-                </p>
-              </div>
+        {FAQ_ITEMS.map((item, index) => (
+          <details
+            key={item.question}
+            open={index === 0}
+            className="group border-b border-hairline"
+          >
+            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-1 py-3.5 text-left text-base leading-[1.4] font-medium text-ink [&::-webkit-details-marker]:hidden">
+              <h4 className="m-0 text-base font-medium">{item.question}</h4>
+              <PlusIcon className="shrink-0 transition-transform duration-200 group-open:rotate-45" />
+            </summary>
+            <div className="pt-0 pr-10 pb-[18px] pl-1">
+              <p className="m-0 text-card leading-[1.6] [overflow-wrap:anywhere] text-ink-2">
+                {item.answer}
+              </p>
             </div>
-          );
-        })}
+          </details>
+        ))}
       </div>
     </BentoCard>
   );

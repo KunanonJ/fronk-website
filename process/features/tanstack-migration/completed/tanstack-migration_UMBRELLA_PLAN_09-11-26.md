@@ -1,6 +1,6 @@
 # TanStack Start migration: umbrella plan
 
-**Status:** IN PROGRESS. Phase 0 (parity harness) executed 09-11-26; Phases 1-6 executed 09-11-26: production runs on TanStack Start (cutover #76, deploy fix #77) and Next is removed. Next: the owner-requested code review, then Phase 7 (bento redesign).
+**Status:** COMPLETE (10-11-26). Phases 0-6 shipped the migration (cutover #76, Next removed #78); the code review shipped as #80-#84; Phase 7 (bento redesign) shipped as #86, #89, #90, #91 and #95. Reports in `../reports/`.
 **Created:** 09-11-26
 **Research:** `process/general-plans/references/tanstack-start-migration-research_REPORT_09-11-26.md`. That report covers the API mapping, the inventory, the risks and the parity references.
 **Target architecture:** `../references/target-architecture_09-11-26.md` (approved 09-11-26). It sets which TanStack packages and Cloudflare products each phase adopts.

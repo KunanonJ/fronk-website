@@ -70,14 +70,20 @@ export const buildBoard: Record<BuildColumn, readonly BuildCard[]> = {
       body: "Topic hubs for AI transformation, ERP/CRM, and tech startups stay indexed and linked.",
       venture: "site",
     },
+  ],
+  shipped: [
+    {
+      id: "KJ-30",
+      title: "FDE positioning",
+      body: "One identity across the site, an AI engineering hub, llms-full.txt and a reusable operating model.",
+      venture: "site",
+    },
     {
       id: "KJ-29",
       title: "Bento rollout",
-      body: "The last pages move onto the bento layout, one route group at a time.",
+      body: "Every page moved onto the bento layout, one route group at a time.",
       venture: "site",
     },
-  ],
-  shipped: [
     {
       id: "KJ-21",
       title: "Bento redesign",
@@ -88,18 +94,6 @@ export const buildBoard: Record<BuildColumn, readonly BuildCard[]> = {
       id: "KJ-22",
       title: "Venture case hubs",
       body: "Public /ventures/manut and /ventures/gogocash case pages.",
-      venture: "site",
-    },
-    {
-      id: "KJ-23",
-      title: "Press + blog surfaces",
-      body: "Press grid and searchable blog index with Sanity fallbacks.",
-      venture: "site",
-    },
-    {
-      id: "KJ-24",
-      title: "About Activity heatmap",
-      body: "GitHub contribution year on /about from real public data.",
       venture: "site",
     },
     {

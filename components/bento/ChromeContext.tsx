@@ -35,6 +35,9 @@ export function ChromeProvider({ children }: { children: ReactNode }) {
     path: string;
   }>({ panel: null, path: pathname });
   const trigger = useRef<HTMLElement | null>(null);
+  // Leaving the page closes the panel for good: without this reset, Back or
+  // Forward to the same path reopened it and moved focus into it.
+  if (state.path !== pathname) setState({ panel: null, path: pathname });
   const panel = state.path === pathname ? state.panel : null;
 
   const toggle = useCallback(

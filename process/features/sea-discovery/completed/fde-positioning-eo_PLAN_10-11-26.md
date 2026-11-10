@@ -1,6 +1,6 @@
 # FDE positioning: SEO, AEO and GEO pass
 
-**Status:** READY. Runs after Phase 7 (bento) lands.
+**Status:** COMPLETE (10-11-26): EO-1 #92, EO-2 #93, EO-3 #96. Report: `../reports/fde-positioning-eo_REPORT_10-11-26.md`. Owner items remain (see the report).
 **Created:** 10-11-26
 **Research:** `../reports/fde-positioning-seo-aeo-geo_REPORT_09-11-26.md`. It
 holds the fact inventory, the claims to avoid, the query targets and the full

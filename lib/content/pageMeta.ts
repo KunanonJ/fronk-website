@@ -10,9 +10,10 @@ import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
  */
 export const PAGE_META = {
   about: {
+    // The About h1 restates this title (aboutPage.test.ts), so it changes with the hero copy.
     title: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok",
     description:
-      "Kunanon Jarat (Fronk / KunanonJ) — Bangkok founder of GoGoCash and Manut AI. Building AI transformation, ERP/CRM, and tech startups for Thailand and SEA.",
+      "Kunanon Jarat (Fronk): AI Engineering Lead at The Binary Holdings, founder of GoGoCash, builder of Manut AI. Open to FDE and AI roles, Bangkok or remote.",
   },
   build: {
     title: "Build",
