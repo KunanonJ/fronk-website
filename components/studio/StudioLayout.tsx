@@ -3,6 +3,9 @@ import type { Metadata, Viewport } from "@/lib/seo/types";
 export const metadata: Metadata = {
   title: "Studio",
   robots: { index: false, follow: false },
+  // Its own URL: the root layout's canonical ("/") would tell crawlers this
+  // noindex page is the home page.
+  alternates: { canonical: "/studio" },
 };
 
 export const viewport: Viewport = {

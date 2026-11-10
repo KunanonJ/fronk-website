@@ -1,5 +1,7 @@
 # Phase 4 — SEM + conversion paths
 
+> **Closed 10-11-26: superseded.** GTM, Google Ads and LinkedIn tags were removed in #99 (owner chose Umami plus Cloudflare Web Analytics). The conversion events in this plan still fire, to Umami, through `lib/analytics/track.ts`.
+
 **Parent**: `sea-discovery_UMBRELLA_PLAN_19-07-26.md`  
 **Status**: DONE (code)
 

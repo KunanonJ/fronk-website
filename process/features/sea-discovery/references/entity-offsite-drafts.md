@@ -2,39 +2,45 @@
 
 Paste-ready copy so third-party bios match kunanonj.com. Owner applies clicks; do not invent metrics.
 
-Canonical who-is (same as `/about` story.whoIs):
+Updated 10-11-26 to the FDE positioning (`lib/content/identity.ts`, PRs #92-#96): lead with the AI engineering role, then the solopreneur ventures, then availability. If `identity.ts` changes, update this file in the same PR.
 
-> Kunanon Jarat (Fronk / KunanonJ) is a Bangkok founder building fintech and AI operator systems for Thailand and SEA. He founded GoGoCash (shopping-to-earn cashback) and builds Manut AI (ERP/CRM with Intelligence AI for automotive SMEs), with a background in electrical engineering, smart contracts, and shipping fintech products.
+Canonical who-is (same as `PERSON_SUMMARY`, shown on `/about`):
+
+> Kunanon Jarat (Fronk / KunanonJ) is a Bangkok-based AI engineering lead and solopreneur. As IT Manager & AI Engineering Lead at The Binary Holdings since November 2025, he leads internal AI agents, automations and the intranet's AI assistant. He founded GoGoCash, a shopping-to-earn cashback platform, in 2023 and builds Manut AI, an ERP/CRM workspace with Intelligence AI for automotive SMEs.
 
 ## GitHub (https://github.com/KunanonJ)
 
 | Field | Value |
 |-------|-------|
 | Name | Kunanon Jarat |
-| Bio | Bangkok founder — GoGoCash · Manut AI · fintech & AI ops for TH/SEA |
-| Company | GoGoCash |
+| Bio | AI Engineering Lead and solopreneur in Bangkok · GoGoCash · Manut AI · Superstacks agent skills |
+| Company | The Binary Holdings |
 | Location | Bangkok, Thailand |
-| Website | **https://kunanonj.com** (replace LinkedIn) |
+| Website | **https://kunanonj.com** (pending: needs `gh auth refresh -h github.com -s user`, then Claude can set it) |
 | Social (optional) | linkedin.com/in/kunanonj |
+
+Done 10-11-26: the Superstacks repo homepage points to https://kunanonj.com/skills.
 
 ## LinkedIn (https://www.linkedin.com/in/kunanonj)
 
 **Headline (≤220 chars):**  
-Founder @ GoGoCash · Building Manut AI (ERP/CRM + Intelligence AI) · Fintech & AI operator systems from Bangkok · Thailand / SEA
+AI Engineering Lead at The Binary Holdings · Solopreneur: GoGoCash and Manut AI (ERP/CRM + Intelligence AI) · Open to Forward Deployed Engineer and AI engineering roles · Bangkok or remote
 
 **About (paste):**
 
-Kunanon Jarat (Fronk / KunanonJ) builds fintech and AI operator systems from Bangkok for Thailand and Southeast Asia.
+I'm Kunanon Jarat (Fronk), an AI engineering lead and solopreneur in Bangkok. As IT Manager & AI Engineering Lead at The Binary Holdings since November 2025, I lead internal AI agents, automations and the intranet's AI assistant, with a person in the loop where the call matters.
 
-I founded GoGoCash, a shopping-to-earn cashback platform, and I’m building Manut AI — an ERP/CRM workspace with Intelligence AI for automotive SMEs. My work sits at the intersection of internal systems, practical AI transformation, and shipping products under real operational constraints.
+I founded GoGoCash, a shopping-to-earn cashback platform, in 2023, and I design and build Manut AI, an ERP/CRM workspace with Intelligence AI for automotive SMEs. I work directly with the people who use what I build: Manut AI customers, GoGoCash merchant partners, and the companies I have run client projects and workshops for.
 
-Background: electrical engineering (Kasetsart University); smart contracts and blockchain systems; product and delivery roles across fintech and Web3. Web3 is part of my history — the lead story today is founder ops, cashback fintech, and AI-augmented ERP/CRM.
+Background: electrical engineering (Kasetsart University), smart contracts at Bitkub, blockchain systems at FICO, then project management across fintech and Web3 products.
 
-Canonical site: https://kunanonj.com  
+Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.
+
+Site: https://kunanonj.com  
 About: https://kunanonj.com/about  
-Topics: AI transformation · ERP/CRM · tech startups TH/SEA
+AI engineering: https://kunanonj.com/topics/forward-deployed-ai-engineering
 
-**Featured links:** kunanonj.com · /about · /ventures/manut · /ventures/gogocash
+**Featured links:** kunanonj.com · /about · /topics/forward-deployed-ai-engineering · /portfolio · /skills
 
 ## Wikidata (create item — not Wikipedia)
 
@@ -46,7 +52,8 @@ Suggested statements (source each with the official URL):
 | given name | Kunanon |
 | family name | Jarat |
 | also known as | Fronk, KunanonJ |
-| occupation | entrepreneur / software engineer |
+| occupation | software engineer / entrepreneur |
+| employer | The Binary Holdings (IT Manager & AI Engineering Lead, since November 2025) |
 | country of citizenship | Thailand |
 | residence | Bangkok |
 | official website | https://kunanonj.com |
@@ -63,7 +70,7 @@ Add the Wikidata item URL to Person `sameAs` in `lib/seo/jsonLd.ts` only after t
 | Full name | Kunanon Jarat |
 | Also known as | Fronk, KunanonJ |
 | Primary location | Bangkok, Thailand |
-| Primary organization | GoGoCash |
+| Primary organization | The Binary Holdings (founder of GoGoCash) |
 | Website | https://kunanonj.com |
 | Biography | Use the LinkedIn About block (shorten to ~500 chars if required) |
 
