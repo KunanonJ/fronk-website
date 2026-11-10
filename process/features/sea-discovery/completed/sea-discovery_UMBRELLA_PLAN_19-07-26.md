@@ -2,7 +2,7 @@
 
 **Date**: 19-07-26  
 **Complexity**: Phase program  
-**Status**: ACTIVE  
+**Status**: COMPLETE (closed 10-11-26; the remaining steps are the owner's)  
 **Feature**: `sea-discovery`  
 **Locks**: **1C** full growth stack (SEO + AEO/GEO + SEM + LinkedIn) · **2C** dual entity (personal + product/category hubs)
 
@@ -44,6 +44,26 @@ Cinematic marketing shell stays `/` + `/showcase`.
 | 9 Content merge | `phase-9_content-merge_PLAN_13-09-26.md` | Merge fallbacks + calendar posts 5–12 |
 | 10 Presence | `phase-10_presence_PLAN_13-09-26.md` | LinkedIn Articles + selective directories |
 | 11 Audit fixes (DONE, #35) | `../completed/phase-11_audit-fixes_PLAN_04-11-26.md` | 04-11-26 audit P1 code fixes: Manut copy, /about h1, Thai lang/locale, RSS feed + discovery, blog hub links |
+
+## Closeout (10-11-26)
+
+Audited against the repo on 10-11-26. Every code item shipped; what remains needs the owner's accounts.
+
+| Phase | Outcome | Plan now in |
+|-------|---------|-------------|
+| 0 Measurement | Done. The GA4 and GTM parts are superseded: analytics are Umami plus Cloudflare Web Analytics only since #99. | `completed/` |
+| 1 Technical + AEO | Done, ported to TanStack Start (#72-#78). | `completed/` |
+| 2 Content hubs | Done. A fourth pillar, forward-deployed-ai-engineering, was added in #93. | `completed/` |
+| 3 Blog engine | Code done. The blog is hidden (`BLOG_PUBLIC = false`, #56) until the posts are expanded (#43). | `completed/` |
+| 4 SEM | Superseded: the GTM, Ads and LinkedIn tags were removed in #99. The conversion events still go to Umami (`lib/analytics/track.ts`). | `completed/` |
+| 5 Distribution | Done (llms.txt "Cite these canonical URLs", LinkedIn playbook). | `completed/` |
+| 6 Operate | Done (`references/operating-loop.md`). | `completed/` |
+| 7 Crawl + AEO unblock | Done, except GSC, Bing and Crawler Hints (#40) and AI Labyrinth (#39). | `completed/` |
+| 8 Entity pack | Code done. Off-site profiles are the owner's job; drafts were refreshed 10-11-26 in `references/entity-offsite-drafts.md`. | `backlog/` |
+| 9 Content merge | Code done. Blog hidden as above. | `completed/` |
+| 10 Presence | Briefs ready. LinkedIn Articles, directories and the monthly spot-check are the owner's job. | `backlog/` |
+
+The IA table above is historical: `/blog` and `/press` are hidden, `/showcase` redirects to `/` (#53), and the indexed set is now in `references/crawl-baseline.md`. The SEM part of the lock (1C) was dropped with GTM. The follow-on FDE pass is in `reports/fde-positioning-eo_REPORT_10-11-26.md`.
 
 ## Out of scope
 

@@ -2,44 +2,44 @@
 
 Run after each phase that touches routes/metadata.
 
+Updated 10-11-26 against the live `/sitemap.xml` (TanStack Start; the source of truth is `lib/seo/sitemap.ts`).
+
 ## Indexed (should appear in `/sitemap.xml`)
 
-- `/`
-- `/about`
-- `/showcase`
-- `/contact`
-- `/press`
-- `/blog` + published `/blog/[slug]` (Sanity **and** cornerstone fallbacks, merged by slug)
-- `/topics/ai-transformation-thailand`
-- `/topics/erp-crm-internal-systems`
-- `/topics/tech-startup-thailand-sea`
-- `/th/topics/*` (same three slugs)
-- `/ventures/manut`
-- `/ventures/gogocash`
+- `/`, `/about`, `/contact`
+- `/portfolio` + `/portfolio/[slug]` (4 projects)
+- `/skills` + `/skills/[slug]`
+- `/learn`, `/examples`, `/proof`, `/stack`, `/build`
+- `/topics/[slug]` and `/th/topics/[slug]`: ai-transformation-thailand, erp-crm-internal-systems, tech-startup-thailand-sea, forward-deployed-ai-engineering
+- `/ventures/gogocash`, `/ventures/manut`
 
-## Noindex
+## Hidden or noindex
 
-- `/resume`
-- `/studio/**`
+- `/blog`, `/blog/[slug]` and `/press`: hidden while `BLOG_PUBLIC = false` (noindex, out of the sitemap, llms.txt and RSS) until the posts are expanded (issue #43)
+- `/resume` (and `/resume.pdf`, `X-Robots-Tag: noindex`)
+- `/studio` (noindex, self-canonical), `/design`
 
-## Redirects (keep)
+## Redirects (keep; `src/lib/redirects.ts`)
 
-- `/ventures` → `/#ventures` (index only)
+- `/ventures` → `/#ventures`; `/work` → `/#ventures`
 - `/stock/asme` → `/about`
-- `/writing` → `/blog`
-- `/now` → `/`
-- `/work` → `/#ventures`
+- `/writing` → `/blog`; `/now` → `/`
+- `/showcase` → `/` (retired in #53); `/stock/velorah` → `/`
+- `/rss.xml` → `/feed.xml`
 
 ## Must NOT redirect
 
 - `/ventures/manut`, `/ventures/gogocash`
-- `/about`, `/blog`, `/contact`, `/press`, `/topics/*`
+- `/about`, `/contact`, `/portfolio/*`, `/skills/*`, `/topics/*`, `/th/topics/*`
+- `/blog` and `/press` (hidden, but the URLs stay)
 
 ## Agent surfaces
 
-- `/llms.txt`, `/sitemap.md`, `/agents.md`, `/feed.xml`
+- `/llms.txt`, `/llms-full.txt`, `/agents.md`, `/sitemap.md`, `/skills.md`, `/skills.json`, `/operating-model.md`
+- Markdown twins: `/about.md`, `/portfolio/[slug].md` (each page links its twin as `rel="alternate" type="text/markdown"`)
+- `/feed.xml` (empty while the blog is hidden)
 
-## App robots (`app/robots.ts`)
+## Robots (`lib/seo/robots.ts`)
 
 | User-agent | Policy |
 |------------|--------|
@@ -69,8 +69,13 @@ Production currently prepends **Cloudflare Managed** rules that may `Disallow` `
 
 ## Google Search Console (owner)
 
-1. Set Workers var `NEXT_PUBLIC_GSC_VERIFICATION` to the HTML-tag token (see `.env.example`).
-2. Redeploy so `metadata.verification.google` is present.
+1. Easiest: verify with a DNS TXT record in Cloudflare (no code or deploy).
+   Or, for the HTML tag: `NEXT_PUBLIC_GSC_VERIFICATION` is inlined at **build** time
+   (`vite.config.mts` reads `wrangler.jsonc` vars and the build shell), so a runtime
+   Worker variable set only in the dashboard never reaches the page. Either add the
+   token to `vars` in `wrangler.jsonc` (it is public; Claude can do this) or set it as
+   a Workers Builds **build variable**.
+2. Redeploy (merge to `main`) and check that `<meta name="google-site-verification">` is on `/`.
 3. Confirm property for `https://kunanonj.com`.
 4. Submit sitemap `https://kunanonj.com/sitemap.xml` (not the old example.com URL).
-5. Request indexing for `/`, `/about`, three EN topic hubs, `/ventures/manut`, `/ventures/gogocash`.
+5. Request indexing for `/`, `/about`, the four EN topic hubs, `/portfolio`, `/ventures/manut`, `/ventures/gogocash`.

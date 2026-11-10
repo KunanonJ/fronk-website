@@ -1,5 +1,7 @@
 # Phase 8 — Entity pack (name search)
 
+> **Moved to backlog 10-11-26.** Code shipped (#92: aliases, who-is, Person graph). Left for the owner: LinkedIn and GitHub profile copy, Wikidata and Crunchbase, using the refreshed `references/entity-offsite-drafts.md`; then Claude adds the new URLs to `sameAs`.
+
 **Parent**: `sea-discovery_UMBRELLA_PLAN_19-07-26.md`  
 **Status**: DONE (code + drafts) · Off-site clicks remain  
 **Date**: 13-09-26

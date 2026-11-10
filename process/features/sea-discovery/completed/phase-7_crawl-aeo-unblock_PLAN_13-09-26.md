@@ -15,7 +15,7 @@ Make crawlers and Search Console trust kunanonj.com: correct robots Host/Sitemap
 - [x] Unit test asserts robots sitemap host is never the example fallback
 - [x] Crawl baseline documents Cloudflare AI Crawl Control matrix + GSC submit checklist
 - [ ] Owner: Cloudflare dashboard — stop blanket-blocking GPTBot / ClaudeBot (keep ai-train=no if desired)
-- [ ] Owner: set `NEXT_PUBLIC_GSC_VERIFICATION` in Workers vars; submit sitemap in GSC; request index for `/`, `/about`, topic hubs, venture hubs
+- [ ] Owner: verify GSC (DNS TXT, or the HTML-tag token in `wrangler.jsonc` vars: it is inlined at build time, so a dashboard runtime var does not work; see `references/crawl-baseline.md`); submit the sitemap; request indexing for `/`, `/about`, topic hubs, venture hubs (tracked in #40)
 
 ## Green check
 

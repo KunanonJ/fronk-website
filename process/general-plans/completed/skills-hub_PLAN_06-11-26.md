@@ -1,6 +1,6 @@
 # Skills Hub: Plan
 
-**Status:** EXECUTED 06-11-26 by a parallel agent in worktree `.claude/worktrees/agent-a954e4036f712e20d` (branch `feat/skills-hub`, uncommitted). The orchestrator reviewed and re-verified it: typecheck pass; lint 0 errors (5 baseline warnings); 355/355 tests; `skills:sync --check` matches `superstacks@v6.1.1`; the `-s, --skill` flag is confirmed in the vercel-labs/skills docs; screenshots reviewed. Agent-reported only: build, perf budget (skills routes 236.8 KB / 300 KB), 41/41 asset URLs 302, e2e 106/106. Report: `process/general-plans/reports/skills-hub_REPORT_06-11-26.md` (in the worktree). Waiting on owner: nav-width change, copy review, commit/PR/deploy.
+**Status:** DONE, closed 10-11-26. Shipped in #54, then ported through the redesign and migration (#67, #72, #91); `skills.generated.json` is at `superstacks@v6.1.1`. The open items in the 06-11 report (framer-motion hydration warning, `next dev` rewriting AGENTS.md) went away with framer-motion and Next.js. History: executed 06-11-26 in a worktree; verification notes below are from that run.
 **Created:** 06-11-26
 **Plan type:** COMPLEX single plan (one PR), general folder
 **Harness note:** `.claude/` and `process/context/` are absent in this checkout. Runs under the Harness-Absent Fallback (`process/development-protocols/orchestration.md`).

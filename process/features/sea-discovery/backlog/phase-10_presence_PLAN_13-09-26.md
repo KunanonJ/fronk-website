@@ -1,5 +1,7 @@
 # Phase 10 — Presence (where AI cites)
 
+> **Moved to backlog 10-11-26.** The briefs are ready (`references/linkedin-distribution.md`, `directory-shortlist.md`). Left for the owner: publishing the LinkedIn Articles, directory listings, and running `reports/ai-citation-spotcheck.md` (FDE rows added 10-11-26).
+
 **Parent**: `sea-discovery_UMBRELLA_PLAN_19-07-26.md`  
 **Status**: DONE (docs) · Owner executes distribution  
 **Date**: 13-09-26
