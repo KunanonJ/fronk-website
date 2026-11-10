@@ -1,4 +1,5 @@
 import type { ExamplePersonaId } from "@/lib/library/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type ExampleCard = {
   title: string;
@@ -10,8 +11,7 @@ export type ExampleCard = {
 export const examplesPage = {
   eyebrow: "Examples",
   title: "Examples",
-  description:
-    "What changes when the work is operator-first — ventures, systems, and a few creative moments from Bangkok.",
+  description: PAGE_META.examples.description,
   /** The description as the bento canvas splits it: the h1, then the lead. */
   headline: {
     lines: [[{ muted: "What changes when" }], ["the work is"]],

@@ -5,7 +5,6 @@ import LearnPage from "@/components/landing/library/LearnPage";
 import type { Metadata } from "@/lib/seo/types";
 import { routeCacheHeaders } from "@/src/lib/cache";
 import { learnCardsQuery } from "@/src/queries/content";
-import { learnPage } from "@/lib/content/learn";
 import {
   LEARN_SEARCH_DEFAULTS,
   learnSearchSchema,
@@ -13,10 +12,11 @@ import {
 } from "@/lib/library/search";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Learn",
-  description: learnPage.description,
+  title: PAGE_META.learn.title,
+  description: PAGE_META.learn.description,
   path: "/learn",
 });
 

@@ -6,6 +6,7 @@
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import type { StackIconId } from "@/lib/content/stackIcons";
 import { PERSON_SUMMARY } from "@/lib/content/identity";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type AboutInlineLink = {
   type: "link";
@@ -53,11 +54,7 @@ export const aboutPage = {
    * suffix) because it already carries the name; kept under 60 characters
    * so Google can show it whole and reuse it as a sitelink.
    */
-  meta: {
-    title: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok",
-    description:
-      "Kunanon Jarat (Fronk / KunanonJ) — Bangkok founder of GoGoCash and Manut AI. Building AI transformation, ERP/CRM, and tech startups for Thailand and SEA.",
-  },
+  meta: PAGE_META.about,
 
   /**
    * Bento hero (phase 7b, canvas): text beside a portrait panel. The email

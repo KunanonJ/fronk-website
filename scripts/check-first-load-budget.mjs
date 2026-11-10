@@ -22,17 +22,22 @@ import zlib from "node:zlib";
 // a few KB of each other. Lower these as routes get lighter; raise only
 // deliberately, with the reason here.
 //
-// Default: system pages (/design) and the discovery hubs. Raised from 200 on
-// 10-11-26, deliberately: the bento chrome (share panel, the server-rendered
-// site menu, typed view transitions) now ships on every page, and the hubs
-// measure 199.9 KB (venture) with the loaders already split out of the entry
-// chunk. 210 is that floor plus the usual ~5%.
-const DEFAULT_BUDGET_KB = 210;
+// Default: system pages (/design) and the discovery hubs. Measured worst
+// 155.2 KB (the topic hubs) on 10-11-26, after page metadata stopped pulling
+// content modules (every SKILL.md, topics, portfolio) into the entry chunk
+// through route head() options. An earlier raise to 210 KB blamed the bento
+// chrome; that leak was the real cause.
+const DEFAULT_BUDGET_KB = 165;
 
-// Marketing: pages with the landing nav plus heavier islands (next/image card
-// chrome, forms, the blog's portable text). Worst: the hidden blog posts at
-// 243.0 KB; the public pages are about 190-197 KB.
-const MARKETING_BUDGET_KB = 255;
+// Marketing: pages with heavier islands (forms, filters, skill sources, the
+// blog's portable text). Measured worst 189.1 KB (the skill pages, which ship
+// their SKILL.md) on 10-11-26.
+const MARKETING_BUDGET_KB = 200;
+
+// The entry chunk every page loads (React, the router, the shell). 113.7 KB on
+// 10-11-26. A content module imported from a route's head() or the root route
+// lands here and costs every page, so it gets its own cap.
+const ENTRY_BUDGET_KB = 120;
 
 const MARKETING_EXACT = new Set([
   "/",
@@ -145,6 +150,22 @@ for (const r of routes) {
   console.log(
     `  ${flag} ${r.kb.toFixed(1).padStart(6)} KB${budgetNote}  ${r.route}`,
   );
+}
+
+// The entry chunk: the one chunk every page references.
+const shared = routes
+  .map((r) => r.chunks)
+  .reduce((a, b) => a.filter((name) => b.includes(name)));
+const entry = shared.find((name) => /^index-.*\.js$/.test(name));
+const entryKb = entry ? gzipKb([entry]) : 0;
+console.log(
+  `\n  ${entryKb > ENTRY_BUDGET_KB ? "❌" : "✅"} ${entryKb.toFixed(1).padStart(6)} KB / ${ENTRY_BUDGET_KB} KB  entry chunk (${entry ?? "not found"})`,
+);
+if (!entry || entryKb > ENTRY_BUDGET_KB) {
+  console.error(
+    `\n[perf] FAIL — entry chunk ${entryKb.toFixed(1)}KB > ${ENTRY_BUDGET_KB}KB budget: a content module is probably imported from a route head() or the root route.`,
+  );
+  process.exit(1);
 }
 
 const overBudget = worstOver > 0;

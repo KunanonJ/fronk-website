@@ -1,3 +1,4 @@
+import { PAGE_META } from "@/lib/content/pageMeta";
 /** Coverage types, in filter order (bento canvas Press, design spec 4.19). */
 export const PRESS_TYPES = ["Feature", "Product", "Profile"] as const;
 export type PressType = (typeof PRESS_TYPES)[number];
@@ -18,8 +19,7 @@ export type PressItem = {
 export const pressPage = {
   eyebrow: "Press",
   title: "Press",
-  description:
-    "Selected coverage and mentions. Click through to read the full piece.",
+  description: PAGE_META.press.description,
   /** The description's two sentences as the canvas hero draws them. */
   headline: {
     muted: "Selected",

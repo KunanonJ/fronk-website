@@ -7,13 +7,13 @@ import { PageMain } from "@/components/bento/Bento";
 import PressPage from "@/components/landing/PressPage";
 import type { Metadata } from "@/lib/seo/types";
 import { pageHead } from "@/src/lib/head";
-import { pressPage } from "@/lib/content/press";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import {
   PRESS_SEARCH_DEFAULTS,
   pressSearchSchema,
   type PressFilter,
 } from "@/lib/press/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 /**
  * Hidden 04-11-26 (owner request): not linked from the nav, sitemap.xml,
@@ -22,8 +22,8 @@ import {
  */
 const metadata: Metadata = {
   ...routeShareMeta({
-    title: "Press",
-    description: pressPage.description,
+    title: PAGE_META.press.title,
+    description: PAGE_META.press.description,
     path: "/press",
   }),
   robots: { index: false, follow: true },

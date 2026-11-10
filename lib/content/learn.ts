@@ -2,6 +2,7 @@ import type { BlogCard } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import type { LearnLang } from "@/lib/library/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export type LearnLink = {
   title: string;
@@ -12,7 +13,7 @@ export type LearnLink = {
 export const learnPage = {
   eyebrow: "Learn",
   title: "Learn",
-  description: `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
+  description: PAGE_META.learn.description,
   /** The h1 as the bento canvas draws it: muted opener, accent close. */
   headline: {
     muted: "How I think about",

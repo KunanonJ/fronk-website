@@ -6,7 +6,6 @@ import {
 import { PageMain } from "@/components/bento/Bento";
 import BuildPage from "@/components/landing/library/BuildPage";
 import type { Metadata } from "@/lib/seo/types";
-import { buildPage } from "@/lib/content/buildBoard";
 import {
   BUILD_SEARCH_DEFAULTS,
   buildSearchSchema,
@@ -14,10 +13,11 @@ import {
 } from "@/lib/library/search";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Build",
-  description: buildPage.description,
+  title: PAGE_META.build.title,
+  description: PAGE_META.build.description,
   path: "/build",
 });
 

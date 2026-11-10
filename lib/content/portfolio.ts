@@ -17,6 +17,7 @@
  */
 
 import type { VisualIconId } from "@/lib/content/visualIcons";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 export interface PortfolioImage {
   /** Site-relative path under `/portfolio/<slug>/`. */
@@ -121,8 +122,7 @@ export const portfolioPage = {
   ] satisfies readonly HeadlineLine[],
   /** Every project is his work: the byline on each project page. */
   author: { name: "Kunanon Jarat", href: "/about" },
-  description:
-    "Internal tools, automations and AI agents built at The Binary Holdings. They run behind a login, so each page shows what the product does and how it is built rather than a live link.",
+  description: PAGE_META.portfolio.description,
 } as const;
 
 const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [

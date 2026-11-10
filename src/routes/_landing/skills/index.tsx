@@ -11,16 +11,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
 import { buildSkillsPackJsonLd } from "@/lib/seo/skillsJsonLd";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
-import { skillsPage } from "@/lib/content/skills";
 import {
   SKILLS_SEARCH_DEFAULTS,
   skillsSearchSchema,
   type SkillFilter,
 } from "@/lib/skills/search";
+import { PAGE_META } from "@/lib/content/pageMeta";
 
 const metadata: Metadata = routeShareMeta({
-  title: "Skills",
-  description: skillsPage.metaDescription,
+  title: PAGE_META.skills.title,
+  description: PAGE_META.skills.description,
   path: "/skills",
 });
 
