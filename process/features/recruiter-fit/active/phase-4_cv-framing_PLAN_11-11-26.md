@@ -46,6 +46,7 @@ owner approves the wording before execution.
 | 4b | **Content.** Apply the approved lines in the content modules, English and Thai |
 | 4c | **Structured data and share images.** The Person and Organization JSON-LD, the page meta, the About share image |
 | 4d | **Tests and references.** A fact test that no surface says "Founder" for the two projects; the parity re-crawl; the baselines for About, the venture pages and Home |
+| 4e | **ARIA's stack, in one sentence (decision 26, 11-11-26).** "Both are true": ARIA uses Google ADK and Gemini with RAG, as the résumé says, and Claude as well, as the site says. Today the FDE hub, the FAQ and the intranet case study say "Gemini and Claude models with embedding search". The owner approves the sentence in 4a. The wording test in `lib/content/resumeFacts.test.ts` lets "RAG" stand in the résumé data only, so it gains the places this sentence goes |
 
 ## Touchpoints
 

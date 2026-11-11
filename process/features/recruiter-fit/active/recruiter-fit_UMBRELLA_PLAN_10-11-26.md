@@ -1,8 +1,9 @@
 # Recruiter fit: umbrella plan
 
 **Status:** IN PROGRESS (11-11-26). Phases 1 and 2 are complete, merged
-through pull request #109 (`fdcb904` on `main`) and live. Phase 3 is approved
-for execution. Phase 4, the CV's framing for the two projects, is planned.
+through pull request #109 (`fdcb904` on `main`) and live. Phase 3 is built,
+verified and approved by the owner for merge (pull request #110). Phase 4,
+the CV's framing for the two projects, is planned.
 **Created:** 10-11-26, at `6d31e16`
 **Owner goal:** make kunanonj.com fit a recruiter or hiring manager who is
 looking for a Forward Deployed Engineer (FDE) or an AI team member.
@@ -136,6 +137,33 @@ Hard safety constraints (non-negotiable, per phase):
     merchandise value and THB 169,000 cashback paid are as of October 2026.
 18. **This site as a project (11-11-26).** "Yes, add it": Phase 3 step 3f.
 
+Asked before the merge of Phase 3 (11-11-26), with each line shown:
+
+19. **Phase 3's lines.** "Approve as written": the four outcome lines and
+    the four "My part" lines, as the Phase 3 report's 3c table has them.
+    That includes "with the team" on AI Automation and "Wrote code for it."
+    on the validator and on the signature tool.
+20. **The staffing figure.** "Everywhere, as built": "Recurring workflow
+    staffing: 10 people to 1 operator" shows on Home, the portfolio index,
+    the case study, `/proof` and the FDE hub.
+21. **The hub lines.** "Yes, keep them": the two English and the two Thai
+    outcome lines on the FDE hub, and the Thai user count, "ผู้ใช้ลงทะเบียน
+    1,000 ราย".
+22. **This site's page.** "Keep as written": "Role: Owner", "Organisation:
+    Personal project", and the sentence about the repository's process and
+    its AI coding agents.
+23. **Wordings with no figure.** "All fine": the GoGoCash intro in the
+    résumé's terms, "Internal tool (no public link)", the `/portfolio` lead
+    and the `/proof` lead.
+24. **Merge of Phase 3.** "Yes, merge": pull request #110.
+25. **The live site's cache.** "Plan a follow-up": a short plan for the
+    hourly purge that does not take effect and for the server-function
+    answers cached with no tag (Phase 3 report, "Findings outside this
+    phase"). It needs its own approval before any code changes.
+26. **ARIA's stack.** "Both are true": ARIA uses Google ADK and Gemini with
+    RAG, as the résumé says, and Claude as well, as the site says. The site
+    says so in one sentence; the résumé stays. Joins Phase 4.
+
 Earlier decisions that still bind this program are listed at the end of the
 research file.
 
@@ -178,7 +206,7 @@ have produced.
 | --- | --- | --- | --- | --- |
 | 1. Résumé and facts | `../completed/phase-1_resume-facts_PLAN_10-11-26.md` | O2, O3, O5, O7 (all have defaults) | One set of career facts on every surface, and a two-page PDF that parses | COMPLETE (10-11-26): merged in pull request #109, live. Report: `../reports/phase-1_resume-facts_REPORT_10-11-26.md` |
 | 2. Recruiter path | `../completed/phase-2_recruiter-path_PLAN_10-11-26.md` | Phase 1 (headline and résumé target); O6, O8, O9 | Role, availability and résumé are visible above the fold and reachable from every page | COMPLETE (10-11-26): merged in pull request #109, live site checked. Report: `../reports/phase-2_recruiter-path_REPORT_10-11-26.md` |
-| 3. Case-study evidence | `phase-3_case-study-evidence_PLAN_10-11-26.md` | Phases 1 and 2; O1, O3, O4 (all answered) | Case studies and Proof state cleared outcomes and the owner's part | APPROVED FOR EXECUTION (11-11-26) |
+| 3. Case-study evidence | `phase-3_case-study-evidence_PLAN_10-11-26.md` | Phases 1 and 2; O1, O3, O4 (all answered) | Case studies and Proof state cleared outcomes and the owner's part | APPROVED FOR MERGE (11-11-26): pull request #110, all gates pass, the owner approved every line (decisions 19 to 24). Report: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md` |
 | 4. The CV's framing | `phase-4_cv-framing_PLAN_11-11-26.md` | Phase 3 | GoGoCash and Manut AI are independent projects on every surface, as in the CV | PLANNED (decision 15); needs its own execution approval |
 
 Phase 1 comes first because it removes contradictions a background check
@@ -198,8 +226,10 @@ Program level. Each phase plan lists its files.
 
 ## Public Contracts
 
-- No URL is added, removed or redirected. `/contact` gains an optional
-  `topic` search parameter in Phase 2.
+- No URL is removed or redirected. `/contact` gains an optional `topic`
+  search parameter in Phase 2. Phase 3 adds three URLs for this site as a
+  project (decision 18): `/portfolio/kunanonj-com`, its Markdown twin and
+  its share image.
 - `/resume.pdf` keeps its path. Its content, length and file name on download
   change in Phase 1.
 - `/llms.txt`, `/llms-full.txt`, the Markdown twins and JSON-LD change by
@@ -229,12 +259,17 @@ commands, results, regression checks and deviations.
 - Phase 2: `../reports/phase-2_recruiter-path_REPORT_10-11-26.md`. All gates
   pass locally, in CI and on the Cloudflare preview; the live site was
   checked after the merge (the report's "Closed out" section).
+- Phase 3: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md`. All
+  gates pass locally, in CI and on the Cloudflare preview, after three
+  review rounds.
 
 ## Resume and Execution Handoff
 
 - **Current state:** Phases 1 and 2 are on `main` (`fdcb904`) and live.
-  Phase 3 is approved for execution with O1 and O4 answered; O5 to O7 stay
-  on their defaults.
+  Phase 3 is in pull request #110, approved for merge. After the merge:
+  check the live site, close the phase out, then write the cache follow-up
+  plan (decision 25) and start Phase 4 at step 4a. O5 to O7 stay on their
+  defaults.
 - **Execute anchor:** `process/features/recruiter-fit/active/phase-3_case-study-evidence_PLAN_10-11-26.md`.
 - **Before EXECUTE of Phase 3:** re-read that plan, the research file and the
   Phase 2 report, and check drift since `fdcb904`.

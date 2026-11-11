@@ -1,11 +1,12 @@
 # Phase 3 report: Case-study evidence
 
 **Plan:** `../active/phase-3_case-study-evidence_PLAN_10-11-26.md`
-**Status:** CODE-COMPLETE, NOT MERGED. Verified on the local production
-build (11-11-26), on Node 26.12.0 and on CI's Node 22.23.4 (see "Gates" for
-the runs and the tree they covered), and reviewed three times (see
-"Review"). The merge waits for the owner: every outcome line and every "My
-part" line is listed under "Open, for the owner" below.
+**Status:** APPROVED FOR MERGE (11-11-26), pull request #110. Verified on
+the local production build, on Node 26.12.0 and on CI's Node 22.23.4 (see
+"Gates" for the runs and the tree they covered), in CI and on the
+Cloudflare preview, and reviewed three times (see "Review"). The owner saw
+every outcome line and every "My part" line and approved them as written
+(see "The owner's answers before the merge").
 **Base:** `27004b0` on `feat/recruiter-fit-phase-3` (`main` is `fdcb904`).
 
 ## Owner answers used (11-11-26)
@@ -174,7 +175,7 @@ part" line is listed under "Open, for the owner" below.
 | 6 | clearance audit, `lib/content/portfolioOutcomes.test.ts` and `lib/content/ventureCase.test.ts` | pass, inside gate 1; the list is below |
 | 7 | Phase 1: PDF text layer against the printed page | 844 words, whole and in order; 2 pages; 6 links; no phone number. A fresh print matches the committed file word for word |
 | 7 | Phase 2: the "recruiter path" browser tests | pass, inside gate 3 |
-| 8 | preview | runs when the pull request has its preview; recorded in the pull request |
+| 8 | preview | 82 passed against the pull request's Cloudflare branch preview: the "recruiter path" and "case-study evidence" blocks. CI passed on the same commit: `typecheck-lint-test-build`, `e2e-smoke`, `visual` and `parity` |
 | 9 | reviews | three rounds; see "Review" |
 
 **What the runs covered.**
@@ -185,6 +186,9 @@ part" line is listed under "Open, for the owner" below.
 - The browser suite, the PDF check and the fallback checks ran on a build
   of the same sources. The parity gate and the visual comparison ran
   against the reference and the baselines as committed.
+- One commit followed the owner's answers: the answers in the process
+  documents, and a comment and a test's title in the audit, which now say
+  the hub lines are approved. CI ran every gate again on that commit.
 - The 844 words are the printed page's text split on whitespace, compared
   in order with the PDF's text layer as `pypdf` extracts it. Another
   extractor may split the same text differently.
@@ -573,9 +577,29 @@ from three lines to five in English and four in Thai. The FAQ card now has
 42 to 43 px below its last line, against 27 px under the proof list
 (measured on the local build, 11-11-26).
 
+## The owner's answers before the merge (11-11-26)
+
+Asked with each line shown. They are decisions 19 to 26 in the umbrella
+plan.
+
+| Asked | Answer |
+| --- | --- |
+| The four outcome lines and the four "My part" lines (items 1 and 2 below) | "Approve as written" |
+| Where the staffing figure shows (item 1) | "Everywhere, as built" |
+| The hub lines in English and Thai, and the Thai user count (item 4) | "Yes, keep them" |
+| This site's page (item 5) | "Keep as written" |
+| The four wordings with no figure (item 7) | "All fine" |
+| Merge pull request #110 | "Yes, merge" |
+| The live site's cache (item 10) | "Plan a follow-up": a plan first, approved before any code changes |
+| ARIA's stack (item 3) | "Both are true": Google ADK and Gemini with RAG, and Claude as well. One sentence on the site, in Phase 4 |
+
+Still open: items 6, 8, 9, 11 and 12. Item 8 belongs with Phase 4, which
+rewrites the same page.
+
 ## Open, for the owner
 
-Asked before the merge. Merging to `main` deploys production.
+The list as it stood before the merge. Merging to `main` deploys
+production.
 
 1. **The outcome lines and the "My part" lines** in the table under 3c:
    approve them or change the wording. Three points inside that:
