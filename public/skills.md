@@ -18,7 +18,7 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
 2. **TanStack Start on Workers**
    - File routes in `src/routes/`; a route owns its `head()`, `headers()`, loader and component.
    - Typed URL state with Valibot schemas in `validateSearch`; defaults stripped from the URL.
-   - Sanity reads run in server functions through TanStack Query; responses carry `Cache-Tag` and are purged by the Sanity webhook.
+   - Sanity reads run in server functions through TanStack Query. The pages that use them carry `Cache-Tag`, are purged by the Sanity webhook and expire at the edge within the hour; the server functions' own answers are `no-store`.
    - Pages built from `lib/content` are prerendered; everything else renders in the Worker.
 
 3. **Design system (bento)**

@@ -12,6 +12,47 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
 };
 
+/**
+ * Where TanStack Start answers server-function calls: its default base,
+ * which this repo does not change.
+ */
+export const SERVER_FN_PATH = "/_serverFn/";
+
+/** The headers that set a lifetime at the edge or in browsers. */
+const CACHE_HEADERS = [
+  "Cache-Control",
+  "CDN-Cache-Control",
+  "Cloudflare-CDN-Cache-Control",
+];
+
+/**
+ * A server function's answer (`GET /_serverFn/<id>`, fetched on a client-side
+ * navigation) carries no cache header unless the function sets one, and the
+ * Worker cache keeps a 200 that carries none for two hours: shared between
+ * visitors, with no tag a purge could reach, and served without the
+ * framework's cross-site check. So an answer that sets none of the cache
+ * headers is kept nowhere. A function that sets any of them chose its own.
+ */
+export function withServerFnNoStore(
+  request: Request,
+  response: Response,
+): Response {
+  if (
+    // A WebSocket upgrade (101) cannot be rebuilt; the site has none.
+    response.status === 101 ||
+    CACHE_HEADERS.some((name) => response.headers.has(name)) ||
+    !new URL(request.url).pathname.startsWith(SERVER_FN_PATH)
+  )
+    return response;
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "no-store");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 /** Copy of `response` with SECURITY_HEADERS added where the response has not set them. */
 export function withSecurityHeaders(response: Response): Response {
   // A WebSocket upgrade (101) cannot be rebuilt; the site has none, but be safe.

@@ -1,10 +1,6 @@
 import { encodeSignatureHeader } from "@sanity/webhook";
-import { describe, expect, it, vi } from "vitest";
-import {
-  ALL_CONTENT_TAGS,
-  WEBHOOK_MAX_AGE_MS,
-  handleSanityWebhook,
-} from "./revalidate";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { WEBHOOK_MAX_AGE_MS, handleSanityWebhook } from "./revalidate";
 
 const SECRET = "test-secret";
 
@@ -21,6 +17,8 @@ async function signed(body: unknown, secret = SECRET, timestamp = Date.now()) {
   });
 }
 
+afterEach(() => vi.restoreAllMocks());
+
 describe("handleSanityWebhook", () => {
   it("purges the tags mapped from the document type", async () => {
     const purge = vi.fn().mockResolvedValue({ success: true });
@@ -32,6 +30,7 @@ describe("handleSanityWebhook", () => {
     expect(res.status).toBe(200);
     expect(purge).toHaveBeenCalledWith({ tags: ["posts"] });
     expect(await res.json()).toMatchObject({
+      status: 200,
       revalidated: true,
       tags: ["posts"],
     });
@@ -75,7 +74,10 @@ describe("handleSanityWebhook", () => {
     ).toBe(500);
   });
 
-  it("reports failure when the Worker cache is not enabled", async () => {
+  // A failed purge answers 500, so Sanity retries the delivery twice, and
+  // it is logged, so the Worker's logs show it. Its body says 500 too.
+  it("reports and logs failure when the Worker cache is not enabled", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     const res = await handleSanityWebhook(
       await signed({ _type: "resumeProfile" }),
       SECRET,
@@ -83,12 +85,56 @@ describe("handleSanityWebhook", () => {
     );
     expect(res.status).toBe(500);
     expect(await res.json()).toMatchObject({
+      status: 500,
       revalidated: false,
       tags: ["resume"],
     });
+    expect(logged).toHaveBeenCalledWith(
+      "[revalidate] cache purge failed",
+      ["resume"],
+      ["Worker cache is not enabled"],
+    );
   });
 
-  it("knows every content tag for the hourly purge", () => {
-    expect(ALL_CONTENT_TAGS).toEqual(["resume", "posts", "writing"]);
+  it("reports and logs a purge Cloudflare did not accept", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const errors = [{ code: 1, message: "rate limited" }];
+    const purge = vi.fn().mockResolvedValue({ success: false, errors });
+    const res = await handleSanityWebhook(
+      await signed({ _type: "post" }),
+      SECRET,
+      { purge },
+    );
+    expect(res.status).toBe(500);
+    expect(await res.json()).toMatchObject({
+      status: 500,
+      revalidated: false,
+    });
+    expect(logged).toHaveBeenCalledWith(
+      "[revalidate] cache purge failed",
+      ["posts"],
+      errors,
+    );
+  });
+
+  it("reports and logs a purge that throws", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const purge = vi.fn().mockRejectedValue(new Error("purge unavailable"));
+    const res = await handleSanityWebhook(
+      await signed({ _type: "writingPage" }),
+      SECRET,
+      { purge },
+    );
+    expect(res.status).toBe(500);
+    expect(await res.json()).toMatchObject({
+      status: 500,
+      revalidated: false,
+      tags: ["writing"],
+    });
+    expect(logged).toHaveBeenCalledWith(
+      "[revalidate] cache purge failed",
+      ["writing"],
+      ["purge unavailable"],
+    );
   });
 });

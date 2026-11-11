@@ -16,7 +16,7 @@ surfaces. Built with TanStack Start and deployed on Cloudflare Workers.
 Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
-Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache, cron, rate limiting)
+Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache, rate limiting)
 Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visual-redesign)
 ```
 
@@ -53,15 +53,14 @@ Visitor / crawler
       v
 Cloudflare Worker (fronk-website, custom domains)
   - Static assets: prerendered pages, hashed JS/CSS, fonts
-  - Worker cache: Sanity-backed pages, Cache-Tag purge (webhook + hourly cron)
+  - Worker cache: Sanity-backed pages for an hour, Cache-Tag purge (webhook)
   - TanStack Start: SSR, server functions, server routes (src/server.ts entry)
       |
       +--> Static landing content (lib/content/landing.ts)
       +--> Sanity Content Lake (studio / resume)
       +--> Optional analytics providers
 
-Sanity webhook ----> /api/revalidate
-Hourly cron -------> scheduled() purge of every content tag
+Sanity webhook ----> /api/revalidate (purges the document's tags)
 ```
 
 ## Routes
@@ -196,10 +195,13 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
   before the Worker runs. Paths ending in `/` reach the Worker (`run_worker_first`)
   so they get a 308 like the old site.
 - **Worker cache** (`cache.enabled`): Sanity-backed pages and text files send
-  `Cache-Tag` and `CDN-Cache-Control`; `POST /api/revalidate` (Sanity webhook,
-  signature checked with `@sanity/webhook`) purges the document's tags, and the
-  hourly cron (`scheduled()`) purges everything as a safety net. Webhooks signed
-  more than 5 minutes ago are rejected (replay window).
+  `Cache-Tag` and `CDN-Cache-Control: public, max-age=3600, stale-if-error=0`.
+  `POST /api/revalidate` (Sanity webhook, signature checked with
+  `@sanity/webhook`) purges the document's tags; if a webhook is missed, the
+  copy still ends within the hour. When the Worker fails on a refresh the
+  visitor gets the error, not an old copy. Server-function answers are
+  `no-store`. Webhooks signed more than 5 minutes ago are rejected (replay
+  window). There is no cron trigger.
 - **Security headers:** HSTS, `nosniff`, `X-Frame-Options: SAMEORIGIN`,
   `Referrer-Policy` and `Permissions-Policy` on every response: Worker responses
   get them from `src/server/http.ts`, static files from `public/_headers`. Keep
@@ -255,7 +257,7 @@ Tools.
 
 ```
 src/
-  server.ts              # Worker entry: redirects, Sanity webhook purge, cron, then Start
+  server.ts              # Worker entry: redirects, Sanity webhook purge, then Start
   router.tsx             # Router + per-request QueryClient (SSR query integration)
   routes/                # File routes: each page owns its metadata, loader and component
     _landing/            # Public site (layout: nav + footer)

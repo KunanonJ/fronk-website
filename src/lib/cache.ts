@@ -1,13 +1,28 @@
 import type { RevalidationTag } from "@/lib/sanity/revalidation";
 
 /*
- * Worker cache headers (wrangler.start.jsonc `cache.enabled`). The cache reads
+ * Worker cache headers (wrangler.jsonc `cache.enabled`). The edge reads
  * CDN-Cache-Control before Cache-Control, so browsers always revalidate while
- * the edge keeps a copy until a Sanity webhook (or the hourly cron) purges
- * its Cache-Tag. s-maxage is avoided: it switches off stale-while-revalidate.
+ * the edge keeps a copy for an hour. A Sanity webhook purges the copy sooner,
+ * by its Cache-Tag; the hour is the bound when a webhook is missed.
+ *
+ * No stale-while-revalidate: on a quiet site the first visit after the hour
+ * would get the previous visitor's copy, up to 25 hours old. stale-if-error=0:
+ * when the Worker fails while it refreshes an expired copy, the visitor gets
+ * the error, not the old copy (Cloudflare's default is the old copy, with no
+ * time limit). worker-cache-followup plan, decision 2. A probe on a preview
+ * showed the edge reads it in CDN-Cache-Control, and that the must-revalidate
+ * in Cache-Control does not stop the old copy
+ * (process/general-plans/references/worker-cache-research_11-11-26.md).
+ *
+ * Left at Cloudflare's defaults, with no header from this repo: a 404 is kept
+ * three minutes, a 405 one minute; a 308 and a 500 are not kept. A not-found
+ * is drawn by the root route, the only route with a notFoundComponent, so a
+ * route's own headers do not apply: on the built site an unknown post's 404
+ * carries no cache header and no tag.
+ * A deploy empties the cache: the Worker's version is part of its key.
  */
-export const EDGE_LIFETIME =
-  "public, max-age=86400, stale-while-revalidate=86400";
+export const EDGE_LIFETIME = "public, max-age=3600, stale-if-error=0";
 
 /**
  * Keeps a response out of the edge cache and the browser's. It has to be
@@ -31,10 +46,10 @@ export function edgeCacheHeaders(
 }
 
 /**
- * For a route's `headers`: edge-cache a successful render only, never a 404
- * or an error page. `cacheable: false` also keeps a render out of the cache:
+ * For a route's `headers`: edge-cache a successful render only, never an
+ * error page. `cacheable: false` also keeps a render out of the cache:
  * /resume passes it when Sanity could not be read and the repo's résumé
- * stands in, so the edge does not keep the stand-in for a day.
+ * stands in, so the edge does not keep the stand-in for the hour.
  */
 export function routeCacheHeaders(
   match: { status: string },
@@ -64,8 +79,10 @@ export async function withEdgeCache(
 }
 
 /**
- * Time-based edge caching for responses no webhook touches (OG images, GitHub).
- * `browser` replaces Cache-Control when the handler's own value is too long.
+ * Time-based edge caching for responses no webhook touches: OG images,
+ * GitHub, and the files built from the repo alone (robots.txt, the
+ * manifest, security.txt, skills.json, the Markdown twins), which change only
+ * on a deploy. `browser` replaces Cache-Control when it is given.
  */
 export async function withEdgeLifetime(
   response: Response | Promise<Response>,

@@ -63,12 +63,13 @@ function blogPostMetadata(slug: string, post: Post | null): Metadata {
  * The résumé for /resume. A failed read falls back to the repo's résumé (see
  * loadResumeProfile), and neither the edge nor the browser's HTTP cache may
  * keep that stand-in. The route's `headers` say so for the page. On a
- * client-side navigation the browser fetches this function itself, and the
- * Worker cache would keep its answer for two hours (see NO_STORE), so the
- * function says so for its own response too. (The tab's query cache does
- * hold the stand-in, as stale: see resumeQuery.) A good read sets nothing
- * here: the page's edge headers are the route's to give, and headers set
- * here would also land on the page.
+ * client-side navigation the browser fetches this function itself; the
+ * Worker entry marks every server-function answer that sets no
+ * Cache-Control no-store (src/server.ts), and the function also says so
+ * for a stand-in, so the stand-in is never kept even without that rule.
+ * (The tab's query cache does hold the stand-in, as stale: see resumeQuery.)
+ * A good read sets nothing here: the page's edge headers are the route's to
+ * give, and headers set here would also land on the page.
  */
 export const getResumeProfile = createServerFn({ method: "GET" }).handler(
   async () => {
