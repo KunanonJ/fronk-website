@@ -50,11 +50,11 @@ const OWNER_CLEARED: Record<
 };
 
 /**
- * The FDE hub's proof lines for the outcomes, as drafted on 11-11-26; the
- * owner reads them before the merge. They are typed in `topics/pillars.ts`,
- * so they are pinned here word for word, in both languages: a figure
- * compared by its digits alone would let "30 นาที" (minutes) become "30
- * ชั่วโมง" (hours).
+ * The FDE hub's proof lines for the outcomes, as the owner approved them
+ * before the merge (11-11-26, decision 21). They are typed in
+ * `topics/pillars.ts`, so they are pinned here word for word, in both
+ * languages: a figure compared by its digits alone would let "30 นาที"
+ * (minutes) become "30 ชั่วโมง" (hours).
  */
 const HUB_LINES: Record<string, { en: string; th: string }> = {
   "tbh-intranet": {
@@ -258,7 +258,7 @@ describe("the FDE hub's outcome lines", () => {
   /** The figures of a text, in the order it gives them. */
   const figures = (text: string) => text.match(/\d[\d,.]*\+?/g) ?? [];
 
-  it("are the lines drafted for the hub, word for word, in both languages", () => {
+  it("are the lines the owner approved, word for word, in both languages", () => {
     expect(withOutcomes.length).toBeGreaterThan(0);
     for (const project of withOutcomes)
       for (const locale of ["en", "th"] as const)
