@@ -7,13 +7,17 @@ import {
   EXTERNAL,
   LibraryHero,
   TEXT_LINK,
+  countLabel,
   WELL,
 } from "@/components/landing/library/parts";
+import { RESUME_HREF } from "@/lib/content/availability";
 import {
   getProofCases,
   getProofMetrics,
+  getProofOutcomes,
   proofPage,
   type ProofMetric,
+  type ProofOutcome,
 } from "@/lib/content/proof";
 import type { Venture } from "@/lib/content/ventures";
 import { cn } from "@/lib/utils/cn";
@@ -21,9 +25,62 @@ import { pad2 } from "@/lib/utils/pad2";
 import { MONO_LABEL } from "@/components/bento/classes";
 
 /**
+ * Delivery (recruiter-fit phase 3): the outcomes the case studies state, a
+ * tile each, linking to its case study. They are the owner's own figures, so
+ * the card says where he states them. In the DOM the label comes before the
+ * figure, as a screen reader should hear it; the figure is drawn on top.
+ */
+function DeliveryCard({ outcomes }: { outcomes: readonly ProofOutcome[] }) {
+  const projects = [...new Set(outcomes.map((outcome) => outcome.project))];
+  return (
+    <article aria-labelledby="card-delivery" className={cn(CARD, "gap-[18px]")}>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <Kicker id="card-delivery">Delivery</Kicker>
+        <span className={MONO_LABEL}>
+          {countLabel(outcomes.length, "outcome", "outcomes")} ·{" "}
+          {projects.join(" · ")}
+        </span>
+      </div>
+      <ul
+        aria-label="Outcomes, each linking to its case study"
+        className="m-0 flex list-none flex-wrap gap-3 p-0"
+      >
+        {outcomes.map((outcome) => (
+          <li
+            key={`${outcome.project}-${outcome.label}`}
+            className="flex min-w-0 flex-[1_1_320px]"
+          >
+            <Link
+              href={outcome.href}
+              className={cn(
+                WELL,
+                "flex min-h-[120px] w-full min-w-0 flex-col items-start gap-2 px-[18px] py-4 text-ink no-underline",
+              )}
+            >
+              <span className={cn(MONO_LABEL, "order-2")}>
+                {outcome.label} · {outcome.project}
+              </span>
+              <span className="order-1 text-[28px] leading-[1.15] font-semibold tracking-[-0.03em]">
+                {outcome.value}
+              </span>
+              <span className="order-3 mt-auto pt-1 text-sm font-medium text-link">
+                Case study →
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link href={RESUME_HREF} className={TEXT_LINK}>
+        As stated in the résumé →
+      </Link>
+    </article>
+  );
+}
+
+/**
  * Venture metrics: a tile per published figure; picking one shows the
  * sentence it comes from. The pick is local state (owner default: metric
- * tiles are not URL state).
+ * tiles are not URL state). A running total prints the month it was true.
  */
 function MetricsCard({ metrics }: { metrics: readonly ProofMetric[] }) {
   const [picked, setPicked] = useState(0);
@@ -52,7 +109,9 @@ function MetricsCard({ metrics }: { metrics: readonly ProofMetric[] }) {
               aria-pressed={on}
               onClick={() => setPicked(i)}
               className={cn(
-                "flex min-h-[120px] min-w-0 flex-[1_1_180px] flex-col items-start gap-2 rounded-well border px-[18px] py-4 text-left text-ink",
+                "flex min-h-[120px] min-w-0 flex-col items-start gap-2 rounded-well border px-[18px] py-4 text-left text-ink",
+                // A running total is long: the two share a row of their own.
+                metric.asOf ? "flex-[1_1_340px]" : "flex-[1_1_180px]",
                 on ? "border-mark bg-surface-tint" : "border-hairline bg-page",
               )}
             >
@@ -61,6 +120,9 @@ function MetricsCard({ metrics }: { metrics: readonly ProofMetric[] }) {
               </span>
               <span className={MONO_LABEL}>
                 {metric.label} · {metric.source}
+                {metric.asOf ? (
+                  <span className="mt-1 block">As of {metric.asOf}</span>
+                ) : null}
               </span>
             </button>
           );
@@ -171,11 +233,14 @@ function CaseCard({ venture }: { venture: Venture }) {
 }
 
 /**
- * Proof (bento redesign, phase 7f; design spec 4.13): the venture metrics
- * card (tiles and the quoted source), then the venture cases side by side.
- * Every figure and quote comes from lib/content/ventures; none is invented.
+ * Proof (bento redesign, phase 7f; design spec 4.13): the delivery outcomes
+ * from the portfolio case studies (recruiter-fit phase 3), the venture
+ * metrics card (tiles and the quoted source), then the venture cases side by
+ * side. Every figure comes from lib/content/portfolio or lib/content/ventures;
+ * none is typed here and none is invented.
  */
 export default function ProofPage() {
+  const outcomes = getProofOutcomes();
   const metrics = getProofMetrics();
   return (
     <>
@@ -184,6 +249,7 @@ export default function ProofPage() {
         headline={proofPage.headline}
         lede={proofPage.description}
       />
+      {outcomes.length > 0 ? <DeliveryCard outcomes={outcomes} /> : null}
       {metrics.length > 0 ? <MetricsCard metrics={metrics} /> : null}
       <section
         aria-label="Case studies"

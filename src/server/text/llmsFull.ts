@@ -8,7 +8,7 @@ import {
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
 import { operatingModel } from "@/lib/content/operatingModel";
-import { getAllPortfolioProjects } from "@/lib/content/portfolio";
+import { outcomeLine } from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import {
   SKILLS_REPO_URL,
@@ -18,6 +18,7 @@ import {
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
+import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 
 /**
  * /llms-full.txt: the whole public fact base in one fetch, for answer engines
@@ -53,16 +54,21 @@ export function buildLlmsFull(): string {
   }
   push("", `Reusable version: ${base}/operating-model.md`, "");
 
-  push("## AI engineering and internal tools (The Binary Holdings)", "");
-  for (const p of getAllPortfolioProjects()) {
-    push(`### ${p.name}`, "");
-    push(`${base}/portfolio/${p.slug}  `);
-    push(`Role: ${p.role}, ${p.organization} (${p.period})  `);
-    push(`Stack: ${p.stack.join(", ")}`, "");
-    push(p.summary, "");
-    for (const h of p.highlights) push(`- ${h}`);
-    push("");
-    for (const s of p.sections) push(`**${s.heading}.** ${s.body}`, "");
+  for (const group of portfolioGroups()) {
+    push(`## ${group.heading}`, "");
+    for (const p of group.projects) {
+      push(`### ${p.name}`, "");
+      push(`${base}/portfolio/${p.slug}  `);
+      push(`Role: ${p.role}, ${p.organization} (${p.period})  `);
+      push(`Stack: ${p.stack.join(", ")}`, "");
+      push(p.summary, "");
+      if (p.outcomes?.length)
+        push(`Outcome: ${p.outcomes.map(outcomeLine).join("; ")}.`, "");
+      if (p.myPart) push(`My part: ${p.myPart}`, "");
+      for (const h of p.highlights) push(`- ${h}`);
+      push("");
+      for (const s of p.sections) push(`**${s.heading}.** ${s.body}`, "");
+    }
   }
 
   push("## Ventures", "");
@@ -76,7 +82,8 @@ export function buildLlmsFull(): string {
       "",
     );
     push(v.description, "");
-    for (const m of v.metrics ?? []) push(`- ${m.value} ${m.label}`);
+    for (const m of v.metrics ?? [])
+      push(`- ${m.value} ${m.label}${m.asOf ? ` (as of ${m.asOf})` : ""}`);
     if (v.metrics?.length) push("");
     if (v.caseStudy) {
       push(v.caseStudy.intro, "");

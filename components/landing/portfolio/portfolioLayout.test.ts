@@ -58,6 +58,7 @@ describe("taglineLines", () => {
       ],
       "email-signature-generator": ["Branded Gmail signatures,", "self-serve."],
       "ai-automation": ["AI agents for", "content ops and hiring."],
+      "kunanonj-com": ["A personal site for", "people and for AI agents."],
     });
   });
 

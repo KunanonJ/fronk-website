@@ -1,3 +1,4 @@
+import { RESUME_HREF } from "@/lib/content/availability";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_NAME } from "@/lib/content/identity";
 import {
@@ -27,12 +28,21 @@ export function buildPortfolioProjectMd(project: PortfolioProject): string {
     `Category: ${project.category}  `,
     `Stack: ${project.stack.join(", ")}  `,
   );
+  // The link's own label: a public project may link its source, not a product.
   if (project.access === "public" && project.url)
-    push(`Live: ${project.url}  `);
-  else push("Access: internal tool (not public)  ");
+    push(`${project.urlLabel ?? "Live"}: ${project.url}  `);
+  else push("Access: internal tool (no public link)  ");
   push(`Updated: ${SITE_UPDATED}`, "");
 
   push(project.summary, "");
+
+  if (project.outcomes?.length) {
+    push("## Outcome", "");
+    for (const outcome of project.outcomes)
+      push(`- **${outcome.label}:** ${outcome.value}`);
+    push("", `As stated in the résumé: ${absoluteUrl(RESUME_HREF)}`, "");
+  }
+  if (project.myPart) push("## My part", "", project.myPart, "");
 
   push("## Highlights", "");
   for (const h of project.highlights) push(`- ${h}`);

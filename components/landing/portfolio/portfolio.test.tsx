@@ -64,20 +64,43 @@ describe("PortfolioIndexPage", () => {
       expect(
         within(card).getByText(p.category, { selector: "h2" }),
       ).toBeInTheDocument();
+      // A drawn mockup says so; a real screenshot (this site) carries its
+      // own description instead.
       expect(
-        within(card).getByText("Illustrative mockup, not real data."),
-      ).toBeInTheDocument();
+        within(card).queryAllByText("Illustrative mockup, not real data."),
+      ).toHaveLength(p.cover ? 0 : 1);
+      expect(
+        within(card).queryAllByRole("img", { name: p.cover?.alt ?? "none" }),
+      ).toHaveLength(p.cover ? 1 : 0);
     }
-    expect(screen.getByText("4 of 4 projects")).toBeInTheDocument();
+    expect(screen.getByText("5 of 5 projects")).toBeInTheDocument();
   });
 
-  it("draws the canvas grid: TBH 2 | Node 1, Email 1 | AI 2", () => {
+  it("draws the canvas grid, then this site on a row of its own: TBH 2 | Node 1, Email 1 | AI 2, site 3", () => {
     renderIndex();
-    const [tbh, node, email, ai] = cards();
+    const [tbh, node, email, ai, site] = cards();
     expect(tbh!.className).toMatch(/min-\[641px\]:col-span-2/);
     expect(node!.className).not.toMatch(/col-span/);
     expect(email!.className).not.toMatch(/col-span/);
     expect(ai!.className).toMatch(/min-\[641px\]:col-span-2/);
+    expect(site).toBe(screen.getByRole("article", { name: "kunanonj.com" }));
+    expect(site!.className).toMatch(/lg:col-span-3/);
+  });
+
+  it("marks this site public and the employer's tools internal", () => {
+    renderIndex();
+    for (const project of projects) {
+      const card = screen.getByRole("article", { name: project.name });
+      // The access tag sits beside the year.
+      expect(
+        within(card).getByText(String(project.year)).parentElement,
+      ).toHaveTextContent(
+        `${project.access === "public" ? "Public" : "Internal tool"}${project.year}`,
+      );
+    }
+    expect(
+      projects.filter((p) => p.access === "public").map((p) => p.slug),
+    ).toEqual(["kunanonj-com"]);
   });
 
   it("caps the tech chips at four, then counts the rest", () => {
@@ -100,6 +123,7 @@ describe("PortfolioIndexPage", () => {
       "Ops automation",
       "Internal tool",
       "AI agents",
+      "Website",
     ]);
     expect(buttons[0]).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(buttons[4]!);
@@ -112,7 +136,7 @@ describe("PortfolioIndexPage", () => {
     const card = screen.getByRole("article", { name: "AI Automation" });
     expect(card.className).toMatch(/lg:col-span-3/);
     expect(within(card).getByText("04")).toBeInTheDocument();
-    expect(screen.getByText("1 of 4 projects")).toBeInTheDocument();
+    expect(screen.getByText("1 of 5 projects")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "AI agents" })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -153,7 +177,7 @@ describe("PortfolioProjectPage (TBH Intranet, the drawn project)", () => {
       ["Role", "IT Manager & AI Engineering Lead"],
       ["Organisation", "The Binary Holdings"],
       ["Period", "May to Oct 2026"],
-      ["Access", "Internal tool (login only)"],
+      ["Access", "Internal tool (no public link)"],
     ])
       expect(
         screen.getByText(label!, { selector: "dt" }).nextElementSibling,
@@ -248,10 +272,60 @@ describe("PortfolioProjectPage (TBH Intranet, the drawn project)", () => {
         .getAllByRole("link")
         .map((a) => a.getAttribute("href")),
     ).toEqual([
-      "/portfolio/ai-automation",
+      "/portfolio/kunanonj-com",
       "/portfolio",
       "/portfolio/node-validator-automation",
     ]);
+  });
+});
+
+describe("PortfolioProjectPage (this site, the public project)", () => {
+  it("links the source, not a login-only tool, and claims no outcome", () => {
+    const project = renderProject("kunanonj-com");
+    const source = screen.getByRole("link", { name: /Source on GitHub/ });
+    expect(source).toHaveAttribute(
+      "href",
+      "https://github.com/KunanonJ/fronk-website",
+    );
+    expect(source).toHaveAttribute("target", "_blank");
+    expect(source).toHaveAttribute("rel", "noopener noreferrer");
+    for (const [label, value] of [
+      ["Role", "Owner"],
+      ["Organisation", "Personal project"],
+      ["Access", "Public"],
+    ])
+      expect(
+        screen.getByText(label!, { selector: "dt" }).nextElementSibling,
+      ).toHaveTextContent(value!);
+    // A screenshot of the real page, sized so the layout does not shift,
+    // with no "illustrative" caption.
+    const shot = within(
+      screen.getByRole("article", { name: "Interface" }),
+    ).getByRole("img");
+    expect(shot).toHaveAttribute("src", "/portfolio/kunanonj-com/cover.webp");
+    expect(shot).toHaveAttribute("width", "1440");
+    expect(shot).toHaveAttribute("height", "900");
+    expect(shot.getAttribute("alt")).toMatch(/^The Home page of kunanonj\.com/);
+    expect(
+      screen.queryByText("Illustrative mockup, not real data."),
+    ).toBeNull();
+    // The CV does not mention the site: no figure and no "my part" is cleared.
+    expect(project.outcomes).toBeUndefined();
+    expect(project.myPart).toBeUndefined();
+    expect(screen.queryByRole("article", { name: "Outcome" })).toBeNull();
+    expect(screen.queryByRole("article", { name: "My part" })).toBeNull();
+  });
+
+  it("gives no other project a public link", () => {
+    for (const other of projects.filter((p) => p.slug !== "kunanonj-com")) {
+      const { unmount } = render(
+        <ChromeProvider>
+          <PortfolioProjectPage project={other} />
+        </ChromeProvider>,
+      );
+      expect(screen.queryByRole("link", { name: /GitHub|Visit/ })).toBeNull();
+      unmount();
+    }
   });
 });
 
@@ -268,7 +342,7 @@ describe("PortfolioProjectPage (the projects the canvas does not draw)", () => {
     ).toHaveTextContent(`By Kunanon Jarat · ${project.role}`);
     expect(
       screen.getByRole("img", {
-        name: `Illustrative mockup of ${project.name}`,
+        name: project.cover?.alt ?? `Illustrative mockup of ${project.name}`,
       }),
     ).toBeInTheDocument();
     const flow = screen.getByRole("list", { name: project.workflow!.title });
@@ -304,6 +378,111 @@ describe("PortfolioProjectPage (the projects the canvas does not draw)", () => {
         "Approval chain",
       ).className,
     ).not.toMatch(/sr-only/);
+  });
+});
+
+describe("PortfolioProjectPage (what changed and his part)", () => {
+  /** The grid's cards, in document order, by their heading. */
+  const gridCards = () =>
+    cards().map((card) => within(card).getAllByRole("heading")[0]!.textContent);
+
+  it.each(["tbh-intranet", "ai-automation"])(
+    "opens %s with the outcomes the résumé states, then his part",
+    (slug) => {
+      const project = renderProject(slug);
+      expect(gridCards().slice(0, 3)).toEqual([
+        "Outcome",
+        "My part",
+        "Interface",
+      ]);
+      const outcome = screen.getByRole("article", { name: "Outcome" });
+      const terms = within(outcome).getAllByRole("term");
+      expect(terms.map((term) => term.textContent)).toEqual(
+        project.outcomes!.map((o) => o.label),
+      );
+      expect(terms.map((term) => term.nextElementSibling?.textContent)).toEqual(
+        project.outcomes!.map((o) => o.value),
+      );
+      // The figures are his own statement, so the card says where they are.
+      expect(
+        within(outcome).getByRole("link", {
+          name: "As stated in the résumé →",
+        }),
+      ).toHaveAttribute("href", "/resume");
+      expect(
+        screen.getByRole("article", { name: "My part" }),
+      ).toHaveTextContent(project.myPart!);
+      // Each a full row: side by side, the longer text stretched the
+      // figures' card and left it half empty.
+      for (const card of [
+        outcome,
+        screen.getByRole("article", { name: "My part" }),
+      ])
+        expect(card.className).toMatch(
+          /min-\[641px\]:col-span-2 lg:col-span-3/,
+        );
+    },
+  );
+
+  it("states the intranet's two figures and the pipeline's two", () => {
+    renderProject("tbh-intranet");
+    expect(screen.getByRole("article", { name: "Outcome" })).toHaveTextContent(
+      "Adoption50+ employeesBuild cycles4 months to 1 week",
+    );
+    renderProject("ai-automation");
+    expect(
+      screen.getAllByRole("article", { name: "Outcome" })[1],
+    ).toHaveTextContent(
+      "Recurring workflow staffing10 people to 1 operatorTurnaround30 minutes",
+    );
+  });
+
+  it.each(["node-validator-automation", "email-signature-generator"])(
+    "gives %s his part on a full row, with no outcome it has no figure for",
+    (slug) => {
+      const project = renderProject(slug);
+      expect(screen.queryByRole("article", { name: "Outcome" })).toBeNull();
+      expect(screen.queryByText("As stated in the résumé →")).toBeNull();
+      const part = screen.getByRole("article", { name: "My part" });
+      expect(part).toHaveTextContent(project.myPart!);
+      expect(part.className).toMatch(/lg:col-span-3/);
+      expect(gridCards().slice(0, 2)).toEqual(["My part", "Interface"]);
+    },
+  );
+
+  it("leaves both cards out for a project that states neither", () => {
+    const {
+      outcomes: _outcomes,
+      myPart: _myPart,
+      ...plain
+    } = getPortfolioProjectBySlug("tbh-intranet")!;
+    render(
+      <ChromeProvider>
+        <PortfolioProjectPage project={plain} />
+      </ChromeProvider>,
+    );
+    expect(screen.queryByRole("article", { name: "Outcome" })).toBeNull();
+    expect(screen.queryByRole("article", { name: "My part" })).toBeNull();
+    expect(gridCards()[0]).toBe("Interface");
+  });
+});
+
+describe("PortfolioIndexPage (the first outcome on each card)", () => {
+  it("shows it under the tagline, only where the project states one", () => {
+    renderIndex();
+    for (const project of projects) {
+      const card = screen.getByRole("article", { name: project.name });
+      const lead = project.outcomes?.[0];
+      const line = lead ? `${lead.label}: ${lead.value}` : null;
+      const tagline = within(card).getByText(project.tagline);
+      expect(tagline.nextElementSibling?.textContent ?? null).toBe(line);
+    }
+    expect(
+      screen.getByRole("article", { name: "TBH Intranet" }),
+    ).toHaveTextContent("Adoption: 50+ employees");
+    expect(
+      screen.getByRole("article", { name: "AI Automation" }),
+    ).toHaveTextContent("Recurring workflow staffing: 10 people to 1 operator");
   });
 });
 

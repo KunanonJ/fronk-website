@@ -222,7 +222,7 @@ test.describe("portfolio > the category filter is a typed search param", () => {
     await expect(
       group.getByRole("button", { name: "AI agents", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText("1 of 4 projects")).toBeVisible();
+    await expect(page.getByText("1 of 5 projects")).toBeVisible();
     const tbh = page.getByRole("article", { name: "TBH Intranet" });
     await expect(tbh).toHaveCount(0);
 
@@ -248,7 +248,7 @@ test.describe("portfolio > the category filter is a typed search param", () => {
     });
     expect(response?.ok()).toBe(true);
     await expect(page).toHaveURL(/\/portfolio$/);
-    await expect(page.getByText("4 of 4 projects")).toBeVisible();
+    await expect(page.getByText("5 of 5 projects")).toBeVisible();
     await expect(
       page
         .getByRole("group", { name: "Filter projects by category" })
@@ -538,10 +538,11 @@ test.describe("recruiter path > the role, the availability and the résumé are 
   }
 
   // The tap-through runs once, not once per route, and stops at the URL.
-  // The first in-browser visit to /resume in a page load reads Sanity; a
-  // failed read shows the error page. One run failed 23 such tests at once,
-  // so this required job no longer asserts the résumé's content here: the
-  // résumé tests above load the page itself.
+  // The first in-browser visit to /resume in a page load reads Sanity. One
+  // run failed 23 such tests at once on a failed read, which then showed the
+  // error page, so this required job no longer asserts the résumé's content
+  // here: the résumé tests above load the page itself. Since phase 3 a failed
+  // read shows the repo's copy instead (resumeProfile.test.ts).
   test("on a phone the menu's Résumé row leads to the résumé", async ({
     page,
   }) => {
@@ -764,6 +765,323 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     await expect(card.getByRole("link", { name: "Contact" })).toHaveAttribute(
       "href",
       "/contact?topic=hiring",
+    );
+  });
+});
+
+/**
+ * Case-study evidence (recruiter-fit phase 3): each case study states what
+ * changed and his part, from figures the owner cleared, and /proof shows
+ * delivery beside the venture metrics.
+ */
+test.describe("case-study evidence > what changed and his part, from cleared figures", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        sessionStorage.setItem("fronk-intro-seen", "1");
+      } catch {
+        // Storage can be unavailable; the intro then plays and the test waits.
+      }
+    });
+    // Cards rise into place; measure them where they rest.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  });
+
+  /** True when nothing is wider than the viewport (no sideways scroll). */
+  const fitsWidth = (page: Page) =>
+    page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    );
+
+  test("the intranet case opens with its two outcomes and his part, above the mockup", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/portfolio/tbh-intranet", { waitUntil: "networkidle" });
+    const outcome = page.getByRole("article", { name: "Outcome", exact: true });
+    const part = page.getByRole("article", { name: "My part", exact: true });
+    await expect(outcome).toContainText("Adoption");
+    await expect(outcome).toContainText("50+ employees");
+    await expect(outcome).toContainText("Build cycles");
+    await expect(outcome).toContainText("4 months to 1 week");
+    await expect(
+      outcome.getByRole("link", { name: "As stated in the résumé →" }),
+    ).toHaveAttribute("href", "/resume");
+    await expect(part).toContainText("wrote code for the platform");
+    // Measure once the cards are drawn and the web fonts have set the text.
+    await expect(outcome).toBeVisible();
+    await expect(part).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    // Each a full row, his part under the outcomes, both before the mockup.
+    const [o, m, mock] = await Promise.all([
+      outcome.boundingBox(),
+      part.boundingBox(),
+      page
+        .getByRole("article", { name: "Interface", exact: true })
+        .boundingBox(),
+    ]);
+    expect(m!.y).toBeGreaterThanOrEqual(o!.y + o!.height);
+    expect(Math.abs(o!.width - m!.width)).toBeLessThan(2);
+    expect(mock!.y).toBeGreaterThanOrEqual(m!.y + m!.height);
+    // Neither card is stretched past its content: no empty band.
+    expect(o!.height).toBeLessThan(260);
+    expect(m!.height).toBeLessThan(260);
+    // Both in view early: the outcomes within the first screen and a half.
+    expect(o!.y + o!.height).toBeLessThan(1.5 * 900);
+  });
+
+  for (const width of [800, 375, 320]) {
+    test(`the outcome and his part stack and fit at ${width} px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/portfolio/tbh-intranet", { waitUntil: "networkidle" });
+      const outcome = page.getByRole("article", {
+        name: "Outcome",
+        exact: true,
+      });
+      const part = page.getByRole("article", { name: "My part", exact: true });
+      await expect(outcome).toBeVisible();
+      await expect(part).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const o = await outcome.boundingBox();
+      const m = await part.boundingBox();
+      expect(m!.y).toBeGreaterThanOrEqual(o!.y + o!.height);
+      expect(Math.abs(o!.width - m!.width)).toBeLessThan(2);
+      expect(await fitsWidth(page)).toBe(true);
+    });
+  }
+
+  test("the agents case states the staffing change and the turnaround", async ({
+    page,
+  }) => {
+    await page.goto("/portfolio/ai-automation", { waitUntil: "networkidle" });
+    const outcome = page.getByRole("article", { name: "Outcome", exact: true });
+    await expect(outcome).toContainText("10 people to 1 operator");
+    await expect(outcome).toContainText("30 minutes");
+    await expect(
+      page.getByRole("article", { name: "My part", exact: true }),
+    ).toContainText("wrote code for the agents");
+  });
+
+  test("a case with no cleared figure shows his part and no outcome", async ({
+    page,
+  }) => {
+    await page.goto("/portfolio/node-validator-automation", {
+      waitUntil: "networkidle",
+    });
+    await expect(
+      page.getByRole("article", { name: "My part", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("article", { name: "Outcome", exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test("the first outcome shows on the portfolio card and on Home", async ({
+    page,
+  }) => {
+    await page.goto("/portfolio", { waitUntil: "networkidle" });
+    await expect(
+      page.getByRole("article", { name: "TBH Intranet" }),
+    ).toContainText("Adoption: 50+ employees");
+    await expect(
+      page.getByRole("article", { name: "AI Automation" }),
+    ).toContainText("Recurring workflow staffing: 10 people to 1 operator");
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(
+      page.getByRole("article", { name: "Selected work" }),
+    ).toContainText("Adoption: 50+ employees");
+  });
+
+  test("proof leads with delivery, and a tile opens its case study", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/proof", { waitUntil: "networkidle" });
+    const delivery = page.getByRole("article", {
+      name: "Delivery",
+      exact: true,
+    });
+    const metrics = page.getByRole("article", {
+      name: "Venture metrics",
+      exact: true,
+    });
+    const [d, v] = await Promise.all([
+      delivery.boundingBox(),
+      metrics.boundingBox(),
+    ]);
+    expect(d!.y).toBeLessThan(v!.y);
+    await expect(
+      delivery.getByRole("link", { name: "As stated in the résumé →" }),
+    ).toHaveAttribute("href", "/resume");
+    const tiles = delivery
+      .getByRole("list", { name: "Outcomes, each linking to its case study" })
+      .getByRole("link");
+    await expect(tiles).toHaveCount(4);
+    // The lead no longer repeats the h1.
+    await expect(
+      page.getByText("Delivery outcomes, as the résumé states them", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    await tiles.filter({ hasText: "10 people to 1 operator" }).click();
+    await expect(page).toHaveURL(/\/portfolio\/ai-automation$/);
+    await expect(
+      page.getByRole("article", { name: "Outcome", exact: true }),
+    ).toContainText("10 people to 1 operator");
+  });
+
+  test("GoGoCash's totals carry their month on proof and on the case page", async ({
+    page,
+  }) => {
+    await page.goto("/proof", { waitUntil: "networkidle" });
+    const total = page.getByRole("button", { name: /THB 13 million/ });
+    await expect(total).toContainText("As of October 2026");
+    await total.click();
+    await expect(page.getByRole("blockquote")).toContainText(
+      "As of October 2026, cumulative gross merchandise value is THB 13 million and cashback paid is THB 169,000.",
+    );
+    await page.goto("/ventures/gogocash", { waitUntil: "networkidle" });
+    for (const [label, value] of [
+      ["Cumulative gross merchandise value", "THB 13 million"],
+      ["Cashback paid", "THB 169,000"],
+    ]) {
+      const tile = page.locator("dl > div", { hasText: label });
+      await expect(tile).toContainText(value!);
+      await expect(tile).toContainText("As of October 2026");
+    }
+    // One user count on the page, as the résumé gives it: every sentence
+    // that counts registered users says 1,000, not 21,000 and not "1,000+".
+    // (The stat tile draws the figure and its label apart; the unit tests
+    // pin that pair.)
+    await expect(page.getByText("more than a thousand")).toHaveCount(0);
+    const text = await page.locator("main").innerText();
+    const counts = [
+      ...text.matchAll(/([\d,.]*\d\+?)\s+registered users/gi),
+    ].map((match) => match[1]);
+    expect(counts.length).toBeGreaterThan(1);
+    expect([...new Set(counts)]).toEqual(["1,000"]);
+  });
+
+  // The longest new figure on each page: it must be drawn, and fit.
+  for (const [path, figure] of [
+    ["/proof", "10 people to 1 operator"],
+    ["/proof", "THB 13 million"],
+    ["/ventures/gogocash", "THB 169,000"],
+    ["/portfolio", "Recurring workflow staffing: 10 people to 1 operator"],
+  ] as const) {
+    for (const width of [375, 320]) {
+      test(`${path} shows "${figure}" on a ${width} px screen without sideways scroll`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 812 });
+        await page.goto(path, { waitUntil: "networkidle" });
+        const shown = page.getByText(figure, { exact: true }).first();
+        await shown.scrollIntoViewIfNeeded();
+        await expect(shown).toBeVisible();
+        // Wrapped, not clipped: the text's box stays inside the screen.
+        const box = await shown.boundingBox();
+        expect(box!.x).toBeGreaterThanOrEqual(0);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+        expect(await fitsWidth(page)).toBe(true);
+      });
+    }
+  }
+
+  test("the FDE hub lists the outcomes in English and in Thai", async ({
+    page,
+  }) => {
+    await page.goto("/topics/forward-deployed-ai-engineering", {
+      waitUntil: "networkidle",
+    });
+    await expect(
+      page.getByText(
+        "TBH Intranet: adoption by 50+ employees; build cycles from 4 months to 1 week",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "AI Automation: recurring workflow staffing from 10 people to 1 operator; 30-minute turnaround",
+      ),
+    ).toBeVisible();
+    await page.goto("/th/topics/forward-deployed-ai-engineering", {
+      waitUntil: "networkidle",
+    });
+    // The Thai wording is pinned in the unit audit; here its figures. Each
+    // line gives the same figures as the English one, in the same order and
+    // in Arabic numerals, and no others.
+    const proof = page.locator('article[aria-labelledby="card-proof"] li');
+    await expect(proof.first()).toBeVisible();
+    const lines = await proof.allInnerTexts();
+    expect(lines.join(" ")).not.toMatch(/[๐-๙]/);
+    const figuresOf = (name: string) =>
+      lines
+        .filter((line) => line.trim().startsWith(`${name}: `))
+        .map((line) => line.match(/\d[\d,.]*\+?/g) ?? []);
+    expect(figuresOf("TBH Intranet")).toEqual([["50+", "4", "1"]]);
+    expect(figuresOf("AI Automation")).toEqual([["10", "1", "30"]]);
+  });
+
+  test("this site is a public project that links its source and claims no figure", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/portfolio/kunanonj-com", { waitUntil: "networkidle" });
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "kunanonj.com.",
+    );
+    await expect(
+      page.getByRole("link", { name: /Source on GitHub/ }),
+    ).toHaveAttribute("href", "https://github.com/KunanonJ/fronk-website");
+    await expect(
+      page.getByRole("article", { name: "Outcome", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("article", { name: "My part", exact: true }),
+    ).toHaveCount(0);
+    const twin = await request.get("/portfolio/kunanonj-com.md");
+    expect(twin.status()).toBe(200);
+    expect(await twin.text()).toContain(
+      "Source on GitHub: https://github.com/KunanonJ/fronk-website",
+    );
+    const image = await request.get("/portfolio/kunanonj-com/opengraph-image");
+    expect(image.status()).toBe(200);
+    expect(image.headers()["content-type"]).toContain("image/png");
+    const sitemap = await request.get("/sitemap.xml");
+    expect(await sitemap.text()).toContain("/portfolio/kunanonj-com</loc>");
+  });
+
+  test("the text endpoints and the structured data carry the same outcomes", async ({
+    page,
+    request,
+  }) => {
+    const twin = await (await request.get("/portfolio/tbh-intranet.md")).text();
+    expect(twin).toContain("## Outcome");
+    expect(twin).toContain("- **Adoption:** 50+ employees");
+    expect(twin).toContain("## My part");
+    const full = await (await request.get("/llms-full.txt")).text();
+    expect(full).toContain(
+      "Outcome: Adoption: 50+ employees; Build cycles: 4 months to 1 week.",
+    );
+    expect(full).toContain("## Personal projects");
+    expect(full).toContain(
+      "- THB 13 million Cumulative gross merchandise value (as of October 2026)",
+    );
+    await page.goto("/portfolio/tbh-intranet", {
+      waitUntil: "domcontentloaded",
+    });
+    const work = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((nodes) =>
+        nodes
+          .map((node) => JSON.parse(node.textContent ?? "{}"))
+          .find((data) => data["@type"] === "CreativeWork"),
+      );
+    expect(work.description).toContain(
+      "Outcome, as stated in the résumé: Adoption: 50+ employees; Build cycles: 4 months to 1 week.",
     );
   });
 });

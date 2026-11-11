@@ -20,6 +20,8 @@ import {
   FlowCard,
   HighlightsCard,
   InterfaceCard,
+  MyPartCard,
+  OutcomeCard,
   ProblemCard,
   ProjectPager,
 } from "@/components/landing/portfolio/ProjectCards";
@@ -163,12 +165,18 @@ export default function PortfolioProjectPage({
   project: PortfolioProject;
 }) {
   const [problem, ...more] = project.sections;
+  const outcomes = project.outcomes ?? [];
   return (
     <>
       <ProjectHero project={project} />
       <div className="flex flex-col gap-5">
         <MetaStrip project={project} />
         <Bento dense>
+          {/* What changed and his part come first: a recruiter reads these
+              before the mockup. Each takes a full row. Side by side, the
+              longer text stretched the figures' card and left it half empty. */}
+          {outcomes.length > 0 ? <OutcomeCard outcomes={outcomes} /> : null}
+          {project.myPart ? <MyPartCard text={project.myPart} /> : null}
           <InterfaceCard project={project} />
           {problem ? (
             <ProblemCard section={problem} beforeAfter={project.beforeAfter} />

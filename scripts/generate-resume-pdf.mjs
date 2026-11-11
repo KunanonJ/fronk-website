@@ -12,8 +12,9 @@
  *   pnpm pdf                   # this script
  *
  * The script refuses to write a résumé that a recruiter could not use: one
- * longer than MAX_PAGES, or one whose contact links are missing or point at
- * the placeholder host. After changing the print layout, also read the PDF's
+ * longer than MAX_PAGES, one whose contact links are missing or point at
+ * the placeholder host, or one drawn from the repo because Sanity could not
+ * be read (the page marks that stand-in). After changing the print layout, also read the PDF's
  * text layer back (any PDF text extractor): words must come out whole and in
  * reading order.
  *
@@ -84,6 +85,15 @@ async function main() {
       );
     });
     await page.waitForLoadState("networkidle");
+
+    // When Sanity cannot be read, /resume draws the repo's résumé instead of
+    // the error page. That stand-in is not what Studio may hold, so it is
+    // never printed as the résumé.
+    if ((await page.locator("[data-resume-stand-in]").count()) > 0)
+      throw new Error(
+        "The page shows the repo's résumé because Sanity could not be read. " +
+          "Print again once Sanity answers.",
+      );
 
     // A résumé without working contact links is not worth writing.
     const contacts = await page

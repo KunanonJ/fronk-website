@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { DEFAULT_RESUME_PROFILE, resolveResumeProfile } from "./resumeProfile";
+import { describe, expect, it, vi } from "vitest";
+import {
+  DEFAULT_RESUME_PROFILE,
+  loadResumeProfile,
+  resolveResumeProfile,
+} from "./resumeProfile";
 import { RESUME_TIMELINE_FALLBACK } from "./resumeTimeline.fallback";
 
 describe("resolveResumeProfile", () => {
@@ -98,5 +102,59 @@ describe("resolveResumeProfile", () => {
     expect(profile.sections[0]?.items[0]?.bullets).toEqual([
       "Helped launch the beta.",
     ]);
+  });
+});
+
+describe("loadResumeProfile", () => {
+  it("draws what Sanity returns, and says the read worked", async () => {
+    const profile = await loadResumeProfile(async () => ({
+      name: "Test",
+      headline: "Headline.",
+      summary: "From the CMS.",
+      sections: null,
+    }));
+    expect(profile.degraded).toBe(false);
+    expect(profile.summary).toBe("From the CMS.");
+  });
+
+  it("draws the repo's résumé when Sanity holds no document", async () => {
+    const profile = await loadResumeProfile(async () => null);
+    expect(profile.degraded).toBe(false);
+    expect(profile.sections).toBe(RESUME_TIMELINE_FALLBACK);
+  });
+
+  it("stands the repo's résumé in when the read fails, and flags it", async () => {
+    // A recruiter who clicks Résumé must not meet the error page. The flag
+    // keeps this stand-in out of the edge cache (src/lib/cache.ts).
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const failure = new Error("Sanity unreachable");
+    const profile = await loadResumeProfile(async () => {
+      throw failure;
+    });
+    expect(profile.degraded).toBe(true);
+    expect(profile).toMatchObject(resolveResumeProfile(null));
+    expect(profile.name).toBe(DEFAULT_RESUME_PROFILE.name);
+    // Swallowed for the visitor, not for the operator.
+    expect(logged).toHaveBeenCalledWith(
+      "[resume] showing the repo's résumé instead",
+      failure,
+    );
+    logged.mockRestore();
+  });
+
+  it("also stands in, and logs, when Sanity returns a document it cannot draw", async () => {
+    // The request worked, so lib/sanity/fetch.ts logged nothing: without the
+    // log here every visit would get the stand-in and nobody would know.
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const profile = await loadResumeProfile(
+      async () =>
+        ({ sections: "not a list" }) as unknown as Parameters<
+          typeof resolveResumeProfile
+        >[0],
+    );
+    expect(profile.degraded).toBe(true);
+    expect(profile.sections).toBe(RESUME_TIMELINE_FALLBACK);
+    expect(logged).toHaveBeenCalledTimes(1);
+    logged.mockRestore();
   });
 });

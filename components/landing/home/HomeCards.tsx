@@ -5,7 +5,10 @@ import { Segmented } from "@/components/bento/Segmented";
 import Link from "@/components/navigation/Link";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { ventures } from "@/lib/content/landing";
-import { getFeaturedPortfolioProjects } from "@/lib/content/portfolio";
+import {
+  getFeaturedPortfolioProjects,
+  outcomeLine,
+} from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { homeExperience } from "@/lib/landing/experience";
 import { cn } from "@/lib/utils/cn";
@@ -139,6 +142,11 @@ export function SelectedWorkCard() {
                   {project.name}
                 </Link>
                 <span className="text-meta text-ink-2">{project.tagline}</span>
+                {project.outcomes?.[0] ? (
+                  <span className="text-meta font-medium">
+                    {outcomeLine(project.outcomes[0])}
+                  </span>
+                ) : null}
               </span>
               <MetaTag>{project.category}</MetaTag>
             </span>

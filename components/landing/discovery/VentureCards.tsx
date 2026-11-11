@@ -37,7 +37,12 @@ import { pad2 } from "@/lib/utils/pad2";
  * with no data are left out (Manut has no metrics and no core loop).
  */
 
-/** Headline figures as stat tiles; each tile lifts on its own (`bento-row`). */
+/**
+ * Headline figures as stat tiles; each tile lifts on its own (`bento-row`).
+ * A running total prints the month it was true under its label, and takes a
+ * wide tile: three short figures fill the first row at 1000 px and the totals
+ * share the second, so a long figure stays on one line.
+ */
 export function VentureStats({
   metrics,
 }: {
@@ -48,10 +53,16 @@ export function VentureStats({
       {metrics.map((metric) => (
         <div
           key={metric.label}
-          className="flex min-w-0 flex-[1_1_180px] flex-col-reverse gap-2 rounded-bento border border-hairline bg-surface px-6 pt-[22px] pb-5 shadow-card"
+          className={cn(
+            "flex min-w-0 flex-col-reverse gap-2 rounded-bento border border-hairline bg-surface px-6 pt-[22px] pb-5 shadow-card",
+            metric.asOf ? "flex-[1_1_360px]" : "flex-[1_1_180px]",
+          )}
         >
           <dt className="font-mono text-xs tracking-[0.06em] text-ink-2 uppercase">
             {metric.label}
+            {metric.asOf ? (
+              <span className="mt-1 block">As of {metric.asOf}</span>
+            ) : null}
           </dt>
           <dd className="m-0 text-[40px] leading-[1.05] font-semibold tracking-[-0.03em] tabular-nums">
             {metric.value}

@@ -207,21 +207,26 @@ function sources(dir: string): string[] {
 }
 
 describe("the wording rule", () => {
-  it('says "RAG" once, for the knowledge platform', () => {
-    // The program's rule: "RAG" only for the knowledge platform. The CV's
-    // Core Skills line lists it too; it stays off the site's skills until
-    // the owner clears that use (umbrella plan, hard constraints).
+  it('says "RAG" only where the owner cleared it', () => {
+    // The owner's answers of 11-11-26: the résumé lists RAG under AI & Cloud
+    // as the CV does, and the knowledge platform of the CV's bullet is ARIA.
+    // The word appears for those two and nowhere else (umbrella plan, hard
+    // constraints).
     const said = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items).flatMap(
       (item) => (item.bullets ?? []).filter((bullet) => /\bRAG\b/.test(bullet)),
     );
     expect(said).toHaveLength(1);
     expect(said[0]).toMatch(/knowledge platform/);
     expect(section("Currently")[0]!.bullets).toContain(said[0]);
-    expect(JSON.stringify(RESUME_SKILLS_FALLBACK)).not.toMatch(/\bRAG\b/);
+    expect(
+      RESUME_SKILLS_FALLBACK.filter((group) =>
+        group.items.some((item) => /\bRAG\b/.test(item)),
+      ).map((group) => group.label),
+    ).toEqual(["AI & Cloud"]);
 
     // And in no other file the site is built from, comments included: a
     // note about the rule belongs in the résumé data file.
-    const files = ["lib", "components", "src"]
+    const files = ["lib", "components", "src", "public", "sanity"]
       .flatMap(sources)
       .filter((file) => /\bRAG\b/.test(readFileSync(file, "utf8")));
     expect(files, 'only the résumé data may say "RAG"').toEqual([

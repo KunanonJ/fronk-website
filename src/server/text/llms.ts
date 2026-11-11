@@ -1,6 +1,5 @@
 import { resolveBlogCards } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
-import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import {
   PACK_INSTALL,
   SKILLS_REPO_URL,
@@ -18,6 +17,7 @@ import {
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
+import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 
 /** Title, organisation and period for the current and past roles (no bullets). */
 function roleLines(): string[] {
@@ -35,7 +35,6 @@ import { fetchAllPosts } from "@/lib/sanity/fetch";
 
 export async function GET() {
   const ventures = getAllVentures();
-  const portfolio = getAllPortfolioProjects();
   // While the blog is hidden (BLOG_PUBLIC), llms.txt doesn't list it, its posts or the RSS feed.
   const cards = BLOG_PUBLIC ? resolveBlogCards(await fetchAllPosts()) : [];
   // The AI engineering (FDE) hub leads: it is the page that answers "who is
@@ -118,17 +117,19 @@ export async function GET() {
   textLines.push(`- Resume: ${base}/resume (noindex)`);
   textLines.push("");
 
-  textLines.push("## AI engineering and internal tools (The Binary Holdings)");
-  textLines.push("");
-  for (const p of portfolio) {
-    textLines.push(`### ${p.name} (${p.year})`);
-    textLines.push(`- **Project page:** ${base}/portfolio/${p.slug}`);
-    textLines.push(`- **Markdown:** ${base}/portfolio/${p.slug}.md`);
-    textLines.push(`- **Tagline:** ${p.tagline}`);
-    textLines.push(`- **Role:** ${p.role}, ${p.organization}`);
-    textLines.push(`- **Stack:** ${p.stack.join(", ")}`);
-    textLines.push(`- **Summary:** ${p.summary}`);
+  for (const group of portfolioGroups()) {
+    textLines.push(`## ${group.heading}`);
     textLines.push("");
+    for (const p of group.projects) {
+      textLines.push(`### ${p.name} (${p.year})`);
+      textLines.push(`- **Project page:** ${base}/portfolio/${p.slug}`);
+      textLines.push(`- **Markdown:** ${base}/portfolio/${p.slug}.md`);
+      textLines.push(`- **Tagline:** ${p.tagline}`);
+      textLines.push(`- **Role:** ${p.role}, ${p.organization}`);
+      textLines.push(`- **Stack:** ${p.stack.join(", ")}`);
+      textLines.push(`- **Summary:** ${p.summary}`);
+      textLines.push("");
+    }
   }
 
   textLines.push("## Topic hubs (quotable)");

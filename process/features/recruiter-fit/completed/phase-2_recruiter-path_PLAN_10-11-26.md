@@ -1,9 +1,8 @@
 # Phase 2: Recruiter path
 
-**Status:** EXECUTED AND VERIFIED on the local production build (10-11-26).
-In pull request #109 with Phase 1. UPDATE PROCESS has not run yet, so this
-plan is still in `active/`. Report:
-`../reports/phase-2_recruiter-path_REPORT_10-11-26.md`
+**Status:** COMPLETE (10-11-26). Merged with Phase 1 through pull request
+#109 (`fdcb904` on `main`), deployed, and checked on the live site. Archived
+on 11-11-26. Report: `../reports/phase-2_recruiter-path_REPORT_10-11-26.md`
 **Created:** 10-11-26, at `6d31e16`
 **Umbrella:** `recruiter-fit_UMBRELLA_PLAN_10-11-26.md`
 **Research:** `../references/recruiter-ux-review_10-11-26.md` (findings 3, 4,

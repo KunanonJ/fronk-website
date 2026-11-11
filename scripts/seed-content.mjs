@@ -155,7 +155,7 @@ const ventures = [
     slug: { _type: "slug", current: "gogocash" },
     tagline: "Shopping-to-earn cashback.",
     description:
-      "A shopping-to-earn cashback platform. 1,000+ users earning up to 30% back across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
+      "A shopping-to-earn cashback platform. 1,000 registered users earning up to 30% back across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
     year: 2023,
     role: "Founder",
     status: "active",

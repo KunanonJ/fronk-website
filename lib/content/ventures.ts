@@ -19,7 +19,7 @@ export interface Venture {
    * value must be corroborated by the description / a published claim. Omit
    * entirely when a venture has no real numbers yet (no fabricated metrics).
    */
-  metrics?: readonly { value: string; label: string }[];
+  metrics?: readonly VentureMetric[];
   /**
    * How people start using it, as the owner stated it (10-11-26). Shown on
    * the case page and in the SoftwareApplication `offers`.
@@ -34,6 +34,20 @@ export interface Venture {
    * clients, or outcomes.
    */
   caseStudy?: VentureCaseStudy;
+}
+
+export interface VentureMetric {
+  value: string;
+  label: string;
+  /**
+   * The month a running total was true, e.g. "October 2026". Set on figures
+   * the owner states as of a date (decision 17 of the recruiter-fit program;
+   * his answer named the GoGoCash page and /proof). Every surface that reads
+   * this list prints the month with the figure: the venture page, /proof and
+   * the ventures section of llms-full.txt. The résumé restates the CV's own
+   * line, which gives none.
+   */
+  asOf?: string;
 }
 
 export interface VentureOffer {
@@ -71,13 +85,16 @@ export interface VentureCaseStudy {
   loop?: readonly string[];
 }
 
+/** The month GoGoCash's running totals were true, as the owner gave it (11-11-26). */
+const GOGOCASH_TOTALS_AS_OF = "October 2026";
+
 const VENTURES: readonly Venture[] = [
   {
     slug: "gogocash",
     name: "GoGoCash",
     tagline: "Shopping-to-earn cashback.",
     description:
-      "A shopping-to-earn cashback platform. 1,000+ users earning up to 30% back across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
+      "A shopping-to-earn cashback platform. 1,000 registered users earning up to 30% back across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
     year: 2023,
     role: "Founder",
     status: "active",
@@ -85,18 +102,31 @@ const VENTURES: readonly Venture[] = [
     url: "https://gogocash.co",
     urlLabel: "gogocash.co",
     logo: "/brand/gogocash.svg",
-    // Corroborated by the description above — not invented.
+    // The first three are corroborated by the description above — not
+    // invented. The two dated totals are not in the description: they restate
+    // the owner's CV (the résumé's GoGoCash line), as of the month he gave
+    // (11-11-26), and "Where it stands" below states them.
     metrics: [
-      { value: "1,000+", label: "Users" },
+      { value: "1,000", label: "Registered users" },
       { value: "220+", label: "Merchants" },
       { value: "30%", label: "Max cashback" },
+      {
+        value: "THB 13 million",
+        label: "Cumulative gross merchandise value",
+        asOf: GOGOCASH_TOTALS_AS_OF,
+      },
+      {
+        value: "THB 169,000",
+        label: "Cashback paid",
+        asOf: GOGOCASH_TOTALS_AS_OF,
+      },
     ],
     offer: FREE_TO_START,
     featured: true,
     featuredOrder: 1,
     caseStudy: {
       intro:
-        "GoGoCash is a shopping-to-earn cashback platform: shop at the stores you already use, earn a cut of every purchase back. It has grown to more than a thousand users earning across 220+ merchants.",
+        "GoGoCash is a shopping-to-earn cashback platform: shop at partner merchants and earn cashback on eligible purchases. It has 1,000 registered users and a catalogue of 220+ merchants.",
       taglineLines: ["Shopping-to-earn", "cashback."],
       timeline: "2023 — present",
       // The stages "Where it stands" names: browse, shop, track cashback, withdraw.
@@ -108,7 +138,7 @@ const VENTURES: readonly Venture[] = [
         },
         {
           heading: "Where it stands",
-          body: "Live at gogocash.co with 1,000+ users and a merchant catalogue past 220 partners. The core loop — browse, shop, track cashback, withdraw — is in production and growing.",
+          body: `Live at gogocash.co with 1,000 registered users and a merchant catalogue past 220 partners. As of ${GOGOCASH_TOTALS_AS_OF}, cumulative gross merchandise value is THB 13 million and cashback paid is THB 169,000. The core loop — browse, shop, track cashback, withdraw — is in production and growing.`,
         },
         {
           heading: "My role",

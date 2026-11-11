@@ -157,8 +157,8 @@ describe("ResumePage (screen)", () => {
       "Tools",
     ]);
     expect(within(skills).getByText("Google ADK")).toBeInTheDocument();
-    // "RAG" is kept to the knowledge-platform bullet (the wording rule).
-    expect(within(skills).queryByText("RAG")).toBeNull();
+    // Listed as the CV lists it (owner, 11-11-26).
+    expect(within(skills).getByText("RAG")).toBeInTheDocument();
   });
 
   it("hides the bullet lists in the compact view", () => {

@@ -186,7 +186,7 @@ export const ventures = {
       title: "GoGoCash",
       icon: "/brand/gogocash.svg",
       summary: "A shopping-to-earn cashback platform.",
-      items: ["1,000+ users", "220+ merchants", "Up to 30% cashback"],
+      items: ["1,000 registered users", "220+ merchants", "Up to 30% cashback"],
       href: "/ventures/gogocash",
       linkLabel: "GoGoCash case study",
     },

@@ -74,7 +74,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
     proof: [
       "Operator based in Bangkok building live products",
       "Manut: ERP/CRM + Intelligence AI for automotive SMEs",
-      "GoGoCash: fintech cashback with 1,000+ users and 220+ merchants",
+      "GoGoCash: fintech cashback with 1,000 registered users and 220+ merchants",
     ],
     faqs: [
       {
@@ -275,6 +275,11 @@ const EN_PILLARS: readonly TopicPillar[] = [
     ],
     proof: [
       `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}`,
+      // The case studies' outcomes, in the résumé's own words. Typed here so
+      // the hubs do not load the portfolio module; portfolioOutcomes.test.ts
+      // checks every clause against the outcome and the bullet it restates.
+      "TBH Intranet: adoption by 50+ employees; build cycles from 4 months to 1 week",
+      "AI Automation: recurring workflow staffing from 10 people to 1 operator; 30-minute turnaround",
       `Superstacks: ${SUPERSTACKS_SKILL_COUNT} MIT-licensed agent skills for Claude Code, Codex and Cursor`,
       OPEN_TO_ROLES.sentence,
     ],
@@ -336,7 +341,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
     proof: [
       "ผู้ก่อตั้งในกรุงเทพฯ ที่ส่งผลิตภัณฑ์จริง",
       "Manut: ERP/CRM + AI สำหรับ SME ยานยนต์",
-      "GoGoCash: เงินคืนช้อปปิ้ง ผู้ใช้ 1,000+ / ร้านค้า 220+",
+      "GoGoCash: เงินคืนช้อปปิ้ง ผู้ใช้ลงทะเบียน 1,000 ราย / ร้านค้า 220+",
     ],
     faqs: [
       {
@@ -453,6 +458,9 @@ const TH_PILLARS: readonly TopicPillar[] = [
     ],
     proof: [
       `${CURRENT_ROLE.title} ที่ ${CURRENT_ROLE.organization} ตั้งแต่${CURRENT_ROLE.sinceThai}`,
+      // The same outcomes as the English hub, figure for figure (tested).
+      "TBH Intranet: มีพนักงานใช้งาน 50+ คน และรอบการพัฒนาลดลงจาก 4 เดือนเหลือ 1 สัปดาห์",
+      "AI Automation: ลดจำนวนคนในเวิร์กโฟลว์ที่ทำเป็นประจำจาก 10 คนเหลือผู้ปฏิบัติงาน 1 คน ด้วยระยะเวลาดำเนินการ 30 นาที",
       OPEN_TO_ROLES.th.sentence,
     ],
     faqs: [

@@ -83,6 +83,52 @@ describe("portfolio/<slug>.md", () => {
     }
   });
 
+  it("states the outcomes and his part before the highlights, as the page does", () => {
+    for (const project of getAllPortfolioProjects()) {
+      const md = buildPortfolioProjectMd(project);
+      const outcomes = project.outcomes ?? [];
+      const headings = [...md.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+      const lead = [
+        ...(outcomes.length > 0 ? ["Outcome"] : []),
+        ...(project.myPart ? ["My part"] : []),
+        "Highlights",
+      ];
+      expect(headings.slice(0, lead.length), project.slug).toEqual(lead);
+      for (const outcome of outcomes)
+        expect(md).toContain(`- **${outcome.label}:** ${outcome.value}`);
+      // The figures are his own statement: the twin names where they are.
+      expect(md.includes(`As stated in the résumé: ${SITE_BASE}/resume`)).toBe(
+        outcomes.length > 0,
+      );
+      expect(md.includes("## My part")).toBe(Boolean(project.myPart));
+      expect(md).toContain(project.myPart ?? "");
+    }
+    // The audit in portfolioOutcomes.test.ts needs both kinds of project.
+    const withOutcomes = getAllPortfolioProjects().filter(
+      (project) => project.outcomes?.length,
+    );
+    expect(withOutcomes.length).toBeGreaterThan(0);
+    expect(withOutcomes.length).toBeLessThan(getAllPortfolioProjects().length);
+  });
+
+  it("labels a public project's link as the project does, and says an internal tool has no public link", () => {
+    for (const project of getAllPortfolioProjects()) {
+      const md = buildPortfolioProjectMd(project);
+      const open = project.access === "public";
+      expect(md.includes("Access: internal tool (no public link)")).toBe(!open);
+      // This site links its source: "Live" would point a reader at GitHub.
+      expect(md.includes(`${project.urlLabel}: ${project.url}  `)).toBe(open);
+      expect(md).not.toMatch(/^Live: https:\/\/github\.com/m);
+    }
+    expect(
+      buildPortfolioProjectMd(
+        getAllPortfolioProjects().find((p) => p.slug === "kunanonj-com")!,
+      ),
+    ).toContain(
+      "Source on GitHub: https://github.com/KunanonJ/fronk-website  ",
+    );
+  });
+
   it("answers an unknown slug with a 404", async () => {
     const res = portfolioMd("not-a-project");
     expect(res.status).toBe(404);

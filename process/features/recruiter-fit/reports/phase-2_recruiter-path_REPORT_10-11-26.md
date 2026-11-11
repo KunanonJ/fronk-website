@@ -1,12 +1,11 @@
 # Phase 2 report: Recruiter path
 
-**Plan:** `../active/phase-2_recruiter-path_PLAN_10-11-26.md`
-**Status:** VERIFIED on the local production build (10-11-26), on Node 26 and
-on CI's Node 22.23.4, and on the Cloudflare preview of the branch. In pull
-request #109 with Phase 1: the phase is commit `cfeee8b` on the branch,
-followed by review-fix commits; a squash merge replaces them all with one
-commit on `main`. Not deployed to production. The live site is checked after
-the owner deploys.
+**Plan:** `../completed/phase-2_recruiter-path_PLAN_10-11-26.md`
+**Status:** COMPLETE. Verified on the local production build (10-11-26), on
+Node 26 and on CI's Node 22.23.4, on the Cloudflare preview of the branch,
+and on the live site after the merge. Merged with Phase 1 through pull
+request #109: one squash commit on `main`, `fdcb904`. See "Closed out" at
+the end.
 **Base:** `b86cfe8`
 
 ## Owner answers used (10-11-26)
@@ -378,3 +377,28 @@ LinkedIn link resolves.
 - **Does not prove:** that recruiters find the path clearer, which needs a
   person; the live site; the résumé's layout by image; the nine stale mobile
   baselines.
+
+## Closed out (10-11-26 and 11-11-26)
+
+- **Merge:** pull request #109, squash commit `fdcb904` on `main`. All four
+  CI jobs passed on the branch head and again on the merge commit.
+- **Deploy:** Cloudflare Workers Builds deployed `main` to production within
+  minutes of the merge. The owner asked for the merge; the deploy follows
+  from it.
+- **Live-site check (10-11-26, after the deploy):** the 60 recruiter-path
+  browser tests pass against kunanonj.com. `/resume` carries its own share
+  tags and stays noindex. `/resume.pdf` is 2 pages and 843 words, with "RAG"
+  once, in the knowledge-platform bullet. `/llms-full.txt` and `/about.md`
+  carry the availability line. The tests only read pages; none submits the
+  contact form.
+- **Owner answers after the merge (11-11-26):** recorded as decisions 9 to 18
+  in the umbrella plan. Two change what this phase shipped: "RAG" returns to
+  the résumé's skills list, and the résumé falls back to the repo's data when
+  the Sanity read fails. Both ride with Phase 3.
+- **UPDATE PROCESS,** approved by the owner ("All of them"): this plan is
+  archived to `../completed/`; the umbrella plan carries the new status, the
+  owner's answers and a Phase 4 row; the Phase 3 plan carries this phase's
+  lessons; five workspace facts are in `AGENTS.md`; the older issues the
+  reviews confirmed are in `../backlog/open-items_11-11-26.md`.
+- **Next phase:** `../active/phase-3_case-study-evidence_PLAN_10-11-26.md`.
+
