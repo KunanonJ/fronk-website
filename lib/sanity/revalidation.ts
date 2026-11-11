@@ -1,7 +1,7 @@
 /**
  * Cache-Tag values on Sanity-backed responses (src/lib/cache.ts). The Sanity
- * webhook purges the tags for the edited document's type; the hourly cron
- * purges all of them.
+ * webhook purges the tags for the edited document's type. A copy the webhook
+ * misses ends with its one-hour edge lifetime.
  */
 export const REVALIDATE_TAGS = {
   resume: "resume",

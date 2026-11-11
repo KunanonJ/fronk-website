@@ -30,9 +30,10 @@
     },
   ],
   // Worker cache in front of the Worker: Sanity-backed responses carry
-  // Cache-Tag + CDN-Cache-Control and are purged by tag from src/server.ts
-  // (webhook, hourly cron). Replaces OpenNext's R2 cache and Durable Objects.
+  // Cache-Tag + CDN-Cache-Control (one hour) and are purged by tag from
+  // src/server.ts (webhook). Replaces OpenNext's R2 cache and Durable Objects.
+  // No cron; the list stays, empty, so that a deploy removes the old one.
   "cache": { "enabled": true },
-  "triggers": { "crons": ["0 * * * *"] },
+  "triggers": { "crons": [] },
   "observability": { "enabled": true },
 }

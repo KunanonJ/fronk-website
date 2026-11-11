@@ -17,10 +17,8 @@ export async function GET(): Promise<Response> {
     buildDate: new Date(),
   });
 
+  // Cache headers are set by the route (withEdgeCache in src/routes/feed[.]xml.ts).
   return new Response(xml, {
-    headers: {
-      "content-type": "application/xml; charset=utf-8",
-      "cache-control": "public, s-maxage=600, stale-while-revalidate=86400",
-    },
+    headers: { "content-type": "application/xml; charset=utf-8" },
   });
 }

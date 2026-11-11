@@ -1085,3 +1085,68 @@ test.describe("case-study evidence > what changed and his part, from cleared fig
     );
   });
 });
+
+// worker-cache-followup plan, step 10. These read the headers the built
+// Worker sends (CI serves `pnpm start`, the Worker runtime). /learn reads
+// nothing from Sanity while the blog is hidden, so neither test depends on
+// Sanity being reachable.
+test.describe("worker cache > what the edge may keep", () => {
+  test("a server function's answer is kept nowhere", async ({ page }) => {
+    const answers: { status: number; cacheControl: string | null }[] = [];
+    page.on("response", (response) => {
+      if (new URL(response.url()).pathname.startsWith("/_serverFn/"))
+        answers.push({
+          status: response.status(),
+          cacheControl: response.headers()["cache-control"] ?? null,
+        });
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/", { waitUntil: "networkidle" });
+    // Learn is in the site menu's Library group.
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await page
+      .getByRole("navigation", { name: "Site" })
+      .getByRole("link", { name: "Learn" })
+      .click();
+    await expect(page).toHaveURL(/\/learn$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    // The link's preload or the navigation fetched the page's data.
+    await expect.poll(() => answers.length).toBeGreaterThan(0);
+    expect(answers).toContainEqual({ status: 200, cacheControl: "no-store" });
+    for (const answer of answers) expect(answer.cacheControl).toBe("no-store");
+  });
+
+  test("a Sanity-backed page is kept an hour, and a failure is not hidden", async ({
+    request,
+  }) => {
+    const res = await request.get("/learn");
+    expect(res.status()).toBe(200);
+    expect(res.headers()["cdn-cache-control"]).toBe(
+      "public, max-age=3600, stale-if-error=0",
+    );
+    expect(res.headers()["cache-control"]).toBe(
+      "public, max-age=0, must-revalidate",
+    );
+    expect(res.headers()["cache-tag"]).toBe("posts");
+  });
+
+  test("files that change only on a deploy keep a day at the edge", async ({
+    request,
+  }) => {
+    const browser: Record<string, string> = {
+      "/robots.txt": "public, max-age=3600",
+      "/manifest.webmanifest": "public, max-age=3600",
+      "/.well-known/security.txt": "public, max-age=3600",
+      "/skills.json": "public, max-age=3600",
+      "/studio": "public, max-age=0, must-revalidate",
+    };
+    for (const [path, cacheControl] of Object.entries(browser)) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      expect(res.headers()["cdn-cache-control"], path).toBe(
+        "public, max-age=86400",
+      );
+      expect(res.headers()["cache-control"], path).toBe(cacheControl);
+    }
+  });
+});

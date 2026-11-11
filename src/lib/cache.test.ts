@@ -8,13 +8,23 @@ import {
 } from "./cache";
 
 describe("Worker cache headers", () => {
-  it("lets the edge keep Sanity pages while browsers revalidate", () => {
+  it("lets the edge keep Sanity pages an hour while browsers revalidate", () => {
     expect(edgeCacheHeaders(["posts", "writing"])).toEqual({
       "Cache-Control": "public, max-age=0, must-revalidate",
-      "CDN-Cache-Control": EDGE_LIFETIME,
+      "CDN-Cache-Control": "public, max-age=3600, stale-if-error=0",
       "Cache-Tag": "posts,writing",
     });
-    expect(EDGE_LIFETIME).not.toContain("s-maxage");
+    expect(edgeCacheHeaders(["resume"])["CDN-Cache-Control"]).toBe(
+      EDGE_LIFETIME,
+    );
+  });
+
+  it("never serves an old copy in place of a fresh render or an error", () => {
+    // With stale-while-revalidate, a quiet site's first visit after the hour
+    // gets the previous visitor's copy. Without stale-if-error=0, Cloudflare
+    // serves the last good copy, with no time limit, when the Worker fails.
+    expect(EDGE_LIFETIME).not.toMatch(/stale-while-revalidate|s-maxage/);
+    expect(EDGE_LIFETIME).toMatch(/\bstale-if-error=0\b/);
   });
 
   it("keeps only a successful, cacheable render of a route", () => {

@@ -104,14 +104,14 @@ afterEach(() => {
 });
 
 describe("/resume: what the edge may keep", () => {
-  it("keeps a résumé read from Sanity for a day, under its tag", () => {
+  it("keeps a résumé read from Sanity for an hour, under its tag", () => {
     const headers = options.headers({
       match: { status: "success" },
       loaderData: fromSanity,
     });
     expect(headers["Cache-Tag"]).toBe("resume");
     expect(headers["CDN-Cache-Control"]).toBe(
-      "public, max-age=86400, stale-while-revalidate=86400",
+      "public, max-age=3600, stale-if-error=0",
     );
   });
 

@@ -4,9 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
  * getResumeProfile's own response (recruiter-fit phase 3). On a client-side
  * navigation the browser fetches this function over HTTP, and the Worker
  * cache keeps a 200 that carries no Cache-Control for two hours (Cloudflare's
- * default once `cache.enabled` is set). A stand-in for a failed Sanity read
- * must not be kept, so the function marks its response no-store itself; the
- * route's `headers` cover the page.
+ * default once `cache.enabled` is set). The Worker entry marks such answers
+ * no-store (src/server.ts); a stand-in for a failed Sanity read must not be
+ * kept even without that rule, so the function marks its response no-store
+ * itself. The route's `headers` cover the page.
  *
  * A server function runs only inside the Start runtime. Here createServerFn
  * is replaced by a builder that hands the handler back, so the handler's own

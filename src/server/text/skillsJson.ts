@@ -69,10 +69,8 @@ export function GET() {
     sources: SKILL_SOURCES,
   };
 
+  // Cache headers are set by the route (src/routes/skills[.]json.ts).
   return new Response(`${JSON.stringify(body, null, 2)}\n`, {
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-    },
+    headers: { "Content-Type": "application/json; charset=utf-8" },
   });
 }

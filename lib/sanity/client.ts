@@ -10,7 +10,14 @@ import {
   projectId,
 } from "@/sanity/env";
 
-/** Published content only, from the API CDN in production. No token: the dataset is public. */
+/**
+ * Published content only, from Sanity's live API. No token: the dataset is
+ * public. Not the API CDN: it serves a stale answer while it refreshes, and
+ * the render that follows a webhook purge must read what was published,
+ * because the edge then keeps that render for up to an hour
+ * (src/lib/cache.ts). Sanity recommends the live API for code that responds
+ * to webhooks; the Worker cache already stands between visitors and Sanity.
+ */
 export function buildClient(): SanityClient | null {
   if (!isSanityConfigured()) return null;
 
@@ -18,7 +25,7 @@ export function buildClient(): SanityClient | null {
     projectId,
     dataset,
     apiVersion,
-    useCdn: process.env.NODE_ENV === "production",
+    useCdn: false,
     perspective: "published",
     // Fail fast so a slow Sanity cannot hold a page render: 10 s per try, 2 retries.
     timeout: 10_000,

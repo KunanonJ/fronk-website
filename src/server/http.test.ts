@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   SECURITY_HEADERS,
+  SERVER_FN_PATH,
   isCrossSite,
   methodNotAllowed,
   readBodyText,
   withSecurityHeaders,
+  withServerFnNoStore,
 } from "./http";
 
 const post = (body: BodyInit | null, headers: Record<string, string> = {}) =>
@@ -40,6 +42,48 @@ describe("withSecurityHeaders", () => {
     expect(res.status).toBe(308);
     expect(res.headers.get("location")).toBe("https://kunanonj.com/about");
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+  });
+});
+
+describe("withServerFnNoStore", () => {
+  const at = (path: string) => new Request(`https://kunanonj.com${path}`);
+
+  it("keeps a server function's answer out of every cache", async () => {
+    const res = withServerFnNoStore(
+      at("/_serverFn/17bb0f50?payload=x"),
+      new Response('{"t":2}', {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(res.headers.get("content-type")).toBe("application/json");
+    expect(await res.text()).toBe('{"t":2}');
+  });
+
+  it("keeps a Cache-Control the function set itself", () => {
+    const own = new Response("{}", {
+      headers: { "Cache-Control": "private, max-age=60" },
+    });
+    expect(
+      withServerFnNoStore(at("/_serverFn/17bb0f50"), own).headers.get(
+        "cache-control",
+      ),
+    ).toBe("private, max-age=60");
+  });
+
+  it("leaves every other response as it is", () => {
+    const page = new Response("<html></html>");
+    expect(withServerFnNoStore(at("/resume"), page)).toBe(page);
+    expect(withServerFnNoStore(at("/_serverFnx/17bb0f50"), page)).toBe(page);
+  });
+
+  it("matches the framework's default path for server functions", () => {
+    // TanStack Start answers server functions under /_serverFn/ unless the
+    // app sets another base; this repo does not. The browser test in
+    // tests/e2e/smoke.spec.ts shows the built site uses it.
+    expect(SERVER_FN_PATH).toBe("/_serverFn/");
   });
 });
 

@@ -1,10 +1,8 @@
 import { buildSecurityTxt } from "@/lib/seo/securityTxt";
 
+/** Its cache headers are set by its route (src/routes/[.]well-known/security[.]txt.ts). */
 export function GET() {
   return new Response(buildSecurityTxt(), {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-    },
+    headers: { "Content-Type": "text/plain; charset=utf-8" },
   });
 }

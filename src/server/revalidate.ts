@@ -3,10 +3,7 @@ import {
   decodeSignatureHeader,
   isValidSignature,
 } from "@sanity/webhook";
-import {
-  REVALIDATE_TAGS,
-  getRevalidationTagsForType,
-} from "@/lib/sanity/revalidation";
+import { getRevalidationTagsForType } from "@/lib/sanity/revalidation";
 
 /*
  * Sanity webhook → Worker cache purge (replaces Next's revalidateTag). Runs in
@@ -19,21 +16,31 @@ export type CachePurger = {
   }): Promise<{ success: boolean; errors?: unknown[] }>;
 };
 
-export const ALL_CONTENT_TAGS = Object.values(REVALIDATE_TAGS);
-
-export async function purgeTags(
+/**
+ * Cloudflare's answer, or a failure in the same shape: no cache object, or
+ * a purge that threw. `success` means Cloudflare accepted the purge.
+ */
+async function purgeTags(
   cache: CachePurger | undefined,
   tags: string[],
-) {
+): Promise<{ success: boolean; errors?: unknown[] }> {
   if (!cache)
     return { success: false, errors: ["Worker cache is not enabled"] };
-  return cache.purge({ tags });
+  try {
+    return await cache.purge({ tags });
+  } catch (error: unknown) {
+    return {
+      success: false,
+      errors: [error instanceof Error ? error.message : String(error)],
+    };
+  }
 }
 
 /**
  * How old a signed webhook may be. Sanity signs the timestamp, so a captured
- * request cannot be replayed after this window; a delivery that arrives later
- * is covered by the hourly purge.
+ * request cannot be replayed after this window. A delivery that arrives
+ * later, or never, is covered by the edge lifetime: a cached copy ends
+ * within the hour (src/lib/cache.ts).
  */
 export const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000;
 
@@ -72,8 +79,14 @@ export async function handleSanityWebhook(
 
   const tags = [...getRevalidationTagsForType(body._type)];
   const result = await purgeTags(cache, tags);
+  // A 500 makes Sanity retry the delivery twice; the log shows it in the
+  // Worker's logs. If the purge keeps failing, the copy still ends within
+  // the hour.
+  if (!result.success)
+    console.error("[revalidate] cache purge failed", tags, result.errors);
+  const status = result.success ? 200 : 500;
   return Response.json(
-    { status: 200, revalidated: result.success, tags, now },
-    { status: result.success ? 200 : 500 },
+    { status, revalidated: result.success, tags, now },
+    { status },
   );
 }

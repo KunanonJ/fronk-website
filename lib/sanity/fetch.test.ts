@@ -9,7 +9,7 @@ import { fetchResumeProfile } from "./fetch";
  * The résumé's fallback (lib/content/resumeProfile.ts) starts from a failed
  * read being a thrown error. If a failed read came back as null instead, an
  * outage would look like "no résumé document": the repo's copy would be
- * drawn as a good read and kept at the edge for a day.
+ * drawn as a good read and kept at the edge for an hour.
  */
 
 afterEach(() => vi.restoreAllMocks());

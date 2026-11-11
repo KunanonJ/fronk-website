@@ -20,10 +20,13 @@
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next did.
   "assets": { "run_worker_first": ["/*/"] },
-  // Worker cache: Sanity-backed responses carry Cache-Tag and are purged by
-  // tag from src/server.ts (Sanity webhook, hourly scheduled()).
+  // Worker cache: Sanity-backed responses carry Cache-Tag and a one-hour edge
+  // lifetime (src/lib/cache.ts); the Sanity webhook purges them by tag from
+  // src/server.ts. No cron: the lifetime is the safety net for a missed
+  // webhook. The list stays, empty: a deploy leaves the deployed triggers in
+  // place when the key is missing.
   "cache": { "enabled": true },
-  "triggers": { "crons": ["0 * * * *"] },
+  "triggers": { "crons": [] },
   // Contact and subscribe: 5 posts per minute per IP.
   "ratelimits": [
     {
