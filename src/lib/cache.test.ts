@@ -19,7 +19,7 @@ describe("Worker cache headers", () => {
     );
   });
 
-  it("never serves an old copy in place of a fresh render or an error", () => {
+  it("sets stale-if-error=0 and no stale-while-revalidate", () => {
     // With stale-while-revalidate, a quiet site's first visit after the hour
     // gets the previous visitor's copy. Without stale-if-error=0, Cloudflare
     // serves the last good copy, with no time limit, when the Worker fails.
@@ -44,6 +44,8 @@ describe("Worker cache headers", () => {
   });
 
   it("tags responses another handler built, keeping body and type", async () => {
+    // The feed's and llms.txt's handlers set no cache header of their own:
+    // these are the only ones they send.
     const res = await withEdgeCache(
       new Response("<rss/>", {
         headers: { "Content-Type": "application/xml" },
@@ -51,6 +53,10 @@ describe("Worker cache headers", () => {
       ["posts"],
     );
     expect(res.headers.get("Cache-Tag")).toBe("posts");
+    expect(res.headers.get("Cache-Control")).toBe(
+      "public, max-age=0, must-revalidate",
+    );
+    expect(res.headers.get("CDN-Cache-Control")).toBe(EDGE_LIFETIME);
     expect(res.headers.get("Content-Type")).toBe("application/xml");
     expect(await res.text()).toBe("<rss/>");
   });

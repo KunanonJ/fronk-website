@@ -19,7 +19,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("the server's Sanity client", () => {
-  it("reads the live API in production, not the API CDN", async () => {
+  it("reads the live API, not the API CDN, in a production build too", async () => {
     const { buildClient } = await import("./client");
     const client = buildClient();
     expect(client).not.toBeNull();

@@ -73,13 +73,24 @@ describe("withServerFnNoStore", () => {
     ).toBe("private, max-age=60");
   });
 
+  it("keeps an edge lifetime the function set itself, adding nothing", () => {
+    for (const name of ["CDN-Cache-Control", "Cloudflare-CDN-Cache-Control"]) {
+      const own = new Response("{}", {
+        headers: { [name]: "public, max-age=60" },
+      });
+      expect(withServerFnNoStore(at("/_serverFn/17bb0f50"), own), name).toBe(
+        own,
+      );
+    }
+  });
+
   it("leaves every other response as it is", () => {
     const page = new Response("<html></html>");
     expect(withServerFnNoStore(at("/resume"), page)).toBe(page);
     expect(withServerFnNoStore(at("/_serverFnx/17bb0f50"), page)).toBe(page);
   });
 
-  it("matches the framework's default path for server functions", () => {
+  it("pins the server-function path (the browser test shows it is the framework's)", () => {
     // TanStack Start answers server functions under /_serverFn/ unless the
     // app sets another base; this repo does not. The browser test in
     // tests/e2e/smoke.spec.ts shows the built site uses it.

@@ -40,7 +40,8 @@ describe("production Worker config (TanStack Start)", () => {
     expect(wrangler.main).toBe("src/server.ts");
     expect(wrangler.cache?.enabled).toBe(true);
     expect(wrangler.triggers).toEqual({ crons: [] });
-    expect(server).not.toMatch(/\bscheduled\s*\(/);
+    // A method or a property; src/server.test.ts checks the object itself.
+    expect(server).not.toMatch(/\bscheduled\s*[(:]/);
   });
 
   it("gives the staging Worker the same entry, cache and empty cron list", () => {

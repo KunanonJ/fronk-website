@@ -7,16 +7,16 @@ import type { RevalidationTag } from "@/lib/sanity/revalidation";
  * by its Cache-Tag; the hour is the bound when a webhook is missed.
  *
  * No stale-while-revalidate: on a quiet site the first visit after the hour
- * would get the previous visitor's copy, up to a day old. stale-if-error=0:
+ * would get the previous visitor's copy, up to 25 hours old. stale-if-error=0:
  * when the Worker fails while it refreshes an expired copy, the visitor gets
  * the error, not the old copy (Cloudflare's default is the old copy, with no
  * time limit). worker-cache-followup plan, decision 2.
  *
  * Left at Cloudflare's defaults, with no header from this repo: a 404 is kept
- * three minutes (a not-found never reaches a route's headers: the root route
- * draws it, so an unknown post's 404 carries no tag either), a 405 one
- * minute; a 308 and a 500 are not kept. A deploy empties the cache: the
- * Worker's version is part of its key.
+ * three minutes, a 405 one minute; a 308 and a 500 are not kept. A not-found
+ * is drawn by the root route, so the route's own headers do not apply: on the
+ * built site an unknown post's 404 carries no cache header and no tag.
+ * A deploy empties the cache: the Worker's version is part of its key.
  */
 export const EDGE_LIFETIME = "public, max-age=3600, stale-if-error=0";
 

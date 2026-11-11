@@ -1102,6 +1102,8 @@ test.describe("worker cache > what the edge may keep", () => {
     });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/", { waitUntil: "networkidle" });
+    // Count only what the visit to Learn fetches.
+    answers.length = 0;
     // Learn is in the site menu's Library group.
     await page.getByRole("button", { name: "Open menu" }).click();
     await page
@@ -1116,18 +1118,20 @@ test.describe("worker cache > what the edge may keep", () => {
     for (const answer of answers) expect(answer.cacheControl).toBe("no-store");
   });
 
-  test("a Sanity-backed page is kept an hour, and a failure is not hidden", async ({
+  test("Sanity-backed responses are kept an hour, and a failure is not hidden", async ({
     request,
   }) => {
-    const res = await request.get("/learn");
-    expect(res.status()).toBe(200);
-    expect(res.headers()["cdn-cache-control"]).toBe(
-      "public, max-age=3600, stale-if-error=0",
-    );
-    expect(res.headers()["cache-control"]).toBe(
-      "public, max-age=0, must-revalidate",
-    );
-    expect(res.headers()["cache-tag"]).toBe("posts");
+    for (const path of ["/learn", "/feed.xml", "/llms.txt", "/sitemap.xml"]) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      expect(res.headers()["cdn-cache-control"], path).toBe(
+        "public, max-age=3600, stale-if-error=0",
+      );
+      expect(res.headers()["cache-control"], path).toBe(
+        "public, max-age=0, must-revalidate",
+      );
+      expect(res.headers()["cache-tag"], path).toBe("posts");
+    }
   });
 
   test("files that change only on a deploy keep a day at the edge", async ({

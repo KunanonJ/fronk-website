@@ -13,9 +13,10 @@ const STUDIO_CSP =
   "frame-ancestors 'self' https://www.sanity.io https://*.sanity.io";
 
 /**
- * The Studio page is the same for everyone (Studio signs in on the client)
- * and changes only on a deploy, which empties the cache: a day at the edge,
- * while browsers revalidate. Only a successful render is kept.
+ * The Studio page is static: it links to the external Studio, whose URL is
+ * set at build time. It changes only on a deploy, which empties the cache: a
+ * day at the edge, while browsers revalidate. Only a successful render is
+ * kept.
  */
 const STUDIO_CACHE = {
   "Cache-Control": "public, max-age=0, must-revalidate",
