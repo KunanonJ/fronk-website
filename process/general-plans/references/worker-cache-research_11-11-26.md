@@ -1,7 +1,8 @@
 # Worker cache: what the live site does, what the documentation says, what the repo does
 
 **Date:** 11-11-26, at `28f0d06`. Revised the same day after two rounds of
-review (a fact check and a design review each time).
+review (a fact check and a design review each time). Section 7, the probe
+on a preview, was added during EXECUTE the same day.
 **For:** `../active/worker-cache-followup_PLAN_11-11-26.md`
 **Origin:** recruiter-fit decision 25, and "Findings outside this phase" in
 `process/features/recruiter-fit/reports/phase-3_case-study-evidence_REPORT_11-11-26.md`
@@ -337,10 +338,10 @@ throwaway secret that was deleted afterwards.
 | Does `cache.purge` from `cloudflare:workers` work inside `scheduled()`? | A test on a deployed Worker |
 | Does the webhook's purge work on production today? | A publish in Studio, then a read of the page |
 | How long does a publish take to reach Sanity's CDN? | The same query read from both of Sanity's hosts after a publish |
-| Does the edge serve the last good copy when the Worker fails, with the site's two headers? | A probe route on a preview that answers 200 and then fails. A new deploy cannot stage it on the real pages, because a deploy empties the cache |
-| Is `stale-if-error=0` honoured in `CDN-Cache-Control`? | The same probe |
-| Does a `must-revalidate` in `Cache-Control` switch off stale serving when `CDN-Cache-Control` asks for it? | A read of a page after its lifetime: `UPDATING` if stale serving works, `EXPIRED` if not |
-| Does a refresh that answers `no-store` drop the expired copy? | Not documented |
+| Does the edge serve the last good copy when the Worker fails, with the site's two headers? | Answered: yes, marked `STALE` (section 7) |
+| Is `stale-if-error=0` honoured in `CDN-Cache-Control`? | Answered: yes (section 7) |
+| Does a `must-revalidate` in `Cache-Control` switch off stale serving when `CDN-Cache-Control` asks for it? | For a failing Worker, answered: no (section 7). For `stale-while-revalidate`, not tested; the site no longer sends it |
+| Does a refresh that answers `no-store` drop the expired copy? | Answered: no; the next healthy read was `EXPIRED`, not `MISS` (section 7) |
 | Which Sanity plan is the project on, and how many requests does it use? | The owner: sanity.io/manage, Usage |
 
 Three causes fit what was observed of the hourly purge. Trigger Events
@@ -353,3 +354,42 @@ and the logs tell them apart.
    speaks against it.
 3. **The purge is accepted and reaches nothing.** No failure in the logs,
    and the entries stay.
+
+## 7. The probe on a preview (plan step 2, 11-11-26)
+
+A throwaway branch, `chore/cache-probe` (commit `7f435b9`, never merged,
+deleted afterwards), added a route to the Worker entry. In the first 20
+seconds of each UTC minute it answered 200 with a ten-second edge lifetime;
+after that it answered 500 with `Cache-Control: no-store`, as the site's
+error pages do. It switched itself off at 13:00 UTC. Cloudflare built a
+preview of the branch. Two runs, at 09:27 and 09:29 UTC, read each variant
+in second 1 (stored), in second 5, in seconds 30 and 45 (the copy expired
+and the route failing), and in second 3 of the next minute (the route
+answering again).
+
+| Variant | `Cache-Control` | `CDN-Cache-Control` | Failing reads, four of each | Next minute |
+| --- | --- | --- | --- | --- |
+| a | `public, max-age=0, must-revalidate` | `public, max-age=10` | 200 `STALE`, the stored body | `EXPIRED`, a new body |
+| b | `public, max-age=0, must-revalidate` | `public, max-age=10, stale-if-error=0` | 500 `BYPASS`, the error | `EXPIRED`, a new body |
+| c | `public, max-age=0` | `public, max-age=10` | 200 `STALE` | `EXPIRED` |
+| d | `public, max-age=0, must-revalidate, stale-if-error=0` | `public, max-age=10, stale-if-error=0` | 500 `BYPASS` | `EXPIRED` |
+| e | `public, max-age=10` | none | 200 `STALE` | `EXPIRED` |
+
+Every first read was a `MISS` and every second a `HIT`, in both runs.
+
+What it shows:
+
+- When the Worker fails on an expired copy, the edge serves the old copy,
+  marked `STALE` (e), as documented.
+- A `must-revalidate` in `Cache-Control` does not stop that when
+  `CDN-Cache-Control` carries the lifetime (a). The live site's pages send
+  that pair today, so during a failure they would show an old copy.
+- `stale-if-error=0` in `CDN-Cache-Control` alone is honoured (b): the
+  visitor gets the error. Putting it in both headers changes nothing (d).
+- The failing refresh, answered with `no-store`, did not drop the expired
+  copy: the next healthy read was `EXPIRED`, not `MISS`.
+- Limits: a ten-second lifetime, where the pages send an hour; one preview
+  on `workers.dev`; the one data centre the reads went through.
+
+The raw log of the 50 reads stayed outside the repository; this table is
+the record.

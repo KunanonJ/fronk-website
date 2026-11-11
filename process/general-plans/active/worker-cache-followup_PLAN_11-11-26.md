@@ -1,7 +1,9 @@
 # Worker cache follow-up: a safety net that does not need a purge
 
-**Status:** PROPOSED (11-11-26). Waits for the owner's approval and the
-answers to "Owner decisions". No code changes before "ENTER EXECUTE MODE".
+**Status:** IN PROGRESS. Approved with "ENTER EXECUTE MODE" on 11-11-26,
+every owner decision at its default. Steps 2 to 10 are done on
+`feat/worker-cache-followup`; gates 7 to 10 follow the pull request and
+the merge. Report: `../reports/worker-cache-followup_REPORT_11-11-26.md`.
 **Created:** 11-11-26, at `28f0d06`. Revised the same day after two rounds
 of independent review (a fact check and a design review each time).
 **Origin:** recruiter-fit decision 25 ("Plan a follow-up"), from "Findings
@@ -255,12 +257,15 @@ values go in its route headers, beside its Content-Security-Policy.
 - `lib/sanity/revalidation.ts` (a comment), `README.md`, `AGENTS.md`,
   `public/skills.md`, `public/_headers` (a comment)
 - `tests/e2e/smoke.spec.ts`, `tests/fixtures/site-parity.json`
-- On the throwaway branch only: one probe route under `src/routes/api/`
+- Added during EXECUTE: `src/server.test.ts` (the Worker entry) and
+  `src/lib/studioRoute.test.ts` (the `/studio` headers)
+- On the throwaway branch only: one probe route (in the end, in
+  `src/server.ts`)
 
-Left as they are: completed plans and reports, and
-`process/features/tanstack-migration/references/target-architecture_09-11-26.md`.
-They are records of their date, and some of what they say about the cache
-is no longer so.
+Left as they are: completed plans and reports,
+`process/features/tanstack-migration/references/target-architecture_09-11-26.md`
+and `docs/redesign/02-current-site-map.md`. They are records of their
+date, and some of what they say about the cache is no longer so.
 
 ## Public Contracts
 
