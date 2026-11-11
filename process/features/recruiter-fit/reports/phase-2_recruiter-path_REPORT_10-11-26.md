@@ -400,5 +400,6 @@ LinkedIn link resolves.
   owner's answers and a Phase 4 row; the Phase 3 plan carries this phase's
   lessons; five workspace facts are in `AGENTS.md`; the older issues the
   reviews confirmed are in `../backlog/open-items_11-11-26.md`.
-- **Next phase:** `../active/phase-3_case-study-evidence_PLAN_10-11-26.md`.
+- **Next phase:** `../completed/phase-3_case-study-evidence_PLAN_10-11-26.md`
+  (archived on 11-11-26).
 
