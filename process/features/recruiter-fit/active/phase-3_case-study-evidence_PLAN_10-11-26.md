@@ -149,14 +149,21 @@ Recorded in the umbrella plan as decisions 10 to 18.
 
 ## Verification Evidence
 
-To be filled during EXECUTE and copied into the report.
+Filled during EXECUTE (11-11-26). The report,
+`../reports/phase-3_case-study-evidence_REPORT_11-11-26.md`, holds the
+detail.
 
 | Gate | Command or check | Result |
 | --- | --- | --- |
-| 1 to 5 | CI gates, baselines, parity | pending |
-| 6 | clearance audit | pending |
-| 7 | regression checks for Phases 1 and 2 | pending |
-| 8 and 9 | preview check, reviews | pending |
+| 1 | typecheck, lint, format, knip and unit tests on Node 26.12.0 and on Node 22.23.4 | pass on both: 925 tests in 107 files, on one tree |
+| 2 | `pnpm build`, `pnpm perf:budget` | pass on both; entry chunk 107.9 KB of 120 KB on Node 22.23.4 |
+| 3 | smoke and axe, desktop, on the production build | 178 passed, 25 of them new |
+| 4 | Linux baselines re-rendered, the changed pages copied back, then CI's comparison | 96 of 96; 48 changed or new, 4 of them new; 9 stale since before the program left alone |
+| 5 | parity re-crawl with `PARITY_SEEDS`, then the gate | 135 URLs: 3 added, 0 removed; 0 differences |
+| 6 | clearance audit, `lib/content/portfolioOutcomes.test.ts` and `lib/content/ventureCase.test.ts` | pass; each figure and the reply that cleared it are in the report |
+| 7 | PDF text layer; the "recruiter path" browser tests | 844 words, whole and in order; pass |
+| 8 | the recruiter-path and case-study tests against the pull request's preview | recorded in the pull request |
+| 9 | three review rounds, each followed by its fixes | see the report; 104 mutations caught, none survived |
 
 ## Blockers that justify BLOCKED
 
