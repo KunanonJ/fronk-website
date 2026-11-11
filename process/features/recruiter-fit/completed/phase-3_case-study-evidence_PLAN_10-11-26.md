@@ -1,6 +1,8 @@
 # Phase 3: Case-study evidence
 
-**Status:** APPROVED FOR EXECUTION (11-11-26). O1, O3 and O4 are answered.
+**Status:** COMPLETE (11-11-26). Merged through pull request #110 (`28f0d06`
+on `main`), deployed, and checked on the live site. Archived on 11-11-26.
+Report: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md`
 **Created:** 10-11-26, at `6d31e16`. Updated 11-11-26, at `fdcb904`, with the
 owner's answers and the lessons of Phase 2.
 **Umbrella:** `recruiter-fit_UMBRELLA_PLAN_10-11-26.md`
@@ -162,7 +164,7 @@ detail.
 | 5 | parity re-crawl with `PARITY_SEEDS`, then the gate | 135 URLs: 3 added, 0 removed; 0 differences |
 | 6 | clearance audit, `lib/content/portfolioOutcomes.test.ts` and `lib/content/ventureCase.test.ts` | pass; each figure and the reply that cleared it are in the report |
 | 7 | PDF text layer; the "recruiter path" browser tests | 844 words, whole and in order; pass |
-| 8 | the recruiter-path and case-study tests against the pull request's preview | recorded in the pull request |
+| 8 | the recruiter-path and case-study tests against the pull request's preview | 82 passed on the preview, and 82 on the live site after the merge |
 | 9 | three review rounds, each followed by its fixes | see the report; 104 mutations caught, none survived |
 
 ## Blockers that justify BLOCKED

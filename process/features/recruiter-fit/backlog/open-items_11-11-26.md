@@ -100,3 +100,49 @@ deferred, Fix options.
 - **Why deferred:** polish, outside the phases' scope.
 - **Fix options:** each is a one-file change; the title change needs a parity
   re-crawl.
+
+---
+
+Added on 11-11-26, from the three reviews of Phase 3 (pull request #110).
+The owner's questions from that phase are O14 to O19 in the umbrella plan.
+The live site's cache has its own plan:
+`process/general-plans/active/worker-cache-followup_PLAN_11-11-26.md`.
+
+## P3: `expectsHeadingPattern` is declared and never asserted
+
+- **Problem:** every route in `tests/e2e/routes.ts` carries an
+  `expectsHeadingPattern`, and no test reads it. The render test checks
+  that an h1 exists, not what it says.
+- **Root cause:** not traced. The field is older than the program.
+- **Why deferred:** outside Phase 3, which only added a route to the list.
+- **Fix options:**
+  1. Assert the pattern in the render test of `tests/e2e/smoke.spec.ts`.
+  2. Delete the field.
+
+## P3: Nine mobile baselines are stale
+
+- **Problem:** design, learn, not-found and topic-hub-th-short on mobile in
+  both themes, and press-light on mobile, differ in bytes from a fresh
+  render. They pass because the comparison tolerates 1% of pixels. Press
+  also varies from run to run.
+- **Root cause:** earlier changes that stayed inside the tolerance, so
+  nobody refreshed the images.
+- **Why deferred:** no phase of this program touches those pages, and each
+  refreshed image has to be looked at.
+- **Fix options:**
+  1. Re-render them in the pinned Playwright image, review each, copy them
+     back. Find why Press varies first.
+  2. Accept the drift until a phase changes those pages.
+
+## P3: `/blog` answers 500 when Sanity cannot be read
+
+- **Problem:** with Sanity unreachable, `/blog` and its posts answer 500
+  (with `no-store`). Since Phase 3 only the résumé falls back.
+- **Root cause:** by design in `lib/sanity/fetch.ts`: a failed read throws,
+  so the edge never keeps fallback content.
+- **Why deferred:** the blog is hidden and unlinked (`BLOG_PUBLIC` is
+  false).
+- **Fix options:**
+  1. Give the blog the résumé's fallback: the repo's posts, marked, with
+     `no-store` on the page and on the server function's response.
+  2. Leave it until the blog goes public.

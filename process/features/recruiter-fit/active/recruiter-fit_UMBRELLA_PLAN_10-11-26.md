@@ -1,9 +1,10 @@
 # Recruiter fit: umbrella plan
 
-**Status:** IN PROGRESS (11-11-26). Phases 1 and 2 are complete, merged
-through pull request #109 (`fdcb904` on `main`) and live. Phase 3 is built,
-verified and approved by the owner for merge (pull request #110). Phase 4,
-the CV's framing for the two projects, is planned.
+**Status:** IN PROGRESS (11-11-26). Phases 1 to 3 are complete and live:
+Phases 1 and 2 merged through pull request #109 (`fdcb904` on `main`), Phase
+3 through pull request #110 (`28f0d06`). Phase 4, the CV's framing for the
+two projects, is planned. A follow-up outside the program, on the live
+site's cache, has its own plan and waits for approval (decision 25).
 **Created:** 10-11-26, at `6d31e16`
 **Owner goal:** make kunanonj.com fit a recruiter or hiring manager who is
 looking for a Forward Deployed Engineer (FDE) or an AI team member.
@@ -159,7 +160,8 @@ Asked before the merge of Phase 3 (11-11-26), with each line shown:
 25. **The live site's cache.** "Plan a follow-up": a short plan for the
     hourly purge that does not take effect and for the server-function
     answers cached with no tag (Phase 3 report, "Findings outside this
-    phase"). It needs its own approval before any code changes.
+    phase"). It needs its own approval before any code changes. The plan:
+    `process/general-plans/active/worker-cache-followup_PLAN_11-11-26.md`.
 26. **ARIA's stack.** "Both are true": ARIA uses Google ADK and Gemini with
     RAG, as the résumé says, and Claude as well, as the site says. The site
     says so in one sentence; the résumé stays. Joins Phase 4.
@@ -182,10 +184,16 @@ Each has a default, so no phase waits on a reply unless the table says so.
 | O7  | Should the public PDF carry a phone number? | No | Phase 1 |
 | O8  | May the header show inline links at desktop width? This changes the approved canvas header | **Answered 10-11-26:** yes | Done |
 | O10 | Does "turn repeated mistakes into guardrails", on `/skills` and in the operating model, break the wording rule? Both predate this program | Left as it is | None |
-| O11 | "The Binary Labs" is named once, on the email signature case study, and nowhere in the résumé | Left as it is | Phase 3 (optional) |
+| O11 | "The Binary Labs" is named once, on the email signature case study, and nowhere in the résumé | Left as it is | None |
 | O12 | The CV writes the current title as "IT Manager / AI Engineering Lead"; the site writes "&" | The site's form | None |
 | O13 | Should "Contact me" on Home open the hiring form? | The general form | None |
 | O9  | Final wording of the role-first hero | **Answered 10-11-26:** "Forward deployed AI engineering from Bangkok." The owner may still edit it in `lib/content/landing.ts` | Done |
+| O14 | Should the résumé give GoGoCash's two totals "as of October 2026", as the venture page does? The CV's line has no month | As the CV: no month | None |
+| O15 | Older GoGoCash copy that is not in the CV: "220+ merchants", "up to 30% back", the merchant names, "in production and growing", "funded by affiliate commissions", and the "My role" sentence | Left as it is | Phase 4 (step 4a lists it) |
+| O16 | The intranet's structured data names him its `creator`. The CV says he owned the roadmap and partnered with engineering. `creator`, or `contributor` as on AI Automation? | `creator`, the older rule | None |
+| O17 | Should `/resume` show a note when the repo's copy stands in for a failed Sanity read? | No note | Before a résumé is published in Studio |
+| O18 | Should a browser test read `/resume`'s user count and totals? It would fail every pull request after an edit in Studio, until the repo agreed | No such test | None |
+| O19 | The `/proof` h1 still reads "venture metrics and case studies". The page now leads with delivery | Left as it is | None |
 
 ## Approach decisions
 
@@ -206,8 +214,8 @@ have produced.
 | --- | --- | --- | --- | --- |
 | 1. Résumé and facts | `../completed/phase-1_resume-facts_PLAN_10-11-26.md` | O2, O3, O5, O7 (all have defaults) | One set of career facts on every surface, and a two-page PDF that parses | COMPLETE (10-11-26): merged in pull request #109, live. Report: `../reports/phase-1_resume-facts_REPORT_10-11-26.md` |
 | 2. Recruiter path | `../completed/phase-2_recruiter-path_PLAN_10-11-26.md` | Phase 1 (headline and résumé target); O6, O8, O9 | Role, availability and résumé are visible above the fold and reachable from every page | COMPLETE (10-11-26): merged in pull request #109, live site checked. Report: `../reports/phase-2_recruiter-path_REPORT_10-11-26.md` |
-| 3. Case-study evidence | `phase-3_case-study-evidence_PLAN_10-11-26.md` | Phases 1 and 2; O1, O3, O4 (all answered) | Case studies and Proof state cleared outcomes and the owner's part | APPROVED FOR MERGE (11-11-26): pull request #110, all gates pass, the owner approved every line (decisions 19 to 24). Report: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md` |
-| 4. The CV's framing | `phase-4_cv-framing_PLAN_11-11-26.md` | Phase 3 | GoGoCash and Manut AI are independent projects on every surface, as in the CV | PLANNED (decision 15); needs its own execution approval |
+| 3. Case-study evidence | `../completed/phase-3_case-study-evidence_PLAN_10-11-26.md` | Phases 1 and 2; O1, O3, O4 (all answered) | Case studies and Proof state cleared outcomes and the owner's part | COMPLETE (11-11-26): merged in pull request #110, live site checked; the owner approved every line (decisions 19 to 24). Report: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md` |
+| 4. The CV's framing | `phase-4_cv-framing_PLAN_11-11-26.md` | Phase 3 | GoGoCash and Manut AI are independent projects on every surface, as in the CV; ARIA's stack reads the same on the site and in the résumé (decision 26) | PLANNED (decisions 15 and 26); needs its own execution approval |
 
 Phase 1 comes first because it removes contradictions a background check
 would find, and because Phase 2 points every new button at the résumé.
@@ -261,21 +269,27 @@ commands, results, regression checks and deviations.
   checked after the merge (the report's "Closed out" section).
 - Phase 3: `../reports/phase-3_case-study-evidence_REPORT_11-11-26.md`. All
   gates pass locally, in CI and on the Cloudflare preview, after three
-  review rounds.
+  review rounds; the live site was checked after the merge (the report's
+  "Closed out" section).
 
 ## Resume and Execution Handoff
 
-- **Current state:** Phases 1 and 2 are on `main` (`fdcb904`) and live.
-  Phase 3 is in pull request #110, approved for merge. After the merge:
-  check the live site, close the phase out, then write the cache follow-up
-  plan (decision 25) and start Phase 4 at step 4a. O5 to O7 stay on their
+- **Current state:** Phases 1 to 3 are on `main` (`28f0d06`) and live. Phase
+  4 is planned and not approved for execution. The cache follow-up plan,
+  `process/general-plans/active/worker-cache-followup_PLAN_11-11-26.md`,
+  waits for the owner's approval. O5 to O7 and O14 to O19 stay on their
   defaults.
-- **Execute anchor:** `process/features/recruiter-fit/active/phase-3_case-study-evidence_PLAN_10-11-26.md`.
-- **Before EXECUTE of Phase 3:** re-read that plan, the research file and the
-  Phase 2 report, and check drift since `fdcb904`.
-- **Regression checks to carry forward:** the PDF text-layer read-back,
-  `lib/content/resumeFacts.test.ts`, `lib/content/availability.test.ts` and
-  the "recruiter path" block of `tests/e2e/smoke.spec.ts`.
+- **Execute anchor:** `process/features/recruiter-fit/active/phase-4_cv-framing_PLAN_11-11-26.md`.
+- **Before EXECUTE of Phase 4:** re-read that plan and the Phase 3 report,
+  and check drift since `28f0d06`. Step 4a is an inventory the owner
+  approves, so the phase starts with a question, not with code.
+- **Regression checks to carry forward:** the PDF text-layer read-back;
+  `lib/content/resumeFacts.test.ts` and `lib/content/availability.test.ts`;
+  the two clearance audits, `lib/content/portfolioOutcomes.test.ts` and
+  `lib/content/ventureCase.test.ts`; the résumé fallback's tests
+  (`src/lib/resumeRoute.test.ts`, `src/lib/resumeHook.test.tsx`,
+  `src/server/content.functions.test.ts`); and the "recruiter path" and
+  "case-study evidence" blocks of `tests/e2e/smoke.spec.ts`.
 - **Merging deploys.** Cloudflare Workers Builds deploys `main` to
   production, and every pull request gets a preview URL in a bot comment.
 - **The CV** is the owner's file "Kunanon Jarat CV.pdf" (2 pages, PDF created

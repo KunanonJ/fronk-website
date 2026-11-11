@@ -1,12 +1,13 @@
 # Phase 3 report: Case-study evidence
 
-**Plan:** `../active/phase-3_case-study-evidence_PLAN_10-11-26.md`
-**Status:** APPROVED FOR MERGE (11-11-26), pull request #110. Verified on
-the local production build, on Node 26.12.0 and on CI's Node 22.23.4 (see
-"Gates" for the runs and the tree they covered), in CI and on the
-Cloudflare preview, and reviewed three times (see "Review"). The owner saw
-every outcome line and every "My part" line and approved them as written
-(see "The owner's answers before the merge").
+**Plan:** `../completed/phase-3_case-study-evidence_PLAN_10-11-26.md`
+**Status:** COMPLETE (11-11-26). Merged through pull request #110
+(`28f0d06` on `main`), deployed, and checked on the live site (see "Closed
+out"). Verified on the local production build, on Node 26.12.0 and on CI's
+Node 22.23.4 (see "Gates" for the runs and the tree they covered), in CI
+and on the Cloudflare preview, and reviewed three times (see "Review"). The
+owner saw every outcome line and every "My part" line and approved them as
+written (see "The owner's answers before the merge").
 **Base:** `27004b0` on `feat/recruiter-fit-phase-3` (`main` is `fdcb904`).
 
 ## Owner answers used (11-11-26)
@@ -535,11 +536,12 @@ résumé is published in Studio.
   the last merge to `main`, and have outlived every hourly run since. The cause is not known
   from the repository: the cron may not run, the purge may fail (the code
   logs "[cron] cache purge failed" and carries on), or the purge may not
-  reach these entries. Whether the Sanity webhook's purge works is not
-  known either: nothing has been published to try it. Until it is checked,
-  an edit in Studio may take up to a day to show. The migration's report
-  left this check for staging. `README.md` and `/agents.md` still describe
-  the purge as working.
+  reach these entries. The webhook's purge was checked on staging at the
+  migration's cutover (09-11-26: a signed webhook, then a miss and a hit on
+  `/resume`). The hourly purge was only run in the local Worker, and
+  nothing has been published since to try the webhook on the live site.
+  If neither lands, an edit in Studio takes up to a day to show.
+  `README.md` and `/agents.md` describe the hourly purge as working.
 - **Server-function answers are cached at the edge for two hours, with no
   tag.** On a client-side navigation to `/resume`, `/learn` or `/blog`, the
   browser fetches a server function. Its answer carries no `Cache-Control`,
@@ -694,3 +696,31 @@ production.
   wording, whatever it says. The owner is asked to read them (item 4).
 - **Not proven:** that every claim about this site stays true. The
   highlights describe the repository as of this commit.
+
+## Closed out (11-11-26)
+
+- **Merge:** pull request #110, squash commit `28f0d06` on `main`, at 06:41
+  UTC, on the head that had passed every check (`e5e5923`). All four CI
+  jobs passed on the branch head and again on the merge commit. The tree of
+  `main` is the tree that was verified.
+- **Deploy:** Cloudflare Workers Builds deployed `main`. The new project
+  page answered on kunanonj.com 70 seconds after the merge. The owner asked
+  for the merge ("Yes, merge"); the deploy follows from it.
+- **Live-site check (11-11-26, 06:43 UTC):** the 82 recruiter-path and
+  case-study browser tests pass against kunanonj.com. Seventeen URLs answer
+  200, among them the new page, its Markdown twin, its share image and its
+  cover. The outcome lines, the "My part" lines, GoGoCash's dated totals
+  and "Internal tool (no public link)" are on the pages as approved.
+  `/resume.pdf` is byte for byte the committed file. The tests only read
+  pages; none submits the contact form.
+- **Owner answers:** decisions 19 to 26 in the umbrella plan.
+- **UPDATE PROCESS,** approved by the owner ("yes"): the plan is archived
+  to `../completed/`; the umbrella plan carries the new status, and the
+  questions still open as O14 to O19; the Phase 4 plan carries this
+  phase's lessons; `AGENTS.md` gains four workspace facts; what the reviews
+  found and nobody fixed is in `../backlog/open-items_11-11-26.md`.
+- **The cache follow-up** (decision 25) has its own plan,
+  `process/general-plans/active/worker-cache-followup_PLAN_11-11-26.md`. It
+  waits for the owner's approval; no code changes before that.
+- **Next phase:** `../active/phase-4_cv-framing_PLAN_11-11-26.md`, which
+  needs its own "ENTER EXECUTE MODE".

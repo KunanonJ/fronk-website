@@ -2,7 +2,8 @@
 
 **Status:** PLANNED (11-11-26). The owner chose the direction; execution
 needs its own "ENTER EXECUTE MODE".
-**Created:** 11-11-26, at `fdcb904`
+**Created:** 11-11-26, at `fdcb904`. Updated 11-11-26, at `28f0d06`, with
+decision 26 (step 4e) and the lessons of Phase 3.
 **Umbrella:** `recruiter-fit_UMBRELLA_PLAN_10-11-26.md`
 **Research:** the Phase 2 report, "Open, for the owner", and the pre-merge
 review of pull request #109.
@@ -37,6 +38,28 @@ owner approves the wording before execution.
 | Person JSON-LD `jobTitle`, the founder Organization nodes | Which schema.org relation fits an independent project |
 | Page meta and the About share image | The description line |
 | `llms.txt`, `llms-full.txt`, `about.md` | Follow the content modules |
+| GoGoCash page, older copy that is not in the CV (O15): "220+ merchants", "up to 30% back", the merchant names, "in production and growing", "funded by affiliate commissions", and the "My role" sentence | Keep each, or the wording to use |
+
+## Lessons from Phase 3 that change this phase
+
+- **Check a claim against the running system, not the code.** Phase 3 came
+  close to publishing "purged every hour" because the code asks for it; the
+  live cache was 17 hours old. A sentence about caching, deploys or what a
+  page does needs an observation behind it.
+- **A fix needs its own review.** Each of three review rounds found a flaw
+  in the round before's fix. Review the fix commits, and aim the mutation
+  checks at them too.
+- **A wording check has two directions.** An audit that only hunts the
+  wrong fact also fails on harmless edits. For each new pattern, write one
+  edit it must catch and one it must let pass.
+- **The audits read every source file.** The fact test of 4d should scan
+  with `tests/siteSources.ts`, in both languages: the Thai user count
+  needed a pattern of its own.
+- **Fill the report from the final tree.** Run the gates on both Node
+  versions after the last fix, print the tree's hash with each run, and
+  write the numbers only then.
+- **Show the owner the line, not a summary of it.** The merge questions
+  quoted every line that would ship, and all eight came back approved.
 
 ## Work
 
@@ -74,5 +97,5 @@ The gates of Phase 3, items 1 to 5 and 7 to 9, plus the fact test of 4d.
 
 ## Resume and Execution Handoff
 
-- **Execute anchor:** this file, after Phase 3 is merged.
+- **Execute anchor:** this file. Phase 3 is merged (`28f0d06`).
 - **Start with 4a** and take the owner's approval of the wording there.
