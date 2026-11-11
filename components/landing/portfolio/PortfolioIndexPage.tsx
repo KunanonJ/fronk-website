@@ -15,6 +15,7 @@ import {
 import { portfolioGrid } from "@/components/landing/portfolio/portfolioLayout";
 import {
   getAllPortfolioProjects,
+  outcomeLine,
   portfolioPage,
   type PortfolioProject,
 } from "@/lib/content/portfolio";
@@ -101,6 +102,8 @@ function ProjectCard({
 }) {
   const nameId = `name-${project.slug}`;
   const shown = project.stack.slice(0, STACK_SHOWN);
+  // The first outcome the owner states for it, when there is one.
+  const lead = project.outcomes?.[0];
   const more = project.stack.length - shown.length;
   return (
     <article
@@ -133,6 +136,12 @@ function ProjectCard({
           <p className="m-0 text-card leading-[1.45] text-ink-2">
             {project.tagline}
           </p>
+          {lead ? (
+            <p className="m-0 flex items-center gap-2 text-meta font-medium">
+              <span aria-hidden className="size-1.5 shrink-0 bg-mark" />
+              {outcomeLine(lead)}
+            </p>
+          ) : null}
         </div>
         <div className="flex min-w-0 flex-[1_1_240px] flex-col items-start gap-2">
           <ul

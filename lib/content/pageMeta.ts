@@ -37,7 +37,7 @@ export const PAGE_META = {
   portfolio: {
     title: "Portfolio",
     description:
-      "Internal tools, automations and AI agents built at The Binary Holdings. They run behind a login, so each page shows what the product does and how it is built rather than a live link.",
+      "Internal tools, automations and AI agents built at The Binary Holdings, plus this site, a personal project. The internal ones have no public link, so each page shows what the product does and how it is built.",
   },
   press: {
     title: "Press",
@@ -46,8 +46,10 @@ export const PAGE_META = {
   },
   proof: {
     title: "Proof",
+    // Says what the page holds; the h1 carries "Honest signals" (it used to
+    // repeat the h1 word for word).
     description:
-      "Honest signals — venture metrics and case studies. No invented scores.",
+      "Delivery outcomes, as the résumé states them, with the case study behind each. Then the ventures' published figures, with the sentence that states each.",
   },
   skills: {
     title: "Skills",

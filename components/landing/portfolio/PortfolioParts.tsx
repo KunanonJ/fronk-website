@@ -140,7 +140,12 @@ export function AccessTag({ access }: { access: PortfolioProject["access"] }) {
   );
 }
 
-/** Meta-strip value for the project's access. */
+/**
+ * Meta-strip value for the project's access. "No public link" is what the
+ * data shows for every internal project (none carries a `url`), and what its
+ * Markdown twin prints. Whether a tool can be reached from outside is not in
+ * the data: only the intranet's own copy mentions a login.
+ */
 export function accessDetail(access: PortfolioProject["access"]): string {
-  return access === "internal" ? "Internal tool (login only)" : "Public";
+  return access === "internal" ? "Internal tool (no public link)" : "Public";
 }

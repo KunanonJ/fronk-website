@@ -60,13 +60,33 @@ describe("VentureHubPage (GoGoCash, the drawn venture)", () => {
   it("shows the published metrics as stat tiles", () => {
     renderVenture("gogocash", GOGOCASH_TOPICS);
     for (const [label, value] of [
-      ["Users", "1,000+"],
+      ["Registered users", "1,000"],
       ["Merchants", "220+"],
       ["Max cashback", "30%"],
+      ["Cumulative gross merchandise value", "THB 13 million"],
+      ["Cashback paid", "THB 169,000"],
     ])
       expect(screen.getByText(label).nextElementSibling).toHaveTextContent(
         value!,
       );
+  });
+
+  it("dates the running totals, and only them", () => {
+    renderVenture("gogocash", GOGOCASH_TOPICS);
+    // A total is true as of a month; a tile without one would read as today.
+    for (const label of ["Cumulative gross merchandise value", "Cashback paid"])
+      expect(screen.getByText(label)).toHaveTextContent(
+        `${label}As of October 2026`,
+      );
+    expect(screen.getAllByText("As of October 2026")).toHaveLength(2);
+    expect(screen.getByText("Registered users")).not.toHaveTextContent("As of");
+    // Wide tiles, so the long figures share a row of their own at 1000 px.
+    expect(screen.getByText("Cashback paid").parentElement?.className).toMatch(
+      /flex-\[1_1_360px\]/,
+    );
+    expect(screen.getByText("Merchants").parentElement?.className).toMatch(
+      /flex-\[1_1_180px\]/,
+    );
   });
 
   it("draws the case sections, related topics, the other venture and Share", () => {

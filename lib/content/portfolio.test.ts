@@ -71,11 +71,21 @@ describe("portfolio content", () => {
 });
 
 describe("portfolio visuals", () => {
-  it("gives every project a mockup, a workflow and an architecture", () => {
+  it("gives every project a visual, a workflow and an architecture", () => {
     for (const p of projects) {
-      expect(p.mockup, p.slug).toBeDefined();
+      // A real screenshot or, for an internal tool, a drawn mockup.
+      expect(p.cover ?? p.mockup, p.slug).toBeDefined();
       expect(p.workflow, p.slug).toBeDefined();
       expect(p.architecture, p.slug).toBeDefined();
+    }
+  });
+
+  it("shows a real screenshot only for a public project, and a mockup otherwise", () => {
+    for (const p of projects) {
+      // An internal tool's screen would show internal data; a public site
+      // drawn as a mockup would misrepresent what anyone can open.
+      expect(Boolean(p.cover), p.slug).toBe(p.access === "public");
+      expect(Boolean(p.mockup), p.slug).toBe(p.access === "internal");
     }
   });
 

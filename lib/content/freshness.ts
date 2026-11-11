@@ -12,5 +12,9 @@
  * pass (EO-1 to EO-3) and the final review fixes shipped. Same day: career
  * facts synced to the owner's CV (recruiter-fit phase 1), then the recruiter
  * path: the role-first Home hero and the hiring contact (phase 2).
+ *
+ * 2026-11-11: case-study evidence (recruiter-fit phase 3): outcomes and "my
+ * part" on the case studies, delivery on /proof, GoGoCash's totals as of
+ * October 2026, and this site as a portfolio project.
  */
-export const SITE_UPDATED = "2026-11-10";
+export const SITE_UPDATED = "2026-11-11";

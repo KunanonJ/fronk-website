@@ -1,10 +1,39 @@
+import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getAllVentures, type Venture } from "@/lib/content/ventures";
 import { PAGE_META } from "@/lib/content/pageMeta";
+
+/**
+ * An outcome a portfolio case study states, as the owner's résumé words it
+ * (recruiter-fit phase 3). Read from the project, never typed here, so the
+ * audit in `portfolioOutcomes.test.ts` covers this page too.
+ */
+export type ProofOutcome = {
+  value: string;
+  label: string;
+  /** The project's name. */
+  project: string;
+  /** The project's case study. */
+  href: string;
+};
+
+/** Every case-study outcome, in portfolio order. */
+export function getProofOutcomes(): readonly ProofOutcome[] {
+  return getAllPortfolioProjects().flatMap((project) =>
+    (project.outcomes ?? []).map((outcome) => ({
+      value: outcome.value,
+      label: outcome.label,
+      project: project.name,
+      href: `/portfolio/${project.slug}`,
+    })),
+  );
+}
 
 /** A published venture metric with the sentence that states it. */
 export type ProofMetric = {
   value: string;
   label: string;
+  /** The month a running total was true, when the figure is dated. */
+  asOf?: string;
   /** The venture's name. */
   source: string;
   /** Where the quote comes from, e.g. "GoGoCash case · Where it stands". */
@@ -68,6 +97,7 @@ export function getProofMetrics(): readonly ProofMetric[] {
       out.push({
         value: metric.value,
         label: metric.label,
+        ...(metric.asOf ? { asOf: metric.asOf } : {}),
         source: venture.name,
         href: `/ventures/${venture.slug}`,
         ...sourceFor(venture, metric.value),

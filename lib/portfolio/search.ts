@@ -22,6 +22,7 @@ export const PORTFOLIO_CATEGORIES = [
   "ops-automation",
   "internal-tool",
   "ai-agents",
+  "website",
 ] as const;
 
 /** Every filter: all projects, then one per category. */
@@ -33,7 +34,7 @@ export const PORTFOLIO_SEARCH_DEFAULTS = { category: "all" } as const;
 
 /**
  * /portfolio search params (TanStack Router `validateSearch`, Standard
- * Schema): `?category=internal-platform|ops-automation|internal-tool|ai-agents`
+ * Schema): `?category=internal-platform|ops-automation|internal-tool|ai-agents|website`
  * narrows the projects. A missing or unknown value falls back to all
  * projects without an error.
  */

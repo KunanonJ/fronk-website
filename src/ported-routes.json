@@ -167,6 +167,17 @@
     "seed": false
   },
   {
+    "path": "/portfolio/kunanonj-com",
+    "test": "portfolio-site"
+  },
+  {
+    "path": "/portfolio/kunanonj-com.md"
+  },
+  {
+    "path": "/portfolio/kunanonj-com/opengraph-image",
+    "seed": false
+  },
+  {
     "path": "/portfolio/node-validator-automation"
   },
   {

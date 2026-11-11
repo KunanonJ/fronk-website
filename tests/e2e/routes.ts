@@ -60,6 +60,13 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /AI Automation|How it works|Architecture/i,
   },
   {
+    // The public project (this site): no Outcome or My part card, and a
+    // link to the source in the hero.
+    path: "/portfolio/kunanonj-com",
+    name: "portfolio-site",
+    expectsHeadingPattern: /^kunanonj\.com\./i,
+  },
+  {
     path: "/skills",
     name: "skills",
     expectsHeadingPattern: /agent skills|Install the whole pack|verify-loop/i,

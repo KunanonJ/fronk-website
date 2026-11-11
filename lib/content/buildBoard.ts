@@ -99,7 +99,7 @@ export const buildBoard: Record<BuildColumn, readonly BuildCard[]> = {
     {
       id: "KJ-25",
       title: "GoGoCash live cashback",
-      body: "1,000+ users and 220+ merchants on the shopping-to-earn loop.",
+      body: "1,000 registered users and 220+ merchants on the shopping-to-earn loop.",
       venture: "gogocash",
     },
     {

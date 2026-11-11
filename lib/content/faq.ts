@@ -39,7 +39,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "What is GoGoCash?",
     answer:
-      "GoGoCash is a shopping-to-earn cashback platform Fronk founded in 2023. Over 1,000 users earn up to 30% cashback across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
+      "GoGoCash is a shopping-to-earn cashback platform Fronk founded in 2023. 1,000 registered users earn up to 30% cashback across 220+ top merchants — Apple, Samsung, Lazada, Shopee, TikTok Shop, Temu, and more.",
   },
   {
     question: "What is Manut AI?",

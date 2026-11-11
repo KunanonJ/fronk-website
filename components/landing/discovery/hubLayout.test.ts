@@ -59,7 +59,7 @@ describe("splitLead", () => {
 
   it("keeps a long first sentence, or a lone one, as body text", () => {
     const long =
-      "Live at gogocash.co with 1,000+ users and a merchant catalogue past 220 partners. The core loop is live.";
+      "Live at gogocash.co with 1,000 registered users and a merchant catalogue past 220 partners. The core loop is live.";
     expect(splitLead(long)).toEqual({ rest: long });
     expect(splitLead("One sentence only.")).toEqual({
       rest: "One sentence only.",

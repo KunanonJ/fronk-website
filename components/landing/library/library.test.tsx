@@ -170,6 +170,79 @@ describe("ProofPage", () => {
     expectNoHiddenLinks(container);
   });
 
+  it("leads with the delivery outcomes, each a link to its case study", () => {
+    const { container } = render(<ProofPage />);
+    const delivery = screen.getByRole("article", { name: "Delivery" });
+    const tiles = within(
+      within(delivery).getByRole("list", {
+        name: "Outcomes, each linking to its case study",
+      }),
+    ).getAllByRole("link");
+    // The label is read before the figure; the figure is drawn above it.
+    expect(tiles.map((tile) => tile.textContent)).toEqual([
+      "Adoption · TBH Intranet50+ employeesCase study →",
+      "Build cycles · TBH Intranet4 months to 1 weekCase study →",
+      "Recurring workflow staffing · AI Automation10 people to 1 operatorCase study →",
+      "Turnaround · AI Automation30 minutesCase study →",
+    ]);
+    expect(tiles.map((tile) => tile.getAttribute("href"))).toEqual([
+      "/portfolio/tbh-intranet",
+      "/portfolio/tbh-intranet",
+      "/portfolio/ai-automation",
+      "/portfolio/ai-automation",
+    ]);
+    expect(delivery).toHaveTextContent(
+      "04 outcomes · TBH Intranet · AI Automation",
+    );
+    // They are his own figures: the card says where he states them.
+    expect(
+      within(delivery).getByRole("link", { name: "As stated in the résumé →" }),
+    ).toHaveAttribute("href", "/resume");
+    // Before the venture metrics: what a hiring reader came for.
+    const articles = [...container.querySelectorAll("article")];
+    expect(articles.indexOf(delivery)).toBeLessThan(
+      articles.indexOf(
+        screen.getByRole("article", { name: "Venture metrics" }),
+      ),
+    );
+  });
+
+  it("says in the lead what the page holds, without repeating the h1", () => {
+    render(<ProofPage />);
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1).toHaveTextContent(
+      "Honest signals: venture metrics and case studies. No invented scores.",
+    );
+    const lead = h1.nextElementSibling!;
+    expect(lead).toHaveTextContent(/^Delivery outcomes, as the résumé states/);
+    for (const phrase of ["Honest signals", "No invented scores"])
+      expect(lead.textContent).not.toContain(phrase);
+  });
+
+  it("dates GoGoCash's running totals on the tile and in the quote", () => {
+    render(<ProofPage />);
+    for (const [value, label] of [
+      ["THB 13 million", "Cumulative gross merchandise value"],
+      ["THB 169,000", "Cashback paid"],
+    ]) {
+      const tile = screen.getByRole("button", { name: new RegExp(value!) });
+      expect(tile).toHaveTextContent(
+        `${value}${label} · GoGoCashAs of October 2026`,
+      );
+      fireEvent.click(tile);
+      expect(
+        screen.getByText(/Source · GoGoCash case · Where it stands/),
+      ).toBeInTheDocument();
+      expect(screen.getByRole("blockquote")).toHaveTextContent(
+        "“As of October 2026, cumulative gross merchandise value is THB 13 million and cashback paid is THB 169,000.”",
+      );
+    }
+    // An undated figure carries no date.
+    expect(screen.getByRole("button", { name: /220\+/ })).not.toHaveTextContent(
+      "As of",
+    );
+  });
+
   it("shows a case card per venture with its live site and case page", () => {
     render(<ProofPage />);
     for (const [name, slug] of [

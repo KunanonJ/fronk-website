@@ -12,7 +12,12 @@ import {
   getLearnWritingLinks,
   learnOperatorNotes,
 } from "@/lib/content/learn";
-import { getProofCases, getProofMetrics } from "@/lib/content/proof";
+import { getAllPortfolioProjects } from "@/lib/content/portfolio";
+import {
+  getProofCases,
+  getProofMetrics,
+  getProofOutcomes,
+} from "@/lib/content/proof";
 import {
   STACK_GROUPS,
   stackItems,
@@ -116,10 +121,38 @@ describe("proof content", () => {
       getProofMetrics().map((m) => [m.label, m.where]),
     );
     expect(where).toEqual({
-      Users: "GoGoCash case · Where it stands",
+      "Registered users": "GoGoCash case · Where it stands",
       Merchants: "GoGoCash · Venture summary",
       "Max cashback": "GoGoCash case · What it is",
+      "Cumulative gross merchandise value": "GoGoCash case · Where it stands",
+      "Cashback paid": "GoGoCash case · Where it stands",
     });
+  });
+
+  it("quotes a dated total with its date", () => {
+    const dated = getProofMetrics().filter((metric) => metric.asOf);
+    expect(dated.map((metric) => metric.value)).toEqual([
+      "THB 13 million",
+      "THB 169,000",
+    ]);
+    // The sentence a reader sees for the figure names the month it was true.
+    for (const metric of dated)
+      expect(metric.quote, metric.label).toContain(`As of ${metric.asOf}`);
+  });
+
+  it("lists each case-study outcome with its case study, in portfolio order", () => {
+    const outcomes = getProofOutcomes();
+    const stated = getAllPortfolioProjects().flatMap((project) =>
+      (project.outcomes ?? []).map((outcome) => ({
+        value: outcome.value,
+        label: outcome.label,
+        project: project.name,
+        href: `/portfolio/${project.slug}`,
+      })),
+    );
+    // Read from the projects, so the clearance audit covers /proof too.
+    expect(outcomes).toEqual(stated);
+    expect(outcomes.length).toBeGreaterThan(0);
   });
 
   it("shows only ventures with a case page, no press items", () => {

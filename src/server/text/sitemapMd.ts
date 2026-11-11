@@ -36,7 +36,7 @@ export function buildSitemapMd(): string {
     [
       "/portfolio",
       "Portfolio",
-      "AI agents and internal tools built at The Binary Holdings",
+      "AI agents and internal tools built at The Binary Holdings, plus this personal site",
     ],
     ...getAllPortfolioProjects().map((p): Row => [
       `/portfolio/${p.slug}`,
@@ -66,7 +66,7 @@ export function buildSitemapMd(): string {
     ["/learn", "Learn", "Index of topic hubs and notes"],
     ["/examples", "Examples", "Scenarios by persona"],
     ["/stack", "Stack", "Tools by stage"],
-    ["/proof", "Proof", "Venture metrics and case studies"],
+    ["/proof", "Proof", "Delivery outcomes, venture metrics and case studies"],
     ["/build", "Build", "Public build board"],
     ["/contact", "Contact", "Email and contact form"],
     ["/resume", "Resume", "Career timeline; noindex"],

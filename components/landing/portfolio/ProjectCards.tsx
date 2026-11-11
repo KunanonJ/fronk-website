@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "@/components/navigation/Link";
-import { BentoCard, Kicker, bentoSpan } from "@/components/bento/Bento";
+import {
+  BentoCard,
+  CardLink,
+  Kicker,
+  bentoSpan,
+} from "@/components/bento/Bento";
 import { TechChip } from "@/components/bento/Chips";
 import Image from "@/components/ui/Image";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
 import { ArrowDownSmallIcon } from "@/components/landing/portfolio/PortfolioParts";
 import VisualIcon from "@/components/landing/portfolio/VisualIcon";
+import { RESUME_HREF } from "@/lib/content/availability";
 import {
   getAdjacentPortfolioProjects,
   portfolioPage,
   type PortfolioArchitecture,
+  type PortfolioOutcome,
   type PortfolioProject,
   type PortfolioWorkflow,
 } from "@/lib/content/portfolio";
@@ -25,6 +32,50 @@ import { CARD_SURFACE, MONO_LABEL } from "@/components/bento/classes";
  */
 
 const BODY = "m-0 text-card leading-[1.6] text-ink-2";
+
+/**
+ * Outcome: what changed, as the owner states it in his résumé (recruiter-fit
+ * phase 3). A full row: each figure sits under what it measures, side by side
+ * from 641 px; the link leads to the résumé the figures come from.
+ */
+export function OutcomeCard({
+  outcomes,
+}: {
+  outcomes: readonly PortfolioOutcome[];
+}) {
+  return (
+    <BentoCard
+      headingId="card-outcome"
+      title="Outcome"
+      span={3}
+      gap={3}
+      minHeight={false}
+    >
+      <dl className="m-0 grid grid-cols-1 gap-x-8 gap-y-5 px-1 min-[641px]:grid-cols-2">
+        {outcomes.map((outcome) => (
+          <div key={outcome.label} className="flex min-w-0 flex-col gap-1.5">
+            <dt className={MONO_LABEL}>{outcome.label}</dt>
+            <dd className="m-0 text-[28px] leading-[1.15] font-semibold tracking-[-0.03em]">
+              {outcome.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <CardLink href={RESUME_HREF} className="self-start px-1">
+        As stated in the résumé →
+      </CardLink>
+    </BentoCard>
+  );
+}
+
+/** My part: what he did himself, in the CV's verbs. A full row, set to a reading measure. */
+export function MyPartCard({ text }: { text: string }) {
+  return (
+    <BentoCard headingId="card-part" title="My part" span={3} minHeight={false}>
+      <p className="m-0 max-w-[760px] px-1 text-base leading-[1.6]">{text}</p>
+    </BentoCard>
+  );
+}
 
 /** Interface: the screenshot or the illustrative mockup, then any gallery. */
 export function InterfaceCard({ project }: { project: PortfolioProject }) {

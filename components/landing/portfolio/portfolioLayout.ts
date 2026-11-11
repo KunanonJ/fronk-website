@@ -4,8 +4,9 @@ import type { HeadlineLine } from "@/lib/content/portfolio";
 
 /*
  * Layout rules for the portfolio (bento canvas 4.5, 4.6). The canvas draws
- * the index with all four projects and one project page (TBH Intranet);
- * these rules give the same result there and derive the rest from the data.
+ * the index with its first four projects and one project page (TBH Intranet);
+ * these rules give the same result there and derive the rest from the data
+ * (the fifth project, this site, takes a row of its own).
  */
 
 /**

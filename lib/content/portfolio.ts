@@ -1,10 +1,18 @@
 /**
  * Portfolio: internal tools, automations and AI agents built at The Binary
- * Holdings. Separate from Ventures (founder companies in `ventures.ts`).
+ * Holdings, and this site. Separate from Ventures (founder companies in
+ * `ventures.ts`).
  *
  * Honesty rule (same as ventures): every claim restates something the
  * project's own source or docs show. No invented numbers, clients or outcomes,
  * and nothing internal (hostnames, IDs, balances, staff or partner names).
+ *
+ * One more source since recruiter-fit phase 3: what the owner states in his
+ * CV. `outcomes` restate a résumé bullet word for word in `source`, and the
+ * owner said which project each bullet describes; `myPart` uses the CV's verbs
+ * and his answer on which systems he wrote code for. What he cleared is
+ * listed in `portfolioOutcomes.test.ts`, which fails on an outcome, or a
+ * "wrote code" claim, that is not in its lists.
  *
  * Adding screenshots:
  *   1. Drop files into `public/portfolio/<slug>/` (e.g. `cover.png`, `shot-1.png`).
@@ -73,6 +81,32 @@ export type PortfolioMockup =
   | { kind: "form-preview"; fields: readonly string[]; action: string }
   | { kind: "review-queue"; title: string; columns: readonly string[] };
 
+/** An outcome of a project, restated from the owner's CV. */
+export interface PortfolioOutcome {
+  /** What is measured, e.g. "Adoption". */
+  label: string;
+  /** The figure or the change, e.g. "50+ employees". */
+  value: string;
+  /** The résumé bullet this restates, word for word. */
+  source: string;
+}
+
+/**
+ * `organization` of a project that is the owner's own and not an employer's
+ * (this site). The text endpoints list such projects apart, and the JSON-LD
+ * names no organisation as their source.
+ */
+export const PERSONAL_PROJECT = "Personal project";
+
+export function isPersonalProject(project: PortfolioProject): boolean {
+  return project.organization === PERSONAL_PROJECT;
+}
+
+/** An outcome on one line, for cards and text endpoints: "Adoption: 50+ employees". */
+export function outcomeLine(outcome: PortfolioOutcome): string {
+  return `${outcome.label}: ${outcome.value}`;
+}
+
 export interface PortfolioProject {
   slug: string;
   name: string;
@@ -87,7 +121,7 @@ export interface PortfolioProject {
   /** Display string, e.g. "May to Oct 2026". */
   period: string;
   year: number;
-  /** Internal tools sit behind a login, so they carry no public link. */
+  /** Internal tools carry no public link. */
   access: "internal" | "public";
   url?: string;
   urlLabel?: string;
@@ -100,6 +134,16 @@ export interface PortfolioProject {
    * problem" card. Only where the copy names both sides.
    */
   beforeAfter?: { before: string; after: string };
+  /**
+   * What changed, as the owner states it in his CV. Each restates a résumé
+   * bullet, and the owner mapped it to this project (11-11-26).
+   */
+  outcomes?: readonly PortfolioOutcome[];
+  /**
+   * The owner's part: the CV's verbs for this work, and his answer on which
+   * systems he wrote code for (11-11-26). Never "solo-built".
+   */
+  myPart?: string;
   cover?: PortfolioImage;
   gallery?: readonly PortfolioImage[];
   /** Illustrative UI; used as the cover until a screenshot is registered. */
@@ -146,6 +190,22 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     year: 2026,
     access: "internal",
     beforeAfter: { before: "Zoho", after: "One login-only web app" },
+    outcomes: [
+      {
+        label: "Adoption",
+        value: "50+ employees",
+        source:
+          "Owned the roadmap and requirements for an internal platform covering CRM, support, HR, project management and AI assistance; achieved adoption by 50+ employees.",
+      },
+      {
+        label: "Build cycles",
+        value: "4 months to 1 week",
+        source:
+          "Partnered with engineering and strategy from requirements through launch; build cycles for the internal company platform fell from 4 months to 1 week.",
+      },
+    ],
+    myPart:
+      "Owned the roadmap and requirements, and wrote code for the platform and for ARIA, its assistant. Led delivery of ARIA as a private-data knowledge platform for competitive analysis and executive decision support, and partnered with engineering and strategy from requirements through launch.",
     mockup: {
       kind: "app-shell",
       title: "Intranet",
@@ -294,6 +354,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "May to Sep 2026",
     year: 2026,
     access: "internal",
+    myPart: "Wrote code for it.",
     mockup: {
       kind: "email-report",
       subject: "Validator health report",
@@ -421,6 +482,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "Sep 2026",
     year: 2026,
     access: "internal",
+    myPart: "Wrote code for it.",
     mockup: {
       kind: "form-preview",
       fields: ["Name", "Title", "Email", "Phone", "Company"],
@@ -536,6 +598,22 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     period: "Mar to Apr 2026",
     year: 2026,
     access: "internal",
+    outcomes: [
+      {
+        label: "Recurring workflow staffing",
+        value: "10 people to 1 operator",
+        source:
+          "Automated video sourcing, trimming, review and publishing; reduced recurring workflow staffing from 10 people to 1 operator, with a 30-minute turnaround.",
+      },
+      {
+        label: "Turnaround",
+        value: "30 minutes",
+        source:
+          "Automated video sourcing, trimming, review and publishing; reduced recurring workflow staffing from 10 people to 1 operator, with a 30-minute turnaround.",
+      },
+    ],
+    myPart:
+      "Automated video sourcing, trimming, review and publishing with the team, and wrote code for the agents.",
     mockup: {
       kind: "review-queue",
       title: "Clip review queue",
@@ -672,6 +750,145 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
       {
         heading: "How it is built",
         body: "Python agents on Google's Agent Development Kit with Gemini models, deployable to Vertex AI Agent Engine. Media handling uses yt-dlp and ffmpeg, and the recruitment agent is a FastAPI service. CI runs ruff, mypy and pytest on GitHub Actions.",
+      },
+    ],
+  },
+  {
+    // This site (recruiter-fit phase 3; owner: "Yes, add it", 11-11-26). The
+    // one project that is public and not built at The Binary Holdings. Every
+    // line restates what the repository shows: its README, its configuration
+    // (package.json, wrangler.jsonc, vite.config.mts, .github/workflows/ci.yml),
+    // its source and its commit history. It states no outcome and no "my
+    // part": the CV does not mention the site, so neither is cleared.
+    slug: "kunanonj-com",
+    name: "kunanonj.com",
+    tagline: "A personal site for people and for AI agents.",
+    summary:
+      "The site you are reading: a résumé, case studies and topic hubs, with the same facts published as plain text and structured data for AI agents. Built on TanStack Start and Cloudflare Workers, with the source public on GitHub.",
+    category: "Website",
+    role: "Owner",
+    organization: PERSONAL_PROJECT,
+    period: "2026",
+    year: 2026,
+    access: "public",
+    url: "https://github.com/KunanonJ/fronk-website",
+    urlLabel: "Source on GitHub",
+    // A real screenshot, not a mockup: the site is public, and the app-shell
+    // mockup (a sidebar dashboard) looks nothing like it. Home at 1440 x 900
+    // in the light theme, from a production build, saved as lossless WebP.
+    // Capture it again when Home changes.
+    cover: {
+      src: "/portfolio/kunanonj-com/cover.webp",
+      alt: "The Home page of kunanonj.com: the headline Forward deployed AI engineering from Bangkok, the Open to roles line, the Contact me and Résumé buttons, and the Selected work and Experience cards",
+      width: 1440,
+      height: 900,
+    },
+    workflow: {
+      title: "From change to production",
+      steps: [
+        {
+          label: "Plan",
+          detail: "A written plan with its checks, kept in the repo",
+          icon: "filetext",
+        },
+        {
+          label: "Build",
+          detail: "Code with its unit tests",
+          icon: "gitcommit",
+        },
+        {
+          label: "Checks",
+          detail: "Types, lint, tests, a build and browser runs",
+          icon: "listchecks",
+        },
+        {
+          label: "Preview",
+          detail: "Each branch uploads its own Worker version",
+          icon: "eye",
+        },
+        {
+          label: "Deploy",
+          detail: "A merge to main ships the Worker",
+          icon: "send",
+        },
+      ],
+    },
+    architecture: {
+      layers: [
+        {
+          label: "Readers",
+          nodes: [
+            { label: "People", note: "Pages in light and dark" },
+            {
+              label: "AI agents and crawlers",
+              note: "Text files, Markdown twins, JSON-LD",
+            },
+          ],
+        },
+        {
+          label: "Web app",
+          nodes: [
+            { label: "TanStack Start", note: "React, rendered on the server" },
+            { label: "Prerendered pages", note: "Built once per deploy" },
+            {
+              label: "Server routes",
+              note: "Text endpoints, share images, contact form",
+            },
+          ],
+        },
+        {
+          label: "Content",
+          nodes: [
+            { label: "Typed content modules", note: "Key facts held by tests" },
+            {
+              label: "Sanity",
+              note: "Résumé edits, with a fallback in the repo",
+            },
+          ],
+        },
+        {
+          label: "Hosting",
+          nodes: [
+            { label: "Cloudflare Workers", note: "Static assets, edge cache" },
+            { label: "GitHub Actions", note: "Checks on every pull request" },
+          ],
+        },
+      ],
+    },
+    stack: [
+      "TypeScript",
+      "React",
+      "TanStack Start",
+      "TanStack Router",
+      "TanStack Query",
+      "TanStack Form",
+      "Tailwind CSS",
+      "Vite",
+      "Valibot",
+      "Sanity",
+      "Cloudflare Workers",
+      "Vitest",
+      "Playwright",
+      "GitHub Actions",
+    ],
+    highlights: [
+      "Pages that read only the content modules are rendered once per deploy and served as static files",
+      "The résumé page asks Sanity for an edited version on request and is cached at the edge; it shows the copy in the repo when Sanity holds none or cannot be read",
+      "The same facts as text for AI agents: llms.txt, a full profile in one file, agents.md and a Markdown twin of each project page",
+      "Structured data for the profile, the projects, the ventures and the topic hubs, and a share image drawn in code for each of them",
+      "Topic hubs in English and Thai, each pointing to its other language",
+      "Tests pin the résumé's role periods, and hold the current role's start month to one wording in the summary and on the forward-deployed hub, in English and Thai",
+      "The résumé PDF is generated from the résumé page",
+      "Every pull request runs type checks, lint, unit tests, a build with a first-load budget, smoke and accessibility tests, visual comparisons and a crawl compared with a reference",
+    ],
+    sections: [
+      {
+        heading: "The problem",
+        body: "The site has two readers: a person deciding whether to get in touch, and the search and answer engines that summarise it first. Both need the same facts, so the text files and the structured data are generated from the repo's content modules, and tests hold the current role, the case-study figures and the user count to one wording.",
+      },
+      {
+        heading: "How it is built",
+        body: "TanStack Start on Cloudflare Workers. Pages that read only the content modules are prerendered at deploy; pages that read Sanity render on request and are cached at the edge. The repository keeps its own process beside the code: written plans, phase reports and instructions for AI coding agents, and many of its commits name one as co-author.",
       },
     ],
   },

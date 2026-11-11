@@ -1,4 +1,4 @@
-import type { PortfolioProject } from "@/lib/content/portfolio";
+import { outcomeLine, type PortfolioProject } from "@/lib/content/portfolio";
 import { EMPLOYER_ORGANIZATION, PERSON_ID, WEBSITE_ID } from "@/lib/seo/jsonLd";
 import { siteConfig } from "@/lib/site";
 
@@ -24,12 +24,20 @@ export function buildPortfolioProjectJsonLd(
     "@type": "CreativeWork",
     "@id": `${url}/#work`,
     name: project.name,
-    description: project.summary,
+    // The outcome lines join the description: schema.org has no property for
+    // an outcome, and an invented one would not validate.
+    description: project.outcomes?.length
+      ? `${project.summary} Outcome, as stated in the résumé: ${project.outcomes.map(outcomeLine).join("; ")}.`
+      : project.summary,
     url,
     mainEntityOfPage: url,
     dateCreated: String(project.year),
     keywords: project.stack.join(", "),
-    sourceOrganization: { "@id": EMPLOYER_ID },
+    // Only the employer's projects, matched by name so no other organisation
+    // is given its id: his own project (this site) has none.
+    ...(project.organization === EMPLOYER_ORGANIZATION.name
+      ? { sourceOrganization: { "@id": EMPLOYER_ID } }
+      : {}),
     isPartOf: { "@id": WEBSITE_ID },
     ...(isTeamProject(project)
       ? { contributor: { "@id": PERSON_ID } }

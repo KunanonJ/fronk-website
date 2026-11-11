@@ -78,16 +78,18 @@ describe("Home cards", () => {
       "/ventures/manut",
     );
     expect(
-      screen.getByText("1,000+ users · 220+ merchants on GoGoCash"),
+      screen.getByText("1,000 registered users · 220+ merchants on GoGoCash"),
     ).toBeInTheDocument();
   });
 
   it("lists the featured work in the canvas order, each with its kind", () => {
     render(<SelectedWorkCard />);
     const items = screen.getAllByRole("listitem");
+    // The first outcome the owner states sits under the tagline; a project
+    // with none (the validator) keeps its two lines.
     expect(items.map((li) => li.textContent)).toEqual([
-      "01TBH IntranetOne back office for a multi-entity group.Internal platform",
-      "02AI AutomationAI agents for content ops and hiring.AI agents",
+      "01TBH IntranetOne back office for a multi-entity group.Adoption: 50+ employeesInternal platform",
+      "02AI AutomationAI agents for content ops and hiring.Recurring workflow staffing: 10 people to 1 operatorAI agents",
       "03Node Validator AutomationDaily health checks for Avalanche L1 validators.Ops automation",
     ]);
     // The widest card on Home: the evidence a hiring reader looks for.
