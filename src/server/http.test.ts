@@ -84,6 +84,14 @@ describe("withServerFnNoStore", () => {
     }
   });
 
+  it("leaves a WebSocket upgrade as it is: a 101 cannot be rebuilt", () => {
+    // Node's Response refuses status 101, so this stands in for one.
+    const upgrade = { status: 101, headers: new Headers() } as Response;
+    expect(withServerFnNoStore(at("/_serverFn/17bb0f50"), upgrade)).toBe(
+      upgrade,
+    );
+  });
+
   it("leaves every other response as it is", () => {
     const page = new Response("<html></html>");
     expect(withServerFnNoStore(at("/resume"), page)).toBe(page);

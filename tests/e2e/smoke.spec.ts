@@ -1118,7 +1118,7 @@ test.describe("worker cache > what the edge may keep", () => {
     for (const answer of answers) expect(answer.cacheControl).toBe("no-store");
   });
 
-  test("Sanity-backed responses are kept an hour, and a failure is not hidden", async ({
+  test("the tagged pages and feeds get an hour at the edge and stale-if-error=0", async ({
     request,
   }) => {
     for (const path of ["/learn", "/feed.xml", "/llms.txt", "/sitemap.xml"]) {

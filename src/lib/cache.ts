@@ -10,12 +10,16 @@ import type { RevalidationTag } from "@/lib/sanity/revalidation";
  * would get the previous visitor's copy, up to 25 hours old. stale-if-error=0:
  * when the Worker fails while it refreshes an expired copy, the visitor gets
  * the error, not the old copy (Cloudflare's default is the old copy, with no
- * time limit). worker-cache-followup plan, decision 2.
+ * time limit). worker-cache-followup plan, decision 2. A probe on a preview
+ * showed the edge reads it in CDN-Cache-Control, and that the must-revalidate
+ * in Cache-Control does not stop the old copy
+ * (process/general-plans/references/worker-cache-research_11-11-26.md).
  *
  * Left at Cloudflare's defaults, with no header from this repo: a 404 is kept
  * three minutes, a 405 one minute; a 308 and a 500 are not kept. A not-found
- * is drawn by the root route, so the route's own headers do not apply: on the
- * built site an unknown post's 404 carries no cache header and no tag.
+ * is drawn by the root route, the only route with a notFoundComponent, so a
+ * route's own headers do not apply: on the built site an unknown post's 404
+ * carries no cache header and no tag.
  * A deploy empties the cache: the Worker's version is part of its key.
  */
 export const EDGE_LIFETIME = "public, max-age=3600, stale-if-error=0";
