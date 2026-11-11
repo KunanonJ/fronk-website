@@ -532,8 +532,8 @@ résumé is published in Studio.
   `/learn` carry `Cache-Tag` and a one-day edge lifetime, and `scheduled()`
   asks for a purge of every content tag each hour. On 11-11-26 at 06:26 UTC
   both answered `cf-cache-status: HIT` with `age: 61620`, about 17 hours.
-  They were stored at 13:19 UTC on 10-11-26, two and a half minutes after
-  the last merge to `main`, and have outlived every hourly run since. The cause is not known
+  They were stored at 13:19 UTC on 10-11-26, about two minutes after
+  the last merge to `main`, and have outlived every hour mark since. The cause is not known
   from the repository: the cron may not run, the purge may fail (the code
   logs "[cron] cache purge failed" and carries on), or the purge may not
   reach these entries. The webhook's purge was checked on staging at the
@@ -541,7 +541,9 @@ résumé is published in Studio.
   `/resume`). The hourly purge was only run in the local Worker, and
   nothing has been published since to try the webhook on the live site.
   If neither lands, an edit in Studio takes up to a day to show.
-  `README.md` and `/agents.md` describe the hourly purge as working.
+  `README.md` describes the hourly purge as working. The public
+  `/agents.md` names only the webhook's purge, which is accurate
+  (corrected 11-11-26: this line first named `/agents.md` too).
 - **Server-function answers are cached at the edge for two hours, with no
   tag.** On a client-side navigation to `/resume`, `/learn` or `/blog`, the
   browser fetches a server function. Its answer carries no `Cache-Control`,

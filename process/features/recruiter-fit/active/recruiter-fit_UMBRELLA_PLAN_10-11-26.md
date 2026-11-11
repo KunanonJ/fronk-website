@@ -158,7 +158,7 @@ Asked before the merge of Phase 3 (11-11-26), with each line shown:
     and the `/proof` lead.
 24. **Merge of Phase 3.** "Yes, merge": pull request #110.
 25. **The live site's cache.** "Plan a follow-up": a short plan for the
-    hourly purge that does not take effect and for the server-function
+    hourly purge that was not seen to take effect and for the server-function
     answers cached with no tag (Phase 3 report, "Findings outside this
     phase"). It needs its own approval before any code changes. The plan:
     `process/general-plans/active/worker-cache-followup_PLAN_11-11-26.md`.
