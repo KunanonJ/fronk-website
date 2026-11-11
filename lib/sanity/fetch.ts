@@ -16,7 +16,9 @@ import type {
  * Run a GROQ query. Null when Sanity is not configured (builds without it use
  * the bundled fallback content) or nothing matches. A failed request throws:
  * the route then renders its error state with no-store, instead of fallback
- * content the edge would keep for a day.
+ * content the edge would keep for a day. The résumé is the exception: its
+ * caller catches the failure and shows the repo's résumé with no-store
+ * (loadResumeProfile in lib/content/resumeProfile.ts).
  */
 async function sanityFetch<T>(
   label: string,

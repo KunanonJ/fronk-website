@@ -13,7 +13,7 @@ import {
 import { routeCacheHeaders } from "@/src/lib/cache";
 import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
-import { resumeQuery } from "@/src/queries/content";
+import { loadResume, resumeQuery } from "@/src/queries/content";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
 // The share tags are the page's own, so a résumé link pasted into a chat
@@ -36,9 +36,12 @@ const metadata: Metadata = {
 export const Route = createFileRoute("/_landing/resume")({
   validateSearch: resumeSearchSchema,
   search: { middlewares: [stripSearchParams(RESUME_SEARCH_DEFAULTS)] },
-  loader: ({ context }) => context.queryClient.ensureQueryData(resumeQuery),
+  loader: ({ context }) => loadResume(context.queryClient),
   head: () => pageHead(metadata),
-  headers: ({ match }) => routeCacheHeaders(match, ["resume"]),
+  // A résumé drawn from the repo because Sanity could not be read is not
+  // kept at the edge: the next visit reads Sanity again.
+  headers: ({ match, loaderData }) =>
+    routeCacheHeaders(match, ["resume"], !loaderData?.degraded),
   component: ResumeRoute,
 });
 
@@ -56,7 +59,12 @@ function ResumeRoute() {
   return (
     <PageMain>
       <ResumePage profile={profile} detail={view} onDetailChange={setView} />
-      <div className="hidden print:block">
+      {/* Marked when the repo's résumé stands in for a failed Sanity read:
+          `pnpm pdf` refuses to print a stand-in as the résumé. */}
+      <div
+        className="hidden print:block"
+        data-resume-stand-in={profile.degraded ? "" : undefined}
+      >
         <ResumePrint profile={profile} />
       </div>
     </PageMain>

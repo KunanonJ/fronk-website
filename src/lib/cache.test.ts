@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   EDGE_LIFETIME,
   edgeCacheHeaders,
+  routeCacheHeaders,
   withEdgeCache,
   withEdgeLifetime,
 } from "./cache";
@@ -14,6 +15,22 @@ describe("Worker cache headers", () => {
       "Cache-Tag": "posts,writing",
     });
     expect(EDGE_LIFETIME).not.toContain("s-maxage");
+  });
+
+  it("keeps only a successful, cacheable render of a route", () => {
+    const cached = edgeCacheHeaders(["resume"]);
+    const never = { "Cache-Control": "no-store" };
+    expect(routeCacheHeaders({ status: "success" }, ["resume"])).toEqual(
+      cached,
+    );
+    expect(routeCacheHeaders({ status: "error" }, ["resume"])).toEqual(never);
+    expect(routeCacheHeaders({ status: "notFound" }, ["resume"])).toEqual(
+      never,
+    );
+    // The résumé drawn from the repo because Sanity could not be read.
+    expect(routeCacheHeaders({ status: "success" }, ["resume"], false)).toEqual(
+      never,
+    );
   });
 
   it("tags responses another handler built, keeping body and type", async () => {

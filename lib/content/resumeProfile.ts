@@ -17,8 +17,9 @@ import {
 export type { ResolvedTimelineItem, ResolvedTimelineSection, ResumeSkillGroup };
 
 /**
- * The header when Sanity holds no résumé document (today's state). The
- * headline is approved identity wording and leads with the AI role.
+ * The header when Sanity holds no résumé document (the state on 11-11-26;
+ * `pnpm seed` or Studio can create one). The headline is approved identity
+ * wording and leads with the AI role.
  */
 export const DEFAULT_RESUME_PROFILE = {
   name: "Kunanon Jarat",
@@ -80,4 +81,32 @@ export function resolveResumeProfile(cms: ResumeProfile | null) {
     skills: RESUME_SKILLS_FALLBACK,
     languages: RESUME_LANGUAGES_FALLBACK,
   };
+}
+
+/** The résumé as the page draws it, and whether Sanity could not be read. */
+export type LoadedResumeProfile = ReturnType<typeof resolveResumeProfile> & {
+  /** True when the Sanity read failed and the repo's résumé stands in. */
+  degraded: boolean;
+};
+
+/**
+ * The résumé for /resume. A failed Sanity read used to show the error page.
+ * Now the repo's résumé stands in (owner, 11-11-26): a recruiter who clicks
+ * Résumé should not meet an error. On 11-11-26 the production dataset held
+ * no résumé document, so the stand-in was also what a good read drew; once
+ * Studio holds one, the stand-in is the older copy. `degraded` lets the route
+ * keep such a response out of the edge cache and ask again on the next
+ * visit. A failed request is logged by `read` (lib/sanity/fetch.ts); the log
+ * here also covers a document the mapper cannot draw, and says what the
+ * visitor was shown.
+ */
+export async function loadResumeProfile(
+  read: () => Promise<ResumeProfile | null>,
+): Promise<LoadedResumeProfile> {
+  try {
+    return { ...resolveResumeProfile(await read()), degraded: false };
+  } catch (error: unknown) {
+    console.error("[resume] showing the repo's résumé instead", error);
+    return { ...resolveResumeProfile(null), degraded: true };
+  }
 }

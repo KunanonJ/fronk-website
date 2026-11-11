@@ -9,6 +9,17 @@ import type { RevalidationTag } from "@/lib/sanity/revalidation";
 export const EDGE_LIFETIME =
   "public, max-age=86400, stale-while-revalidate=86400";
 
+/**
+ * Keeps a response out of the edge cache and the browser's. It has to be
+ * said: the Worker cache keeps a 200 that carries no Cache-Control for two
+ * hours (Cloudflare's default for a Worker with `cache.enabled`). On a page
+ * it holds as long as no parent route sets CDN-Cache-Control, which the
+ * edge reads first; none does.
+ */
+export const NO_STORE: Readonly<Record<string, string>> = {
+  "Cache-Control": "no-store",
+};
+
 export function edgeCacheHeaders(
   tags: readonly RevalidationTag[],
 ): Record<string, string> {
@@ -19,14 +30,20 @@ export function edgeCacheHeaders(
   };
 }
 
-/** For a route's `headers`: edge-cache a successful render only, never a 404 or an error page. */
+/**
+ * For a route's `headers`: edge-cache a successful render only, never a 404
+ * or an error page. `cacheable: false` also keeps a render out of the cache:
+ * /resume passes it when Sanity could not be read and the repo's résumé
+ * stands in, so the edge does not keep the stand-in for a day.
+ */
 export function routeCacheHeaders(
   match: { status: string },
   tags: readonly RevalidationTag[],
+  cacheable = true,
 ): Record<string, string> {
-  return match.status === "success"
+  return match.status === "success" && cacheable
     ? edgeCacheHeaders(tags)
-    : { "Cache-Control": "no-store" };
+    : { ...NO_STORE };
 }
 
 /** The same headers on a response another handler built (feed, llms, sitemap). */
