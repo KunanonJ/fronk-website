@@ -1,10 +1,10 @@
 # Report: Agent readiness
 
-**Plan:** `../active/agent-readiness_PLAN_12-11-26.md`
-**Status:** MERGED (12-11-26). Pull request #114 (`57c0e0d` on `main`),
+**Plan:** `../completed/agent-readiness_PLAN_12-11-26.md`
+**Status:** COMPLETE (12-11-26). Pull request #114 (`57c0e0d` on `main`),
 merged at 03:41:19 UTC after every CI check passed, and live by 03:42:37.
-Gates 1 to 8 pass (see "Gates"). Gate 9, Cloudflare's Diagnostics, is the
-owner's and still open, so the plan stays in `active/`.
+All nine gates pass (see "Gates"); the owner reported gate 9, Cloudflare's
+Diagnostics, the same day. Archived on 12-11-26.
 **Base:** `cb496e6` on `main`. Commits on the branch: `2625b2a` (the
 change), `6efad5f` (first review's fixes), `acf13ff` (second review's
 fixes), `76bba0a` (the records); squash-merged as `57c0e0d`.
@@ -85,7 +85,7 @@ builds deployed nothing.
 | 6 | **On the preview of `76bba0a`, 03:39 UTC.** One address read four times, `/about?probe=g6033951`: Markdown `MISS`, HTML `MISS`, Markdown `HIT`, HTML `HIT`, each with its own body, so the cache keeps the versions apart. `/`, `/about` and `/portfolio/kunanonj-com` each answered `text/markdown` with their Markdown and `Content-Location`, and a browser with HTML; both with `Vary: Accept` and the planned lifetimes; `/` with its `Link` header. The cover image, the `.md` and share-image addresses, the trailing-slash 308, `/index.md`, the index (20 skills) and robots.txt (14 signal lines) answered as planned. **On production, 03:42 UTC**, after the merge: the same, and `/resume`, `/learn`, `/skills`, `/portfolio`, `/llms.txt`, `/agents.md` and the sitemap answered 200 |
 | 7 | Every check first passed on the clean tree. 27 of 27 mutations caught: negotiation (13), the Worker entry (2), robots.txt (3), the skills index (3), the sync (2), the config (3), the home page's Markdown and `/llms.txt` (2). 3 of 3 harmless edits pass. Files restored byte for byte, then a clean rebuild |
 | 8 | Two reviews; see "Review" |
-| 9 | The owner's; see "Still to do" |
+| 9 | **Passed, by the owner's report on 12-11-26,** after re-running Cloudflare's Agent Readiness Diagnostics for the zone: "diagnostics done, all checks passing now" |
 
 ## Review
 
@@ -145,14 +145,10 @@ plan and none of my verdicts.
   project. This is unchanged by this work: production answers the same
   today. An agent that also accepts `text/html` gets the page.
 
-## Still to do (the owner's)
+## Ongoing (the owner's)
 
-- **Gate 9.** Re-run Cloudflare's Agent Readiness Diagnostics for the zone
-  (Agent Readiness, Diagnostics). Content Signals and Markdown negotiation
-  should pass (Quick Wins 5 of 5), and so should the Link headers and Agent
-  Skills checks where the page lists them. The checks not taken on (OAuth,
-  Auth.md, A2A, Web Bot Auth, commerce, MCP, WebMCP) stay open by the
-  owner's choice.
 - **Watch the request count.** On the Workers Free plan, a day past 100,000
   requests would make `/`, `/about` and the portfolio pages answer 429
   (Workers and Pages, the `fronk-website` Worker, Metrics).
+- **Out of scope, by the owner's choice:** OAuth, Auth.md, A2A, Web Bot
+  Auth, commerce, MCP and WebMCP. Taking any of them on needs a new plan.
