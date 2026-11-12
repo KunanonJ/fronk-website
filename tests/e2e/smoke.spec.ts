@@ -1154,3 +1154,89 @@ test.describe("worker cache > what the edge may keep", () => {
     }
   });
 });
+
+// agent-readiness plan, gate 3: the formats Cloudflare's Agent Readiness
+// checks look for. The built Worker answers these (CI serves `pnpm start`).
+test.describe("agent readiness", () => {
+  const BROWSER = "text/html,application/xhtml+xml,*/*;q=0.8";
+
+  test("pages with a Markdown version answer Accept: text/markdown with it", async ({
+    request,
+  }) => {
+    for (const [path, markdown] of [
+      ["/", "/index.md"],
+      ["/about", "/about.md"],
+      ["/portfolio/kunanonj-com", "/portfolio/kunanonj-com.md"],
+    ]) {
+      const md = await request.get(path, {
+        headers: { Accept: "text/markdown" },
+      });
+      expect(md.status(), path).toBe(200);
+      expect(md.headers()["content-type"], path).toBe(
+        "text/markdown; charset=utf-8",
+      );
+      expect(md.headers()["vary"], path).toBe("Accept");
+      expect(md.headers()["content-location"], path).toBe(markdown);
+      expect(await md.text(), path).toMatch(/^# /);
+
+      const html = await request.get(path, { headers: { Accept: BROWSER } });
+      expect(html.status(), path).toBe(200);
+      expect(html.headers()["content-type"], path).toContain("text/html");
+      expect(html.headers()["vary"], path).toBe("Accept");
+      expect(html.headers()["content-location"], path).toBeUndefined();
+    }
+  });
+
+  test("the home page links its Markdown, llms.txt and the sitemap", async ({
+    request,
+  }) => {
+    const link = (await request.get("/")).headers()["link"] ?? "";
+    expect(link).toContain(
+      '</index.md>; rel="alternate"; type="text/markdown"',
+    );
+    expect(link).toContain('</llms.txt>; rel="describedby"');
+    expect(link).toContain('</sitemap.xml>; rel="sitemap"');
+  });
+
+  test("robots.txt declares the content signals in every group that allows crawling", async ({
+    request,
+  }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const text = await res.text();
+    const groups = text.split("\n\n").filter((g) => g.startsWith("User-Agent"));
+    // The * group, the named crawlers and the two blocked ones.
+    expect(groups.length).toBeGreaterThanOrEqual(4);
+    expect(groups.filter((g) => /^Disallow: \/$/m.test(g)).length).toBe(2);
+    for (const group of groups) {
+      const allows = /^Allow: \//m.test(group);
+      expect(
+        /^Content-Signal: search=yes, ai-input=yes, ai-train=yes$/m.test(group),
+        group.split("\n")[0],
+      ).toBe(allows);
+    }
+  });
+
+  test("the Agent Skills index lists the skills in the discovery format", async ({
+    request,
+  }) => {
+    const res = await request.get("/.well-known/agent-skills/index.json");
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toBe(
+      "application/json; charset=utf-8",
+    );
+    const index = (await res.json()) as {
+      $schema: string;
+      skills: { name: string; type: string; url: string; digest: string }[];
+    };
+    expect(index.$schema).toBe(
+      "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+    );
+    expect(index.skills).toHaveLength(20);
+    for (const skill of index.skills) {
+      expect(skill.type, skill.name).toBe("archive");
+      expect(skill.url, skill.name).toMatch(/-flat\.zip$/);
+      expect(skill.digest, skill.name).toMatch(/^sha256:[0-9a-f]{64}$/);
+    }
+  });
+});

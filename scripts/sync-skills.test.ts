@@ -96,9 +96,17 @@ describe("parseFrontmatter", () => {
 const ROOT = "plugins/superstacks/skills";
 const skillMd = (name: string, extra = "") =>
   `---\nname: ${name}\ndescription: Use when testing ${name}.\nlicense: MIT\n${extra}---\n\n# ${name}\n`;
+// GitHub's release API reports a sha256 digest for each asset.
+const digestOf = (name: string) =>
+  `sha256:${[...name]
+    .map((c) => c.charCodeAt(0).toString(16))
+    .join("")
+    .padEnd(64, "0")
+    .slice(0, 64)}`;
 const asset = (name: string, size: number) => ({
   name,
   size,
+  digest: digestOf(name),
   browser_download_url: `https://github.com/KunanonJ/superstacks/releases/download/v1.0.0/${name}`,
 });
 
@@ -186,6 +194,9 @@ describe("buildSnapshot", () => {
     expect(zeta.zip.url).toBe(
       "https://github.com/KunanonJ/superstacks/releases/download/v1.0.0/zeta.zip",
     );
+    // The Agent Skills index needs the digest of each flat ZIP's bytes.
+    expect(zeta.flatZip.digest).toBe(digestOf("zeta-flat.zip"));
+    expect(snap.pluginZip.digest).toBe(digestOf("superstacks-plugin.zip"));
     expect(snap.pluginZip.name).toBe("superstacks-plugin.zip");
   });
 
@@ -207,6 +218,12 @@ describe("buildSnapshot", () => {
       (x) => x.name !== "alpha-flat.zip",
     );
     expect(() => buildSnapshot(missingZip)).toThrow(/alpha-flat\.zip/);
+
+    const noDigest = fixture();
+    noDigest.release.assets = noDigest.release.assets.map((x) =>
+      x.name === "zeta-flat.zip" ? { ...x, digest: "md5:abc" } : x,
+    );
+    expect(() => buildSnapshot(noDigest)).toThrow(/zeta-flat\.zip.*digest/);
 
     const wrongName = fixture();
     wrongName.skillFiles.alpha = skillMd("beta");

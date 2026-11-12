@@ -29,6 +29,8 @@ export interface SkillAsset {
   /** Bytes, from the GitHub release. */
   size: number;
   url: string;
+  /** `sha256:` and the hex digest of the file's bytes, from the GitHub release. */
+  digest: string;
 }
 
 export interface SkillSource {

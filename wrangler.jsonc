@@ -19,7 +19,27 @@
     "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next did.
-  "assets": { "run_worker_first": ["/*/"] },
+  // The pages with a Markdown version also run the Worker first, so it can
+  // answer Accept: text/markdown (src/server/negotiate.ts); any other GET or
+  // HEAD gets the static file through ASSETS, or Start when there is none.
+  // Named one by one, not with "/portfolio/*":
+  // that would catch the cover images. And not with a "!" pattern: what it
+  // matches goes to the static files without the Worker (the build's
+  // prerender step got a 404 for /portfolio/<slug>/ instead of its 308).
+  // lib/cloudflare/cacheConfig.test.ts keeps the list equal to the projects.
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/*/",
+      "/",
+      "/about",
+      "/portfolio/ai-automation",
+      "/portfolio/email-signature-generator",
+      "/portfolio/kunanonj-com",
+      "/portfolio/node-validator-automation",
+      "/portfolio/tbh-intranet",
+    ],
+  },
   // Worker cache: Sanity-backed responses carry Cache-Tag and a one-hour edge
   // lifetime (src/lib/cache.ts); the Sanity webhook purges them by tag from
   // src/server.ts. No cron: the lifetime is the safety net for a missed

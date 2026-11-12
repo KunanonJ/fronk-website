@@ -3,7 +3,8 @@ import type { Manifest, Robots, Sitemap } from "@/lib/seo/types";
 /*
  * Text output of Next's metadata routes (robots.ts, sitemap.ts, manifest.ts),
  * for frameworks that serve them by hand (the TanStack Start build). Matches
- * Next's own serialisers byte for byte for the fields this site uses.
+ * Next's own serialisers byte for byte for Next's fields. robots.txt's
+ * `comment` and `contentSignal` are this site's additions (Content Signals).
  */
 
 const list = <T>(value: T | T[] | undefined): T[] =>
@@ -11,9 +12,12 @@ const list = <T>(value: T | T[] | undefined): T[] =>
 
 export function robotsToText(robots: Robots): string {
   let out = "";
+  for (const line of list(robots.comment)) out += `# ${line}\n`;
+  if (robots.comment !== undefined) out += "\n";
   for (const rule of list(robots.rules)) {
     for (const agent of list(rule.userAgent ?? "*"))
       out += `User-Agent: ${agent}\n`;
+    if (rule.contentSignal) out += `Content-Signal: ${rule.contentSignal}\n`;
     for (const path of list(rule.allow)) out += `Allow: ${path}\n`;
     for (const path of list(rule.disallow)) out += `Disallow: ${path}\n`;
     if (rule.crawlDelay) out += `Crawl-delay: ${rule.crawlDelay}\n`;

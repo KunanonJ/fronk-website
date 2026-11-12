@@ -16,6 +16,7 @@ import { Route as AgentsDotmdRouteImport } from './routes/agents[.]md'
 import { Route as AppleIconRouteImport } from './routes/apple-icon'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as IconRouteImport } from './routes/icon'
+import { Route as IndexDotmdRouteImport } from './routes/index[.]md'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
@@ -41,6 +42,7 @@ import { Route as SystemDesignRouteImport } from './routes/_system/design'
 import { Route as AboutOpengraphImageRouteImport } from './routes/about.opengraph-image'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as PortfolioChar123slugChar125DotmdRouteImport } from './routes/portfolio.{$slug}[.]md'
+import { Route as DotwellKnownAgentSkillsIndexDotjsonRouteImport } from './routes/[.]well-known/agent-skills/index[.]json'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
 import { Route as LandingPortfolioIndexRouteImport } from './routes/_landing/portfolio/index'
@@ -87,6 +89,11 @@ const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
 const IconRoute = IconRouteImport.update({
   id: '/icon',
   path: '/icon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexDotmdRoute = IndexDotmdRouteImport.update({
+  id: '/index.md',
+  path: '/index.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
@@ -216,6 +223,12 @@ const PortfolioChar123slugChar125DotmdRoute =
     path: '/portfolio/{$slug}.md',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotwellKnownAgentSkillsIndexDotjsonRoute =
+  DotwellKnownAgentSkillsIndexDotjsonRouteImport.update({
+    id: '/.well-known/agent-skills/index.json',
+    path: '/.well-known/agent-skills/index.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LandingBlogIndexRoute = LandingBlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -298,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/index.md': typeof IndexDotmdRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -322,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
+  '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
@@ -344,6 +359,7 @@ export interface FileRoutesByTo {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/index.md': typeof IndexDotmdRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -368,6 +384,7 @@ export interface FileRoutesByTo {
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
+  '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/skills/$slug': typeof LandingSkillsSlugRoute
@@ -392,6 +409,7 @@ export interface FileRoutesById {
   '/apple-icon': typeof AppleIconRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/icon': typeof IconRoute
+  '/index.md': typeof IndexDotmdRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -417,6 +435,7 @@ export interface FileRoutesById {
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
   '/_landing/': typeof LandingIndexRoute
+  '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
   '/_landing/portfolio/$slug': typeof LandingPortfolioSlugRoute
   '/_landing/skills/$slug': typeof LandingSkillsSlugRoute
@@ -441,6 +460,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/index.md'
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
@@ -465,6 +485,7 @@ export interface FileRouteTypes {
     | '/about/opengraph-image'
     | '/api/contact'
     | '/portfolio/{$slug}.md'
+    | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
@@ -487,6 +508,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/index.md'
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
@@ -511,6 +533,7 @@ export interface FileRouteTypes {
     | '/about/opengraph-image'
     | '/api/contact'
     | '/portfolio/{$slug}.md'
+    | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
     | '/portfolio/$slug'
     | '/skills/$slug'
@@ -534,6 +557,7 @@ export interface FileRouteTypes {
     | '/apple-icon'
     | '/feed.xml'
     | '/icon'
+    | '/index.md'
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
@@ -559,6 +583,7 @@ export interface FileRouteTypes {
     | '/api/contact'
     | '/portfolio/{$slug}.md'
     | '/_landing/'
+    | '/.well-known/agent-skills/index.json'
     | '/_landing/blog/$slug'
     | '/_landing/portfolio/$slug'
     | '/_landing/skills/$slug'
@@ -583,6 +608,7 @@ export interface RootRouteChildren {
   AppleIconRoute: typeof AppleIconRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IconRoute: typeof IconRoute
+  IndexDotmdRoute: typeof IndexDotmdRoute
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
@@ -597,6 +623,7 @@ export interface RootRouteChildren {
   AboutOpengraphImageRoute: typeof AboutOpengraphImageRoute
   ApiContactRoute: typeof ApiContactRoute
   PortfolioChar123slugChar125DotmdRoute: typeof PortfolioChar123slugChar125DotmdRoute
+  DotwellKnownAgentSkillsIndexDotjsonRoute: typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
   PortfolioSlugOpengraphImageRoute: typeof PortfolioSlugOpengraphImageRoute
   SkillsSlugOpengraphImageRoute: typeof SkillsSlugOpengraphImageRoute
@@ -653,6 +680,13 @@ declare module '@tanstack/react-router' {
       path: '/icon'
       fullPath: '/icon'
       preLoaderRoute: typeof IconRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/index.md': {
+      id: '/index.md'
+      path: '/index.md'
+      fullPath: '/index.md'
+      preLoaderRoute: typeof IndexDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llms-full.txt': {
@@ -830,6 +864,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioChar123slugChar125DotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/agent-skills/index.json': {
+      id: '/.well-known/agent-skills/index.json'
+      path: '/.well-known/agent-skills/index.json'
+      fullPath: '/.well-known/agent-skills/index.json'
+      preLoaderRoute: typeof DotwellKnownAgentSkillsIndexDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_landing/blog/': {
       id: '/_landing/blog/'
       path: '/blog'
@@ -997,6 +1038,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppleIconRoute: AppleIconRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   IconRoute: IconRoute,
+  IndexDotmdRoute: IndexDotmdRoute,
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
@@ -1011,6 +1053,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutOpengraphImageRoute: AboutOpengraphImageRoute,
   ApiContactRoute: ApiContactRoute,
   PortfolioChar123slugChar125DotmdRoute: PortfolioChar123slugChar125DotmdRoute,
+  DotwellKnownAgentSkillsIndexDotjsonRoute:
+    DotwellKnownAgentSkillsIndexDotjsonRoute,
   ApiGithubContributionsRoute: ApiGithubContributionsRoute,
   PortfolioSlugOpengraphImageRoute: PortfolioSlugOpengraphImageRoute,
   SkillsSlugOpengraphImageRoute: SkillsSlugOpengraphImageRoute,

@@ -73,12 +73,16 @@ type ChangeFrequency =
 
 export type RobotsRule = {
   userAgent?: string | string[];
+  /** Content Signals (contentsignals.org), e.g. `search=yes, ai-train=no`. */
+  contentSignal?: string;
   allow?: string | string[];
   disallow?: string | string[];
   crawlDelay?: number;
 };
 
 export type Robots = {
+  /** Comment lines at the top of robots.txt, without the leading `#`. */
+  comment?: string | string[];
   rules: RobotsRule | RobotsRule[];
   sitemap?: string | string[];
   host?: string;

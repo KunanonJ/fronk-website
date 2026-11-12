@@ -4,6 +4,9 @@
     "test": "home"
   },
   {
+    "path": "/.well-known/agent-skills/index.json"
+  },
+  {
     "path": "/.well-known/security.txt",
     "seed": false
   },
@@ -114,6 +117,9 @@
   {
     "path": "/icon",
     "seed": false
+  },
+  {
+    "path": "/index.md"
   },
   {
     "path": "/learn",

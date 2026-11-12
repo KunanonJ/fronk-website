@@ -18,8 +18,21 @@
     "NEXT_PUBLIC_SANITY_STUDIO_URL": "https://fronk-website.sanity.studio/",
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next;
-  // otherwise the asset handler answers /about/ itself with a 307.
-  "assets": { "run_worker_first": ["/*/"] },
+  // otherwise the asset handler answers /about/ itself with a 307. The pages
+  // with a Markdown version run it first too, as in wrangler.jsonc.
+  "assets": {
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/*/",
+      "/",
+      "/about",
+      "/portfolio/ai-automation",
+      "/portfolio/email-signature-generator",
+      "/portfolio/kunanonj-com",
+      "/portfolio/node-validator-automation",
+      "/portfolio/tbh-intranet",
+    ],
+  },
   // Contact and subscribe: 5 posts per minute per IP (approximate, per data
   // centre). TURNSTILE_SECRET_KEY is a secret (wrangler secret put).
   "ratelimits": [

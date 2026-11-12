@@ -186,12 +186,15 @@ export async function GET() {
     `- Agent guide (coding skills for this site): ${base}/skills.md`,
   );
   textLines.push(`- Skills catalog (JSON): ${base}/skills.json`);
+  textLines.push(
+    `- Agent Skills index: ${base}/.well-known/agent-skills/index.json`,
+  );
   if (BLOG_PUBLIC) textLines.push(`- RSS: ${base}/feed.xml`);
   textLines.push(`- This file: ${base}/llms.txt`);
   textLines.push(`- Full profile (one fetch): ${base}/llms-full.txt`);
   textLines.push(`- Solopreneur operating model: ${base}/operating-model.md`);
   textLines.push(
-    `- Markdown versions of pages: ${base}/about.md and ${base}/portfolio/[slug].md (also linked from each page as rel="alternate" type="text/markdown")`,
+    `- Markdown versions of pages: ${base}/about.md and ${base}/portfolio/[slug].md (also linked from each page as rel="alternate" type="text/markdown"). The home page, /about and each project page also answer a request sent with Accept: text/markdown in Markdown.`,
   );
   textLines.push("");
 
