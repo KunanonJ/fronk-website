@@ -1,9 +1,9 @@
 # Worker cache follow-up: a safety net that does not need a purge
 
-**Status:** IN PROGRESS. Approved with "ENTER EXECUTE MODE" on 11-11-26,
-every owner decision at its default. Steps 2 to 10 are done on
-`feat/worker-cache-followup`; gates 7 to 10 follow the pull request and
-the merge. Report: `../reports/worker-cache-followup_REPORT_11-11-26.md`.
+**Status:** MERGED, owner checks open. Approved with "ENTER EXECUTE MODE"
+on 11-11-26, every owner decision at its default; merged as pull request
+#112 (`1654b92`) the same day. Gates 9 and 10 and step 1 are the owner's.
+Report: `../reports/worker-cache-followup_REPORT_11-11-26.md`.
 **Created:** 11-11-26, at `28f0d06`. Revised the same day after two rounds
 of independent review (a fact check and a design review each time).
 **Origin:** recruiter-fit decision 25 ("Plan a follow-up"), from "Findings

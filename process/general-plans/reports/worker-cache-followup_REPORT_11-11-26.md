@@ -3,11 +3,13 @@
 **Plan:** `../active/worker-cache-followup_PLAN_11-11-26.md`
 **Research:** `../references/worker-cache-research_11-11-26.md` (section 7
 holds the probe)
-**Status:** IN PROGRESS (11-11-26). The code is complete on
-`feat/worker-cache-followup` and verified locally (see "Gates"). Gates 7
-to 10 follow the pull request and the merge.
-**Base:** `4bbb462` on `main`. Commits: `4d60e65` (the change), `ca62b98`
-(first review's fixes), `c8b37d3` (second review's fixes).
+**Status:** MERGED (11-11-26). Pull request #112 (`1654b92` on `main`),
+merged at 10:38:57 UTC after every CI check passed and live by 10:40:41.
+Gates 1 to 8, 11 and 12 pass (see "Gates"). Gates 9 and 10 and step 1
+are the owner's and still open, so the plan stays in `active/`.
+**Base:** `4bbb462` on `main`. Commits on the branch: `4d60e65` (the
+change), `ca62b98` (first review's fixes), `c8b37d3` (second review's
+fixes), `953b060` (the records); squash-merged as `1654b92`.
 
 ## Owner answers used (11-11-26)
 
@@ -17,9 +19,10 @@ to 10 follow the pull request and the merge.
   2. A failing Worker shows its error (`stale-if-error=0`).
   3. A publish test in Studio after the merge (gate 10).
   4. The staging Worker is redeployed after the merge.
-- **Still needed:** the Sanity project's plan and this month's API and API
-  CDN request counts, before the merge (decision 1). The live API's
-  allowance is a quarter of the CDN's.
+- **The merge:** "Merge when CI is green", asked with the Sanity usage
+  question of decision 1 (the live API's allowance is a quarter of the
+  CDN's): the owner's usage is well under it, or the owner accepts the
+  risk.
 
 ## What changed
 
@@ -60,10 +63,12 @@ builds deployed nothing.
 | 1 | Typecheck, lint, format, unused code and unit tests pass on Node 26.12.0 and on Node 22.23.4: 940 tests in 110 files on each |
 | 2 | Build and first-load budget pass on both (entry chunk 107.9 KB of 120 KB on Node 22). The built `dist/server/wrangler.json` holds `"triggers": {"crons": []}` |
 | 3 | Smoke and accessibility, desktop, on the production build, Node 22.23.4: 181 passed (178 before, and the 3 new header tests) |
-| 4 | CI's `visual` job, in the pinned image (see "Deviations"). No baseline file changed |
+| 4 | CI's `visual` job, in the pinned image, passed on the pull request's head `953b060` (see "Deviations"). No baseline file changed |
 | 5 | The parity reference, crawled again: 135 URLs, none added or removed, one entry changed (the body of `/skills.md`). The parity gate: 135 URLs compared, 0 with differences |
 | 6 | The probe: variant (b), the pages' new headers, answered the 500 on all four of its failing reads, in two runs |
-| 7 to 10 | After the pull request and the merge |
+| 7 | **On the preview of `953b060`, 10:37 UTC.** A browser run showed the visit to `/learn` calls `/_serverFn/18705441…`. Asked with `Sec-Fetch-Site: same-origin`, it answered 200 with its JSON body, `Cache-Control: no-store` and `BYPASS`, twice; without that header, 403. `/learn` and `/resume` sent exactly `public, max-age=3600, stale-if-error=0`. **On production, 10:41 UTC**, after the merge: the same for `/learn`'s function and for the résumé's (it answered `HIT` before the change), twice each. `/robots.txt`, `/studio` and `/skills.json` sent the lifetimes of step 7 |
+| 8 | **On production, two addresses no visitor uses** (`/learn?probe=g8-104051`, `/resume?probe=g8-104051`). Read 1, 10:40:51 UTC: `MISS` on both, each with its page's title. Read 2, 11:41:51 (minute 61): `EXPIRED` on both. Read 3, 11:42:13: `HIT` with age 20 on both. A copy ends within the hour. `EXPIRED`, not `MISS`, also shows that no deploy came in between |
+| 9, 10 | The owner's; see "Still to do" |
 | 11 | Every check first passed on the clean tree. 22 of 22 mutations caught: the server-function rule (5), the lifetime and `withEdgeCache` (4), `useCdn` (1), the cron in both files and the handler (4), the webhook (3), `/studio` (2), robots.txt and skills.json (2), the stand-in's own `no-store` (1). 4 of 4 harmless edits pass. Files restored byte for byte, then a clean rebuild. Also: removing the 101 guard fails its new test |
 | 12 | Two reviews; see "Review" |
 
@@ -113,21 +118,25 @@ plan and none of my verdicts.
 - **`AGENTS.md`** cites the research file, whose path does not move at
   closeout, instead of the plan.
 
-## Still to do
+## Still to do (the owner's)
 
-- **Gate 7,** on the pull request's preview: the server function behind
-  `/learn`, asked with `Sec-Fetch-Site: same-origin`, answers 200 with
-  `no-store` and `BYPASS` twice; `/learn` and `/resume` send exactly the
-  new `CDN-Cache-Control`.
-- **Before the merge:** the owner's Sanity plan and request counts
-  (decision 1), and the owner's word to merge, which deploys production.
-- **After the merge:**
-  - Gate 8: the expiry, read again after minute 60, on probe addresses.
-  - Gate 9: the cron gone. It takes up to two and a quarter hours, and
-    the owner's dashboard.
-  - Gate 10: the owner's publish test.
-  - Housekeeping: redeploy staging, which needs the owner's Wrangler
-    sign-in; the owner deletes the old cron Worker after gate 9.
-- **Step 1, the owner's:** Trigger Events and the logs for
-  `[cron] cache purge failed`, ideally before the merge while the trigger
-  still runs.
+- **Gate 9, the cron gone.** In the Cloudflare dashboard, the
+  `fronk-website` Worker, Settings: the list of cron triggers is empty,
+  and Trigger Events show no run after 10:56 UTC (15 minutes after the
+  deploy), across the 11:00 and 12:00 marks. Events can take up to 30
+  minutes to show, so look after 12:30 UTC. If a run shows, the plan's
+  Blockers apply.
+- **Step 1, why the purge never landed.** On the same page: the runs
+  before the merge, and the Worker's logs for `[cron] cache purge failed`.
+  The answer goes into the research file.
+- **Gate 10, the publish test.** In Studio, change the writing page's
+  eyebrow (`/blog` shows it above the heading; the default is "Blog") and
+  publish, then say when. The steps are in plan gate 10: `/blog` is read
+  until it is a `HIT` younger than 3000 seconds before the publish, then
+  every 15 seconds. The new text within two minutes means the webhook
+  works on production. Set the eyebrow back afterwards.
+- **Housekeeping.** Redeploy the staging Worker (`pnpm deploy:staging`,
+  which needs a Wrangler sign-in) so that it loses its hourly cron and
+  serves this build. After gate 9, delete the old
+  `fronk-website-revalidate-cron` Worker, after a look at its Trigger
+  Events.
