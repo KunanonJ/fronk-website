@@ -1,6 +1,9 @@
 # Agent readiness: what is true of the site, said in the agents' formats
 
-**Status:** IN PROGRESS. Approved with "ENTER EXECUTE MODE" on 12-11-26.
+**Status:** MERGED, owner check open. Approved with "ENTER EXECUTE MODE" on
+12-11-26; merged as pull request #114 (`57c0e0d`) the same day. Gate 9,
+Cloudflare's Diagnostics, is the owner's. Report:
+`../reports/agent-readiness_REPORT_12-11-26.md`.
 **Created:** 12-11-26, at `1654b92`. Amended during EXECUTE the same day
 where the build or a review showed a better way: the tie rule, the
 run-first list and the lifetimes below say what was built.

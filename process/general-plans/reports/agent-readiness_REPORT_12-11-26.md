@@ -1,12 +1,13 @@
 # Report: Agent readiness
 
 **Plan:** `../active/agent-readiness_PLAN_12-11-26.md`
-**Status:** IN PROGRESS (12-11-26). The code is complete on
-`feat/agent-readiness` and verified locally (see "Gates"). Gate 6 follows
-the pull request's preview, and gate 9 (Cloudflare's Diagnostics) the
-merge.
-**Base:** `cb496e6` on `main`. Commits: `2625b2a` (the change), `6efad5f`
-(first review's fixes), `acf13ff` (second review's fixes).
+**Status:** MERGED (12-11-26). Pull request #114 (`57c0e0d` on `main`),
+merged at 03:41:19 UTC after every CI check passed, and live by 03:42:37.
+Gates 1 to 8 pass (see "Gates"). Gate 9, Cloudflare's Diagnostics, is the
+owner's and still open, so the plan stays in `active/`.
+**Base:** `cb496e6` on `main`. Commits on the branch: `2625b2a` (the
+change), `6efad5f` (first review's fixes), `acf13ff` (second review's
+fixes), `76bba0a` (the records); squash-merged as `57c0e0d`.
 
 ## Owner answers used (12-11-26)
 
@@ -79,12 +80,12 @@ builds deployed nothing.
 | 1 | Typecheck, lint, format, unused code and unit tests pass on Node 26.12.0 and on Node 22.23.4: 993 tests in 112 files on each |
 | 2 | Build and first-load budget pass on both (entry chunk 107.9 KB of 120 KB on Node 22). The built `dist/server/wrangler.json` keeps `"binding": "ASSETS"`, the eight-entry `run_worker_first` list and `"crons": []` |
 | 3 | Smoke and accessibility, desktop, on the production build, Node 22.23.4: 185 passed (181 before, and the 4 new agent-readiness tests) |
-| 4 | CI's `visual` job, on the pull request |
+| 4 | CI's `visual` job, in the pinned image, passed on the pull request's head `76bba0a`. No baseline file changed |
 | 5 | The parity reference, crawled again: 137 addresses, the two new ones added, none removed, and only the bodies of `/agents.md`, `/llms.txt` and `/robots.txt` changed. The parity gate: 137 compared, 0 with differences |
-| 6 | On the pull request's preview |
+| 6 | **On the preview of `76bba0a`, 03:39 UTC.** One address read four times, `/about?probe=g6033951`: Markdown `MISS`, HTML `MISS`, Markdown `HIT`, HTML `HIT`, each with its own body, so the cache keeps the versions apart. `/`, `/about` and `/portfolio/kunanonj-com` each answered `text/markdown` with their Markdown and `Content-Location`, and a browser with HTML; both with `Vary: Accept` and the planned lifetimes; `/` with its `Link` header. The cover image, the `.md` and share-image addresses, the trailing-slash 308, `/index.md`, the index (20 skills) and robots.txt (14 signal lines) answered as planned. **On production, 03:42 UTC**, after the merge: the same, and `/resume`, `/learn`, `/skills`, `/portfolio`, `/llms.txt`, `/agents.md` and the sitemap answered 200 |
 | 7 | Every check first passed on the clean tree. 27 of 27 mutations caught: negotiation (13), the Worker entry (2), robots.txt (3), the skills index (3), the sync (2), the config (3), the home page's Markdown and `/llms.txt` (2). 3 of 3 harmless edits pass. Files restored byte for byte, then a clean rebuild |
 | 8 | Two reviews; see "Review" |
-| 9 | The owner, after the merge |
+| 9 | The owner's; see "Still to do" |
 
 ## Review
 
@@ -144,15 +145,14 @@ plan and none of my verdicts.
   project. This is unchanged by this work: production answers the same
   today. An agent that also accepts `text/html` gets the page.
 
-## Still to do
+## Still to do (the owner's)
 
-- **Gate 6, on the pull request's preview:**
-  - The Markdown and HTML versions of `/`, `/about` and a portfolio page.
-  - Markdown, then HTML, then Markdown on the same address, each answered
-    correctly.
-  - The skills index and robots.txt.
-- **The merge:** the owner's word; it deploys production.
-- **Gate 9, the owner, after the merge:** Cloudflare's Agent Readiness
-  Diagnostics should show Content Signals and Markdown negotiation passing
-  (Quick Wins 5 of 5), and the Link headers and Agent Skills checks where
-  the page lists them.
+- **Gate 9.** Re-run Cloudflare's Agent Readiness Diagnostics for the zone
+  (Agent Readiness, Diagnostics). Content Signals and Markdown negotiation
+  should pass (Quick Wins 5 of 5), and so should the Link headers and Agent
+  Skills checks where the page lists them. The checks not taken on (OAuth,
+  Auth.md, A2A, Web Bot Auth, commerce, MCP, WebMCP) stay open by the
+  owner's choice.
+- **Watch the request count.** On the Workers Free plan, a day past 100,000
+  requests would make `/`, `/about` and the portfolio pages answer 429
+  (Workers and Pages, the `fronk-website` Worker, Metrics).
