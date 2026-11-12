@@ -50,7 +50,7 @@ describe("IntroLoader", () => {
     sessionStorage.clear();
   });
 
-  it("cycles the greetings and is gone within 1.5 s on a first visit", () => {
+  it("cycles the greetings and is gone within 5.5 s on a first visit", () => {
     render(<IntroLoader />);
     advance(20);
     expect(overlay()).not.toBeNull();
