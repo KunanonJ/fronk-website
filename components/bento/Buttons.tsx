@@ -18,7 +18,7 @@ const CTA_VARIANT = {
 
 /** lg: hero actions (17 px); md: form submit and card CTAs (16 px); sm: paired card buttons (15 px). */
 const CTA_SIZE = {
-  lg: "gap-2.5 px-[30px] text-[17px]",
+  lg: "gap-2.5 px-[30px] text-[17px] max-sm:px-4",
   md: "gap-2 px-[30px] text-base",
   sm: "gap-1.5 px-4 text-card",
 } as const;
