@@ -6,6 +6,10 @@ import { ShareIcon } from "@/components/bento/icons";
  * share panel, so the two share one state and one aria-expanded value.
  * `labelLang` marks the label's language on a page in another one (the Thai
  * topic hubs keep "Share" in English).
+ *
+ * Below 640 px it is a 56 px round icon, so it can sit beside the hero's
+ * other buttons instead of wrapping alone onto a row of its own (the owner's
+ * choice, 12-11-26). The label stays in the button for screen readers.
  */
 export default function SharePill({
   label = "Share",
@@ -22,10 +26,12 @@ export default function SharePill({
       aria-expanded={panel === "share"}
       data-panel-trigger
       onClick={(event) => toggle("share", event.currentTarget)}
-      className="inline-flex h-14 items-center gap-2.5 rounded-full border border-hairline-strong bg-surface px-[30px] text-[17px] font-semibold text-ink"
+      className="inline-flex h-14 items-center justify-center gap-2.5 rounded-full border border-hairline-strong bg-surface px-[30px] text-[17px] font-semibold text-ink max-sm:w-14 max-sm:px-0"
     >
       <ShareIcon />
-      <span lang={labelLang}>{label}</span>
+      <span lang={labelLang} className="max-sm:sr-only">
+        {label}
+      </span>
     </button>
   );
 }

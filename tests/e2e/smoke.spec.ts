@@ -1426,3 +1426,29 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     });
   }
 });
+
+test.describe("share pill > a round icon on phones, the labelled pill from 640 px", () => {
+  for (const width of [390, 639, 640]) {
+    test(`at ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/skills", { waitUntil: "networkidle" });
+      // The hero pill; the header's own button is "Share this page".
+      const share = page
+        .getByRole("main")
+        .getByRole("button", { name: "Share", exact: true });
+      await expect(share).toBeVisible();
+      const box = (await share.boundingBox())!;
+      const label = share.getByText("Share", { exact: true });
+      const labelBox = (await label.boundingBox())!;
+      if (width < 640) {
+        // 56 px round, the label kept for screen readers only.
+        expect(Math.round(box.width)).toBe(56);
+        expect(Math.round(box.height)).toBe(56);
+        expect(labelBox.width).toBeLessThanOrEqual(1);
+      } else {
+        expect(box.width).toBeGreaterThan(box.height);
+        expect(labelBox.width).toBeGreaterThan(20);
+      }
+    });
+  }
+});

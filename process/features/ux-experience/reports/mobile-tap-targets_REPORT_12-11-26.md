@@ -1,11 +1,12 @@
 # Report: Tap areas on phones
 
 **Plan:** `../active/mobile-tap-targets_PLAN_12-11-26.md`
-**Status:** Steps 1 to 4 are done on branch `fix/mobile-tap-targets`.
-- **Pass:** gates 1 to 3 and 5 to 7.
-- **Open:** gate 4, CI's `visual` job on the pull request, and gate 8, the
-  phone audit after the merge.
-- **Waiting:** step 5, for the owner's details.
+**Status:**
+- **Steps 1 to 4:** merged as pull request #117 (`71f2586`) at 06:57:09 UTC
+  on 12-11-26, live by 06:58:22. All eight gates pass.
+- **Step 5,** the owner's report: on branch `feat/share-icon-phones`. Its
+  gates are under "Step 5", and its check on production comes after the
+  merge.
 
 **Base:** `3b82323` on `main`.
 
@@ -40,11 +41,11 @@ environment CI gives it, and the Sanity write token was unset.
 | 1 | Typecheck, lint, format, unused code and unit tests pass on Node 26.12.0 and on Node 22.23.4: 993 tests in 112 files on each |
 | 2 | Build and first-load budget pass on both. The entry chunk is 107.7 KB on Node 26 and 107.9 KB on Node 22, of 120 KB |
 | 3 | Smoke and accessibility, desktop, on the production build, Node 22.23.4: 201 passed (185 before, and the 16 new cases) |
-| 4 | **Open:** CI's `visual` job on the pull request. A changed baseline stops the merge |
+| 4 | Passed: CI's `visual` job on #117's head `70f291c`. The pull request changed no baseline file |
 | 5 | Parity: 137 URLs compared, 0 with differences, with no new crawl |
 | 6 | Mutation checks, below. Every file was restored byte for byte |
 | 7 | Two independent reviews; see "Review" |
-| 8 | **Open:** the phone audit on production, after the merge |
+| 8 | Passed on production after the deploy, from 06:58 UTC, GET only. The merged rules ran on an iPhone SE (320 px), a Galaxy S8 (360) and an iPhone 13 (390), on the seven pages and the open menu: 24 of 24 clear. The 50-page audit on four phones: tap areas under 24 px went from 54 on 49 pages to none, nothing scrolls sideways, and every page answers 200 |
 
 Local runs set `PLAYWRIGHT_BASE_URL=http://localhost:3000` (see "Found along
 the way").
@@ -152,8 +153,66 @@ rule, the open menu and the coverage check.
   on phones. The pictures are captioned as illustrations, and pinch zoom
   works.
 
+## Step 5: the owner's report (12-11-26)
+
+The report, the owner's choices and the widths before and after are in the
+plan, under "Step 5 (12-11-26)".
+
+**Owner answers used:** "Share on its own row" and "The grey ‹ tab"; then
+"Icon-only Share on phones"; then "Icon plus slimmer buttons"; then "ship
+it", after screenshots at 390 and 440 px.
+
+**The grey "‹" tab:** not the site's. The page has no fixed or sticky
+element, and a render at the owner's width (440 px) has no tab. It is most
+likely a Safari extension. Nothing changed for it.
+
+**What changed, below 640 px only:**
+- **`SharePill`** is a 56 px round icon, with its label hidden only
+  visually.
+- **The `lg` hero buttons** have 16 px side padding instead of 30.
+- **On the résumé,** Download PDF takes the first row.
+- **A smoke test,** "share pill > ...", covers the pill at 390, 639 and
+  640 px.
+
+**Gates.** Final tree `f6cc43a791ac2488`, the git tree of every file
+outside `process/`, 08:09 to 08:10 UTC:
+
+| Gate | Result |
+| --- | --- |
+| 1 | Typecheck, lint, format, unused code and unit tests pass on Node 26.12.0 and on Node 22.23.4: 994 tests in 112 files |
+| 2 | Build and first-load budget pass on both: entry chunk 107.7 KB on Node 26 and 107.9 KB on Node 22, of 120 KB |
+| 3 | Smoke and accessibility, desktop, on the production build, Node 22.23.4: 204 passed (201 before, and the 3 new share-pill cases). All 16 tap-area cases still pass |
+| 4 | Visual baselines regenerated in the pinned image (`playwright:v1.64.1-noble`), see below. CI's `visual` job is on the pull request |
+| 5 | Parity: 137 URLs compared, 0 with differences |
+| 6 | Mutation checks: a visible label on phones fails the 390 and 639 px cases; a harmless colour change passes. Restored byte for byte |
+| 8 | **Open:** after the merge, the width sweep and the tap-area rules on production |
+
+**Baselines.** The phone baselines were rendered twice in the pinned image,
+once from `main` (`36023fd`) and once from the branch, one run at a time.
+Both runs passed 48 of 48, with the old phone files deleted first, so every
+file is fresh.
+
+- **Changed by this branch, and committed:** 30 files, 15 routes in both
+  themes:
+  - `home`, `about` and `design`;
+  - `portfolio-diagrams`, `portfolio-project` and `portfolio-site`;
+  - `skills` and `skill-detail`;
+  - `topic-hub`, `topic-hub-fde`, `topic-hub-fde-th`, `topic-hub-th` and
+    `topic-hub-th-short`;
+  - `venture-hub` and `venture-hub-manut`.
+- **Unchanged:** the other 18 phone baselines and every desktop baseline.
+- **Older drift, left alone:** 9 committed phone baselines already differed
+  from a fresh render of `main`, within the 1% tolerance.
+- **Checked by eye, `main` beside the branch:** `topic-hub-fde-dark`,
+  `venture-hub-dark`, `home-light`, `skills-light`, `portfolio-project-dark`
+  and `topic-hub-th-short-light`.
+
+**Found along the way:** two visual runs in parallel, one container each,
+starved the full-page captures. Sixteen to eighteen `toHaveScreenshot` calls
+timed out at 5 s, so those runs could not be trusted. Run the containers one
+at a time.
+
 ## Still to do
 
-- Gate 4, on the pull request.
-- Gate 8, after the merge: the phone audit on production.
-- Step 5, when the owner describes what they saw.
+- Step 5, gate 8: after the merge, the width sweep and the tap-area rules
+  on production.

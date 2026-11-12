@@ -92,7 +92,13 @@ export default function ResumePage({
         />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <CtaLink href={RESUME_PDF_HREF} download={RESUME_PDF_NAME}>
+            {/* On phones the PDF takes the first row, so Contact and the Share
+                icon share the second instead of the icon wrapping alone. */}
+            <CtaLink
+              href={RESUME_PDF_HREF}
+              download={RESUME_PDF_NAME}
+              className="max-sm:w-full"
+            >
               <DownloadIcon />
               <span>Download PDF</span>
             </CtaLink>

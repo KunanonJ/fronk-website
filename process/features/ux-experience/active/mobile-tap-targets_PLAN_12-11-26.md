@@ -2,11 +2,11 @@
 
 **Status:** IN PROGRESS (12-11-26). Approved with "A, ENTER EXECUTE MODE"
 on 12-11-26: steps 1 to 4, and option A for the picture labels.
-- **Done:** steps 1 to 4. Gates 1 to 3 and 5 to 7 pass on the final tree
-  (see the report).
-- **Waiting:** gate 4 (CI's `visual` job) on the pull request, and gate 8
-  after the merge.
-- **Step 5** waits for the owner's details.
+- **Steps 1 to 4:** merged as pull request #117 (`71f2586`). All eight gates
+  pass, gate 8 on production after the deploy.
+- **Step 5,** the owner's report: approved with "ship it" on 12-11-26, after
+  screenshots (see "Step 5 (12-11-26)"). It is on branch
+  `feat/share-icon-phones`; its gates are in the report.
 
 **Report:** `../reports/mobile-tap-targets_REPORT_12-11-26.md`. The
 deviations are listed under "Deviations (12-11-26)".
@@ -137,6 +137,56 @@ Made during execution, after two independent reviews:
   - **The describe title** is "tap areas > ...", so it no longer shares the
     `mobile` project's name.
 
+## Step 5 (12-11-26)
+
+**The owner's report:** a screenshot without a note, showing
+`/topics/forward-deployed-ai-engineering` in night mode on an iPhone about
+440 px wide. A render at 440 px matched it line for line. Asked what looked
+wrong, the owner named two things:
+
+- **A grey "‹" tab at the top right edge.** The site does not draw it: the
+  page has no fixed or sticky element, and no component draws an edge tab.
+  It is most likely a Safari extension. Nothing to change in the code.
+- **Share on a row of its own.** The hero Share pill wrapped alone on most
+  page types, at different phone widths.
+
+**The owner's choices, in order:**
+
+1. Share as an icon on phones, rather than hidden, or a full-width row.
+2. Measured after building: the icon alone left lone rows on the résumé,
+   on ventures and on English topics. The owner then chose slimmer buttons
+   as well.
+3. Measured again: slimmer buttons left the résumé's icon alone from 322 to
+   404 px. The fix proposed was the PDF button on a full row of its own on
+   phones. After screenshots at 390 and 440 px, the owner said "ship it".
+
+This is a layout change beyond tap areas, which "Blockers" sends back to
+PLAN. The owner approved the wider scope at each of the three steps above.
+
+**The change, below 640 px only (wider screens unchanged):**
+
+| Where | Change |
+| --- | --- |
+| `components/bento/SharePill.tsx` | A 56 px round icon. The label stays in the button, hidden only visually (`max-sm:sr-only`) |
+| `components/bento/Buttons.tsx` | The `lg` hero buttons' side padding goes from 30 px to 16 px (`max-sm:px-4`) on every page that uses them |
+| `components/resume/ResumePage.tsx` | Download PDF takes the full first row, so Contact and the Share icon share the second |
+| `tests/e2e/smoke.spec.ts` | "share pill > ...": at 390 and 639 px the pill is 56 × 56 with its label hidden; at 640 px it is the labelled pill |
+
+**Widths (320 to 639 px, every 2 px) where Share sits alone:**
+
+| Page | Live before | After |
+| --- | --- | --- |
+| English topics | 324 to 488 | 320 to 334 |
+| Thai topics | 320 to 440 | none |
+| Skills, skill pages | 320 to 406 | none |
+| Résumé | 378 to 380, 394 to 542 | none |
+| Ventures | none | none |
+| Project pages without a public link | every width (the only button, by design) | every width (unchanged) |
+
+**Blast radius:** every hero's `lg` buttons on phones. The phone-size visual
+baselines of the routes that show them are regenerated; desktop baselines
+must not change.
+
 ## Touchpoints
 
 `components/bento/SiteFooter.tsx`, `components/landing/home/HomeCards.tsx`,
@@ -168,8 +218,7 @@ No unit test pins these class strings (checked 12-11-26).
 
 ## Waiting on the owner
 
-- **What they saw on a phone:** the page, the phone and browser, and what
-  looked wrong. A screenshot helps.
+Nothing. Step 5's details arrived on 12-11-26.
 
 ## Blockers that justify BLOCKED
 
@@ -179,8 +228,9 @@ No unit test pins these class strings (checked 12-11-26).
 
 ## Resume and Execution Handoff
 
-- **Execute anchor:** this file, branch `fix/mobile-tap-targets`.
-- **Order:** steps 1 to 3, then 4, then the gates; step 5 when the owner's
-  details arrive.
+- **Execute anchor:** this file. Steps 1 to 4 on `fix/mobile-tap-targets`
+  (merged, #117); step 5 on `feat/share-icon-phones`.
+- **Order:** steps 1 to 3, then 4, then the gates; step 5 after the owner's
+  details, with its own gates.
 - **The audit scripts** live outside the repository, in the session's
   scratchpad. Gate 8 reruns them, and they read the live site only.
