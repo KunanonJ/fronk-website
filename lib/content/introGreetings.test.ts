@@ -8,9 +8,14 @@ import {
 } from "@/lib/content/introGreetings";
 
 describe("intro timing", () => {
-  it("finishes within the 1.5 s ceiling, exit included", () => {
-    expect(INTRO_MAX_MS).toBe(1500);
+  it("finishes within the 5.5 s ceiling, exit included", () => {
+    expect(INTRO_MAX_MS).toBe(5500);
     expect(introTotalMs()).toBeLessThanOrEqual(INTRO_MAX_MS);
+  });
+
+  it("keeps the owner's chosen length: five greetings, 5.2 s", () => {
+    expect(INTRO_GREETINGS).toHaveLength(5);
+    expect(introTotalMs()).toBe(5200);
   });
 
   it("starts the exit after every greeting has been shown", () => {

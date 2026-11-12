@@ -30,7 +30,7 @@ Also see: [/agents.md](/agents.md) · [/llms.txt](/llms.txt) · [/sitemap.md](/s
    - Entrance stagger, hover lift and panel pop from `globals.css`; reduced motion turns all of it off.
    - Page changes use view transitions of type `page`; the theme switch uses type `theme`.
    - The hero h1 is the LCP element: never start it invisible or blurred.
-   - First-visit intro: at most 1.5 s, skippable, ends with a short celebratory burst.
+   - First-visit intro: five greetings in 5.2 s (ceiling 5.5 s), skippable, ends with a short celebratory burst.
 
 5. **Content**
    - Copy lives in `lib/content/`; identity facts in `lib/content/identity.ts`. Never invent claims, numbers or dates.
