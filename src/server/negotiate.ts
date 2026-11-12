@@ -3,8 +3,9 @@ import { EDGE_LIFETIME } from "@/src/lib/cache";
 /*
  * Markdown content negotiation (agent-readiness plan, step 4). These pages
  * are static files, so wrangler.jsonc runs the Worker first for them
- * (`assets.run_worker_first`). A GET or HEAD that prefers text/markdown gets
- * the page's Markdown version; any other GET or HEAD gets the static file
+ * (`assets.run_worker_first`). A GET or HEAD that names text/markdown and
+ * weighs it at least as high as text/html gets the page's Markdown version;
+ * any other GET or HEAD, and one whose Markdown fails, gets the static file
  * through ASSETS, or Start when there is none. src/server.ts sends other
  * methods to Start, as before.
  */
@@ -105,16 +106,24 @@ function withVersionHeaders(
   pathname: string,
   markdownPath: string | null,
   bodyless: boolean,
+  keep = true,
 ): Response {
   if (!(response.ok || response.status === 304)) return response;
   const headers = new Headers(response.headers);
   const vary = headers.get("Vary");
   if (!vary || !/(^|,)\s*accept\s*(,|$)/i.test(vary))
     headers.set("Vary", vary ? `${vary}, Accept` : "Accept");
-  for (const [name, value] of Object.entries(
-    edgeHeadersFor(pathname, markdownPath !== null),
-  ))
-    headers.set(name, value);
+  if (keep) {
+    for (const [name, value] of Object.entries(
+      edgeHeadersFor(pathname, markdownPath !== null),
+    ))
+      headers.set(name, value);
+  } else {
+    // HTML in place of Markdown that failed: kept nowhere, or the cache
+    // would answer that Accept value with HTML long after the failure.
+    headers.delete("CDN-Cache-Control");
+    headers.set("Cache-Control", "no-store");
+  }
   if (markdownPath) headers.set("Content-Location", markdownPath);
   if (pathname === "/") headers.set("Link", HOME_LINKS);
   return new Response(bodyless ? null : response.body, {
@@ -137,6 +146,7 @@ export async function negotiate(
   assets: (request: Request) => Response | Promise<Response>,
 ): Promise<Response> {
   const { pathname } = new URL(request.url);
+  let markdownFailed = false;
   if (prefersMarkdown(request.headers.get("Accept"))) {
     try {
       const markdown = await start(
@@ -152,11 +162,22 @@ export async function negotiate(
           markdownPath,
           request.method === "HEAD",
         );
+      // A 404 is an unknown project, whose page is a 404 too.
+      if (markdown.status !== 404) {
+        markdownFailed = true;
+        console.error(
+          `[negotiate] ${markdownPath} answered ${markdown.status}; ${pathname} answers HTML`,
+        );
+      }
     } catch (error: unknown) {
-      console.error("[negotiate] Markdown failed, answering HTML", error);
+      markdownFailed = true;
+      console.error(
+        `[negotiate] ${markdownPath} failed; ${pathname} answers HTML`,
+        error,
+      );
     }
   }
   const page = await assets(request);
   const html = page.status === 404 ? await start(request) : page;
-  return withVersionHeaders(html, pathname, null, false);
+  return withVersionHeaders(html, pathname, null, false, !markdownFailed);
 }

@@ -20,9 +20,9 @@
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next did.
   // The pages with a Markdown version also run the Worker first, so it can
-  // answer Accept: text/markdown (src/server/negotiate.ts); a GET or HEAD
-  // that does not prefer Markdown gets the static file through ASSETS, or
-  // Start when there is none. Named one by one, not with "/portfolio/*":
+  // answer Accept: text/markdown (src/server/negotiate.ts); any other GET or
+  // HEAD gets the static file through ASSETS, or Start when there is none.
+  // Named one by one, not with "/portfolio/*":
   // that would catch the cover images. And not with a "!" pattern: what it
   // matches goes to the static files without the Worker (the build's
   // prerender step got a 404 for /portfolio/<slug>/ instead of its 308).

@@ -99,11 +99,13 @@ describe("the Worker entry", () => {
 
   it("hands a page with no static file to the app", async () => {
     assets.mockResolvedValueOnce(new Response(null, { status: 404 }));
+    const calls = assets.mock.calls.length;
     const res = await worker.fetch(
       at("/portfolio/not-a-project", { Accept: "text/html" }),
       env,
       ctx,
     );
+    expect(assets.mock.calls.length).toBe(calls + 1);
     expect(await res.text()).toBe('{"t":2}');
   });
 

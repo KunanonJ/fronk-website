@@ -19,6 +19,11 @@ describe("prefersMarkdown", () => {
     ["text/markdown, */*", true],
     ["text/markdown;q=", true],
     ["text/markdown;q=0, text/markdown;q=1", true],
+    ["text/*;q=0.5, text/markdown", true],
+    ["  text/markdown  ;  q = 0.5 , text/html ; q=0.5", true],
+    ["text/markdown;q=0.4, text/*;q=0.9", false],
+    ["text/markdown;q=0.0", false],
+    ["*/*;q=0", false],
     ["text/html, text/markdown;q=0.9", false],
     ["text/markdown;q=0.5, */*", false],
     ["text/markdown;q=0", false],
@@ -128,22 +133,35 @@ describe("negotiate", () => {
     }
   });
 
-  it("answers the HTML when the Markdown cannot be built", async () => {
+  it("answers the HTML, kept nowhere, when the Markdown cannot be built", async () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
-    const start = vi.fn(async () => {
-      throw new Error("render failed");
-    });
-    const assets = vi.fn(async () => html("<h1>About</h1>"));
-    const res = await negotiate(
-      get("/about", "text/markdown"),
-      "/about.md",
-      start,
-      assets,
-    );
-    expect(await res.text()).toBe("<h1>About</h1>");
-    expect(res.headers.get("content-location")).toBeNull();
-    expect(logged).toHaveBeenCalled();
-    logged.mockRestore();
+    try {
+      for (const start of [
+        vi.fn(async () => {
+          throw new Error("render failed");
+        }),
+        vi.fn(async () => new Response("boom", { status: 500 })),
+      ]) {
+        const res = await negotiate(
+          get("/about", "text/markdown"),
+          "/about.md",
+          start,
+          vi.fn(async () => html("<h1>About</h1>")),
+        );
+        expect(await res.text()).toBe("<h1>About</h1>");
+        expect(res.headers.get("content-location")).toBeNull();
+        // Otherwise the cache would answer this Accept with HTML for a day.
+        expect(res.headers.get("cache-control")).toBe("no-store");
+        expect(res.headers.get("cdn-cache-control")).toBeNull();
+        expect(res.headers.get("vary")).toBe("Accept");
+      }
+      expect(logged).toHaveBeenCalledTimes(2);
+      expect(String(logged.mock.calls[1]?.[0])).toContain(
+        "/about.md answered 500",
+      );
+    } finally {
+      logged.mockRestore();
+    }
   });
 
   it("falls back to the app when there is no static file, and leaves a 404 alone", async () => {

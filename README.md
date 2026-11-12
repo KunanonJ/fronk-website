@@ -83,10 +83,11 @@ Sanity webhook ----> /api/revalidate (purges the document's tags)
 | `/index.md`, `/.well-known/agent-skills/index.json` | route | The home page in Markdown (the `/llms.txt` brief); the skills in the Agent Skills discovery format |
 
 **Agent readiness.** `/`, `/about` and each `/portfolio/[slug]` answer a
-request that prefers `Accept: text/markdown` with their Markdown version
-(`src/server/negotiate.ts`). These pages run the Worker first
-(`assets.run_worker_first` in both wrangler files); a GET or HEAD that does
-not prefer Markdown gets the static file through the `ASSETS` binding, or
+request that names `text/markdown` in `Accept`, at least as high as
+`text/html`, with their Markdown version (`src/server/negotiate.ts`); if the
+Markdown fails, with the page's HTML, kept nowhere. These pages run the Worker first
+(`assets.run_worker_first` in both wrangler files); any other GET or HEAD
+gets the static file through the `ASSETS` binding, or
 Start when there is none. Both versions carry `Vary: Accept` (each distinct
 `Accept` value is its own copy in the Worker cache), and `/` sends `Link`
 headers to its Markdown,
