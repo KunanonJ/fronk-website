@@ -1240,3 +1240,189 @@ test.describe("agent readiness", () => {
     }
   });
 });
+
+/**
+ * Tap targets inside `root` that are under `min` px, that overlap another
+ * target, or that something else covers. A link in a sentence is left out,
+ * as WCAG 2.2's inline exception (2.5.8) allows: an inline link next to
+ * visible text that belongs to no target. (Such a link wrapping onto a second
+ * line would also measure as one box over both lines, overlapping its
+ * neighbours on paper only.) "Covered" hit-tests the centre and a point 1 px
+ * inside the middle of each edge, not the corners, where rounded controls
+ * give way to their parent. It runs in the page, so it uses nothing from this
+ * file's scope.
+ */
+function tapAreas({ min, root }: { min: number; root: string }) {
+  const SELECTOR =
+    "a[href], button, input:not([type=hidden]), select, textarea, summary, [role=button], [role=tab]";
+  const name = (el: Element) =>
+    (
+      (el as HTMLElement).innerText?.trim() ||
+      el.getAttribute("aria-label") ||
+      el.tagName
+    ).slice(0, 40);
+  // Visible text in `block` outside every target and every aria-hidden part.
+  const sentenceText = (block: Element) => {
+    let length = 0;
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest(`${SELECTOR}, [aria-hidden="true"]`))
+        continue;
+      const box = parent.getBoundingClientRect();
+      // Screen-reader-only text is clipped to a 1 px box.
+      if (box.width <= 1 || box.height <= 1) continue;
+      length += (node.nodeValue ?? "").trim().length;
+    }
+    return length;
+  };
+  const inSentence = (el: Element, style: CSSStyleDeclaration) => {
+    if (style.display !== "inline") return false;
+    let block = el.parentElement;
+    while (
+      block &&
+      ["inline", "inline-block", "contents"].includes(
+        getComputedStyle(block).display,
+      )
+    )
+      block = block.parentElement;
+    return block !== null && sentenceText(block) > 0;
+  };
+  const scope = document.querySelector(root);
+  const found = scope ? Array.from(scope.querySelectorAll(SELECTOR)) : [];
+  const targets = found
+    .map((el) => ({
+      el,
+      box: el.getBoundingClientRect(),
+      style: getComputedStyle(el),
+    }))
+    .filter(
+      ({ el, box, style }) =>
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        box.width > 1 &&
+        box.height > 1 &&
+        !inSentence(el, style),
+    );
+  const small = targets
+    .filter(({ box }) => Math.min(box.width, box.height) < min)
+    .map(
+      ({ el, box }) =>
+        `${name(el)} ${box.width.toFixed(1)}×${box.height.toFixed(1)}`,
+    );
+  const overlaps: string[] = [];
+  for (const [i, a] of targets.entries()) {
+    for (const b of targets.slice(i + 1)) {
+      if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      const x =
+        Math.min(a.box.right, b.box.right) - Math.max(a.box.left, b.box.left);
+      const y =
+        Math.min(a.box.bottom, b.box.bottom) - Math.max(a.box.top, b.box.top);
+      if (x > 0.5 && y > 0.5) overlaps.push(`${name(a.el)} / ${name(b.el)}`);
+    }
+  }
+  const covered: string[] = [];
+  for (const { el } of targets) {
+    el.scrollIntoView({ block: "nearest", behavior: "instant" });
+    // The part of the target on screen, inside every clipping ancestor.
+    let { left, top, right, bottom } = el.getBoundingClientRect();
+    for (let a = el.parentElement; a; a = a.parentElement) {
+      const style = getComputedStyle(a);
+      if (style.overflowX === "visible" && style.overflowY === "visible")
+        continue;
+      const clip = a.getBoundingClientRect();
+      left = Math.max(left, clip.left);
+      top = Math.max(top, clip.top);
+      right = Math.min(right, clip.right);
+      bottom = Math.min(bottom, clip.bottom);
+    }
+    left = Math.max(left, 0);
+    top = Math.max(top, 0);
+    right = Math.min(right, window.innerWidth);
+    bottom = Math.min(bottom, window.innerHeight);
+    if (right - left < 2 || bottom - top < 2) continue;
+    const x = (left + right) / 2;
+    const y = (top + bottom) / 2;
+    const points: [number, number][] = [
+      [x, y],
+      [left + 1, y],
+      [right - 1, y],
+      [x, top + 1],
+      [x, bottom - 1],
+    ];
+    for (const [px, py] of points) {
+      const hit = document.elementFromPoint(px, py);
+      if (hit && el.contains(hit)) continue;
+      covered.push(
+        `${name(el)} at ${Math.round(px)},${Math.round(py)}: ${hit?.tagName ?? "nothing"}`,
+      );
+      break;
+    }
+  }
+  window.scrollTo(0, 0);
+  return { count: targets.length, small, overlaps, covered };
+}
+
+test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered", () => {
+  // WCAG 2.2, 2.5.8 Target Size (Minimum).
+  const MIN = 24;
+  // The pages a phone visitor reaches first, and the ones with short links:
+  // the footer's X on every page, the adapted-skills lists on /skills.
+  const PAGES = [
+    "/",
+    "/about",
+    "/skills",
+    "/portfolio",
+    "/portfolio/tbh-intranet",
+    "/contact",
+    "/resume",
+  ];
+
+  test.beforeEach(async ({ page }) => {
+    // Cards rise into place; measure them where they rest.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  });
+
+  for (const width of [320, 390]) {
+    for (const path of PAGES) {
+      test(`${path} at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 });
+        const res = await page.goto(path, { waitUntil: "networkidle" });
+        // A page that went missing would measure the 404 page instead.
+        expect(res?.status(), path).toBe(200);
+        await expect(
+          page.getByRole("heading", { level: 1 }).first(),
+        ).toBeVisible();
+        await page.evaluate(() => document.fonts.ready);
+        const { count, small, overlaps, covered } = await page.evaluate(
+          tapAreas,
+          { min: MIN, root: "body" },
+        );
+        expect(count).toBeGreaterThan(0);
+        expect(small, `tap areas under ${MIN} px`).toEqual([]);
+        expect(overlaps, "overlapping tap areas").toEqual([]);
+        expect(covered, "covered tap areas").toEqual([]);
+      });
+    }
+
+    // Hidden while closed, so the page tests above never measure it.
+    test(`the open menu at ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/", { waitUntil: "networkidle" });
+      const trigger = page.getByRole("button", { name: "Open menu" });
+      await expect(trigger).toBeVisible();
+      await trigger.click();
+      await expect(page.locator("#site-menu")).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const { count, small, overlaps, covered } = await page.evaluate(
+        tapAreas,
+        { min: MIN, root: "#site-menu" },
+      );
+      // More than a handful of links, so the menu was measured open.
+      expect(count).toBeGreaterThan(5);
+      expect(small, `menu tap areas under ${MIN} px`).toEqual([]);
+      expect(overlaps, "overlapping menu tap areas").toEqual([]);
+      expect(covered, "covered menu tap areas").toEqual([]);
+    });
+  }
+});
