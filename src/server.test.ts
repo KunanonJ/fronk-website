@@ -74,14 +74,49 @@ describe("the Worker entry", () => {
   });
 
   it("answers a browser with the static page", async () => {
+    for (const path of ["/", "/about", "/portfolio/kunanonj-com"]) {
+      const res = await worker.fetch(
+        at(path, { Accept: "text/html,*/*;q=0.8" }),
+        env,
+        ctx,
+      );
+      expect(await res.text(), path).toBe("<h1>Static</h1>");
+      expect(res.headers.get("vary"), path).toBe("Accept");
+      expect(res.headers.get("x-content-type-options"), path).toBe("nosniff");
+    }
+  });
+
+  it("sends the home page's Link header with both versions", async () => {
+    for (const accept of ["text/markdown", "text/html"]) {
+      const res = await worker.fetch(at("/", { Accept: accept }), env, ctx);
+      expect(res.headers.get("link"), accept).toContain(
+        '</index.md>; rel="alternate"; type="text/markdown"',
+      );
+    }
+    const about = await worker.fetch(at("/about"), env, ctx);
+    expect(about.headers.get("link")).toBeNull();
+  });
+
+  it("hands a page with no static file to the app", async () => {
+    assets.mockResolvedValueOnce(new Response(null, { status: 404 }));
     const res = await worker.fetch(
-      at("/about", { Accept: "text/html,*/*;q=0.8" }),
+      at("/portfolio/not-a-project", { Accept: "text/html" }),
       env,
       ctx,
     );
-    expect(await res.text()).toBe("<h1>Static</h1>");
-    expect(res.headers.get("vary")).toBe("Accept");
-    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(await res.text()).toBe('{"t":2}');
+  });
+
+  it("leaves an address with no Markdown version to the app", async () => {
+    const calls = assets.mock.calls.length;
+    const res = await worker.fetch(
+      at("/resume", { Accept: "text/markdown" }),
+      env,
+      ctx,
+    );
+    expect(await res.text()).toBe('{"t":2}');
+    expect(res.headers.get("vary")).toBeNull();
+    expect(assets.mock.calls.length).toBe(calls);
   });
 
   it("negotiates only GET and HEAD", async () => {

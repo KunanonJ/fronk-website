@@ -16,6 +16,9 @@ describe("prefersMarkdown", () => {
     ["text/markdown, text/html", true],
     ["TEXT/Markdown; charset=utf-8", true],
     ["text/markdown;q=0.5, */*;q=0.1", true],
+    ["text/markdown, */*", true],
+    ["text/markdown;q=", true],
+    ["text/markdown;q=0, text/markdown;q=1", true],
     ["text/html, text/markdown;q=0.9", false],
     ["text/markdown;q=0.5, */*", false],
     ["text/markdown;q=0", false],
@@ -108,18 +111,39 @@ describe("negotiate", () => {
     expect(start).not.toHaveBeenCalled();
   });
 
-  it("gives both versions of the home page its links, tag and lifetime", async () => {
+  it("gives both versions of the home page its links and one tag", async () => {
     const start = vi.fn(async () => md("# Kunanon Jarat"));
     const assets = vi.fn(async () => html("<h1>Home</h1>"));
-    for (const accept of ["text/markdown", BROWSER]) {
+    // The Markdown is the /llms.txt brief, so it keeps that file's hour; the
+    // static HTML changes only on a deploy, so it keeps a day like /about.
+    for (const [accept, lifetime] of [
+      ["text/markdown", "public, max-age=3600, stale-if-error=0"],
+      [BROWSER, "public, max-age=86400"],
+    ]) {
       const res = await negotiate(get("/", accept), "/index.md", start, assets);
       expect(res.headers.get("link"), accept).toBe(HOME_LINKS);
       expect(res.headers.get("cache-tag"), accept).toBe("posts");
-      expect(res.headers.get("cdn-cache-control"), accept).toBe(
-        "public, max-age=3600, stale-if-error=0",
-      );
+      expect(res.headers.get("cdn-cache-control"), accept).toBe(lifetime);
       expect(res.headers.get("vary"), accept).toBe("Accept");
     }
+  });
+
+  it("answers the HTML when the Markdown cannot be built", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const start = vi.fn(async () => {
+      throw new Error("render failed");
+    });
+    const assets = vi.fn(async () => html("<h1>About</h1>"));
+    const res = await negotiate(
+      get("/about", "text/markdown"),
+      "/about.md",
+      start,
+      assets,
+    );
+    expect(await res.text()).toBe("<h1>About</h1>");
+    expect(res.headers.get("content-location")).toBeNull();
+    expect(logged).toHaveBeenCalled();
+    logged.mockRestore();
   });
 
   it("falls back to the app when there is no static file, and leaves a 404 alone", async () => {

@@ -20,11 +20,12 @@
   },
   // Paths ending in "/" reach the Worker so it can 308 them like Next did.
   // The pages with a Markdown version also run the Worker first, so it can
-  // answer Accept: text/markdown (src/server/negotiate.ts); it hands every
-  // other request back to the static files through ASSETS. Named one by one,
-  // not with "/portfolio/*": that would catch the cover images, and a "!"
-  // pattern sends a request to the static files without the Worker, which
-  // breaks the trailing-slash 308s and the Worker's own /portfolio routes.
+  // answer Accept: text/markdown (src/server/negotiate.ts); a GET or HEAD
+  // that does not prefer Markdown gets the static file through ASSETS, or
+  // Start when there is none. Named one by one, not with "/portfolio/*":
+  // that would catch the cover images. And not with a "!" pattern: what it
+  // matches goes to the static files without the Worker (the build's
+  // prerender step got a 404 for /portfolio/<slug>/ instead of its 308).
   // lib/cloudflare/cacheConfig.test.ts keeps the list equal to the projects.
   "assets": {
     "binding": "ASSETS",

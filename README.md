@@ -85,9 +85,11 @@ Sanity webhook ----> /api/revalidate (purges the document's tags)
 **Agent readiness.** `/`, `/about` and each `/portfolio/[slug]` answer a
 request that prefers `Accept: text/markdown` with their Markdown version
 (`src/server/negotiate.ts`). These pages run the Worker first
-(`assets.run_worker_first` in both wrangler files); the Worker hands every
-other request back to the static files through the `ASSETS` binding. Both
-versions carry `Vary: Accept`, and `/` sends `Link` headers to its Markdown,
+(`assets.run_worker_first` in both wrangler files); a GET or HEAD that does
+not prefer Markdown gets the static file through the `ASSETS` binding, or
+Start when there is none. Both versions carry `Vary: Accept` (each distinct
+`Accept` value is its own copy in the Worker cache), and `/` sends `Link`
+headers to its Markdown,
 `/llms.txt` and the sitemap. `robots.txt` carries `Content-Signal: search=yes,
 ai-input=yes, ai-train=yes` in every group that allows crawling. A new
 portfolio project needs its address in `run_worker_first`;

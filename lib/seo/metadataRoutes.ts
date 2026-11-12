@@ -3,7 +3,8 @@ import type { Manifest, Robots, Sitemap } from "@/lib/seo/types";
 /*
  * Text output of Next's metadata routes (robots.ts, sitemap.ts, manifest.ts),
  * for frameworks that serve them by hand (the TanStack Start build). Matches
- * Next's own serialisers byte for byte for the fields this site uses.
+ * Next's own serialisers byte for byte for Next's fields. robots.txt's
+ * `comment` and `contentSignal` are this site's additions (Content Signals).
  */
 
 const list = <T>(value: T | T[] | undefined): T[] =>

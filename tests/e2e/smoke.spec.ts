@@ -1155,8 +1155,8 @@ test.describe("worker cache > what the edge may keep", () => {
   });
 });
 
-// agent-readiness plan, gate 3: what Cloudflare's Agent Readiness checks
-// read. The built Worker answers these (CI serves `pnpm start`).
+// agent-readiness plan, gate 3: the formats Cloudflare's Agent Readiness
+// checks look for. The built Worker answers these (CI serves `pnpm start`).
 test.describe("agent readiness", () => {
   const BROWSER = "text/html,application/xhtml+xml,*/*;q=0.8";
 
@@ -1201,8 +1201,13 @@ test.describe("agent readiness", () => {
   test("robots.txt declares the content signals in every group that allows crawling", async ({
     request,
   }) => {
-    const text = await (await request.get("/robots.txt")).text();
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const text = await res.text();
     const groups = text.split("\n\n").filter((g) => g.startsWith("User-Agent"));
+    // The * group, the named crawlers and the two blocked ones.
+    expect(groups.length).toBeGreaterThanOrEqual(4);
+    expect(groups.filter((g) => /^Disallow: \/$/m.test(g)).length).toBe(2);
     for (const group of groups) {
       const allows = /^Allow: \//m.test(group);
       expect(
