@@ -373,9 +373,12 @@ function CreditsCard() {
                 >
                   {source.skills.map((slug) => (
                     <li key={slug}>
+                      {/* Short slugs such as "pr" get a 24 px tap area from
+                          padding the negative margin takes back; with the
+                          16 px gap, neighbouring areas stay 4 px apart. */}
                       <Link
                         href={`/skills/${slug}`}
-                        className="inline-flex min-h-11 items-center"
+                        className="-mx-1.5 inline-flex min-h-11 min-w-6 items-center justify-center px-1.5"
                       >
                         {slug}
                       </Link>

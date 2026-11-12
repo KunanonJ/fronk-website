@@ -1,6 +1,12 @@
 import { footerAgents, socials } from "@/lib/content/landing";
 
-const LINK = "inline-flex min-h-11 items-center";
+/**
+ * 44 px tall, and at least 24 px wide: padding taken back by an equal negative
+ * margin widens the tap area without moving the text (the X link's label is
+ * one letter). With the rows' 18 px gaps, neighbouring areas stay 1 px apart.
+ */
+const LINK =
+  "-mx-[8.5px] inline-flex min-h-11 min-w-6 items-center justify-center px-[8.5px]";
 
 /**
  * Site footer (bento canvas, design spec 3.9): copyright and socials, plus

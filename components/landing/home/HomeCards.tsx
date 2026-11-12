@@ -137,7 +137,10 @@ export function SelectedWorkCard() {
               <span className="flex min-w-0 flex-col">
                 <Link
                   href={`/portfolio/${project.slug}`}
-                  className={cn(NAME_LINK, "text-card font-medium")}
+                  // Padding above the name, taken back by the margin, makes
+                  // the tap area 26 px tall without moving the text. Only
+                  // above: below, the tagline would paint over it.
+                  className={cn(NAME_LINK, "-mt-1 pt-1 text-card font-medium")}
                 >
                   {project.name}
                 </Link>
