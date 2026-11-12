@@ -18,6 +18,20 @@ describe("metadata route serialisers (match the site reference)", () => {
     expect(robotsToText(robots())).toBe(reference["/robots.txt"].body);
   });
 
+  it("writes comments first and a group's Content-Signal after its User-Agent lines", () => {
+    expect(
+      robotsToText({
+        comment: "Content signals: https://contentsignals.org",
+        rules: [
+          { userAgent: "*", contentSignal: "search=yes", allow: "/" },
+          { userAgent: "CCBot", disallow: "/" },
+        ],
+      }),
+    ).toBe(
+      "# Content signals: https://contentsignals.org\n\nUser-Agent: *\nContent-Signal: search=yes\nAllow: /\n\nUser-Agent: CCBot\nDisallow: /\n\n",
+    );
+  });
+
   it("manifest.webmanifest", () => {
     expect(manifestToJson(manifest())).toBe(
       reference["/manifest.webmanifest"].body,

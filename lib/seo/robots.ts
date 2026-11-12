@@ -26,6 +26,14 @@ const CITATION_USER_AGENTS = [
   "Applebot-Extended",
 ] as const;
 
+/**
+ * How AI may use the site's text (contentsignals.org), the owner's answer of
+ * 12-11-26: search, AI answers and training are all allowed, as the citation
+ * crawlers above already are. A crawler reads only the group that names it,
+ * so every group that allows crawling carries the line.
+ */
+export const CONTENT_SIGNAL = "search=yes, ai-input=yes, ai-train=yes";
+
 /** Training / aggressive scrapers — keep blocked at the app layer. */
 const BLOCKED_USER_AGENTS = ["CCBot", "Bytespider"] as const;
 
@@ -47,14 +55,17 @@ export default function robots(): Robots {
   const sharedDisallow = ["/studio", "/api"] as const;
 
   return {
+    comment: "Content signals: https://contentsignals.org",
     rules: [
       {
         userAgent: "*",
+        contentSignal: CONTENT_SIGNAL,
         allow: "/",
         disallow: [...sharedDisallow],
       },
       ...CITATION_USER_AGENTS.map((userAgent) => ({
         userAgent,
+        contentSignal: CONTENT_SIGNAL,
         allow: "/",
         disallow: [...sharedDisallow],
       })),

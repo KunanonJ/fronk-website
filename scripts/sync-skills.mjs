@@ -13,7 +13,7 @@
  *
  * Reads (all pinned to the tag): the git tree (skill folders and file lists),
  * every `SKILL.md`, `sources.lock.json`, the `patches/` names, and the release
- * assets (names, sizes, download URLs). `GITHUB_TOKEN` is used when set.
+ * assets (names, sizes, digests, download URLs). `GITHUB_TOKEN` is used when set.
  *
  * Output is stable: arrays are sorted, there is no timestamp, so re-running
  * against the same tag produces a byte-identical file.
@@ -177,7 +177,17 @@ function assetFor(assetsByName, name, skill) {
       `Release is missing asset ${name}${skill ? ` for ${skill}` : ""}`,
     );
   }
-  return { name: asset.name, size: asset.size, url: asset.url };
+  if (!/^sha256:[0-9a-f]{64}$/.test(asset.digest ?? "")) {
+    throw new Error(
+      `Release asset ${name} has no sha256 digest (the Agent Skills index needs one)`,
+    );
+  }
+  return {
+    name: asset.name,
+    size: asset.size,
+    url: asset.url,
+    digest: asset.digest,
+  };
 }
 
 /** `how-v6.1.patch` -> `how`; file patches map back through sources.lock `copied`. */
@@ -203,7 +213,7 @@ function skillForPatch(patchFile, skillNames, copied) {
  * @param {{
  *   tag: string,
  *   release: { tag_name: string, html_url: string, published_at: string,
- *     assets: { name: string, size: number, browser_download_url: string }[] },
+ *     assets: { name: string, size: number, digest?: string, browser_download_url: string }[] },
  *   tree: { path: string, type: string, size?: number }[],
  *   skillFiles: Record<string, string>,
  *   sourcesLock: { version: string, sources: Record<string, unknown>[],
@@ -229,7 +239,12 @@ export function buildSnapshot(raw) {
   const assetsByName = new Map(
     release.assets.map((a) => [
       a.name,
-      { name: a.name, size: a.size, url: a.browser_download_url },
+      {
+        name: a.name,
+        size: a.size,
+        url: a.browser_download_url,
+        digest: a.digest,
+      },
     ]),
   );
 
@@ -442,6 +457,7 @@ export async function fetchRaw(tag) {
       assets: release.assets.map((a) => ({
         name: a.name,
         size: a.size,
+        digest: a.digest,
         browser_download_url: a.browser_download_url,
       })),
     },

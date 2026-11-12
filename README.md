@@ -80,6 +80,18 @@ Sanity webhook ----> /api/revalidate (purges the document's tags)
 | `/api/revalidate`                          | POST (src/server.ts)           | Sanity webhook → purge Worker cache tags           |
 | `/sitemap.xml`, `/robots.txt`, `/feed.xml`, `/rss.xml` | generated / redirect | XML sitemap + RSS (`/rss.xml` → `/feed.xml`)        |
 | `/agents.md`, `/sitemap.md`, `/skills.md`, `/llms.txt` | static / route         | Agent & LLM discovery surfaces (linked in footer)  |
+| `/index.md`, `/.well-known/agent-skills/index.json` | route | The home page in Markdown (the `/llms.txt` brief); the skills in the Agent Skills discovery format |
+
+**Agent readiness.** `/`, `/about` and each `/portfolio/[slug]` answer a
+request that prefers `Accept: text/markdown` with their Markdown version
+(`src/server/negotiate.ts`). These pages run the Worker first
+(`assets.run_worker_first` in both wrangler files); the Worker hands every
+other request back to the static files through the `ASSETS` binding. Both
+versions carry `Vary: Accept`, and `/` sends `Link` headers to its Markdown,
+`/llms.txt` and the sitemap. `robots.txt` carries `Content-Signal: search=yes,
+ai-input=yes, ai-train=yes` in every group that allows crawling. A new
+portfolio project needs its address in `run_worker_first`;
+`lib/cloudflare/cacheConfig.test.ts` fails until it is there.
 
 ## Local development
 

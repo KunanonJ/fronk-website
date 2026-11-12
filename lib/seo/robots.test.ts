@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import robots from "./robots";
+import robots, { CONTENT_SIGNAL } from "./robots";
 import { PLACEHOLDER_SITE_URL } from "@/lib/seo/siteUrl";
 
 describe("robots()", () => {
@@ -26,5 +26,15 @@ describe("robots()", () => {
     const ccDisallow = cc?.disallow;
     const list = Array.isArray(ccDisallow) ? ccDisallow : [ccDisallow];
     expect(list).toContain("/");
+  });
+
+  it("gives the content signals to every group that allows crawling, and only those", () => {
+    expect(CONTENT_SIGNAL).toBe("search=yes, ai-input=yes, ai-train=yes");
+    const rules = robots().rules;
+    for (const rule of Array.isArray(rules) ? rules : [rules]) {
+      const agent = String(rule.userAgent);
+      if (rule.allow) expect(rule.contentSignal, agent).toBe(CONTENT_SIGNAL);
+      else expect(rule.contentSignal, agent).toBeUndefined();
+    }
   });
 });

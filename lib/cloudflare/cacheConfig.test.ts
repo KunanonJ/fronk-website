@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { getAllPortfolioSlugs } from "@/lib/content/portfolio";
 import { parseJsonc } from "@/scripts/wrangler-vars.mjs";
 
 /**
@@ -18,7 +19,7 @@ type WranglerConfig = {
   cache?: { enabled?: boolean };
   triggers?: { crons?: string[] };
   ratelimits?: { name: string }[];
-  assets?: { run_worker_first?: string[] };
+  assets?: { binding?: string; run_worker_first?: string[] };
   durable_objects?: { bindings?: { class_name: string }[] };
   migrations?: {
     tag: string;
@@ -50,11 +51,25 @@ describe("production Worker config (TanStack Start)", () => {
     expect(staging.triggers).toEqual({ crons: [] });
   });
 
-  it("rate-limits the forms and routes trailing slashes through the Worker", () => {
+  it("rate-limits the forms", () => {
     expect(wrangler.ratelimits?.map((r) => r.name)).toContain(
       "FORM_RATE_LIMIT",
     );
-    expect(wrangler.assets?.run_worker_first).toEqual(["/*/"]);
+  });
+
+  it("runs the Worker first for trailing slashes and every page with a Markdown version", () => {
+    // Named one by one: a "*" would catch the portfolio cover images, and a
+    // "!" pattern skips the Worker entirely for what it matches.
+    const expected = [
+      "/*/",
+      "/",
+      "/about",
+      ...[...getAllPortfolioSlugs()].sort().map((slug) => `/portfolio/${slug}`),
+    ];
+    for (const config of [wrangler, staging]) {
+      expect(config.assets?.binding).toBe("ASSETS");
+      expect(config.assets?.run_worker_first).toEqual(expected);
+    }
   });
 
   it("deletes the legacy Durable Object classes after creating them", () => {

@@ -165,3 +165,26 @@ describe("operating-model.md", () => {
     expect(md).toContain("## Use it in another project");
   });
 });
+
+describe("agent readiness in the agent docs", () => {
+  it("the home page's Markdown is the llms.txt brief, served as Markdown", async () => {
+    const { GET: homeMd } = await import("./homeMd");
+    const res = await homeMd();
+    expect(res.headers.get("content-type")).toBe(
+      "text/markdown; charset=utf-8",
+    );
+    expect(await res.text()).toBe(await (await llmsTxt()).text());
+  });
+
+  it("llms.txt and agents.md name the skills index and the Markdown answers", async () => {
+    const text = await (await llmsTxt()).text();
+    expect(text).toContain("/.well-known/agent-skills/index.json");
+    expect(text).toContain("Accept: text/markdown");
+    const md = buildAgentsMd();
+    expect(md).toContain(
+      "[/.well-known/agent-skills/index.json](/.well-known/agent-skills/index.json)",
+    );
+    expect(md).toContain("`Accept: text/markdown`");
+    expect(md).toContain("content signals");
+  });
+});
