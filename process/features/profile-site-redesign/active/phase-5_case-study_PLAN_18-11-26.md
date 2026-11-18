@@ -1,6 +1,6 @@
 # Phase 5: Case-study template
 
-**Status:** CODE DONE (18-11-26)
+**Status:** VERIFIED (18-11-26). Reviewed, and every finding fixed or recorded (report: Code review and fixes); every gate passed on the fixed tree.
 **Evidence:** `../reports/phase-5_case-study_REPORT_18-11-26.md` (gates,
 deviations, draft copy and open items; Linux baselines pending, rendered by
 the orchestrator). The review's fixes: its section 9 (branch

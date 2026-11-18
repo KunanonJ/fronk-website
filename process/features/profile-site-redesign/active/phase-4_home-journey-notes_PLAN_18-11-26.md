@@ -1,6 +1,6 @@
 # Phase 4: Home journey and testimonial notebook
 
-**Status:** CODE DONE (18-11-26). Parallel lane (branch
+**Status:** VERIFIED (18-11-26). Reviewed, and every finding fixed or recorded (report: Code review and fixes); every gate passed on the fixed tree.
 `feat/home-journey-testimonial-notebook`, from `5721eab`); Linux baselines
 and the review wait for the orchestrator.
 **Evidence:** `../reports/phase-4_home-journey-notes_REPORT_18-11-26.md`;
