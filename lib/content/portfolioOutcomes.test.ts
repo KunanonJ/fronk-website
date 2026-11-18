@@ -5,6 +5,9 @@ import {
   getAllTopicPillars,
   getTopicPillar,
 } from "@/lib/content/topics/pillars";
+import { getAllVentures } from "@/lib/content/ventures";
+import { aboutStats } from "@/lib/landing/aboutStats";
+import { stackCards } from "@/lib/landing/stackCards";
 import { siteSources } from "@/tests/siteSources";
 
 /*
@@ -240,6 +243,40 @@ describe("portfolio outcomes", () => {
     for (const project of projects) {
       const labels = (project.outcomes ?? []).map((outcome) => outcome.label);
       expect(new Set(labels).size, project.slug).toBe(labels.length);
+    }
+  });
+});
+
+/*
+ * The redesigned Home (profile redesign Phase 3). The work stack prints a
+ * project's first cleared outcome, and the About stats tile draws figures;
+ * both read them through lib/landing/stackCards.ts and aboutStats.ts, and
+ * lib/content/homeWorkAbout.ts types none (the "no other place" check above
+ * scans it with every other source file). These hold what they show.
+ */
+describe("the redesigned Home's work stack and stats", () => {
+  it("shows each project's first cleared outcome line, and nothing on a project with none", () => {
+    const cards = stackCards().filter((card) => card.kind === "project");
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards)
+      expect(card.evidence, card.slug).toBe(
+        OWNER_CLEARED[card.slug]?.[0]?.line,
+      );
+  });
+
+  it("draws only figures a project's outcome or a venture's metric states", () => {
+    const stats = aboutStats();
+    expect(stats.length).toBeGreaterThan(0);
+    for (const { figure } of stats) {
+      const outcome = projects.some((project) =>
+        (project.outcomes ?? []).some((item) =>
+          item.value.startsWith(`${figure} `),
+        ),
+      );
+      const metric = getAllVentures().some((venture) =>
+        (venture.metrics ?? []).some((item) => item.value === figure),
+      );
+      expect(outcome || metric, figure).toBe(true);
     }
   });
 });
