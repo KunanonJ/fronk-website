@@ -1194,12 +1194,12 @@
   }
 
   /* Breakpoints (spec 4.1 and 10.1). */
-  @media (min-width: 40rem) {
+  @media (width >= 40rem) {
     .pf-resume__pdf {
       inline-size: auto;
     }
   }
-  @media (min-width: 37.5rem) {
+  @media (width >= 37.5rem) {
     .pf-status__grid,
     .pf-skill-steps,
     .pf-skill-stage__grid,
@@ -1229,7 +1229,7 @@
       grid-column: 1 / -1;
     }
   }
-  @media (min-width: 64rem) {
+  @media (width >= 64rem) {
     .pf-skill-install {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     }

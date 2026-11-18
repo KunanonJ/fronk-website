@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Profile redesign, Phase 7 group D2 (process/features/profile-site-redesign,
@@ -58,6 +58,19 @@ async function open(page: Page, path: string) {
   const res = await page.goto(path, { waitUntil: "networkidle" });
   expect(res?.status(), path).toBe(path === PAGES.notFound ? 404 : 200);
   await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Moves focus to `target` with real Tab presses from wherever focus is, as a
+ * keyboard reader does (never a script focus on a control). Desktop
+ * Chromium only, where Tab reaches every control.
+ */
+async function tabTo(page: Page, target: Locator) {
+  for (let presses = 0; presses < 60; presses += 1) {
+    if (await target.evaluate((el) => el === document.activeElement)) return;
+    await page.keyboard.press("Tab");
+  }
+  await expect(target).toBeFocused();
 }
 
 /** Sideways scroll, text under 12 px and targets under 24 px. */
@@ -400,6 +413,42 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     expect(h1.y).toBeGreaterThan(80);
   });
 
+  test("a route that fails shows the new error page, in the scope, and Try again recovers", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await open(page, "/");
+    // The résumé's loader asks the server on an in-app visit: fail it.
+    await page.route("**/_serverFn/**", (route) => route.abort());
+    await page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "Résumé" })
+      .click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Something went wrong.",
+    );
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-design",
+      "profile",
+    );
+    await expect(
+      page
+        .getByRole("article", { name: "Error · Didn't load" })
+        .locator("svg.pf-art"),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Recovery links" })
+        .getByRole("link"),
+    ).toHaveCount(4);
+    await page.unroute("**/_serverFn/**");
+    await page.getByRole("button", { name: "Try again" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "Kunanon Jarat.",
+    );
+  });
+
   test("/design: its own canonical, noindex, and a theme switch of its own", async ({
     page,
   }) => {
@@ -444,15 +493,15 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
         /^\/skills\/[a-z-]+$/,
       );
     }
-    // The install tabs are toggle pills: the arrow keys move the selection.
+    // The install tabs are toggle pills: Tab reaches the selected one from
+    // the top of the page, and the arrow keys move the selection.
     const tabs = page.getByRole("tablist", {
       name: "Install the whole pack with",
     });
-    await tabs.getByRole("tab", { name: "Claude Code" }).focus();
+    await tabTo(page, tabs.getByRole("tab", { name: "Claude Code" }));
     await page.keyboard.press("ArrowRight");
-    await expect(tabs.getByRole("tab", { name: "Codex" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    const codex = tabs.getByRole("tab", { name: "Codex" });
+    await expect(codex).toHaveAttribute("aria-selected", "true");
+    await expect(codex).toBeFocused();
   });
 });

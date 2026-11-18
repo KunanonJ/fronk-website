@@ -31,6 +31,14 @@ describe("PressPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps the headings: each card's type, then its title", () => {
+    render(<PressPage type="all" onTypeChange={() => {}} />);
+    expect(
+      screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent),
+    ).toEqual(["Feature", "Product", "Product", "Profile"]);
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(4);
+  });
+
   it("shows every item with its type, date and an external link", () => {
     render(<PressPage type="all" onTypeChange={() => {}} />);
     const cards = screen.getAllByRole("article");

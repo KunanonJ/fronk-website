@@ -75,9 +75,9 @@ function PressCard({
       className="ds-tile ds-tile--paper pf-press-card"
     >
       <div className="pf-press-card__head">
-        <p id={`press-type-${item.id}`} className="t-meta pf-cat-kicker">
+        <h2 id={`press-type-${item.id}`} className="t-meta pf-cat-kicker">
           {item.source}
-        </p>
+        </h2>
         <time dateTime={item.date} className="t-meta pf-cat-note">
           {formatPressDate(item.date)}
         </time>

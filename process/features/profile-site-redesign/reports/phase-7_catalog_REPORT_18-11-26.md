@@ -29,7 +29,7 @@ to set once both groups are merged. Linux baselines are not rendered here
 | 7g `/design` | `components/system/{DesignSystemPage,SystemLayout}.tsx`, `src/routes/_system/design.tsx` | The content of the deleted `/preview/system` (from `ea9c1d0^`): colour, ink mixes, materials and washes; every type style; radii and shadows; every primitive; the testimonial notebook with its three labelled samples (`sampleNotes.ts`); and states and preferences, last. The hero on the sky keeps the h1 "Design system". No site chrome, as before, so the phone theme switch (`ThemeSwitch`) sits in a bar of its own where the nav would be. Still noindex; its canonical is now `/design` (backlog P3) |
 | 7h `/blog`, `/blog/$slug`, `/press` | `components/landing/blog/{BlogIndexPage,BlogPostPage,BlogParts}.tsx`, `components/landing/PressPage.tsx` | Light restyles: the hero on the sky, the bento cards as tiles in the same spans (press keeps `pressSpans`, now as `data-span`), the filters as toggle pills, the post rows and the links lists restyled. Still noindex, unlinked, out of the sitemap |
 | Routes | `src/routes/_landing/{skills/index,skills/$slug,resume,press,blog/index,blog/$slug}.tsx` | `PageMain` (the bento column) gives way to `ProfileMain` (`main#main.pf-main`, under the fixed bar); heads, loaders and JSON-LD unchanged |
-| Styles | `src/styles/profile/pages-catalog.css` | This lane's partial only: plain CSS on the tokens, phones first, rem breakpoints, `@layer components`, the chevron's turn inside no-preference, contrast and forced-colours blocks |
+| Styles | `src/styles/profile/pages-catalog.css` | This lane's partial only: plain CSS on the tokens, phones first, rem breakpoints in range syntax (`width >= 37.5rem`, `40rem`, `64rem`; no `max-width` pairs), `@layer components`, the chevron's turn inside no-preference, contrast and forced-colours blocks. `cutover.css` and the other partials are untouched |
 | 7i Tests | section 4 | Unit tests rewritten to the same intents; a guard for this group's files; a browser spec of its own; the notebook checks re-enabled on `/design` |
 | Dead code | `components/bento/MonoEyebrow.tsx` (deleted), `BentoRow` in `components/bento/Bento.tsx` (deleted) | knip flagged both once their last users moved |
 
@@ -44,15 +44,46 @@ to set once both groups are merged. Linux baselines are not rendered here
   text endpoints, redirects and 404s of every page are unchanged. `og:url`
   on `/design` still names the homepage (the backlog item names only the
   canonical; one tag changed, not the whole share block).
-- **Visible text.** The parity crawl does not read body text, so the lane
-  compared it itself: the base build (`09ee95b`) and this build served on
-  3108, the `innerText` of `<main>` at 1440 px, words compared as multisets
-  with case folded (CSS uppercases the mono labels) on `/skills`, five skill
-  pages, `/resume`, `/resume?view=compact`, the 404, `/press`, `/blog` and
-  two posts. **Every page has the same words**, the same h1 and the same
-  status, except one glyph: a post's "Back to Blog" link now draws its arrow
-  as an `aria-hidden` "←" (the shared back link) where the old one drew an
-  SVG arrow. `/design` changed on purpose (rebuilt).
+- **Visible text.** The parity crawl (`lib/parity/parity.mjs`,
+  `extractPage`) compares head tags, JSON-LD, the languages, the title and
+  the first h1, not body text, so it cannot show a lost heading or label.
+  The lane therefore served the base build (`09ee95b`, on 4308) and this
+  build (on 3108) side by side and dumped, for every page it changes, the
+  `innerText` of `<main>` at 1440 px and its heading outline (level and
+  text, in order): `/skills` and `/skills?show=user`, all 20 skill pages,
+  `/resume` in both views, `/press` and `/press?type=product`, `/blog` and
+  all 16 posts it links, the 404 at an unknown URL, `/skills/not-a-skill`
+  and `/blog/not-a-post`, the error state (an in-app visit to `/resume`
+  whose server call fails), and `/design`: 48 page states. Words were
+  compared as multisets (case folded, since CSS uppercases the mono labels;
+  arrows split off) and as ordered streams; a second dump of `textContent`
+  checked what `innerText` skips (inactive tab panels, folded SKILL.md
+  lines, screen-reader text) on the 24 pages that have such parts.
+  - **31 page states are word for word the same, with the same heading
+    outline**: every skill page, both 404s of the routes and the unknown
+    URL, the error state, the résumé in both views, press in both filters,
+    and the blog index. The `textContent` check is the same on all 24 pages.
+  - **Moved, not changed:** on `/skills` (both filters) the release pill,
+    "Superstacks v6.1.1 · Oct 2026", now follows the hero's buttons (View on
+    GitHub, Share) instead of sitting beside the h1; same words.
+  - **Added, decorative:** each of the 16 posts' back link now reads
+    "← Back to Blog" with the arrow as an `aria-hidden` text glyph (the
+    shared back link the case pages use), where the base drew an SVG arrow
+    before "Back to Blog". The link's name is unchanged.
+  - **Replaced on purpose:** `/design` (plan 7g). The base page's eyebrow
+    "Internal", lead "The bento canvas as built: tokens, type, buttons,
+    chips, cards and motion. Switch the theme to review night." and its
+    sections (Colour, Type, Radii, Buttons, Chips, Filters, Card with "An
+    in-card title", Pixel art, Motion) gave way to the content of the
+    deleted `/preview/system`. Every visible line of that page (156 checked
+    from its source at `ea9c1d0^`) is on `/design` except its two header
+    lines: the eyebrow "Phase 0 · tokens and primitives" (now "Tokens and
+    primitives") and the h1 "Design system preview" (now "Design system",
+    the parity reference's h1).
+  - **Restored:** a first pass had turned each press card's source label
+    ("Feature", "Product", "Profile") from an `h2` into a paragraph. It is
+    an `h2` again, as on the base page, and `PressPage.test.tsx` now asserts
+    the headings.
 - **Prerender:** the sorted `dist/client/**/*.html` lists of the base and
   this build are identical, 46 files.
 - **Link names.** Links this lane restyled keep their arrows on screen but in
@@ -83,7 +114,7 @@ production build of it:
 | | Visible text | section 2, on the first and the final build | same words on every page but one arrow glyph |
 
 The lane's own spec alone (`tests/e2e/profile-pages-catalog.spec.ts
---project=desktop`): 38 passed in 17.8 s on its first run.
+--project=desktop`), on the final build: 39 passed in 19.7 s.
 
 ## 4. Tests: changed and new (umbrella input R17)
 
@@ -94,13 +125,13 @@ The lane's own spec alone (`tests/e2e/profile-pages-catalog.spec.ts
 | `components/landing/StatusPage.test.tsx` | Two checks rewritten, two added | The hero is the new one (`t-display`, `pf-page-hero`), the status tile carries the decorative pixel drawing, the page is `main#main.pf-main`; "Try again" is the dark pill (was the `bg-cta` class); the drawings' rows are even and the two differ. The chrome, recovery-link and report checks are unchanged |
 | `components/landing/skills/skills.test.tsx` | Unchanged | Every check holds on the new markup (names, anchors, counts, the fold) |
 | `components/resume/ResumePage.test.tsx` | Five checks adapted | The h1 class `t-display` (was `kj-lines`), still three lines; link names without arrows ("Case studies", "Case study", "gogocash.co"); the live markers by their class (`li > .pf-resume__live`, was `.bg-ember`); the cards' kinds by `data-kind` (was the bento's Tailwind span classes; the browser spec measures the placement); print hides both screen parts (the hero and the body) |
-| `components/landing/PressPage.test.tsx` | Three checks adapted | The hero class; the canvas spans as `data-span` (was Tailwind span classes); "View on gogocash.co" without the arrow in its name |
+| `components/landing/PressPage.test.tsx` | Three checks adapted, one added | The hero class; the canvas spans as `data-span` (was Tailwind span classes); "View on gogocash.co" without the arrow in its name; new: the headings, each card's type as an `h2` ("Feature", "Product", "Product", "Profile") and its title as an `h3`, the outline the base page had (section 2, "Restored") |
 | `components/landing/blog/blog.test.tsx` | Two checks adapted | The hero class; "Back to Blog" read inside the hero (the "Keep reading" tile now has a link of the same name) |
 | `components/system/DesignSystemPage.test.tsx` (new) | | The h1, the six sections, swatches that paint tokens, the sample notebook with its three notes, the page's own theme switch and no site nav |
 | `tests/e2e/routes.ts` | `PROFILE_ROUTE_NAMES` gains seven names | `skills`, `skill-detail`, `resume`, `not-found`, `design`, `blog`, `press`: axe runs WCAG 2.2 on them in both themes, and `profile.spec.ts` checks their fit on every project |
 | `tests/e2e/profile-shell.spec.ts` | Two pairs flipped | `/skills` and `/design` now preload Onest and Instrument Serif and carry the scope |
 | `tests/e2e/profile-journey.spec.ts` | Notebook checks re-enabled | `SYSTEM` is `/design`; the three `test.skip(true, …)` and their reason are gone: keyboard, autoplay, the turn, reduced motion, the drag, the layout across the matrix, the spanned hinge, and the baseline (which the orchestrator renders) |
-| `tests/e2e/profile-pages-catalog.spec.ts` (new) | | Desktop Chromium: every group page at 344, 390, 820, 882, 1180 and 1440 px (no sideways scroll, 12 px text, 24 px targets, in the scope); one page per family (`/skills/verify-loop`, `/resume`, the 404, `/design`, `/press`) through forced colours (this group's ringed parts included), text spacing, zoom, more contrast and request origins (not on `/press`, section 8); the résumé's grid and print; the 404's scope and picture; `/design`'s canonical, robots and theme switch; the hidden pages' robots; the pipeline's links and the tabs' arrow keys. Each best-practice check first fails a fixture. The check functions are copied from `profile.spec.ts` rather than imported (a spec importing a spec registers its tests twice); Phase 8 can move them to one helper |
+| `tests/e2e/profile-pages-catalog.spec.ts` (new) | | Desktop Chromium: every group page at 344, 390, 820, 882, 1180 and 1440 px (no sideways scroll, 12 px text, 24 px targets, in the scope); one page per family (`/skills/verify-loop`, `/resume`, the 404, `/design`, `/press`) through forced colours (this group's ringed parts included), text spacing, zoom, more contrast and request origins (not on `/press`, section 8); the résumé's grid and print; the 404's scope and picture; `/design`'s canonical, robots and theme switch; the hidden pages' robots; the error state (an in-app visit to `/resume` whose server call is made to fail: the new status page as an alert, in the scope, with its picture and four recovery links, and Try again recovers); the pipeline's links; and the install tabs by keyboard, reached by pressing Tab from the top of the page (no script focus on a control), then moved with the arrow keys. Each best-practice check first fails a fixture. The check functions are copied from `profile.spec.ts` rather than imported (a spec importing a spec registers its tests twice); Phase 8 can move them to one helper |
 
 ## 5. Owner inputs used
 
@@ -148,10 +179,12 @@ preview's sample lines and the notebook's samples come back unchanged.
 3. **A skill's h1 is set in JetBrains Mono at display size**, not the
    serif: skill names are identifiers ("verify-loop"), as the bento page set
    them in mono; it keeps the hero's other parts.
-4. **The press source label is a paragraph**, not a second heading per card
-   (it was an `h2` above the card's `h3`). Headings are the cards' titles.
+4. **The skills release pill moved** after the hero's buttons (section 2).
+   The hero's anatomy puts its pills under the lead; the words are the
+   same.
 5. **Arrows leave the link names** of the links this lane restyled (section
-   2). Visible text is unchanged.
+   2). Visible text is unchanged, but for the posts' back link, which now
+   shows "←" as a text glyph where it drew an SVG arrow.
 6. **The blog post body is not restyled.** `components/PortableText.tsx` is
    shared and its tests pin its classes; inside the scope its code spans
    keep the frozen Geist Mono. The light restyle (7h) covers the page around
