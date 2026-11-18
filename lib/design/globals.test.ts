@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 const globalsCss = readFileSync(
   join(process.cwd(), "src/styles/globals.css"),
@@ -18,6 +19,39 @@ const landingLayout = readFileSync(
   join(process.cwd(), "components/landing/LandingLayout.tsx"),
   "utf8",
 );
+
+/*
+ * The preview-only stylesheet (profile redesign, Phase 1): profile.css and its
+ * partials. Every guard that reads globals.css also reads these.
+ */
+const profileSheets = [
+  "src/styles/profile.css",
+  ...readdirSync(join(process.cwd(), "src/styles/profile"))
+    .filter((name) => name.endsWith(".css"))
+    .sort()
+    .map((name) => `src/styles/profile/${name}`),
+].map((path) => ({
+  path,
+  css: readFileSync(join(process.cwd(), path), "utf8"),
+}));
+
+/** The CSS with every `prefers-reduced-motion: no-preference` block removed. */
+function withoutNoPreference(css: string): string {
+  let rest = css;
+  for (;;) {
+    const at = rest.search(
+      /@media [^{]*prefers-reduced-motion: no-preference\)/,
+    );
+    if (at === -1) return rest;
+    let depth = 0;
+    let end = rest.indexOf("{", at);
+    for (; end < rest.length; end += 1) {
+      if (rest[end] === "{") depth += 1;
+      if (rest[end] === "}" && --depth === 0) break;
+    }
+    rest = rest.slice(0, at) + rest.slice(end + 1);
+  }
+}
 
 /**
  * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
@@ -72,7 +106,7 @@ describe("visual-redesign foundation", () => {
     }
   });
 
-  it("uses Geist, Geist Mono and Noto Sans Thai, and drops the retired fonts", () => {
+  it("uses Geist, Geist Mono, Noto Sans Thai and the profile fonts, and drops the retired fonts", () => {
     const families = [
       ...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g),
     ].map((m) => m[1]!.trim());
@@ -84,11 +118,20 @@ describe("visual-redesign foundation", () => {
         "Geist Mono Fallback",
         "Noto Sans Thai",
         "Noto Sans Thai Fallback",
+        // Profile redesign (umbrella plan of 18-11-26, owner decisions 1 and 8
+        // and "What these reverse"): the reference's type joins Geist, which
+        // Phase 8 removes. Instrument Serif leaves the retired list below.
+        "Instrument Serif",
+        "Instrument Serif Fallback",
+        "Onest",
+        "Onest Fallback",
+        "JetBrains Mono",
+        "JetBrains Mono Fallback",
+        "Patrick Hand",
       ]),
     );
     for (const retired of [
       "Hanken Grotesk",
-      "Instrument Serif",
       "Space Mono",
       "Almarai",
       "Inter",
@@ -165,27 +208,41 @@ describe("bento motion contract", () => {
   });
 
   it("keeps every entrance and loop behind no-preference", () => {
-    // Drop each no-preference block (brace-matched); nothing left may animate.
-    let rest = globalsCss;
-    for (;;) {
-      const at = rest.search(
-        /@media [^{]*prefers-reduced-motion: no-preference\)/,
-      );
-      if (at === -1) break;
-      let depth = 0;
-      let end = rest.indexOf("{", at);
-      for (; end < rest.length; end += 1) {
-        if (rest[end] === "{") depth += 1;
-        if (rest[end] === "}" && --depth === 0) break;
-      }
-      rest = rest.slice(0, at) + rest.slice(end + 1);
+    // Widened in the profile redesign (Phase 0, design spec 5.1): any
+    // animation outside no-preference fails, not only kj- and intro- names,
+    // and Phase 1 reads the preview stylesheet too. Two exceptions, each never
+    // started under reduced motion: the theme reveal is a view transition the
+    // toggle skips (and the reduced-motion block below disables), and the
+    // intro's words belong to an overlay that IntroLoader does not mount under
+    // reduced motion.
+    const allowed = /^(none\b|kj-reveal\b|intro-word-in\b)/;
+    for (const { path, css } of [
+      { path: "src/styles/globals.css", css: globalsCss },
+      ...profileSheets,
+    ]) {
+      const loose = [
+        ...withoutNoPreference(css).matchAll(/animation:\s*([^;]+);/g),
+      ]
+        .map((m) => m[1]!.trim())
+        .filter((value) => !allowed.test(value));
+      expect(loose, path).toEqual([]);
     }
-    // (The theme reveal is a view transition: the toggle never starts one
-    // under reduced motion, and the reduced-motion block below disables it.)
-    expect(rest).not.toMatch(
-      /animation:\s*(kj-(?!reveal)|intro-(confetti|sparkle|pop|flash))/,
-    );
     expect(globalsCss).toMatch(/animation: kj-rise/);
+  });
+
+  it("names every keyframe kj- (or the intro's own intro-), so the guard covers it", () => {
+    const names = [...globalsCss.matchAll(/@keyframes ([\w-]+)/g)].map(
+      (m) => m[1]!,
+    );
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.filter((n) => !/^(kj|intro)-/.test(n))).toEqual([]);
+    for (const { path, css } of profileSheets) {
+      const own = [...css.matchAll(/@keyframes ([\w-]+)/g)].map((m) => m[1]!);
+      expect(
+        own.filter((n) => !/^kj-/.test(n)),
+        path,
+      ).toEqual([]);
+    }
   });
 
   it("scopes the circular reveal to theme switches and turns view transitions off under reduced motion", () => {
@@ -207,5 +264,184 @@ describe("bento motion contract", () => {
     expect(globalsCss).not.toContain("smooth-cursor");
     expect(globalsCss).not.toContain(".keyword");
     expect(layoutTsx).not.toContain("RouteFade");
+  });
+});
+
+/**
+ * Profile redesign, Phase 0 (process/features/profile-site-redesign): the new
+ * tokens live in one scope, `data-design="profile"` on <html>, until the
+ * cutover. Contrast pairs for the scope are in contrast.test.ts.
+ */
+describe("profile redesign scope", () => {
+  it("defines the scope in both themes", () => {
+    expect(globalsCss).toMatch(/^\[data-design="profile"\] \{/m);
+    expect(globalsCss).toMatch(
+      /^html\.dark\[data-design="profile"\],\n\.dark \[data-design="profile"\] \{/m,
+    );
+  });
+
+  it("never fakes bold or italic Instrument Serif", () => {
+    const scope =
+      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
+      "";
+    expect(scope).toMatch(/font-synthesis-weight: none;/);
+  });
+
+  it("sets the scope on <html> from the matched routes, for the preview only", () => {
+    expect(layoutTsx).toContain("data-design={design}");
+    expect(layoutTsx).toMatch(/profileDesign\(s\.matches\.map/);
+    expect(read("lib/design/scope.ts")).toMatch(/new Set\(\["\/preview"\]\)/);
+  });
+
+  it("points Tailwind's preflight fonts at the scope's own stacks", () => {
+    const scope =
+      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
+      "";
+    expect(scope).toContain("--default-font-family: var(--font-sans);");
+    expect(scope).toContain("--default-mono-font-family: var(--font-mono);");
+  });
+
+  it("keeps the frozen font utilities out of the redesign's components", () => {
+    // `@theme inline` bakes the Geist stacks into font-sans, font-mono and
+    // font-display, so inside the scope they would render the old fonts.
+    const offenders = sourceFiles([
+      "components/ds",
+      "components/profile",
+    ]).filter((f) => /\bfont-(?:sans|mono|display)\b/.test(read(f)));
+    expect(offenders).toEqual([]);
+  });
+
+  it("keeps the preview's reader-preference blocks", () => {
+    for (const query of [
+      "prefers-contrast: more",
+      "prefers-reduced-transparency: reduce",
+      "forced-colors: active",
+    ]) {
+      expect(globalsCss, query).toContain(`@media (${query})`);
+    }
+  });
+});
+
+/**
+ * Profile redesign, Phase 1 (process/features/profile-site-redesign): the
+ * preview stylesheet is layered and plain. profile.css fixes the layer order
+ * before any other sheet can, each phase owns one partial, the partials hold no
+ * raw hex colour, and no build-time CSS leaks in: they read tokens only.
+ */
+describe("profile stylesheet", () => {
+  const entry = profileSheets[0]!.css;
+  const partials = profileSheets.slice(1);
+
+  it("declares the layer order first, then imports each phase's partial in order", () => {
+    expect(entry).toMatch(/^@layer theme, base, components, utilities;/m);
+    expect(entry.indexOf("@layer")).toBeLessThan(entry.indexOf("@import"));
+    const imports = [
+      ...entry.matchAll(/@import "\.\/(profile\/[\w-]+\.css)";/g),
+    ].map((m) => m[1]);
+    expect(imports).toEqual([
+      "profile/shell.css",
+      "profile/home-hero.css",
+      "profile/home-work-about.css",
+      "profile/home-journey.css",
+      "profile/case.css",
+    ]);
+  });
+
+  it("names its phase in each partial's first line, so a lane edits only its own", () => {
+    const phases: Record<string, string> = {
+      "shell.css": "Phase 1",
+      "home-hero.css": "Phase 2",
+      "home-work-about.css": "Phase 3",
+      "home-journey.css": "Phase 4",
+      "case.css": "Phase 5",
+    };
+    for (const [name, phase] of Object.entries(phases)) {
+      const partial = partials.find((sheet) => sheet.path.endsWith(`/${name}`));
+      expect(partial, name).toBeDefined();
+      // The header may run to several lines; the phase is named in its first five.
+      expect(partial!.css.split("\n").slice(0, 5).join("\n"), name).toContain(
+        `Profile redesign, ${phase}`,
+      );
+    }
+  });
+
+  it("has no raw hex colour in any profile sheet: colour comes from tokens", () => {
+    for (const { path, css } of profileSheets) {
+      expect(css.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [], path).toEqual([]);
+    }
+  });
+
+  it("uses plain CSS only: no @apply, theme(), @utility or Tailwind imports", () => {
+    for (const { path, css } of profileSheets) {
+      expect(css, path).not.toMatch(
+        /@apply|theme\(|@utility|@tailwind|@import "tailwindcss"/,
+      );
+    }
+  });
+
+  it("fails the motion guard on a fixture with a loose animation", () => {
+    // The guard must fire on a known-bad sheet, or a pass proves nothing.
+    const fixture =
+      "a { animation: kj-loose 1s; } @media (prefers-reduced-motion: no-preference) { b { animation: kj-fine 1s; } }";
+    const loose = [
+      ...withoutNoPreference(fixture).matchAll(/animation:\s*([^;]+);/g),
+    ].map((m) => m[1]!.trim());
+    expect(loose).toEqual(["kj-loose 1s"]);
+  });
+
+  it("keeps movement and its transitions behind no-preference", () => {
+    // Opacity and colour may move under reduced motion (spec 5.1); transform,
+    // filter, width and registered custom properties may not.
+    for (const { path, css } of profileSheets) {
+      const outside = withoutNoPreference(css);
+      const moving = [...outside.matchAll(/transition:\s*([^;]+);/g)]
+        .map((m) => m[1]!)
+        .filter((value) => /transform|filter|width|height|--/.test(value));
+      expect(moving, path).toEqual([]);
+    }
+  });
+
+  it("keeps the bar in view for keyboard focus only, and caps the popovers on short screens", () => {
+    const shell = partials.find((sheet) =>
+      sheet.path.endsWith("/shell.css"),
+    )!.css;
+    // A mouse click on a nav control must not pin the bar (only :focus-visible does).
+    expect(shell).not.toMatch(/:not\(:focus-within\)/);
+    expect(shell).toContain(":not(:has(:focus-visible))");
+    // Each popover scrolls within the screen (WCAG 1.4.10, 2.4.11).
+    // The footer's panel inherits the scrolling of .pf-say__panel; it sets its own cap.
+    for (const panel of [
+      ".pf-menu {",
+      ".pf-say__panel {",
+      ".pf-say__panel--footer {",
+    ]) {
+      const block = shell.slice(
+        shell.indexOf(panel),
+        shell.indexOf("}", shell.indexOf(panel)),
+      );
+      expect(block, panel).toContain("max-block-size: calc(100dvh");
+      if (panel !== ".pf-say__panel--footer {") {
+        expect(block, panel).toContain("overflow-y: auto");
+        expect(block, panel).toContain("overscroll-behavior: contain");
+      }
+    }
+    // Without the Popover API the panels wait for data-open.
+    expect(shell).toMatch(
+      /@supports not selector\(:popover-open\) \{\s*\.pf-say__panel,\s*\.pf-menu \{\s*display: none;/,
+    );
+    expect(shell).toMatch(/\.pf-menu\[data-open\] \{\s*display: block;/);
+  });
+
+  it("scopes the theme fade to the preview and keeps it behind no-preference", () => {
+    const shell = partials.find((sheet) =>
+      sheet.path.endsWith("/shell.css"),
+    )!.css;
+    const fade = withoutNoPreference(shell);
+    expect(fade).not.toMatch(/animation:[^;]*kj-theme-fade/);
+    expect(shell).toMatch(
+      // Whitespace is allowed inside the pseudo-class argument: prettier wraps it.
+      /@media \(prefers-reduced-motion: no-preference\) \{\s*html\[data-design="profile"\]:active-view-transition-type\(\s*theme\s*\)::view-transition-old\(root\)/,
+    );
+    expect(shell).toMatch(/animation: kj-theme-fade 0\.56s/);
   });
 });

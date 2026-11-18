@@ -17,6 +17,7 @@ import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
+import { profileDesign } from "@/lib/design/scope";
 import geistLatin from "../fonts/geist-latin.woff2?url";
 import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -70,9 +71,15 @@ function RootDocument({ children }: { children: ReactNode }) {
   // Thai pages declare Thai on <html> (Next only set it on <main>).
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
+  // Profile redesign: the new tokens apply only inside this scope, taken from
+  // the routes on screen so a navigation never restyles the old page.
+  const design = useRouterState({
+    select: (s) => profileDesign(s.matches.map((m) => m.routeId)),
+  });
   return (
     <html
       lang={lang}
+      data-design={design}
       className="h-full antialiased"
       data-scroll-behavior="smooth"
       suppressHydrationWarning

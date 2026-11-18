@@ -119,6 +119,30 @@
   /* Bento canvas curves: "soft" is the canvas --ease, "spring" overshoots. */
   --ease-soft: var(--ease);
   --ease-spring: var(--spring);
+
+  /* Profile redesign (Phase 0, spec 2.12): names for the scoped tokens. They
+   * resolve only inside data-design="profile" and avoid the substrings the
+   * foundation guard bans; the existing paper colour name stays as it is. */
+  --color-mark-ink: var(--accent-ink);
+  --color-mark-deep: var(--accent-deep);
+  --color-mark-soft: var(--accent-soft);
+  --color-ink-30: var(--ink-30);
+  --color-ink-45: var(--ink-45);
+  --color-ink-60: var(--ink-60);
+  --color-ink-68: var(--muted-strong);
+  --color-ink-80: var(--ink-80);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-tint-1: var(--tint-1);
+  --color-tint-2: var(--tint-2);
+  --color-tint-3: var(--tint-3);
+  --color-tint-4: var(--tint-4);
+  --color-tint-coral: var(--tint-coral);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-peach: var(--peach);
+  /* 810 px (spec 4.1): Tailwind md stays at 768 for the live components. */
+  --breakpoint-tablet: 50.625rem;
 }
 
 /* ─── Palette (owner, visual-redesign 09-11-26) ─────────────────────────────
@@ -1091,5 +1115,992 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+/* ─── Profile redesign: tokens and primitives (Phase 0, 18-11-26) ────────────
+ * The design of process/features/profile-site-redesign (design spec sections
+ * 2 to 6) in one scope until the cutover: `data-design="profile"` on <html>,
+ * which src/routes/__root.tsx sets for /preview/* only, so nothing below
+ * matches a live page. Role tokens keep their names and take new values in
+ * the scope (spec 2.12); Phase 8 folds the scope into :root and .dark.
+ * Contrast pairs: lib/design/contrast.test.ts ("profile scope").
+ * Primitives are `ds-*` classes in @layer components, so Tailwind utilities
+ * still override them; the type classes keep the spec's `t-*` names. Type
+ * sizes are rem, and every fluid size clamps between rem bounds (spec 3.3).
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+@property --turn {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --cast {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --count {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --arrow-active {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --field-resolve {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+[data-design="profile"] {
+  /* Palette (spec 2.1). */
+  --ink: #120e1f;
+  --paper: #ffffff;
+  --paper-2: #f7f5fb;
+  --paper-3: #efecf7;
+  --accent: #6e3cff;
+  --accent-ink: #4b23c2;
+  --accent-deep: #3b1e8f;
+  --accent-soft: #efe8ff;
+  --coral: #ff7a3d;
+  --coral-deep: #d9541c;
+  --peach: #ffd9c4;
+  --tint-1: #fbf9ff;
+  --tint-2: #f3eeff;
+  --tint-3: #ddd0ff;
+  --tint-4: #c9b6ff;
+  --tint-coral: #ffe9dc;
+  --on-accent: #ffffff;
+  --theme-color: #f7f3ff;
+
+  /* Ink mixes (spec 2.2), computed here so they follow the theme's ink. */
+  --ink-80: color-mix(in srgb, var(--ink) 80%, transparent);
+  --muted-strong: color-mix(in srgb, var(--ink) 68%, transparent);
+  --ink-60: color-mix(in srgb, var(--ink) 60%, transparent);
+  --muted: color-mix(in srgb, var(--ink) 52%, transparent);
+  --ink-45: color-mix(in srgb, var(--ink) 45%, transparent);
+  --ink-30: color-mix(in srgb, var(--ink) 30%, transparent);
+  --line: color-mix(in srgb, var(--ink) 10%, transparent);
+  --line-soft: color-mix(in srgb, var(--ink) 6%, transparent);
+  --line-strong: color-mix(in srgb, var(--ink) 16%, transparent);
+
+  /* Washes, the stats tile, notebook paper and showcase tones (spec 2.3 to 2.6). */
+  --sunset-1: #ece4ff;
+  --sunset-2: #f3edff;
+  --sunset-3: #fff0e6;
+  --sunset: linear-gradient(
+    165deg,
+    var(--sunset-1) 0%,
+    var(--sunset-2) 30%,
+    var(--sunset-3) 70%,
+    var(--paper) 100%
+  );
+  --dusk: linear-gradient(
+    180deg,
+    var(--paper) 0%,
+    var(--tint-2) 60%,
+    var(--tint-coral) 100%
+  );
+  --sunset-strong: linear-gradient(
+    150deg,
+    #6e3cff 0%,
+    #9a63ff 40%,
+    #ff7a3d 100%
+  );
+  --footer-sheet: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--tint-1) 40%,
+    var(--tint-2) 100%
+  );
+  --stats-1: #6e3cff;
+  --stats-2: #3b1e8f;
+  --stats-3: #120e1f;
+  --on-stats: #ffffff;
+  --stats-wash: radial-gradient(
+    120% 120% at 20% 0%,
+    var(--stats-1) 0%,
+    var(--stats-2) 55%,
+    var(--stats-3) 100%
+  );
+  --leaf: #fffdf8;
+  --leaf-ink: #1f1a33;
+  --leaf-ink-68: color-mix(in srgb, var(--leaf-ink) 68%, transparent);
+  --spiral-1: #d6d0e4;
+  --spiral-2: #9a92b3;
+  --tile: #e1e2e5;
+  --tile-deep: #cfd2d7;
+  --tile-brand: #dde7f4;
+
+  /* Case-card materials (spec 2.4), in card order: 253, 79, 292, 327, 266, 301. */
+  --material-253-a: oklch(0.95 0.03 253);
+  --material-253-b: oklch(0.9 0.055 253);
+  --material-79-a: oklch(0.95 0.03 79);
+  --material-79-b: oklch(0.9 0.055 79);
+  --material-292-a: oklch(0.95 0.03 292);
+  --material-292-b: oklch(0.9 0.055 292);
+  --material-327-a: oklch(0.95 0.03 327);
+  --material-327-b: oklch(0.9 0.055 327);
+  --material-266-a: oklch(0.95 0.03 266);
+  --material-266-b: oklch(0.9 0.055 266);
+  --material-301-a: oklch(0.95 0.03 301);
+  --material-301-b: oklch(0.9 0.055 301);
+
+  /* Shape, depth and motion (spec 2.7 to 2.10). */
+  --radius-tag: 10px;
+  --radius-tile: 12px;
+  --radius-row: 14px;
+  --radius-mat: 16px;
+  --radius-snug: 18px;
+  --radius-well: 20px;
+  --radius-sheet: 24px;
+  --radius-bento: 28px;
+  --radius-pill: 9999px;
+  --elev-ring: 0 0 0 1px var(--line);
+  --elev-soft: 0 0 0 1px var(--line), 0 12px 32px -16px #00000029;
+  --elev-lift: 0 0 0 1px var(--line-strong), 0 20px 40px -20px #00000033;
+  --elev-nav: 0 0 0 1px var(--line-soft), 0 10px 28px -14px #120e1f40;
+  --elev-pop:
+    0 0 0 1px var(--line), 0 30px 60px -24px #120e1f66,
+    0 12px 24px -16px #6e3cff59;
+  --elev-frame: 0 0 0 1px var(--line-soft), 0 24px 48px -32px #120e1f66;
+  --elev-float: 0 0 0 1px var(--line-soft), 0 12px 24px -16px #120e1f66;
+  --elev-thumb: 0 0 0 1px var(--line-soft), 0 6px 16px -8px #120e1f59;
+  --elev-mat: 0 0 0 1px var(--line-soft), 0 24px 44px -36px #120e1f59;
+  --elev-stage: 0 40px 80px -40px #120e1f59;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-swap: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 0.1s;
+  --duration-base: 0.24s;
+  --duration-slow: 0.6s;
+
+  /* Layout (spec 2.11). */
+  --wrap: 1360px;
+  --read: 760px;
+  --pad: max(clamp(20px, 5vw, 72px), calc((100vw - 1360px) / 2));
+  --bar-top: 32px;
+  --bar-row: 48px;
+  --nav-h: 92px;
+  --screen: max(640px, 100svh);
+
+  /* Type (spec 3.3): rem bounds, the largest at most 2.5x the smallest, so
+   * 200% zoom always doubles text; the hero keeps a 42 px floor. */
+  --type-hero: clamp(2.625rem, min(5.4vw + 0.625rem, 8.4svh + 0.25rem), 6rem);
+  --type-display: clamp(2.625rem, 5.4vw + 0.625rem, 6rem);
+  --type-title: clamp(2.75rem, 4.8vw + 0.625rem, 5.25rem);
+  --type-footer: clamp(2.25rem, 4.2vw + 0.5rem, 4.5rem);
+  --type-statement: clamp(1.75rem, 2vw + 0.875rem, 2.75rem);
+  --type-card: clamp(1.75rem, 2.4vw + 0.625rem, 2.75rem);
+  --type-h3: clamp(1.5rem, 1.6vw + 0.75rem, 2.125rem);
+  --type-lead: clamp(1.125rem, 0.6vw + 0.875rem, 1.375rem);
+  --font-sans:
+    "Onest", "Onest Fallback", var(--font-noto-thai), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-display:
+    "Instrument Serif", "Instrument Serif Fallback", var(--font-noto-thai),
+    ui-serif, Georgia, serif;
+  --font-mono:
+    "JetBrains Mono", "JetBrains Mono Fallback", var(--font-noto-thai),
+    ui-monospace, monospace;
+  --font-hand: "Patrick Hand", var(--font-noto-thai), cursive;
+  /* Tailwind's preflight reads these for html and for code, kbd, samp and
+     pre; `@theme inline` froze them to the Geist stacks at :root. The
+     font-sans, font-mono and font-display utilities stay frozen too, so a
+     guard keeps them out of components/ds and components/profile. */
+  --default-font-family: var(--font-sans);
+  --default-mono-font-family: var(--font-mono);
+
+  /* Roles (spec 2.12): the names components already read, new values. */
+  --page: var(--paper);
+  --surface: var(--paper);
+  --surface-tint: var(--tint-2);
+  --surface-warm: var(--tint-coral);
+  --well: var(--paper-2);
+  --ink-2: var(--ink-60);
+  --hairline: var(--line);
+  --hairline-strong: var(--line-strong);
+  --focus: var(--accent);
+  --link: var(--accent-ink);
+  --action: var(--accent);
+  --action-hover: var(--accent-deep);
+  --on-action: var(--on-accent);
+  --cta: var(--ink);
+  --oncta: var(--paper);
+  --ember: var(--coral-deep);
+
+  color: var(--ink);
+  font-family: var(--font-sans);
+  /* Instrument Serif has one weight: never fake a bold. */
+  font-synthesis-weight: none;
+}
+
+html.dark[data-design="profile"],
+.dark [data-design="profile"] {
+  --ink: #f1edfa;
+  --paper: #0f0c18;
+  --paper-2: #17131f;
+  --paper-3: #201a2c;
+  --accent: #8d6bff;
+  --accent-ink: #b9a4ff;
+  --accent-deep: #c5b3ff;
+  --accent-soft: #241b44;
+  --coral: #ff8a52;
+  --coral-deep: #ff9e70;
+  --peach: #47283f;
+  --tint-1: #130f1d;
+  --tint-2: #1c1630;
+  --tint-3: #2c2250;
+  --tint-4: #3d306e;
+  --tint-coral: #2d1a27;
+  --on-accent: #0f0c18;
+  --theme-color: #0f0c18;
+  --sunset-1: #1d1636;
+  --sunset-2: #171128;
+  --sunset-3: #1d1320;
+  --sunset: linear-gradient(
+    165deg,
+    var(--sunset-1) 0%,
+    var(--sunset-2) 32%,
+    var(--sunset-3) 70%,
+    var(--paper) 100%
+  );
+  --tile: #1d1a26;
+  --tile-deep: #17131f;
+  --tile-brand: color-mix(in srgb, #dde7f4 16%, var(--tile));
+  --material-253-a: oklch(0.27 0.05 253);
+  --material-253-b: oklch(0.22 0.075 253);
+  --material-79-a: oklch(0.27 0.05 79);
+  --material-79-b: oklch(0.22 0.075 79);
+  --material-292-a: oklch(0.27 0.05 292);
+  --material-292-b: oklch(0.22 0.075 292);
+  --material-327-a: oklch(0.27 0.05 327);
+  --material-327-b: oklch(0.22 0.075 327);
+  --material-266-a: oklch(0.27 0.05 266);
+  --material-266-b: oklch(0.22 0.075 266);
+  --material-301-a: oklch(0.27 0.05 301);
+  --material-301-b: oklch(0.22 0.075 301);
+  --elev-nav: 0 0 0 1px var(--line), 0 10px 28px -14px #000000b3;
+}
+
+/* More contrast on request: the small-text floor and every ring step up. */
+@media (prefers-contrast: more) {
+  [data-design="profile"],
+  html.dark[data-design="profile"],
+  .dark [data-design="profile"] {
+    --ink-60: var(--ink-80);
+    --muted: var(--ink-80);
+    --line: var(--line-strong);
+    --line-soft: var(--line-strong);
+  }
+}
+
+/* Unlayered, like the site-wide ::selection it overrides inside the scope. */
+[data-design="profile"] ::selection {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+@layer components {
+  [data-design="profile"] :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* Type (spec 3.3). Colour is the component's choice. */
+  .t-hero,
+  .t-display,
+  .t-title,
+  .t-footer,
+  .t-statement {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  .t-hero {
+    font-size: var(--type-hero);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .t-display {
+    font-size: var(--type-display);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .t-title {
+    font-size: var(--type-title);
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+  }
+  .t-footer {
+    font-size: var(--type-footer);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+  }
+  .t-statement {
+    font-size: var(--type-statement);
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+  }
+  .t-italic {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent-ink);
+  }
+  .t-h3,
+  .t-card-title {
+    font-weight: 500;
+    text-wrap: balance;
+  }
+  .t-h3 {
+    font-size: var(--type-h3);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .t-card-title {
+    font-size: var(--type-card);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+  .t-lead {
+    font-size: var(--type-lead);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+  .t-body,
+  .t-prose {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  .t-prose {
+    max-width: 64ch;
+    line-height: 1.7;
+  }
+  .t-prose > * + * {
+    margin-top: 1em;
+  }
+  .t-small {
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .t-meta,
+  .t-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+  }
+  .t-kicker {
+    line-height: 1.55;
+  }
+  .t-nav {
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    letter-spacing: -0.005em;
+  }
+  .t-item {
+    font-size: 1.1875rem;
+    font-weight: 500;
+  }
+  .t-meta-value {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.375rem;
+  }
+  .t-lift-title {
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .t-quote {
+    font-family: var(--font-hand);
+    font-size: 1.375rem;
+    line-height: 2rem;
+  }
+  /* :lang() follows the inherited language, so these match a Thai element
+     whether `lang="th"` sits on it or on an ancestor. */
+  :is(.t-meta, .t-kicker):lang(th) {
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  :is(.t-body, .t-prose):lang(th) {
+    line-height: 1.75;
+  }
+  :is(.t-hero, .t-display, .t-title, .t-footer, .t-statement):lang(th) {
+    line-height: 1.4;
+  }
+
+  /* Layout and the card link pattern (spec 2.11, 6.12). */
+  .ds-wrap {
+    width: 100%;
+    max-width: calc(var(--wrap) + var(--pad) * 2);
+    margin-inline: auto;
+    padding-inline: var(--pad);
+  }
+  .ds-stretch {
+    text-decoration: none;
+  }
+  .ds-stretch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+  .ds-stretch:focus-visible {
+    outline: none;
+  }
+  .ds-stretch:focus-visible .ds-pill {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* Pill (spec 6.1). A transparent border keeps the shape in forced colors. */
+  .ds-pill {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    block-size: 44px;
+    padding-inline: 22px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--cta);
+    color: var(--oncta);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ds-pill::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    padding: 3px;
+    border-radius: inherit;
+    background: repeating-linear-gradient(
+      to right,
+      var(--coral) 0 6px,
+      var(--accent) 6px 10px,
+      var(--coral) 10px 18px,
+      var(--accent) 18px 23px,
+      var(--coral) 23px 30px,
+      var(--accent) 30px 34px
+    );
+    opacity: 0;
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+  .ds-pill:focus-visible::before,
+  .ds-stretch:focus-visible .ds-pill::before {
+    opacity: 1;
+  }
+  .ds-pill--ghost {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--elev-ring);
+  }
+  .ds-pill--ghost::before {
+    display: none;
+  }
+  .ds-pill--hero {
+    padding-inline: 22px 16px;
+    font-size: 1rem;
+  }
+  .ds-pill--nav {
+    block-size: 48px;
+    padding-inline: 22px 16px;
+  }
+  .ds-pill--lg {
+    block-size: 52px;
+    padding-inline: 24px 16px;
+    font-size: 1rem;
+  }
+  .ds-pill--sm {
+    block-size: 36px;
+    padding-inline: 16px;
+    font-size: 0.875rem;
+  }
+  .ds-pill--round {
+    inline-size: 44px;
+    padding-inline: 0;
+  }
+  .ds-pill--round.ds-pill--nav {
+    inline-size: 48px;
+  }
+  .ds-pill--round.ds-pill--sm {
+    inline-size: 36px;
+  }
+  .ds-pill--round.ds-pill--lg {
+    inline-size: 52px;
+  }
+  .ds-pill__icon {
+    display: inline-flex;
+  }
+  /* Swap arrow: arrow A leaves up-right while B arrives, on --arrow-active. */
+  .ds-swap {
+    position: relative;
+    display: inline-block;
+    inline-size: 16px;
+    block-size: 16px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+  }
+  .ds-swap > * {
+    position: absolute;
+    inset: 0;
+  }
+  .ds-swap > :first-child {
+    transform: translate(
+      calc(var(--arrow-active) * 150%),
+      calc(var(--arrow-active) * -150%)
+    );
+  }
+  .ds-swap > :last-child {
+    transform: translate(
+      calc((var(--arrow-active) - 1) * 150%),
+      calc((1 - var(--arrow-active)) * 150%)
+    );
+  }
+  .ds-pill:focus-visible,
+  .ds-stretch:focus-visible .ds-pill {
+    --arrow-active: 1;
+  }
+  .ds-cta-arrow {
+    display: grid;
+    place-items: center;
+    inline-size: 0;
+    /* Cancels the pill's 10 px gap while collapsed, so the label stays
+       centred. */
+    margin-inline-start: -10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+
+  /* Labels (spec 6.2 to 6.6). */
+  .ds-badge {
+    display: inline-flex;
+    align-items: center;
+    block-size: 30px;
+    padding-inline: 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--action);
+    color: var(--on-action);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .ds-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    block-size: 26px;
+    padding-inline: 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+  }
+  .ds-chip--illustration {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-start: 8px;
+    z-index: 2;
+  }
+  .ds-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--ink-60);
+  }
+  .ds-eyebrow::after,
+  .ds-eyebrow--centred::before {
+    content: "";
+    flex: 1;
+    block-size: 1px;
+    background: var(--line);
+  }
+  .ds-status-dot {
+    position: relative;
+    flex: none;
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .ds-status-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--accent);
+    opacity: 0;
+  }
+  .ds-dot {
+    flex: none;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .ds-px-mark {
+    flex: none;
+    inline-size: 8px;
+    block-size: 8px;
+    margin-inline-end: 4px;
+    background: var(--accent);
+    box-shadow: 8px 8px 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .ds-px-dot {
+    flex: none;
+    inline-size: 6px;
+    block-size: 6px;
+    margin-block-start: 0.62em;
+    background: var(--accent);
+  }
+  .ds-word-mark {
+    display: inline-block;
+    inline-size: 0.14em;
+    block-size: 0.14em;
+    background: var(--coral);
+    image-rendering: pixelated;
+  }
+
+  /* Surfaces (spec 6.4). */
+  .ds-tile {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(20px, 2.4vw, 36px);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sheet);
+    background: var(--well);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .ds-tile--tint {
+    background: var(--surface-tint);
+  }
+  .ds-tile--paper {
+    background: var(--paper);
+  }
+  .ds-tile--stats {
+    background: var(--stats-wash);
+    color: var(--on-stats);
+  }
+
+  /* Controls and links (spec 6.10, 6.11). */
+  .ds-motion-toggle {
+    display: grid;
+    place-items: center;
+    inline-size: 30px;
+    block-size: 30px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+    color: var(--ink);
+    box-shadow: var(--elev-ring);
+    cursor: pointer;
+  }
+  .ds-text-link,
+  .ds-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-block-size: 24px;
+    color: var(--ink-60);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    text-decoration: none;
+  }
+  .ds-back {
+    min-block-size: 40px;
+  }
+  .ds-text-link__arrow {
+    display: inline-block;
+  }
+  .ds-prose-link {
+    color: var(--link);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    text-underline-offset: 3px;
+  }
+
+  /* Skip link: hidden until focused, then above everything (z-skip, spec 4.4). */
+  .ds-skip {
+    position: fixed;
+    inset-block-start: 8px;
+    inset-inline-start: 8px;
+    z-index: 110;
+    padding: 10px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--cta);
+    color: var(--oncta);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transform: translateY(calc(-100% - 16px));
+  }
+  .ds-skip:focus-visible {
+    transform: none;
+  }
+
+  /* Marquee (spec 8.3): two copies, the second aria-hidden; paused by the
+   * motion toggle; a still, centred list under reduced motion. */
+  .ds-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 10% 90%,
+      transparent
+    );
+    mask-image: linear-gradient(90deg, transparent, #000 10% 90%, transparent);
+  }
+  .ds-marquee__track {
+    display: flex;
+    inline-size: max-content;
+  }
+  .ds-marquee__list {
+    display: flex;
+    align-items: center;
+    gap: 56px;
+    padding-inline-end: 56px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-marquee {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .ds-marquee__track {
+      inline-size: auto;
+      justify-content: center;
+    }
+    .ds-marquee__list {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 20px;
+      padding-inline-end: 0;
+    }
+    .ds-marquee__list[aria-hidden="true"] {
+      display: none;
+    }
+  }
+
+  /* Decoration that never takes input (spec 6.8). */
+  .ds-dither {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  /* Hover only where a fine pointer can hover. */
+  @media (hover: hover) and (pointer: fine) {
+    .ds-pill:hover::before,
+    .ds-stretch-card:hover .ds-pill::before {
+      opacity: 1;
+    }
+    .ds-pill:hover,
+    .ds-stretch-card:hover .ds-pill {
+      --arrow-active: 1;
+    }
+    .ds-pill--ghost:hover,
+    .ds-motion-toggle:hover {
+      background: var(--paper-2);
+    }
+    .ds-text-link:hover,
+    .ds-back:hover {
+      color: var(--ink);
+    }
+    .ds-stretch-card:hover .ds-cta-arrow {
+      inline-size: 16px;
+      margin-inline-start: 0;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Pixel cursors only where nobody relies on their own pointer: never in
+     forced colors or with a contrast preference, where a large or
+     high-contrast system pointer must stay. */
+  @media (hover: hover) and (pointer: fine) and (forced-colors: none) and (prefers-contrast: no-preference) {
+    [data-design="profile"] {
+      cursor:
+        url("/cursors/arrow.svg") 2 1,
+        auto;
+    }
+    [data-design="profile"] :is(a, button, label, summary, [role="button"]) {
+      cursor:
+        url("/cursors/hand.svg") 10 2,
+        pointer;
+    }
+  }
+
+  /* Reader preferences (best-practices audit sections 3 and 6). */
+  @media (prefers-contrast: more) {
+    .ds-chip,
+    .ds-motion-toggle {
+      background: var(--paper);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .ds-chip,
+    .ds-motion-toggle {
+      background: var(--paper);
+    }
+  }
+  @media (forced-colors: active) {
+    .ds-pill,
+    .ds-badge,
+    .ds-motion-toggle {
+      border-color: ButtonText;
+    }
+    .ds-chip,
+    .ds-tile {
+      border-color: CanvasText;
+    }
+    .ds-pill::before,
+    .ds-status-dot::after,
+    .ds-px-mark,
+    .ds-px-dot,
+    .ds-word-mark,
+    .ds-dither {
+      display: none;
+    }
+    [data-design="profile"] [aria-current] {
+      text-decoration-line: underline;
+      text-underline-offset: 4px;
+    }
+  }
+}
+
+/* Profile motion: keyframes are inert until a no-preference rule uses them. */
+@keyframes kj-ping {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes kj-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ds-pill {
+    transition:
+      transform 0.14s var(--ease-snappy),
+      background-color 0.1s ease-out,
+      --arrow-active 0.6s var(--ease-swap);
+  }
+  .ds-pill::before {
+    transition: opacity 0.12s ease-out;
+  }
+  .ds-pill:active {
+    transform: scale(0.97);
+  }
+  .ds-cta-arrow {
+    transition:
+      inline-size 0.22s var(--ease-smooth),
+      margin-inline-start 0.22s var(--ease-smooth),
+      opacity 0.16s ease-out,
+      transform 0.22s var(--ease-smooth);
+  }
+  .ds-text-link__arrow {
+    transition: transform 0.24s var(--ease-smooth);
+  }
+  .ds-status-dot--ping::after {
+    animation: kj-ping 2.8s var(--ease-expo) 1 both;
+  }
+  /* `data-running` arrives with hydration, together with the pause control
+     (WCAG 2.2.2): server HTML and pages without JavaScript stay still. The
+     paused rule matches the running rule's specificity and follows it,
+     because the `animation` shorthand resets the play state. */
+  .ds-marquee[data-running] .ds-marquee__track {
+    animation: kj-marquee 44s linear infinite;
+  }
+  .ds-marquee--paused[data-running] .ds-marquee__track {
+    animation-play-state: paused;
+  }
+  /* Reveal (spec 6.7): only elements below the fold wait, and only here. */
+  [data-reveal] {
+    transition:
+      opacity 0.7s var(--ease-expo),
+      transform 0.7s var(--ease-expo);
+  }
+  [data-reveal].is-pending {
+    opacity: 0;
+    transform: translateY(var(--reveal-rise, 24px));
+  }
+  [data-reveal="scale"].is-pending {
+    transform: scale(0.98);
+  }
+}
+
+/* Print shows everything. The no-preference query above also matches print,
+   so a block never scrolled into view would otherwise print blank. */
+@media print {
+  [data-reveal].is-pending {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .ds-pill--ghost:hover {
+    transform: translateY(-1px);
+  }
+  .ds-text-link:hover .ds-text-link__arrow {
+    transform: translateX(4px);
+  }
+  .ds-back:hover .ds-text-link__arrow {
+    transform: translateX(-2px);
   }
 }

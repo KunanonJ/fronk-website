@@ -204,6 +204,21 @@ jobs:
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm exec playwright test visual.spec.ts --project=mobile --project=desktop
 
+      # Profile redesign previews (/preview/*): the device matrix, an
+      # iPhone-class WebKit phone and the best-practice checks.
+      - name: Profile previews (device matrix, WebKit phone, best practices)
+        # Runs even when the screenshot step fails, so one run reports (and
+        # uploads) both sets of baselines.
+        if: ${{ !cancelled() }}
+        env:
+          CI: "true"
+          PLAYWRIGHT_WEB_SERVER: pnpm start
+          NEXT_PUBLIC_SITE_URL: https://kunanonj.com
+          NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
+          NEXT_PUBLIC_SANITY_DATASET: production
+          NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
+        run: pnpm exec playwright test tests/e2e/profile --project=desktop --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone
+
       - name: Upload snapshots and diffs
         if: always()
         uses: actions/upload-artifact@v7
@@ -211,6 +226,7 @@ jobs:
           name: visual-snapshots
           path: |
             tests/e2e/visual.spec.ts-snapshots/
+            tests/e2e/profile*.spec.ts-snapshots/
             test-results/
           retention-days: 7
 

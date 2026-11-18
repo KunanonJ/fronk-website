@@ -5,8 +5,11 @@ import {
   AA_NON_TEXT,
   AA_TEXT,
   contrastRatio,
+  mixColors,
   parseColor,
+  type Rgba,
 } from "@/lib/design/contrast";
+import { isZoomSafeClamp, parseClamp, remValue } from "@/lib/design/fluidType";
 
 const css = readFileSync(join(process.cwd(), "src/styles/globals.css"), "utf8");
 
@@ -187,10 +190,266 @@ describe("palette rules the components rely on", () => {
   });
 });
 
+/*
+ * Profile redesign scope (Phase 0, process/features/profile-site-redesign).
+ * The tokens sit on <html data-design="profile">, so the browser resolves
+ * them in this order: :root, .dark (dark only), the scope, the scope's dark
+ * block (dark only). Mixes (color-mix with transparent) and the oklch case
+ * materials are evaluated as CSS computes them.
+ */
+function scopeBlock(selectorLine: string): Record<string, string> {
+  const re = new RegExp(`^${selectorLine}\\s*\\{([\\s\\S]*?)^\\}`, "gm");
+  const out: Record<string, string> = {};
+  for (const match of css.matchAll(re)) {
+    const body = match[1]!.replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const decl of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+      out[decl[1]!] = decl[2]!.trim().replace(/\s+/g, " ");
+    }
+  }
+  return out;
+}
+
+/** The scope's token overrides inside one @media block. */
+function mediaScope(query: string): Record<string, string> {
+  const at = css.indexOf(`@media (${query}) {\n  [data-design="profile"],`);
+  if (at === -1) throw new Error(`No scoped ${query} block`);
+  const body = css.slice(css.indexOf("{", css.indexOf("{", at) + 1) + 1);
+  const out: Record<string, string> = {};
+  for (const decl of body
+    .slice(0, body.indexOf("}"))
+    .matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+    out[decl[1]!] = decl[2]!.trim();
+  }
+  return out;
+}
+
+const scopeLight = scopeBlock(String.raw`\[data-design="profile"\]`);
+const scopeDark = scopeBlock(
+  String.raw`html\.dark\[data-design="profile"\],\n\.dark \[data-design="profile"\]`,
+);
+const profileThemes = {
+  light: { ...light, ...scopeLight },
+  dark: { ...dark, ...scopeLight, ...scopeDark },
+} as const;
+
+function substitute(
+  vars: Record<string, string>,
+  value: string,
+  depth = 0,
+): string {
+  if (depth > 16) throw new Error(`Cycle in ${value}`);
+  return value.replace(/var\((--[\w-]+)\)/g, (_m, name: string) => {
+    const next = vars[name];
+    if (next === undefined) throw new Error(`Missing token ${name}`);
+    return substitute(vars, next, depth + 1);
+  });
+}
+
+function evaluateColor(expr: string): Rgba {
+  const mix = expr
+    .trim()
+    .match(/^color-mix\(in srgb,\s*(.+?)\s+([\d.]+)%,\s*(.+)\)$/);
+  if (mix) {
+    return mixColors(
+      evaluateColor(mix[1]!),
+      evaluateColor(mix[3]!),
+      Number(mix[2]) / 100,
+    );
+  }
+  return parseColor(expr);
+}
+
+function profileColor(vars: Record<string, string>, name: string): string {
+  const { r, g, b, a } = evaluateColor(substitute(vars, `var(${name})`));
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+function profileRatio(
+  vars: Record<string, string>,
+  fg: string,
+  bg: string,
+): number {
+  return contrastRatio(
+    profileColor(vars, fg),
+    profileColor(vars, bg),
+    profileColor(vars, "--page"),
+  );
+}
+
+const MATERIAL_HUES = [253, 79, 292, 327, 266, 301] as const;
+const MATERIALS = MATERIAL_HUES.flatMap((h) => [
+  `--material-${h}-a`,
+  `--material-${h}-b`,
+]);
+
+/** Text pairs (4.5:1): the design system's Accessibility table. */
+const PROFILE_TEXT: readonly [string, string][] = [
+  ...[
+    "--page",
+    "--well",
+    "--paper-3",
+    "--surface-tint",
+    "--surface-warm",
+    "--sunset-1",
+    "--sunset-2",
+    "--sunset-3",
+    ...MATERIALS,
+  ].map((bg) => ["--ink", bg] as [string, string]),
+  ["--ink-80", "--page"],
+  ["--ink-80", "--well"],
+  ...["--page", "--well", ...MATERIALS].map(
+    (bg) => ["--muted-strong", bg] as [string, string],
+  ),
+  // The small-text floor, on every ground it is allowed on.
+  ...[
+    "--page",
+    "--well",
+    "--surface-tint",
+    "--sunset-1",
+    "--sunset-2",
+    "--sunset-3",
+  ].map((bg) => ["--ink-2", bg] as [string, string]),
+  ["--link", "--page"],
+  ["--link", "--well"],
+  ["--link", "--accent-soft"],
+  ["--link", "--surface-tint"],
+  ["--on-action", "--action"],
+  ["--oncta", "--cta"],
+  ["--error-text", "--page"],
+  ["--error-text", "--well"],
+  ["--success-text", "--page"],
+  ["--success-text", "--well"],
+  ["--leaf-ink", "--leaf"],
+  ["--leaf-ink-68", "--leaf"],
+  ["--on-stats", "--stats-1"],
+  ["--on-stats", "--stats-2"],
+  ["--on-stats", "--stats-3"],
+];
+
+/** Display text of 24 px or more (3:1). */
+const PROFILE_LARGE: readonly [string, string][] = [
+  ["--muted", "--page"],
+  ["--muted", "--well"],
+  ["--ember", "--page"],
+];
+
+/** Focus rings, marks and input borders (3:1). */
+const PROFILE_NON_TEXT: readonly [string, string][] = [
+  ["--focus", "--page"],
+  ["--focus", "--well"],
+  ["--focus", "--paper-3"],
+  ["--focus", "--surface-tint"],
+  ["--focus", "--sunset-1"],
+  ["--accent", "--page"],
+  ["--ink-45", "--page"],
+  ["--ember", "--page"],
+];
+
+describe("profile scope meets WCAG AA in both themes", () => {
+  for (const [theme, vars] of Object.entries(profileThemes)) {
+    for (const [fg, bg] of PROFILE_TEXT) {
+      it(`${theme}: ${fg} on ${bg} >= 4.5`, () => {
+        const ratio = profileRatio(vars, fg, bg);
+        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(AA_TEXT);
+      });
+    }
+    for (const [fg, bg] of PROFILE_LARGE) {
+      it(`${theme}: ${fg} on ${bg} >= 3 (24 px and up)`, () => {
+        const ratio = profileRatio(vars, fg, bg);
+        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+    for (const [fg, bg] of PROFILE_NON_TEXT) {
+      it(`${theme}: ${fg} on ${bg} >= 3 (non-text)`, () => {
+        const ratio = profileRatio(vars, fg, bg);
+        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(AA_NON_TEXT);
+      });
+    }
+  }
+
+  it("records why summaries on light materials use --muted-strong", () => {
+    const lowest = Math.min(
+      ...MATERIALS.map((m) => profileRatio(profileThemes.light, "--ink-2", m)),
+    );
+    expect(lowest).toBeLessThan(AA_TEXT);
+  });
+
+  it("records why coral is never text or the only mark on light paper", () => {
+    expect(profileRatio(profileThemes.light, "--coral", "--page")).toBeLessThan(
+      AA_NON_TEXT,
+    );
+  });
+});
+
+describe("profile scope under prefers-contrast: more", () => {
+  const more = mediaScope("prefers-contrast: more");
+  for (const [theme, vars] of Object.entries(profileThemes)) {
+    for (const bg of ["--page", "--well", "--surface-tint", "--sunset-1"]) {
+      it(`${theme}: small text on ${bg} reaches 7:1`, () => {
+        const ratio = profileRatio({ ...vars, ...more }, "--ink-2", bg);
+        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(7);
+      });
+    }
+  }
+});
+
+describe("profile scope theme colour", () => {
+  // The values Phase 6 puts in the theme-color metas (design spec 2.1).
+  it("matches the browser-chrome colours in both themes", () => {
+    expect(scopeLight["--theme-color"]).toBe("#f7f3ff");
+    expect(scopeDark["--theme-color"]).toBe("#0f0c18");
+  });
+});
+
+describe("profile type stays zoom-safe (WCAG 1.4.4)", () => {
+  const sizes = Object.entries(scopeLight).filter(([name]) =>
+    name.startsWith("--type-"),
+  );
+
+  it("finds the type scale", () => {
+    expect(sizes.length).toBeGreaterThanOrEqual(8);
+  });
+
+  for (const [name, value] of sizes) {
+    it(`${name} clamps between rem bounds`, () => {
+      const parts = parseClamp(value);
+      expect(parts, value).not.toBeNull();
+      expect(remValue(parts!.min), parts!.min).not.toBeNull();
+      expect(remValue(parts!.max), parts!.max).not.toBeNull();
+    });
+
+    it(`${name} still doubles at 200% zoom`, () => {
+      const parts = parseClamp(value)!;
+      expect(
+        isZoomSafeClamp(remValue(parts.min)!, remValue(parts.max)!),
+        value,
+      ).toBe(true);
+    });
+  }
+});
+
 describe("contrast helpers", () => {
   it("matches known WCAG values", () => {
     expect(contrastRatio("#000000", "#ffffff")).toBeCloseTo(21, 1);
     expect(contrastRatio("#2b3bff", "#ffffff")).toBeCloseTo(6.62, 1);
+  });
+
+  it("converts oklch and mixes like CSS", () => {
+    // oklch(0.628 0.2577 29.23) is sRGB red.
+    expect(parseColor("oklch(0.628 0.2577 29.23)")).toMatchObject({
+      r: 255,
+      g: 0,
+      b: 0,
+    });
+    const mixed = mixColors(
+      parseColor("#120e1f"),
+      parseColor("transparent"),
+      0.6,
+    );
+    expect(mixed.r).toBeCloseTo(18);
+    expect(mixed.g).toBeCloseTo(14);
+    expect(mixed.b).toBeCloseTo(31);
+    expect(mixed.a).toBeCloseTo(0.6);
   });
 
   it("composites translucent colours over their background", () => {

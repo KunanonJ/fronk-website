@@ -28,6 +28,17 @@ describe("robots()", () => {
     expect(list).toContain("/");
   });
 
+  it("keeps every crawler that may crawl out of the hidden previews", () => {
+    const rules = robots().rules;
+    for (const rule of Array.isArray(rules) ? rules : [rules]) {
+      if (!rule.allow) continue;
+      const disallow = Array.isArray(rule.disallow)
+        ? rule.disallow
+        : [rule.disallow];
+      expect(disallow, String(rule.userAgent)).toContain("/preview");
+    }
+  });
+
   it("gives the content signals to every group that allows crawling, and only those", () => {
     expect(CONTENT_SIGNAL).toBe("search=yes, ai-input=yes, ai-train=yes");
     const rules = robots().rules;

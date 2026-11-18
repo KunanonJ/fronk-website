@@ -102,8 +102,10 @@ export default defineConfig(({ command, mode }) => {
           autoSubfolderIndex: false,
           // Pages only: Sanity-backed routes and text/API endpoints render on
           // request, and /x/ is a 308 to /x (no second copy as x/index.html).
+          // The hidden /preview pages of the profile redesign render on
+          // request too, so they never join the static build.
           filter: ({ path }) =>
-            !/^\/(resume|learn|blog|api|studio)(\/|$)/.test(path) &&
+            !/^\/(resume|learn|blog|api|studio|preview)(\/|$)/.test(path) &&
             !/\.[a-z0-9]+$/i.test(path) &&
             (path === "/" || !path.endsWith("/")),
         },

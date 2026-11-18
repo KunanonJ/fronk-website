@@ -22,6 +22,8 @@ describe("raw hex ratchet", () => {
   const files = sourceFiles([
     "components/landing",
     "components/bento",
+    "components/ds",
+    "components/profile",
     "src/routes",
   ]).filter((f) => !ALLOW.some((re) => re.test(f)));
   const counts = files

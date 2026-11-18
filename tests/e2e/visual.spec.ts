@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ROUTES } from "./routes";
+import { PREVIEW_ROUTES, ROUTES } from "./routes";
 
 /**
  * Full-page visual baselines for every public route, in both themes
@@ -81,7 +81,7 @@ for (const theme of THEMES) {
       }, theme);
     });
 
-    for (const route of ROUTES) {
+    for (const route of [...ROUTES, ...PREVIEW_ROUTES]) {
       test(`${route.name} matches its baseline`, async ({ page }) => {
         test.skip(CMS_DRIVEN.has(route.name), "content comes from Sanity");
         await page.goto(route.path, { waitUntil: "networkidle" });
