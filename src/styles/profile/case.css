@@ -1,1 +1,1183 @@
-/* Profile redesign, Phase 5: the case-study template (spec 9). Empty until Phase 5. */
+/* Profile redesign, Phase 5: the case-study template (spec 9). */
+/*
+ * Design spec 9, 10, 10.1, 11 and 12. Plain CSS on the tokens in globals.css,
+ * phones first: the meta row and the steps take two columns from 600 px, the
+ * showcase two from 600 px, the viewer opens from 810 px, the meta row takes
+ * four columns from 1024 px and the rail appears from 1100 px. Every rule is
+ * in @layer components; movement waits for prefers-reduced-motion:
+ * no-preference at the end.
+ */
+
+@layer components {
+  /* The page starts under the floating bar: the hero clears it itself. */
+  .pf-main:has(> .pf-case) {
+    padding-top: 0;
+  }
+  .pf-case {
+    overflow-x: clip;
+  }
+
+  /* Materials (spec 2.4) behind drawn pictures: a case wears its Home card's. */
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="253"] {
+    --case-a: var(--material-253-a);
+    --case-b: var(--material-253-b);
+  }
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="79"] {
+    --case-a: var(--material-79-a);
+    --case-b: var(--material-79-b);
+  }
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="292"] {
+    --case-a: var(--material-292-a);
+    --case-b: var(--material-292-b);
+  }
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="327"] {
+    --case-a: var(--material-327-a);
+    --case-b: var(--material-327-b);
+  }
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="266"] {
+    --case-a: var(--material-266-a);
+    --case-b: var(--material-266-b);
+  }
+  :is(.pf-case-cover__frame, .pf-lift__mat)[data-hue="301"] {
+    --case-a: var(--material-301-a);
+    --case-b: var(--material-301-b);
+  }
+
+  /* Hero (spec 9.2): the pixel sky behind the top, dissolving downward. */
+  .pf-case-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: calc(var(--nav-h) + 48px) 24px;
+  }
+  .pf-case-hero__sky {
+    position: absolute;
+    inset: 0 0 auto;
+    block-size: min(72vh, 620px);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(black 35%, transparent);
+    mask-image: linear-gradient(black 35%, transparent);
+  }
+  .pf-case-hero__wrap {
+    position: relative;
+  }
+  /* Small text on the sky is ink 80: ink 60 falls near 4:1 on its densest
+     lavender pixels (spec 12 item 1 sets the floor, not the ceiling). */
+  .pf-case-hero__back .ds-back {
+    color: var(--ink-80);
+  }
+  .pf-case-hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    color: var(--ink-80);
+  }
+  .pf-case-hero__title {
+    max-inline-size: 20ch;
+    margin-top: 20px;
+    color: var(--ink);
+  }
+  .pf-case-hero__logo {
+    display: inline-block;
+    inline-size: 0.82em;
+    block-size: 0.82em;
+    margin-inline-end: 0.18em;
+    border: 1px solid transparent;
+    border-radius: 0.2em;
+    background: var(--paper);
+    box-shadow: var(--elev-ring);
+    object-fit: cover;
+    vertical-align: -0.06em;
+  }
+  /* The tagline: a smaller italic line inside the h1 (R12). */
+  .pf-case-hero__tagline {
+    display: block;
+    margin-top: 0.3em;
+    font-size: var(--type-statement);
+    font-style: italic;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    color: var(--ink-60);
+  }
+  .pf-case-hero__lead {
+    max-inline-size: 640px;
+    margin-top: 24px;
+    color: var(--ink-80);
+  }
+  .pf-case-hero__byline {
+    margin-top: 16px;
+    color: var(--ink-80);
+  }
+  .pf-case-actions {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 32px;
+  }
+  .pf-case-actions__external {
+    gap: 8px;
+  }
+  .pf-case-actions__arrow {
+    display: inline-flex;
+  }
+  /* The share panel opens under the row, from its start (spec 13 item 27). */
+  .pf-case-actions__panel {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 5;
+    inline-size: min(340px, 100%);
+  }
+
+  /* Evidence rows (spec 9.3): full width, a hairline above each. */
+  .pf-case-evidence {
+    display: grid;
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .pf-case-row {
+    display: grid;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-case-row__head {
+    color: var(--ink-60);
+  }
+  .pf-case-row__body {
+    display: grid;
+    justify-items: start;
+    gap: 16px;
+    min-inline-size: 0;
+  }
+  .pf-case-figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 48px;
+  }
+  .pf-case-figure {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+  .pf-case-figure__value {
+    order: -1;
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 1.2vw + 1.5rem, 2.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .pf-case-figure__label {
+    margin-top: 6px;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--ink-60);
+  }
+  .pf-case-figure__note {
+    margin-top: 4px;
+    color: var(--ink-60);
+  }
+  .pf-case-row__text {
+    max-inline-size: 72ch;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--ink-80);
+    text-wrap: pretty;
+  }
+
+  /* Cover (spec 9.4). */
+  .pf-case-cover {
+    margin-top: 56px;
+  }
+  .pf-case-cover__figure {
+    margin: 0;
+  }
+  .pf-case-cover__frame {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border: 1px solid transparent;
+    border-radius: var(--radius-bento);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-case-cover__frame[data-kind="illustration"] {
+    padding: 6% 10%;
+    background: linear-gradient(
+      160deg,
+      var(--case-a, var(--paper-2)),
+      var(--case-b, var(--paper-3))
+    );
+  }
+  .pf-case-cover__caption {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-60);
+  }
+
+  /* A case's picture: the screenshot, the mockup or the venture's loop. */
+  .pf-case-art {
+    container-type: inline-size;
+    inline-size: 100%;
+  }
+  .pf-case-art__wide {
+    display: none;
+  }
+  .pf-case-art__shot {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .pf-case-venture {
+    display: grid;
+    justify-items: center;
+    gap: max(14px, 3cqi);
+  }
+  .pf-case-venture__logo {
+    inline-size: clamp(48px, 10cqi, 112px);
+    block-size: clamp(48px, 10cqi, 112px);
+    border: 1px solid transparent;
+    border-radius: 22%;
+    background: var(--paper);
+    box-shadow: var(--elev-frame);
+    object-fit: cover;
+  }
+  .pf-case-venture__steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: max(8px, 1.4cqi);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-venture__step {
+    display: inline-flex;
+    align-items: center;
+    gap: max(8px, 1.4cqi);
+  }
+  .pf-case-venture__arrow {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-case-venture__name {
+    padding: max(6px, 1cqi) max(12px, 2cqi);
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    font-size: max(0.875rem, 2.2cqi);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  /* Meta row (spec 9.5): two columns, four from 1024 px. */
+  .pf-case-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-case-meta__item {
+    min-inline-size: 0;
+  }
+  .pf-case-meta__label {
+    color: var(--ink-60);
+  }
+  .pf-case-meta__value {
+    margin-top: 6px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  /* Body (spec 9.6): the column, and the rail from 1100 px. */
+  .pf-case-body-wrap {
+    margin-top: 80px;
+  }
+  .pf-case-body {
+    display: grid;
+    gap: 40px;
+  }
+  .pf-case-column {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    max-inline-size: 1080px;
+  }
+  .pf-case-rail {
+    display: none;
+  }
+  .pf-case-rail__nav {
+    position: sticky;
+    inset-block-start: calc(var(--nav-h) + 28px);
+  }
+  .pf-case-rail__title {
+    margin-bottom: 16px;
+    color: var(--ink-60);
+  }
+  .pf-case-toc {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-toc__link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-block-size: 24px;
+    padding-block: 6px;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    color: var(--ink-60);
+    text-decoration: none;
+  }
+  .pf-case-toc__link.is-current {
+    color: var(--ink);
+  }
+  .pf-case-toc__number {
+    position: relative;
+    flex: none;
+    min-inline-size: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-60);
+  }
+  .pf-case-toc__link.is-current .pf-case-toc__number {
+    color: var(--accent);
+  }
+  .pf-case-toc__link.is-current .pf-case-toc__number::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0.32em;
+    inset-inline-start: -14px;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--accent);
+  }
+  /* Under 1100 px: a closed disclosure after the meta row (ours). */
+  .pf-case-contents {
+    margin-bottom: 48px;
+  }
+  .pf-case-contents__details {
+    border-block: 1px solid var(--line);
+  }
+  .pf-case-contents__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-block-size: 48px;
+    color: var(--ink);
+    list-style: none;
+    cursor: pointer;
+  }
+  .pf-case-contents__summary::-webkit-details-marker {
+    display: none;
+  }
+  .pf-case-contents__summary::after {
+    content: "+";
+    font-size: 1.125rem;
+    line-height: 1;
+    color: var(--ink-60);
+  }
+  .pf-case-contents__details[open] .pf-case-contents__summary::after {
+    content: "\2212";
+  }
+  .pf-case-contents .pf-case-toc {
+    padding: 4px 0 16px 18px;
+  }
+
+  /* Chapters (spec 9.7). */
+  .pf-case-step + .pf-case-step {
+    margin-top: clamp(80px, 9vw, 128px);
+  }
+  .pf-case-step + .pf-case-step > .pf-case-chapter {
+    padding-top: 36px;
+    border-top: 1px solid var(--line);
+  }
+  /* A chapter takes focus only when the contents move to it: no ring. */
+  .pf-case .pf-case-chapter:focus-visible {
+    outline: none;
+  }
+  .pf-case-kicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    color: var(--ink-60);
+  }
+  .pf-case-chapter__headline {
+    max-inline-size: 26ch;
+    color: var(--ink);
+  }
+  .pf-case-chapter > .pf-case-kicker + * {
+    margin-top: 0;
+  }
+  .pf-case-prose {
+    margin-top: 20px;
+    color: var(--ink-80);
+  }
+
+  /* Fact strip and point list (spec 9.8). */
+  .pf-case-facts {
+    display: grid;
+    gap: 14px 32px;
+    margin-top: 36px;
+    padding-block: 18px;
+    border-block: 1px solid var(--line);
+  }
+  .pf-case-facts__item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-inline-size: 0;
+  }
+  .pf-case-facts__label {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-case-facts__value {
+    min-inline-size: 0;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .pf-case-points {
+    display: grid;
+    gap: 10px;
+    max-inline-size: 64ch;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-points__item {
+    display: flex;
+    gap: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-80);
+  }
+
+  /* Steps (spec 9.13): a workflow or a loop. */
+  .pf-case-steps {
+    margin-top: 32px;
+  }
+  .pf-case-steps__name {
+    margin-bottom: 12px;
+    color: var(--ink-60);
+  }
+  .pf-case-steps__list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-steps__item {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    min-inline-size: 0;
+    padding: 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-row);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-case-steps__number {
+    color: var(--accent-ink);
+  }
+  .pf-case-steps__label {
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .pf-case-steps__detail {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--ink-60);
+  }
+
+  /* Architecture layers. */
+  .pf-case-layers {
+    display: grid;
+    gap: 8px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-layers__layer {
+    display: grid;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-row);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-case-layers__name {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-case-layers__nodes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-layers__node {
+    max-inline-size: 100%;
+    padding: 5px 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-tile);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .pf-case-layers__note {
+    color: var(--ink-60);
+  }
+
+  /* Tech stack chips and related links. */
+  .pf-case-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-links {
+    display: grid;
+    justify-items: start;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .pf-case-links__list {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-links .ds-text-link {
+    min-block-size: 32px;
+    color: var(--ink-80);
+  }
+
+  /* Showcase (spec 9.9): one column, two from 600 px. */
+  .pf-sc-grid {
+    display: grid;
+    gap: 48px;
+    margin-top: 40px;
+  }
+  .pf-sc {
+    min-inline-size: 0;
+    margin: 0;
+  }
+  .pf-sc__tile {
+    position: relative;
+    overflow: hidden;
+    container-type: inline-size;
+    display: grid;
+    place-items: center;
+    aspect-ratio: var(--ratio, 16 / 10);
+    border: 1px solid transparent;
+    border-radius: var(--radius-tile);
+    background: var(--tile);
+  }
+  .pf-sc__tile[data-tone="deep"] {
+    background: var(--tile-deep);
+  }
+  .pf-sc__tile[data-tone="brand"] {
+    background: var(--tile-brand);
+  }
+  /* The viewer shows its own copy; the page's tile steps aside. */
+  .pf-sc__tile[data-viewing] {
+    visibility: hidden;
+  }
+  .pf-sc__shot {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .pf-sc__art {
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 6cqi;
+  }
+  .pf-sc__btn {
+    position: absolute;
+    inset-inline-end: 8px;
+    z-index: 2;
+    inline-size: 30px;
+    block-size: 30px;
+    opacity: 0;
+  }
+  .pf-sc__btn--pause {
+    inset-block-end: 8px;
+  }
+  .pf-sc__btn--enlarge {
+    display: none;
+    inset-block-start: 14px;
+  }
+  .pf-sc__tile:is(:hover, :focus-within) .pf-sc__btn,
+  .pf-sc__btn:focus-visible {
+    opacity: 1;
+  }
+  .pf-sc__cap {
+    display: grid;
+    gap: 2px;
+    max-inline-size: 60ch;
+    margin-top: 14px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-60);
+  }
+  .pf-sc__label {
+    justify-self: start;
+    margin-bottom: 4px;
+  }
+  .pf-sc__title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  /* The workflow picture: steps checked off in turn (container units). */
+  .pf-flow {
+    inline-size: min(100%, 40rem);
+    padding: max(14px, 4.4cqi);
+    border: 1px solid transparent;
+    border-radius: max(12px, 2.6cqi);
+    background: var(--paper);
+    box-shadow: var(--elev-frame);
+  }
+  .pf-flow__list {
+    display: grid;
+    gap: max(8px, 2.2cqi);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-flow__step {
+    display: flex;
+    align-items: center;
+    gap: max(10px, 2.4cqi);
+    font-size: max(0.75rem, 3.5cqi);
+    line-height: 1.3;
+    color: var(--ink-60);
+  }
+  .pf-flow__dot {
+    flex: none;
+    display: grid;
+    place-items: center;
+    inline-size: max(26px, 6.8cqi);
+    block-size: max(26px, 6.8cqi);
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line);
+    font-family: var(--font-mono);
+    font-size: max(0.75rem, 2.6cqi);
+    font-weight: 500;
+    color: var(--ink-60);
+  }
+  .pf-flow__step[data-state="done"] {
+    color: var(--ink);
+  }
+  .pf-flow__step[data-state="done"] .pf-flow__dot {
+    background: var(--accent);
+    box-shadow: none;
+    color: var(--on-accent);
+  }
+  .pf-flow__step[data-state="now"] {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .pf-flow__step[data-state="now"] .pf-flow__dot {
+    background: var(--paper);
+    box-shadow: 0 0 0 2px var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* The architecture picture: each layer a band, each part a bar. */
+  .pf-layers-art {
+    display: grid;
+    gap: max(6px, 1.4cqi);
+    inline-size: min(100%, 34rem);
+  }
+  .pf-layers-art__band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: max(8px, 2cqi);
+    padding: max(8px, 1.8cqi) max(10px, 2.4cqi);
+    border: 1px solid transparent;
+    border-radius: max(10px, 1.8cqi);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-layers-art__label {
+    font-family: var(--font-mono);
+    font-size: max(0.75rem, 2.2cqi);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-60);
+    overflow-wrap: anywhere;
+  }
+  .pf-layers-art__nodes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: max(4px, 1cqi);
+  }
+  .pf-layers-art__node {
+    inline-size: max(18px, 5cqi);
+    block-size: max(10px, 2.2cqi);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--accent) 32%, var(--paper));
+  }
+  .pf-layers-art__band:first-child .pf-layers-art__node {
+    background: var(--accent);
+  }
+
+  /* The viewer (spec 9.10): a full-screen modal dialog over a veil. */
+  .pf-lightbox {
+    position: fixed;
+    inset: 0;
+    inline-size: 100vw;
+    block-size: 100dvh;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: hidden;
+    color: var(--on-stats);
+  }
+  .pf-lightbox::backdrop {
+    background: transparent;
+  }
+  .pf-lightbox__veil {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--stats-3) 72%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+  .pf-lightbox__stage {
+    --gap-y: clamp(16px, 3vh, 32px);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: var(--gap-y) clamp(16px, 2.5vw, 40px);
+  }
+  .pf-lightbox__figure {
+    inline-size: min(
+      100%,
+      1760px,
+      calc((100dvh - 2 * var(--gap-y) - 84px) * var(--ratio))
+    );
+    margin: 0;
+  }
+  .pf-lightbox__tile {
+    border-radius: var(--radius-snug);
+    box-shadow: var(--elev-stage);
+    transform-origin: 0 0;
+    cursor: default;
+  }
+  .pf-lightbox__cap {
+    display: grid;
+    gap: 4px;
+    max-inline-size: 60ch;
+    margin-top: 16px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--on-stats) 68%, transparent);
+  }
+  .pf-lightbox__label {
+    justify-self: start;
+  }
+  .pf-lightbox__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--on-stats);
+  }
+  .pf-lightbox__btn {
+    position: absolute;
+    inset-inline-end: 16px;
+  }
+  .pf-lightbox__btn--close {
+    inset-block-start: 16px;
+  }
+  .pf-lightbox__btn--pause {
+    inset-block-end: 16px;
+  }
+
+  /* Hiring panel (spec 9.11). */
+  .pf-case-step--hire .pf-case-hire {
+    margin-top: 0;
+  }
+  .pf-case-hire {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px 32px;
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sheet);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-case-hire__text {
+    display: grid;
+    gap: 10px;
+    flex: 1 1 22rem;
+    min-inline-size: 0;
+  }
+  .pf-case-hire__kicker {
+    color: var(--ink-60);
+  }
+  .pf-case-hire__heading {
+    color: var(--ink);
+  }
+  .pf-case-hire__sentence {
+    max-inline-size: 560px;
+    color: var(--ink-60);
+  }
+  .pf-case-hire__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* More projects (spec 9.12): lift cards, two from 600 px. */
+  .pf-case-more {
+    padding-block: 128px;
+  }
+  .pf-case-more__inner {
+    padding-top: 48px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-case-more__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 24px;
+  }
+  .pf-case-more__grid {
+    display: grid;
+    gap: 64px 32px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-case-more__item {
+    display: flex;
+    min-inline-size: 0;
+  }
+  .pf-lift {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    inline-size: 100%;
+  }
+  .pf-lift__mat {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border: 1px solid transparent;
+    border-radius: var(--radius-mat);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-lift__mat[data-kind="illustration"] {
+    background: linear-gradient(
+      160deg,
+      var(--case-a, var(--paper-2)),
+      var(--case-b, var(--paper-3))
+    );
+  }
+  .pf-lift__media {
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .pf-lift__mat[data-kind="illustration"] .pf-lift__media {
+    padding: 9% 11%;
+  }
+  .pf-lift__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 20px;
+    color: var(--ink-60);
+  }
+  .pf-lift__title {
+    margin-top: 8px;
+    color: var(--ink);
+  }
+  .pf-lift__summary {
+    max-inline-size: 46ch;
+    margin-top: 8px;
+    color: var(--ink-60);
+  }
+  .pf-lift__link {
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+  /* Focus shows on the picture (spec 6.10): the card's whole target. */
+  .pf-lift:has(.ds-stretch:focus-visible) .pf-lift__mat {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .pf-lift .ds-stretch:focus-visible .ds-pill {
+    outline: none;
+  }
+
+  /* Breakpoints (spec 4.1 and 10.1). */
+  @media (min-width: 37.5rem) {
+    .pf-case-steps__list,
+    .pf-sc-grid,
+    .pf-case-more__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pf-sc-grid {
+      gap: 48px 16px;
+    }
+    .pf-sc--full {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 40rem) {
+    .pf-case-facts {
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
+    }
+    .pf-case-layers__layer {
+      grid-template-columns: 150px minmax(0, 1fr);
+      align-items: start;
+      gap: 16px;
+    }
+    .pf-case-layers__name {
+      padding-top: 6px;
+    }
+    .pf-sc__tile {
+      border-radius: var(--radius-sheet);
+    }
+    .pf-sc__btn {
+      inset-inline-end: 14px;
+      inline-size: 44px;
+      block-size: 44px;
+    }
+    .pf-sc__btn--pause {
+      inset-block-end: 14px;
+    }
+    .pf-lightbox__tile {
+      border-radius: var(--radius-bento);
+    }
+  }
+  @media (max-width: 44.9375rem) {
+    /* The cover bleeds to 12 px from the screen's edges (spec 9.4). */
+    .pf-case-cover__frame {
+      margin-inline: calc(12px - var(--pad));
+      border-radius: var(--radius-row);
+    }
+  }
+  @media (min-width: 50.625rem) {
+    .pf-case-hero {
+      padding-top: calc(var(--nav-h) + 80px);
+    }
+    .pf-case-row {
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: 24px;
+    }
+    .pf-case-row__head {
+      padding-top: 6px;
+    }
+    .pf-case-art__wide {
+      display: block;
+    }
+    .pf-case-art__narrow {
+      display: none;
+    }
+    .pf-sc-grid {
+      gap: clamp(56px, 5vw, 88px) 20px;
+    }
+    .pf-sc__tile {
+      cursor: zoom-in;
+    }
+    .pf-sc__btn--enlarge {
+      display: inline-flex;
+    }
+    .pf-sc__cap {
+      gap: 4px;
+      margin-top: 16px;
+      font-size: 1rem;
+    }
+    .pf-sc__title {
+      font-size: 1.125rem;
+    }
+    .pf-case-more__grid {
+      gap: 80px 40px;
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-case-meta {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .pf-case-steps__list {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+  }
+  @media (min-width: 68.75rem) {
+    .pf-case-contents {
+      display: none;
+    }
+    .pf-case-body {
+      grid-template-columns: minmax(0, 1080px) 188px;
+      justify-content: space-between;
+      column-gap: clamp(40px, 4vw, 72px);
+    }
+    .pf-case-rail {
+      display: block;
+      order: 2;
+    }
+  }
+
+  /* Touch screens see the tile buttons at once (spec 9.9). */
+  @media (hover: none) {
+    .pf-sc__btn {
+      opacity: 1;
+    }
+  }
+
+  /* Reader preferences (spec 12 items 26 to 28). */
+  @media (prefers-contrast: more) {
+    .pf-lightbox__cap {
+      color: var(--on-stats);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .pf-lightbox__veil {
+      background: var(--stats-3);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .pf-case-cover__frame,
+    .pf-case-venture__logo,
+    .pf-case-venture__name,
+    .pf-case-steps__item,
+    .pf-case-layers__layer,
+    .pf-case-layers__node,
+    .pf-sc__tile,
+    .pf-flow,
+    .pf-flow__dot,
+    .pf-layers-art__band,
+    .pf-case-hire,
+    .pf-lift__mat {
+      border-color: CanvasText;
+    }
+    .pf-case-toc__link.is-current .pf-case-toc__number::before {
+      background: CanvasText;
+    }
+    .pf-layers-art__node {
+      background: CanvasText;
+    }
+    .pf-case-hero__sky {
+      display: none;
+    }
+  }
+}
+
+/* Movement waits for no-preference (spec 5.1 and 5.3): colour and opacity
+   only otherwise. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-case-toc__link,
+    .pf-case-hero__back .ds-back {
+      transition: color 0.1s ease-out;
+    }
+    .pf-sc__btn {
+      transition:
+        opacity 0.2s ease,
+        transform 0.14s var(--ease-snappy);
+    }
+    .pf-sc__btn:active {
+      transform: scale(0.97);
+    }
+    .pf-flow__step,
+    .pf-flow__dot {
+      transition:
+        color 0.2s ease-out,
+        background-color 0.2s ease-out,
+        box-shadow 0.2s ease-out;
+    }
+    .pf-case-actions__arrow {
+      transition: transform 0.24s var(--ease-smooth);
+    }
+    .pf-lift__media,
+    .pf-lift__mat {
+      transition: transform 0.4s var(--ease-snappy);
+    }
+    .pf-lift:active .pf-lift__mat {
+      transform: scale(0.985);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pf-case-toc__link:hover {
+      color: var(--ink);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-case-actions__external:hover .pf-case-actions__arrow {
+      transform: translate(3px, -3px);
+    }
+    .pf-lift:hover .pf-lift__media {
+      transform: scale(1.03);
+    }
+  }
+}

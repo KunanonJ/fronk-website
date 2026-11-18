@@ -172,4 +172,26 @@ export const PREVIEW_ROUTES: readonly RouteUnderTest[] = [
     name: "preview-system",
     expectsHeadingPattern: /Design system preview/,
   },
+  // The case-study template (Phase 5): the four cases its plan baselines.
+  // profile-case.spec.ts covers all seven.
+  {
+    path: "/preview/portfolio/tbh-intranet",
+    name: "preview-case-intranet",
+    expectsHeadingPattern: /TBH Intranet\. One back office/,
+  },
+  {
+    path: "/preview/portfolio/ai-automation",
+    name: "preview-case-agents",
+    expectsHeadingPattern: /AI Automation\. AI agents/,
+  },
+  {
+    path: "/preview/portfolio/kunanonj-com",
+    name: "preview-case-site",
+    expectsHeadingPattern: /^kunanonj\.com\./,
+  },
+  {
+    path: "/preview/ventures/gogocash",
+    name: "preview-case-gogocash",
+    expectsHeadingPattern: /GoGoCash Shopping-to-earn cashback\./,
+  },
 ];

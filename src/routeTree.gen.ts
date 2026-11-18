@@ -56,6 +56,8 @@ import { Route as LandingTopicsSlugRouteImport } from './routes/_landing/topics/
 import { Route as LandingVenturesSlugRouteImport } from './routes/_landing/ventures/$slug'
 import { Route as ApiGithubContributionsRouteImport } from './routes/api/github/contributions'
 import { Route as PortfolioSlugOpengraphImageRouteImport } from './routes/portfolio.$slug.opengraph-image'
+import { Route as PreviewPortfolioSlugRouteImport } from './routes/preview/portfolio/$slug'
+import { Route as PreviewVenturesSlugRouteImport } from './routes/preview/ventures/$slug'
 import { Route as SkillsSlugOpengraphImageRouteImport } from './routes/skills.$slug.opengraph-image'
 import { Route as TopicsSlugOpengraphImageRouteImport } from './routes/topics.$slug.opengraph-image'
 import { Route as VenturesSlugOpengraphImageRouteImport } from './routes/ventures.$slug.opengraph-image'
@@ -298,6 +300,16 @@ const PortfolioSlugOpengraphImageRoute =
     path: '/portfolio/$slug/opengraph-image',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PreviewPortfolioSlugRoute = PreviewPortfolioSlugRouteImport.update({
+  id: '/portfolio/$slug',
+  path: '/portfolio/$slug',
+  getParentRoute: () => PreviewRouteRoute,
+} as any)
+const PreviewVenturesSlugRoute = PreviewVenturesSlugRouteImport.update({
+  id: '/ventures/$slug',
+  path: '/ventures/$slug',
+  getParentRoute: () => PreviewRouteRoute,
+} as any)
 const SkillsSlugOpengraphImageRoute =
   SkillsSlugOpengraphImageRouteImport.update({
     id: '/skills/$slug/opengraph-image',
@@ -365,6 +377,8 @@ export interface FileRoutesByFullPath {
   '/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/preview/portfolio/$slug': typeof PreviewPortfolioSlugRoute
+  '/preview/ventures/$slug': typeof PreviewVenturesSlugRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
   '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
@@ -415,6 +429,8 @@ export interface FileRoutesByTo {
   '/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/preview/portfolio/$slug': typeof PreviewPortfolioSlugRoute
+  '/preview/ventures/$slug': typeof PreviewVenturesSlugRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
   '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
@@ -469,6 +485,8 @@ export interface FileRoutesById {
   '/_landing/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
+  '/preview/portfolio/$slug': typeof PreviewPortfolioSlugRoute
+  '/preview/ventures/$slug': typeof PreviewVenturesSlugRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
   '/ventures/$slug/opengraph-image': typeof VenturesSlugOpengraphImageRoute
@@ -522,6 +540,8 @@ export interface FileRouteTypes {
     | '/ventures/$slug'
     | '/api/github/contributions'
     | '/portfolio/$slug/opengraph-image'
+    | '/preview/portfolio/$slug'
+    | '/preview/ventures/$slug'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
     | '/ventures/$slug/opengraph-image'
@@ -572,6 +592,8 @@ export interface FileRouteTypes {
     | '/ventures/$slug'
     | '/api/github/contributions'
     | '/portfolio/$slug/opengraph-image'
+    | '/preview/portfolio/$slug'
+    | '/preview/ventures/$slug'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
     | '/ventures/$slug/opengraph-image'
@@ -625,6 +647,8 @@ export interface FileRouteTypes {
     | '/_landing/ventures/$slug'
     | '/api/github/contributions'
     | '/portfolio/$slug/opengraph-image'
+    | '/preview/portfolio/$slug'
+    | '/preview/ventures/$slug'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
     | '/ventures/$slug/opengraph-image'
@@ -997,6 +1021,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioSlugOpengraphImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preview/portfolio/$slug': {
+      id: '/preview/portfolio/$slug'
+      path: '/portfolio/$slug'
+      fullPath: '/preview/portfolio/$slug'
+      preLoaderRoute: typeof PreviewPortfolioSlugRouteImport
+      parentRoute: typeof PreviewRouteRoute
+    }
+    '/preview/ventures/$slug': {
+      id: '/preview/ventures/$slug'
+      path: '/ventures/$slug'
+      fullPath: '/preview/ventures/$slug'
+      preLoaderRoute: typeof PreviewVenturesSlugRouteImport
+      parentRoute: typeof PreviewRouteRoute
+    }
     '/skills/$slug/opengraph-image': {
       id: '/skills/$slug/opengraph-image'
       path: '/skills/$slug/opengraph-image'
@@ -1031,11 +1069,15 @@ declare module '@tanstack/react-router' {
 interface PreviewRouteRouteChildren {
   PreviewSystemRoute: typeof PreviewSystemRoute
   PreviewIndexRoute: typeof PreviewIndexRoute
+  PreviewPortfolioSlugRoute: typeof PreviewPortfolioSlugRoute
+  PreviewVenturesSlugRoute: typeof PreviewVenturesSlugRoute
 }
 
 const PreviewRouteRouteChildren: PreviewRouteRouteChildren = {
   PreviewSystemRoute: PreviewSystemRoute,
   PreviewIndexRoute: PreviewIndexRoute,
+  PreviewPortfolioSlugRoute: PreviewPortfolioSlugRoute,
+  PreviewVenturesSlugRoute: PreviewVenturesSlugRoute,
 }
 
 const PreviewRouteRouteWithChildren = PreviewRouteRoute._addFileChildren(

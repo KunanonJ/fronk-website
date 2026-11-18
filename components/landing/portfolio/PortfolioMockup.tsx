@@ -15,9 +15,15 @@ const H = 400;
  * How the mockup draws its labels. "text" (the default) writes them; "bars"
  * draws each as a rounded bar of about its length instead, for a mockup drawn
  * so small that its 10 to 18 unit labels would render under the 12 px text
- * floor (the redesigned Home's stack cards, design spec 12 item 5).
+ * floor (the redesigned Home's stack cards, design spec 12 item 5). "floor"
+ * writes the labels of 12 units or more and draws the smaller ones as bars,
+ * for a mockup drawn at its full size or larger (the case-study cover from
+ * 810 px, Phase 5), where every written label renders at 12 px or more.
  */
-type LabelStyle = "text" | "bars";
+type LabelStyle = "text" | "bars" | "floor";
+
+/** The smallest label "floor" still writes, in viewBox units. */
+const FLOOR = 12;
 
 const LabelStyleContext = createContext<LabelStyle>("text");
 
@@ -91,7 +97,7 @@ function Label({
   caps?: boolean;
 }) {
   const style = useContext(LabelStyleContext);
-  if (style === "bars") {
+  if (style === "bars" || (style === "floor" && size < FLOOR)) {
     return (
       <LabelBar
         x={x}
@@ -624,6 +630,8 @@ type PortfolioMockupProps = {
   /**
    * "text" (default) writes every label. "bars" draws them as bars, for a
    * mockup drawn small enough that its labels would fall under 12 px.
+   * "floor" writes only the labels of 12 units or more, for a mockup drawn at
+   * its full size or larger.
    */
   labels?: LabelStyle;
 };
