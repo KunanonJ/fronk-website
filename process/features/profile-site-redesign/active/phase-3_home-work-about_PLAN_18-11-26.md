@@ -1,6 +1,6 @@
 # Phase 3: Home work stack and About bento
 
-**Status:** CODE DONE (18-11-26)
+**Status:** VERIFIED (18-11-26). Reviewed, and every finding fixed (report: Code review and fixes); every gate passed on the fixed tree.
 **Evidence:** `../reports/phase-3_home-work-about_REPORT_18-11-26.md` (gates,
 deviations, draft copy and open items; Linux baselines pending, rendered by
 the orchestrator).
