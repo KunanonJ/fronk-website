@@ -849,10 +849,27 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
       0,
     );
     await page.getByRole("button", { name: "Next page" }).click();
-    // At once: within a frame (the global reduced-motion rule leaves a
-    // 0.01 ms transition, which WebKit ends on the next frame). The 1 s turn
-    // would still be near its start after 300 ms.
-    await expect.poll(() => turnOf(page, 0), { timeout: 300 }).toBe(1);
+    // At once: the global reduced-motion rule leaves the page a 0.01 ms
+    // transition in place of the 1 s turn. That is checked directly, not by
+    // racing a short timer (on a busy runner WebKit's next frame can come
+    // later than any small window). The default would read 0 s, the motion
+    // path 1 s; only the reduced-motion rule reads just above 0.
+    const durationsMs = await page
+      .locator(`${NOTEBOOK} article[data-page='0']`)
+      .evaluate((el) =>
+        getComputedStyle(el)
+          .transitionDuration.split(",")
+          .map((value) => {
+            const trimmed = value.trim();
+            const amount = parseFloat(trimmed);
+            return trimmed.endsWith("ms") ? amount : amount * 1000;
+          }),
+      );
+    for (const ms of durationsMs) {
+      expect(ms).toBeGreaterThan(0);
+      expect(ms).toBeLessThanOrEqual(0.011);
+    }
+    await expect.poll(() => turnOf(page, 0), { timeout: 3_000 }).toBe(1);
     await page.clock.runFor(60_000);
     expect(await openPage(page)).toBe("Note 2 of 3");
   });
