@@ -22,10 +22,10 @@ import { pad2 } from "@/lib/utils/pad2";
  * strip, the FAQ as native disclosures (every answer stays in the HTML, so
  * the text matches the FAQPage JSON-LD), and the related links beside the
  * contact panel. From 1024 px each block sets its kicker and heading beside
- * its content, so the page uses its width. Thai hubs keep `lang="th"` on <main>; links to English pages
- * say so with `lang` and `hreflang`. Styles: `.pf-hub*` in
- * src/styles/profile/pages-hubs.css, with the case template's chapter,
- * kicker, prose and panel classes (case.css) and the FAQ of About
+ * its content, so the page uses its width. Thai hubs keep `lang="th"` on
+ * <main>; links to English pages say so with `lang` and `hreflang`. Styles:
+ * `.pf-hub*` in src/styles/profile/pages-hubs.css, with the case template's
+ * chapter, kicker, prose and panel classes (case.css) and the FAQ of About
  * (cutover.css).
  */
 
