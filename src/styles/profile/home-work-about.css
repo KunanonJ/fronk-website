@@ -1,1 +1,815 @@
-/* Profile redesign, Phase 3: the Work stack and the About bento (spec 8.4 and 8.5). Empty until Phase 3. */
+/* Profile redesign, Phase 3: the Work stack and the About bento (spec 8.4 and 8.5).
+ * Design spec 4.2, 6.12, 8.4, 8.5, 10, 10.1, 11 and 12. Every rule sits in
+ * @layer components, so Tailwind utilities still win; only the keyframes at
+ * the end are outside it, as keyframes are not cascaded rules. Plain CSS with
+ * tokens from globals.css. Breakpoints in rem: 23.125 (370 px), 37.5 (600),
+ * 40 (640), 50.625 (810), 64 (1024), 73.75 (1180). Upper bounds use the
+ * range syntax, `(width < 50.625rem)`, so no fractional width falls between
+ * two queries.
+ */
+
+@layer components {
+  /* Sections after the hero slide over it (spec 8.0). */
+  .pf-work,
+  .pf-about {
+    position: relative;
+    z-index: 1;
+    background: var(--paper);
+  }
+  .pf-work {
+    padding-block: 112px 160px;
+  }
+  /* With #about's scroll margin (-128 px, -176 px from 810, shell.css) the
+     eyebrow lands just under the bar. */
+  .pf-about {
+    padding-block: 128px 96px;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-about {
+      padding-block-start: 176px;
+    }
+  }
+
+  /* The section header (SectionHeader.tsx). */
+  .pf-section-head {
+    display: grid;
+    gap: 32px;
+  }
+  .pf-section-head__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    align-items: last baseline;
+    justify-content: space-between;
+    gap: 24px 48px;
+  }
+  .pf-section-head__title {
+    color: var(--ink);
+  }
+  .pf-section-head__lead {
+    max-inline-size: 40ch;
+    color: var(--ink-60);
+  }
+  .pf-section-head--centred {
+    justify-items: center;
+    text-align: center;
+  }
+  .pf-section-head--centred > .ds-eyebrow {
+    justify-self: stretch;
+  }
+  .pf-section-head--centred .pf-section-head__row {
+    flex-direction: column;
+    align-items: center;
+  }
+  @media (width < 50.625rem) {
+    .pf-section-head__row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  /* The work stack (spec 8.4): each item sticks 14 px lower than the one
+     before. Only on screens tall enough to show a whole card under the bar;
+     on shorter ones the cards simply follow each other, so no part of a card
+     is ever kept out of view. */
+  .pf-stack {
+    display: grid;
+    gap: 24px;
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-height: 40rem) {
+    .pf-stack__item {
+      position: sticky;
+      inset-block-start: calc(104px + 14px * var(--i, 0));
+    }
+    /* /#ventures lands the GoGoCash card at its own sticky offset (the bar's
+       96 px scroll padding plus 8 + 14 px per card), so it does not shift
+       after the jump and the next card stays a gap below it. This replaces
+       shell.css's 0 (spec 4.3), which assumes a target that does not stick.
+       The browser measures a stuck card where it is stuck, so a jump from
+       inside or below the stack misses; WorkStack's script then scrolls to
+       the place the list gives. This margin is the page without script. */
+    [data-design="profile"] .pf-stack #ventures {
+      scroll-margin-top: calc(8px + 14px * var(--i, 0));
+    }
+  }
+
+  /* The card (spec 6.12, 8.4): the material of its hue (spec 2.4), a dither
+     field over its right 60 %, the body on the left and the media on the
+     right. `--depth` arrives from WorkStack's script. */
+  .pf-card {
+    --mat-a: var(--material-253-a);
+    --mat-b: var(--material-253-b);
+    /* The dither's pixels: the material's own hue, deeper in light and
+       lighter in dark, read by DitherField from these two names. */
+    --card-px-1: color-mix(in oklab, var(--mat-b) 80%, var(--accent));
+    --card-px-2: color-mix(in oklab, var(--mat-b) 88%, var(--ink));
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 32px;
+    min-block-size: min(72vh, 620px);
+    padding: 36px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-bento);
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--mat-a) 0%, var(--mat-b) 100%);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    transform-origin: top center;
+  }
+  .pf-card[data-hue="79"] {
+    --mat-a: var(--material-79-a);
+    --mat-b: var(--material-79-b);
+  }
+  .pf-card[data-hue="292"] {
+    --mat-a: var(--material-292-a);
+    --mat-b: var(--material-292-b);
+  }
+  .pf-card[data-hue="327"] {
+    --mat-a: var(--material-327-a);
+    --mat-b: var(--material-327-b);
+  }
+  .pf-card[data-hue="266"] {
+    --mat-a: var(--material-266-a);
+    --mat-b: var(--material-266-b);
+  }
+  .pf-card[data-hue="301"] {
+    --mat-a: var(--material-301-a);
+    --mat-b: var(--material-301-b);
+  }
+  .pf-card--text {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* The paper veil over a covered card (spec 8.4); see the motion block. */
+  .pf-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    background: var(--paper);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .pf-card__sky {
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: 60%;
+    pointer-events: none;
+  }
+  .pf-card__sky--tall {
+    display: none;
+  }
+  /* Not positioned: the link's ::after (`.ds-stretch`, z-index 1) then
+     covers the whole card, media included, not only this column. */
+  .pf-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-inline-size: 0;
+  }
+  .pf-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-card__title {
+    color: var(--ink);
+  }
+  /* Card summaries take ink 68: ink 60 falls under 4.5:1 on the darker end
+     of four light materials (spec 2.4, 12 item 2). */
+  .pf-card__summary {
+    max-inline-size: 34ch;
+    color: var(--muted-strong);
+    font-size: 1rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  .pf-card__evidence {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-80);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .pf-card__evidence::before {
+    content: "";
+    flex: none;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--accent);
+  }
+  .pf-card__link {
+    align-self: flex-start;
+    margin-block-start: auto;
+  }
+  /* Over the media's Illustration chip (z-index 2) too, so a press anywhere
+     on the card opens the case; the veil (::after of the card) still paints
+     over it, and lets presses through. */
+  .pf-card .pf-card__link::after {
+    z-index: 3;
+  }
+  .pf-card__media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-inline-size: 0;
+  }
+  /* The white frame (spec 8.4), with a small mat so a drawn window's own
+     rounded edge never meets the frame's larger radius. */
+  .pf-card__frame {
+    position: relative;
+    inline-size: 100%;
+    padding: 3.5%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-well);
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: var(--elev-frame);
+  }
+  .pf-card__shot {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-tile);
+    object-fit: cover;
+  }
+
+  /* A venture's code-drawn picture: its logo and its loop, on a dotted
+     canvas. Text 13 px, over the 12 px floor. */
+  .pf-venture-art {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 24px;
+    aspect-ratio: 16 / 10;
+    padding: 6%;
+    border-radius: var(--radius-tile);
+    background-color: var(--paper-2);
+    background-image: radial-gradient(
+      circle,
+      var(--line-strong) 1px,
+      transparent 1.5px
+    );
+    background-size: 16px 16px;
+  }
+  .pf-venture-art__logo {
+    display: block;
+    inline-size: 5.5rem;
+    block-size: 5.5rem;
+    border-radius: var(--radius-sheet);
+    box-shadow: var(--elev-soft);
+  }
+  .pf-venture-art__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-venture-art__step {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-venture-art__arrow {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-venture-art__name {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 34px;
+    padding-inline: 14px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line);
+    color: var(--ink-80);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* Tablets, the open Fold and small laptops (spec 10.1). */
+  @media (50.625rem <= width < 73.75rem) {
+    .pf-card {
+      gap: 24px;
+      min-block-size: min(72vh, 520px);
+      padding: 28px;
+    }
+    .pf-card__title {
+      font-size: 1.875rem;
+    }
+  }
+
+  /* Phones (spec 8.4, 10): the compact card. Media first at 16:10, the title
+     beside a 40 px round arrow pill whose label stays for screen readers;
+     chips and summary hidden; the evidence line and the Illustration chip
+     stay; the dither over the top 70 %. */
+  @media (width < 50.625rem) {
+    .pf-card {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      min-block-size: 0;
+      padding: 20px;
+      border-radius: var(--radius-snug);
+    }
+    .pf-card__sky--wide {
+      display: none;
+    }
+    .pf-card__sky--tall {
+      display: block;
+      inset-inline: 0;
+      inset-block: 0 auto;
+      inline-size: auto;
+      block-size: 70%;
+    }
+    .pf-card__media {
+      order: -1;
+    }
+    .pf-card__frame {
+      border-radius: var(--radius-tile);
+    }
+    .pf-card__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px 16px;
+    }
+    .pf-card__chips,
+    .pf-card__summary {
+      display: none;
+    }
+    .pf-card__title {
+      grid-column: 1;
+      font-size: 1.375rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .pf-card__evidence {
+      grid-column: 1;
+    }
+    .pf-card__link {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      margin: 0;
+    }
+    .ds-pill.pf-card__cta {
+      inline-size: 40px;
+      block-size: 40px;
+      gap: 0;
+      padding-inline: 0;
+    }
+    .pf-card__cta-label {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .pf-card__cta .ds-cta-arrow {
+      inline-size: 16px;
+      margin-inline-start: 0;
+      opacity: 1;
+      transform: none;
+    }
+    .pf-venture-art {
+      gap: 12px;
+      padding: 5%;
+    }
+    .pf-venture-art__logo {
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+      border-radius: var(--radius-tile);
+    }
+    .pf-venture-art__steps {
+      gap: 6px;
+    }
+    .pf-venture-art__step {
+      gap: 6px;
+    }
+    .pf-venture-art__name {
+      min-block-size: 28px;
+      padding-inline: 12px;
+      font-size: 0.8125rem;
+    }
+  }
+
+  /* The About bento (spec 4.2, 8.5, 10.1). */
+  .pf-bento {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-block-start: 56px;
+  }
+  .pf-bento__tile {
+    min-inline-size: 0;
+  }
+  @media (min-width: 37.5rem) {
+    .pf-bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pf-bento__brief,
+    .pf-bento__mess,
+    .pf-bento__stats,
+    .pf-bento__motion {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 50.625rem) {
+    .pf-bento {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .pf-bento__tile {
+      grid-column: span 6;
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-bento__brief,
+    .pf-bento__stats {
+      grid-column: span 7;
+    }
+    .pf-bento__mess,
+    .pf-bento__motion {
+      grid-column: span 5;
+    }
+    .pf-bento__principle {
+      grid-column: span 3;
+    }
+  }
+  .pf-tile__label {
+    color: var(--ink-60);
+  }
+
+  /* In short. */
+  .pf-brief {
+    display: grid;
+    gap: 20px;
+    margin-block-start: 20px;
+    color: var(--ink-80);
+  }
+
+  /* The mess tile: tidy here; scattered only under no-preference, below. The
+     tile is a size container, so a chip's offset is clamped to its width. */
+  .ds-tile.pf-bento__mess {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    container-type: inline-size;
+  }
+  .pf-mess {
+    --spread: 1;
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-mess__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-inline-size: 100%;
+    min-block-size: 38px;
+    padding: 6px 14px 6px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line);
+    color: var(--ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .pf-mess__check {
+    display: grid;
+    flex: none;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .pf-mess__line {
+    margin-block-start: 28px;
+    font-size: clamp(1.75rem, 2vw + 0.75rem, 2.5rem);
+    line-height: 1.05;
+  }
+  @media (width < 50.625rem) {
+    .pf-mess {
+      --spread: 0.4;
+    }
+  }
+  @media (width < 23.125rem) {
+    .pf-mess {
+      --spread: 0.25;
+    }
+  }
+
+  /* The stats tile: the wash (spec 2.3) under a dither, white text. */
+  .ds-tile.pf-bento__stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 32px;
+    min-block-size: 380px;
+  }
+  .pf-stats__sky {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .pf-stats,
+  .pf-stats__foot {
+    position: relative;
+  }
+  .pf-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px 44px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-stats__item {
+    display: grid;
+    gap: 14px;
+  }
+  .pf-stats__label,
+  .pf-stats__foot {
+    max-inline-size: 40ch;
+    color: var(--on-stats);
+  }
+  .pf-pixel-number {
+    display: block;
+  }
+  .pf-pixel-number svg {
+    display: block;
+    block-size: 3rem;
+    inline-size: auto;
+    fill: currentColor;
+  }
+
+  /* The motion tile: a still, gathered grid until the loop runs. */
+  .ds-tile.pf-bento__motion {
+    display: grid;
+    place-items: center;
+    min-block-size: 380px;
+    background: linear-gradient(160deg, var(--tint-1), var(--tint-2));
+  }
+  .pf-motion__blocks {
+    display: grid;
+    grid-template-columns: repeat(6, 22px);
+    gap: 6px;
+  }
+  .pf-motion__block {
+    inline-size: 22px;
+    block-size: 22px;
+    border-radius: 3px;
+    background: var(--accent);
+  }
+  .pf-motion__block:nth-child(3n) {
+    background: var(--coral);
+  }
+  .pf-motion__block:nth-child(5n) {
+    background: var(--tint-4);
+  }
+  .pf-motion__caption {
+    position: absolute;
+    inset-block-end: 20px;
+    inset-inline-start: 20px;
+    max-inline-size: calc(100% - 96px);
+  }
+  .pf-motion__toggle {
+    position: absolute;
+    inset-block-end: 16px;
+    inset-inline-end: 16px;
+  }
+
+  /* The four principles. */
+  .ds-tile.pf-bento__principle {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 330px;
+  }
+  .pf-principle__icon {
+    display: block;
+    inline-size: 4rem;
+  }
+  .pf-principle__art {
+    inline-size: 100%;
+  }
+  .pf-principle__title {
+    margin-block-start: 24px;
+    color: var(--ink);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .pf-principle__body {
+    margin-block-start: 12px;
+    color: var(--ink-60);
+  }
+
+  /* Phones: the tiles take their content's height (spec 8.5). */
+  @media (width < 50.625rem) {
+    .ds-tile.pf-bento__stats {
+      min-block-size: 0;
+    }
+    .pf-pixel-number svg {
+      block-size: 2.25rem;
+    }
+    .ds-tile.pf-bento__motion {
+      min-block-size: 320px;
+    }
+    .ds-tile.pf-bento__principle {
+      min-block-size: 0;
+    }
+  }
+
+  /* Reader preferences (spec 12, items 26 to 28). In forced colours the
+     washes and the decoration go, the rings become system borders. */
+  @media (forced-colors: active) {
+    .pf-card,
+    .pf-card__frame,
+    .pf-mess__chip,
+    .pf-venture-art__name {
+      border-color: CanvasText;
+    }
+    .ds-tile.pf-bento__stats,
+    .pf-card {
+      background: Canvas;
+    }
+    .pf-card__evidence::before,
+    .pf-mess__check,
+    .pf-motion__blocks,
+    .pf-venture-art {
+      display: none;
+    }
+  }
+}
+
+/* Motion (spec 5.1, 5.3, 5.7): movement only with no-preference. The stack
+   still stacks under reduced motion; it never scales or veils. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-card {
+      transform: scale(calc(1 - min(var(--depth, 0), 4) * 0.035));
+    }
+    .pf-card::after {
+      opacity: calc(var(--depth, 0) * 0.12);
+    }
+    .pf-card__frame {
+      transition: transform 0.6s var(--ease-swap);
+    }
+
+    .pf-mess[data-state="mess"] .pf-mess__chip {
+      translate: min(calc(var(--mx) * var(--spread)), calc(100cqi - 100%))
+        var(--my);
+      rotate: var(--mr);
+      gap: 0;
+      padding-inline-start: 14px;
+      color: var(--ink-80);
+    }
+    .pf-mess[data-state="mess"] .pf-mess__chip:nth-child(2n) {
+      background: color-mix(in srgb, var(--coral) 16%, var(--paper));
+    }
+    .pf-mess[data-state="mess"] .pf-mess__chip:nth-child(3n) {
+      background: color-mix(in srgb, var(--accent) 12%, var(--paper));
+    }
+    .pf-mess[data-state="mess"] .pf-mess__check {
+      inline-size: 0;
+      opacity: 0;
+    }
+    .pf-mess__chip {
+      transition:
+        translate 0.75s var(--ease-expo) var(--d),
+        rotate 0.75s var(--ease-expo) var(--d),
+        background-color 0.3s ease-out var(--d),
+        color 0.3s ease-out var(--d),
+        padding 0.3s ease-out var(--d),
+        gap 0.3s ease-out var(--d);
+    }
+    .pf-mess__check {
+      transition:
+        inline-size 0.3s var(--ease-expo) calc(var(--d) + 0.3s),
+        opacity 0.3s ease-out calc(var(--d) + 0.3s);
+    }
+    /* The scatter is set at once after hydration (MessTile). */
+    .pf-mess[data-instant] .pf-mess__chip,
+    .pf-mess[data-instant] .pf-mess__check {
+      transition: none;
+    }
+
+    /* `data-running` arrives with hydration, with the pause control. The
+       paused rule follows the running one: the shorthand resets the play
+       state. */
+    .pf-motion[data-running] .pf-motion__block {
+      animation: kj-gather 6s var(--ease-expo) var(--d) infinite both;
+    }
+    .pf-motion[data-running][data-paused] .pf-motion__block {
+      animation-play-state: paused;
+    }
+
+    .pf-principle[data-seen] .pf-principle__icon {
+      animation: kj-pixel-hop 0.7s var(--ease-expo) both;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-card:hover .pf-card__frame {
+      transform: scale(1.015);
+    }
+    .pf-principle:hover .pf-principle__art {
+      animation: kj-pixel-nudge 0.6s var(--ease-back) both;
+    }
+  }
+
+  /* Print: the stack and the bento as the page lays them out, not as the
+     screen last showed them. After the motion rules, which these match in
+     specificity, so they win. */
+  @media print {
+    .pf-stack__item {
+      position: static;
+    }
+    .pf-card {
+      transform: none;
+    }
+    .pf-card::after {
+      opacity: 0;
+    }
+    .pf-mess[data-state] .pf-mess__chip {
+      translate: none;
+      rotate: none;
+    }
+    .pf-motion[data-running] .pf-motion__block {
+      animation: none;
+    }
+  }
+}
+
+/* Keyframes: inert until a no-preference rule above uses them. */
+@keyframes kj-gather {
+  0%,
+  10% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r));
+  }
+  45%,
+  80% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r));
+  }
+}
+
+@keyframes kj-pixel-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-8px);
+  }
+  80% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes kj-pixel-nudge {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-4deg);
+  }
+}

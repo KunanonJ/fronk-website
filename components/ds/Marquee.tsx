@@ -8,7 +8,8 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * page has hydrated and motion is allowed, which is also when its pause
  * control exists: the server HTML, and a page without JavaScript, show a
  * still row. Under reduced motion the CSS shows one still, centred list and
- * the toggle does not render.
+ * the toggle does not render. A parent that moves other things too (the
+ * Home hero's headline) can own the play state, so one toggle pauses both.
  */
 export function Marquee<T>({
   label,
@@ -18,6 +19,8 @@ export function Marquee<T>({
   itemClassName,
   className,
   toggleLabels,
+  playing: controlled,
+  onPlayingChange,
 }: {
   /** Accessible name of the visible list. */
   label: string;
@@ -28,9 +31,17 @@ export function Marquee<T>({
   className?: string;
   /** What the toggle says; "Pause motion" and "Play motion" by default. */
   toggleLabels?: { pause: string; play: string };
+  /** The play state, when the parent owns it; the toggle then reports to it. */
+  playing?: boolean;
+  onPlayingChange?: (playing: boolean) => void;
 }) {
   const reduced = useReducedMotion();
-  const [playing, setPlaying] = useState(true);
+  const [own, setOwn] = useState(true);
+  const playing = controlled ?? own;
+  const setPlaying = (next: boolean) => {
+    if (controlled === undefined) setOwn(next);
+    onPlayingChange?.(next);
+  };
   const list = (hidden: boolean) => (
     <ul
       className="ds-marquee__list"

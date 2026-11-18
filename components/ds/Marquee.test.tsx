@@ -64,6 +64,32 @@ describe("Marquee", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
+  it("follows a parent that owns the play state, and reports its toggle to it", () => {
+    stubMotion(false);
+    const onPlayingChange = vi.fn();
+    const props = {
+      label: "Sample wordmarks",
+      items: NAMES,
+      getKey: (name: string) => name,
+      renderItem: (name: string) => name,
+      onPlayingChange,
+    };
+    const { container, rerender } = render(
+      <Marquee {...props} playing={false} />,
+    );
+    const box = container.querySelector(".ds-marquee");
+    expect(box).toHaveClass("ds-marquee--paused");
+
+    fireEvent.click(screen.getByRole("button", { name: "Play motion" }));
+    expect(onPlayingChange).toHaveBeenCalledWith(true);
+    // The parent decides: until it passes the new state, nothing changes.
+    expect(box).toHaveClass("ds-marquee--paused");
+
+    rerender(<Marquee {...props} playing />);
+    expect(box).not.toHaveClass("ds-marquee--paused");
+    expect(screen.getByRole("button", { name: "Pause motion" })).toBeVisible();
+  });
+
   it("names one list and hides the copy from assistive technology", () => {
     stubMotion(false);
     render(marquee());

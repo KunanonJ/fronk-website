@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import IntroBurst from "@/components/landing/IntroBurst";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import {
@@ -7,6 +7,7 @@ import {
   INTRO_TIMING,
   introExitStartMs,
 } from "@/lib/content/introGreetings";
+import { markIntroDone, markIntroPending } from "@/lib/motion/introSignal";
 
 type Phase = "off" | "cycling" | "exiting";
 
@@ -42,6 +43,15 @@ export default function IntroLoader() {
   const [phase, setPhase] = useState<Phase>("off");
   const [index, setIndex] = useState(0);
 
+  // The intro is coming (the test below, which it plays on): mark the page
+  // before it paints, so a hero waiting on the mark stays still under the
+  // overlay. A full load has the inline script's mark already; a visit made
+  // in the app has none until this runs.
+  useLayoutEffect(() => {
+    if (reducedMotion || alreadySeen()) return;
+    markIntroPending();
+  }, [reducedMotion]);
+
   useEffect(() => {
     if (reducedMotion || alreadySeen()) return;
     const frame = window.requestAnimationFrame(() => setPhase("cycling"));
@@ -72,6 +82,8 @@ export default function IntroLoader() {
   useEffect(() => {
     if (phase !== "exiting") return;
     markSeen();
+    // The intro-finished signal: a hero waiting on it starts its entrance now.
+    markIntroDone();
     const id = window.setTimeout(() => setPhase("off"), INTRO_TIMING.exitMs);
     return () => window.clearTimeout(id);
   }, [phase]);

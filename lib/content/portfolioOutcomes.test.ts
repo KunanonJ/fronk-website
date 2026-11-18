@@ -5,6 +5,9 @@ import {
   getAllTopicPillars,
   getTopicPillar,
 } from "@/lib/content/topics/pillars";
+import { getAllVentures } from "@/lib/content/ventures";
+import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
+import { stackCards } from "@/lib/landing/stackCards";
 import { siteSources } from "@/tests/siteSources";
 
 /*
@@ -241,6 +244,75 @@ describe("portfolio outcomes", () => {
       const labels = (project.outcomes ?? []).map((outcome) => outcome.label);
       expect(new Set(labels).size, project.slug).toBe(labels.length);
     }
+  });
+});
+
+/*
+ * The redesigned Home (profile redesign Phase 3). The work stack prints a
+ * project's first cleared outcome, and the About stats tile draws figures;
+ * both read them through lib/landing/stackCards.ts and aboutStats.ts, and
+ * lib/content/homeWorkAbout.ts types none (the "no other place" check above
+ * scans it with every other source file). These hold what they show.
+ */
+describe("the redesigned Home's work stack and stats", () => {
+  it("shows each project's first cleared outcome line, and nothing on a project with none", () => {
+    const cards = stackCards().filter((card) => card.kind === "project");
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards)
+      expect(card.evidence, card.slug).toBe(
+        OWNER_CLEARED[card.slug]?.[0]?.line,
+      );
+  });
+
+  it("draws only figures a project's outcome or a venture's metric states", () => {
+    const stats = aboutStats();
+    expect(stats.length).toBeGreaterThan(0);
+    for (const { figure } of stats) {
+      const outcome = projects.some((project) =>
+        (project.outcomes ?? []).some((item) =>
+          item.value.startsWith(`${figure} `),
+        ),
+      );
+      const metric = getAllVentures().some((venture) =>
+        (venture.metrics ?? []).some((item) => item.value === figure),
+      );
+      expect(outcome || metric, figure).toBe(true);
+    }
+  });
+
+  it("labels each figure in its source's own words, and the footnote names exactly the cases they come from", () => {
+    const stats = aboutStats();
+    for (const stat of stats) {
+      const project = projects.find((each) => each.name === stat.source);
+      const venture = getAllVentures().find(
+        (each) => each.name === stat.source,
+      );
+      // An outcome keeps its label and its unit ("Adoption: employees");
+      // a metric keeps its label ("Registered users").
+      const words = project
+        ? (project.outcomes ?? [])
+            .filter((item) => item.value.startsWith(`${stat.figure} `))
+            .map(
+              (item) =>
+                `${item.label}: ${item.value.slice(stat.figure.length + 1)}`,
+            )
+        : (venture?.metrics ?? [])
+            .filter((item) => item.value === stat.figure)
+            .map((item) => item.label);
+      expect(words, stat.label).not.toEqual([]);
+      expect(
+        words.map((each) => `${each} on ${stat.source}`),
+        stat.label,
+      ).toContain(stat.label);
+    }
+    const footnote = statsFootnote(stats);
+    const cases = new Set(stats.map((stat) => stat.source));
+    for (const name of cases) expect(footnote, name).toContain(name);
+    const others = [
+      ...projects.map((each) => each.name),
+      ...getAllVentures().map((each) => each.name),
+    ].filter((name) => !cases.has(name));
+    for (const name of others) expect(footnote, name).not.toContain(name);
   });
 });
 

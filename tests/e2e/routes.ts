@@ -165,7 +165,7 @@ export const PREVIEW_ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/preview",
     name: "preview-home",
-    expectsHeadingPattern: /Profile preview/,
+    expectsHeadingPattern: /Hi, I.m Kunanon Jarat\. Forward deployed/,
   },
   {
     path: "/preview/system",
