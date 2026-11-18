@@ -288,6 +288,61 @@ function labelReport(page: Page) {
   });
 }
 
+/**
+ * The orbit's shown names and its control buttons, each against every box
+ * that clips it: the stage, any ancestor whose overflow is not visible or
+ * that contains its paint, and the viewport, which clips the page itself.
+ * An element screenshot in Chromium draws only what the viewport holds when
+ * the element is no taller than it (Playwright compares sizes, not places),
+ * so a name past the screen's edge comes out cut.
+ */
+function clipReport(page: Page) {
+  return page.evaluate(() => {
+    const stage = document.querySelector(".pf-journey__stage")!;
+    const names = [...document.querySelectorAll(".pf-orbit__label")].filter(
+      (el) => parseFloat(getComputedStyle(el).opacity) > 0.01,
+    );
+    const buttons = [
+      ...document.querySelectorAll(".pf-orbit__controls button"),
+    ];
+    const problems: string[] = [];
+    for (const el of [...names, ...buttons]) {
+      const what = names.includes(el)
+        ? `the name "${el.textContent!.trim()}"`
+        : `the button "${el.getAttribute("aria-label") ?? el.textContent!.trim()}"`;
+      const clips = new Map<string, DOMRect>([
+        ["the stage", stage.getBoundingClientRect()],
+        ["the viewport", new DOMRect(0, 0, innerWidth, innerHeight)],
+      ]);
+      for (let box = el.parentElement; box; box = box.parentElement) {
+        const style = getComputedStyle(box);
+        if (
+          box !== stage &&
+          (style.overflowX !== "visible" ||
+            style.overflowY !== "visible" ||
+            /paint|strict|content/.test(style.contain))
+        )
+          clips.set(
+            `.${[...box.classList].join(".") || box.localName}`,
+            box.getBoundingClientRect(),
+          );
+      }
+      const own = el.getBoundingClientRect();
+      for (const [name, clip] of clips) {
+        const past = Math.max(
+          clip.left - own.left,
+          clip.top - own.top,
+          own.right - clip.right,
+          own.bottom - clip.bottom,
+        );
+        if (past > 0.5)
+          problems.push(`${what} reaches ${past.toFixed(1)} px past ${name}`);
+      }
+    }
+    return { names: names.length, buttons: buttons.length, problems };
+  });
+}
+
 test.describe("journey: the stage and its orbit", () => {
   test.beforeEach(({ browserName: _browserName }, testInfo) => {
     test.skip(
@@ -606,6 +661,38 @@ test.describe("journey: device matrix, tap areas and the story's layout (desktop
       const report = await labelReport(page);
       expect(report.half, `half-drawn labels at ${width}`).toBe(0);
       expect(report.problems, `labels at ${width}`).toEqual([]);
+    }
+  });
+
+  test("at 1180 x 820 and 1440 x 900, scrolled into view as an element screenshot does, the stage shows its near names and its controls whole", async ({
+    page,
+  }) => {
+    await prepare(page);
+    const stage = page.locator(".pf-journey__stage");
+    for (const motion of ["reduce", "no-preference"] as const) {
+      await page.emulateMedia({ reducedMotion: motion });
+      for (const [width, height] of [
+        [1180, 820],
+        [1440, 900],
+      ] as const) {
+        const at = `${width} x ${height}, motion ${motion}`;
+        await page.setViewportSize({ width, height });
+        await visit(page);
+        if (motion === "no-preference")
+          await page.getByRole("button", { name: "Pause the orbit" }).click();
+        // toHaveScreenshot's own first step. The root's 96 px scroll padding
+        // (the bar) counts, so a stage a screen tall lands whole only if its
+        // scroll margin cancels it (home-journey.css).
+        await stage.scrollIntoViewIfNeeded();
+        await orbitStill(page);
+        await settle(page);
+        const report = await clipReport(page);
+        expect(report.names, `near names at ${at}`).toBeGreaterThan(3);
+        expect(report.buttons, `buttons at ${at}`).toBe(
+          motion === "reduce" ? 2 : 3,
+        );
+        expect(report.problems, at).toEqual([]);
+      }
     }
   });
 

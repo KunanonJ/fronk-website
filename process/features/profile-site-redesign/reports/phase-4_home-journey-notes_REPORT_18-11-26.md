@@ -353,3 +353,51 @@ of 94), 861 skipped by project scope; every check of
 project, the WebKit phone included, and so did the live smoke tests. Parity:
 137 URLs compared, 0 with differences, so the router change leaves every
 live page's HTML as it was.
+
+### The Journey stage cut short at 1180 x 820 (18-11-26)
+
+A later fix in the worktree `t3-04f25844-5caa56d6e748a950`, local branch
+`fix/journey-stage-orbit-clip`, from `c0410c2`; `PORT=3106`,
+`GATES_PORT=4306`, Playwright `--workers=2`. One local commit; nothing
+pushed, merged or deployed.
+
+- **Defect.** CI's render of the Journey's stage on tablet-landscape (an
+  image 1180 x 821) cut the near names (Turborepo's "BUILD" in half) and the
+  turn buttons along one line about 50 px above the stage's bottom, with
+  nothing drawn below it. Local captures showed the same cut at fold-open
+  (882 x 1104, the buttons) and at 1440 x 900.
+- **Cause.** Nothing in the page clipped them: their only clipping box, the
+  stage (`overflow: clip`), holds them (at 1180 x 820 Turborepo's name ends
+  at 782 of 820 px, the buttons at 796). The cut was the screen's bottom
+  edge. The bar's 96 px scroll padding (`shell.css`) leaves 724 px for a
+  stage a screen tall, so the element screenshot's first step, a centring
+  scroll into view (Chromium's `DOM.scrollIntoViewIfNeeded`), put its top
+  at 48 and its bottom 48 px past the screen (`scrollIntoView` start and
+  nearest: 96 px). As the stage is no taller than the viewport, Playwright
+  captured without `captureBeyondViewport` (it compares sizes, not places),
+  and Chromium drew nothing past the edge. WebKit's capture draws the whole
+  box; phones' 640 px stage fits under the bar.
+- **Fix** (`home-journey.css`). `.pf-journey__stage` gets
+  `scroll-margin-block-start: -96px`, which cancels the scroll padding: in
+  Chromium and WebKit every `scrollIntoView` alignment, and Playwright's
+  scroll in Chromium, now land the stage whole with its top at the screen's,
+  as the `#journey` anchor does. Under 810 px it is 0, so the 640 px stage
+  still lands below the bar. Nothing is drawn differently.
+- **Test** (`profile-journey.spec.ts`, desktop Chromium). At 1180 x 820 and
+  1440 x 900, under reduced motion and with motion allowed (held by its
+  button), the stage is scrolled into view as an element screenshot does;
+  then every shown name (more than 3) and every control button must lie
+  inside the stage, inside every ancestor whose overflow is not visible or
+  that contains its paint, and inside the viewport (`clipReport`). On
+  `c0410c2` it fails: "Turborepo, Build" 10.2 px and both turn buttons
+  24.3 px past the viewport.
+- **Baselines (orchestrator).** The `preview-journey-*` images on
+  tablet-landscape and fold-open change (whole now); fold-closed does not.
+  None rendered here.
+- **Gates (final tree).** Typecheck, lint (0 warnings), format and knip
+  pass; 1,566 unit tests (164 files) pass; `pnpm build` (one of `c0410c2` to
+  reproduce, one of the fix) and the perf budget pass. Browsers, production
+  build, `profile-journey.spec.ts` and `profile.spec.ts` on desktop,
+  fold-closed, fold-open, tablet-landscape and the WebKit phone, baselines
+  left out: 110 passed, 0 failed, 135 skipped by project scope. Parity: 137
+  URLs compared, 0 with differences.

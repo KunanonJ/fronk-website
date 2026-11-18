@@ -21,7 +21,13 @@
 
 @layer components {
   /* The stage (spec 8.6): the full screen from 810 px, 640 px on phones,
-     under 112 px of the section's own padding. */
+     under 112 px of the section's own padding.
+     A full screen cannot fit under the bar's 96 px of scroll padding
+     (shell.css): scrolled into view, the stage was centred in what is left
+     (724 px at 1180 x 820), and its bottom 48 px, with the front names and
+     the controls, lay past the screen's edge, where an element screenshot
+     drew nothing. Its negative margin cancels that padding, so it lands
+     whole, its top at the screen's, as the #journey anchor does. */
   .pf-journey__stage {
     position: relative;
     isolation: isolate;
@@ -30,6 +36,7 @@
     min-block-size: var(--screen);
     padding: 96px var(--pad);
     overflow: clip;
+    scroll-margin-block-start: -96px;
   }
   .pf-journey__wash {
     position: absolute;
@@ -363,10 +370,13 @@
     .pf-journey {
       padding-block-start: 112px;
     }
+    /* The 640 px stage fits under the bar, and lands below it, as the
+       #journey anchor puts it. */
     .pf-journey__stage {
       --orbit-band: 64px;
       min-block-size: 640px;
       padding-block: 72px calc(72px + var(--orbit-band));
+      scroll-margin-block-start: 0;
     }
     .pf-journey__copy {
       gap: 24px;
