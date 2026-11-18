@@ -97,6 +97,10 @@ describe("TopicHubPage (English)", () => {
       // Every answer is in the HTML, open or closed (FAQPage JSON-LD).
       expect(items[i]).toHaveTextContent(item.question);
       expect(items[i]).toHaveTextContent(item.answer);
+      // Numbered as the bento hub numbered them, the number drawn only.
+      const number = items[i]!.querySelector(".pf-faq__number")!;
+      expect(number).toHaveTextContent(`0${i + 1}`);
+      expect(number).toHaveAttribute("aria-hidden", "true");
       expect(
         within(items[i] as HTMLElement).getByRole("heading", { level: 3 }),
       ).toHaveTextContent(item.question);
@@ -112,10 +116,13 @@ describe("TopicHubPage (English)", () => {
       "/ventures/manut",
       "/topics/tech-startup-thailand-sea",
     ]);
-    // Link names are their words: the arrows are drawn, not read.
-    expect(
-      within(explore).getByRole("link", { name: "Manut case" }),
-    ).toBeInTheDocument();
+    // Link names are their words: the numbers and arrows are drawn, not read.
+    const manut = within(explore).getByRole("link", { name: "Manut case" });
+    expect(manut).toHaveTextContent("02Manut case→");
+    expect(manut.querySelector(".pf-hub-links__number")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
 
     const contact = screen.getByRole("article", { name: "Contact" });
     expect(contact).toHaveTextContent(pillar.description);

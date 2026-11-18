@@ -1,8 +1,4 @@
-import {
-  ArrowLink,
-  FilterBar,
-  type FilterOption,
-} from "@/components/profile/pages/library/parts";
+import { ArrowLink, BlockHead } from "@/components/profile/pages/library/parts";
 import {
   ReadingHero,
   SegmentHeadline,
@@ -16,18 +12,51 @@ import type { ExamplePersonaId } from "@/lib/library/search";
 import { pad2 } from "@/lib/utils/pad2";
 
 /*
- * /examples (profile redesign, Phase 7 lane D1, plan step 7d): the hero, the
- * persona filter, then that persona's examples as tiles in a wrapping row.
- * The persona is the `?persona=` search param, owned by the route: the
- * prerendered page shows the default and the param applies after hydration.
+ * /examples (profile redesign, Phase 7 lane D1, plan step 7d): the hero,
+ * "Show examples for" with a pickable tile per persona (its number, its count
+ * of examples, its name) and the polite result line, then that persona's
+ * examples as tiles in a wrapping row. The persona is the `?persona=` search
+ * param, owned by the route: the prerendered page shows the default and the
+ * param applies after hydration.
  */
 
-const PERSONAS: readonly FilterOption<ExamplePersonaId>[] =
-  EXAMPLE_PERSONAS.map((persona) => ({
-    id: persona.id,
-    label: persona.label,
-    count: examplesByPersona[persona.id].length,
-  }));
+/** The persona picker: a tile per persona, the pressed one ringed. */
+function PersonaPicker({
+  persona,
+  onChange,
+  result,
+}: {
+  persona: ExamplePersonaId;
+  onChange: (next: ExamplePersonaId) => void;
+  result: string;
+}) {
+  return (
+    <div>
+      <BlockHead
+        id="card-persona"
+        title="Show examples for"
+        note={result}
+        live
+      />
+      <div role="group" aria-labelledby="card-persona" className="pf-read-flex">
+        {EXAMPLE_PERSONAS.map((option, i) => (
+          <button
+            key={option.id}
+            type="button"
+            aria-pressed={option.id === persona}
+            onClick={() => onChange(option.id)}
+            className="ds-tile pf-read-pick pf-read-pick--persona"
+          >
+            <span className="t-meta text-ink-2">
+              {pad2(i + 1)} · {examplesByPersona[option.id].length} examples
+            </span>
+            <span className="t-lift-title">{option.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ExamplesPage({
   persona,
@@ -58,10 +87,8 @@ export default function ExamplesPage({
         className="ds-wrap pf-read-body"
       >
         <div>
-          <FilterBar
-            label="Show examples for"
-            options={PERSONAS}
-            value={persona}
+          <PersonaPicker
+            persona={persona}
             onChange={onPersonaChange}
             result={`${cards.length} examples for ${label}`}
           />

@@ -34,13 +34,16 @@ import { pad2 } from "@/lib/utils/pad2";
  */
 
 const LANG_OPTIONS: readonly FilterOption<LearnLang>[] = [
-  { id: "en", label: "English", lang: "en" },
-  { id: "th", label: "ไทย", lang: "th" },
+  { id: "en", label: "English", code: "EN", lang: "en" },
+  { id: "th", label: "ไทย", code: "TH", lang: "th" },
 ];
 
 const LANG_NAME: Record<LearnLang, string> = { en: "English", th: "Thai" };
 
-/** A hub in the chosen language; the first leads, with its path and the other language. */
+/**
+ * A hub in the chosen language, under "Read the hubs in" (so its title is an
+ * h3); the first leads, with its path and the other language.
+ */
 function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
   const lead = index === 0;
   const id = `hub-${hub.slug}`;
@@ -55,13 +58,13 @@ function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
           {hub.lang.toUpperCase()} · {hub.href}
         </p>
       ) : null}
-      <h2
+      <h3
         id={id}
         lang={hub.lang}
         className={cn(lead ? "t-card-title" : "t-h3", "pf-read-title")}
       >
         {hub.title}
-      </h2>
+      </h3>
       <p lang={hub.lang} className="t-body pf-read-text">
         {hub.lede}
       </p>
@@ -172,7 +175,15 @@ export default function LearnPage({
       </ReadingHero>
       <div className="ds-wrap pf-read-body">
         <section aria-labelledby="card-language">
-          <BlockHead id="card-language" title="Read the hubs in" />
+          <BlockHead
+            id="card-language"
+            title="Read the hubs in"
+            note={
+              <span aria-hidden="true">
+                {LANG_OPTIONS.find((option) => option.id === lang)?.code}
+              </span>
+            }
+          />
           <FilterBar
             label="Hub language"
             options={LANG_OPTIONS}

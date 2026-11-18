@@ -84,7 +84,7 @@ function ToolRow({ item }: { item: StackItem }) {
           </span>
           <span className="t-small text-ink-2">{item.purpose}</span>
           <span className="t-meta pf-read-path">
-            {domain(item.website)} <span aria-hidden="true">↗</span>
+            {domain(item.website)} <span aria-hidden="true">→</span>
           </span>
         </span>
       </a>

@@ -26,6 +26,7 @@ export function BlockHead({
   title,
   marker,
   note,
+  live = false,
   level = 2,
 }: {
   id: string;
@@ -33,6 +34,8 @@ export function BlockHead({
   /** A class for a square of the block's own colour, in place of the mark. */
   marker?: string;
   note?: ReactNode;
+  /** The note reports a filter's result: a screen reader hears it change. */
+  live?: boolean;
   level?: 2 | 3;
 }) {
   const Heading = level === 2 ? "h2" : "h3";
@@ -46,7 +49,14 @@ export function BlockHead({
         )}
         <span>{title}</span>
       </Heading>
-      {note ? <p className="t-meta text-ink-2">{note}</p> : null}
+      {note ? (
+        <p
+          aria-live={live ? "polite" : undefined}
+          className="t-meta text-ink-2"
+        >
+          {note}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -56,12 +66,14 @@ export type FilterOption<T extends string> = {
   label: string;
   /** Shown after the label; the language switch has none. */
   count?: number;
+  /** A short code drawn after the label and not read ("EN", "TH"). */
+  code?: string;
   /** The label's language, when not the page's. */
   lang?: string;
 };
 
 /**
- * The filter bar (Stack, Build, Examples, Learn): the portfolio index's
+ * The filter bar (Stack, Build, Learn): the portfolio index's
  * pressed pills on one paper track, and a polite result line. The value is a
  * URL search param owned by the route.
  */
@@ -96,6 +108,14 @@ export function FilterBar<T extends string>({
                 <span className="pf-read-count">{option.count}</span>
               </>
             )}
+            {option.code ? (
+              <>
+                {" "}
+                <span className="pf-read-count" aria-hidden="true">
+                  {option.code}
+                </span>
+              </>
+            ) : null}
           </button>
         ))}
       </div>
@@ -147,7 +167,7 @@ export function ArrowLink({
         ) : null}
       </span>
       <span className="ds-text-link__arrow" aria-hidden="true">
-        {external ? "↗" : "→"}
+        →
       </span>
     </Link>
   );

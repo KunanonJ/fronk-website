@@ -3,6 +3,7 @@ import { Badge, PixelMark } from "@/components/ds/labels";
 import { Pill } from "@/components/ds/Pill";
 import { Reveal } from "@/components/ds/Reveal";
 import Link from "@/components/navigation/Link";
+import { FaqList } from "@/components/profile/pages/FaqList";
 import {
   ReadingHero,
   SegmentHeadline,
@@ -166,7 +167,7 @@ function Proof({ pillar }: { pillar: TopicPillar }) {
   );
 }
 
-/** FAQ: a native disclosure per question, the first one open. */
+/** FAQ: a native disclosure per question, numbered, the first one open. */
 function Faq({ pillar }: { pillar: TopicPillar }) {
   return (
     <section
@@ -175,26 +176,15 @@ function Faq({ pillar }: { pillar: TopicPillar }) {
       className="pf-case-chapter pf-hub-row"
     >
       <Kicker id="card-faq">FAQ</Kicker>
-      <div className="pf-faq">
-        {pillar.faqs.map((faq, index) => (
-          <details
-            key={faq.question}
-            open={index === 0}
-            className="pf-faq__item"
-          >
-            <summary className="pf-faq__question">
-              <h3 className="pf-faq__heading">{faq.question}</h3>
-              <span className="pf-faq__mark" aria-hidden="true" />
-            </summary>
-            <p className="t-body pf-faq__answer">{faq.answer}</p>
-          </details>
-        ))}
-      </div>
+      <FaqList items={pillar.faqs} numbered />
     </section>
   );
 }
 
-/** Keep exploring: the related pages as ruled rows, minus the hidden blog. */
+/**
+ * Keep exploring: the related pages as numbered, ruled rows, minus the hidden
+ * blog. The numbers and arrows are drawn; a link's name is its words.
+ */
 function Explore({
   pillar,
   links,
@@ -206,7 +196,7 @@ function Explore({
     <article aria-labelledby="card-related">
       <Kicker id="card-related">{COPY[pillar.locale].related}</Kicker>
       <ul className="pf-hub-links">
-        {links.map((link) => (
+        {links.map((link, index) => (
           <li key={link.href}>
             <Link
               href={link.href}
@@ -214,7 +204,10 @@ function Explore({
               lang={link.lang}
               className="pf-hub-links__link"
             >
-              <span>{link.label}</span>
+              <span className="t-meta pf-hub-links__number" aria-hidden="true">
+                {pad2(index + 1)}
+              </span>
+              <span className="pf-hub-links__label">{link.label}</span>
               <span className="pf-hub-links__arrow" aria-hidden="true">
                 →
               </span>

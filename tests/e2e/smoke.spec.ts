@@ -340,7 +340,7 @@ test.describe("library > list filters are typed search params", () => {
     await expect(thai).toBeVisible();
     const count = Number((await thai.textContent())?.match(/\d+/)?.[0]);
     expect(count).toBeGreaterThan(0);
-    await expect(page.locator('h2[lang="th"]')).toHaveCount(count);
+    await expect(page.locator('h3[lang="th"]')).toHaveCount(count);
     await page
       .getByRole("group", { name: "Hub language" })
       .getByRole("button", { name: "English" })

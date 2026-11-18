@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { extractPage } from "../../lib/parity/parity.mjs";
 
 /**
@@ -59,6 +59,30 @@ async function prepare(page: Page, theme: "light" | "dark" = "light") {
       // Storage can be unavailable; the site then uses its default theme.
     }
   }, theme);
+}
+
+/**
+ * Puts the keyboard's starting point on `place` (a heading, say), as reading
+ * up to it would: a script focus on plain text, which the next Tab leaves.
+ */
+async function startAt(place: Locator) {
+  await place.evaluate((el) => {
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+    (el as HTMLElement).focus({ preventScroll: true });
+  });
+}
+
+/**
+ * Presses Tab until `target` has focus, as a keyboard reader moves; WebKit
+ * moves to links and buttons with Option+Tab, as Safari does by default.
+ */
+async function tabTo(page: Page, target: Locator, most = 12) {
+  const webkit = page.context().browser()?.browserType().name() === "webkit";
+  for (let presses = 0; presses < most; presses += 1) {
+    if (await target.evaluate((el) => el === document.activeElement)) break;
+    await page.keyboard.press(webkit ? "Alt+Tab" : "Tab");
+  }
+  await expect(target).toBeFocused();
 }
 
 function only(projects: ReadonlySet<string>, why: string) {
@@ -355,6 +379,7 @@ test.describe("Thai typography (plan step 7b)", () => {
       ];
       const body = [
         ".pf-page-hero__lead",
+        ".pf-read-avail",
         ".pf-case-prose p",
         ".pf-hub-facts__item",
         ".pf-faq__answer",
@@ -429,7 +454,7 @@ test.describe("Thai typography (plan step 7b)", () => {
 });
 
 test.describe("the hubs by keyboard", () => {
-  test("the FAQ opens and closes from the keyboard, every answer in the page", async ({
+  test("Tab reaches the FAQ's questions; Space and Enter open and close them", async ({
     page,
   }) => {
     only(BEHAVIOUR, "desktop Chromium and the WebKit phone");
@@ -441,16 +466,22 @@ test.describe("the hubs by keyboard", () => {
     await expect(items.first()).toHaveAttribute("open", "");
     // Closed answers are still in the HTML: the FAQPage JSON-LD's text.
     await expect(items.nth(1).locator(".pf-faq__answer")).toBeAttached();
+    const first = items.nth(0).locator("summary");
     const second = items.nth(1).locator("summary");
-    await second.focus();
+    // From the FAQ's heading, as a reader arrives at it.
+    await startAt(page.locator("#card-faq"));
+    await tabTo(page, first);
+    await page.keyboard.press("Space");
+    await expect(items.nth(0)).not.toHaveAttribute("open", "");
+    await tabTo(page, second);
     await page.keyboard.press("Enter");
     await expect(items.nth(1)).toHaveAttribute("open", "");
     await expect(items.nth(1).locator(".pf-faq__answer")).toBeVisible();
-    await page.keyboard.press("Enter");
+    await page.keyboard.press("Space");
     await expect(items.nth(1)).not.toHaveAttribute("open", "");
   });
 
-  test("the language switch moves between the two hubs and marks the current one", async ({
+  test("Tab reaches the language switch, and Enter on ไทย opens the Thai hub", async ({
     page,
   }) => {
     only(BEHAVIOUR, "desktop Chromium and the WebKit phone");
@@ -461,7 +492,11 @@ test.describe("the hubs by keyboard", () => {
       "aria-current",
       "page",
     );
-    await nav.getByRole("link", { name: "ไทย" }).click();
+    // From the eyebrow beside the switch: English, then ไทย.
+    await startAt(page.locator(".pf-page-hero__eyebrow"));
+    const thai = nav.getByRole("link", { name: "ไทย" });
+    await tabTo(page, thai);
+    await page.keyboard.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${FDE_TH}$`));
     await expect(page.locator("main")).toHaveAttribute("lang", "th");
     await expect(page.locator("html")).toHaveAttribute("lang", "th");
@@ -471,7 +506,9 @@ test.describe("the hubs by keyboard", () => {
         .getByRole("link", { name: "ไทย" }),
     ).toHaveAttribute("aria-current", "page");
   });
+});
 
+test.describe("the FDE hub's hiring path and printing", () => {
   test("the hiring buttons and the contact panel lead to the hiring form", async ({
     page,
   }) => {
@@ -491,5 +528,47 @@ test.describe("the hubs by keyboard", () => {
     await expect(
       panel.getByRole("link", { name: "fronk.kunanon@gmail.com" }),
     ).toHaveAttribute("href", "mailto:fronk.kunanon@gmail.com");
+  });
+
+  // The hubs and About share the FAQ list: printing opens every answer.
+  for (const path of [FDE, "/th/topics/ai-transformation-thailand", "/about"]) {
+    test(`printing opens every FAQ answer, and closes them after (${path})`, async ({
+      page,
+    }) => {
+      only(DESKTOP, "desktop Chromium");
+      await prepare(page);
+      await page.goto(path, { waitUntil: "networkidle" });
+      const items = page.locator(".pf-faq details");
+      expect(await items.count()).toBeGreaterThan(1);
+      const states = () =>
+        items.evaluateAll((all) =>
+          all.map((item) => (item as HTMLDetailsElement).open),
+        );
+      const before = await states();
+      expect(before).toContain(false);
+      await page.evaluate(() => window.dispatchEvent(new Event("beforeprint")));
+      expect(await states()).toEqual(before.map(() => true));
+      await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+      expect(await states()).toEqual(before);
+    });
+  }
+});
+
+test.describe("the reading pages' pickable tiles (desktop Chromium)", () => {
+  test("Proof's metrics and Examples' personas keep the site's hand cursor", async ({
+    page,
+  }) => {
+    only(DESKTOP, "desktop Chromium");
+    await prepare(page);
+    for (const [path, name] of [
+      ["/proof", /220\+/],
+      ["/examples", /Founders/],
+    ] as const) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      const cursor = await page
+        .getByRole("button", { name })
+        .evaluate((el) => getComputedStyle(el).cursor);
+      expect(cursor, path).toContain("hand.svg");
+    }
   });
 });

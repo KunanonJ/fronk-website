@@ -13,6 +13,7 @@ import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildBoard } from "@/lib/content/buildBoard";
 import { examplesByPersona } from "@/lib/content/examples";
 import { stackItems } from "@/lib/content/stack";
+import { orbitRing } from "@/lib/landing/journey";
 import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
 
 /*
@@ -129,9 +130,13 @@ describe("LearnPage", () => {
     renderLearn("th");
     for (const slug of TOPIC_SLUGS) {
       const th = getTopicPillar(slug, "th");
-      const heading = screen.getByRole("heading", { level: 2, name: th?.h1 });
+      // Under the h2 "Read the hubs in", each hub's title is an h3.
+      const heading = screen.getByRole("heading", { level: 3, name: th?.h1 });
       expect(heading).toHaveAttribute("lang", "th");
     }
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Read the hubs in" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(`Showing ${TOPIC_SLUGS.length} hubs in Thai`),
     ).toBeInTheDocument();
@@ -143,6 +148,24 @@ describe("LearnPage", () => {
     expect(
       within(group).getByRole("button", { name: "English" }),
     ).toHaveAttribute("aria-pressed", "false");
+    // The codes are drawn, as before, and not read: the names stay the words.
+    expect(
+      within(group).getByRole("button", { name: "ไทย" }),
+    ).toHaveTextContent("ไทย TH");
+    expect(
+      [...group.querySelectorAll(".pf-read-count")].map((code) => [
+        code.textContent,
+        code.getAttribute("aria-hidden"),
+      ]),
+    ).toEqual([
+      ["EN", "true"],
+      ["TH", "true"],
+    ]);
+    // The header shows the chosen language's code.
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Read the hubs in" })
+        .parentElement,
+    ).toHaveTextContent("Read the hubs inTH");
   });
 
   it("asks the route to switch the language", () => {
@@ -181,12 +204,35 @@ describe("ExamplesPage", () => {
         within(article).getByRole("link", { name: card.ctaLabel }),
       ).toHaveAttribute("href", card.href);
     }
-    expect(screen.getByText("3 examples for Operators")).toBeInTheDocument();
+    expect(screen.getByText("3 examples for Operators")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
     expect(screen.getByRole("button", { name: /Operators/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
     expectNoHiddenLinks(container);
+  });
+
+  it("asks who the examples are for, each persona with its number and count", () => {
+    render(<ExamplesPage persona="builders" onPersonaChange={() => {}} />);
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Show examples for",
+    });
+    // The picker is named by that heading.
+    const group = screen.getByRole("group", { name: "Show examples for" });
+    expect(group).toHaveAttribute("aria-labelledby", heading.id);
+    expect(
+      within(group)
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual([
+      "01 · 3 examplesBuilders",
+      "02 · 3 examplesOperators",
+      "03 · 3 examplesFounders",
+    ]);
   });
 
   it("asks the route to switch persona", () => {
@@ -230,10 +276,32 @@ describe("StackPage", () => {
       "a svg.pf-px[aria-hidden='true']",
     );
     expect(badges).toHaveLength(stackItems.length);
-    // The first tool takes the orbit's first colour, as on the Home.
+    // Every tool wears the colour it has in the Home's orbit.
+    const tones = new Map(
+      orbitRing().flatMap((item) =>
+        item.type === "tool" ? [[item.name, item.tone] as const] : [],
+      ),
+    );
+    expect(new Set(tones.values()).size).toBeGreaterThan(1);
+    for (const item of stackItems) {
+      const link = screen.getByRole("link", {
+        name: new RegExp(
+          `^${item.name.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}`,
+        ),
+      });
+      expect(link.querySelector("svg"), item.name).toHaveClass(
+        `pf-px--${tones.get(item.name)}`,
+      );
+    }
+    // Two that are not the violet the code falls back to.
     expect(
-      screen.getByRole("link", { name: /^TypeScript/ }).querySelector("svg"),
-    ).toHaveClass("pf-px--violet");
+      screen.getByRole("link", { name: /^Next\.js/ }).querySelector("svg"),
+    ).toHaveClass("pf-px--ink");
+    expect(
+      screen
+        .getByRole("link", { name: /^Expo \/ React Native/ })
+        .querySelector("svg"),
+    ).toHaveClass("pf-px--coral");
   });
 
   it("narrows to one group under ?group=", () => {
@@ -332,7 +400,7 @@ describe("ProofPage", () => {
       expect(tile).toHaveTextContent(
         `${value}${label} · GoGoCashAs of October 2026`,
       );
-      expect(tile).toHaveClass("pf-read-metric--dated");
+      expect(tile).toHaveClass("pf-read-pick--wide");
       fireEvent.click(tile);
       expect(
         screen.getByText(/Source · GoGoCash case · Where it stands/),
@@ -344,7 +412,7 @@ describe("ProofPage", () => {
     // An undated figure carries no date.
     const undated = screen.getByRole("button", { name: /220\+/ });
     expect(undated).not.toHaveTextContent("As of");
-    expect(undated).not.toHaveClass("pf-read-metric--dated");
+    expect(undated).not.toHaveClass("pf-read-pick--wide");
   });
 
   it("shows a case tile per venture with its live site and case page", () => {

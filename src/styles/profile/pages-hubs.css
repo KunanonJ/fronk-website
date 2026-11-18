@@ -130,6 +130,16 @@
     flex: none;
     color: var(--accent-ink);
   }
+  .pf-hub-links__number,
+  .pf-faq__number {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-hub-links__label,
+  .pf-faq__number + .pf-faq__heading {
+    flex: 1;
+    min-inline-size: 0;
+  }
   .pf-hub-contact__text {
     color: var(--ink-80);
   }
@@ -335,10 +345,12 @@
     color: var(--ink-60);
   }
 
-  /* Proof: figure tiles (the label is read first, the figure drawn on top),
-     metric tiles that pick their source, the dated running totals. */
+  /* Proof: figure tiles (the label is read first, the figure drawn on top).
+     Pickable tiles: Proof's metrics, which pick their source (the dated
+     running totals wider), and Examples' personas. They keep the site's hand
+     cursor (globals.css, spec 6.9). */
   .pf-read-figure-tile,
-  .pf-read-metric {
+  .pf-read-pick {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -365,15 +377,17 @@
   .pf-read-note {
     margin-top: 20px;
   }
-  .pf-read-flex > .pf-read-metric {
+  .pf-read-flex > .pf-read-pick {
     flex-basis: 11.25rem;
     font: inherit;
-    cursor: pointer;
   }
-  .pf-read-flex > .pf-read-metric--dated {
+  .pf-read-flex > .pf-read-pick--wide {
     flex-basis: 21.25rem;
   }
-  .pf-read-metric[aria-pressed="true"] {
+  .pf-read-pick--persona {
+    justify-content: space-between;
+  }
+  .pf-read-pick[aria-pressed="true"] {
     background: var(--tint-2);
     box-shadow: 0 0 0 2px var(--accent);
   }
@@ -411,7 +425,8 @@
   }
 
   /* Thai (plan step 7b; spec 3.4): body text at 1.75, no tracking. */
-  .pf-hub-facts__item:lang(th) {
+  .pf-hub-facts__item:lang(th),
+  .pf-read-avail:lang(th) {
     line-height: 1.75;
     letter-spacing: normal;
   }
@@ -431,7 +446,7 @@
       grid-column: 1 / -1;
     }
   }
-  @media (min-width: 37.5rem) and (max-width: 63.9375rem) {
+  @media (37.5rem <= width < 64rem) {
     /* Shipped takes the row Next and In progress leave. */
     .pf-read-board--build > :last-child {
       grid-column: 1 / -1;
@@ -471,6 +486,14 @@
     }
   }
 
+  /* Print shows every FAQ answer: FaqList opens the closed ones before
+     printing; engines with ::details-content show them without it. */
+  @media print {
+    .pf-faq__item::details-content {
+      content-visibility: visible;
+    }
+  }
+
   /* Reader preferences (spec 12 items 26 to 28). */
   @media (prefers-contrast: more) {
     .pf-read-avail,
@@ -488,7 +511,7 @@
       border-color: CanvasText;
     }
     .pf-hub-lang[aria-current="page"],
-    .pf-read-metric[aria-pressed="true"] {
+    .pf-read-pick[aria-pressed="true"] {
       border-color: Highlight;
       outline: 2px solid Highlight;
     }

@@ -106,9 +106,9 @@ function Metrics({ metrics }: { metrics: readonly ProofMetric[] }) {
             aria-pressed={i === picked}
             onClick={() => setPicked(i)}
             className={cn(
-              "ds-tile pf-read-metric",
+              "ds-tile pf-read-pick",
               // A running total is long: the two share a row of their own.
-              metric.asOf && "pf-read-metric--dated",
+              metric.asOf && "pf-read-pick--wide",
             )}
           >
             <span className="t-h3 pf-read-figure">{metric.value}</span>
