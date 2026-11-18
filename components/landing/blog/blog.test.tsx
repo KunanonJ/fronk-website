@@ -34,13 +34,14 @@ const rows = () =>
   );
 
 describe("BlogIndexPage", () => {
-  it("draws the canvas hero in three block lines", () => {
+  it("draws the hero on the pixel sky, in three block lines", () => {
     renderIndex();
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent(
       "Notes on fintech, AI workspaces, and shipping from Bangkok.",
     );
-    expect(h1.className).toMatch(/kj-lines/);
+    expect(h1).toHaveClass("t-display");
+    expect(h1.closest("section")).toHaveClass("pf-page-hero");
     expect(h1.children).toHaveLength(3);
   });
 
@@ -132,16 +133,16 @@ function renderPost(slug: string, post: Post | null = null) {
   );
 }
 
-describe("BlogPostView (bento post)", () => {
+describe("BlogPostView (profile redesign, a light restyle)", () => {
   it("shows the hero, the note and its details", () => {
     const { container } = renderPost("ai-transformation-thailand-smes");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "AI transformation for Thai SMEs",
-    );
-    expect(screen.getByRole("link", { name: "Back to Blog" })).toHaveAttribute(
-      "href",
-      "/blog",
-    );
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1).toHaveTextContent("AI transformation for Thai SMEs");
+    const hero = h1.closest("section")!;
+    expect(hero).toHaveClass("pf-page-hero");
+    expect(
+      within(hero).getByRole("link", { name: "Back to Blog" }),
+    ).toHaveAttribute("href", "/blog");
     expect(screen.getByRole("button", { name: "Share" })).toBeInTheDocument();
     const note = screen.getByRole("article", { name: "The note" });
     expect(within(note).getAllByRole("paragraph")).toHaveLength(3);

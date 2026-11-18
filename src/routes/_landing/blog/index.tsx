@@ -1,7 +1,7 @@
 import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import BlogIndexPage from "@/components/landing/blog/BlogIndexPage";
 import { BLOG_SEARCH_DEFAULTS, blogSearchSchema } from "@/lib/blog/search";
 import { routeCacheHeaders } from "@/src/lib/cache";
@@ -33,7 +33,7 @@ function BlogRoute() {
     });
   };
   return (
-    <PageMain>
+    <ProfileMain>
       <BlogIndexPage
         posts={cards}
         eyebrow={eyebrow}
@@ -42,6 +42,6 @@ function BlogRoute() {
         onTagChange={(next) => update({ tag: next })}
         onQueryChange={(next) => update({ q: next })}
       />
-    </PageMain>
+    </ProfileMain>
   );
 }

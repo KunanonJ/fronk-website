@@ -19,12 +19,13 @@ type InstallTabsProps = {
 };
 
 /**
- * The install chooser (bento canvas, design spec 4.8 and 4.9): the canvas
- * toggle chips (ink when selected) with WAI-ARIA tabs behaviour, automatic
- * activation: Left/Right move between tabs and select them, Home/End jump to
- * the ends, Tab moves into the panel. Local state, never the URL. Every panel
- * is server-rendered; inactive ones are `hidden`, so the first is already
- * correct before hydration.
+ * The install chooser (profile redesign Phase 7c): toggle pills, ink when
+ * selected, with WAI-ARIA tabs behaviour, automatic activation: Left/Right
+ * move between tabs and select them, Home/End jump to the ends, Tab moves
+ * into the panel. Local state, never the URL. Every panel is
+ * server-rendered; inactive ones are `hidden`, so the first is already
+ * correct before hydration. Styles: `.pf-cat-filter`, `.pf-cat-option` and
+ * `.pf-cat-panel` in src/styles/profile/pages-catalog.css.
  */
 export default function InstallTabs({
   label,
@@ -59,7 +60,7 @@ export default function InstallTabs({
 
   return (
     <>
-      <div role="tablist" aria-label={label} className="flex flex-wrap gap-2">
+      <div role="tablist" aria-label={label} className="pf-cat-filter">
         {tabs.map((tab, index) => {
           const active = index === selected;
           return (
@@ -76,12 +77,7 @@ export default function InstallTabs({
               tabIndex={active ? 0 : -1}
               onClick={() => setSelected(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
-              className={cn(
-                "inline-flex min-h-11 items-center rounded-full border px-4 text-left text-sm font-medium",
-                active
-                  ? "border-cta bg-cta text-on-cta"
-                  : "border-hairline-strong bg-surface text-ink-2",
-              )}
+              className="pf-cat-option"
             >
               {tab.label}
             </button>
@@ -96,10 +92,7 @@ export default function InstallTabs({
           aria-labelledby={`${idBase}-tab-${tab.id}`}
           tabIndex={0}
           hidden={index !== selected}
-          className={cn(
-            "flex flex-col border-t border-hairline pt-[18px]",
-            panelClassName,
-          )}
+          className={cn("pf-cat-panel", panelClassName)}
         >
           {tab.panel}
         </div>

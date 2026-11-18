@@ -1,24 +1,20 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { bentoSpan } from "@/components/bento/Bento";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
+import { pillClass } from "@/components/ds/Pill";
 import CopyButton from "@/components/landing/skills/CopyButton";
 import { EXTERNAL } from "@/components/landing/skills/SkillParts";
 import { SKILLS_TAG, type Skill } from "@/lib/content/skills";
 import { cn } from "@/lib/utils/cn";
-import { CARD_SURFACE } from "@/components/bento/classes";
 
-/** Lines shown before "Show all": the canvas shows the first fifteen. */
+/** Lines shown before "Show all". */
 const HEAD_LINES = 15;
 
-const PRE =
-  "m-0 font-mono text-meta leading-[1.65] [overflow-wrap:anywhere] whitespace-pre-wrap text-ink";
-
 /**
- * SKILL.md (bento canvas, design spec 3.11 and 4.9): the source in a well,
- * Copy and GitHub. Long files show their first lines under a fade, with a
- * disclosure for the rest; the rest is in the HTML either way (`hidden`),
- * so crawlers and Copy always get the whole file. Short files show in full.
+ * SKILL.md (profile redesign Phase 7c): the source on the page colour, Copy
+ * and GitHub. Long files show their first lines under a fade, with a
+ * disclosure for the rest; the rest is in the HTML either way (`hidden`), so
+ * crawlers and Copy always get the whole file. Short files show in full.
  */
 export default function SkillSourceCard({ skill }: { skill: Skill }) {
   const [open, setOpen] = useState(false);
@@ -30,20 +26,13 @@ export default function SkillSourceCard({ skill }: { skill: Skill }) {
     <article
       id="skill-source"
       aria-labelledby="card-source"
-      className={cn(
-        CARD_SURFACE,
-        "flex scroll-mt-6 flex-col gap-4",
-        bentoSpan(3),
-      )}
+      className="ds-tile pf-skill-tile pf-skill-tile--full"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2
-          id="card-source"
-          className="m-0 rounded-full border border-hairline bg-page px-3 py-[7px] font-mono text-meta leading-none font-medium"
-        >
+      <div className="pf-skill-source__head">
+        <h2 id="card-source" className="ds-chip pf-cat-code">
           SKILL.md
         </h2>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="pf-skill-source__actions">
           <CopyButton
             text={skill.content}
             accessibleLabel={`Copy the SKILL.md of ${skill.name}`}
@@ -53,29 +42,26 @@ export default function SkillSourceCard({ skill }: { skill: Skill }) {
             href={skill.skillMdUrl}
             aria-label={`View on GitHub: ${skill.name} SKILL.md at ${SKILLS_TAG}`}
             {...EXTERNAL}
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-hairline-strong bg-surface px-3.5 text-sm font-medium text-ink no-underline"
+            className={pillClass({ variant: "ghost" })}
           >
             View on GitHub
-            <ArrowUpRightIcon size={12} />
+            <span className="ds-pill__icon" aria-hidden="true">
+              <ArrowUpRightIcon size={12} />
+            </span>
           </a>
         </div>
       </div>
-      <div
-        id="skill-md"
-        className="min-w-0 rounded-well border border-hairline bg-page p-5"
-      >
+      <div id="skill-md" className="pf-skill-source__well">
         <pre
           className={cn(
-            PRE,
-            long &&
-              !open &&
-              "[mask-image:linear-gradient(to_bottom,var(--ink)_55%,transparent)]",
+            "pf-skill-source__code",
+            long && !open && "pf-skill-source__code--fade",
           )}
         >
           {head.join("\n")}
         </pre>
         {long ? (
-          <pre hidden={!open} className={PRE}>
+          <pre hidden={!open} className="pf-skill-source__code">
             {lines.slice(HEAD_LINES).join("\n")}
           </pre>
         ) : null}
@@ -86,19 +72,17 @@ export default function SkillSourceCard({ skill }: { skill: Skill }) {
           aria-expanded={open}
           aria-controls="skill-md"
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex min-h-11 items-center gap-2 self-start rounded-full border border-hairline-strong bg-surface px-[18px] text-sm font-medium text-ink"
+          className={cn(
+            pillClass({ variant: "ghost" }),
+            "pf-skill-source__toggle",
+          )}
         >
           <span>
             {open ? "Show fewer lines" : `Show all ${lines.length} lines`}
           </span>
-          <ChevronDown
-            aria-hidden
-            size={14}
-            className={cn(
-              "transition-transform duration-150",
-              open && "rotate-180",
-            )}
-          />
+          <span className="ds-pill__icon" aria-hidden="true">
+            <ChevronDown size={14} className="pf-skill-source__chevron" />
+          </span>
         </button>
       ) : null}
     </article>

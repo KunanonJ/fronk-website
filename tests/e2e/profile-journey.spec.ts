@@ -4,10 +4,10 @@ import { notebookEntries } from "../../lib/content/testimonials";
 /**
  * Profile redesign, Phase 4: the Journey (stage, tool orbit, story, records
  * card) on Home (live since the Phase 6 cutover), and the testimonial
- * notebook, reviewed on /preview/system with labelled samples until that
- * page went with the previews (process/features/
- * profile-site-redesign, phase 4 gates 2 to 7, and the device matrix and
- * dual screen of design spec 10.1).
+ * notebook, reviewed with labelled samples on /design (on /preview/system
+ * until the Phase 6 cutover deleted it; Phase 7g brought the samples back)
+ * (process/features/profile-site-redesign, phase 4 gates 2 to 7, and the
+ * device matrix and dual screen of design spec 10.1).
  *
  * Behaviour runs in desktop Chromium (1440 px) and the WebKit phone (390 px);
  * the matrix widths, the tap areas and the hinge set their own viewports in
@@ -17,8 +17,8 @@ import { notebookEntries } from "../../lib/content/testimonials";
  */
 
 const HOME = "/";
-/** The notebook's sample page: gone since the Phase 6 cutover (see below). */
-const SYSTEM = "/preview/system";
+/** The notebook's sample page: /design since Phase 7g (see below). */
+const SYSTEM = "/design";
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
 /** The fixed bar's bottom edge: 32 px down and 48 px tall. */
@@ -48,7 +48,7 @@ async function prepare(page: Page, theme: Theme = "light") {
 
 /**
  * Opens a page and waits until it has hydrated: the orbit's controls (the
- * Home) and the notebook's ready mark (/preview/system) render only on the
+ * Home) and the notebook's ready mark (/design) render only on the
  * client, after the router's own restore has run.
  */
 async function visit(page: Page, path = HOME) {
@@ -818,19 +818,11 @@ test.describe("the Home's notebook: hidden below three cleared quotes", () => {
 /*
  * The notebook with its labelled samples lived on /preview/system, which the
  * Phase 6 cutover deleted with the other previews. No live page renders the
- * notebook until three quotes are cleared (umbrella input R11), so these
- * browser checks wait for Phase 7 (plan row 7g, lane D2), which brings the
- * samples back on /design and owns turning them on again; its unit tests
- * (Notebook.test.tsx, Notes.test.tsx) still run. A tripwire in
- * lib/content/testimonials.test.ts fails if three quotes are cleared while
- * these checks are still skipped.
+ * notebook until three quotes are cleared (umbrella input R11); Phase 7g
+ * brought the samples back on /design, where these checks run again.
  */
-const NOTEBOOK_PAGE_GONE =
-  "the sample notebook page went with /preview/system (Phase 6); Phase 7g restores it on /design";
-
-test.describe("the notebook, with sample notes on /preview/system", () => {
+test.describe("the notebook, with sample notes on /design", () => {
   test.beforeEach(({ browserName: _browserName }, testInfo) => {
-    test.skip(true, NOTEBOOK_PAGE_GONE);
     test.skip(
       !BEHAVIOUR.has(testInfo.project.name),
       "desktop and the WebKit phone",
@@ -1012,7 +1004,6 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
 
 test.describe("the notebook's layout (desktop Chromium)", () => {
   test.beforeEach(() => {
-    test.skip(true, NOTEBOOK_PAGE_GONE);
     only(["desktop"]);
   });
 
@@ -1147,7 +1138,6 @@ test.describe("journey and notebook: baselines on the device matrix", () => {
     test(`the sample notebook matches its baseline at this width (${theme})`, async ({
       page,
     }) => {
-      test.skip(true, NOTEBOOK_PAGE_GONE);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page, theme);
       await visit(page, SYSTEM);

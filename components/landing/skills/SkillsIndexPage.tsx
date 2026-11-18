@@ -1,9 +1,8 @@
-import { ArrowRight } from "lucide-react";
 import Link from "@/components/navigation/Link";
-import { BentoCard } from "@/components/bento/Bento";
-import { ctaClasses } from "@/components/bento/Buttons";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
+import { EyebrowRow } from "@/components/ds/labels";
+import { pillClass } from "@/components/ds/Pill";
 import CopyButton from "@/components/landing/skills/CopyButton";
 import InstallTabs from "@/components/landing/skills/InstallTabs";
 import SkillsCatalog from "@/components/landing/skills/SkillsCatalog";
@@ -38,77 +37,76 @@ import {
 import type { SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
-import { PageTitle, HeroLead } from "@/components/bento/PageHero";
+import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
+import { Headline } from "@/components/profile/pages/PageHero";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
 /*
- * /skills (bento redesign, phase 7d; design spec 4.8): the hero, the install
- * row (whole pack, ask your agent, the pipeline), the filterable catalog and
- * the credits. Copy and commands come from lib/content/skills and its
- * snapshot; nothing here is written by hand.
+ * /skills (profile redesign Phase 7c; plan step 7c): the hero on the pixel
+ * sky, the install tiles (whole pack, ask your agent, the pipeline as case
+ * steps), the filterable catalog of skill tiles and the credits as a fact
+ * strip. Copy and commands come from lib/content/skills and its snapshot;
+ * nothing here is written by hand. Styles: `.pf-skill*` and `.pf-cat*` in
+ * src/styles/profile/pages-catalog.css.
  */
 
 function SkillsHero() {
   const { headline } = skillsPage;
   return (
-    <section aria-labelledby="hero-title" className="flex flex-col gap-7">
-      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-5">
-        <div className="flex flex-col items-start gap-5">
-          <p className="m-0 rounded-full border border-hairline bg-surface px-3 py-[7px] text-meta leading-none font-medium">
-            {skillsPage.eyebrow}
-          </p>
-          <PageTitle>
-            <span className="block">
-              <span className="text-ink-3">{headline.muted}</span>{" "}
-              {headline.rest}
-            </span>{" "}
-            <span className="block text-mark">{headline.accent}</span>
-          </PageTitle>
-        </div>
+    <CatalogHero
+      eyebrow={skillsPage.eyebrow}
+      title={
+        <Headline
+          lines={[
+            [{ text: headline.muted, tone: "muted" }, { text: headline.rest }],
+            [{ text: headline.accent, tone: "accent" }],
+          ]}
+        />
+      }
+      lead={skillsPage.description}
+    >
+      <div className="pf-cat-hero__actions">
+        <a
+          href={SKILLS_REPO_URL}
+          aria-label={`View on GitHub: ${SKILLS_REPO}`}
+          {...EXTERNAL}
+          className={pillClass({ size: "hero" })}
+        >
+          View on GitHub
+          <span className="ds-pill__icon" aria-hidden="true">
+            <ArrowUpRightIcon size={16} />
+          </span>
+        </a>
+        <SharePill />
         <a
           href={SKILLS_RELEASE_URL}
           aria-label={`Superstacks ${SKILLS_TAG} · ${SKILLS_RELEASE_MONTH}, release on GitHub`}
           {...EXTERNAL}
-          className="mb-1.5 inline-flex min-h-11 items-center gap-2.5 rounded-full border border-hairline-strong bg-surface px-4 text-card font-medium text-ink no-underline"
+          className={cn(pillClass({ variant: "ghost" }), "pf-skill-release")}
         >
-          <span aria-hidden className="size-2 shrink-0 bg-mark" />
+          <span aria-hidden className="pf-skill-tag__mark" />
           <span>
-            Superstacks <span className="font-mono">{SKILLS_TAG}</span>
+            Superstacks <span className="pf-cat-code">{SKILLS_TAG}</span>
           </span>
-          <span className="text-ink-2">· {SKILLS_RELEASE_MONTH}</span>
-          <ArrowUpRightIcon size={14} />
+          <span className="pf-cat-note">· {SKILLS_RELEASE_MONTH}</span>
+          <span className="ds-pill__icon" aria-hidden="true">
+            <ArrowUpRightIcon size={14} />
+          </span>
         </a>
       </div>
-      <HeroLead>{skillsPage.description}</HeroLead>
-      <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
-        <div className="flex flex-wrap gap-3">
-          <a
-            href={SKILLS_REPO_URL}
-            aria-label={`View on GitHub: ${SKILLS_REPO}`}
-            {...EXTERNAL}
-            className={ctaClasses()}
-          >
-            View on GitHub
-            <ArrowUpRightIcon />
-          </a>
-          <SharePill />
-        </div>
-        <p className="m-0 text-card text-ink-2">
-          <span className="font-mono">{TOTAL}</span> skills · MIT license ·{" "}
-          <span className="font-mono">{ORIGINAL_COUNT}</span> original,{" "}
-          <span className="font-mono">{ADAPTED_COUNT}</span> adapted ·
-          maintained by{" "}
-          <Link
-            href={skillsPage.maintainer.href}
-            rel="author"
-            className="font-medium text-ink underline underline-offset-4"
-          >
-            {skillsPage.maintainer.name}
-          </Link>
-        </p>
-      </div>
-    </section>
+      <p className="t-small pf-cat-hero__meta">
+        {TOTAL} skills · MIT license · {ORIGINAL_COUNT} original,{" "}
+        {ADAPTED_COUNT} adapted · maintained by{" "}
+        <Link
+          href={skillsPage.maintainer.href}
+          rel="author"
+          className="ds-prose-link"
+        >
+          {skillsPage.maintainer.name}
+        </Link>
+      </p>
+    </CatalogHero>
   );
 }
 
@@ -117,7 +115,7 @@ const packTabs = [
     id: "claude-code",
     label: "Claude Code",
     panel: (
-      <div className="flex flex-col gap-4">
+      <div className="pf-cat-stack">
         <CommandRow
           label="1. Add the marketplace (type it in Claude Code)"
           command={PACK_INSTALL.claudeCode[0]}
@@ -153,13 +151,13 @@ const packTabs = [
     id: "cursor",
     label: "Cursor",
     panel: (
-      <div className="flex flex-col gap-4">
-        <p className={cn(NOTE, "leading-[1.55]")}>
+      <div className="pf-cat-stack">
+        <p className={NOTE}>
           Until the public Cursor listing exists, copy the{" "}
           <a
             href={PLUGIN_FOLDER_URL}
             {...EXTERNAL}
-            className="font-mono text-meta"
+            className="ds-prose-link pf-cat-code"
           >
             {PACK_INSTALL.cursorFrom}
           </a>{" "}
@@ -177,7 +175,7 @@ const packTabs = [
     id: "npx",
     label: "npx skills",
     panel: (
-      <div className="flex flex-col gap-4">
+      <div className="pf-cat-stack">
         <CommandRow
           label="Installs every skill globally for the agents it finds"
           command={PACK_INSTALL.npx}
@@ -196,8 +194,8 @@ const packTabs = [
     id: "zip",
     label: "ZIP",
     panel: (
-      <div className="flex flex-col items-start gap-[18px]">
-        <p className={cn(NOTE, "max-w-[520px] leading-[1.55]")}>
+      <div className="pf-cat-stack pf-cat-stack--start">
+        <p className={`${NOTE} pf-cat-measure`}>
           claude.ai and ChatGPT take one skill per ZIP: use the ZIP link on any
           skill below. For the OpenAI plugin portal, upload the whole pack as
           one file.
@@ -208,99 +206,82 @@ const packTabs = [
   },
 ];
 
-/** The README's pipeline as numbered rows; the last ends on the accent square. */
+/**
+ * The README's pipeline as the case template's steps (spec 9.13): numbered
+ * cards in order, each a link to its skill.
+ */
 function PipelineCard() {
   const steps = SKILL_PIPELINE.flatMap((step) => {
     const skill = getSkillBySlug(step.slug);
     return skill ? [{ ...step, name: skill.name }] : [];
   });
   return (
-    <BentoCard
+    <article
       id="pipeline"
-      headingId="card-pipeline"
-      title="The pipeline"
-      gap={3.5}
-      minHeight={false}
-      className="min-w-0 flex-[1_1_100%] scroll-mt-6"
+      aria-labelledby="card-pipeline"
+      className="ds-tile pf-skill-tile pf-skill-tile--wide"
     >
-      <p className="m-0 max-w-[640px] text-card leading-[1.55] text-ink-2">
+      <h2 id="card-pipeline" className="t-meta pf-cat-kicker">
+        The pipeline
+      </h2>
+      <p className={`${NOTE} pf-cat-measure`}>
         The order the skills run in on a ticket, from the Superstacks README.{" "}
-        <Link href="/skills/ticket-pipeline" className="font-mono text-sm">
+        <Link
+          href="/skills/ticket-pipeline"
+          className="ds-prose-link pf-cat-code"
+        >
           ticket-pipeline
         </Link>{" "}
         routes a ticket through it.
       </p>
-      <ol className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
+      <ol className="pf-skill-steps">
         {steps.map((step, index) => (
-          <li
-            key={step.slug}
-            className="flex min-w-[140px] flex-[1_1_calc(25%-6px)]"
-          >
-            <Link
-              href={`/skills/${step.slug}`}
-              className="kj-row flex min-h-11 flex-1 flex-col gap-2.5 rounded-2xl px-3 pt-3 pb-3.5 text-ink no-underline"
-            >
-              <span
-                aria-hidden
-                className="flex items-center gap-2.5 font-mono text-xs text-ink-2"
-              >
+          <li key={step.slug} className="pf-skill-steps__item">
+            <Link href={`/skills/${step.slug}`} className="pf-skill-step">
+              <span aria-hidden className="t-meta pf-skill-step__number">
                 {pad2(index + 1)}
-                <span className="h-px flex-1 bg-hairline-strong" />
-                {index < steps.length - 1 ? (
-                  <ArrowRight size={14} />
-                ) : (
-                  <span className="size-2 bg-mark" />
-                )}
               </span>
-              <span className="flex flex-col gap-0.5">
-                <span className="font-mono text-card leading-[1.4] font-medium [overflow-wrap:anywhere]">
-                  {step.name}
-                </span>
-                {step.note ? (
-                  <span className="text-meta leading-[1.4] text-ink-2">
-                    ({step.note})
-                  </span>
-                ) : null}
-              </span>
+              <span className="pf-skill-step__name">{step.name}</span>
+              {step.note ? (
+                <span className="pf-skill-step__note">({step.note})</span>
+              ) : null}
             </Link>
           </li>
         ))}
       </ol>
-    </BentoCard>
+    </article>
   );
 }
 
 function InstallRow() {
   return (
-    <div className="flex flex-wrap gap-5">
-      <BentoCard
+    <div className="ds-wrap pf-cat-section pf-skill-install">
+      <article
         id="install"
-        headingId="card-install"
-        title="Install the whole pack"
-        className="min-w-0 flex-[2_1_440px] scroll-mt-6"
+        aria-labelledby="card-install"
+        className="ds-tile pf-skill-tile pf-skill-tile--install"
       >
+        <h2 id="card-install" className="t-meta pf-cat-kicker">
+          Install the whole pack
+        </h2>
         <InstallTabs
           label="Install the whole pack with"
           idBase="pack-install"
           tabs={packTabs}
           panelClassName="min-h-[252px]"
         />
-      </BentoCard>
-      <BentoCard
-        headingId="card-ask"
-        title="Or ask your agent"
-        gap={3.5}
-        className="min-w-0 flex-[1_1_280px]"
-      >
+      </article>
+      <article aria-labelledby="card-ask" className="ds-tile pf-skill-tile">
+        <h2 id="card-ask" className="t-meta pf-cat-kicker">
+          Or ask your agent
+        </h2>
         <p className={NOTE}>
           Paste this into Claude Code, Codex or Cursor and let it follow the
           README.
         </p>
-        <figure className="m-0 flex flex-1 flex-col justify-between gap-[18px] rounded-well bg-surface-tint p-[18px]">
-          <p className="m-0 text-lg leading-[1.45] font-medium tracking-[-0.01em] [overflow-wrap:anywhere] text-ink">
-            {skillsPage.askAgentPrompt}
-          </p>
-          <figcaption className="flex justify-end">
+        <figure className="pf-skill-prompt">
+          <p className="pf-skill-prompt__text">{skillsPage.askAgentPrompt}</p>
+          <figcaption className="pf-skill-prompt__actions">
             <CopyButton
               text={skillsPage.askAgentPrompt}
               label="Copy prompt"
@@ -310,7 +291,7 @@ function InstallRow() {
             />
           </figcaption>
         </figure>
-      </BentoCard>
+      </article>
       <PipelineCard />
     </div>
   );
@@ -318,11 +299,20 @@ function InstallRow() {
 
 const shortSha = (sha: string) => sha.slice(0, 7);
 
-/** Upstream projects: license, pinned commit, and the skills taken from each. */
+/**
+ * Upstream projects as a fact strip (spec 9.8): one row between hairlines
+ * per project, with its license, pinned commit and the skills taken from it.
+ */
 function CreditsCard() {
   return (
-    <BentoCard headingId="card-credits" title="Credits" minHeight={false}>
-      <p className="m-0 max-w-[640px] text-card leading-[1.55] text-ink-2">
+    <article
+      aria-labelledby="card-credits"
+      className="ds-wrap pf-cat-section pf-cat-end"
+    >
+      <EyebrowRow as="h2" id="card-credits">
+        Credits
+      </EyebrowRow>
+      <p className={`${NOTE} pf-cat-measure`}>
         {ADAPTED_COUNT} skills are adapted from these MIT-licensed projects,
         pinned to a commit and patched where noted. Full notices are in{" "}
         <a href={THIRD_PARTY_URL} {...EXTERNAL} className={INLINE_LINK}>
@@ -334,33 +324,30 @@ function CreditsCard() {
         </a>
         .
       </p>
-      <ul className="bento-2 m-0 grid list-none grid-cols-1 gap-3 p-0 min-[641px]:grid-cols-2">
+      <ul className="pf-skill-credits">
         {SKILL_SOURCES.map((source) => {
           const label = sourceLabel(source);
           return (
-            <li
-              key={source.name}
-              className="flex flex-col gap-1 rounded-well border border-hairline bg-page px-4 pt-2.5 pb-3.5"
-            >
-              <h3 className="m-0 font-mono text-card font-medium">
+            <li key={source.name} className="pf-skill-credits__row">
+              <h3 className="pf-skill-credits__name">
                 <a
                   href={source.url}
                   {...EXTERNAL}
-                  className="inline-flex min-h-11 items-center no-underline"
+                  className="pf-skill-credits__link"
                 >
                   {label}
                 </a>
               </h3>
-              <p className="m-0 text-meta leading-[1.5] text-ink-2">
+              <p className="t-small pf-cat-note">
                 {source.license} · {source.copyright}
               </p>
               {source.sha ? (
-                <p className="m-0 flex items-center gap-1.5 text-meta text-ink-2">
+                <p className="t-small pf-cat-note pf-skill-credits__pin">
                   Pinned at{" "}
                   <a
                     href={`${source.url}/tree/${source.sha}`}
                     {...EXTERNAL}
-                    className="inline-flex min-h-11 items-center font-mono"
+                    className="pf-skill-credits__sha"
                   >
                     {shortSha(source.sha)}
                   </a>
@@ -369,7 +356,7 @@ function CreditsCard() {
               {source.skills.length > 0 ? (
                 <ul
                   aria-label={`Skills adapted from ${label}`}
-                  className="m-0 flex list-none flex-wrap gap-x-4 border-t border-hairline p-0 pt-1.5 font-mono text-meta"
+                  className="pf-skill-credits__skills"
                 >
                   {source.skills.map((slug) => (
                     <li key={slug}>
@@ -378,7 +365,7 @@ function CreditsCard() {
                           16 px gap, neighbouring areas stay 4 px apart. */}
                       <Link
                         href={`/skills/${slug}`}
-                        className="-mx-1.5 inline-flex min-h-11 min-w-6 items-center justify-center px-1.5"
+                        className="pf-skill-credits__skill"
                       >
                         {slug}
                       </Link>
@@ -386,7 +373,7 @@ function CreditsCard() {
                   ))}
                 </ul>
               ) : (
-                <p className="m-0 mt-1.5 border-t border-hairline pt-2.5 text-meta leading-[1.6] text-ink-2">
+                <p className="t-small pf-cat-note pf-skill-credits__excerpt">
                   Credited excerpt inside{" "}
                   {getAllSkills()
                     .filter((s) =>
@@ -396,7 +383,7 @@ function CreditsCard() {
                       <Link
                         key={s.slug}
                         href={`/skills/${s.slug}`}
-                        className="font-mono"
+                        className="ds-prose-link pf-cat-code"
                       >
                         {s.name}
                       </Link>
@@ -408,7 +395,7 @@ function CreditsCard() {
           );
         })}
       </ul>
-    </BentoCard>
+    </article>
   );
 }
 
@@ -423,7 +410,9 @@ export default function SkillsIndexPage({
     <>
       <SkillsHero />
       <InstallRow />
-      <SkillsCatalog show={show} onShowChange={onShowChange} />
+      <div className="ds-wrap pf-cat-section">
+        <SkillsCatalog show={show} onShowChange={onShowChange} />
+      </div>
       <CreditsCard />
     </>
   );

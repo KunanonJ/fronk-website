@@ -99,32 +99,6 @@ export function BentoPair({
 }
 
 /**
- * A full-width bento cell holding cards side by side in a wrapping flex row
- * (About FAQ + Next, Résumé Skills + Share). The cards size by their
- * `flex` basis, so the row wraps without media queries. The row itself
- * never lifts on hover; its cards do (`bento-row` in globals.css).
- */
-export function BentoRow({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "bento-row flex min-w-0 flex-wrap gap-5",
-        bentoSpan(3),
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-/**
  * Card kicker as a 13 px pill on the page colour. `as` keeps it a heading
  * when it names the card, or a paragraph when an h2 below does; `marker`
  * (the square's size and fill classes) puts a square before the text.

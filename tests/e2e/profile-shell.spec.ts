@@ -894,8 +894,9 @@ test.describe("chrome: Say hello and the theme", () => {
     for (const [path, scoped] of [
       ["/", true],
       ["/portfolio/tbh-intranet", true],
-      ["/skills", false],
-      ["/design", false],
+      // Phase 7 group D2 moved these two into the scope.
+      ["/skills", true],
+      ["/design", true],
     ] as const) {
       await page.goto(path, { waitUntil: "networkidle" });
       const sheets = page.locator('link[rel="stylesheet"]');

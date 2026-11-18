@@ -1,23 +1,16 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { PortableTextBlock } from "@portabletext/react";
 import Link from "@/components/navigation/Link";
-import {
-  Bento,
-  BentoCard,
-  BentoPair,
-  Kicker,
-  CardLink,
-  bentoSpan,
-} from "@/components/bento/Bento";
-import { CtaLink } from "@/components/bento/Buttons";
-import { EyebrowChip } from "@/components/bento/Chips";
 import SharePill from "@/components/bento/SharePill";
+import { Pill } from "@/components/ds/Pill";
+import { TextLink } from "@/components/ds/TextLink";
 import {
-  ArrowLeftIcon,
   BODY_LINK,
   BannerFigure,
   PostRow,
 } from "@/components/landing/blog/BlogParts";
+import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
+import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
 import { PortableText } from "@/components/PortableText";
 import {
   blogPage,
@@ -30,69 +23,79 @@ import type { NoteLink } from "@/lib/content/noteLinks";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
-import { MONO_LABEL } from "@/components/bento/classes";
-import { HeroLead } from "@/components/bento/PageHero";
 
 /*
- * One post (bento canvas Post, design spec 4.18): the hero, the note beside
- * its details and links, then more posts on the same tag, "Keep reading"
- * and the contact card. Hidden with the blog while BLOG_PUBLIC is false.
+ * One post (profile redesign Phase 7h, a light restyle of the bento canvas
+ * Post): the hero on the pixel sky, the note beside its details and links,
+ * then more posts on the same tag, "Keep reading" and the contact tile.
+ * Hidden with the blog while BLOG_PUBLIC is false. Styles: `.pf-blog*` in
+ * src/styles/profile/pages-catalog.css.
  */
+
+/** A tile named by its mono heading. */
+function PostTile({
+  id,
+  title,
+  className,
+  children,
+}: {
+  id: string;
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <article
+      aria-labelledby={id}
+      className={cn("ds-tile pf-blog-tile", className)}
+    >
+      <h2 id={id} className="t-meta pf-cat-kicker">
+        {title}
+      </h2>
+      {children}
+    </article>
+  );
+}
 
 /** How many related posts a tag shows. */
 const RELATED_LIMIT = 3;
 
 function PostHero({ post }: { post: BlogCard }) {
   return (
-    <section
-      aria-labelledby="hero-title"
-      className="flex flex-col items-start gap-6"
-    >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <EyebrowChip className="self-center">Blog</EyebrowChip>
-        <Link
-          href="/blog"
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium no-underline"
-        >
-          <ArrowLeftIcon />
+    <CatalogHero
+      back={
+        <TextLink href="/blog" arrow="left">
           Back to Blog
-        </Link>
-      </div>
-      <p className="m-0 flex flex-wrap items-center gap-2">
+        </TextLink>
+      }
+      eyebrow="Blog"
+      title={post.title}
+      lead={post.excerpt}
+    >
+      <p className="pf-blog-hero__meta">
         <time
           dateTime={post.publishedAt.slice(0, 10)}
-          className="mr-1 font-mono text-meta text-ink-2"
+          className="t-meta pf-cat-note"
         >
           {formatBlogDate(post.publishedAt)}
         </time>
         {post.tags.map((tag) => (
-          <span
-            key={tag}
-            className={cn(
-              MONO_LABEL,
-              "rounded-full border border-hairline-strong bg-surface px-2.5 py-1",
-            )}
-          >
+          <span key={tag} className="ds-chip">
             {tag}
           </span>
         ))}
       </p>
-      <h1 id="hero-title" className="m-0 text-title text-ink">
-        {post.title}
-      </h1>
-      <HeroLead>{post.excerpt}</HeroLead>
-      <SharePill />
-    </section>
+      <div className="pf-cat-hero__actions">
+        <SharePill />
+      </div>
+    </CatalogHero>
   );
 }
 
 /** Plain-text paragraphs (fallback posts), with site paths as links. */
 function Paragraphs({ paragraphs }: { paragraphs: readonly string[] }) {
   return paragraphs.map((paragraph) => (
-    <p
-      key={paragraph.slice(0, 48)}
-      className="m-0 text-[17px] leading-[1.7] text-ink"
-    >
+    <p key={paragraph.slice(0, 48)} className="t-prose pf-blog-note__text">
       {linkifyInternalPaths(paragraph).map((segment, index) =>
         segment.type === "link" ? (
           <Link
@@ -120,72 +123,51 @@ function NoteCard({
   paragraphs: readonly string[];
 }) {
   return (
-    <BentoCard
-      headingId="card-note"
-      title="The note"
-      gap={0}
-      minHeight={false}
-      className="min-w-0 flex-[999_1_560px] gap-5 pb-7"
-    >
+    <PostTile id="card-note" title="The note" className="pf-blog-note">
       <BannerFigure
         post={post}
         priority
         sizes="(min-width: 1024px) 640px, 100vw"
-        className="aspect-[16/9]"
+        className="pf-blog-note__banner"
       />
-      <div className="flex max-w-[620px] flex-col gap-5 px-1 pt-1">
+      <div className="pf-blog-note__body">
         {body && body.length > 0 ? (
           <PortableText value={body} />
         ) : paragraphs.length > 0 ? (
           <Paragraphs paragraphs={paragraphs} />
         ) : (
-          <p className="m-0 text-card leading-[1.55] text-ink-2">
+          <p className="t-small pf-cat-note">
             Full article body will appear here once published in Sanity Studio.
             This preview shows the title, banner, tags and excerpt only.
           </p>
         )}
       </div>
-    </BentoCard>
+    </PostTile>
   );
 }
 
 function DetailsCard({ post, author }: { post: BlogCard; author: string }) {
-  const row = "flex flex-col gap-1 py-3";
   return (
-    <BentoCard
-      headingId="card-details"
-      title="Details"
-      gap={3}
-      minHeight={false}
-      className="min-w-0 flex-[1_1_260px] pb-3.5"
-    >
-      <dl className="m-0 flex flex-col">
-        <div className={cn(row, "border-b border-hairline")}>
-          <dt className={MONO_LABEL}>Published</dt>
-          <dd className="m-0 font-mono text-sm">
+    <PostTile id="card-details" title="Details">
+      <dl className="pf-blog-details">
+        <div className="pf-blog-details__row">
+          <dt className="t-meta pf-cat-note">Published</dt>
+          <dd className="pf-cat-code">
             <time dateTime={post.publishedAt.slice(0, 10)}>
               {formatBlogDate(post.publishedAt)}
             </time>
           </dd>
         </div>
-        <div
-          className={cn(
-            row,
-            post.tags.length > 0 && "border-b border-hairline",
-          )}
-        >
-          <dt className={MONO_LABEL}>Written by</dt>
-          <dd className="m-0 text-card font-medium">{author}</dd>
+        <div className="pf-blog-details__row">
+          <dt className="t-meta pf-cat-note">Written by</dt>
+          <dd className="pf-cat-title">{author}</dd>
         </div>
         {post.tags.length > 0 ? (
-          <div className={cn(row, "gap-2")}>
-            <dt className={MONO_LABEL}>Tags</dt>
-            <dd className="m-0 flex flex-wrap gap-1.5">
+          <div className="pf-blog-details__row">
+            <dt className="t-meta pf-cat-note">Tags</dt>
+            <dd className="pf-blog-details__tags">
               {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-surface-tint px-2.5 py-1 text-meta leading-none font-medium"
-                >
+                <span key={tag} className="ds-chip">
                   {tag}
                 </span>
               ))}
@@ -193,41 +175,30 @@ function DetailsCard({ post, author }: { post: BlogCard; author: string }) {
           </div>
         ) : null}
       </dl>
-    </BentoCard>
+    </PostTile>
   );
 }
 
 function LinksCard({ links }: { links: readonly NoteLink[] }) {
   return (
-    <BentoCard
-      headingId="card-links"
-      title="Linked in this note"
-      gap={2}
-      minHeight={false}
-      className="min-w-0 flex-[1_1_260px] pb-3"
-    >
-      <ul className="m-0 flex list-none flex-col p-0">
+    <PostTile id="card-links" title="Linked in this note">
+      <ul className="pf-blog-links">
         {links.map((link, i) => (
-          <li
-            key={link.href}
-            className={cn(i < links.length - 1 && "border-b border-hairline")}
-          >
+          <li key={link.href} className="pf-blog-links__item">
             <Link
               href={link.href}
               {...(link.href.startsWith("/")
                 ? {}
                 : { target: "_blank", rel: "noopener noreferrer" })}
-              className="flex min-h-[52px] items-center gap-3 py-1.5 font-mono text-meta no-underline"
+              className="pf-blog-links__link"
             >
-              <span className="shrink-0 text-ink-2">{pad2(i + 1)}</span>
-              <span className="min-w-0 [overflow-wrap:anywhere]">
-                {link.label} →
-              </span>
+              <span className="t-meta pf-cat-note">{pad2(i + 1)}</span>
+              <span className="pf-blog-links__label">{link.label} →</span>
             </Link>
           </li>
         ))}
       </ul>
-    </BentoCard>
+    </PostTile>
   );
 }
 
@@ -249,59 +220,29 @@ function RelatedCard({
   const noun = current.list.length === 1 ? "post" : "posts";
 
   return (
-    <article
-      aria-labelledby="card-more"
-      className={cn(
-        "relative flex flex-col gap-3.5 overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-3 text-ink shadow-card",
-        bentoSpan(3),
-      )}
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Kicker id="card-more">More on this tag</Kicker>
-        <div
-          role="group"
-          aria-label="Related posts by tag"
-          className="flex flex-wrap gap-1 rounded-full border border-hairline bg-page p-[5px]"
-        >
-          {groups.map((group) => {
-            const on = group.tag === current.tag;
-            return (
-              <button
-                key={group.tag}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setPicked(group.tag)}
-                className={cn(
-                  "inline-flex min-h-11 flex-auto items-center gap-2 rounded-full border-0 px-[18px] text-sm font-medium",
-                  on ? "bg-cta text-on-cta" : "bg-transparent text-ink-2",
-                )}
-              >
-                {group.tag}{" "}
-                <span
-                  className={cn(
-                    "font-mono text-xs",
-                    on ? "text-on-cta" : "text-ink-2",
-                  )}
-                >
-                  {group.list.length}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <p aria-live="polite" className={cn(MONO_LABEL, "m-0 px-1")}>
+    <PostTile id="card-more" title="More on this tag" className="pf-blog-more">
+      <ToggleGroup
+        label="Related posts by tag"
+        value={current.tag}
+        onChange={setPicked}
+        options={groups.map((group) => ({
+          value: group.tag,
+          label: group.tag,
+          count: group.list.length,
+        }))}
+      />
+      <p aria-live="polite" className="t-meta pf-cat-note">
         Latest {shown.length} of {current.list.length} other {noun} tagged{" "}
         {current.tag}
       </p>
-      <ol className="m-0 flex list-none flex-col p-0">
+      <ol className="pf-blog-list">
         {shown.map((related) => (
-          <li key={related.id} className="border-t border-hairline">
+          <li key={related.id} className="pf-blog-list__item">
             <PostRow post={related} />
           </li>
         ))}
       </ol>
-    </article>
+    </PostTile>
   );
 }
 
@@ -327,53 +268,35 @@ export default function BlogPostPage({
   return (
     <>
       <PostHero post={post} />
-      <div className="flex flex-wrap items-start gap-5">
-        <NoteCard post={post} body={body} paragraphs={paragraphs} />
-        <div className="flex min-w-0 flex-[1_1_280px] flex-wrap gap-5">
-          <DetailsCard post={post} author={author} />
-          {links.length > 0 ? <LinksCard links={links} /> : null}
+      <div className="ds-wrap pf-cat-section pf-cat-end pf-blog-post">
+        <div className="pf-blog-post__top">
+          <NoteCard post={post} body={body} paragraphs={paragraphs} />
+          <div className="pf-blog-post__side">
+            <DetailsCard post={post} author={author} />
+            {links.length > 0 ? <LinksCard links={links} /> : null}
+          </div>
+        </div>
+        {/* Keyed by post: a client navigation to another post resets the tag. */}
+        <RelatedCard key={post.slug} post={post} posts={posts} />
+        <div className="pf-blog-post__pair">
+          <PostTile id="card-keep" title="Keep reading">
+            <div>
+              <p className="t-title pf-cat-title">{posts.length}</p>
+              <p className="t-meta pf-cat-note">Posts on the blog</p>
+            </div>
+            <p className="t-small pf-cat-note">{blogPage.keepReading}</p>
+            <div className="pf-blog-tile__end">
+              <TextLink href="/blog">Back to Blog</TextLink>
+            </div>
+          </PostTile>
+          <PostTile id="card-eyes" title="A second set of eyes">
+            <p className="t-statement pf-cat-title">{siteConfig.tagline}</p>
+            <div className="pf-blog-tile__end">
+              <Pill href="/contact">Contact me</Pill>
+            </div>
+          </PostTile>
         </div>
       </div>
-      {/* Keyed by post: a client navigation to another post resets the tag. */}
-      <Bento key={post.slug}>
-        <RelatedCard post={post} posts={posts} />
-      </Bento>
-      <BentoPair>
-        <BentoCard
-          headingId="card-keep"
-          title="Keep reading"
-          gap={3.5}
-          minHeight={false}
-          className="min-h-60"
-        >
-          <div className="mt-auto">
-            <p className="m-0 text-[40px] leading-[1.05] font-semibold tracking-[-0.03em] tabular-nums">
-              {posts.length}
-            </p>
-            <p className={cn(MONO_LABEL, "m-0 mt-0.5")}>Posts on the blog</p>
-          </div>
-          <p className="m-0 text-card leading-[1.55] text-ink-2">
-            {blogPage.keepReading}
-          </p>
-          <CardLink href="/blog" className="self-start">
-            Back to Blog →
-          </CardLink>
-        </BentoCard>
-        <BentoCard
-          headingId="card-eyes"
-          title="A second set of eyes"
-          gap={3.5}
-          minHeight={false}
-          className="min-h-60"
-        >
-          <p className="m-0 mt-auto text-[22px] leading-[1.3] font-semibold tracking-[-0.02em]">
-            {siteConfig.tagline}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <CtaLink href="/contact">Contact me</CtaLink>
-          </div>
-        </BentoCard>
-      </BentoPair>
     </>
   );
 }

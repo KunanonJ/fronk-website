@@ -20,11 +20,12 @@ describe("pressSpans", () => {
 });
 
 describe("PressPage", () => {
-  it("draws the canvas hero from the press copy", () => {
+  it("draws the hero from the press copy, on the pixel sky", () => {
     render(<PressPage type="all" onTypeChange={() => {}} />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent("Selected coverage and mentions.");
-    expect(h1.className).toMatch(/kj-lines/);
+    expect(h1).toHaveClass("t-display");
+    expect(h1.closest("section")).toHaveClass("pf-page-hero");
     expect(
       screen.getByText("Click through to read the full piece."),
     ).toBeInTheDocument();
@@ -35,12 +36,19 @@ describe("PressPage", () => {
     const cards = screen.getAllByRole("article");
     expect(cards).toHaveLength(4);
     expect(screen.getByText("Showing 4 of 4")).toBeInTheDocument();
-    expect(cards[0]?.className).toMatch(/min-\[641px\]:col-span-2/);
-    expect(cards[0]?.className).not.toMatch(/lg:col-span-3/);
+    // The canvas's spans, laid out by pages-catalog.css.
+    expect(cards.map((card) => card.getAttribute("data-span"))).toEqual([
+      "2",
+      "1",
+      "1",
+      "2",
+    ]);
     const first = cards[0]!;
     expect(first).toHaveTextContent("Feature");
     expect(first).toHaveTextContent("09/07/2026");
-    const view = screen.getAllByRole("link", { name: "View on gogocash.co →" });
+    // The arrow is drawn, not read (spec 12 item 18).
+    const view = screen.getAllByRole("link", { name: "View on gogocash.co" });
+    expect(view[0]).toHaveTextContent(/^View on gogocash\.co\s*→$/);
     expect(view[0]).toHaveAttribute("target", "_blank");
     expect(view[0]).toHaveAttribute("rel", "noopener noreferrer");
   });
@@ -50,7 +58,7 @@ describe("PressPage", () => {
     const cards = screen.getAllByRole("article");
     expect(cards).toHaveLength(2);
     for (const card of cards) {
-      expect(card.className).toMatch(/lg:col-span-3/);
+      expect(card).toHaveAttribute("data-span", "3");
       expect(card).toHaveTextContent("Product");
     }
     expect(screen.getByText("Showing 2 of 4")).toBeInTheDocument();

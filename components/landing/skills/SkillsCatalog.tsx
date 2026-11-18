@@ -1,4 +1,3 @@
-import { Kicker } from "@/components/bento/Bento";
 import SkillCard from "@/components/landing/skills/SkillCard";
 import { NOTE } from "@/components/landing/skills/SkillParts";
 import {
@@ -10,12 +9,10 @@ import {
   getSkillsByStage,
 } from "@/lib/content/skills";
 import { matchesSkillFilter, type SkillFilter } from "@/lib/skills/search";
-import { cn } from "@/lib/utils/cn";
-import { CARD_SURFACE } from "@/components/bento/classes";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
-/** The canvas chips: by origin, then by who invokes the skill. */
+/** The filter's pills: by origin, then by who invokes the skill. */
 const FILTERS: readonly { id: SkillFilter; label: string; count: number }[] = [
   { id: "all", label: "All", count: TOTAL },
   { id: "original", label: "Original", count: ORIGINAL_COUNT },
@@ -29,8 +26,8 @@ function skillCount(n: number): string {
 }
 
 /**
- * The catalog (bento canvas, design spec 4.8): a filter card, then one card
- * per stage with its skills as wells. The filter is the `?show=` search
+ * The catalog (profile redesign Phase 7c): a filter tile, then one section
+ * per stage with its skills as paper tiles. The filter is the `?show=` search
  * param, owned by the route; a stage with no matching skill is left out.
  */
 export default function SkillsCatalog({
@@ -49,57 +46,43 @@ export default function SkillsCatalog({
     .filter(({ skills }) => skills.length > 0);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="pf-skill-catalog">
       <article
         id="catalog"
         aria-labelledby="card-catalog"
-        className={cn(
-          CARD_SURFACE,
-          "flex scroll-mt-6 flex-wrap items-center justify-between gap-x-5 gap-y-3.5",
-        )}
+        className="ds-tile pf-skill-filter"
       >
-        <div className="flex flex-col items-start gap-2">
-          <Kicker id="card-catalog">All {TOTAL} skills</Kicker>
-          <p aria-live="polite" className={cn(NOTE, "ml-1")}>
+        <div className="pf-cat-stack">
+          <h2 id="card-catalog" className="t-h3 pf-cat-title">
+            All {TOTAL} skills
+          </h2>
+          <p aria-live="polite" className={NOTE}>
             {show === "all"
               ? `Showing all ${TOTAL} skills`
               : `Showing ${shown.length} of ${TOTAL} skills`}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span
-            id="skills-filter-label"
-            className="font-mono text-label text-ink-2 uppercase"
-          >
+        <div className="pf-skill-filter__controls">
+          <span id="skills-filter-label" className="t-meta pf-cat-note">
             Show
           </span>
           <div
             role="group"
             aria-labelledby="skills-filter-label"
-            className="flex flex-wrap gap-2"
+            className="pf-cat-filter"
           >
-            {FILTERS.map((filter) => {
-              const on = filter.id === show;
-              return (
-                <button
-                  key={filter.id}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => onShowChange(filter.id)}
-                  className={cn(
-                    "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium",
-                    on
-                      ? "border-cta bg-cta text-on-cta"
-                      : "border-hairline-strong bg-surface text-ink-2",
-                  )}
-                >
-                  <span>{filter.label}</span>
-                  <span className="font-mono text-xs tabular-nums">
-                    {filter.count}
-                  </span>
-                </button>
-              );
-            })}
+            {FILTERS.map((filter) => (
+              <button
+                key={filter.id}
+                type="button"
+                aria-pressed={filter.id === show}
+                onClick={() => onShowChange(filter.id)}
+                className="pf-cat-option"
+              >
+                <span>{filter.label}</span>
+                <span className="pf-cat-count">{filter.count}</span>
+              </button>
+            ))}
           </div>
         </div>
       </article>
@@ -108,18 +91,18 @@ export default function SkillsCatalog({
         <article
           key={stage.id}
           aria-labelledby={`stage-${stage.id}`}
-          className={cn(CARD_SURFACE, "flex flex-col gap-[18px]")}
+          className="pf-skill-stage"
         >
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2.5">
-            <div className="flex items-center gap-3">
-              <Kicker id={`stage-${stage.id}`}>{stage.label}</Kicker>
-              <span className="font-mono text-xs text-ink-2">
-                {skillCount(skills.length)}
-              </span>
-            </div>
-            <p className={NOTE}>{stage.blurb}</p>
+          <div className="pf-skill-stage__head">
+            <h2 id={`stage-${stage.id}`} className="t-h3 pf-cat-title">
+              {stage.label}
+            </h2>
+            <span className="t-meta pf-cat-note">
+              {skillCount(skills.length)}
+            </span>
+            <p className={`${NOTE} pf-skill-stage__blurb`}>{stage.blurb}</p>
           </div>
-          <ul className="bento m-0 grid list-none grid-cols-1 gap-3 p-0 min-[641px]:grid-cols-2 lg:grid-cols-3">
+          <ul className="pf-skill-stage__grid">
             {skills.map((skill) => (
               <SkillCard key={skill.slug} skill={skill} />
             ))}

@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import Link from "@/components/navigation/Link";
-import { BentoCard, CardLink, type BentoSpan } from "@/components/bento/Bento";
-import { CtaLink } from "@/components/bento/Buttons";
 import { DownloadIcon } from "@/components/bento/icons";
 import ShareRows, {
   shareUrlLabel,
   type ShareTarget,
 } from "@/components/bento/ShareRows";
 import { CompanyLogo } from "@/components/CompanyLogo";
+import { pillClass } from "@/components/ds/Pill";
+import { TextLink } from "@/components/ds/TextLink";
 import { RESUME_PDF_HREF, RESUME_PDF_NAME } from "@/lib/content/availability";
 import type {
   ResolvedTimelineItem,
@@ -28,55 +28,36 @@ import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
 
 /*
- * Résumé bento cards (bento canvas, design spec 4.4). Every section comes
- * from the résumé data in the repo (or from Sanity, if a résumé document is
- * ever created) and is drawn by its title: Currently, Experience,
- * Independent projects, University-era, Education, Affiliations and Training
- * (or Certifications) have canvas cards; any other section reads as roles.
- * `detail` "compact" hides the bullet lists. Screen only: print uses
- * ResumePrint.
+ * Résumé sections in the records card's style (profile redesign Phase 7e;
+ * design spec 8.6): paper 2, a mono heading, and rows of the title, the
+ * organisation and the period. Every section comes from the résumé data in
+ * the repo (or from Sanity, if a résumé document is ever created) and is
+ * drawn by its title: Currently, Experience, Independent projects,
+ * University-era, Education, Affiliations and Training (or Certifications)
+ * have their layouts; any other section reads as roles. `detail` "compact"
+ * hides the bullet lists. Screen only: print uses ResumePrint. Styles:
+ * `.pf-resume*` in src/styles/profile/pages-catalog.css.
  */
 
 /** One line under the organisation: a project's description, or an overlap. */
-function Note({
-  item,
-  className,
-}: {
-  item: ResolvedTimelineItem;
-  className: string;
-}) {
+function Note({ item }: { item: ResolvedTimelineItem }) {
   if (!item.note) return null;
-  return (
-    <p className={cn("mb-0 leading-[1.45] text-ink-2", className)}>
-      {item.note}
-    </p>
-  );
+  return <p className="pf-resume__note">{item.note}</p>;
 }
 
-function Bullets({
-  bullets,
-  className,
-}: {
-  bullets: readonly string[];
-  className?: string;
-}) {
+function Bullets({ bullets }: { bullets: readonly string[] }) {
   if (bullets.length === 0) return null;
   return (
-    <ul className={cn("m-0 flex list-none flex-col gap-1.5 p-0", className)}>
+    <ul className="pf-resume__bullets">
       {bullets.map((bullet) => (
-        <li
-          key={bullet}
-          className="flex gap-2.5 text-sm leading-normal text-ink-2"
-        >
-          {isLiveBullet(bullet) ? (
-            // Live marker: Ember on a ring of surface, since the wells are page-coloured.
-            <span
-              aria-hidden
-              className="mt-2 size-1.5 shrink-0 bg-ember shadow-[0_0_0_2px_var(--surface)]"
-            />
-          ) : (
-            <span aria-hidden className="mt-[9px] size-1 shrink-0 bg-ink-2" />
-          )}
+        <li key={bullet} className="pf-resume__bullet">
+          {/* A live product: the coral square; anything else: a plain one. */}
+          <span
+            aria-hidden
+            className={
+              isLiveBullet(bullet) ? "pf-resume__live" : "pf-resume__mark"
+            }
+          />
           <span>{bullet}</span>
         </li>
       ))}
@@ -100,20 +81,15 @@ function Logo({ item, size }: { item: ResolvedTimelineItem; size: number }) {
 function ItemTitle({ item }: { item: ResolvedTimelineItem }) {
   if (!item.href) return <>{item.title}</>;
   return (
-    <Link
-      href={item.href}
-      className="text-ink underline decoration-hairline-strong underline-offset-4"
-    >
+    <Link href={item.href} className="pf-resume__title-link">
       {item.title}
     </Link>
   );
 }
 
-const PERIOD = "font-mono text-xs text-ink-2";
-
 /**
- * Currently and Independent projects: wells with a logo, the period, bullets
- * and links (the entry's own site, and its page on this site).
+ * Currently and Independent projects: paper rows with a logo, the period,
+ * bullets and links (the entry's own site, and its page on this site).
  */
 function CurrentRoles({
   items,
@@ -123,33 +99,28 @@ function CurrentRoles({
   detail: ResumeDetail;
 }) {
   return (
-    <ol className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3 p-0">
+    <ol className="pf-resume__wells">
       {items.map((item) => (
-        <li
-          key={`${item.title}-${item.org}`}
-          className="flex flex-col gap-3.5 rounded-well border border-hairline bg-page px-4 pt-4 pb-[18px]"
-        >
-          <div className="flex items-center justify-between gap-3">
+        <li key={`${item.title}-${item.org}`} className="pf-resume__well">
+          <div className="pf-resume__well-head">
             <Logo item={item} size={44} />
-            <span className={cn(PERIOD, "text-right")}>{item.period}</span>
+            <span className="pf-resume__period">{item.period}</span>
           </div>
           <div>
-            <h3 className="m-0 text-[17px] leading-[1.3] font-semibold tracking-[-0.01em]">
+            <h3 className="pf-resume__role pf-resume__role--lead">
               {item.title}
             </h3>
-            <p className="mt-1 mb-0 text-meta leading-[1.45] text-ink-2">
-              {item.org}
-            </p>
-            <Note item={item} className="mt-2 text-meta" />
+            <p className="pf-resume__org">{item.org}</p>
+            <Note item={item} />
           </div>
           <Bullets bullets={visibleBullets(item, detail)} />
           {item.href || item.more ? (
-            <div className="mt-auto flex flex-wrap gap-x-5">
+            <div className="pf-resume__links">
               {item.href ? (
-                <CardLink href={item.href}>{linkLabel(item.href)} →</CardLink>
+                <TextLink href={item.href}>{linkLabel(item.href)}</TextLink>
               ) : null}
               {item.more ? (
-                <CardLink href={item.more.href}>{item.more.label} →</CardLink>
+                <TextLink href={item.more.href}>{item.more.label}</TextLink>
               ) : null}
             </div>
           ) : null}
@@ -170,36 +141,26 @@ function RoleList({
   detail: ResumeDetail;
 }) {
   return (
-    <ol start={start + 1} className="m-0 list-none p-0">
+    <ol start={start + 1} className="pf-resume__rows">
       {items.map((item, i) => (
         <li
           key={`${item.title}-${item.org}-${item.period}`}
-          className="flex gap-3.5 border-t border-hairline py-4"
+          className="pf-resume__row"
         >
-          <span
-            aria-hidden
-            className="flex w-10 shrink-0 flex-col items-center gap-2"
-          >
+          <span aria-hidden className="pf-resume__aside">
             <Logo item={item} size={40} />
-            <span className={PERIOD}>{pad2(start + i + 1)}</span>
+            <span className="pf-resume__period">{pad2(start + i + 1)}</span>
           </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-              <h3 className="m-0 text-base leading-[1.35] font-semibold">
+          <div className="pf-resume__body">
+            <div className="pf-resume__line">
+              <h3 className="pf-resume__role">
                 <ItemTitle item={item} />
               </h3>
-              <span className={cn(PERIOD, "whitespace-nowrap")}>
-                {item.period}
-              </span>
+              <span className="pf-resume__period">{item.period}</span>
             </div>
-            <p className="mt-0.5 mb-0 text-sm leading-[1.45] text-ink-2">
-              {item.org}
-            </p>
-            <Note item={item} className="mt-0.5 text-sm" />
-            <Bullets
-              bullets={visibleBullets(item, detail)}
-              className="mt-2.5"
-            />
+            <p className="pf-resume__org">{item.org}</p>
+            <Note item={item} />
+            <Bullets bullets={visibleBullets(item, detail)} />
           </div>
         </li>
       ))}
@@ -218,26 +179,23 @@ function CredentialList({
   detail: ResumeDetail;
 }) {
   return (
-    <ol start={start + 1} className="m-0 list-none p-0">
+    <ol start={start + 1} className="pf-resume__rows">
       {items.map((item, i) => (
         <li
           key={`${item.title}-${item.org}-${item.period}`}
-          className="flex gap-3.5 border-t border-hairline py-4"
+          className="pf-resume__row"
         >
-          <span
-            aria-hidden
-            className="flex w-10 shrink-0 flex-col items-center gap-2"
-          >
+          <span aria-hidden className="pf-resume__aside">
             <Logo item={item} size={40} />
-            <span className={PERIOD}>{pad2(start + i + 1)}</span>
+            <span className="pf-resume__period">{pad2(start + i + 1)}</span>
           </span>
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h3 className="m-0 text-card leading-[1.35] font-semibold">
+          <div className="pf-resume__body">
+            <h3 className="pf-resume__role">
               <ItemTitle item={item} />
             </h3>
-            <p className="m-0 text-sm leading-[1.45] text-ink-2">{item.org}</p>
-            <p className={cn(PERIOD, "mt-0.5 mb-0")}>{item.period}</p>
-            <Bullets bullets={visibleBullets(item, detail)} className="mt-2" />
+            <p className="pf-resume__org">{item.org}</p>
+            <p className="pf-resume__period">{item.period}</p>
+            <Bullets bullets={visibleBullets(item, detail)} />
           </div>
         </li>
       ))}
@@ -246,23 +204,21 @@ function CredentialList({
 }
 
 /**
- * Two list columns side by side from 641px (not a bento-2: they never lift),
- * split where their heights are closest.
+ * Two list columns side by side from 600 px, split where their heights are
+ * closest.
  */
 function TwoColumns({
   items,
   detail,
   List,
-  gap,
 }: {
   items: readonly ResolvedTimelineItem[];
   detail: ResumeDetail;
   List: typeof RoleList;
-  gap: string;
 }) {
   const [left, right] = splitColumns(items, (item) => rowWeight(item, detail));
   return (
-    <div className={cn("grid grid-cols-1 min-[641px]:grid-cols-2", gap)}>
+    <div className="pf-resume__columns">
       <List items={left} start={0} detail={detail} />
       <List items={right} start={left.length} detail={detail} />
     </div>
@@ -277,97 +233,76 @@ function EducationItems({
   items: readonly ResolvedTimelineItem[];
   detail: ResumeDetail;
 }) {
-  return items.map((item, i) => (
-    <div
-      key={`${item.title}-${item.org}`}
-      className={cn(
-        "flex flex-col gap-4",
-        i > 0 && "border-t border-hairline pt-4",
-      )}
-    >
-      <div className="mt-1 flex items-center justify-between gap-3">
+  return items.map((item) => (
+    <div key={`${item.title}-${item.org}`} className="pf-resume__degree">
+      <div className="pf-resume__well-head">
         <Logo item={item} size={52} />
-        <span className={cn(PERIOD, "text-right")}>{item.period}</span>
+        <span className="pf-resume__period">{item.period}</span>
       </div>
       <div>
-        <h3 className="m-0 text-lg leading-[1.3] font-semibold tracking-[-0.01em]">
+        <h3 className="pf-resume__role pf-resume__role--lead">
           <ItemTitle item={item} />
         </h3>
-        <p className="mt-1 mb-0 text-sm leading-[1.45] text-ink-2">
-          {item.org}
-        </p>
+        <p className="pf-resume__org">{item.org}</p>
       </div>
       <Bullets bullets={visibleBullets(item, detail)} />
     </div>
   ));
 }
 
-type Layout = {
-  span: BentoSpan;
-  gap: 2.5 | 4;
+type Body = (
+  items: readonly ResolvedTimelineItem[],
+  detail: ResumeDetail,
+) => ReactNode;
+
+const BODIES: Record<ReturnType<typeof resumeSectionKind>, Body> = {
+  current: (items, detail) => <CurrentRoles items={items} detail={detail} />,
+  roles: (items, detail) => (
+    <TwoColumns items={items} detail={detail} List={RoleList} />
+  ),
+  early: (items, detail) => (
+    <RoleList items={items} start={0} detail={detail} />
+  ),
+  education: (items, detail) => (
+    <EducationItems items={items} detail={detail} />
+  ),
+  list: (items, detail) => (
+    <CredentialList items={items} start={0} detail={detail} />
+  ),
+  credentials: (items, detail) => (
+    <TwoColumns items={items} detail={detail} List={CredentialList} />
+  ),
+};
+
+/** A section's card: its kind places it in the grid (`data-kind`). */
+function RecordsCard({
+  id,
+  title,
+  kind,
+  className,
+  children,
+}: {
+  id: string;
+  title: ReactNode;
+  kind: string;
   className?: string;
-  body: (
-    items: readonly ResolvedTimelineItem[],
-    detail: ResumeDetail,
-  ) => ReactNode;
-};
+  children: ReactNode;
+}) {
+  return (
+    <article
+      aria-labelledby={id}
+      data-kind={kind}
+      className={cn("pf-resume__card", className)}
+    >
+      <h2 id={id} className="t-meta pf-resume__heading">
+        {title}
+      </h2>
+      {children}
+    </article>
+  );
+}
 
-const LAYOUTS: Record<ReturnType<typeof resumeSectionKind>, Layout> = {
-  current: {
-    span: 3,
-    gap: 4,
-    body: (items, detail) => <CurrentRoles items={items} detail={detail} />,
-  },
-  roles: {
-    span: 3,
-    gap: 2.5,
-    body: (items, detail) => (
-      <TwoColumns
-        items={items}
-        detail={detail}
-        List={RoleList}
-        gap="gap-x-10"
-      />
-    ),
-  },
-  // University-era: columns 2-3 over two rows beside Education and
-  // Affiliations on desktop; full width from 641 to 1023px (spec gap 23:
-  // the canvas's `2 / span 2` there made an implicit third column).
-  early: {
-    span: 2,
-    gap: 2.5,
-    className: "lg:col-[2/span_2] lg:row-span-2",
-    body: (items, detail) => (
-      <RoleList items={items} start={0} detail={detail} />
-    ),
-  },
-  education: {
-    span: 1,
-    gap: 4,
-    body: (items, detail) => <EducationItems items={items} detail={detail} />,
-  },
-  list: {
-    span: 1,
-    gap: 2.5,
-    body: (items, detail) => (
-      <CredentialList items={items} start={0} detail={detail} />
-    ),
-  },
-  credentials: {
-    span: 2,
-    gap: 2.5,
-    body: (items, detail) => (
-      <TwoColumns
-        items={items}
-        detail={detail}
-        List={CredentialList}
-        gap="gap-x-8"
-      />
-    ),
-  },
-};
-
-/** One résumé section as its canvas card. */
+/** One résumé section as its records card. */
 export function ResumeSectionCard({
   section,
   detail,
@@ -375,48 +310,33 @@ export function ResumeSectionCard({
   section: ResolvedTimelineSection;
   detail: ResumeDetail;
 }) {
-  const layout = LAYOUTS[resumeSectionKind(section.title)];
+  const kind = resumeSectionKind(section.title);
   return (
-    <BentoCard
-      headingId={`card-${sectionSlug(section.title)}`}
+    <RecordsCard
+      id={`card-${sectionSlug(section.title)}`}
       title={section.title}
-      span={layout.span}
-      gap={layout.gap}
-      minHeight={false}
-      className={layout.className}
+      kind={kind}
     >
-      {layout.body(section.items, detail)}
-    </BentoCard>
+      {BODIES[kind](section.items, detail)}
+    </RecordsCard>
   );
 }
 
 /** Skills: the labelled groups, one chip per skill. */
 export function SkillsCard({
   skills,
-  className,
 }: {
   skills: readonly ResumeSkillGroup[];
-  className?: string;
 }) {
   return (
-    <BentoCard
-      headingId="card-skills"
-      title="Skills"
-      minHeight={false}
-      className={className}
-    >
-      <div className="flex flex-col gap-4">
+    <RecordsCard id="card-skills" title="Skills" kind="skills">
+      <div className="pf-resume__groups">
         {skills.map((group) => (
-          <div key={group.label} className="flex flex-col gap-2">
-            <h3 className="m-0 font-mono text-label uppercase text-ink-2">
-              {group.label}
-            </h3>
-            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+          <div key={group.label} className="pf-resume__group">
+            <h3 className="t-meta pf-resume__heading">{group.label}</h3>
+            <ul className="pf-resume__chips">
               {group.items.map((skill) => (
-                <li
-                  key={skill}
-                  className="inline-flex min-h-10 items-center rounded-full border border-hairline-strong bg-page px-4 text-sm font-medium"
-                >
+                <li key={skill} className="ds-chip pf-resume__chip">
                   {skill}
                 </li>
               ))}
@@ -424,45 +344,33 @@ export function SkillsCard({
           </div>
         ))}
       </div>
-    </BentoCard>
+    </RecordsCard>
   );
 }
 
-/** Share: the header panel's actions inline, then the PDF download. */
-export function ShareCard({
-  target,
-  className,
-}: {
-  target: ShareTarget;
-  className?: string;
-}) {
+/** Share: the share panel's actions inline, then the PDF download. */
+export function ShareCard({ target }: { target: ShareTarget }) {
   return (
-    <BentoCard
-      headingId="card-share"
-      title="Share"
-      gap={3}
-      minHeight={false}
-      className={className}
-    >
-      <div className="px-3 pt-0.5">
-        <p className="m-0 text-card leading-[1.35] font-semibold">
-          {target.title}
-        </p>
-        <p className="mt-0.5 mb-0 font-mono text-xs text-ink-2">
+    <RecordsCard id="card-share" title="Share" kind="share">
+      <div>
+        <p className="pf-resume__role">{target.title}</p>
+        <p className="pf-resume__period pf-resume__url">
           {shareUrlLabel(target.url)}
         </p>
       </div>
-      <div className="flex flex-col gap-0.5">
+      <div className="pf-resume__share">
         <ShareRows target={target} />
       </div>
-      <CtaLink
+      <a
         href={RESUME_PDF_HREF}
         download={RESUME_PDF_NAME}
-        className="mt-auto"
+        className={`${pillClass({ size: "lg" })} pf-resume__card-pdf`}
       >
-        <DownloadIcon />
+        <span className="ds-pill__icon" aria-hidden="true">
+          <DownloadIcon />
+        </span>
         <span>Download PDF</span>
-      </CtaLink>
-    </BentoCard>
+      </a>
+    </RecordsCard>
   );
 }

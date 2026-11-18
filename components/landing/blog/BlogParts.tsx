@@ -3,20 +3,19 @@ import Image from "@/components/ui/Image";
 import { formatBlogDate, type BlogCard } from "@/lib/content/blog";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
-import { MONO_LABEL } from "@/components/bento/classes";
 
 /*
- * Pieces shared by the bento Blog index and Post (design spec 4.17-4.18).
+ * Pieces shared by the blog index and a post (profile redesign Phase 7h, a
+ * light restyle of the bento canvas Blog and Post). Hidden while BLOG_PUBLIC
+ * is false. Styles: `.pf-blog*` in src/styles/profile/pages-catalog.css.
  */
 
-/** Body links: the link colour, underlined, as in the canvas post body. */
-export const BODY_LINK =
-  "text-link underline decoration-1 underline-offset-4 [overflow-wrap:anywhere] hover:text-ink";
+/** Body links: the prose link, underlined (axe link-in-text-block). */
+export const BODY_LINK = "ds-prose-link";
 
 /**
- * A post banner in the canvas figure frame (tint well, 20 px radius). The
- * banners stay the current images until the owner supplies new ones (spec
- * 6, gap 12).
+ * A post banner in a mat (tint, 20 px radius). The banners stay the current
+ * images until the owner supplies new ones.
  */
 export function BannerFigure({
   post,
@@ -30,12 +29,7 @@ export function BannerFigure({
   className?: string;
 }) {
   return (
-    <figure
-      className={cn(
-        "relative m-0 overflow-hidden rounded-well border border-hairline bg-surface-tint",
-        className,
-      )}
-    >
+    <figure className={cn("pf-blog-banner", className)}>
       <Image
         src={post.bannerSrc}
         alt={post.bannerAlt}
@@ -61,51 +55,30 @@ export function PostRow({
   index?: number;
   showTags?: boolean;
 }) {
-  const date = (
-    <time
-      dateTime={post.publishedAt.slice(0, 10)}
-      className={cn(
-        "font-mono text-meta",
-        index === undefined ? "text-ink-2" : "text-ink",
-      )}
-    >
-      {formatBlogDate(post.publishedAt)}
-    </time>
-  );
   const read = (
-    <span aria-hidden className="text-sm font-medium text-link">
+    <span aria-hidden className="pf-blog-row__read">
       Read →
     </span>
   );
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className={cn(
-        "kj-row flex flex-wrap items-start gap-x-6 gap-y-1.5 rounded-[18px] px-3 text-ink no-underline",
-        index === undefined ? "py-4" : "py-[18px]",
-      )}
-    >
-      <div className="flex flex-[0_0_104px] flex-col gap-0.5 pt-1">
+    <Link href={`/blog/${post.slug}`} className="pf-blog-row">
+      <div className="pf-blog-row__when">
         {index !== undefined ? (
-          <span className="font-mono text-xs text-ink-2">{pad2(index)}</span>
+          <span className="t-meta pf-cat-note">{pad2(index)}</span>
         ) : null}
-        {date}
-      </div>
-      <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-1.5">
-        <h3
-          className={cn(
-            "m-0 leading-[1.3] font-semibold tracking-[-0.015em]",
-            index === undefined ? "text-lg" : "text-[19px]",
-          )}
+        <time
+          dateTime={post.publishedAt.slice(0, 10)}
+          className="t-meta pf-blog-row__date"
         >
-          {post.title}
-        </h3>
-        <p className="m-0 max-w-[620px] text-card leading-[1.55] text-ink-2">
-          {post.excerpt}
-        </p>
+          {formatBlogDate(post.publishedAt)}
+        </time>
+      </div>
+      <div className="pf-blog-row__copy">
+        <h3 className="t-lift-title pf-cat-title">{post.title}</h3>
+        <p className="t-small pf-cat-note">{post.excerpt}</p>
         {showTags ? (
-          <div className="mt-0.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
-            <span className={MONO_LABEL}>{post.tags.join(" · ")}</span>
+          <div className="pf-blog-row__foot">
+            <span className="t-meta pf-cat-note">{post.tags.join(" · ")}</span>
             {read}
           </div>
         ) : (
@@ -113,25 +86,5 @@ export function PostRow({
         )}
       </div>
     </Link>
-  );
-}
-
-/** The 14 px back arrow before "Back to Blog". */
-export function ArrowLeftIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 12H5" />
-      <path d="M12 19l-7-7 7-7" />
-    </svg>
   );
 }

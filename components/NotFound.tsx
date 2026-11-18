@@ -2,6 +2,7 @@ import LandingLayout from "@/components/landing/LandingLayout";
 import StatusPage, {
   type StatusPageCopy,
 } from "@/components/landing/StatusPage";
+import { NOT_FOUND_ART } from "@/components/landing/statusArt";
 import { siteConfig } from "@/lib/site";
 
 const COPY: StatusPageCopy = {
@@ -9,7 +10,7 @@ const COPY: StatusPageCopy = {
   headline: { muted: "Nothing", middle: "lives", accent: "here." },
   lead: "Either the URL is stale, or this page never existed. Try one of these instead.",
   status: "404 · Not found",
-  seed: 404,
+  art: NOT_FOUND_ART,
   report: {
     title: "Broken link?",
     subject: `Broken link on ${siteConfig.url}`,
@@ -17,11 +18,10 @@ const COPY: StatusPageCopy = {
 };
 
 /**
- * 404. The root renders it outside the `_landing` layout for every unknown
- * path, so it brings the site chrome itself: LandingLayout's pill nav and
- * footer (profile redesign, Phase 6 cutover). The page body is still
- * the bento StatusPage (design spec 4.20) until Phase 7 (plan step 7f)
- * restyles it. The response status stays 404.
+ * 404 (profile redesign Phase 7f; design spec 13 item 18). The root renders
+ * it outside the `_landing` layout for every unknown path, so it brings the
+ * site's nav and footer itself. The response status stays 404, and the page
+ * is in the redesign's token scope (lib/design/scope.ts).
  */
 export default function NotFound() {
   return (

@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SAMPLE_NOTES } from "@/components/profile/preview/sampleNotes";
 import {
@@ -189,63 +187,5 @@ describe("testimonials: claim audit", () => {
     }
     // No clearance date: the 3-quote rule drops them even if passed to it.
     expect(notebookEntries(SAMPLE_NOTES)).toEqual([]);
-  });
-});
-
-/*
- * The notebook's browser checks are parked: they ran on the labelled samples
- * of /preview/system, which the Phase 6 cutover deleted, and Phase 7 (plan
- * row 7g, lane D2) brings them back on /design. Until then nothing checks the
- * notebook in a browser, so the Home must not show it: this tripwire fails as
- * soon as three quotes are cleared while the checks are still skipped.
- */
-const JOURNEY_SPEC = "tests/e2e/profile-journey.spec.ts";
-const PARKED_CHECKS = [
-  "the notebook, with sample notes on /preview/system",
-  "the notebook's layout (desktop Chromium)",
-  "the sample notebook matches its baseline at this width",
-];
-
-/** The checks a spec still skips for the missing sample page. */
-function parkedNotebookChecks(spec: string): number {
-  return spec.match(/test\.skip\(true, NOTEBOOK_PAGE_GONE\)/g)?.length ?? 0;
-}
-
-/** Why the Home cannot show the notebook yet, or null when it can. */
-function notebookTripwire(
-  entries: readonly Testimonial[],
-  spec: string,
-): string | null {
-  const parked = parkedNotebookChecks(spec);
-  if (notebookEntries(entries).length === 0 || parked === 0) return null;
-  return `${TESTIMONIALS_MIN} quotes are cleared, so the Home shows the notebook, but ${parked} of its browser checks in ${JOURNEY_SPEC} are still skipped (NOTEBOOK_PAGE_GONE): ${PARKED_CHECKS.join("; ")}. Restore them first (Phase 7 plan row 7g, lane D2).`;
-}
-
-describe("testimonials: the notebook's parked browser checks", () => {
-  const spec = readFileSync(join(process.cwd(), JOURNEY_SPEC), "utf8");
-  const three = [entry(), entry({ name: "B" }), entry({ name: "C" })];
-  const parkedSpec = "test.skip(true, NOTEBOOK_PAGE_GONE);";
-
-  it("fires on three cleared quotes while a check is parked (the fixture it must fail)", () => {
-    expect(notebookTripwire(three, parkedSpec)).toMatch(
-      /Restore them first \(Phase 7 plan row 7g, lane D2\)/,
-    );
-    expect(notebookTripwire(three.slice(0, 2), parkedSpec)).toBeNull();
-    expect(notebookTripwire(three, "test.skip(!BEHAVIOUR.has(name));")).toBe(
-      null,
-    );
-  });
-
-  it("reads every use of the parked reason in the journey spec as a skipped check", () => {
-    // A check parked some other way would slip past the tripwire.
-    const uses = spec.match(/\bNOTEBOOK_PAGE_GONE\b(?!\s*=)/g)?.length ?? 0;
-    expect(parkedNotebookChecks(spec)).toBe(uses);
-    for (const title of PARKED_CHECKS) {
-      if (parkedNotebookChecks(spec) > 0) expect(spec).toContain(title);
-    }
-  });
-
-  it("keeps the notebook off the Home while its browser checks are parked", () => {
-    expect(notebookTripwire(TESTIMONIALS, spec)).toBeNull();
   });
 });
