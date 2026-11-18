@@ -94,9 +94,8 @@ to set once both groups are merged. Linux baselines are not rendered here
 
 ## 3. Gates
 
-On the final tree (the last commit of this lane, whose only change after
-`de535f1` is `/design`'s section order, a CSS comment and this report), the
-production build of it:
+On the final tree (`c13a5f9`, the lane's last code commit), the production
+build of it:
 
 | # | Gate | Command | Result |
 | --- | --- | --- | --- |
@@ -104,10 +103,10 @@ production build of it:
 | 1 | Lint | `pnpm lint` (`--max-warnings=0`) | pass, no issues |
 | 1 | Format | `pnpm exec prettier --write` on touched files, then `pnpm format:check` | pass |
 | 1 | Dead code | `pnpm knip` | pass (after deleting `MonoEyebrow` and `BentoRow`) |
-| 1 | Unit | `pnpm test` | 162 files, 1,499 tests pass |
+| 1 | Unit | `pnpm test` | 162 files, 1,500 tests pass |
 | 1 | Build | `pnpm build` | pass (the Sanity schema deploy skips without `SANITY_AUTH_TOKEN`) |
-| 1 | Budgets | `pnpm perf:budget` | pass: entry 108.8 / 120 KB, worst route 194.7 / 200 KB (`/skills/code-review`, was 196.9), stylesheets **36.4 / 37 KB** (was 34.2), fonts 51.2 / 56 KB |
-| 1, 4, 5, 7 | Browser gate | `PORT=3108 PLAYWRIGHT_WEB_SERVER="pnpm start" pnpm exec playwright test smoke.spec.ts a11y.spec.ts tests/e2e/profile --project=desktop --project=mobile --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone --grep-invert "matches its baseline" --workers=2` | 2,064 tests. Final build: **922 passed, 1,136 skipped by project scope, 6 failed**, all six 30 s timeouts on desktop (`goto`, `mouse.move`, `evaluate`, `click`) while the machine ran at a load average of 12 to 19 (the run took 47.7 min; the run before it took 11.7). Five are Home checks this lane does not touch (the Journey orbit's drag, spin and labels at 390 px; the work stack's two `#ventures` jumps), one is the notebook drag on `/design`. Run alone, `--last-failed`: 6 of 6 passed; by name with `--repeat-each=3`: 21 of 21 passed (the grep also matched the 344 px variant). The run before, on the first build: 927 passed, 1,136 skipped, 1 failed, the notebook layout check fixed by deviation 8 (then 14 of 14 notebook checks passed on desktop and the WebKit phone) |
+| 1 | Budgets | `pnpm perf:budget` | pass: entry 108.8 / 120 KB, worst route 194.8 / 200 KB (`/skills/code-review`, was 196.9), stylesheets **36.4 / 37 KB** (was 34.2), fonts 51.2 / 56 KB |
+| 1, 4, 5, 7 | Browser gate | `PORT=3108 PLAYWRIGHT_WEB_SERVER="pnpm start" pnpm exec playwright test smoke.spec.ts a11y.spec.ts tests/e2e/profile --project=desktop --project=mobile --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone --grep-invert "matches its baseline" --workers=2` | On the final build (`c13a5f9`), 2,070 tests: **927 passed, 1,141 skipped by project scope, 2 failed**, both 30 s timeouts inside axe's `analyze()` on the dark-theme scans of the two Thai topic hubs (group D1's pages, unchanged here; their light scans passed) while the machine ran at a load average of about 19 (27.1 min). Run alone with `--repeat-each=3`: 6 of 6 passed. Earlier full runs, for the record: on the first build 927 passed and 1 failed (the notebook layout check, fixed by deviation 8); on the build after that fix 922 passed and 6 failed, all 30 s load timeouts (five Home checks this lane does not touch and the notebook drag), which passed alone, 6 of 6, then 21 of 21 with `--repeat-each=3` |
 | 3 | Parity | `GATES_PORT=4308 node scripts/start-gates.mjs --parity-only` | Before the fixture update: 137 URLs compared, 1 with differences (`/design`'s canonical, intended). After it: **137 URLs compared, 0 with differences**; the crawl reached 138 URLs (66 HTML pages), as in Phase 6 |
 | 6 | Print | `RESUME_URL=http://127.0.0.1:3108/resume OUTPUT=<scratch>/resume.pdf pnpm pdf`, text read back with pypdf | 2 pages; text layer **identical** to the committed `public/resume.pdf` (5,902 characters, from "Kunanon Jarat" to the last training line). `public/resume.pdf` not rewritten. Printed from the build of `de535f1`; nothing it prints changed after |
 | | Prerender | sorted HTML lists, base against this build | identical, 46 files |
