@@ -776,6 +776,12 @@ test.describe("work and about: baselines on the device matrix", () => {
         await page.emulateMedia({ reducedMotion: "reduce" });
         await prepare(page, theme);
         await visit(page);
+        // A section taller than the viewport is captured beyond it, where
+        // the parked skip link and the fixed bar would be drawn over it.
+        await page.addStyleTag({
+          content:
+            "[data-site-chrome], .ds-skip { visibility: hidden !important; }",
+        });
         await expect(page.locator(`#${id}`)).toHaveScreenshot(
           `preview-${id}-${theme}.png`,
         );
