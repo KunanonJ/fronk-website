@@ -57,22 +57,6 @@ export function MoonIcon(props: IconProps) {
   );
 }
 
-export function MenuIcon(props: IconProps) {
-  return (
-    <Stroke {...props}>
-      <path d="M4 8h16M8 16h12" />
-    </Stroke>
-  );
-}
-
-export function CloseIcon(props: IconProps) {
-  return (
-    <Stroke {...props}>
-      <path d="M6 6l12 12M18 6L6 18" />
-    </Stroke>
-  );
-}
-
 export function LinkIcon(props: IconProps) {
   return (
     <Stroke {...props}>
@@ -146,44 +130,6 @@ export function LinkedInLogoIcon({ size = 16, ...rest }: IconProps) {
   );
 }
 
-export function ClockIcon({ size = 16, ...rest }: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.4}
-      strokeLinecap="round"
-      {...rest}
-    >
-      <circle cx="8" cy="8" r="6.3" />
-      <path d="M8 4.6V8l2.2 1.6" />
-    </svg>
-  );
-}
-
-export function TempleIcon({ size = 28, ...rest }: IconProps) {
-  return (
-    <svg
-      aria-hidden="true"
-      width={size}
-      height={size}
-      viewBox="0 0 32 32"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...rest}
-    >
-      <path d="M16 3v4M13.6 11.5 16 7l2.4 4.5M12.4 27l1.2-15.5h4.8L19.6 27M7.5 27l.9-7.5L9.5 17l1.1 2.5.9 7.5M20.5 27l.9-7.5 1.1-2.5 1.1 2.5.9 7.5M4 27h24M14.4 20h3.2" />
-    </svg>
-  );
-}
-
 export function CopyIcon({ size = 16, ...props }: IconProps) {
   return (
     <Stroke size={size} {...props}>
@@ -203,30 +149,12 @@ export function ArrowUpRightIcon({ size = 16, ...props }: IconProps) {
   );
 }
 
-export function ArrowDownIcon({ size = 16, ...props }: IconProps) {
-  return (
-    <Stroke size={size} {...props}>
-      <path d="M12 5v14" />
-      <path d="M6 13l6 6 6-6" />
-    </Stroke>
-  );
-}
-
 export function DownloadIcon(props: IconProps) {
   return (
     <Stroke {...props}>
       <path d="M12 4v11" />
       <path d="M7 10l5 5 5-5" />
       <path d="M5 20h14" />
-    </Stroke>
-  );
-}
-
-/** The FAQ toggle: a plus that turns into a cross when the answer opens. */
-export function PlusIcon({ size = 16, ...props }: IconProps) {
-  return (
-    <Stroke size={size} {...props}>
-      <path d="M12 5v14M5 12h14" />
     </Stroke>
   );
 }

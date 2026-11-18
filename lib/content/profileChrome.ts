@@ -19,10 +19,10 @@ import {
  */
 
 /**
- * Where the redesigned Home is served. The preview lives under /preview; the
- * Phase 6 cutover sets this to "" and every chrome link follows it.
+ * Where the redesigned Home is served. It lived under /preview until the
+ * Phase 6 cutover set it to "", the site's root; every chrome link follows it.
  */
-export const PROFILE_BASE = "/preview";
+export const PROFILE_BASE = "";
 
 /** The Home page, or one of its sections: `homeHref("work")`. */
 export function homeHref(section?: string): string {
@@ -55,13 +55,19 @@ export const profileNav: readonly ChromeLink[] = [
     label: "Work",
     href: homeHref("work"),
     section: "work",
-    current: [`${PROFILE_BASE}/portfolio/`, `${PROFILE_BASE}/ventures/`],
+    // The portfolio index and every case page (spec 7.2).
+    current: [
+      `${PROFILE_BASE}/portfolio`,
+      `${PROFILE_BASE}/portfolio/`,
+      `${PROFILE_BASE}/ventures/`,
+    ],
   },
   {
     label: "About",
     href: homeHref("about"),
     section: "about",
-    current: [],
+    // The About page as well as Home's section (spec 7.2).
+    current: ["/about"],
   },
   {
     label: "Journey",
@@ -86,9 +92,22 @@ export const profileMenu: readonly ChromeLink[] = [
   { label: "Contact", href: navCta.href, current: [navCta.href] },
 ];
 
-/** Whether a link is the page the reader is on. */
+/**
+ * Whether a link is the page the reader is on, or that page's section parent
+ * (spec 7.2). A Thai hub (/th/topics/...) counts as its English twin, as the
+ * old site menu's rows did: no chrome link goes to /th, so the Thai FDE hub
+ * marks "AI engineering" as the English one does. Only hubs live under /th;
+ * anything else there is a not-found page and marks nothing.
+ *
+ * The other hubs mark no link (decided at the Phase 6 review, finding 3):
+ * their section parent was the old menu's Learn row, and spec 7.1 and 7.6 give
+ * the chrome no Learn link. The footer lists Learn but is the same on every
+ * page (spec 7.7), so it marks only the exact page, through the router.
+ */
 export function isCurrentLink(link: ChromeLink, pathname: string): boolean {
-  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  const path = (
+    pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname
+  ).replace(/^\/th(?=\/topics\/)/, "");
   return link.current.some((prefix) =>
     prefix.endsWith("/") ? path.startsWith(prefix) : path === prefix,
   );

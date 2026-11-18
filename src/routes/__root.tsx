@@ -20,7 +20,10 @@ import { site as landingSite } from "@/lib/content/landing";
 import { profileDesign } from "@/lib/design/scope";
 import geistLatin from "../fonts/geist-latin.woff2?url";
 import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
+import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
+import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
+import profileCss from "../styles/profile.css?url";
 
 const siteJsonLd = serializeJsonLd(buildSiteJsonLd());
 const global = rootHead(rootViewport);
@@ -34,28 +37,34 @@ const Devtools = import.meta.env.DEV
   ? lazy(() => import("../devtools"))
   : () => null;
 
+const preloadFont = (href: string) => ({
+  rel: "preload",
+  href,
+  as: "font",
+  type: "font/woff2",
+  crossOrigin: "anonymous" as const,
+});
+
+/*
+ * The Latin faces a page's first screen sets, preloaded; Thai and the rest
+ * load on demand. The profile redesign's pages (design spec 2.13, 3.1) set
+ * the hero in Instrument Serif over Onest, so they preload those two instead
+ * of Geist, not beside it; the pages Phase 7 restyles keep Geist.
+ */
+const PROFILE_FONTS = [onestLatin, instrumentSerifLatin].map(preloadFont);
+const GEIST_FONTS = [geistLatin, geistMonoLatin].map(preloadFont);
+
 export const Route = createRootRouteWithContext<RouterContext>()({
-  head: () => ({
+  head: ({ matches }) => ({
     // The default title; every page's head() replaces it (404 and error pages keep it).
     meta: [...globalMeta, { title: landingSite.title }],
     links: [
-      // Same two Latin faces next/font preloaded; Thai loads on demand.
-      {
-        rel: "preload",
-        href: geistLatin,
-        as: "font",
-        type: "font/woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        href: geistMonoLatin,
-        as: "font",
-        type: "font/woff2",
-        crossOrigin: "anonymous",
-      },
+      ...(profileDesign(matches) ? PROFILE_FONTS : GEIST_FONTS),
       { rel: "stylesheet", href: fontsCss },
       { rel: "stylesheet", href: appCss },
+      // The redesign's chrome and sections (Phases 1 to 6): every public
+      // page renders the new nav and footer, so every page links it.
+      { rel: "stylesheet", href: profileCss },
       { rel: "preconnect", href: "https://cdn.sanity.io", crossOrigin: "" },
       { rel: "dns-prefetch", href: "https://cdn.sanity.io" },
       ...global.links,
@@ -74,7 +83,7 @@ function RootDocument({ children }: { children: ReactNode }) {
   // Profile redesign: the new tokens apply only inside this scope, taken from
   // the routes on screen so a navigation never restyles the old page.
   const design = useRouterState({
-    select: (s) => profileDesign(s.matches.map((m) => m.routeId)),
+    select: (s) => profileDesign(s.matches),
   });
   return (
     <html

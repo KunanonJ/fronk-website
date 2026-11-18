@@ -250,6 +250,36 @@ describe("CasePage, the hero's links", () => {
     ).toHaveAttribute("href", "/portfolio");
   });
 
+  it("gives only a public project a link out: no Visit or source link on an internal tool", () => {
+    // The base project page's check ("gives no other project a public link",
+    // portfolio.test.tsx before the cutover; review finding 8).
+    const projects = getAllPortfolioProjects();
+    expect(
+      projects.filter((p) => p.access === "public").map((p) => p.slug),
+    ).toEqual(["kunanonj-com"]);
+    for (const project of projects) {
+      const { container, unmount } = render(
+        <CasePage study={findProjectCase(project.slug)!} />,
+      );
+      const out = container.querySelectorAll(".pf-case-actions__external");
+      if (project.access === "public") {
+        expect(out, project.slug).toHaveLength(1);
+        expect(out[0]).toHaveAttribute("href", project.url);
+      } else {
+        expect(out, project.slug).toHaveLength(0);
+        expect(
+          screen.queryAllByRole("link", { name: /GitHub|Visit/ }),
+          project.slug,
+        ).toEqual([]);
+        expect(
+          container.querySelectorAll('.pf-case-hero a[target="_blank"]'),
+          project.slug,
+        ).toHaveLength(0);
+      }
+      unmount();
+    }
+  });
+
   it("gives a venture the byline that carries its live page's My role footer", () => {
     const ventures = getAllVentures().filter((venture) => venture.caseStudy);
     expect(ventures.length).toBeGreaterThan(0);

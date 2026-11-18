@@ -298,9 +298,10 @@ describe("the hero, cover and meta row (spec 9.2, 9.4, 9.5)", () => {
       label: "All projects",
       href: "/portfolio",
     });
+    // Home's ventures card: /#ventures since the cutover (Phase 6).
     expect(findVentureCase("manut")!.back).toEqual({
       label: "Ventures",
-      href: `${PROFILE_BASE}#ventures`,
+      href: `${PROFILE_BASE || "/"}#ventures`,
     });
   });
 

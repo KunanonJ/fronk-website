@@ -1,36 +1,39 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { extractPage } from "../../lib/parity/parity.mjs";
 
 /**
- * Profile redesign, Phase 5: the case-study template on the hidden
- * /preview/portfolio/<slug> and /preview/ventures/<slug> pages
- * (process/features/profile-site-redesign, phase 5 gates 2 to 7, and the
- * device matrix of design spec 10.1).
+ * Profile redesign, Phase 5: the case-study template, on the live
+ * /portfolio/<slug> and /ventures/<slug> pages since the Phase 6 cutover (on
+ * hidden /preview copies before it; process/features/profile-site-redesign,
+ * phase 5 gates 2 to 7, and the device matrix of design spec 10.1).
  *
  * Behaviour runs in desktop Chromium (1440 px) and the WebKit phone (390 px);
  * the widths, the tap areas and the best-practice checks set their own
  * viewports in desktop Chromium; the matrix projects hold the baselines of
- * one case. profile.spec.ts holds what every preview page must meet, and
+ * one case. profile.spec.ts holds what every profile page must meet, and
  * routes.ts gives four of these pages to smoke, axe and visual.
  */
 
 const CASES = [
-  { path: "/preview/portfolio/tbh-intranet", name: "TBH Intranet" },
+  { path: "/portfolio/tbh-intranet", name: "TBH Intranet" },
   {
-    path: "/preview/portfolio/node-validator-automation",
+    path: "/portfolio/node-validator-automation",
     name: "Node Validator Automation",
   },
   {
-    path: "/preview/portfolio/email-signature-generator",
+    path: "/portfolio/email-signature-generator",
     name: "Email Signature Generator",
   },
-  { path: "/preview/portfolio/ai-automation", name: "AI Automation" },
-  { path: "/preview/portfolio/kunanonj-com", name: "kunanonj.com" },
-  { path: "/preview/ventures/gogocash", name: "GoGoCash" },
-  { path: "/preview/ventures/manut", name: "Manut AI" },
+  { path: "/portfolio/ai-automation", name: "AI Automation" },
+  { path: "/portfolio/kunanonj-com", name: "kunanonj.com" },
+  { path: "/ventures/gogocash", name: "GoGoCash" },
+  { path: "/ventures/manut", name: "Manut AI" },
 ] as const;
 const INTRANET = CASES[0].path;
-const GOGOCASH = "/preview/ventures/gogocash";
+const GOGOCASH = "/ventures/gogocash";
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
 /** The fixed bar's bottom edge: 32 px down and 48 px tall. */
@@ -330,19 +333,18 @@ test.describe("case pages render (plan gate 2)", () => {
         "data-design",
         "profile",
       );
-      // Hidden like every preview.
-      await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute(
-        "content",
-        /noindex/,
-      );
+      // Live and indexable since the cutover: no noindex.
+      await expect(
+        page.locator('meta[name="robots"][content*="noindex"]'),
+      ).toHaveCount(0);
       expect(errors).toEqual([]);
     });
   }
 
   test("an unknown case is a 404", async ({ page }) => {
-    const project = await page.goto("/preview/portfolio/not-a-case");
+    const project = await page.goto("/portfolio/not-a-case");
     expect(project?.status()).toBe(404);
-    const venture = await page.goto("/preview/ventures/not-a-case");
+    const venture = await page.goto("/ventures/not-a-case");
     expect(venture?.status()).toBe(404);
   });
 });
@@ -350,13 +352,13 @@ test.describe("case pages render (plan gate 2)", () => {
 test.describe("links into the case pages", () => {
   test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
 
-  test("every case link on the preview Home resolves to a case page with an h1", async ({
+  test("every case link on Home resolves to a case page with an h1", async ({
     page,
   }) => {
     await prepare(page);
-    await visit(page, "/preview");
+    await visit(page, "/");
     const hrefs = await page
-      .locator('a[href^="/preview/portfolio/"], a[href^="/preview/ventures/"]')
+      .locator('a[href^="/portfolio/"], a[href^="/ventures/"]')
       .evaluateAll((links) => [
         ...new Set(links.map((link) => link.getAttribute("href")!)),
       ]);
@@ -381,7 +383,7 @@ test.describe("links into the case pages", () => {
         .evaluateAll((links) => links.map((l) => l.getAttribute("href")!));
       expect(hrefs, path).toHaveLength(2);
       for (const href of hrefs) {
-        expect(href).toMatch(/^\/preview\/(portfolio|ventures)\/[a-z-]+$/);
+        expect(href).toMatch(/^\/(portfolio|ventures)\/[a-z-]+$/);
         expect(href).not.toBe(path);
       }
     }
@@ -394,9 +396,9 @@ test.describe("the evidence rule (plan gate 3)", () => {
   // Two cases have cleared outcomes (portfolio.ts); the other two show none.
   for (const [path, outcomes] of [
     [INTRANET, 1],
-    ["/preview/portfolio/ai-automation", 1],
-    ["/preview/portfolio/node-validator-automation", 0],
-    ["/preview/portfolio/email-signature-generator", 0],
+    ["/portfolio/ai-automation", 1],
+    ["/portfolio/node-validator-automation", 0],
+    ["/portfolio/email-signature-generator", 0],
   ] as const) {
     test(`${path}: what changed and his part come first, within a screen and a half at 1440 x 900`, async ({
       page,
@@ -454,7 +456,7 @@ test.describe("the evidence rule (plan gate 3)", () => {
 
   // The longest figures: drawn, wrapped and inside the screen.
   for (const [path, figure] of [
-    ["/preview/portfolio/ai-automation", "10 people to 1 operator"],
+    ["/portfolio/ai-automation", "10 people to 1 operator"],
     [GOGOCASH, "THB 169,000"],
     [GOGOCASH, "THB 13 million"],
   ] as const) {
@@ -874,6 +876,16 @@ test.describe("with motion allowed: the pause control is measured and audited", 
 
 test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", () => {
   test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
+  /**
+   * The intranet and GoGoCash, and the two projects that routes.ts does not
+   * give to smoke and the fit check (review finding 8).
+   */
+  const MATRIX_CASES = [
+    INTRANET,
+    "/portfolio/node-validator-automation",
+    "/portfolio/email-signature-generator",
+    GOGOCASH,
+  ];
 
   for (const width of [344, 390, 820, 882, 1180, 1440]) {
     test(`at ${width} px nothing scrolls sideways and the grids follow spec 10.1`, async ({
@@ -882,7 +894,7 @@ test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", ()
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page);
-      for (const path of [INTRANET, GOGOCASH]) {
+      for (const path of MATRIX_CASES) {
         await visit(page, path);
         expect(await sideways(page), path).toBeLessThanOrEqual(0);
         const columns = await page
@@ -918,7 +930,7 @@ test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", ()
       await page.setViewportSize({ width, height: 800 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page);
-      for (const path of [INTRANET, GOGOCASH]) {
+      for (const path of MATRIX_CASES) {
         await visit(page, path);
         expect(await tapProblems(page), path).toEqual([]);
       }
@@ -979,35 +991,45 @@ test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", ()
     ).toBe(true);
   });
 
-  test("the head is the live page's, robots aside, so Share copies the live address", async ({
+  test("every case keeps the head the parity reference holds, indexable, so Share copies the live address", async ({
     page,
   }) => {
-    const head = (path: string) =>
-      page.goto(path, { waitUntil: "domcontentloaded" }).then(() =>
-        page.evaluate(() => ({
-          canonical: [
-            ...document.querySelectorAll<HTMLLinkElement>(
-              'link[rel="canonical"]',
-            ),
-          ].map((link) => link.href),
-          url: document
-            .querySelector('meta[property="og:url"]')
-            ?.getAttribute("content"),
-          image: document
-            .querySelector('meta[property="og:image"]')
-            ?.getAttribute("content"),
-          description: document
-            .querySelector('meta[name="description"]')
-            ?.getAttribute("content"),
-        })),
+    // The head after hydration, which Share reads, normalised as
+    // scripts/parity-crawl.mjs normalised the reference: the title, the
+    // canonical, the Open Graph and Twitter tags, the description and robots.
+    const reference = JSON.parse(
+      readFileSync(
+        join(process.cwd(), "tests/fixtures/site-parity.json"),
+        "utf8",
+      ),
+    ) as Record<string, { title: string; tags: string[] }>;
+    const shared = (tags: readonly string[]) =>
+      tags.filter((tag) =>
+        /^link href=\S+ rel="canonical"$|^meta content=.* (property="og:[\w:]+"|name="(description|robots|twitter:[\w:]+)")$/.test(
+          tag,
+        ),
       );
-    for (const [live, preview] of [
-      ["/portfolio/tbh-intranet", INTRANET],
-      ["/ventures/gogocash", GOGOCASH],
-    ] as const) {
-      const own = await head(preview);
-      expect(own, preview).toEqual(await head(live));
-      expect(own.canonical, preview).toHaveLength(1);
+    for (const { path } of CASES) {
+      const response = await page.goto(path, { waitUntil: "networkidle" });
+      const own = extractPage(await page.content());
+      const ref = reference[path]!;
+      expect(own.title, path).toBe(ref.title);
+      expect(shared(own.tags), path).toEqual(shared(ref.tags));
+      expect(
+        own.tags.filter((tag) => tag.endsWith('rel="canonical"')),
+        path,
+      ).toEqual([`link href="https://kunanonj.com${path}" rel="canonical"`]);
+      // Indexable: no noindex in a meta tag or in a response header.
+      expect(
+        own.tags.filter((tag) => /noindex/i.test(tag)),
+        path,
+      ).toEqual([]);
+      expect(own.tags, path).toContain(
+        'meta content="index, follow" name="robots"',
+      );
+      expect(response?.headers()["x-robots-tag"] ?? "", path).not.toMatch(
+        /noindex/i,
+      );
     }
     await prepare(page);
     await visit(page);
@@ -1135,34 +1157,28 @@ test.describe("best practices on the case pages (desktop Chromium)", () => {
     expect([...origins].filter((origin) => !allowed.has(origin))).toEqual([]);
   });
 
-  test("the structured data is the live page's, script for script", async ({
+  test("the structured data is the pre-cutover page's, script for script", async ({
     page,
   }) => {
-    const scripts = (path: string) =>
-      page
-        .goto(path, { waitUntil: "domcontentloaded" })
-        .then(() =>
-          page
-            .locator('script[type="application/ld+json"]')
-            .evaluateAll((nodes) =>
-              nodes.map((node) => JSON.parse(node.textContent ?? "{}")),
-            ),
-        );
-    for (const [live, preview] of [
-      ["/portfolio/tbh-intranet", INTRANET],
-      ["/portfolio/kunanonj-com", "/preview/portfolio/kunanonj-com"],
-      ["/ventures/gogocash", GOGOCASH],
-      ["/ventures/manut", "/preview/ventures/manut"],
-    ] as const) {
-      const own = (list: Record<string, unknown>[]) =>
-        list.filter((data) =>
-          ["CreativeWork", "SoftwareApplication", "BreadcrumbList"].includes(
-            data["@type"] as string,
+    // The parity reference holds every case page's JSON-LD as it was before
+    // the template replaced the body (normalised and sorted the way
+    // scripts/parity-crawl.mjs records it); the cutover keeps it unchanged.
+    const reference = JSON.parse(
+      readFileSync(
+        join(process.cwd(), "tests/fixtures/site-parity.json"),
+        "utf8",
+      ),
+    ) as Record<string, { jsonLd: string[] }>;
+    for (const { path } of CASES) {
+      await page.goto(path, { waitUntil: "domcontentloaded" });
+      const scripts = await page
+        .locator('script[type="application/ld+json"]')
+        .evaluateAll((nodes) =>
+          nodes.map((node) =>
+            JSON.stringify(JSON.parse(node.textContent ?? "{}")),
           ),
         );
-      expect(own(await scripts(preview)), preview).toEqual(
-        own(await scripts(live)),
-      );
+      expect(scripts.sort(), path).toEqual(reference[path]!.jsonLd);
     }
   });
 });
@@ -1172,9 +1188,9 @@ test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
 
   for (const theme of ["light", "dark"] as const) {
     for (const path of [
-      "/preview/portfolio/node-validator-automation",
-      "/preview/portfolio/email-signature-generator",
-      "/preview/ventures/manut",
+      "/portfolio/node-validator-automation",
+      "/portfolio/email-signature-generator",
+      "/ventures/manut",
     ]) {
       test(`${path} has no serious or critical axe violations (${theme})`, async ({
         page,

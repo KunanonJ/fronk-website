@@ -1,7 +1,8 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
- * Profile redesign, Phase 1: the site chrome on the hidden /preview Home
+ * Profile redesign, Phase 1: the site chrome, on Home since the Phase 6
+ * cutover (on the hidden /preview Home before it)
  * (process/features/profile-site-redesign, phase 1 gates 3, 4, 8 and 9, and the
  * device matrix of design spec 10.1).
  *
@@ -9,10 +10,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
  * (390 px), which set their own viewports. The anchors, the scrollspy and the
  * focus checks run in desktop Chromium only, at the widths they set, and so do
  * the matrix widths and the tap areas. profile.spec.ts holds the widths every
- * preview page must fit, and the best-practice checks.
+ * profile page must fit, and the best-practice checks.
  */
 
-const HOME = "/preview";
+const HOME = "/";
+/** Home's address with nothing after the slash: no hash, no query. */
+const HOME_URL = /^https?:\/\/[^/]+\/$/;
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
@@ -521,14 +524,14 @@ test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
     const name = page.getByRole("link", { name: "Kunanon Jarat, home" });
     await revealBar(page);
     await name.click();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
 
     await scrollPage(page, 900);
     await settle(page);
     await revealBar(page);
     await name.click();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
   });
 
@@ -662,7 +665,7 @@ test.describe("chrome: the phone menu", () => {
     const menu = page.getByRole("navigation", { name: "Site" });
     await expect(menu).toBeVisible();
     await page.goBack();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect(menu).toBeHidden();
   });
 });
@@ -831,7 +834,7 @@ test.describe("chrome: Say hello and the theme", () => {
     await page.getByRole("button", { name: "Say hello" }).first().click();
     await expect(dialog).toBeVisible();
     await page.goBack();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect(dialog).toBeHidden();
 
     await scrollPage(page, 0);
@@ -868,20 +871,55 @@ test.describe("chrome: Say hello and the theme", () => {
     await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
   });
 
-  test("the preview's stylesheet is linked on /preview only", async ({
+  test("every page links the profile stylesheet once, and preloads the fonts of its own design", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "one check is enough");
-    // The live Home links nothing of the preview: no stylesheet, and no
-    // script chunk named after a profile module either.
-    await page.goto("/", { waitUntil: "networkidle" });
-    expect(await page.locator('link[href*="/assets/profile"]').count()).toBe(0);
-    // /preview links the one stylesheet. It may also preload a script chunk
-    // named after a profile module (profileChrome), so only stylesheets count.
-    await page.goto(HOME, { waitUntil: "networkidle" });
-    await expect(
-      page.locator('link[rel="stylesheet"][href*="/assets/profile"]'),
-    ).toHaveCount(1);
+    // Since the Phase 6 cutover the chrome is on every public page, so the
+    // root links profile.css everywhere, after globals.css. The pages in the
+    // token scope preload Onest and Instrument Serif; the others keep Geist
+    // (plan step 6b). Only stylesheets count: a profile module may also have
+    // a script chunk of its own.
+    const preloads = () =>
+      page
+        .locator('link[rel="preload"][as="font"]')
+        .evaluateAll((links) =>
+          links.map((link) =>
+            (link.getAttribute("href") ?? "").replace(
+              /^.*\/assets\/([a-z-]+)-[\w-]+\.woff2$/,
+              "$1",
+            ),
+          ),
+        );
+    for (const [path, scoped] of [
+      ["/", true],
+      ["/portfolio/tbh-intranet", true],
+      ["/skills", false],
+      ["/design", false],
+    ] as const) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      const sheets = page.locator('link[rel="stylesheet"]');
+      await expect(
+        page.locator('link[rel="stylesheet"][href*="/assets/profile"]'),
+        path,
+      ).toHaveCount(1);
+      const hrefs = await sheets.evaluateAll((links) =>
+        links.map((link) => link.getAttribute("href") ?? ""),
+      );
+      const globals = hrefs.findIndex((href) => /\/globals-/.test(href));
+      const profile = hrefs.findIndex((href) => /\/profile-/.test(href));
+      expect(globals, path).toBeGreaterThanOrEqual(0);
+      expect(profile, path).toBeGreaterThan(globals);
+      // Outside the scope the attribute is absent, not empty.
+      expect(await page.locator("html").getAttribute("data-design"), path).toBe(
+        scoped ? "profile" : null,
+      );
+      expect((await preloads()).sort(), path).toEqual(
+        scoped
+          ? ["instrument-serif-latin", "onest-latin"]
+          : ["geist-latin", "geist-mono-latin"],
+      );
+    }
   });
 });
 
@@ -1085,7 +1123,7 @@ test.describe("chrome: the device matrix and the tap areas", () => {
   });
 });
 
-test.describe("chrome: the layer order of the preview stylesheet", () => {
+test.describe("chrome: the layer order of the profile stylesheet", () => {
   test("component rules lose to Tailwind utilities and beat the base layer", async ({
     page,
   }, testInfo) => {
@@ -1136,7 +1174,7 @@ test.describe("router: a scroll made before hydration", () => {
     );
   });
 
-  test("survives hydration on the preview Home", async ({ page }) => {
+  test("survives hydration on Home", async ({ page }) => {
     await prepare(page);
     const release = await holdScripts(page);
     await page.goto(HOME, { waitUntil: "commit" });
@@ -1150,19 +1188,20 @@ test.describe("router: a scroll made before hydration", () => {
     expect(await pageY(page)).toBe(600);
   });
 
-  test("survives hydration on a live page", async ({ page }) => {
-    // The live header's theme switch names the day theme once hydrated in
-    // the dark theme (before, it keeps the server's light-theme label).
+  test("survives hydration on About", async ({ page }) => {
+    // The old header's theme button, which this test read on /about before
+    // the Phase 6 cutover, is gone, and the pill nav hides its toggle on
+    // phones; the nav's Say hello copy row (rendered once hydrated) marks
+    // hydration here, as on Home.
     await prepare(page, "dark");
     const release = await holdScripts(page);
     await page.goto("/about", { waitUntil: "commit" });
     await page.waitForFunction(() => document.readyState !== "loading");
-    const day = page.getByRole("button", { name: "Switch to day mode" });
-    await expect(day).toHaveCount(0);
+    await expect(page.locator(".pf-say__copy")).toHaveCount(0);
     await scrollPage(page, 600);
     expect(await pageY(page)).toBe(600);
     release();
-    await expect(day.first()).toBeAttached();
+    await hydrated(page);
     await settle(page);
     expect(await pageY(page)).toBe(600);
   });
@@ -1172,7 +1211,7 @@ test.describe("router: a scroll made before hydration", () => {
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
-    await visit(page, "/preview/portfolio/tbh-intranet#ch-03");
+    await visit(page, "/portfolio/tbh-intranet#ch-03");
     await settle(page);
     // The contents' landing: 96 px of scroll padding and a 16 px margin.
     const top = await page.evaluate(

@@ -3,19 +3,21 @@ import { notebookEntries } from "../../lib/content/testimonials";
 
 /**
  * Profile redesign, Phase 4: the Journey (stage, tool orbit, story, records
- * card) on the hidden /preview Home, and the testimonial notebook, reviewed
- * on /preview/system with labelled samples (process/features/
+ * card) on Home (live since the Phase 6 cutover), and the testimonial
+ * notebook, reviewed on /preview/system with labelled samples until that
+ * page went with the previews (process/features/
  * profile-site-redesign, phase 4 gates 2 to 7, and the device matrix and
  * dual screen of design spec 10.1).
  *
  * Behaviour runs in desktop Chromium (1440 px) and the WebKit phone (390 px);
  * the matrix widths, the tap areas and the hinge set their own viewports in
  * desktop Chromium; the matrix projects hold the baselines.
- * profile.spec.ts holds what every preview page must meet (no sideways
+ * profile.spec.ts holds what every profile page must meet (no sideways
  * scroll, 12 px text, 24 px targets, forced colours, zoom, text spacing).
  */
 
-const HOME = "/preview";
+const HOME = "/";
+/** The notebook's sample page: gone since the Phase 6 cutover (see below). */
 const SYSTEM = "/preview/system";
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
@@ -792,7 +794,7 @@ test.describe("the Home's notebook: hidden below three cleared quotes", () => {
     );
   });
 
-  test("/preview has no notebook section, heading or link while fewer than three are cleared", async ({
+  test("Home has no notebook section, heading or link while fewer than three are cleared", async ({
     page,
   }) => {
     await prepare(page);
@@ -813,8 +815,22 @@ test.describe("the Home's notebook: hidden below three cleared quotes", () => {
   });
 });
 
+/*
+ * The notebook with its labelled samples lived on /preview/system, which the
+ * Phase 6 cutover deleted with the other previews. No live page renders the
+ * notebook until three quotes are cleared (umbrella input R11), so these
+ * browser checks wait for Phase 7 (plan row 7g, lane D2), which brings the
+ * samples back on /design and owns turning them on again; its unit tests
+ * (Notebook.test.tsx, Notes.test.tsx) still run. A tripwire in
+ * lib/content/testimonials.test.ts fails if three quotes are cleared while
+ * these checks are still skipped.
+ */
+const NOTEBOOK_PAGE_GONE =
+  "the sample notebook page went with /preview/system (Phase 6); Phase 7g restores it on /design";
+
 test.describe("the notebook, with sample notes on /preview/system", () => {
   test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(true, NOTEBOOK_PAGE_GONE);
     test.skip(
       !BEHAVIOUR.has(testInfo.project.name),
       "desktop and the WebKit phone",
@@ -995,7 +1011,10 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
 });
 
 test.describe("the notebook's layout (desktop Chromium)", () => {
-  test.beforeEach(() => only(["desktop"]));
+  test.beforeEach(() => {
+    test.skip(true, NOTEBOOK_PAGE_GONE);
+    only(["desktop"]);
+  });
 
   test("its arrows sit beside the book from 1180 px and under it below, 88 px apart", async ({
     page,
@@ -1128,6 +1147,7 @@ test.describe("journey and notebook: baselines on the device matrix", () => {
     test(`the sample notebook matches its baseline at this width (${theme})`, async ({
       page,
     }) => {
+      test.skip(true, NOTEBOOK_PAGE_GONE);
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page, theme);
       await visit(page, SYSTEM);

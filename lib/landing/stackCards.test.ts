@@ -45,12 +45,12 @@ describe("stackCards", () => {
     ).toEqual([["gogocash", "ventures"]]);
   });
 
-  it("links each case under the profile base (Phase 5 builds those pages)", () => {
+  it("links each case at its live address (the profile base is the root since the cutover)", () => {
     for (const card of cards) {
       const kind = card.kind === "project" ? "portfolio" : "ventures";
       expect(card.href, card.slug).toBe(`${PROFILE_BASE}/${kind}/${card.slug}`);
     }
-    expect(PROFILE_BASE).toBe("/preview");
+    expect(PROFILE_BASE).toBe("");
   });
 
   it("gives each card the next material, in the spec's order, wrapping after six", () => {

@@ -17,9 +17,11 @@ const COPY: StatusPageCopy = {
 };
 
 /**
- * 404 (bento canvas NotFound, design spec 4.20). The root renders it outside
- * the `_landing` layout for every unknown path, so it brings the site header
- * and footer itself, on the canvas column. The response status stays 404.
+ * 404. The root renders it outside the `_landing` layout for every unknown
+ * path, so it brings the site chrome itself: LandingLayout's pill nav and
+ * footer (profile redesign, Phase 6 cutover). The page body is still
+ * the bento StatusPage (design spec 4.20) until Phase 7 (plan step 7f)
+ * restyles it. The response status stays 404.
  */
 export default function NotFound() {
   return (

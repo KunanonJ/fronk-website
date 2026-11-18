@@ -2,17 +2,20 @@ import { expect, test, type Page } from "@playwright/test";
 
 /**
  * Profile redesign, Phase 2: the Home hero, its canvas mock and the logo strip
- * on the hidden /preview (process/features/profile-site-redesign, phase 2
+ * on Home since the Phase 6 cutover, on the hidden /preview before it
+ * (process/features/profile-site-redesign, phase 2
  * gates 2 to 9 and the device matrix of design spec 10.1).
  *
  * Most checks set their own viewport and run once, in desktop Chromium; the
  * phone row, the pager and the recruiter facts also run on the WebKit phone.
- * profile.spec.ts runs the page-wide checks on /preview (12 px text, 24 px
+ * profile.spec.ts runs the page-wide checks on Home (12 px text, 24 px
  * targets, forced colours, text spacing, zoom, request origins) and a11y.spec
  * runs axe with WCAG 2.2 in both themes.
  */
 
-const HOME = "/preview";
+const HOME = "/";
+/** Home's address with nothing after the slash: no hash, no query. */
+const HOME_URL = /^https?:\/\/[^/]+\/$/;
 const HERO = "section.pf-hero";
 const TITLE =
   "Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok.";
@@ -297,12 +300,12 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     only(["desktop"]);
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await prepare(page, { intro: true });
-    // A full load of another preview page: no intro there, and no inline
-    // script on the Home's hero runs in a visit made in the app.
-    await page.goto(`${HOME}/system`, { waitUntil: "networkidle" });
+    // A full load of another page: no intro there, and no inline script on
+    // the Home's hero runs in a visit made in the app.
+    await page.goto("/skills", { waitUntil: "networkidle" });
     await expect(page.locator("html")).not.toHaveAttribute("data-intro", /.*/);
     await page.getByRole("link", { name: "Kunanon Jarat, home" }).click();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     const overlay = page.getByTestId("intro-overlay");
     await expect(overlay).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-intro", "pending");
@@ -353,10 +356,7 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
       const link = group.getByRole("link", {
         name: `${name}: open the case study`,
       });
-      await expect(link).toHaveAttribute(
-        "href",
-        /^\/preview\/portfolio\/[a-z-]+$/,
-      );
+      await expect(link).toHaveAttribute("href", /^\/portfolio\/[a-z-]+$/);
       if (index === 1) await link.hover();
       if (index === 2) await link.focus();
       if (index > 0) {

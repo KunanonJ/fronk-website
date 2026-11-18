@@ -68,10 +68,14 @@ function BriefTile() {
   );
 }
 
-export default function AboutBento() {
+/**
+ * `id` is "about" on Home (the nav's section). /about renders the same bento
+ * under "principles", the anchor /learn links for the four principles.
+ */
+export default function AboutBento({ id = "about" }: { id?: string }) {
   return (
     <section
-      id="about"
+      id={id}
       aria-labelledby="about-eyebrow"
       className="pf-about ds-wrap"
     >

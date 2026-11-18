@@ -7,7 +7,8 @@ import { storyCopy, type StoryRun } from "@/lib/content/homeJourney";
  * two paragraphs with their key phrases in bold, the roles I am open to with
  * the cleared availability and its chips, and the records card beside them
  * (under them below 1024 px). The "Read the story" pill on the stage links
- * here.
+ * here. /about puts the anchor on its own section instead (`anchor={false}`),
+ * so "Read my story" lands with the section's heading in view.
  */
 
 function Runs({ runs }: { runs: readonly StoryRun[] }) {
@@ -22,9 +23,9 @@ function Runs({ runs }: { runs: readonly StoryRun[] }) {
   );
 }
 
-export function Story() {
+export function Story({ anchor = true }: { anchor?: boolean }) {
   return (
-    <div id="story" className="ds-wrap pf-story">
+    <div id={anchor ? "story" : undefined} className="ds-wrap pf-story">
       <div className="t-body pf-story__text">
         {storyCopy.paragraphs.map((runs, index) => (
           <p key={index}>

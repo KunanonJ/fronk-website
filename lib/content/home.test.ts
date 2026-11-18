@@ -128,13 +128,13 @@ describe("canvasMock", () => {
       ...FEATURED_PORTFOLIO_SLUGS,
     ]);
     for (const frame of canvasMock.frames) {
-      expect(frame.href).toBe(`/preview/portfolio/${frame.slug}`);
+      expect(frame.href).toBe(`/portfolio/${frame.slug}`);
       expect(frame.name.length).toBeGreaterThan(0);
       // No featured project has a shareable screenshot yet (R10): each
       // frame draws its kind of screen instead.
       expect(frame.cover ?? frame.mockup).toBeTruthy();
     }
-    expect(caseHref("ventures", "gogocash")).toBe("/preview/ventures/gogocash");
+    expect(caseHref("ventures", "gogocash")).toBe("/ventures/gogocash");
   });
 
   it("names each frame link with its visible label first (WCAG 2.5.3)", () => {

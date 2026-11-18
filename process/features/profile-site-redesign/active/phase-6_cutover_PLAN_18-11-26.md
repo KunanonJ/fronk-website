@@ -1,7 +1,11 @@
 # Phase 6: Cutover
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE" and,
-before the merge, the owner's go on the pull request's preview URL.
+**Status:** CODE DONE (18-11-26). Steps 6a to 6i done in the lane
+`feat/profile-redesign-phase-6-cutover` (local commits). The owner's go of
+18-11-26 ("please continue working until done then deploy to production for
+me") covers the merge; step 6j (merge, deploy, live check) is the
+orchestrator's, after the Linux baselines and gate 8 on the preview URL.
+**Evidence:** `../reports/phase-6_cutover_REPORT_18-11-26.md`
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** the whole of `../references/design-spec_18-11-26.md`, especially

@@ -152,13 +152,16 @@ describe("visual-redesign foundation", () => {
   it("defaults to light with the toggle unlocked and palette themeColors", () => {
     expect(layoutTsx).not.toContain("forcedTheme");
     expect(layoutTsx).toContain('defaultTheme="light"');
-    // Theme colours live in the metadata module both frameworks share.
+    // Theme colours live in the metadata module both frameworks share. The
+    // profile redesign's cutover (Phase 6, design spec 2.1 and 13 item 23)
+    // moved them from the owner palette (#0b0d17, #f5f6fa) to the new one.
     const rootMeta = readFileSync(
       join(process.cwd(), "lib/seo/rootMetadata.ts"),
       "utf8",
     );
-    expect(rootMeta).toMatch(/#0b0d17/i);
-    expect(rootMeta).toMatch(/#f5f6fa/i);
+    expect(rootMeta).toMatch(/#0f0c18/i);
+    expect(rootMeta).toMatch(/#f7f3ff/i);
+    expect(rootMeta).not.toMatch(/#0b0d17|#f5f6fa/i);
   });
 
   it("keeps the landing shell wrapper and skip link", () => {
@@ -210,12 +213,12 @@ describe("bento motion contract", () => {
   it("keeps every entrance and loop behind no-preference", () => {
     // Widened in the profile redesign (Phase 0, design spec 5.1): any
     // animation outside no-preference fails, not only kj- and intro- names,
-    // and Phase 1 reads the preview stylesheet too. Two exceptions, each never
-    // started under reduced motion: the theme reveal is a view transition the
-    // toggle skips (and the reduced-motion block below disables), and the
-    // intro's words belong to an overlay that IntroLoader does not mount under
-    // reduced motion.
-    const allowed = /^(none\b|kj-reveal\b|intro-word-in\b)/;
+    // and Phase 1 reads the profile stylesheet too. One exception, never
+    // started under reduced motion: the intro's words belong to an overlay
+    // that IntroLoader does not mount under reduced motion. (The circular
+    // theme reveal was the other until the Phase 6 cutover; the theme fade
+    // that replaced it sits inside no-preference.)
+    const allowed = /^(none\b|intro-word-in\b)/;
     for (const { path, css } of [
       { path: "src/styles/globals.css", css: globalsCss },
       ...profileSheets,
@@ -245,15 +248,55 @@ describe("bento motion contract", () => {
     }
   });
 
-  it("scopes the circular reveal to theme switches and turns view transitions off under reduced motion", () => {
-    expect(globalsCss).toMatch(
-      /:active-view-transition-type\(theme\)::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/,
+  it("defines every keyframe a sheet animates, once: globals.css its own, the profile sheets theirs or globals.css's", () => {
+    // globals.css loads on every page and stands alone; the profile sheets
+    // load after it. A keyframe used but defined nowhere fails silently in
+    // the browser (Phase 6 review, finding 6: kj-theme-fade lived only in
+    // shell.css while globals.css ran it).
+    const used = (css: string) =>
+      new Set(
+        [...css.matchAll(/animation(?:-name)?:\s*([^;]+);/g)].flatMap((m) =>
+          [...m[1]!.matchAll(/\b((?:kj|intro)-[\w-]+)/g)].map((n) => n[1]!),
+        ),
+      );
+    const defined = (css: string) =>
+      [...css.matchAll(/@keyframes ([\w-]+)/g)].map((m) => m[1]!);
+    expect(
+      [...used("a { animation: kj-orphan 1s; }")].filter(
+        (name) => !defined("").includes(name),
+      ),
+    ).toEqual(["kj-orphan"]);
+
+    const own = defined(globalsCss);
+    expect([...used(globalsCss)].filter((name) => !own.includes(name))).toEqual(
+      [],
     );
-    expect(globalsCss).toMatch(
-      /html\.kj-vt::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/,
+    expect(own).toContain("kj-theme-fade");
+
+    const all = [...own, ...profileSheets.flatMap(({ css }) => defined(css))];
+    for (const { path, css } of profileSheets) {
+      expect(
+        [...used(css)].filter((name) => !all.includes(name)),
+        path,
+      ).toEqual([]);
+    }
+    expect(all.filter((name, at) => all.indexOf(name) !== at)).toEqual([]);
+  });
+
+  it("fades theme switches on every page, only with no-preference, and turns view transitions off under reduced motion", () => {
+    // The profile redesign's cutover (Phase 6, design spec 7.5 and 13 items
+    // 6 and 23): the .56 s fade replaces the circular reveal site-wide.
+    expect(globalsCss).not.toContain("kj-reveal");
+    const fade = globalsCss.match(
+      /@media \(prefers-reduced-motion: no-preference\) \{\s*html\.kj-vt::view-transition-old\(root\),\s*html:active-view-transition-type\(theme\)::view-transition-old\(root\) \{[\s\S]*?\n\}/,
+    )?.[0];
+    expect(fade).toBeDefined();
+    expect(fade).toMatch(
+      /html\.kj-vt::view-transition-new\(root\),\s*html:active-view-transition-type\(theme\)::view-transition-new\(root\) \{\s*animation: kj-theme-fade 0\.56s/,
     );
+    // Plain page navigations keep the UA cross-fade: no theme animation.
     expect(globalsCss).not.toMatch(
-      /^::view-transition-new\(root\)\s*\{\s*animation: kj-reveal/m,
+      /^::view-transition-new\(root\)\s*\{\s*animation: kj-/m,
     );
     expect(globalsCss).toMatch(
       /prefers-reduced-motion: reduce\)\s*\{\s*::view-transition-group\(\*\),\s*::view-transition-old\(\*\),\s*::view-transition-new\(\*\)\s*\{\s*animation: none !important/,
@@ -287,10 +330,22 @@ describe("profile redesign scope", () => {
     expect(scope).toMatch(/font-synthesis-weight: none;/);
   });
 
-  it("sets the scope on <html> from the matched routes, for the preview only", () => {
+  it("sets the scope on <html> from the matched routes, for the cut-over pages", () => {
     expect(layoutTsx).toContain("data-design={design}");
-    expect(layoutTsx).toMatch(/profileDesign\(s\.matches\.map/);
-    expect(read("lib/design/scope.ts")).toMatch(/new Set\(\["\/preview"\]\)/);
+    expect(layoutTsx).toMatch(/profileDesign\(s\.matches\)/);
+    // Phase 6 opted the core pages in (design spec 2.13); the previews are gone.
+    const scope = read("lib/design/scope.ts");
+    for (const id of [
+      '"/_landing/"',
+      '"/_landing/portfolio/"',
+      '"/_landing/portfolio/$slug"',
+      '"/_landing/ventures/$slug"',
+      '"/_landing/about"',
+      '"/_landing/contact"',
+    ]) {
+      expect(scope, id).toContain(id);
+    }
+    expect(scope).not.toContain('"/preview"');
   });
 
   it("points Tailwind's preflight fonts at the scope's own stacks", () => {
@@ -344,6 +399,9 @@ describe("profile stylesheet", () => {
       "profile/home-work-about.css",
       "profile/home-journey.css",
       "profile/case.css",
+      "profile/cutover.css",
+      "profile/pages-hubs.css",
+      "profile/pages-catalog.css",
     ]);
   });
 
@@ -354,6 +412,7 @@ describe("profile stylesheet", () => {
       "home-work-about.css": "Phase 3",
       "home-journey.css": "Phase 4",
       "case.css": "Phase 5",
+      "cutover.css": "Phase 6",
     };
     for (const [name, phase] of Object.entries(phases)) {
       const partial = partials.find((sheet) => sheet.path.endsWith(`/${name}`));
@@ -432,12 +491,14 @@ describe("profile stylesheet", () => {
     expect(shell).toMatch(/\.pf-menu\[data-open\] \{\s*display: block;/);
   });
 
-  it("scopes the theme fade to the preview and keeps it behind no-preference", () => {
+  it("keeps the scope's copy of the theme fade behind no-preference, on globals.css's keyframes", () => {
     const shell = partials.find((sheet) =>
       sheet.path.endsWith("/shell.css"),
     )!.css;
     const fade = withoutNoPreference(shell);
     expect(fade).not.toMatch(/animation:[^;]*kj-theme-fade/);
+    // One definition, in globals.css, beside the rule every page runs.
+    expect(shell).not.toContain("@keyframes kj-theme-fade");
     expect(shell).toMatch(
       // Whitespace is allowed inside the pseudo-class argument: prettier wraps it.
       /@media \(prefers-reduced-motion: no-preference\) \{\s*html\[data-design="profile"\]:active-view-transition-type\(\s*theme\s*\)::view-transition-old\(root\)/,

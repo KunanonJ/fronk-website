@@ -48,7 +48,7 @@ import {
  * inherit them.
  */
 
-/** The path without a trailing slash, so "/preview/" is Home too. */
+/** The path without a trailing slash, so a trailing slash is the same page. */
 function normalise(path: string): string {
   return path.length > 1 ? path.replace(/\/+$/, "") : path;
 }
@@ -174,7 +174,15 @@ export default function SiteNav() {
   };
 
   return (
-    <header ref={bar} data-site-chrome lang="en" className="pf-nav">
+    <header
+      ref={bar}
+      data-site-chrome
+      // The chrome carries the token scope itself, so it looks the same
+      // around the pages Phase 7 has not restyled yet (design spec 2.13).
+      data-design="profile"
+      lang="en"
+      className="pf-nav"
+    >
       <div className="pf-nav__row">
         <div className="pf-nav__pill">
           <ProfileLink
