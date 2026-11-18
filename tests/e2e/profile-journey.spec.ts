@@ -860,6 +860,11 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
     await page.clock.install();
     await prepare(page);
     await visit(page, SYSTEM);
+    // Installed clocks keep running in real time until paused, so on a busy
+    // runner real seconds would count toward the autoplay wait. Pause now,
+    // before the notebook comes into view and arms its timer; from here only
+    // runFor moves time.
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
     await scrollTop(page, NOTEBOOK, 100);
     await page.mouse.move(0, 0);
     // The scroll's intersection and the re-render it causes.
