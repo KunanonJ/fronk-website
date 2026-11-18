@@ -254,7 +254,7 @@ describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
     ).toContain("/resume");
   });
 
-  it("sets its four sections as chapters 01 to 04 in one column", () => {
+  it("sets its four sections as chapters 01 to 04 in the hub's column", () => {
     const { pillar, container } = renderTopic(SLUG, "en");
     expect(pillar.sections).toHaveLength(4);
     const kickers = [
@@ -263,11 +263,15 @@ describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
       ),
     ].map((kicker) => kicker.textContent);
     expect(kickers).toEqual(["01", "02", "03", "04"]);
-    const column = container.querySelector(".pf-case-column")!;
+    const column = container.querySelector(".pf-hub-column")!;
     for (const section of pillar.sections) {
-      expect(column).toContainElement(
-        screen.getByRole("heading", { level: 2, name: section.heading }),
-      );
+      const heading = screen.getByRole("heading", {
+        level: 2,
+        name: section.heading,
+      });
+      expect(column).toContainElement(heading);
+      // A row: from 1024 px the kicker and heading sit beside the body.
+      expect(heading.closest("section")).toHaveClass("pf-hub-row");
     }
   });
 

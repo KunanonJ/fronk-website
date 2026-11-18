@@ -203,7 +203,7 @@ function Explore({
   links: readonly HubLink[];
 }) {
   return (
-    <article aria-labelledby="card-related" className="pf-hub-explore">
+    <article aria-labelledby="card-related">
       <Kicker id="card-related">{COPY[pillar.locale].related}</Kicker>
       <ul className="pf-hub-links">
         {links.map((link) => (
@@ -229,7 +229,7 @@ function Explore({
 /** Contact: the hub's pitch, its call to action and the email address. */
 function Contact({ pillar }: { pillar: TopicPillar }) {
   return (
-    <article aria-labelledby="card-cta" className="pf-case-hire pf-hub-contact">
+    <article aria-labelledby="card-cta" className="pf-case-hire">
       <div className="pf-case-hire__text">
         <h2 id="card-cta" className="t-meta pf-case-hire__kicker">
           {COPY[pillar.locale].contact}

@@ -49,7 +49,7 @@ function Delivery({ outcomes }: { outcomes: readonly ProofOutcome[] }) {
       />
       <ul
         aria-label="Outcomes, each linking to its case study"
-        className="pf-read-flex pf-read-flex--wide"
+        className="pf-read-pair"
       >
         {outcomes.map((outcome) => (
           <li
@@ -230,10 +230,7 @@ export default function ProofPage() {
           </Reveal>
         ) : null}
         <Reveal>
-          <section
-            aria-label="Case studies"
-            className="pf-read-flex pf-read-flex--wide"
-          >
+          <section aria-label="Case studies" className="pf-read-pair">
             {getProofCases().map((venture) => (
               <CaseTile key={venture.slug} venture={venture} />
             ))}

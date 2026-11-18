@@ -187,11 +187,16 @@
     flex: 1 1 16rem;
     min-inline-size: 0;
   }
-  .pf-read-flex--wide > * {
-    flex-basis: 28rem;
-  }
   .pf-read-flex > .pf-read-lead {
     flex-basis: 100%;
+  }
+  /* Two by two from 810 px: the four outcomes, the two venture cases. */
+  .pf-read-pair {
+    display: grid;
+    gap: 16px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
   }
   .pf-read-item {
     display: flex;
@@ -430,6 +435,11 @@
     /* Shipped takes the row Next and In progress leave. */
     .pf-read-board--build > :last-child {
       grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 50.625rem) {
+    .pf-read-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   @media (min-width: 64rem) {
