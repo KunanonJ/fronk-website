@@ -65,15 +65,15 @@ export const storyCopy = {
    */
   paragraphs: [
     [
-      "I studied ",
-      { strong: "electrical engineering at Kasetsart University" },
-      ", then started on smart contracts at Bitkub and blockchain development at KK Venture Global.",
+      "I studied ", // DRAFT
+      { strong: "electrical engineering at Kasetsart University" }, // DRAFT
+      ", then started on smart contracts at Bitkub and blockchain development at KK Venture Global.", // DRAFT
     ],
     [
-      "From there I moved into delivery: ",
-      { strong: "business systems" },
-      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Today I lead ",
-      { strong: "IT and AI engineering at The Binary Holdings" },
+      "From there I moved into delivery: ", // DRAFT
+      { strong: "business systems" }, // DRAFT
+      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Today I lead ", // DRAFT
+      { strong: "IT and AI engineering at The Binary Holdings" }, // DRAFT
       ".",
     ],
   ] as const satisfies readonly (readonly StoryRun[])[],

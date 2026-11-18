@@ -3,9 +3,10 @@
  * Design spec 9, 10, 10.1, 11 and 12. Plain CSS on the tokens in globals.css,
  * phones first: the meta row and the steps take two columns from 600 px, the
  * showcase two from 600 px, the viewer opens from 810 px, the meta row takes
- * four columns from 1024 px and the rail appears from 1100 px. Every rule is
- * in @layer components; movement waits for prefers-reduced-motion:
- * no-preference at the end.
+ * four columns from 1024 px and the rail appears from 1100 px. The cover's
+ * labelled drawing follows the picture's own width, not the screen's (a
+ * container query). Every rule is in @layer components; movement waits for
+ * prefers-reduced-motion: no-preference at the end.
  */
 
 @layer components {
@@ -231,6 +232,19 @@
   .pf-case-art__wide {
     display: none;
   }
+  /* The labelled drawing once the picture itself is 640 px wide (40rem): the
+     mockup's 640-unit drawing is then at its full size or larger, so its
+     labels of 12 units render at 12 px or more (spec 12 item 5). A screen
+     query cannot tell: the frame's padding keeps the picture under 640 px up
+     to a screen of about 892 px. */
+  @container (min-width: 40rem) {
+    .pf-case-art__wide {
+      display: block;
+    }
+    .pf-case-art__narrow {
+      display: none;
+    }
+  }
   .pf-case-art__shot {
     display: block;
     inline-size: 100%;
@@ -391,14 +405,18 @@
   .pf-case-contents__summary::-webkit-details-marker {
     display: none;
   }
+  /* The marks are drawn, not read: empty alternative text after the slash.
+     An engine without that syntax keeps the first declaration. */
   .pf-case-contents__summary::after {
     content: "+";
+    content: "+" / "";
     font-size: 1.125rem;
     line-height: 1;
     color: var(--ink-60);
   }
   .pf-case-contents__details[open] .pf-case-contents__summary::after {
     content: "\2212";
+    content: "\2212" / "";
   }
   .pf-case-contents .pf-case-toc {
     padding: 4px 0 16px 18px;
@@ -816,6 +834,10 @@
     border-radius: var(--radius-snug);
     box-shadow: var(--elev-stage);
     transform-origin: 0 0;
+  }
+  /* The viewer's picture opens nothing: this beats the page tile's zoom-in
+     cursor from 810 px, which the viewer's copy shares a class with. */
+  .pf-lightbox .pf-lightbox__tile {
     cursor: default;
   }
   .pf-lightbox__cap {
@@ -944,6 +966,14 @@
   .pf-lift__mat[data-kind="illustration"] .pf-lift__media {
     padding: 9% 11%;
   }
+  /* A card's venture drawing under 22rem of picture: the logo alone. The
+     mat's height follows its 16:10 ratio, and the loop's names would wrap
+     past it (at a 600 px screen, by 35 px); the card's title says the same. */
+  @container (width < 22rem) {
+    .pf-lift__mat .pf-case-venture__steps {
+      display: none;
+    }
+  }
   .pf-lift__meta {
     display: flex;
     flex-wrap: wrap;
@@ -1034,12 +1064,6 @@
     .pf-case-row__head {
       padding-top: 6px;
     }
-    .pf-case-art__wide {
-      display: block;
-    }
-    .pf-case-art__narrow {
-      display: none;
-    }
     .pf-sc-grid {
       gap: clamp(56px, 5vw, 88px) 20px;
     }
@@ -1122,6 +1146,10 @@
     .pf-case-toc__link.is-current .pf-case-toc__number::before {
       background: CanvasText;
     }
+    /* The ink and accent that mark the current chapter are gone here. */
+    .pf-case-toc__link[aria-current] {
+      text-decoration-line: underline;
+    }
     .pf-layers-art__node {
       background: CanvasText;
     }
@@ -1167,7 +1195,11 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .pf-case-toc__link:hover {
+    /* The back link and the related topics wear ink 80 here, which beats
+       the text links' own hover ink: give it back. */
+    .pf-case-toc__link:hover,
+    .pf-case-hero__back .ds-back:hover,
+    .pf-case-links .ds-text-link:hover {
       color: var(--ink);
     }
   }

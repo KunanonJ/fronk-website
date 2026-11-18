@@ -62,6 +62,10 @@ export function ShowcaseTile({
     <figure
       className={cn("pf-sc", tile.size === "full" && "pf-sc--full")}
       aria-labelledby={titleId}
+      // Focus returns here from the viewer when Enlarge is not drawn (the
+      // screen narrowed under 810 px while it was open); never a tab stop.
+      tabIndex={-1}
+      data-sc-figure={tile.id}
     >
       {/* The tile is not a control itself: the Enlarge button is its
           keyboard and screen-reader way in, so the press here only helps a

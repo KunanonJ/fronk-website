@@ -27,9 +27,11 @@ import { cn } from "@/lib/utils/cn";
  * own copy of the tile's picture, so nothing moves between the page and the
  * dialog; the page's tile steps aside while it is open. Escape (the dialog's
  * cancel event), the close button or a press on the empty stage closes it.
- * While it is open the page behind does not scroll. Focus lands on the pause
- * control of a moving picture, else on close, and returns to the tile's
- * Enlarge button. Styles: `.pf-lightbox*` in src/styles/profile/case.css.
+ * While it is open the page behind does not scroll, though a pinch or a
+ * ctrl-wheel still zooms. Focus lands on the pause control of a moving
+ * picture, else on close, and returns to the tile's Enlarge button, or to the
+ * tile's figure when Enlarge is not drawn (the screen narrowed under 810 px
+ * while the viewer was open). Styles: `.pf-lightbox*` in case.css.
  */
 
 /** Keys that would scroll the page behind the viewer. */
@@ -42,6 +44,25 @@ const SCROLL_KEYS = new Set([
   "End",
   " ",
 ]);
+
+/**
+ * A pinch (two fingers or more) or a ctrl-wheel: a zoom, which stays the
+ * reader's while the viewer holds the page still (WCAG 1.4.4).
+ */
+export function isZoomGesture(event: Event): boolean {
+  if (event.type === "wheel") return (event as WheelEvent).ctrlKey;
+  if (event.type === "touchmove") {
+    return ((event as TouchEvent).touches?.length ?? 0) > 1;
+  }
+  return false;
+}
+
+/** Whether `el` is drawn: Enlarge is `display: none` under 810 px. */
+function drawn(el: HTMLElement): boolean {
+  return typeof el.checkVisibility === "function"
+    ? el.checkVisibility()
+    : getComputedStyle(el).display !== "none";
+}
 
 function LargeMedia({
   tile,
@@ -123,7 +144,15 @@ export function CaseLightbox({
     // The page's tile is hidden until the parent hears of the close, and a
     // hidden button cannot take focus: commit that first, then return focus.
     flushSync(onClosed);
-    opener?.focus();
+    // Under 810 px Enlarge is not drawn and cannot take focus, which would
+    // fall to the page: the tile's figure takes it instead.
+    const target =
+      opener && drawn(opener)
+        ? opener
+        : tileId
+          ? document.querySelector<HTMLElement>(`[data-sc-figure="${tileId}"]`)
+          : null;
+    target?.focus();
   }, [tileId, onClosed]);
 
   const requestClose = useCallback(() => {
@@ -157,10 +186,12 @@ export function CaseLightbox({
   }, [tileId, parts, origin]);
 
   // While open, the page behind keeps still: no wheel, touch or key scrolls.
-  // Space still presses a focused button.
+  // A zoom still zooms, and Space still presses a focused button.
   useEffect(() => {
     if (!tileId) return;
-    const stop = (event: Event) => event.preventDefault();
+    const stop = (event: Event) => {
+      if (!isZoomGesture(event)) event.preventDefault();
+    };
     const onKey = (event: KeyboardEvent) => {
       if (!SCROLL_KEYS.has(event.key)) return;
       const target = event.target as Element | null;

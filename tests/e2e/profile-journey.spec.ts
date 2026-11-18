@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { notebookEntries } from "../../lib/content/testimonials";
 
 /**
@@ -44,9 +44,93 @@ async function prepare(page: Page, theme: Theme = "light") {
   }, theme);
 }
 
+/**
+ * Opens a page and waits until it has hydrated: the orbit's controls (the
+ * Home) and the notebook's ready mark (/preview/system) render only on the
+ * client, after the router's own restore has run.
+ */
 async function visit(page: Page, path = HOME) {
+  // A fresh navigation each time: the same address again counts as a
+  // reload, after which the browser restores the last scroll position on its
+  // own, late, over the test's own scroll.
+  if (page.url() !== "about:blank") await page.goto("about:blank");
   await page.goto(path, { waitUntil: "networkidle" });
+  await expect(
+    page.locator(
+      path === SYSTEM
+        ? `${NOTEBOOK} .pf-book[data-ready]`
+        : ".pf-orbit__controls",
+    ),
+  ).toBeAttached();
   await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Puts the keyboard's starting point on `place` (a heading, say), as reading
+ * up to it would: a script focus on plain text, which the next Tab leaves.
+ */
+async function startAt(place: Locator) {
+  await place.evaluate((el) => {
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+    (el as HTMLElement).focus({ preventScroll: true });
+  });
+}
+
+/**
+ * Moves focus to `target` with real Tab presses, as a keyboard reader does,
+ * from `from` when given (see startAt); Shift+Tab when `backward`.
+ */
+async function tabTo(
+  page: Page,
+  target: Locator,
+  { from, backward = false }: { from?: Locator; backward?: boolean } = {},
+) {
+  if (from) await startAt(from);
+  for (let presses = 0; presses < 30; presses += 1) {
+    if (await target.evaluate((el) => el === document.activeElement)) return;
+    await page.keyboard.press(tabKey(page, backward));
+  }
+  await expect(target).toBeFocused();
+}
+
+/**
+ * The key that moves focus to the next control. Safari's Tab reaches only
+ * text fields unless a setting is on; Option+Tab reaches every control, and
+ * is what a keyboard reader there presses.
+ */
+function tabKey(page: Page, backward = false): string {
+  const webkit = page.context().browser()?.browserType().name() === "webkit";
+  return `${webkit ? "Alt+" : ""}${backward ? "Shift+" : ""}Tab`;
+}
+
+/** The orbit's spin, as its animation runs: "running", "paused" or "none". */
+const spinState = (page: Page) =>
+  page
+    .locator(".pf-orbit")
+    .evaluate(
+      (el) =>
+        el
+          .getAnimations()
+          .find(
+            (animation) =>
+              (animation as CSSAnimation).animationName === "kj-orbit-spin",
+          )?.playState ?? "none",
+    );
+
+/**
+ * Waits until the orbit stands still: no rise-in, turn or spin under way in
+ * it (the spin held by its button, hover or focus).
+ */
+function orbitStill(page: Page) {
+  return page.waitForFunction(() =>
+    document.getAnimations().every((animation) => {
+      const target = (animation.effect as KeyframeEffect | null)?.target;
+      return (
+        !(target instanceof Element && target.closest(".pf-orbit")) ||
+        animation.playState !== "running"
+      );
+    }),
+  );
 }
 
 function only(projects: readonly string[]) {
@@ -68,38 +152,31 @@ function settle(page: Page) {
 
 /**
  * Puts an element's top at `offset` px from the viewport's, without
- * smoothing, and checks it stays there: WebKit restores the scroll position
- * once more as the page hydrates, so an early scroll can snap back to the
- * top. Waits use real time, so this works with a fake clock installed too.
+ * smoothing. `visit` waits for hydration, after which nothing moves the
+ * page on its own (src/lib/scrollRestoration.ts keeps an early scroll too).
  */
 async function scrollTop(page: Page, selector: string, offset = 0) {
-  const top = () =>
-    page.evaluate(
-      (sel) => document.querySelector(sel)!.getBoundingClientRect().top,
-      selector,
-    );
+  // Scrolls again on each look, in case the page grew after the first one
+  // (an image or a font arriving): it ends as soon as the place holds.
   await expect
     .poll(
-      async () => {
-        await page.evaluate(
+      () =>
+        page.evaluate(
           ([sel, off]) => {
             const el = document.querySelector(sel as string)!;
+            const top = () => el.getBoundingClientRect().top;
             window.scrollTo({
-              top:
-                el.getBoundingClientRect().top +
-                window.scrollY -
-                (off as number),
+              top: top() + window.scrollY - (off as number),
               behavior: "instant",
             });
+            // How far it still is from its place, in px.
+            return Math.abs(top() - (off as number));
           },
           [selector, offset] as const,
-        );
-        await page.waitForTimeout(150);
-        return Math.abs((await top()) - offset) <= 1;
-      },
-      { timeout: 10_000, message: `${selector} held at ${offset}px` },
+        ),
+      { message: `${selector} at ${offset}px` },
     )
-    .toBe(true);
+    .toBeLessThanOrEqual(1);
 }
 
 const orbitValue = (page: Page, property: string) =>
@@ -183,17 +260,29 @@ function labelReport(page: Page) {
       });
       if (copy.some((c) => overlap(a, c)))
         problems.push(`label ${i} overlaps the copy or the controls`);
-      // A tool's name, or a file tile's extension.
+      // A tool's name, or a file tile's extension. A word kept only for
+      // screen readers (1 px, on phones) is not drawn, so nothing covers it.
       const words = shown[i]!.querySelector(
         ".pf-orbit__name, .pf-orbit__kind",
       )!;
       const box = rect(words);
-      const hit = document.elementFromPoint(
-        box.left + box.width / 2,
-        box.top + box.height / 2,
-      );
-      if (box.top >= 0 && box.bottom <= innerHeight && !words.contains(hit))
-        problems.push(`label ${i} is covered`);
+      if (box.width <= 1 || box.height <= 1) return;
+      // A name faded out to nothing (a neighbour's, when the ring stops
+      // between slots) is not drawn: look through it.
+      const hit = document
+        .elementsFromPoint(box.left + box.width / 2, box.top + box.height / 2)
+        .find((el) => {
+          const label = el.closest(".pf-orbit__label");
+          return !label || parseFloat(getComputedStyle(label).opacity) > 0.01;
+        });
+      if (
+        box.top >= 0 &&
+        box.bottom <= innerHeight &&
+        !words.contains(hit ?? null)
+      )
+        problems.push(
+          `label ${i} is covered by .${[...(hit?.classList ?? [])].join(".")}`,
+        );
     });
     return { shown: shown.length, half, problems };
   });
@@ -323,66 +412,106 @@ test.describe("journey: the stage and its orbit", () => {
     expect(await offset()).toBe(turned);
   });
 
-  test("with motion allowed the ring turns while in view, and pauses by its button, on hover and on focus", async ({
+  test("with motion allowed the ring turns while in view, and holds by its button, with focus inside and on hover", async ({
     page,
   }) => {
     await prepare(page);
     await visit(page);
-    // The stage in view, 300 px down, and the pointer above it: hovering the
-    // stage would hold the ring too. The buttons are pressed from script, so
-    // neither the pointer nor the focus moves onto the stage, and the page
-    // does not scroll to them.
-    await scrollTop(page, "#journey", 300);
-    await page.mouse.move(5, 5);
-    const press = (name: string) =>
-      page.evaluate((label) => {
-        const button = [
-          ...document.querySelectorAll<HTMLButtonElement>(
-            ".pf-orbit__controls button",
-          ),
-        ].find(
-          (el) =>
-            el.getAttribute("aria-label") === label ||
-            el.textContent?.trim() === label,
-        )!;
-        button.click();
-      }, name);
+    const stage = page.locator(".pf-journey__stage");
     const spin = () => orbitValue(page, "--orbit-spin");
+    const inStage = () =>
+      stage.evaluate((el) => el.contains(document.activeElement));
+    // The stage in view, 300 px down, and the pointer on the section above
+    // it. A real click scrolls its button into view, so this comes again.
+    const away = async () => {
+      await scrollTop(page, "#journey", 300);
+      await page.mouse.move(5, 5);
+    };
+    await away();
+    await expect.poll(() => spinState(page)).toBe("running");
     const a = await spin();
-    await page.waitForTimeout(400);
-    expect(await spin()).toBeGreaterThan(a);
+    await expect.poll(spin).toBeGreaterThan(a);
     // The pause button holds it, and names what the next press will do.
-    await press("Pause the orbit");
+    await page.getByRole("button", { name: "Pause the orbit" }).click();
     await expect(
       page.getByRole("button", { name: "Play the orbit" }),
     ).toHaveCount(1);
-    // A running animation still ticks once as the pause applies.
-    await settle(page);
-    const held = await spin();
-    await page.waitForTimeout(400);
-    expect(await spin()).toBe(held);
-    await press("Play the orbit");
+    await expect.poll(() => spinState(page)).toBe("paused");
+    // Play plays at once, though the pointer is on the stage and the focus
+    // may be on the button.
+    await page.getByRole("button", { name: "Play the orbit" }).click();
+    await expect.poll(() => spinState(page)).toBe("running");
     const playing = await spin();
-    await page.waitForTimeout(400);
-    expect(await spin()).toBeGreaterThan(playing);
-    // Focus inside the stage holds it too.
-    await page.evaluate(() =>
-      document
-        .querySelector<HTMLButtonElement>(".pf-orbit__controls button")!
-        .focus({ preventScroll: true }),
-    );
-    await settle(page);
-    const focused = await spin();
-    await page.waitForTimeout(400);
-    expect(await spin()).toBe(focused);
+    await expect.poll(spin).toBeGreaterThan(playing);
+    // Once the pointer and the focus have left (to the story, after the
+    // stage), it turns; the keyboard back to its controls holds it again.
+    await away();
+    await startAt(page.locator("#story"));
+    expect(await inStage()).toBe(false);
+    await expect.poll(() => spinState(page)).toBe("running");
+    await page.keyboard.press(tabKey(page, true));
+    expect(await inStage()).toBe(true);
+    await expect.poll(() => spinState(page)).toBe("paused");
     if (test.info().project.name === "desktop") {
-      await page.evaluate(() => (document.activeElement as HTMLElement).blur());
-      const stage = (await page.locator(".pf-journey__stage").boundingBox())!;
-      await page.mouse.move(stage.x + 20, stage.y + 20);
-      await settle(page);
-      const hovered = await spin();
-      await page.waitForTimeout(400);
-      expect(await spin()).toBe(hovered);
+      // Hover holds it too: focus out of the stage, the pointer onto it.
+      await startAt(page.locator("#story"));
+      await away();
+      await expect.poll(() => spinState(page)).toBe("running");
+      const box = (await stage.boundingBox())!;
+      await page.mouse.move(box.x + 20, box.y + 20);
+      await expect.poll(() => spinState(page)).toBe("paused");
+    }
+  });
+
+  test("with motion allowed, names stay fully drawn wherever the ring stops: on hover, and after drags of 5, 9 and 13 degrees", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page);
+    await scrollTop(page, "#journey", 300);
+    await page.mouse.move(5, 5);
+    const stage = page.locator(".pf-journey__stage");
+    const spin = () => orbitValue(page, "--orbit-spin");
+    if (test.info().project.name === "desktop") {
+      // Hover holds the ring wherever its turn has got to: three moments.
+      const box = (await stage.boundingBox())!;
+      for (let moment = 0; moment < 3; moment += 1) {
+        const from = await spin();
+        await expect.poll(spin).toBeGreaterThan(from + 4);
+        await page.mouse.move(box.x + 20, box.y + 20);
+        await expect.poll(() => spinState(page)).toBe("paused");
+        await orbitStill(page);
+        const report = await labelReport(page);
+        expect(report.half, `half-drawn names at moment ${moment}`).toBe(0);
+        expect(report.shown).toBeGreaterThan(0);
+        await page.mouse.move(5, 5);
+      }
+    }
+    // Drags that end between slots, with the spin paused by its button. The
+    // click scrolls the button into view: the stage is placed again, its top
+    // at the screen's, and measured there.
+    await page.getByRole("button", { name: "Pause the orbit" }).click();
+    await scrollTop(page, ".pf-journey__stage");
+    await orbitStill(page);
+    const box = (await stage.boundingBox())!;
+    const radius = await page
+      .locator(".pf-orbit")
+      .evaluate((el) => el.clientWidth * 0.43);
+    // The ring's left edge, level with the stage's middle: outside the copy.
+    const y = box.y + box.height / 2;
+    for (const degrees of [5, 9, 13]) {
+      const dx = (degrees * Math.PI * radius) / 180;
+      const before = await orbitValue(page, "--orbit-offset");
+      await page.mouse.move(box.x + 12, y);
+      await page.mouse.down();
+      await page.mouse.move(box.x + 12 + dx, y, { steps: 8 });
+      await page.mouse.up();
+      await orbitStill(page);
+      // The drag turned the ring.
+      expect(await orbitValue(page, "--orbit-offset")).toBeLessThan(before);
+      const report = await labelReport(page);
+      expect(report.half, `half-drawn names after ${degrees} degrees`).toBe(0);
+      expect(report.shown).toBeGreaterThan(0);
     }
   });
 
@@ -462,6 +591,44 @@ test.describe("journey: device matrix, tap areas and the story's layout (desktop
       }
     }
   });
+
+  test("with motion allowed, held by its button at each width, the ring's names are whole and collide with nothing", async ({
+    page,
+  }) => {
+    await prepare(page);
+    for (const [width, height] of MATRIX_SIZES) {
+      await page.setViewportSize({ width, height });
+      await visit(page);
+      await scrollTop(page, "#journey");
+      await page.getByRole("button", { name: "Pause the orbit" }).click();
+      await page.mouse.move(0, 0);
+      await orbitStill(page);
+      const report = await labelReport(page);
+      expect(report.half, `half-drawn labels at ${width}`).toBe(0);
+      expect(report.problems, `labels at ${width}`).toEqual([]);
+    }
+  });
+
+  for (const width of [344, 390]) {
+    test(`at ${width} px, with motion allowed, no name slides under the controls in any of the 20 positions`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await prepare(page);
+      await visit(page);
+      await scrollTop(page, "#journey");
+      await page.getByRole("button", { name: "Pause the orbit" }).click();
+      const right = page.getByRole("button", { name: "Turn the tools right" });
+      for (let position = 0; position < 20; position += 1) {
+        await orbitStill(page);
+        const report = await labelReport(page);
+        expect(report.problems, `position ${position}`).toEqual([]);
+        expect(report.half, `position ${position}`).toBe(0);
+        expect(report.shown, `position ${position}`).toBe(1);
+        await right.click();
+      }
+    });
+  }
 
   test("the story sits beside the records card from 1024 px, and above it below", async ({
     page,
@@ -570,23 +737,34 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
   test("previous, next and pause work from the keyboard; only the open page is reachable", async ({
     page,
   }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Motion allowed, so the pause button is there to reach.
     await prepare(page);
     await visit(page, SYSTEM);
     await scrollTop(page, NOTEBOOK, 100);
     expect(await openPage(page)).toBe("Note 1 of 3");
     await expect(page.locator(`${NOTEBOOK} article[inert]`)).toHaveCount(2);
-    await page.getByRole("button", { name: "Next page" }).focus();
+    const heading = page.locator(`${NOTEBOOK} h2`);
+    await tabTo(page, page.getByRole("button", { name: "Next page" }), {
+      from: heading,
+    });
     await page.keyboard.press("Enter");
     await expect.poll(() => openPage(page)).toBe("Note 2 of 3");
     await expect(page.locator(`${NOTEBOOK} [aria-live='polite']`)).toHaveText(
       "Note 2 of 3: Sample person",
     );
-    await page.getByRole("button", { name: "Previous page" }).focus();
+    await tabTo(page, page.getByRole("button", { name: "Previous page" }), {
+      backward: true,
+    });
     await page.keyboard.press("Enter");
     await expect.poll(() => openPage(page)).toBe("Note 1 of 3");
     await page.keyboard.press("Enter");
     await expect.poll(() => openPage(page)).toBe("Note 3 of 3");
+    // The pause button, between them, names what the next press will do.
+    await tabTo(page, page.getByRole("button", { name: "Pause notes" }));
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", { name: "Play notes" }),
+    ).toBeFocused();
   });
 
   test("turns on its own after the page's wait, holds while focus is inside, and the pause button names what it does", async ({
@@ -608,11 +786,13 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
     await expect(page.locator(`${NOTEBOOK} [aria-live='polite']`)).toHaveText(
       "",
     );
-    await page.getByRole("button", { name: "Next page" }).focus();
+    await tabTo(page, page.getByRole("button", { name: "Next page" }), {
+      from: page.locator(`${NOTEBOOK} h2`),
+    });
     await page.clock.runFor(30_000);
     expect(await openPage(page)).toBe("Note 2 of 3");
     const pause = page.getByRole("button", { name: "Pause notes" });
-    await pause.focus();
+    await tabTo(page, pause, { backward: true });
     await page.keyboard.press("Space");
     await expect(
       page.getByRole("button", { name: "Play notes" }),
@@ -639,10 +819,21 @@ test.describe("the notebook, with sample notes on /preview/system", () => {
     await visit(page, SYSTEM);
     await scrollTop(page, NOTEBOOK, 100);
     await page.getByRole("button", { name: "Next page" }).click();
-    await page.waitForTimeout(300);
-    const mid = await turnOf(page, 0);
-    expect(mid).toBeGreaterThan(0);
-    expect(mid).toBeLessThan(1);
+    // The turn is a 1 s transition of the page's --turn, under way now.
+    const turning = await page
+      .locator(`${NOTEBOOK} article[data-page='0']`)
+      .evaluate((el) =>
+        el.getAnimations().map((animation) => ({
+          property: (animation as CSSTransition).transitionProperty,
+          duration: animation.effect?.getTiming().duration,
+          state: animation.playState,
+        })),
+      );
+    expect(turning).toContainEqual({
+      property: "--turn",
+      duration: 1000,
+      state: "running",
+    });
     await expect.poll(() => turnOf(page, 0), { timeout: 3_000 }).toBe(1);
   });
 

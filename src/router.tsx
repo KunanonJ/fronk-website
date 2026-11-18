@@ -3,6 +3,7 @@ import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import RouteError from "@/components/RouteError";
 import { createQueryClient } from "@/src/lib/queryClient";
+import { restoreScrollAfterHydration } from "@/src/lib/scrollRestoration";
 import { routeTree } from "./routeTree.gen";
 
 export type RouterContext = { queryClient: QueryClient };
@@ -14,7 +15,9 @@ export function getRouter() {
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    scrollRestoration: true,
+    // On, except the restore that runs as the page hydrates once the visitor
+    // has scrolled (src/lib/scrollRestoration.ts).
+    scrollRestoration: restoreScrollAfterHydration(),
     defaultPreload: "intent",
     // Nested routes fail inside the site layout; the root has its own errorComponent.
     defaultErrorComponent: RouteError,

@@ -250,6 +250,23 @@ describe("CasePage, the hero's links", () => {
     ).toHaveAttribute("href", "/portfolio");
   });
 
+  it("gives a venture the byline that carries its live page's My role footer", () => {
+    const ventures = getAllVentures().filter((venture) => venture.caseStudy);
+    expect(ventures.length).toBeGreaterThan(0);
+    for (const venture of ventures) {
+      const { unmount } = render(
+        <CasePage study={findVentureCase(venture.slug)!} />,
+      );
+      const author = screen.getByRole("link", { name: "Kunanon Jarat" });
+      expect(author, venture.slug).toHaveAttribute("href", "/about");
+      expect(author, venture.slug).toHaveAttribute("rel", "author");
+      expect(author.closest("p")?.textContent, venture.slug).toBe(
+        `By Kunanon Jarat · ${venture.role}`,
+      );
+      unmount();
+    }
+  });
+
   it("opens the share panel from the reused Share pill, and Escape closes it", () => {
     render(<CasePage study={findProjectCase("tbh-intranet")!} />);
     const share = screen.getByRole("button", { name: "Share" });
@@ -273,6 +290,33 @@ describe("CasePage, the hero's links", () => {
     expect(
       screen.queryByRole("region", { name: "Share this page" }),
     ).toBeNull();
+  });
+
+  it("closes the share panel when focus leaves its row, and leaves focus where it went (WCAG 2.4.11)", () => {
+    render(<CasePage study={findProjectCase("tbh-intranet")!} />);
+    fireEvent.click(screen.getByRole("button", { name: "Share" }));
+    const panel = screen.getByRole("region", { name: "Share this page" });
+    const row = within(panel).getAllByRole("button")[0]!;
+    // Inside the row (the panel's rows and the pill), it stays open.
+    fireEvent.blur(row, {
+      relatedTarget: screen.getByRole("button", { name: "Share" }),
+    });
+    expect(screen.getByRole("region", { name: "Share this page" })).toBe(panel);
+    // Focus going nowhere (another window, the share sheet) keeps it open.
+    fireEvent.blur(row, { relatedTarget: null });
+    expect(
+      screen.getByRole("region", { name: "Share this page" }),
+    ).toBeInTheDocument();
+    // Tab past the panel, to the link under it: it closes.
+    const next = screen.getByRole("link", {
+      name: "As stated in the résumé →",
+    });
+    next.focus();
+    fireEvent.blur(row, { relatedTarget: next });
+    expect(
+      screen.queryByRole("region", { name: "Share this page" }),
+    ).toBeNull();
+    expect(next).toHaveFocus();
   });
 });
 

@@ -41,6 +41,16 @@ export interface SectionHeaderProps {
   rule?: boolean;
   /** The lead's type style: `t-body` (default), or `t-lead` (the Journey). */
   leadSize?: "body" | "lead";
+  /**
+   * A class added to the h2, after `t-title`, for a section whose heading
+   * takes its own size (the notebook, spec 8.7).
+   */
+  titleClassName?: string;
+  /**
+   * Links or buttons under the h2 and the lead, such as the Journey's "Read
+   * the story" pill (spec 8.6). None by default.
+   */
+  actions?: ReactNode;
   className?: string;
 }
 
@@ -54,6 +64,8 @@ export function SectionHeader({
   align = "split",
   rule = true,
   leadSize = "body",
+  titleClassName,
+  actions,
   className,
 }: SectionHeaderProps) {
   const centred = align === "centred";
@@ -77,7 +89,7 @@ export function SectionHeader({
       <div className="pf-section-head__row">
         <h2
           id={titleId}
-          className="t-title pf-section-head__title"
+          className={cn("t-title pf-section-head__title", titleClassName)}
           style={{ maxInlineSize: `${titleMaxWidth}ch` }}
         >
           {title}
@@ -94,6 +106,9 @@ export function SectionHeader({
           </p>
         ) : null}
       </div>
+      {actions ? (
+        <div className="pf-section-head__actions">{actions}</div>
+      ) : null}
     </div>
   );
 }

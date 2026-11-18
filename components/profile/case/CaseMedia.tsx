@@ -7,8 +7,9 @@ import type { CaseArt, CaseMedia } from "@/lib/content/caseStudy";
  * registered screenshot, or a code-drawn illustration. The cover shows it
  * large; a More projects card shows it small. Text drawn inside renders at
  * 12 px or more, or is drawn as bars (spec 12 item 5): the project mockup's
- * SVG writes its labels of 12 units or more only from 810 px, where the cover
- * draws it at its full size or larger, and draws bars below that and on cards.
+ * SVG writes its labels of 12 units or more only once the picture is 640 px
+ * wide (a container query on `.pf-case-art`), where the cover draws it at its
+ * full size or larger, and draws bars below that and on cards.
  * Styles: `.pf-case-art*` in src/styles/profile/case.css.
  */
 

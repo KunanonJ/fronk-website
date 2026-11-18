@@ -107,6 +107,59 @@ describe("Journey", () => {
     ).not.toHaveAttribute("aria-pressed");
   });
 
+  it("plays at once when Play is pressed: hover and focus hold it again only after both have left", () => {
+    stubMotion(false);
+    const { container } = render(
+      <>
+        <Journey />
+        <button type="button">Elsewhere</button>
+      </>,
+    );
+    const stage = container.querySelector<HTMLElement>(".pf-journey__stage")!;
+    fireEvent.click(screen.getByRole("button", { name: orbitCopy.pause }));
+    expect(stage).not.toHaveAttribute("data-play");
+    const play = screen.getByRole("button", { name: orbitCopy.play });
+    fireEvent.pointerEnter(stage);
+    play.focus();
+    fireEvent.click(play);
+    expect(stage).not.toHaveAttribute("data-paused");
+    expect(stage).toHaveAttribute("data-play");
+    // The pointer leaves, focus stays inside: still playing.
+    fireEvent.pointerLeave(stage);
+    expect(stage).toHaveAttribute("data-play");
+    // Focus leaves too: the holds are back.
+    const elsewhere = screen.getByRole("button", { name: "Elsewhere" });
+    fireEvent.blur(screen.getByRole("button", { name: orbitCopy.pause }), {
+      relatedTarget: elsewhere,
+    });
+    expect(stage).not.toHaveAttribute("data-play");
+    // Pause clears it as well.
+    fireEvent.click(screen.getByRole("button", { name: orbitCopy.pause }));
+    fireEvent.click(screen.getByRole("button", { name: orbitCopy.play }));
+    expect(stage).toHaveAttribute("data-play");
+    fireEvent.click(screen.getByRole("button", { name: orbitCopy.pause }));
+    expect(stage).not.toHaveAttribute("data-play");
+  });
+
+  it("puts the heading before the tool list, so a screen reader meets it first", () => {
+    stubMotion(false);
+    render(<Journey />);
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: journeyCopy.heading,
+    });
+    const list = screen.getByRole("list", { name: orbitCopy.label });
+    expect(
+      heading.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // The controls come after the list.
+    expect(
+      list.compareDocumentPosition(
+        screen.getByRole("button", { name: orbitCopy.previous }),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("stays still under reduced motion, with no pause button, but still turns by the buttons", () => {
     stubMotion(true);
     const { container } = render(<Journey />);

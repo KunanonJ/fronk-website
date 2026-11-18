@@ -14,7 +14,7 @@ import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
  * compare the two and swap the page body under an unchanged JSON-LD.
  */
 
-/** A project page's two scripts: the work, then its breadcrumb. */
+/** A project page's two scripts: its breadcrumb, then the work. */
 export function projectJsonLd(project: PortfolioProject): string[] {
   return [
     serializeJsonLd(

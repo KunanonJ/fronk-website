@@ -14,7 +14,9 @@ import { cn } from "@/lib/utils/cn";
  * the bento chrome's state, which the live header provides and the preview
  * chrome does not, so this row provides it, and draws the same panel under
  * itself. Escape closes it and returns focus to the pill; a press outside the
- * row closes it. Styles: `.pf-case-actions*` in src/styles/profile/case.css.
+ * row closes it, and so does focus that moves out of the row (Tab past the
+ * panel), which leaves focus where it went: the panel would cover it there
+ * (WCAG 2.4.11). Styles: `.pf-case-actions*` in src/styles/profile/case.css.
  */
 
 function ShareRow({ external }: { external?: CaseLink }) {
@@ -40,7 +42,21 @@ function ShareRow({ external }: { external?: CaseLink }) {
   }, [panel, close]);
 
   return (
-    <div ref={row} className="pf-case-actions">
+    <div
+      ref={row}
+      className="pf-case-actions"
+      onBlur={(event) => {
+        // Focus going nowhere (another window, the share sheet) keeps it open.
+        const next = event.relatedTarget;
+        if (
+          panel === "share" &&
+          next instanceof Node &&
+          !event.currentTarget.contains(next)
+        ) {
+          close();
+        }
+      }}
+    >
       {external ? (
         <a
           href={external.href}

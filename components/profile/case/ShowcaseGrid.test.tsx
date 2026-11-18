@@ -214,6 +214,40 @@ describe("the viewer", () => {
     expect(after.defaultPrevented).toBe(false);
   });
 
+  it("lets a pinch or a ctrl-wheel zoom while it holds the page still (WCAG 1.4.4)", () => {
+    render(<ShowcaseGrid tiles={tilesOf("tbh-intranet")} />);
+    openFrom("Approval flow");
+    const touch = (fingers: number) => {
+      const event = new Event("touchmove", { cancelable: true });
+      Object.defineProperty(event, "touches", { value: { length: fingers } });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    const wheel = (ctrlKey: boolean) => {
+      const event = new WheelEvent("wheel", { cancelable: true, ctrlKey });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(touch(1)).toBe(true);
+    expect(touch(2)).toBe(false);
+    expect(wheel(false)).toBe(true);
+    expect(wheel(true)).toBe(false);
+  });
+
+  it("gives focus to the tile's figure when Enlarge is not drawn, as under 810 px", async () => {
+    render(<ShowcaseGrid tiles={tilesOf("tbh-intranet")} />);
+    const enlarge = openFrom("Architecture");
+    // The screen narrowed while the viewer was open: Enlarge is display: none.
+    enlarge.style.display = "none";
+    const dialog = screen.getByRole("dialog");
+    await act(async () => {
+      dialog.dispatchEvent(new Event("cancel", { cancelable: true }));
+    });
+    expect(dialog).not.toHaveAttribute("open");
+    expect(screen.getByRole("figure", { name: "Architecture" })).toHaveFocus();
+    expect(document.body).not.toHaveFocus();
+  });
+
   it("shares the pause state between the page's tile and the viewer", async () => {
     render(<ShowcaseGrid tiles={tilesOf("tbh-intranet")} />);
     openFrom("Approval flow");

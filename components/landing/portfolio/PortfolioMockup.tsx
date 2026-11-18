@@ -17,8 +17,9 @@ const H = 400;
  * so small that its 10 to 18 unit labels would render under the 12 px text
  * floor (the redesigned Home's stack cards, design spec 12 item 5). "floor"
  * writes the labels of 12 units or more and draws the smaller ones as bars,
- * for a mockup drawn at its full size or larger (the case-study cover from
- * 810 px, Phase 5), where every written label renders at 12 px or more.
+ * for a mockup drawn at its full size or larger (the case-study cover once
+ * the picture is 640 px wide, Phase 5), where every written label renders at
+ * 12 px or more.
  */
 type LabelStyle = "text" | "bars" | "floor";
 

@@ -47,8 +47,12 @@ import { pad2 } from "@/lib/utils/pad2";
  * passes labelled samples.
  */
 
-/** The spread's breakpoint; crossing it opens the notebook at page one. */
-const SPREAD = "(min-width: 50.625rem)";
+/**
+ * The spread's breakpoint; crossing it opens the notebook at page one. Range
+ * syntax, as home-journey.css writes it, so no fractional width falls between
+ * the phone and the spread layouts.
+ */
+const SPREAD = "(width >= 50.625rem)";
 const RINGS = 12;
 /** Horizontal travel, in px, before a press on the book becomes a drag. */
 const DRAG_START = 8;
@@ -202,6 +206,9 @@ export function Notebook({
       current.direction = direction;
       event.currentTarget.setPointerCapture(event.pointerId);
       event.currentTarget.dataset.dragging = "";
+      // A mouse press on the quote began selecting it: a page turn selects
+      // nothing (the stylesheet stops any further selection).
+      window.getSelection()?.removeAllRanges();
     }
     const toward = -current.direction;
     current.progress = Math.min(1, Math.max(0, (toward * dx) / current.width));

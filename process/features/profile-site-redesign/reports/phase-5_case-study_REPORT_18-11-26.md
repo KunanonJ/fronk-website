@@ -195,13 +195,17 @@ What `profile-case.spec.ts` covers:
 14. **The byline stays** ("By Kunanon Jarat · {role}", the name linked with
     `rel="author"` to `/about`): the live project pages print it for search,
     and spec 9.2 does not list it.
-15. **Three live-page parts are carried another way.** A venture's "Also
+15. **Four live-page parts are carried another way.** A venture's "Also
     building" card becomes its More projects card (spec 9.12: name, timeline,
     tagline and a link to its case; the other venture's site link stays on
     its own case page). The venture Share card becomes the hero's Share pill
     (the same rows). The venture hero's Contact link becomes the Hiring
     panel's Contact (`/contact?topic=hiring`), which ventures now show too
-    (spec 9.11: recommended).
+    (spec 9.11: recommended). The venture "My role" card's footer (his
+    portrait, his name and "About →") becomes the hero's byline, as on a
+    project: "By Kunanon Jarat · Founder", the name linked to `/about` with
+    `rel="author"`, the role read from `ventures.ts` (review finding 5). The
+    portrait is not carried: the template has no place for it.
 16. **The related topics moved** to `lib/content/ventures.ts`
     (`VENTURE_RELATED_TOPICS`): the live route file held them, and the brief
     keeps content in `lib/content/`, read and never retyped. The live route
@@ -227,6 +231,13 @@ What `profile-case.spec.ts` covers:
     its entry chunk is 1.0 KB gzip smaller than in the Phase 3 build of the
     orchestrator's checkout. Parity holds (0 differences); the crawl counts
     one more URL because the `icons` chunk's name matches its icon pattern.
+    **Accepted (review nit):** loading the preview's share panel on demand
+    would not keep the live chunks as they were. The bundler gives a module
+    reached from two chunks that load on demand (the live layout's and the
+    preview route's) a chunk of its own, whether the preview reaches it by a
+    static import or by a further dynamic one, so the four chunks stay split
+    either way. Only a manual chunk rule could undo it, and that would
+    reshape the live build for a preview that Phase 6 deletes.
 
 ## 6. Owner inputs used and their defaults
 
@@ -247,9 +258,11 @@ Marked DRAFT in `lib/content/caseStudy.ts`. No figure is typed in any.
 - Viewer buttons: "Enlarge" (named "Enlarge: {title}"), "Close"
 - Status words no venture uses yet: "Acquired", "Shut down", "Paused" ("Live"
   is the live pages' word)
-- Accessible names composed from content: "Illustration of {workflow
+- Accessible names composed from content, now patterns in `caseCopy.art`,
+  each marked DRAFT (review finding 10): "Illustration of {workflow
   title}: {steps}", "Illustration of the architecture: {layers}",
-  "Illustration of {venture}: {stages}"
+  "Illustration of {venture}: {stages}". "Illustrative mockup of {name}" is
+  the live project cards' wording, not new.
 
 Reused, not new: "Read the case study", "Venture", "Pause the animation" and
 "Play the animation" (Phase 3's drafts in `homeWorkAbout.ts`); "Illustration"
@@ -284,3 +297,64 @@ topics", "The core loop", "Before", "After", "All projects", "Ventures",
 8. **Firefox** is not installed here and was not run.
 9. **Umbrella status** for Phase 5 (the orchestrator updates the phase
    table).
+
+## 9. Code review and fixes (18-11-26)
+
+A fix pass on this phase's review, together with the Phase 4 review and the
+router's scroll restoration (Phase 4 report, section 9), in the worktree
+`t3-d8574179-f1f03c6bbcb3dbc5` on the local branch
+`fix/profile-case-review-findings`, from `02de7bf` (Phases 2 and 3 with their
+fixes, Phases 4 and 5, and one test fix). Lane settings: `PORT=3106`,
+`GATES_PORT=4306`, Playwright `--workers=2`. One local commit; nothing
+pushed, merged or deployed.
+
+| # | Finding | Fix | Test |
+| --- | --- | --- | --- |
+| 1 | Medium. The cover's labelled drawing showed from 810 px, but the picture stays under 640 px wide up to a screen of about 892 px, so its 12-unit labels drew at 10.9 to 11.9 px; the floor check read the declared SVG size | The drawing is chosen by the picture's own width: `@container (min-width: 40rem)` on `.pf-case-art`, already an inline-size container; the viewport rule is gone | `profile-case.spec.ts`: at 820 and 882 px the cover writes no label (bars); at 900, 1024 and 1440 px it does, and every visible `text` renders at 12 px or more (`fontSize` times its `getScreenCTM()` scale). `profile.spec.ts`'s floor check multiplies SVG text by its drawn scale, with a fixture it must fail (a 12-unit label 580 px wide reads 10.9 px) |
+| 2 | Medium. The share panel stayed open when keyboard focus left it and covered "As stated in the résumé →" under 810 px (WCAG 2.4.11) | The row closes the panel on `focusout` to a target outside it and leaves focus where it went; focus going nowhere (another window, the share sheet) keeps it open | Unit: blur inside the row, to nowhere, and to the link under it. Browser at 720 x 900: Tab out of the panel; it is hidden, focus is on the résumé link, and `elementFromPoint` at the link's centre lands in it |
+| 3 | Medium. The previews took the Home's canonical and Open Graph tags, so Share copied `https://kunanonj.com/` | `src/lib/caseHead.ts` builds a case page's head as the live routes do (the same builders and input); the previews call it with `hidden`, which changes only `robots`. The live route files are untouched, so live HTML and chunks are as they were | Unit `caseHead.test.ts`, all five projects and both ventures: the helper equals the live route's own loader head, and the preview loader's head equals it but for robots, with canonical, og:url and og:image naming the live page. Browser: canonical, og:url, og:image and description of the intranet and GoGoCash previews equal the live pages' (one canonical each), and the Share copy row reads `kunanonj.com/portfolio/tbh-intranet` |
+| 4 | Low. A case opened from More projects kept the last case's rail mark, pause and reveal state | `<CasePage key={slug} …/>` in both preview routes | Browser (desktop, tablet-landscape): scroll to ch-04, open the first card: no `[aria-current="location"]` in the rail |
+| 5 | Low. Venture pages lost the live "My role" footer | Ventures get the byline, "By Kunanon Jarat · Founder", the name to `/about` with `rel="author"`, the role read from `ventures.ts` (deviation 15) | Unit: both ventures render that link, its rel and the line's text |
+| 6 | Low. In forced colours the rail's current item was not underlined | `.pf-case-toc__link[aria-current] { text-decoration-line: underline }` in the forced-colours block | Browser: the current rail link reads `none` in ordinary colours and `underline` in forced colours |
+| 7 | Low. The viewer's large picture showed a zoom-in cursor from 810 px | `.pf-lightbox .pf-lightbox__tile { cursor: default }` | Browser: the page's tile reads `zoom-in`, the viewer's `default` |
+| 8 | Low. Focus fell to the page on close when the screen narrowed under 810 px while the viewer was open (Enlarge is `display: none` there) | Focus returns to Enlarge when it is drawn (`checkVisibility()`, else its display), else to the tile's figure (`tabIndex={-1}`, never a tab stop) | Unit: Enlarge set to `display: none`, Escape: the figure has focus. Browser: open at 1024, resize to 700, Escape: the figure "Architecture" has focus, not `body` |
+| 9 | Low. The viewer blocked zoom | `isZoomGesture()`: a `wheel` with `ctrlKey`, or a `touchmove` with two touches or more, is not cancelled | Unit: one-finger touch and a plain wheel are cancelled; two fingers and a ctrl-wheel are not |
+| 10 | Low. Three generated accessible names were drafts without the marker | Patterns in `caseCopy.art`, each `// DRAFT` (section 7) | The existing unit tests read the same names |
+| 11 | Low, test. The viewer's keyboard test used no keyboard | The rail's "What it does" by Enter (focus moves to the chapter), then Tab to Enlarge; `opacity: 1` asserted; `force: true` dropped from the click test | itself |
+| 12 | Low, test. Fixed sleeps | 300 ms: `settle(page)`. 30 ms: an init script wraps `Element.prototype.animate` and records the viewer tile's keyframes as they start. 1,500 ms: `page.clock` runs three 1.2 s ticks, with a motion-allowed control that moves a step | itself |
+| 13 | Low, test. The evidence test skipped Outcome when it was missing | Outcome counts: 1 on the intranet and ai-automation cases, 0 on the other two | itself |
+| 14 | Low, test. Every check ran under reduced motion | One pass per case with motion allowed, at 390 px where the pause control is 30 px: every target 24 px or more, apart and uncovered, then axe with WCAG 2.2 | itself |
+| 15 | Low, test. The text-spacing check could not see text a tile clips | Each run of text is measured against its nearest clipping box on each axis (itself included), skipping 1 px visually hidden text; it runs at 1440, 600 and 390 px, with a fixture it must fail | itself. It found a real clip, which is fixed: at a 600 px screen a More projects venture card drew its logo and its loop's names 35 px past its 16:10 mat, with or without text spacing. Under 22rem of card picture the card draws the logo alone (a container query on `.pf-case-art`; the mat is decorative and the card's title says the same) |
+
+Nits:
+
+- `caseJsonLd.ts`: "its breadcrumb, then the work", the order the code and
+  the live route use.
+- The back link and the related topics take ink on hover again: the hover
+  rule now outranks the ink 80 override.
+- The disclosure's marks: `content: "+" / ""` and `"\2212" / ""`, each after
+  a plain `content` fallback (both kept by the minifier).
+- Deviation 21: recorded as accepted (section 5).
+
+Baselines these fixes change (not rendered here; the orchestrator renders
+them): every `preview-case-gogocash` image (the venture byline in the hero;
+at phone and fold widths the Manut card in More projects draws its logo
+alone) and the 882 px matrix image of the intranet case (`fold-open`: the
+cover now draws bars, its picture being under 640 px wide). No live baseline
+changes.
+
+### Gates of the fix pass (final tree)
+
+| # | Command | Result |
+| --- | --- | --- |
+| 1 | `pnpm typecheck` | pass |
+| 2 | `pnpm lint` | pass, 0 warnings |
+| 3 | `pnpm exec prettier --write` (touched files), `pnpm format:check` | pass |
+| 4 | `pnpm knip` | pass |
+| 5 | `pnpm test` | 164 files, 1,566 tests pass (26 new across both phases and the router) |
+| 6 | `pnpm build` | pass, twice: the second after the stronger text-spacing check found the venture card's clip (finding 15, a CSS fix). Every browser check and parity below ran on the second build |
+| 7 | `pnpm perf:budget` | pass: entry chunk 106.6 / 120 KB; worst route 192.2 / 200 KB (`/skills/code-review`); stylesheets 20.2 / 22 KB; preloaded fonts 51.2 / 56 KB |
+| 8 | `PORT=3106 PLAYWRIGHT_WEB_SERVER="pnpm start" pnpm exec playwright test smoke.spec.ts a11y.spec.ts tests/e2e/profile --project=desktop --project=mobile --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone --grep-invert "matches its baseline" --workers=2` | 768 passed, 5 failed, 861 skipped by project scope (7.4 min; another lane was testing on the machine). The 5 were the new motion-allowed tap and axe pass (finding 14): its tap check ended with a `scrollTo(0, 0)` that is smooth with motion allowed, so axe read the bar mid fade-in (3.1:1 and 1.9:1). The check now scrolls at once and lets the page settle first. Then that pass for all seven cases, twice each: 14 passed; and `profile-case.spec.ts` on all six projects: 94 passed, 0 failed. Everything else in the gate passed, the live smoke tests included |
+| 9 | `GATES_PORT=4306 node scripts/start-gates.mjs --parity-only` | 137 URLs compared, 0 with differences (138 crawled: the extra is the `icons` chunk, deviation 21) |
+
+Firefox is not installed here and was not run.

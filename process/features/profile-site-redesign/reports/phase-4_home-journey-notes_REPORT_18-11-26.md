@@ -130,12 +130,15 @@ under the page's top edge (the ruled layer repeated upward).
    tiles, names at the back and the sides collide or sit behind nearer tiles,
    and blurred or scaled text breaks the 12 px floor and the contrast floor.
    Depth (scale, blur) applies to the tiles alone, so every name renders at
-   its size. At rest every name is fully on or fully off (the fade's
-   threshold sits between the resting positions), so axe never meets
-   half-transparent text. All names stay in the list for screen readers.
-6. **Orbit controls together at the stage's bottom-right:** spec 8.6 puts the
-   pause button there; the plan places previous and next nowhere; the canvas
-   put them at the bottom centre, where the front tiles pass.
+   its size. Wherever the ring stops, every name is fully on or fully off:
+   each reads the depth of its item's nearest slot (review finding 2; at
+   first only a ring at rest had this), so axe never meets half-transparent
+   text. All names stay in the list for screen readers.
+6. **Orbit controls together at the stage's bottom-right from 810 px:** spec
+   8.6 puts the pause button there; the plan places previous and next
+   nowhere; the canvas put them at the bottom centre, where the front tiles
+   pass. Under 810 px they sit centred in a 64 px band of their own under
+   the ring (review finding 1), where no name can pass under them.
 7. **Each tool's kind is its /stack group** (Build, Ship, Operate), as spec
    15.5 sources it, not the canvas's per-tool words ("Language", "Edge"),
    which would be new copy.
@@ -193,6 +196,10 @@ under the page's top edge (the ruled layer repeated upward).
     the Journey and the notebook). Phase 3's tall element baselines (`#work`,
     `#about`) may show the same; worth a look when the orchestrator renders
     them.
+24. **Play plays at once** (review finding 4, a spec decision): pressing Play
+    lifts the hover and focus holds until the pointer and the focus have
+    both left the stage, so the button never offers to pause a ring that
+    stands still. Pause, a drag and an off-screen stage still hold it.
 
 ## 6. Owner inputs used and their defaults
 
@@ -247,8 +254,9 @@ availability sentence and chips.
    is checked through Chromium's emulation only.
 5. **Touch hardware:** the drag and swipe are driven by a mouse in the
    browser checks; check them on a phone at Phase 6.
-6. **WebKit's scroll restoration at hydration** (section 1) also affects the
-   live site's deep links; worth a look with Phase 3's open item 5.
+6. **Scroll restoration at hydration** (section 1): found and fixed in the
+   review pass (section 9). It was TanStack's restore, in every engine, on
+   live pages too; one residual is recorded there.
 7. **Preview weight:** `/preview` loads 187.5 KB of JavaScript gzip (200 KB
    budget), `/preview/system` 163.5 KB; `profile.css` 51.6 KB raw, 11.0 KB
    gzip.
@@ -259,3 +267,89 @@ availability sentence and chips.
    unchanged), `SystemPreview.tsx` (one new section at the end) and
    `profile-shell.spec.ts` (one locator). `src/styles/profile/case.css` and
    `tests/e2e/routes.ts` are untouched.
+
+## 9. Code review and fixes (18-11-26)
+
+A fix pass on this phase's review, together with the Phase 5 review (Phase 5
+report, section 9), in the worktree `t3-d8574179-f1f03c6bbcb3dbc5` on the
+local branch `fix/profile-case-review-findings`, from `02de7bf` (Phases 2
+and 3 with their fixes, Phases 4 and 5, and one test fix). Lane settings:
+`PORT=3106`, `GATES_PORT=4306`, Playwright `--workers=2`. One local commit;
+nothing pushed, merged or deployed.
+
+| # | Finding | Fix | Test |
+| --- | --- | --- | --- |
+| 1 | Medium. On phones with motion allowed the controls (134 px wide with the pause button, z 31, y 572 to 616) covered the front tool's name (y 584 to 601) | Under 810 px the controls have a 64 px band of their own under the ring: the ring layer ends above it (`inset-block-end: var(--orbit-band)`), the controls sit centred in it, and the stage's bottom padding grows by the band, so the copy stays centred on the ring. From 810 px they stay at the bottom right (deviation 6) | `profile-journey.spec.ts`, at 344 and 390 px with motion allowed: Pause pressed, then all 20 positions stepped with real clicks on "Turn the tools right", each turn awaited: no name overlaps another, the copy or a control, none is covered, one name shows and none is half drawn |
+| 2 | Medium. Names stayed half transparent whenever the ring stopped between slots (hover, focus, pause, off screen, a drag release): 7 degrees past rest left "TypeScript" at 44 % opacity, about 3:1 | Each name reads the depth of its item's nearest slot, `--rest: sin(round(nearest, var(--a) - 20deg, 360deg / var(--n)) + 20deg)`, in both opacity rules, so any stop shows each name fully on or off (deviation 5) | With motion allowed: in desktop Chromium, hover at three moments of the turn; in both projects, the spin paused by its button and drags of 5, 9 and 13 degrees (each checked to turn the ring). Each time, with no turn or rise under way, `labelReport().half` is 0. The matrix check also runs with motion allowed (held by its button) at all six widths |
+| 3 | Low. Screen readers met the tool list before the Journey's heading | `Orbit` renders the copy, then the ring, then the controls. The layers' z-index keeps the drawing and the hit testing as they were | Unit: the h2 precedes the list, and the list the controls, in DOM order |
+| 4 | Low, tests | Motion-allowed passes for the label and matrix checks (above). Fixed sleeps gone: the 300 ms mid-turn sleep (the page's `--turn` transition is read from `getAnimations()`: 1,000 ms, running), the four 400 ms sleeps (the spin's `CSSAnimation.playState` and `expect.poll` on its angle) and the 150 ms hold (`visit` waits for a hydration signal, `.pf-orbit__controls` on the Home and `.pf-book[data-ready]` on `/preview/system`, and starts from `about:blank`, since opening the same address again is a reload after which the browser restores the last scroll position late; `scrollTop` scrolls until the place holds). Real Tab presses (Option+Tab in WebKit, whose Tab alone reaches only text fields) from a starting point, and real clicks. The notebook's keyboard test runs with motion allowed and presses its pause button. `testimonials.test.ts` scans every source for a `quote:` string or words typed inside a `<blockquote>`, with fixtures it must fail. `labelReport` skips 1 px words and looks through names faded to nothing | themselves |
+| 4b | The quirk real clicks exposed: after Play, hover and focus kept the ring still while the button already offered "Pause the orbit" | Play plays at once: it sets `data-play` on the stage, which lifts the hover and focus-within holds until the pointer and the focus have both left the stage (the pointer is tracked with pointerenter and pointerleave); Pause clears it (deviation 24) | Unit: `data-play` after Play, kept while focus stays inside after the pointer leaves, cleared when focus leaves too, and by Pause. Browser: after a real click on Play, with the pointer and focus on it, the spin runs; once both have left it runs; the keyboard back to the controls holds it; in desktop Chromium hover holds it |
+| 5 | Low. The on-demand notebook had no error boundary and reserved no space | `Notes` wraps its section in an error boundary that renders nothing, so a failed `Notebook-*.js` costs the section, not the Home. The Suspense fallback is an empty `pf-book-wrap pf-book-wrap--pending` of the book's least height plus its controls (556 px; 667 px under 810) | Unit `Notes.unavailable.test.tsx`: the module's import rejects; the reserved place shows while it loads, then the section goes and the rest of the page (an h1 and a paragraph after it) renders |
+| 6 | Low. 1 px breakpoint gaps | Range syntax: `(37.5rem <= width < 64rem)` and `(width < 50.625rem)` twice in `home-journey.css`, `(23.125rem <= width < 50.625rem)` and `(width < 23.125rem)` in `shell.css` (the Phase 3 fix agent's open item). `Notebook.tsx`'s spread query reads `(width >= 50.625rem)`, in step | no `max-width` gap value is left in `src/styles/profile` |
+| 7 | Low. A mouse drag on a page selected the quote | `.pf-book[data-ready] { user-select: none }` (the server HTML stays selectable), and the selection is cleared when a drag starts | Unit: the selection is cleared once a press has moved 8 px sideways, not before |
+| 8 | Low. In dark theme the records card and the cover glowed | Both use `var(--elev-mat)` | visual baselines (orchestrator) |
+| 9 | Low. `.pf-orbit` reused `--tile` as a size | `--orbit-tile` | gates |
+| 10 | Low. `SectionHeader` gaps | Two options: `titleClassName` (a class added to the h2) and `actions` (under the header). The notebook's h2 size moves to `.pf-notes__title`; Journey's "Read the story" pill moves into `actions` (32 px under the lead, 24 under 810 px, as before). The default output is unchanged | Unit: the output with the new options left out is byte for byte the old one; the class and the actions render, in order |
+| 11 | Low. On phones the spin re-blurred about 8 tiles every frame | The depth blur applies from 810 px only | gates |
+| 12 | Nit. The story's lines were marked only in a doc comment | `// DRAFT` on each run of the two paragraphs | gates |
+
+### The WebKit flake: root cause and fix
+
+**Root cause (in every engine, live pages included).** `src/router.tsx`
+turns TanStack's scroll restoration on. The router starts with its reset flag
+set (`router-core/router.js`, `this._scroll = { n: true }`), and its first
+`onRendered`, emitted in the hydration commit, restores
+(`scroll-restoration.js`): without a hash it calls `scrollTo(0, 0)` (or a
+saved position), with one it scrolls the hash's target into view. A scroll
+made before hydration ended was undone. WebKit hydrates later, so Phase 1's
+shell test, which scrolled right after `networkidle`, met it there first. On
+the live site a visitor who scrolled while the page was still loading was
+pulled back to the top.
+
+**Fix.** `src/lib/scrollRestoration.ts` gives the router its
+`scrollRestoration` as a function, which TanStack asks before each restore.
+On the client its first answer (the restore at hydration) is no once the
+visitor has scrolled: a wheel, a touch move or a scroll key since the client
+script started, or, on a page without a hash, the page no longer at the top.
+Every later restore (navigations in the app, Back and Forward) runs as
+before. On the server it always answers yes, so the router's inline restore
+script stays in the HTML and the live HTML is unchanged. A deep link the
+visitor has not moved from still lands on its anchor.
+
+**Residual.** A visitor who scrolls a deep-link page before the client script
+has even started (while it downloads) is still taken back to the anchor at
+hydration: input before the script runs is unseen, and the position alone
+cannot tell a visitor's scroll from the browser's own jump to the anchor.
+
+**Tests.** Unit `scrollRestoration.test.ts` (8): restore on an unmoved page
+and on a deep link; skip after the page has left the top, or after a wheel, a
+touch move or a scroll key, a deep link included; keys that do not scroll do
+not count; every later navigation restores. Browser
+(`profile-shell.spec.ts`, desktop Chromium and the WebKit phone): with the
+page's scripts held, so it is parsed and drawn but not hydrated, a scroll to
+600 px survives hydration on `/preview` (signal: Say hello's copy button,
+rendered only on the client) and on the live `/about` (signal: the live theme
+switch's label for the day theme in the dark theme); a deep link to `#ch-03`
+of a case page lands at 112 px and stays there after hydration. Phase 1's
+test "the bar hides on the way down" now scrolls only after `visit` has seen
+the hydration signal.
+
+Baselines these fixes change (not rendered here; the orchestrator renders
+them): under 810 px the Journey's stage (the controls' band, no depth blur:
+`preview-journey-*-fold-closed` and the mobile `/preview` images); in both
+themes the records card and the notebook's cover (their shadow:
+`preview-story-*`, `preview-notebook-*`, the `/preview` and
+`/preview/system` images). No live baseline changes.
+
+### Gates of the fix pass (final tree)
+
+One pass for both phases; the full table is in the Phase 5 report
+(section 9). In short: typecheck, lint (0 warnings), format, knip, 1,566 unit
+tests (164 files), two builds (the second for a Phase 5 CSS fix) and the
+perf budget pass. The browser gate on all six projects: 768 passed, 5 failed
+(a Phase 5 test-only issue, then fixed: 14 of 14 and the whole case spec, 94
+of 94), 861 skipped by project scope; every check of
+`profile-journey.spec.ts` and `profile-shell.spec.ts` passed in every
+project, the WebKit phone included, and so did the live smoke tests. Parity:
+137 URLs compared, 0 with differences, so the router change leaves every
+live page's HTML as it was.

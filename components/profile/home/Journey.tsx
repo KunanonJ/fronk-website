@@ -29,15 +29,17 @@ export default function Journey() {
           lead={journeyCopy.lead}
           leadSize="lead"
           className="pf-journey__head"
+          actions={
+            <Pill
+              href="#story"
+              variant="ghost"
+              size="sm"
+              className="pf-journey__more"
+            >
+              {journeyCopy.storyLink}
+            </Pill>
+          }
         />
-        <Pill
-          href="#story"
-          variant="ghost"
-          size="sm"
-          className="pf-journey__more"
-        >
-          {journeyCopy.storyLink}
-        </Pill>
       </Orbit>
       <Story />
     </section>

@@ -156,4 +156,30 @@ describe("Notebook", () => {
     const { container } = render(<Notebook entries={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("clears the selection a press began once a sideways drag starts (review finding 7)", () => {
+    // jsdom has no pointer capture: stand-ins for this test only.
+    const proto = Element.prototype as unknown as Record<string, unknown>;
+    const capture = Object.getOwnPropertyDescriptor(proto, "setPointerCapture");
+    proto.setPointerCapture = () => {};
+    try {
+      const { container } = render(<Notebook entries={SAMPLE_NOTES} />);
+      const book = container.querySelector<HTMLElement>(".pf-book")!;
+      const removeAllRanges = vi.spyOn(
+        document.getSelection()!,
+        "removeAllRanges",
+      );
+      const at = (clientX: number) => ({ pointerId: 1, clientX, clientY: 200 });
+      fireEvent.pointerDown(book, at(300));
+      // Under the 8 px that make it a drag: nothing yet.
+      fireEvent.pointerMove(book, at(296));
+      expect(removeAllRanges).not.toHaveBeenCalled();
+      fireEvent.pointerMove(book, at(280));
+      expect(book).toHaveAttribute("data-dragging");
+      expect(removeAllRanges).toHaveBeenCalled();
+    } finally {
+      if (capture) Object.defineProperty(proto, "setPointerCapture", capture);
+      else delete proto.setPointerCapture;
+    }
+  });
 });

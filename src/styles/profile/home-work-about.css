@@ -50,6 +50,12 @@
     max-inline-size: 40ch;
     color: var(--ink-60);
   }
+  /* Links or buttons under the header (its `actions`, Phase 4). */
+  .pf-section-head__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
   .pf-section-head--centred {
     justify-items: center;
     text-align: center;

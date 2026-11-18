@@ -3,7 +3,8 @@
 **Status:** CODE DONE (18-11-26)
 **Evidence:** `../reports/phase-5_case-study_REPORT_18-11-26.md` (gates,
 deviations, draft copy and open items; Linux baselines pending, rendered by
-the orchestrator).
+the orchestrator). The review's fixes: its section 9 (branch
+`fix/profile-case-review-findings`).
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` section 9 (case-study

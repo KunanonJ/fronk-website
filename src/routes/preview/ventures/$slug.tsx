@@ -3,26 +3,20 @@ import CasePage from "@/components/profile/case/CasePage";
 import { ventureJsonLd } from "@/components/profile/case/caseJsonLd";
 import { ventureCase } from "@/lib/content/caseStudy";
 import { getVentureBySlug } from "@/lib/content/ventures";
-import { namedPageTitle } from "@/lib/seo/pageTitle";
-import type { Metadata } from "@/lib/seo/types";
-import { pageHead } from "@/src/lib/head";
+import { ventureCaseHead } from "@/src/lib/caseHead";
 
 /*
  * /preview/ventures/<slug>: a venture in the case-study template (profile
  * redesign Phase 5), hidden like every preview (noindex, disallowed, never
- * prerendered). Only a venture with a case study has a page, as on the live
- * route. Phase 6 moves the body to /ventures/<slug> and deletes this route.
+ * prerendered). Its head is the live page's, only kept out of search. Only a
+ * venture with a case study has a page, as on the live route. Phase 6 moves
+ * the body to /ventures/<slug> and deletes this route.
  */
 export const Route = createFileRoute("/preview/ventures/$slug")({
   loader: ({ params }) => {
     const venture = getVentureBySlug(params.slug);
     if (!venture?.caseStudy) throw notFound();
-    const metadata: Metadata = {
-      title: namedPageTitle(venture.name, venture.tagline),
-      description: venture.description,
-      robots: { index: false, follow: false },
-    };
-    return { head: pageHead(metadata) };
+    return { head: ventureCaseHead(venture, { hidden: true }) };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: PreviewVentureCase,
@@ -41,7 +35,9 @@ function PreviewVentureCase() {
           dangerouslySetInnerHTML={{ __html: json }}
         />
       ))}
-      <CasePage study={ventureCase(venture)} />
+      {/* A key per case: the router keeps this component when only the slug
+          changes, and no state may carry over from the last case. */}
+      <CasePage key={slug} study={ventureCase(venture)} />
     </>
   );
 }

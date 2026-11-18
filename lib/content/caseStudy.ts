@@ -199,7 +199,11 @@ export interface CaseStudy {
   readonly back: CaseLink;
   readonly eyebrow: string;
   readonly lead: string;
-  /** The byline the live project pages print for search (by, name, role). */
+  /**
+   * "By {name} · {role}", the name linked to /about as the author: the live
+   * project pages print it for search, and on a venture it carries the live
+   * page's "My role" footer (his name and the About link).
+   */
   readonly byline?: { readonly author: CaseLink; readonly role: string };
   /** The public site or the source: a new tab. */
   readonly external?: CaseLink;
@@ -267,6 +271,18 @@ export const caseCopy = {
   loop: "The core loop",
   categories: "Categories",
   allTopics: { label: "All topics", href: "/learn" },
+  /**
+   * The accessible names of the drawn pictures, composed from the case's own
+   * words (spec 9.9 and 15.7): new with the redesign.
+   */
+  art: {
+    venture: (name: string, steps: readonly string[]) =>
+      `Illustration of ${name}: ${steps.join(", ")}`, // DRAFT
+    flow: (title: string, steps: readonly string[]) =>
+      `Illustration of ${title}: ${steps.join(", ")}`, // DRAFT
+    layers: (layers: readonly string[]) =>
+      `Illustration of the architecture: ${layers.join(", ")}`, // DRAFT
+  },
   /** The showcase's tile buttons and viewer (spec 9.9, 9.10). */
   enlarge: "Enlarge", // DRAFT (spec 9.9, ours)
   close: "Close", // DRAFT
@@ -330,9 +346,16 @@ function numbered(
   });
 }
 
+/** The live project cards' name for the drawing (ProjectCards.tsx). */
 function mockupLabel(name: string): string {
   return `Illustrative mockup of ${name}`;
 }
+
+/** The byline's author: the site's, as the live project pages link him. */
+const AUTHOR: CaseLink = {
+  label: portfolioPage.author.name,
+  href: portfolioPage.author.href,
+};
 
 function projectMedia(project: PortfolioProject): CaseMedia | null {
   if (project.cover) return { kind: "screenshot", image: project.cover };
@@ -357,7 +380,7 @@ function ventureMedia(venture: Venture): CaseMedia {
       steps,
       loop: steps === loop,
     },
-    label: `Illustration of ${venture.name}: ${steps.join(", ")}`,
+    label: caseCopy.art.venture(venture.name, steps),
   };
 }
 
@@ -388,7 +411,7 @@ function projectShowcase(project: PortfolioProject): ShowcaseTile[] {
       media: {
         kind: "illustration",
         art: { type: "flow", steps },
-        label: `Illustration of ${workflow.title}: ${steps.join(", ")}`,
+        label: caseCopy.art.flow(workflow.title, steps),
       },
       title: workflow.title,
       text: steps.join(" · "),
@@ -407,7 +430,7 @@ function projectShowcase(project: PortfolioProject): ShowcaseTile[] {
       media: {
         kind: "illustration",
         art: { type: "layers", layers },
-        label: `Illustration of the architecture: ${labels.join(", ")}`,
+        label: caseCopy.art.layers(labels),
       },
       title: caseCopy.chapter.architecture,
       text: labels.join(" · "),
@@ -560,13 +583,7 @@ export function projectCase(project: PortfolioProject): CaseStudy {
     back: { label: caseCopy.backToProjects, href: "/portfolio" },
     eyebrow: `${project.category} · ${project.period}`,
     lead: project.summary,
-    byline: {
-      author: {
-        label: portfolioPage.author.name,
-        href: portfolioPage.author.href,
-      },
-      role: project.role,
-    },
+    byline: { author: AUTHOR, role: project.role },
     external:
       project.access === "public" && project.url
         ? { label: project.urlLabel ?? "Visit", href: project.url }
@@ -699,6 +716,8 @@ export function ventureCase(venture: Venture): CaseStudy {
       ? `${caseCopy.venture} · ${caseStudy.timeline}`
       : caseCopy.venture,
     lead: caseStudy?.intro ?? venture.description,
+    // The live page's "My role" footer: his name, linked to /about.
+    byline: { author: AUTHOR, role: venture.role },
     external: { label: `Visit ${venture.urlLabel}`, href: venture.url },
     evidence: {
       figures:

@@ -44,6 +44,38 @@ function quotesElsewhere(
   );
 }
 
+/**
+ * Quotes typed straight into code, not read from testimonials.ts: a `quote:`
+ * string that is not a labelled sample, or words written inside a
+ * <blockquote> of a component (its expressions, which read content, aside).
+ */
+function typedQuotes(sources: readonly SiteSource[]): string[] {
+  const out: string[] = [];
+  for (const { file, text } of sources) {
+    if (file === OWN || !/\.(ts|tsx)$/.test(file)) continue;
+    for (const match of text.matchAll(/\bquote:\s*(["'`])([\s\S]*?)\1/g)) {
+      const quote = match[2]!.trim();
+      if (!/^Sample note/.test(quote))
+        out.push(`${file}: quote "${quote.slice(0, 40)}"`);
+    }
+    if (!file.endsWith(".tsx")) continue;
+    for (const match of text.matchAll(
+      /<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/g,
+    )) {
+      let inner = match[1]!;
+      // Expressions, nested or not, then tags: what is left was typed.
+      for (let before = ""; before !== inner;) {
+        before = inner;
+        inner = inner.replace(/\{[^{}]*\}/g, "");
+      }
+      const typed = inner.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ");
+      if (/\p{L}{2,}/u.test(typed))
+        out.push(`${file}: <blockquote> "${typed.trim().slice(0, 40)}"`);
+    }
+  }
+  return out;
+}
+
 describe("testimonials: the 3-quote rule", () => {
   it("needs three cleared quotes: the Home gets all of them, or none", () => {
     expect(TESTIMONIALS_MIN).toBe(3);
@@ -111,6 +143,38 @@ describe("testimonials: claim audit", () => {
 
   it("keeps every quote in testimonials.ts and in no other place", () => {
     expect(quotesElsewhere(TESTIMONIALS, siteSources())).toEqual([]);
+  });
+
+  it("finds a quote typed into a component (the fixtures it must fail)", () => {
+    expect(
+      typedQuotes([
+        {
+          file: "components/profile/home/Praise.tsx",
+          text: `const notes = [{ quote: "Great to work with.", name: "A" }];`,
+        },
+        {
+          file: "components/profile/home/Praise2.tsx",
+          text: `<blockquote className="q">\n  <p>He ships fast.</p>\n</blockquote>`,
+        },
+      ]),
+    ).toEqual([
+      'components/profile/home/Praise.tsx: quote "Great to work with."',
+      'components/profile/home/Praise2.tsx: <blockquote> "He ships fast."',
+    ]);
+    // Content read from a module, and a labelled sample, pass.
+    expect(
+      typedQuotes([
+        {
+          file: "components/A.tsx",
+          text: `<blockquote className="t-quote">“{source.quote}”</blockquote><blockquote><p>{entry.quote}</p></blockquote>`,
+        },
+        { file: "components/B.ts", text: `{ quote: "Sample note four." }` },
+      ]),
+    ).toEqual([]);
+  });
+
+  it("types no quote into any component: every quote is read from testimonials.ts", () => {
+    expect(typedQuotes(siteSources())).toEqual([]);
   });
 
   it("keeps the preview's samples out of the content module and off the Home", () => {

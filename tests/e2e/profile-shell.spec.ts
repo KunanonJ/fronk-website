@@ -43,9 +43,35 @@ async function prepare(page: Page, theme: Theme = "light") {
   }, theme);
 }
 
+/**
+ * Say hello's copy button renders only on the client, so it is there once the
+ * page has hydrated, after the router's own scroll restore has run.
+ */
+function hydrated(page: Page) {
+  return expect(page.locator(".pf-say__copy").first()).toBeAttached();
+}
+
+/** Opens a page and waits until it has hydrated and its fonts are in. */
 async function visit(page: Page, path = HOME) {
   await page.goto(path, { waitUntil: "networkidle" });
+  await hydrated(page);
   await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Holds every script of the page until the returned function is called, so
+ * the page stays as the server sent it: parsed and drawn, not hydrated.
+ */
+async function holdScripts(page: Page): Promise<() => void> {
+  let release!: () => void;
+  const gate = new Promise<void>((done) => {
+    release = done;
+  });
+  await page.route(/\/assets\/[^?]+\.js(\?.*)?$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  return release;
 }
 
 /** The computed value of one CSS property of an element, read at the call. */
@@ -324,6 +350,7 @@ test.describe("chrome: layout and the pill nav", () => {
   }) => {
     await prepare(page);
     await page.setViewportSize(PHONE);
+    // Scrolls only once the page has hydrated (visit waits for it).
     await visit(page);
     const header = bar(page);
     await page.evaluate(() =>
@@ -1091,5 +1118,66 @@ test.describe("chrome: the layer order of the preview stylesheet", () => {
       // The page body is a flex column, so the span blockifies to flex.
       componentDisplay: "flex",
     });
+  });
+});
+
+/**
+ * The router's scroll restoration (src/lib/scrollRestoration.ts): TanStack
+ * restores the scroll once more as the page hydrates, which pulled a reader
+ * who had scrolled before hydration back to the top (WebKit hydrates late
+ * enough to show it). Scripts are held, so the page is parsed and drawn but
+ * not hydrated while the reader scrolls.
+ */
+test.describe("router: a scroll made before hydration", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !BEHAVIOUR.has(testInfo.project.name),
+      "desktop and the WebKit phone",
+    );
+  });
+
+  test("survives hydration on the preview Home", async ({ page }) => {
+    await prepare(page);
+    const release = await holdScripts(page);
+    await page.goto(HOME, { waitUntil: "commit" });
+    await page.waitForFunction(() => document.readyState !== "loading");
+    await expect(page.locator(".pf-say__copy")).toHaveCount(0);
+    await scrollPage(page, 600);
+    expect(await pageY(page)).toBe(600);
+    release();
+    await hydrated(page);
+    await settle(page);
+    expect(await pageY(page)).toBe(600);
+  });
+
+  test("survives hydration on a live page", async ({ page }) => {
+    // The live header's theme switch names the day theme once hydrated in
+    // the dark theme (before, it keeps the server's light-theme label).
+    await prepare(page, "dark");
+    const release = await holdScripts(page);
+    await page.goto("/about", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.readyState !== "loading");
+    const day = page.getByRole("button", { name: "Switch to day mode" });
+    await expect(day).toHaveCount(0);
+    await scrollPage(page, 600);
+    expect(await pageY(page)).toBe(600);
+    release();
+    await expect(day.first()).toBeAttached();
+    await settle(page);
+    expect(await pageY(page)).toBe(600);
+  });
+
+  test("a deep link still lands on its target and stays there", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/preview/portfolio/tbh-intranet#ch-03");
+    await settle(page);
+    // The contents' landing: 96 px of scroll padding and a 16 px margin.
+    const top = await page.evaluate(
+      () => document.getElementById("ch-03")!.getBoundingClientRect().top,
+    );
+    expect(Math.abs(top - 112)).toBeLessThanOrEqual(3);
   });
 });

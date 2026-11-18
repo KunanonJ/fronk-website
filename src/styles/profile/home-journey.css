@@ -83,6 +83,10 @@
   .pf-journey__copy .pf-section-head__lead {
     max-inline-size: 17em;
   }
+  /* "Read the story" (SectionHeader's actions): 32 px under the lead. */
+  .pf-journey__copy .pf-section-head__actions {
+    margin-block-start: 16px;
+  }
 
   /* The ring (Orbit.tsx). Each item's angle is its slot plus the two turns;
      cos() and sin() place it on an ellipse of --rx by --ry around the
@@ -98,7 +102,7 @@
     -webkit-user-select: none;
     --rx: 42cqi;
     --ry: 35cqb;
-    --tile: clamp(72px, 6.4vw, 100px);
+    --orbit-tile: clamp(72px, 6.4vw, 100px);
   }
   .pf-journey__stage[data-dragging] .pf-orbit {
     cursor: grabbing;
@@ -117,11 +121,18 @@
     );
     --s: sin(var(--a));
     --k: calc(0.62 + 0.24 * (var(--s) + 1));
+    /* The depth of the slot nearest the item: the ring rests with an item
+       on every slot (20 degrees plus a step of 360 / n), so a ring stopped
+       anywhere (a drag, a hover, the pause button) shows its names as at
+       rest, each fully on or off. */
+    --rest: sin(
+      calc(round(nearest, var(--a) - 20deg, 360deg / var(--n)) + 20deg)
+    );
     position: absolute;
     inset-block-start: 50%;
     inset-inline-start: 50%;
-    inline-size: var(--tile);
-    block-size: var(--tile);
+    inline-size: var(--orbit-tile);
+    block-size: var(--orbit-tile);
     translate: calc(-50% + cos(var(--a)) * var(--rx))
       calc(-50% + var(--s) * var(--ry));
     z-index: calc(round(var(--s) * 10) + 11);
@@ -131,11 +142,10 @@
     inline-size: 100%;
     block-size: 100%;
     scale: var(--k);
-    filter: blur(calc(max(0, 0.4 - (var(--s) + 1) / 2) * 7px));
   }
   /* Names show on the near arc only, so no two collide and none sits
-     behind a nearer tile. The fade is narrow enough that a ring at rest has
-     every label fully on or fully off. */
+     behind a nearer tile. They read the nearest slot's depth, not their
+     own: wherever the ring stops, each name is fully on or fully off. */
   .pf-orbit__label {
     position: absolute;
     inset-block-start: calc(50% + var(--k) * 50% + 8px);
@@ -146,7 +156,7 @@
     gap: 2px;
     inline-size: 8.5rem;
     text-align: center;
-    opacity: clamp(0, (var(--s) - 0.985) * 200, 1);
+    opacity: clamp(0, (var(--rest) - 0.985) * 200, 1);
   }
   .pf-orbit__name {
     color: var(--ink);
@@ -156,13 +166,21 @@
   .pf-orbit__kind {
     color: var(--ink-60);
   }
+  /* Depth blur from 810 px only: on phones the tiles are small, and re-blurring
+     a ring that turns every frame is costly. */
+  @media (width >= 50.625rem) {
+    .pf-orbit__tile {
+      filter: blur(calc(max(0, 0.4 - (var(--s) + 1) / 2) * 7px));
+    }
+  }
   @media (min-width: 73.75rem) {
     .pf-orbit__label {
-      opacity: clamp(0, (var(--s) - 0.38) * 6, 1);
+      opacity: clamp(0, (var(--rest) - 0.38) * 6, 1);
     }
   }
 
-  /* Previous, next and the pause button, at the stage's bottom-right. */
+  /* Previous, next and the pause button, at the stage's bottom-right (on
+     phones, in a band of their own under the ring). */
   .pf-orbit__controls {
     position: absolute;
     inset-block-end: 24px;
@@ -266,9 +284,8 @@
     border: 1px solid transparent;
     border-radius: var(--radius-mat);
     background: var(--paper-2);
-    box-shadow:
-      0 0 0 1px var(--line-soft),
-      0 18px 36px -30px color-mix(in srgb, var(--ink) 18%, transparent);
+    /* A shadow in both themes: one mixed from ink would glow in dark. */
+    box-shadow: var(--elev-mat);
   }
   .pf-records__heading {
     margin: 0;
@@ -314,7 +331,7 @@
     block-size: 56px;
   }
 
-  @media (min-width: 37.5rem) and (max-width: 63.9375rem) {
+  @media (37.5rem <= width < 64rem) {
     .pf-records {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       column-gap: 32px;
@@ -338,14 +355,18 @@
   }
 
   /* Phones (spec 10): the section pads 112 px above a 640 px stage; small
-     tiles; one name at a time, at the front; kinds stay for screen readers. */
-  @media (max-width: 50.5625rem) {
+     tiles; one name at a time, at the front; kinds stay for screen readers.
+     The controls get a 64 px band of their own under the ring, which ends
+     above it, so no name ever slides under them; the stage's bottom padding
+     grows by the band, so the copy stays centred on the ring. */
+  @media (width < 50.625rem) {
     .pf-journey {
       padding-block-start: 112px;
     }
     .pf-journey__stage {
+      --orbit-band: 64px;
       min-block-size: 640px;
-      padding-block: 72px;
+      padding-block: 72px calc(72px + var(--orbit-band));
     }
     .pf-journey__copy {
       gap: 24px;
@@ -354,10 +375,19 @@
     .pf-journey__copy .pf-section-head__lead {
       max-inline-size: 15rem;
     }
+    .pf-journey__copy .pf-section-head__actions {
+      margin-block-start: 8px;
+    }
     .pf-orbit {
+      inset-block-end: var(--orbit-band);
       --rx: 44cqi;
       --ry: 36cqb;
-      --tile: 46px;
+      --orbit-tile: 46px;
+    }
+    .pf-orbit__controls {
+      inset-block-end: 10px;
+      inset-inline: 50% auto;
+      translate: -50% 0;
     }
     .pf-orbit__kind {
       position: absolute;
@@ -373,7 +403,8 @@
   .pf-notes {
     padding-block: 160px 176px;
   }
-  .pf-notes__head .pf-section-head__title {
+  /* The notebook's h2 (SectionHeader's titleClassName). */
+  .pf-notes__title {
     font-size: clamp(2.125rem, 3vw + 0.625rem, 3.5rem);
   }
 
@@ -386,6 +417,11 @@
     max-inline-size: 1008px;
     margin: 56px auto 0;
   }
+  /* While the notebook's code loads (Notes.tsx): the book's least height and
+     its controls' row, so the footer does not jump when it arrives. */
+  .pf-book-wrap--pending {
+    min-block-size: calc(480px + 28px + 48px);
+  }
   .pf-book {
     position: relative;
     display: grid;
@@ -394,8 +430,11 @@
     perspective: 2400px;
     touch-action: pan-y;
   }
+  /* Once the script runs, a sideways drag turns the page: it selects no text. */
   .pf-book[data-ready] {
     cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .pf-book[data-dragging] {
     cursor: grabbing;
@@ -409,9 +448,8 @@
     border: 1px solid transparent;
     border-radius: 20px 6px 6px 20px;
     background: linear-gradient(160deg, var(--tint-2), var(--tint-3));
-    box-shadow:
-      0 0 0 1px var(--line-soft),
-      0 30px 60px -40px color-mix(in srgb, var(--ink) 35%, transparent);
+    /* A shadow in both themes: one mixed from ink would glow in dark. */
+    box-shadow: var(--elev-mat);
   }
   .pf-book__cover p {
     margin: 0;
@@ -656,9 +694,12 @@
 
   /* Phones (spec 8.7): one page that bleeds to the left edge, a 36 px cover
      strip, the rings at x 30. The cover's words stay for screen readers. */
-  @media (max-width: 50.5625rem) {
+  @media (width < 50.625rem) {
     .pf-notes {
       padding-block: 112px 128px;
+    }
+    .pf-book-wrap--pending {
+      min-block-size: calc(591px + 28px + 48px);
     }
     .pf-book {
       grid-template-columns: minmax(0, 1fr);
@@ -745,7 +786,9 @@
 @layer components {
   @media (prefers-reduced-motion: no-preference) {
     /* `data-running` arrives with hydration, with the pause button; the
-       paused rules follow it, as the shorthand resets the play state. */
+       paused rules follow it, as the shorthand resets the play state. Focus
+       inside and hover hold the ring, except just after the reader pressed
+       Play (`data-play`, until both have left the stage). */
     .pf-journey__stage[data-running] .pf-orbit {
       animation: kj-orbit-spin 60s linear infinite;
     }
@@ -753,7 +796,7 @@
         [data-paused],
         [data-dragging],
         [data-offscreen],
-        :focus-within
+        :not([data-play]):focus-within
       )
       .pf-orbit {
       animation-play-state: paused;
@@ -789,7 +832,7 @@
   }
 
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .pf-journey__stage[data-running]:hover .pf-orbit {
+    .pf-journey__stage[data-running]:not([data-play]):hover .pf-orbit {
       animation-play-state: paused;
     }
   }

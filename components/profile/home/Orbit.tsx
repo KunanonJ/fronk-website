@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FocusEvent,
   type PointerEvent,
   type ReactNode,
 } from "react";
@@ -29,14 +30,19 @@ import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
  *
  * Once hydrated, with motion allowed: the ring turns slowly while the stage is
  * in view, and pauses on hover, on focus inside, while dragged and by its
- * pause button (WCAG 2.2.2). A stage still below the fold waits and its tiles
- * rise in (`kj-file-in`) as it comes into view. Under reduced motion the ring
- * stays still; dragging and the two buttons still turn it (WCAG 2.5.7: the
- * buttons are the single-pointer way to do what dragging does).
+ * pause button (WCAG 2.2.2). Pressing Play turns it at once: hover and focus
+ * inside stop holding it until both have left the stage, so the button never
+ * offers to pause a ring that stands still. A stage still below the fold
+ * waits and its tiles rise in (`kj-file-in`) as it comes into view. Under
+ * reduced motion the ring stays still; dragging and the two buttons still
+ * turn it (WCAG 2.5.7: the buttons are the single-pointer way to do what
+ * dragging does).
  *
  * The tools are a real list with their names and kinds as text, in /stack's
  * order; the ellipse is visual only, and the file tiles are hidden from
- * assistive technology.
+ * assistive technology. The copy comes first in the DOM, so a screen reader
+ * meets the heading before the list; the stage's layers keep it drawn above
+ * the ring.
  */
 
 const RING = orbitRing();
@@ -58,6 +64,10 @@ export function Orbit({
   const hydrated = useHydrated();
   const reduced = useReducedMotion();
   const [playing, setPlaying] = useState(true);
+  /** Play was just pressed: hover and focus inside do not hold the ring. */
+  const [insist, setInsist] = useState(false);
+  /** Whether a pointer is over the stage. */
+  const hovering = useRef(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   /** The ring's turn from drags and buttons, in degrees. */
@@ -153,14 +163,33 @@ export function Orbit({
     setOffset(current.from - (dx / radius) * (180 / Math.PI));
   };
 
+  // The holds come back once the pointer and the focus have both left.
+  const onPointerEnter = () => {
+    hovering.current = true;
+  };
+  const onPointerLeave = () => {
+    hovering.current = false;
+    if (!stageRef.current?.contains(document.activeElement)) setInsist(false);
+  };
+  const onBlur = (event: FocusEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget;
+    if (next instanceof Node && event.currentTarget.contains(next)) return;
+    if (!hovering.current) setInsist(false);
+  };
+
   return (
     <div
       ref={stageRef}
       className="pf-journey__stage"
       data-running={reduced ? undefined : ""}
       data-paused={playing ? undefined : ""}
+      data-play={insist ? "" : undefined}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onBlur={onBlur}
     >
       <div className="pf-journey__wash" aria-hidden="true" />
+      <div className="pf-journey__copy">{children}</div>
       <div
         ref={ringRef}
         className="pf-orbit"
@@ -208,7 +237,6 @@ export function Orbit({
           )}
         </ul>
       </div>
-      <div className="pf-journey__copy">{children}</div>
       {hydrated ? (
         <div className="pf-orbit__controls">
           <Pill
@@ -229,7 +257,10 @@ export function Orbit({
           </Pill>
           <MotionToggle
             playing={playing}
-            onToggle={setPlaying}
+            onToggle={(next) => {
+              setPlaying(next);
+              setInsist(next);
+            }}
             labels={{ pause: orbitCopy.pause, play: orbitCopy.play }}
           />
         </div>

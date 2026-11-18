@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Profile redesign, Phase 5: the case-study template on the hidden
@@ -37,6 +37,13 @@ const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
 const BAR_BOTTOM = 80;
 /** Where the contents land a chapter: 96 px padding and 16 px margin. */
 const CHAPTER_TOP = 112;
+/** How long each workflow step stays current (FLOW_TICK, useFlowStep.ts). */
+const FLOW_TICK = 1200;
+/** axe's WCAG 2.2 AA run, as a11y.spec.ts gives the preview pages. */
+const WCAG_22 = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+/** WCAG 1.4.12's text spacing, as a reader's stylesheet applies it. */
+const TEXT_SPACING =
+  "*, *::before, *::after { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }";
 
 type Theme = "light" | "dark";
 
@@ -84,6 +91,137 @@ function sideways(page: Page): Promise<number> {
   return page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
   );
+}
+
+/** Presses Tab until `target` has focus, as a keyboard reader moves. */
+async function tabTo(page: Page, target: Locator, most = 12) {
+  for (let presses = 0; presses < most; presses += 1) {
+    if (await target.evaluate((el) => el === document.activeElement)) return;
+    await page.keyboard.press("Tab");
+  }
+  await expect(target).toBeFocused();
+}
+
+/**
+ * With motion allowed: scrolls through the page so every waiting block
+ * shows, back to the top, and waits until their rise has ended.
+ */
+async function revealAll(page: Page) {
+  await page.evaluate(async () => {
+    const frame = () =>
+      new Promise((done) =>
+        requestAnimationFrame(() => requestAnimationFrame(done)),
+      );
+    const end = () => document.documentElement.scrollHeight;
+    for (let y = 0; y < end(); y += window.innerHeight / 2) {
+      window.scrollTo({ top: y, behavior: "instant" });
+      await frame();
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
+  await expect(page.locator("[data-reveal].is-pending")).toHaveCount(0);
+  await stillFrame(page);
+}
+
+/**
+ * Waits for a moment when nothing finite is moving: the rises, and the bar
+ * fading back in at the top. The workflow's steps change colour every 1.2 s,
+ * so such a moment comes quickly.
+ */
+function stillFrame(page: Page) {
+  return page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .every(
+        (animation) =>
+          animation.playState !== "running" ||
+          animation.effect?.getTiming().iterations === Infinity,
+      ),
+  );
+}
+
+/** The cover's visible SVG labels and the size each one renders at. */
+function coverLabels(page: Page) {
+  return page.locator(".pf-case-cover").evaluate((cover) =>
+    [...cover.querySelectorAll<SVGTextElement>("text")]
+      .filter((el) => {
+        const box = el.getBoundingClientRect();
+        return box.width > 0 && box.height > 0;
+      })
+      .map((el) => {
+        const matrix = el.getScreenCTM();
+        const scale = matrix ? Math.hypot(matrix.a, matrix.b) : 1;
+        return {
+          text: el.textContent ?? "",
+          px: parseFloat(getComputedStyle(el).fontSize) * scale,
+        };
+      }),
+  );
+}
+
+/**
+ * Text that a box with hidden or clipped overflow cuts off. Each run of text
+ * is measured against its nearest clipping ancestor on each axis (itself
+ * included), so text clipped by a tile it sits in counts too.
+ */
+function clippedText(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const out: string[] = [];
+    const clips = (el: Element, axis: "x" | "y") =>
+      /hidden|clip/.test(
+        getComputedStyle(el)[axis === "x" ? "overflowX" : "overflowY"],
+      );
+    // The page itself scrolls: html and body never count as clipping boxes.
+    const clipper = (from: Element, axis: "x" | "y") => {
+      for (
+        let el: Element | null = from;
+        el && el !== document.body && el !== document.documentElement;
+        el = el.parentElement
+      ) {
+        if (clips(el, axis)) return el;
+      }
+      return null;
+    };
+    const range = document.createRange();
+    for (const el of document.querySelectorAll(".pf-case *")) {
+      // Visually hidden text (a 1 px box, such as the Share pill's label on
+      // phones) is clipped on purpose; a shut disclosure's content is not
+      // drawn.
+      if (el.closest(".sr-only, details:not([open]) > :not(summary)")) continue;
+      const own = el.getBoundingClientRect();
+      if (own.width <= 1 || own.height <= 1) continue;
+      for (const node of el.childNodes) {
+        if (node.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) {
+          continue;
+        }
+        range.selectNodeContents(node);
+        const text = range.getBoundingClientRect();
+        if (text.width < 1 || text.height < 1) continue;
+        for (const axis of ["x", "y"] as const) {
+          const box = clipper(el, axis);
+          if (!box) continue;
+          // The clipping box's padding box: inside its borders.
+          const edge = box.getBoundingClientRect();
+          const start =
+            axis === "x"
+              ? edge.left + box.clientLeft
+              : edge.top + box.clientTop;
+          const end =
+            start + (axis === "x" ? box.clientWidth : box.clientHeight);
+          const [from, to] =
+            axis === "x" ? [text.left, text.right] : [text.top, text.bottom];
+          if (from < start - 1 || to > end + 1) {
+            out.push(
+              `${axis === "x" ? "sideways" : "downward"} by .${[
+                ...box.classList,
+              ].join(".")}: "${node.textContent.trim().slice(0, 30)}"`,
+            );
+          }
+        }
+      }
+    }
+    return out;
+  });
 }
 
 /** A chapter's top edge in the viewport. */
@@ -161,7 +299,8 @@ function tapProblems(page: Page): Promise<string[]> {
         problems.push(`covered ${name(el)} by ${hit?.className ?? "nothing"}`);
       }
     }
-    window.scrollTo(0, 0);
+    // At once: with motion allowed the page's own scrolling is smooth.
+    window.scrollTo({ top: 0, behavior: "instant" });
     return problems;
   });
 }
@@ -252,12 +391,13 @@ test.describe("links into the case pages", () => {
 test.describe("the evidence rule (plan gate 3)", () => {
   test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
 
-  for (const path of [
-    INTRANET,
-    "/preview/portfolio/ai-automation",
-    "/preview/portfolio/node-validator-automation",
-    "/preview/portfolio/email-signature-generator",
-  ]) {
+  // Two cases have cleared outcomes (portfolio.ts); the other two show none.
+  for (const [path, outcomes] of [
+    [INTRANET, 1],
+    ["/preview/portfolio/ai-automation", 1],
+    ["/preview/portfolio/node-validator-automation", 0],
+    ["/preview/portfolio/email-signature-generator", 0],
+  ] as const) {
     test(`${path}: what changed and his part come first, within a screen and a half at 1440 x 900`, async ({
       page,
     }) => {
@@ -279,7 +419,8 @@ test.describe("the evidence rule (plan gate 3)", () => {
       expect(m.height).toBeLessThan(260);
       expect(c.y).toBeGreaterThanOrEqual(m.y + m.height);
       expect(m.y + m.height).toBeLessThan(1.5 * 900);
-      if ((await outcome.count()) > 0) {
+      await expect(outcome).toHaveCount(outcomes);
+      if (outcomes > 0) {
         const o = (await outcome.boundingBox())!;
         expect(m.y).toBeGreaterThanOrEqual(o.y + o.height);
         expect(Math.abs(o.width - m.width)).toBeLessThan(2);
@@ -388,6 +529,35 @@ test.describe("the contents (plan gate 4)", () => {
     expect(nav.y).toBeGreaterThanOrEqual(BAR_BOTTOM);
   });
 
+  test("a case opened from More projects starts afresh: the last case's chapter is not marked", async ({
+    page,
+  }) => {
+    only(new Set(["desktop", "tablet-landscape"]), "the rail is from 1100 px");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const rail = page.locator(".pf-case-rail");
+    await page.evaluate(() => {
+      const el = document.getElementById("ch-04")!;
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 200,
+        behavior: "instant",
+      });
+    });
+    await expect(rail.locator('[aria-current="location"]')).toHaveCount(1);
+    const card = page
+      .getByRole("region", { name: "More projects" })
+      .getByRole("link", { name: /^Read the case study: / })
+      .first();
+    const href = (await card.getAttribute("href"))!;
+    await card.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    await expect(page.getByRole("heading", { level: 1 })).not.toContainText(
+      "TBH Intranet",
+    );
+    await expect(rail.locator('[aria-current="location"]')).toHaveCount(0);
+  });
+
   for (const motion of ["reduce", "no-preference"] as const) {
     test(`a click lands the chapter 112 px down, below the bar, and replaces the hash (motion: ${motion})`, async ({
       page,
@@ -465,9 +635,22 @@ test.describe("the viewer (plan gate 5)", () => {
     const enlarge = page.getByRole("button", {
       name: "Enlarge: Approval flow",
     });
-    await enlarge.scrollIntoViewIfNeeded();
-    await enlarge.focus();
-    await expect(enlarge).toBeVisible(); // shown on focus
+    // By keyboard all the way: the contents move focus to the chapter, and
+    // Tab goes on from there to the tile's buttons.
+    await page
+      .locator(".pf-case-rail")
+      .getByRole("link", { name: "What it does" })
+      .focus();
+    await page.keyboard.press("Enter");
+    await settle(page);
+    await tabTo(page, enlarge);
+    await expect(enlarge).toHaveCSS("opacity", "1"); // shown on focus
+    // The tile in the middle of the screen, as a reader looking at it has
+    // it: focus moving back to Enlarge then has nothing to scroll.
+    await enlarge.evaluate((el) =>
+      el.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
+    await settle(page);
     const y = await page.evaluate(() => window.scrollY);
     await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog", { name: "Approval flow" });
@@ -484,7 +667,7 @@ test.describe("the viewer (plan gate 5)", () => {
       await page.keyboard.press(key);
     }
     await page.mouse.wheel(0, 600);
-    await page.waitForTimeout(300);
+    await settle(page);
     expect(await page.evaluate(() => window.scrollY)).toBe(y);
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
@@ -503,9 +686,19 @@ test.describe("the viewer (plan gate 5)", () => {
     await visit(page);
     const enlarge = page.getByRole("button", { name: "Enlarge: Architecture" });
     await enlarge.scrollIntoViewIfNeeded();
-    await enlarge.click({ force: true });
+    // The page's tile opens the viewer from 810 px; the viewer's copy opens
+    // nothing, so it keeps the plain cursor.
+    await expect(page.locator('[data-sc-tile="layers"]')).toHaveCSS(
+      "cursor",
+      "zoom-in",
+    );
+    await enlarge.click();
     const dialog = page.getByRole("dialog", { name: "Architecture" });
     await expect(dialog).toBeVisible();
+    await expect(dialog.locator(".pf-lightbox__tile")).toHaveCSS(
+      "cursor",
+      "default",
+    );
     await expect(dialog.getByRole("button", { name: "Close" })).toBeFocused();
     await dialog.getByRole("button", { name: "Close" }).click();
     await expect(dialog).toBeHidden();
@@ -519,58 +712,164 @@ test.describe("the viewer (plan gate 5)", () => {
   test("grows the tile from its place, and only fades it under reduced motion", async ({
     page,
   }) => {
+    // Every animation started on the viewer's tile, recorded as it starts.
+    await page.addInitScript(() => {
+      const started: string[] = [];
+      (window as unknown as { tileKeys: string[] }).tileKeys = started;
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function (
+        this: Element,
+        keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+        options?: number | KeyframeAnimationOptions,
+      ) {
+        if (this.classList.contains("pf-lightbox__tile")) {
+          const frames = Array.isArray(keyframes)
+            ? keyframes
+            : [keyframes ?? {}];
+          for (const frame of frames) {
+            for (const key of Object.keys(frame)) {
+              if (!["offset", "easing", "composite"].includes(key)) {
+                started.push(key);
+              }
+            }
+          }
+        }
+        return animate.call(this, keyframes, options);
+      };
+    });
     for (const motion of ["no-preference", "reduce"] as const) {
       await page.emulateMedia({ reducedMotion: motion });
       await prepare(page);
       await visit(page);
-      const keyframes = await page.evaluate(async () => {
-        const button = document.querySelector<HTMLButtonElement>(
-          '[data-sc-enlarge="layers"]',
-        )!;
-        button.click();
-        // React renders the viewer in a task after the click; the opening
-        // runs for 200 ms at least, so it is still under way here.
-        await new Promise((done) => setTimeout(done, 30));
-        const tile = document.querySelector(".pf-lightbox__tile")!;
-        return tile
-          .getAnimations()
-          .flatMap((animation) =>
-            (animation.effect as KeyframeEffect).getKeyframes(),
-          )
-          .flatMap((frame) => Object.keys(frame))
-          .filter(
-            (key) =>
-              !["offset", "easing", "composite", "computedOffset"].includes(
-                key,
-              ),
-          );
+      const enlarge = page.getByRole("button", {
+        name: "Enlarge: Architecture",
       });
+      await enlarge.scrollIntoViewIfNeeded();
+      await enlarge.click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      const keys = await page.evaluate(
+        () => (window as unknown as { tileKeys: string[] }).tileKeys,
+      );
       if (motion === "reduce") {
-        expect(new Set(keyframes)).toEqual(new Set(["opacity"]));
+        expect(new Set(keys)).toEqual(new Set(["opacity"]));
       } else {
-        expect(keyframes).toContain("transform");
+        expect(keys).toContain("transform");
       }
       await page.keyboard.press("Escape");
       await expect(page.getByRole("dialog")).toBeHidden();
     }
   });
 
+  test("closes under 810 px with focus on the tile's figure, not lost to the page", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await prepare(page);
+    await visit(page);
+    const enlarge = page.getByRole("button", { name: "Enlarge: Architecture" });
+    await enlarge.scrollIntoViewIfNeeded();
+    await enlarge.click();
+    const dialog = page.getByRole("dialog", { name: "Architecture" });
+    await expect(dialog).toBeVisible();
+    // The screen narrows under 810 px, where Enlarge is not drawn.
+    await page.setViewportSize({ width: 700, height: 800 });
+    await expect(enlarge).toBeHidden();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    expect(
+      await page.evaluate(() => document.activeElement === document.body),
+    ).toBe(false);
+    await expect(
+      page.getByRole("figure", { name: "Architecture" }),
+    ).toBeFocused();
+  });
+
   test("draws a still workflow with no pause control under reduced motion", async ({
     page,
   }) => {
+    // The page's own clock: its timers run when the test moves it on.
+    await page.clock.install();
+    const flowStates = () =>
+      page
+        .getByRole("figure", { name: "Approval flow" })
+        .locator(".pf-flow__step")
+        .evaluateAll((steps) =>
+          steps.map((step) => step.getAttribute("data-state")),
+        );
+
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
     await visit(page);
-    const flow = page.getByRole("figure", { name: "Approval flow" });
     await expect(
-      flow.getByRole("button", { name: /the animation/ }),
+      page
+        .getByRole("figure", { name: "Approval flow" })
+        .getByRole("button", { name: /the animation/ }),
     ).toHaveCount(0);
-    await page.waitForTimeout(1500);
-    const states = await flow
-      .locator(".pf-flow__step")
-      .evaluateAll((steps) => steps.map((s) => s.getAttribute("data-state")));
-    expect(new Set(states)).toEqual(new Set(["done"]));
+    await page.clock.runFor(FLOW_TICK * 3);
+    expect(new Set(await flowStates())).toEqual(new Set(["done"]));
+
+    // The control: with motion allowed, the same clock moves it on a step.
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await visit(page);
+    await page.clock.runFor(FLOW_TICK);
+    expect(await flowStates()).toContain("now");
   });
+});
+
+test.describe("the cover's labels (spec 12 item 5)", () => {
+  test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
+
+  // The picture is 640 px wide from a screen of about 892 px: the drawing
+  // writes its labels from there, and draws them as bars before.
+  for (const width of [820, 882, 900, 1024, 1440]) {
+    test(`at ${width} px every label drawn on the cover renders at 12 px or more`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await prepare(page);
+      await visit(page);
+      const labels = await coverLabels(page);
+      expect(labels.length > 0, "labels written").toBe(width >= 900);
+      for (const label of labels) {
+        expect(label.px, label.text).toBeGreaterThanOrEqual(12);
+      }
+    });
+  }
+});
+
+test.describe("with motion allowed: the pause control is measured and audited", () => {
+  test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
+
+  // At 390 px, where the pause control is at its smallest (30 px).
+  for (const { path } of CASES) {
+    test(`${path}: every target 24 px or more, and no serious axe violations`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 800 });
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await prepare(page);
+      await visit(page, path);
+      await revealAll(page);
+      expect(await tapProblems(page)).toEqual([]);
+      // The tap check scrolled through the page and back to the top: the bar
+      // fades back in there; axe reads it once the page is still.
+      await settle(page);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+      await expect(page.locator(".pf-nav__row")).toHaveCSS("opacity", "1");
+      await stillFrame(page);
+      const results = await new AxeBuilder({ page })
+        .withTags(WCAG_22)
+        .analyze();
+      expect(
+        results.violations
+          .filter((v) => ["serious", "critical"].includes(v.impact ?? ""))
+          .map((v) => ({
+            id: v.id,
+            nodes: v.nodes.map((n) => n.target.join(" ")).slice(0, 5),
+          })),
+      ).toEqual([]);
+    });
+  }
 });
 
 test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", () => {
@@ -643,6 +942,83 @@ test.describe("the device matrix and the tap areas (plan gate 6, spec 10.1)", ()
     await expect(panel).toBeHidden();
     await expect(page.getByRole("button", { name: "Share" })).toBeFocused();
   });
+
+  test("Tab past the share panel closes it, so it covers nothing focus moves to (WCAG 2.4.11)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 720, height: 900 });
+    await prepare(page);
+    await visit(page);
+    await page.getByRole("button", { name: "Share" }).click();
+    const panel = page.getByRole("region", { name: "Share this page" });
+    await expect(panel).toBeVisible();
+    // Out of the panel's last row, onward in the page.
+    const outside = () =>
+      page.evaluate(
+        () =>
+          !document.activeElement?.closest(".pf-case-actions") &&
+          document.activeElement !== document.body,
+      );
+    for (let presses = 0; presses < 12 && !(await outside()); presses += 1) {
+      await page.keyboard.press("Tab");
+    }
+    expect(await outside()).toBe(true);
+    await expect(panel).toBeHidden();
+    const focused = page.locator(":focus");
+    await expect(focused).toHaveAccessibleName("As stated in the résumé →");
+    // What has focus is what is drawn at its centre.
+    expect(
+      await focused.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          box.left + box.width / 2,
+          box.top + box.height / 2,
+        );
+        return Boolean(hit && el.contains(hit));
+      }),
+    ).toBe(true);
+  });
+
+  test("the head is the live page's, robots aside, so Share copies the live address", async ({
+    page,
+  }) => {
+    const head = (path: string) =>
+      page.goto(path, { waitUntil: "domcontentloaded" }).then(() =>
+        page.evaluate(() => ({
+          canonical: [
+            ...document.querySelectorAll<HTMLLinkElement>(
+              'link[rel="canonical"]',
+            ),
+          ].map((link) => link.href),
+          url: document
+            .querySelector('meta[property="og:url"]')
+            ?.getAttribute("content"),
+          image: document
+            .querySelector('meta[property="og:image"]')
+            ?.getAttribute("content"),
+          description: document
+            .querySelector('meta[name="description"]')
+            ?.getAttribute("content"),
+        })),
+      );
+    for (const [live, preview] of [
+      ["/portfolio/tbh-intranet", INTRANET],
+      ["/ventures/gogocash", GOGOCASH],
+    ] as const) {
+      const own = await head(preview);
+      expect(own, preview).toEqual(await head(live));
+      expect(own.canonical, preview).toHaveLength(1);
+    }
+    await prepare(page);
+    await visit(page);
+    await page.getByRole("button", { name: "Share" }).click();
+    // The copy row prints the address it copies, without its scheme.
+    await expect(
+      page
+        .getByRole("region", { name: "Share this page" })
+        .getByText("kunanonj.com/portfolio/tbh-intranet", { exact: true }),
+    ).toBeAttached();
+  });
 });
 
 test.describe("best practices on the case pages (desktop Chromium)", () => {
@@ -681,35 +1057,51 @@ test.describe("best practices on the case pages (desktop Chromium)", () => {
     }
   });
 
-  test("text spacing (WCAG 1.4.12) clips no text", async ({ page }) => {
+  test("the text-spacing check sees text a tile clips", async ({ page }) => {
+    // A fixture it must fail: words clipped by the box around them, not by
+    // their own box.
+    await page.setContent(
+      `<div class="pf-case"><div style="width:120px;height:20px;overflow:hidden"><span style="font-size:16px">Words that cannot fit in this tile</span></div></div>`,
+    );
+    expect(await clippedText(page)).not.toEqual([]);
+  });
+
+  for (const width of [1440, 600, 390]) {
+    test(`text spacing (WCAG 1.4.12) clips no text at ${width} px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await prepare(page);
+      for (const path of [INTRANET, GOGOCASH]) {
+        await visit(page, path);
+        await page.addStyleTag({ content: TEXT_SPACING });
+        expect(await clippedText(page), path).toEqual([]);
+      }
+    });
+  }
+
+  test("forced colors: the rail's current chapter is underlined, not only coloured", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
-    for (const path of [INTRANET, GOGOCASH]) {
-      await visit(page, path);
-      await page.addStyleTag({
-        content:
-          "*, *::before, *::after { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }",
+    await visit(page);
+    await page.evaluate(() => {
+      const el = document.getElementById("ch-02")!;
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 200,
+        behavior: "instant",
       });
-      const clipped = await page.evaluate(() => {
-        const out: string[] = [];
-        for (const el of document.querySelectorAll<HTMLElement>(".pf-case *")) {
-          const own = [...el.childNodes].some(
-            (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
-          );
-          if (!own) continue;
-          const s = getComputedStyle(el);
-          if (!/hidden|clip/.test(s.overflowX + s.overflowY)) continue;
-          if (el.clientWidth <= 1) continue;
-          if (
-            el.scrollHeight > el.clientHeight + 1 ||
-            el.scrollWidth > el.clientWidth + 1
-          ) {
-            out.push(`clipped: "${el.textContent?.trim().slice(0, 30)}"`);
-          }
-        }
-        return out;
-      });
-      expect(clipped, path).toEqual([]);
-    }
+    });
+    const current = page.locator(
+      '.pf-case-rail .pf-case-toc__link[aria-current="location"]',
+    );
+    await expect(current).toHaveCount(1);
+    // Colour marks it in ordinary colours; forced colours take the colour away.
+    await expect(current).toHaveCSS("text-decoration-line", "none");
+    await page.emulateMedia({ forcedColors: "active" });
+    await expect(current).toHaveCSS("text-decoration-line", "underline");
   });
 
   test("at 200% zoom (720 x 450) nothing scrolls sideways and the h1 keeps 42 px", async ({
@@ -794,7 +1186,7 @@ test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
           new RegExp(`(^|\\s)${theme}(\\s|$)`),
         );
         const results = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+          .withTags(WCAG_22)
           .analyze();
         expect(
           results.violations
