@@ -658,6 +658,12 @@
       black calc(100% - 2px)
     );
   }
+  /* The pause button's icon is swapped on every press, so it must not be the
+     node under the pointer (see .ds-motion-toggle in globals.css): the book's
+     hover hold would stick in Safari and it would never turn again. */
+  .pf-book__pause > svg {
+    pointer-events: none;
+  }
   @media (min-width: 73.75rem) {
     .pf-book-wrap {
       grid-template-columns: 48px minmax(0, 1fr) 48px;

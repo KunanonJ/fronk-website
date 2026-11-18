@@ -1864,6 +1864,13 @@ html.dark[data-design="profile"],
     box-shadow: var(--elev-ring);
     cursor: pointer;
   }
+  /* The icon is swapped on every press (Pause for Play), so it must never be
+     the node under the pointer: macOS WebKit loses the hover chain when the
+     hovered node is removed, and the region around the toggle then never
+     gets pointerleave, so its hover and focus holds stick. */
+  .ds-motion-toggle > svg {
+    pointer-events: none;
+  }
   .ds-text-link,
   .ds-back {
     display: inline-flex;
