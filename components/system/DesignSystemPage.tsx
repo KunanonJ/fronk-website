@@ -488,6 +488,18 @@ export default function DesignSystemPage() {
           </div>
         </Section>
 
+        {/* The testimonial notebook, with labelled samples (Phase 4, plan
+            step 4f): back from /preview/system in Phase 7g. Not the last
+            section: its browser checks scroll it to the top of tall
+            screens, and the page has no footer under it. */}
+        <Section id="notebook" title="Notebook, with sample notes">
+          <p className="t-body max-w-[64ch] text-ink-80">
+            These three notes are samples, for reviewing the notebook. The Home
+            shows it only once three or more real recommendations are cleared.
+          </p>
+          <Notebook entries={SAMPLE_NOTES} />
+        </Section>
+
         <Section id="states" title="States and preferences">
           <ul className="t-body flex max-w-[64ch] flex-col gap-3 text-ink-80">
             <li>
@@ -532,16 +544,6 @@ export default function DesignSystemPage() {
               </Tile>
             </Reveal>
           </div>
-        </Section>
-
-        {/* The testimonial notebook, with labelled samples (Phase 4, plan
-            step 4f): back from /preview/system in Phase 7g. */}
-        <Section id="notebook" title="Notebook, with sample notes">
-          <p className="t-body max-w-[64ch] text-ink-80">
-            These three notes are samples, for reviewing the notebook. The Home
-            shows it only once three or more real recommendations are cleared.
-          </p>
-          <Notebook entries={SAMPLE_NOTES} />
         </Section>
       </div>
     </main>

@@ -46,8 +46,8 @@ describe("DesignSystemPage", () => {
       "Type",
       "Shape and depth",
       "Primitives",
-      "States and preferences",
       "Notebook, with sample notes",
+      "States and preferences",
     ]);
     // Swatches paint tokens, never raw values.
     const colour = screen.getByRole("region", { name: "Colour" });

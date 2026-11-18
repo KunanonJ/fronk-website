@@ -1,12 +1,14 @@
 /* Profile redesign, Phase 7 lane D2: /skills and the skill pages, /resume, the 404 and error pages, /design, and the hidden /blog and /press. Only that lane edits this partial. */
 /*
- * Design spec 6, 9 (the hero, fact strip, steps and tiles), 10, 10.1 and 12;
- * plan steps 7c, 7e, 7f, 7g and 7h. The pages reuse the core pages' hero
- * (`.pf-page-hero*`, cutover.css), the case template's steps, fact strip and
- * point list (case.css) and the `ds-*` primitives; this file adds only what
- * those lack. Plain CSS on the tokens in globals.css, phones first, rem
- * breakpoints (37.5rem = 600, 50.625rem = 810, 64rem = 1024 px); every rule
- * in @layer components; movement waits for no-preference at the end.
+ * Design spec 6, 8.6 (the records card), 9 (the hero, fact strip, steps and
+ * tiles), 10, 10.1 and 12; plan steps 7c, 7e, 7f, 7g and 7h. The pages reuse
+ * the core pages' hero (`.pf-page-hero*`, cutover.css), the footer's pixel
+ * art (`.pf-art`, shell.css) and the `ds-*` primitives; the pipeline's steps
+ * and the credits' strip follow the case template's (spec 9.13 and 9.8) in
+ * classes of their own. Plain CSS on the tokens in globals.css, phones
+ * first, rem breakpoints (37.5rem = 600, 40rem = 640, 64rem = 1024 px);
+ * every rule in @layer components; movement waits for no-preference at the
+ * end.
  */
 
 @layer components {
