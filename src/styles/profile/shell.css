@@ -860,16 +860,12 @@
   }
 }
 
-/* The theme fade (spec 7.5) replaces the live site's circular reveal inside
-   the scope only. These rules are unlayered on purpose: the live reveal in
-   globals.css is unlayered, and a layered rule would lose to it whatever its
-   specificity. Each selector here is more specific than the live one. */
-@keyframes kj-theme-fade {
-  from {
-    opacity: 0;
-  }
-}
-
+/* The theme fade (spec 7.5), written for the scope when it replaced the live
+   site's circular reveal there. Since the Phase 6 cutover globals.css runs
+   the same fade on every page and defines its keyframes, kj-theme-fade;
+   these rules repeat it until Phase 8 removes them. They are unlayered on
+   purpose: the rules in globals.css are unlayered, and a layered rule would
+   lose to them whatever its specificity. */
 @media (prefers-reduced-motion: no-preference) {
   html[data-design="profile"]:active-view-transition-type(
       theme

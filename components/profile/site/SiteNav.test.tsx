@@ -36,12 +36,16 @@ describe("SiteNav, server HTML", () => {
     expect(html).toContain('class="pf-nav"');
   });
 
-  it("names the name link and the Primary links, with their preview addresses", () => {
+  it("carries the redesign's token scope itself, for the pages Phase 7 restyles", () => {
+    expect(html).toMatch(/<header[^>]*data-design="profile"/);
+  });
+
+  it("names the name link and the Primary links, with their live addresses", () => {
     expect(html).toContain('aria-label="Kunanon Jarat, home"');
     expect(html).toContain('aria-label="Primary"');
-    expect(html).toContain('href="/preview#work"');
-    expect(html).toContain('href="/preview#about"');
-    expect(html).toContain('href="/preview#journey"');
+    expect(html).toContain('href="/#work"');
+    expect(html).toContain('href="/#about"');
+    expect(html).toContain('href="/#journey"');
     expect(html).toContain('href="/resume"');
   });
 
@@ -69,10 +73,10 @@ describe("SiteNav, server HTML", () => {
 
 describe("SiteNav, the name link", () => {
   beforeEach(() => {
-    ROUTE.pathname = "/preview";
+    ROUTE.pathname = "/";
     ROUTE.replace.mockClear();
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
-    window.history.replaceState(null, "", "/preview");
+    window.history.replaceState(null, "", "/");
   });
 
   afterEach(() => {
@@ -94,10 +98,10 @@ describe("SiteNav, the name link", () => {
   });
 
   it("replaces the entry with a plain Home when a hash is present, and leaves scrolling to the router", () => {
-    window.history.replaceState(null, "", "/preview#work");
+    window.history.replaceState(null, "", "/#work");
     render(<SiteNav />);
     fireEvent.click(name());
-    expect(ROUTE.replace).toHaveBeenCalledWith("/preview");
+    expect(ROUTE.replace).toHaveBeenCalledWith("/");
     expect(window.scrollTo).not.toHaveBeenCalled();
   });
 
@@ -114,7 +118,7 @@ describe("SiteNav, the name link", () => {
   });
 
   it("follows the router off Home, without preventing the click", () => {
-    ROUTE.pathname = "/preview/system";
+    ROUTE.pathname = "/skills";
     render(<SiteNav />);
     expect(fireEvent.click(name())).toBe(true);
     expect(window.scrollTo).not.toHaveBeenCalled();

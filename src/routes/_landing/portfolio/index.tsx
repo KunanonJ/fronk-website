@@ -1,7 +1,7 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import { PageMain } from "@/components/bento/Bento";
-import PortfolioIndexPage from "@/components/landing/portfolio/PortfolioIndexPage";
+import WorkIndexPage from "@/components/profile/pages/WorkIndexPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import type { Metadata } from "@/lib/seo/types";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -23,9 +23,10 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /portfolio (bento redesign, phase 7e; design spec 4.5). The category
- * filter is the typed `?category=` param (Valibot); the default, all, never
- * shows in the URL and an unknown value falls back to it.
+ * /portfolio, "All work" (profile redesign, Phase 6 cutover; plan step 6d).
+ * The category filter is the typed `?category=` param (Valibot); the
+ * default, all, never shows in the URL and an unknown value falls back to
+ * it. The breadcrumb and CollectionPage JSON-LD are unchanged.
  */
 export const Route = createFileRoute("/_landing/portfolio/")({
   validateSearch: portfolioSearchSchema,
@@ -58,7 +59,7 @@ function PortfolioRoute() {
   );
 
   return (
-    <PageMain>
+    <ProfileMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
@@ -67,7 +68,7 @@ function PortfolioRoute() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: collectionLd }}
       />
-      <PortfolioIndexPage category={category} onCategoryChange={setCategory} />
-    </PageMain>
+      <WorkIndexPage category={category} onCategoryChange={setCategory} />
+    </ProfileMain>
   );
 }

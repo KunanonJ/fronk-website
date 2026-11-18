@@ -57,7 +57,7 @@ describe("CanvasMock", () => {
       FRAMES.map((frame) => `${frame.name}: open the case study`),
     );
     expect(links.map((link) => link.getAttribute("href"))).toEqual(
-      FRAMES.map((frame) => `/preview/portfolio/${frame.slug}`),
+      FRAMES.map((frame) => `/portfolio/${frame.slug}`),
     );
     // A link's visible text is its name and nothing else, so the visible
     // label is part of the accessible name (WCAG 2.5.3; axe's

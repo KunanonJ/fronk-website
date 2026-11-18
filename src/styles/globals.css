@@ -1062,22 +1062,18 @@ a {
   }
 }
 
-@keyframes kj-reveal {
-  from {
-    clip-path: circle(0 at var(--vtx, 92%) var(--vty, 4%));
-  }
-  to {
-    clip-path: circle(150% at var(--vtx, 92%) var(--vty, 4%));
-  }
-}
-
 /* ─── View transitions ───────────────────────────────────────────────────────
  * Two kinds, told apart by view-transition types: the router starts page
  * navigations with type "page" (a short cross-fade, the UA default), and the
- * theme toggle starts its switch with type "theme" (the circular reveal from
- * the click point). The toggle also sets html.kj-vt for the duration, which
- * stops CSS transitions blending into the snapshot and carries the reveal in
- * browsers that lack view-transition types.
+ * theme toggle starts its switch with type "theme". The toggle also sets
+ * html.kj-vt for the duration, which stops CSS transitions blending into the
+ * snapshot and carries the theme switch in browsers that lack view-transition
+ * types. Since the profile redesign's cutover (Phase 6, design spec 7.5 and
+ * 13 items 6 and 23) the theme switch is the .56 s fade on every page, not
+ * the circular reveal: `kj-theme-fade` is defined with the chrome, in
+ * src/styles/profile/shell.css, which every page links. Movement-free, and
+ * still only with no-preference: the toggle starts no transition under
+ * reduced motion, and the block after this one turns them all off.
  * ─────────────────────────────────────────────────────────────────────────── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -1091,23 +1087,26 @@ html.kj-vt *::after {
   transition: none !important;
 }
 
-html.kj-vt::view-transition-old(root),
-html.kj-vt::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
+@media (prefers-reduced-motion: no-preference) {
+  html.kj-vt::view-transition-old(root),
+  html:active-view-transition-type(theme)::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
 
-html.kj-vt::view-transition-new(root) {
-  animation: kj-reveal 0.8s var(--ease);
-}
+  html.kj-vt::view-transition-new(root),
+  html:active-view-transition-type(theme)::view-transition-new(root) {
+    animation: kj-theme-fade 0.56s cubic-bezier(0.4, 0, 0.2, 1) both;
+    mix-blend-mode: normal;
+  }
 
-html:active-view-transition-type(theme)::view-transition-old(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-html:active-view-transition-type(theme)::view-transition-new(root) {
-  animation: kj-reveal 0.8s var(--ease);
+  /* Defined here, beside its only rule: this sheet loads on every page and
+     must not lean on the profile stylesheet for it. */
+  @keyframes kj-theme-fade {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1120,9 +1119,11 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
 
 /* ─── Profile redesign: tokens and primitives (Phase 0, 18-11-26) ────────────
  * The design of process/features/profile-site-redesign (design spec sections
- * 2 to 6) in one scope until the cutover: `data-design="profile"` on <html>,
- * which src/routes/__root.tsx sets for /preview/* only, so nothing below
- * matches a live page. Role tokens keep their names and take new values in
+ * 2 to 6) in one scope: `data-design="profile"` on <html>, which
+ * src/routes/__root.tsx sets for the pages moved so far (lib/design/scope.ts;
+ * the hidden /preview pages until the Phase 6 cutover, the core pages
+ * since), and on the site's nav and footer themselves, so they look the same
+ * around the pages Phase 7 restyles. Role tokens keep their names and take new values in
  * the scope (spec 2.12); Phase 8 folds the scope into :root and .dark.
  * Contrast pairs: lib/design/contrast.test.ts ("profile scope").
  * Primitives are `ds-*` classes in @layer components, so Tailwind utilities

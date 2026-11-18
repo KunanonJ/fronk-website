@@ -1,0 +1,545 @@
+/* Profile redesign, Phase 6: the cutover (old bodies under the chrome; All work, About, Contact). */
+/*
+ * Design spec 4.3, 9.2, 9.12, 12 and 13 items 25 and 32; plan step 6d. The
+ * chrome is on every public page now; the pages Phase 7 restyles keep the old
+ * tokens and get the bar's height as a top offset. The portfolio index,
+ * About and Contact are rebuilt from the redesign's parts. Plain CSS on the
+ * tokens in globals.css, phones first, rem breakpoints; every rule in
+ * @layer components; movement waits for no-preference at the end.
+ */
+
+@layer components {
+  /* Old bodies under the fixed bar (spec 13 item 32): outside the scope the
+     token is not defined, so its value is the fallback. Screens only: print
+     drops the bar, and the printed résumé starts at the top (pnpm pdf). */
+  @media screen {
+    html:not([data-design="profile"]) .landing-root {
+      padding-top: var(--nav-h, 92px);
+    }
+  }
+  /* Focus and anchors land below the bar on every page with the chrome
+     (spec 4.3, 12 item 9); the scope sets the same on its own pages. */
+  html:has(.pf-nav) {
+    scroll-padding-top: 96px;
+  }
+
+  /* The core pages' hero (spec 9.2's sky): it clears the bar itself. */
+  .pf-main:has(> .pf-page-hero) {
+    padding-top: 0;
+  }
+  .pf-page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: calc(var(--nav-h) + 48px) 32px;
+  }
+  .pf-page-hero__sky {
+    position: absolute;
+    inset: 0 0 auto;
+    block-size: min(72vh, 620px);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(black 35%, transparent);
+    mask-image: linear-gradient(black 35%, transparent);
+  }
+  .pf-page-hero__wrap {
+    position: relative;
+    display: grid;
+    gap: 40px;
+  }
+  .pf-page-hero__copy {
+    min-inline-size: 0;
+  }
+  /* Small text on the sky is ink 80, as on the case pages. */
+  .pf-page-hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-80);
+  }
+  .pf-page-hero__title {
+    max-inline-size: 18ch;
+    margin-top: 20px;
+    color: var(--ink);
+  }
+  .pf-page-hero__line {
+    display: block;
+  }
+  /* Display words of 24 px and more: ink 60 holds 3:1 on the sky's pixels. */
+  .pf-page-hero__muted {
+    color: var(--ink-60);
+  }
+  .pf-page-hero__accent {
+    font-style: italic;
+    color: var(--accent-ink);
+  }
+  .pf-page-hero__lead {
+    max-inline-size: 640px;
+    margin-top: 24px;
+    color: var(--ink-80);
+  }
+
+  /* All work: the filter bar and the lift cards. The block is
+     pf-work-index, not pf-work: Home's article#work owns .pf-work
+     (home-work-about.css), and a second .pf-work rule reset its padding. */
+  .pf-work-index {
+    padding-block: 24px 112px;
+  }
+  /* The filter bar, shared by every page that filters a list: the row
+     (.pf-filter-bar, with its live count) and the segmented group
+     (.pf-filter, whose options are buttons with aria-pressed). A switch
+     whose options are pages, such as a hub's language links, styles its own
+     aria-current state. */
+  .pf-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+  }
+  .pf-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 28px;
+    background: var(--paper);
+    box-shadow: var(--elev-ring);
+  }
+  .pf-filter__option {
+    min-block-size: 44px;
+    padding-inline: 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--ink-60);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .pf-filter__option[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .pf-filter-bar__count {
+    color: var(--ink-60);
+  }
+  .pf-work-index__grid {
+    display: grid;
+    gap: 56px 24px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-work-index__item {
+    display: flex;
+    min-inline-size: 0;
+  }
+  .pf-work-card__outcome {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 12px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-work-card__outcome .ds-px-dot {
+    flex: none;
+    transform: translateY(-1px);
+  }
+
+  /* About. */
+  .pf-about-page__portrait {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    max-inline-size: 420px;
+    border: 1px solid transparent;
+    border-radius: 28px;
+    background: var(--tint-2);
+    box-shadow: var(--elev-ring);
+  }
+  .pf-about-page__photo {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .pf-about-page__socials {
+    position: absolute;
+    inset-block-end: 16px;
+    inset-inline-start: 50%;
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: var(--elev-pop);
+    list-style: none;
+    translate: -50% 0;
+  }
+  .pf-about-page__availability {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 28px;
+  }
+  .pf-about-page__detail {
+    color: var(--ink-80);
+  }
+  .pf-about-page__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    margin-top: 28px;
+  }
+  .pf-about-page__jump {
+    min-block-size: 44px;
+    padding-inline: 8px;
+    color: var(--ink-80);
+  }
+  .pf-about-page__story {
+    padding-top: 112px;
+  }
+  .pf-about-page__story .pf-story {
+    margin-top: 40px;
+  }
+  .pf-about-page__section {
+    padding-top: 112px;
+  }
+  .pf-about-page__prose {
+    max-inline-size: 64ch;
+    margin-top: 32px;
+    color: var(--ink-80);
+  }
+  .pf-about-page__prose > * + * {
+    margin-top: 1em;
+  }
+  .pf-about-page__grid {
+    display: grid;
+    gap: 12px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-about-page__tile {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .pf-about-page__label {
+    color: var(--ink-60);
+  }
+  .pf-about-page__stage {
+    color: var(--ink);
+  }
+  .pf-about-page__text {
+    color: var(--ink-60);
+  }
+  .pf-about-page__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-about-page__skill {
+    min-block-size: 28px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+  }
+  .pf-about-page__seen {
+    margin-top: auto;
+    color: var(--ink-60);
+  }
+  .pf-about-page__more {
+    margin-top: 20px;
+  }
+  .pf-about-page__activity {
+    padding-top: 112px;
+  }
+  .pf-about-page__close {
+    display: grid;
+    gap: 32px;
+    padding-block: 112px 128px;
+  }
+  .pf-faq {
+    margin-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-faq__item {
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-block-size: 56px;
+    padding-block: 14px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .pf-faq__question::-webkit-details-marker {
+    display: none;
+  }
+  .pf-faq__heading {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  /* A plus drawn from two bars; it turns into a cross while open. */
+  .pf-faq__mark {
+    position: relative;
+    flex: none;
+    inline-size: 14px;
+    block-size: 14px;
+  }
+  .pf-faq__mark::before,
+  .pf-faq__mark::after {
+    position: absolute;
+    inset: 6px 0 auto;
+    block-size: 2px;
+    background: var(--ink-60);
+    content: "";
+  }
+  .pf-faq__mark::after {
+    rotate: 90deg;
+  }
+  .pf-faq__item[open] .pf-faq__mark {
+    rotate: 45deg;
+  }
+  .pf-faq__answer {
+    max-inline-size: 64ch;
+    padding: 0 40px 20px 0;
+    overflow-wrap: anywhere;
+    color: var(--ink-80);
+  }
+  .pf-about-page__next {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: start;
+  }
+  .pf-about-page__next-title {
+    color: var(--ink);
+  }
+  .pf-about-page__recruit {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-about-page__next-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .pf-about-page__next-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* What a recruiter asks first (About's Next, Contact's For recruiters). */
+  .pf-recruit__line {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-recruit__time {
+    color: var(--ink-60);
+  }
+  .pf-recruit__links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Contact. */
+  .pf-contact {
+    display: grid;
+    gap: 16px;
+    padding-block: 24px 128px;
+  }
+  .pf-contact__top,
+  .pf-contact__row {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-contact__side {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+  }
+  .pf-contact__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-margin-top: 16px;
+  }
+  .pf-contact__title {
+    color: var(--ink);
+  }
+  .pf-contact__tile {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-inline-size: 0;
+  }
+  .pf-contact__label {
+    color: var(--ink-60);
+  }
+  .pf-contact__address {
+    color: var(--ink);
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 6px;
+  }
+  .pf-contact__actions,
+  .pf-contact__profiles,
+  .pf-contact__next {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-contact__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-block-size: 44px;
+    padding-inline: 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: var(--elev-ring);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .pf-contact__profile {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 44px;
+    justify-content: center;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-contact__profile-name {
+    font-weight: 500;
+  }
+  .pf-contact__profile-url {
+    overflow: hidden;
+    color: var(--ink-60);
+    text-overflow: ellipsis;
+    text-transform: none;
+    white-space: nowrap;
+  }
+  .pf-contact__who {
+    max-inline-size: 30ch;
+    color: var(--ink);
+  }
+  .pf-contact__next {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    margin-top: auto;
+  }
+
+  /* Breakpoints (spec 4.1 and 10.1). */
+  @media (min-width: 37.5rem) {
+    .pf-work-index__grid,
+    .pf-about-page__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 50.625rem) {
+    .pf-page-hero {
+      padding-top: calc(var(--nav-h) + 80px);
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-page-hero--aside .pf-page-hero__wrap {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+      align-items: end;
+    }
+    .pf-work-index__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .pf-about-page__close {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+    .pf-contact__top {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+    /* "Who should write" beside "For recruiters": one row, no empty cell. */
+    .pf-contact__row {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+  }
+
+  /* Reader preferences (spec 12 items 26 to 28). */
+  @media (prefers-contrast: more) {
+    .pf-page-hero__eyebrow,
+    .pf-page-hero__lead,
+    .pf-filter-bar__count,
+    .pf-filter__option {
+      color: var(--ink);
+    }
+  }
+  @media (forced-colors: active) {
+    .pf-filter,
+    .pf-about-page__portrait,
+    .pf-about-page__socials,
+    .pf-contact__action {
+      border-color: CanvasText;
+    }
+    .pf-filter__option[aria-pressed="true"] {
+      border-color: Highlight;
+      outline: 2px solid Highlight;
+    }
+    .pf-page-hero__sky {
+      display: none;
+    }
+    /* The FAQ's plus and cross are two bars drawn as backgrounds, which
+       forced colours paint as Canvas: drawn in the text colour instead, so
+       open and closed still read apart (review finding 10). */
+    .pf-faq__mark::before,
+    .pf-faq__mark::after {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pf-faq__mark {
+    transition: rotate 0.2s var(--ease-snappy);
+  }
+}

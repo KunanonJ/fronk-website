@@ -7,38 +7,20 @@ import { pageHead } from "./head";
 import { fileOg } from "./og";
 
 /*
- * The head of a case page, /portfolio/<slug> or /ventures/<slug>, as its live
- * route builds it: the same builders with the same input. The hidden previews
- * of the case-study template (profile redesign Phase 5) use it with `hidden`,
- * so they carry the live page's canonical, Open Graph and Twitter tags (Share
- * copies the canonical address) and differ only in `robots`. caseHead.test.ts
- * compares both with the live routes' own loaders, so the two cannot drift
- * apart before Phase 6 moves the template onto the live routes.
+ * The head of a case page, /portfolio/<slug> or /ventures/<slug>: the title,
+ * description, canonical, Open Graph and Twitter tags, the Markdown twin and
+ * the share image, from the same builders the live routes used before the
+ * case-study template (profile redesign Phase 5) moved onto them at the
+ * Phase 6 cutover. The routes' loaders call it; caseHead.test.ts pins it
+ * through them, and the parity gate pins the served tags.
  */
 
-/** A preview's one difference: kept out of search. */
-const HIDDEN: NonNullable<Metadata["robots"]> = { index: false, follow: false };
-
-type CaseHeadOptions = {
-  /** True for a hidden preview: noindex and nofollow, all else the same. */
-  hidden?: boolean;
-};
-
-function head(
-  metadata: Metadata,
-  ogImage: ReturnType<typeof fileOg>,
-  { hidden = false }: CaseHeadOptions,
-) {
-  return pageHead(hidden ? { ...metadata, robots: HIDDEN } : metadata, {
-    fileOgImage: ogImage,
-  });
+function head(metadata: Metadata, ogImage: ReturnType<typeof fileOg>) {
+  return pageHead(metadata, { fileOgImage: ogImage });
 }
 
 /** The head of /portfolio/<slug>, as `_landing/portfolio/$slug.tsx` builds it. */
-export function projectCaseHead(
-  project: PortfolioProject,
-  options: CaseHeadOptions = {},
-) {
+export function projectCaseHead(project: PortfolioProject) {
   const path = `/portfolio/${project.slug}`;
   return head(
     routeShareMeta({
@@ -49,15 +31,11 @@ export function projectCaseHead(
       markdownPath: `${path}.md`,
     }),
     fileOg(path, `${project.name}: by Kunanon Jarat`),
-    options,
   );
 }
 
 /** The head of /ventures/<slug>, as `_landing/ventures/$slug.tsx` builds it. */
-export function ventureCaseHead(
-  venture: Venture,
-  options: CaseHeadOptions = {},
-) {
+export function ventureCaseHead(venture: Venture) {
   const path = `/ventures/${venture.slug}`;
   return head(
     routeShareMeta({
@@ -67,6 +45,5 @@ export function ventureCaseHead(
       hasOwnOgImage: true,
     }),
     fileOg(path, "Venture hub"),
-    options,
   );
 }

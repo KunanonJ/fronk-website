@@ -11,9 +11,10 @@ describe("web app manifest", () => {
     expect(result.start_url).toBe("/");
   });
 
-  it("matches the landing black brand canvas", () => {
-    expect(result.background_color).toBe("#000000");
-    expect(result.theme_color).toBe("#000000");
+  it("takes the profile palette: the light paper and the light theme colour", () => {
+    // Phase 6 cutover (design spec 13 item 37): was #000000 for both.
+    expect(result.background_color).toBe("#ffffff");
+    expect(result.theme_color).toBe("#f7f3ff");
   });
 
   it("references at least one icon", () => {

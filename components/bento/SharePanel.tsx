@@ -15,10 +15,13 @@ export function readShareTarget(): ShareTarget {
 }
 
 /**
- * Header share panel (bento canvas). Mounted only while open, on the client,
- * so it reads the live title and canonical URL. "Link copied" stays until the
- * panel is reopened. "More options" (the native share sheet) shows only where
- * navigator.share exists. Focus moves to the first row on open.
+ * The share panel of a hero Share pill (bento canvas; since the Phase 6
+ * cutover the pill nav has no Share button). The layout's SharePanelHost
+ * draws it under the bar for the pages Phase 7 restyles; the case pages draw
+ * it under their own pill (CaseActions). Mounted only while open, on the
+ * client, so it reads the live title and canonical URL. "Link copied" stays
+ * until the panel is reopened. "More options" (the native share sheet) shows
+ * only where navigator.share exists. Focus moves to the first row on open.
  */
 export default function SharePanel() {
   const [target] = useState(readShareTarget);

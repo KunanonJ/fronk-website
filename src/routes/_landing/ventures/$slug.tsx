@@ -1,87 +1,43 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import VentureHubPage from "@/components/landing/discovery/VentureHubPage";
-import type { Metadata } from "@/lib/seo/types";
-import {
-  buildBreadcrumbJsonLd,
-  buildSoftwareApplicationJsonLd,
-} from "@/lib/seo/jsonLd";
-import {
-  VENTURE_RELATED_TOPICS,
-  getVentureBySlug,
-} from "@/lib/content/ventures";
-import { fileOg } from "@/src/lib/og";
-import { namedPageTitle } from "@/lib/seo/pageTitle";
-import { pageHead } from "@/src/lib/head";
-import { routeShareMeta } from "@/lib/seo/routeMeta";
-import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
+import CasePage from "@/components/profile/case/CasePage";
+import { ventureJsonLd } from "@/components/profile/case/caseJsonLd";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import { ventureCase } from "@/lib/content/caseStudy";
+import { getVentureBySlug } from "@/lib/content/ventures";
+import { ventureCaseHead } from "@/src/lib/caseHead";
 
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const venture = getVentureBySlug(slug);
-  if (!venture) return { title: "Venture" };
-
-  return routeShareMeta({
-    title: namedPageTitle(venture.name, venture.tagline),
-    description: venture.description,
-    path: `/ventures/${slug}`,
-    hasOwnOgImage: true,
-  });
-}
-
-/** The page body for one slug; shared with the TanStack Start route. */
+/**
+ * The page body for one slug (profile redesign, Phase 6 cutover; design spec
+ * 9): the case-study template, under the same JSON-LD as before (the
+ * application, then the breadcrumb, from the same builders). Only a venture
+ * with a case study has a page. Keyed on the slug, as the project pages are:
+ * the router keeps this component when only the slug changes.
+ */
 function VentureCasePageView({ slug }: { slug: string }) {
   const venture = getVentureBySlug(slug);
   if (!venture?.caseStudy) throw notFound();
 
-  const appLd = serializeJsonLd(
-    buildSoftwareApplicationJsonLd({
-      name: venture.name,
-      description: venture.description,
-      url: venture.url,
-      pagePath: `/ventures/${slug}`,
-      offer: venture.offer,
-    }),
-  );
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Ventures", path: "/#ventures" },
-      { name: venture.name, path: `/ventures/${slug}` },
-    ]),
-  );
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: appLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
-      />
-      <VentureHubPage
-        venture={venture}
-        relatedTopics={withoutHiddenBlogLinks(
-          VENTURE_RELATED_TOPICS[slug] ?? [],
-        )}
-      />
-    </>
+    <ProfileMain>
+      {ventureJsonLd(venture).map((json) => (
+        <script
+          key={json}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: json }}
+        />
+      ))}
+      <CasePage key={slug} study={ventureCase(venture)} />
+    </ProfileMain>
   );
 }
 
 export const Route = createFileRoute("/_landing/ventures/$slug")({
-  loader: async ({ params }) => {
-    if (!getVentureBySlug(params.slug)?.caseStudy) throw notFound();
-    return {
-      head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
-        { fileOgImage: fileOg(`/ventures/${params.slug}`, "Venture hub") },
-      ),
-    };
+  // The head comes from src/lib/caseHead.ts (pinned by caseHead.test.ts);
+  // only a venture with a case study has a page.
+  loader: ({ params }) => {
+    const venture = getVentureBySlug(params.slug);
+    if (!venture?.caseStudy) throw notFound();
+    return { head: ventureCaseHead(venture) };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

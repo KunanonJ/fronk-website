@@ -1,26 +1,34 @@
 import { expect, test, type Page } from "@playwright/test";
-import { PREVIEW_ROUTES } from "./routes";
+import { PROFILE_ROUTES } from "./routes";
 
 /**
- * Profile redesign checks for the hidden /preview pages (Phase 0 onward).
+ * Profile redesign checks for the pages in the redesign's token scope: the
+ * hidden /preview pages until the Phase 6 cutover, the live core pages since
+ * (Home, the portfolio, the case pages, About and Contact; routes.ts).
  *
  * - Every project that runs this file (the device matrix of design spec 10.1,
  *   the WebKit phone, and the mobile, tablet and desktop projects): nothing
  *   scrolls sideways, no text under 12 px, every control 24 x 24 px or more.
  * - Desktop Chromium only: the best-practice checks of
  *   process/features/profile-site-redesign/references/best-practices-audit_18-11-26.md
- *   (forced colors, text spacing, zoom, more contrast, request origins). Each
- *   check is a plain function, run first on a fixture it must fail, so a
- *   check that stops catching anything fails too.
- * - The matrix projects (fold-closed, fold-open, tablet-landscape): baselines
- *   of /preview/system in both themes. Linux only, captured in the pinned
- *   Playwright image like visual.spec.ts; mobile and desktop are there.
+ *   (forced colors, text spacing, zoom, more contrast, request origins) on
+ *   Home, a case page, About and Contact (Phase 6 plan gate 10). Each check
+ *   is a plain function, run first on a fixture it must fail, so a check
+ *   that stops catching anything fails too.
+ * - The matrix baselines live with each section's spec (profile-hero,
+ *   profile-work-about, profile-journey and profile-case); the full pages'
+ *   are in visual.spec.ts. The /preview/system baselines went with that page.
  */
 
 const THEMES = ["light", "dark"] as const;
-const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
-const SYSTEM = "/preview/system";
-const HOME = "/preview";
+const HOME = "/";
+/** Plan gate 10: Home, a case page, About and Contact. */
+const BEST_PRACTICE_PAGES = [
+  HOME,
+  "/portfolio/tbh-intranet",
+  "/about",
+  "/contact",
+] as const;
 
 async function prepare(page: Page, theme: (typeof THEMES)[number]) {
   await page.addInitScript((value) => {
@@ -110,6 +118,34 @@ async function forcedColorsProblems(page: Page): Promise<string[]> {
         out.push(`still drawn: .${[...el.classList].join(".")}`);
       }
     }
+    return out;
+  });
+}
+
+/**
+ * In forced colors, each bar of the FAQ's plus and cross keeps its ink: drawn
+ * in CanvasText with forced-color-adjust off, not painted over as Canvas, so
+ * open and closed still read apart (review finding 10).
+ */
+async function faqMarkProblems(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const probe = document.createElement("span");
+    probe.style.color = "CanvasText";
+    document.body.append(probe);
+    const ink = getComputedStyle(probe).color;
+    probe.remove();
+    const marks = document.querySelectorAll<HTMLElement>(".pf-faq__mark");
+    const out = marks.length === 0 ? ["no FAQ mark"] : [];
+    marks.forEach((mark, at) => {
+      for (const part of ["::before", "::after"]) {
+        const bar = getComputedStyle(mark, part);
+        if (bar.forcedColorAdjust !== "none" || bar.backgroundColor !== ink) {
+          out.push(
+            `mark ${at}${part}: ${bar.backgroundColor} (${bar.forcedColorAdjust}), not ${ink}`,
+          );
+        }
+      }
+    });
     return out;
   });
 }
@@ -209,7 +245,7 @@ function foreignOrigins(urls: readonly string[], base: string): string[] {
   return [...new Set(origins)].filter((origin) => !allowed.has(origin));
 }
 
-for (const route of PREVIEW_ROUTES) {
+for (const route of PROFILE_ROUTES) {
   for (const theme of THEMES) {
     test(`${route.name} (${theme}) fits this width: no sideways scroll, 12 px text, 24 px targets`, async ({
       page,
@@ -233,6 +269,59 @@ function desktopOnly() {
   );
 }
 
+/*
+ * The device matrix (design spec 10.1; Phase 6 plan): the pages the cutover
+ * rebuilt hold at every anchor width. Home's sections and the intranet case
+ * have their own matrix checks in their specs.
+ */
+test.describe("the pages the cutover rebuilt, across the device matrix (desktop Chromium)", () => {
+  for (const path of ["/portfolio", "/about", "/contact"]) {
+    test(`${path} holds at 344, 390, 820, 882, 1180 and 1440 px`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      for (const width of [344, 390, 820, 882, 1180, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.evaluate(() => document.fonts.ready);
+        expect(await layoutProblems(page), `${path} at ${width}px`).toEqual([]);
+      }
+    });
+  }
+});
+
+test.describe("About's Read my story (review finding 9)", () => {
+  test("lands with the story's heading below the bar", async ({ page }) => {
+    test.skip(
+      !["desktop", "webkit-phone"].includes(test.info().project.name),
+      "desktop Chromium and the WebKit phone",
+    );
+    // The fixed bar's bottom edge: 32 px down and 48 px tall.
+    const BAR_BOTTOM = 80;
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page, "light");
+    await page.goto("/about", { waitUntil: "networkidle" });
+    await page.getByRole("link", { name: "Read my story" }).click();
+    await expect(page).toHaveURL(/#story$/);
+    // The story section's h2 (AboutPage's StorySection).
+    const heading = page.locator("h2#story-title");
+    await expect(heading).toHaveCount(1);
+    // Once the jump has settled, the heading is on screen, under the bar.
+    await expect
+      .poll(async () => (await heading.boundingBox())?.y ?? -1)
+      .toBeGreaterThanOrEqual(BAR_BOTTOM);
+    const box = (await heading.boundingBox())!;
+    const height = page.viewportSize()!.height;
+    expect(box.y + box.height).toBeLessThanOrEqual(height);
+    // The section, heading included, is the anchor the browser scrolled to.
+    expect(await page.locator("#story").evaluate((el) => el.tagName)).toBe(
+      "SECTION",
+    );
+  });
+});
+
 test("the 12 px floor reads SVG text at the size it is drawn", async ({
   page,
 }) => {
@@ -251,8 +340,31 @@ test("the 12 px floor reads SVG text at the size it is drawn", async ({
   expect(await layoutProblems(page)).toEqual([]);
 });
 
-test.describe("best practices on the preview (desktop Chromium)", () => {
-  for (const path of [SYSTEM, HOME]) {
+test.describe("best practices on the profile pages (desktop Chromium)", () => {
+  test("forced colors: the FAQ's open and closed marks keep their bars (/about)", async ({
+    page,
+  }) => {
+    desktopOnly();
+    await page.emulateMedia({ forcedColors: "active" });
+    await page.setContent(
+      `<style>.pf-faq__mark::before, .pf-faq__mark::after { content: ""; display: block; height: 2px; background: rgb(113, 110, 121); }</style><span class="pf-faq__mark"></span>`,
+    );
+    expect(await faqMarkProblems(page)).not.toEqual([]);
+
+    await prepare(page, "light");
+    await page.goto("/about", { waitUntil: "networkidle" });
+    expect(await faqMarkProblems(page)).toEqual([]);
+    // Open and closed differ: the open mark is turned into a cross.
+    const turns = await page
+      .locator(".pf-faq__mark")
+      .evaluateAll((marks) =>
+        marks.map((mark) => getComputedStyle(mark).rotate),
+      );
+    expect(turns[0]).toBe("45deg");
+    expect(new Set(turns.slice(1))).toEqual(new Set(["none"]));
+  });
+
+  for (const path of BEST_PRACTICE_PAGES) {
     test(`forced colors: ringed parts keep an edge, pixel art hides (${path})`, async ({
       page,
     }) => {
@@ -368,24 +480,3 @@ test.describe("best practices on the preview (desktop Chromium)", () => {
     });
   }
 });
-
-for (const theme of THEMES) {
-  test(`preview-system matches its baseline at this width (${theme})`, async ({
-    page,
-  }, testInfo) => {
-    test.skip(
-      !MATRIX.has(testInfo.project.name),
-      "matrix widths only; visual.spec.ts covers mobile and desktop",
-    );
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await prepare(page, theme);
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    await expect(page.locator("html")).toHaveClass(
-      new RegExp(`(^|\\s)${theme}(\\s|$)`),
-    );
-    await page.evaluate(() => document.fonts.ready);
-    await expect(page).toHaveScreenshot(`preview-system-${theme}.png`, {
-      fullPage: true,
-    });
-  });
-}

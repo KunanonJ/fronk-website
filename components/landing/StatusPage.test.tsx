@@ -28,11 +28,23 @@ describe("NotFound (bento 404)", () => {
     ).toBeInTheDocument();
   });
 
-  it("brings the site header and footer, on the canvas column", () => {
+  it("brings the site's pill nav and footer, which carry the redesign's scope", () => {
+    // Since the Phase 6 cutover the 404 wears the new chrome around its old
+    // body (plan step 6c; Phase 7f restyles the body).
     const { container } = render(<NotFound />);
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    const chrome = container.querySelectorAll("[data-site-chrome]");
-    expect(chrome[0]?.className).toMatch(/max-w-\[1000px\]/);
+    const chrome = [...container.querySelectorAll("[data-site-chrome]")];
+    expect(chrome.map((el) => el.tagName)).toEqual(["HEADER", "FOOTER"]);
+    for (const el of chrome)
+      expect(el).toHaveAttribute("data-design", "profile");
+    expect(container.querySelector("header.pf-nav")).not.toBeNull();
+    expect(
+      screen.getByRole("navigation", { name: "Primary" }),
+    ).toBeInTheDocument();
+    const skip = screen.getByRole("link", { name: "Skip to content" });
+    expect(skip).toHaveAttribute("href", "#main");
+    // Fixed and moved off screen, it would print: print drops it (pnpm pdf).
+    expect(skip).toHaveAttribute("data-print-hide");
   });
 
   it("offers Home, Portfolio, Ventures and Contact, and no hidden pages", () => {

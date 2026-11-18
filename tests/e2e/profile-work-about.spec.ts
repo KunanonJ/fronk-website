@@ -2,21 +2,21 @@ import { expect, test, type Page } from "@playwright/test";
 
 /**
  * Profile redesign, Phase 3: the Home work stack and About bento on the
- * hidden /preview Home (process/features/profile-site-redesign, phase 3
+ * Home, live since the Phase 6 cutover (the hidden /preview Home before
+ * it; process/features/profile-site-redesign, phase 3
  * gates 2 to 7, and the device matrix of design spec 10.1).
  *
  * Behaviour runs in desktop Chromium (1440 px) and the WebKit phone (390 px);
  * the matrix widths and the tap areas set their own viewports in desktop
  * Chromium; the matrix projects hold the baselines of both sections.
- * profile.spec.ts holds what every preview page must meet (no sideways
+ * profile.spec.ts holds what every profile page must meet (no sideways
  * scroll, 12 px text, 24 px targets, forced colours, zoom, text spacing).
  *
- * The case links point at /preview/portfolio/<slug> and
- * /preview/ventures/<slug>, which Phase 5 builds; these tests read the
- * addresses and do not follow them.
+ * The case links point at /portfolio/<slug> and /ventures/<slug>; these
+ * tests read the addresses, and profile-case.spec.ts follows them.
  */
 
-const HOME = "/preview";
+const HOME = "/";
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
 /** The fixed bar's bottom edge: 32 px down and 48 px tall. */
@@ -211,7 +211,7 @@ test.describe("work stack: sticking, depth and focus", () => {
     expect(sideways).toBeLessThanOrEqual(1);
   });
 
-  test("/preview#ventures lands on the GoGoCash card, below the bar", async ({
+  test("/#ventures lands on the GoGoCash card, below the bar", async ({
     page,
   }) => {
     // Under reduced motion: the jump is instant. The test after this one
@@ -234,7 +234,7 @@ test.describe("work stack: sticking, depth and focus", () => {
     expect(await uncovered(page, "#ventures")).toEqual([]);
   });
 
-  test("/preview#ventures with motion allowed: once the page stops scrolling, the card rests at 146 px", async ({
+  test("/#ventures with motion allowed: once the page stops scrolling, the card rests at 146 px", async ({
     page,
   }) => {
     // The default path: smooth scrolling, in Chromium and WebKit. The browser
@@ -264,9 +264,9 @@ test.describe("work stack: sticking, depth and focus", () => {
         window as unknown as {
           __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
         }
-      ).__TSR_ROUTER__.navigate({ to: "/preview", hash: "ventures" }),
+      ).__TSR_ROUTER__.navigate({ to: "/", hash: "ventures" }),
     );
-    await expect(page).toHaveURL(/\/preview#ventures$/);
+    await expect(page).toHaveURL(/\/#ventures$/);
     await venturesAtRest(page);
   });
 
@@ -291,10 +291,10 @@ test.describe("work stack: sticking, depth and focus", () => {
           window as unknown as {
             __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
           }
-        ).__TSR_ROUTER__.navigate({ to: "/preview", hash }),
+        ).__TSR_ROUTER__.navigate({ to: "/", hash }),
       href!.split("#")[1],
     );
-    await expect(page).toHaveURL(/\/preview#ventures$/);
+    await expect(page).toHaveURL(/\/#ventures$/);
     await venturesAtRest(page);
   });
 
@@ -492,20 +492,18 @@ test.describe("work stack: sticking, depth and focus", () => {
     expect(new Set(paper.chips)).toEqual(new Set(["none none"]));
   });
 
-  test("the cards link to the preview case pages that Phase 5 builds", async ({
-    page,
-  }) => {
+  test("the cards link to the live case pages", async ({ page }) => {
     await prepare(page);
     await visit(page);
     const hrefs = await page
       .locator(".pf-card__link")
       .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
     expect(hrefs).toEqual([
-      "/preview/portfolio/tbh-intranet",
-      "/preview/portfolio/ai-automation",
-      "/preview/portfolio/node-validator-automation",
-      "/preview/ventures/gogocash",
-      "/preview/ventures/manut",
+      "/portfolio/tbh-intranet",
+      "/portfolio/ai-automation",
+      "/portfolio/node-validator-automation",
+      "/ventures/gogocash",
+      "/ventures/manut",
     ]);
   });
 });

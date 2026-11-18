@@ -16,7 +16,6 @@ import {
   TechChip,
 } from "@/components/bento/Chips";
 import { Segmented } from "@/components/bento/Segmented";
-import SiteFooter from "@/components/bento/SiteFooter";
 
 describe("Bento grid", () => {
   it("is one column on phones, two from 641px, three from 1024px", () => {
@@ -146,25 +145,5 @@ describe("chips and buttons", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Step 02" }));
     expect(onChange).toHaveBeenCalledWith("1");
-  });
-});
-
-describe("SiteFooter", () => {
-  it("links the socials and the agent surfaces, and nothing hidden", () => {
-    render(<SiteFooter />);
-    expect(
-      screen.getByText(/© \d{4} Kunanon Jarat · Bangkok/),
-    ).toBeInTheDocument();
-    for (const name of ["X", "LinkedIn", "GitHub"])
-      expect(screen.getByRole("link", { name })).toHaveAttribute(
-        "target",
-        "_blank",
-      );
-    const agents = screen.getByRole("navigation", { name: "For agents" });
-    expect(
-      [...agents.querySelectorAll("a")].map((a) => a.getAttribute("href")),
-    ).toEqual(["/agents.md", "/llms.txt", "/sitemap.md", "/skills.md"]);
-    for (const a of document.querySelectorAll("a"))
-      expect(a.getAttribute("href")).not.toMatch(/^\/(blog|press)/);
   });
 });

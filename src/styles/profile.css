@@ -1,8 +1,9 @@
 @layer theme, base, components, utilities;
 
 /*
- * The profile redesign's preview stylesheet (Phases 0 to 5), linked only by
- * the /preview routes. The layer order above is declared first, so it holds
+ * The profile redesign's stylesheet. Since the Phase 6 cutover the root
+ * route links it on every page, after globals.css (the chrome is on every
+ * public page). The layer order above is declared first, so it holds
  * whichever of this file and globals.css loads first. One partial per phase;
  * each phase edits only its own partial. Tokens stay in globals.css.
  */
@@ -11,3 +12,6 @@
 @import "./profile/home-work-about.css";
 @import "./profile/home-journey.css";
 @import "./profile/case.css";
+@import "./profile/cutover.css";
+@import "./profile/pages-hubs.css";
+@import "./profile/pages-catalog.css";

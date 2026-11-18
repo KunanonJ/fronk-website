@@ -1,3 +1,4 @@
+import { render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import SiteFooter from "@/components/profile/site/SiteFooter";
@@ -67,5 +68,51 @@ describe("SiteFooter", () => {
   it("opens Say hello above its trigger, from the footer", () => {
     expect(html).toMatch(/popovertarget="say-hello-footer"/i);
     expect(html).toContain('id="say-hello-footer"');
+  });
+});
+
+/*
+ * What the bento footer's test checked (components/bento/primitives.test.tsx
+ * before the Phase 6 cutover; review finding 7), on the rendered footer: each
+ * public profile by its name, the agent files in their order, and no link to
+ * a hidden page, under any address that starts with it.
+ */
+describe("SiteFooter, its links", () => {
+  it("links each public profile by its name, in a new tab", () => {
+    render(<SiteFooter />);
+    const elsewhere = screen.getByRole("navigation", { name: "Elsewhere" });
+    for (const [name, href] of [
+      ["X", "https://x.com/fkj98"],
+      ["LinkedIn", "https://www.linkedin.com/in/kunanonj"],
+      ["GitHub", "https://github.com/KunanonJ"],
+    ] as const) {
+      const link = within(elsewhere).getByRole("link", {
+        name: `${name} (opens in a new tab)`,
+      });
+      expect(link).toHaveAttribute("href", href);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link.getAttribute("rel")).toContain("noopener");
+    }
+    expect(within(elsewhere).getAllByRole("link")).toHaveLength(3);
+  });
+
+  it("lists the four agent files, in order", () => {
+    render(<SiteFooter />);
+    const agents = screen.getByRole("navigation", { name: "For agents" });
+    expect(
+      within(agents)
+        .getAllByRole("link")
+        .map((a) => a.getAttribute("href")),
+    ).toEqual(["/agents.md", "/llms.txt", "/sitemap.md", "/skills.md"]);
+  });
+
+  it("links no hidden page: no address under /blog or /press", () => {
+    const { container } = render(<SiteFooter />);
+    const hrefs = [...container.querySelectorAll("a[href]")].map((a) =>
+      a.getAttribute("href")!,
+    );
+    // Every list was rendered: the pages, the agent files and the profiles.
+    expect(hrefs.length).toBeGreaterThanOrEqual(20);
+    expect(hrefs.filter((href) => /^\/(blog|press)/.test(href))).toEqual([]);
   });
 });

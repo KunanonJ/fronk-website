@@ -10,21 +10,18 @@ import { siteConfig } from "@/lib/site";
 import { projectCaseHead, ventureCaseHead } from "@/src/lib/caseHead";
 
 /*
- * The case pages' heads (profile redesign Phase 5): caseHead.ts builds what
- * the live routes build, and the hidden previews carry that head with only
- * `robots` changed, so their canonical, og:url and og:image (and Share, which
- * copies the canonical) name the live page. These go through the routes'
- * own loaders, so rewiring either route fails here.
+ * The case pages' heads (profile redesign Phase 5; the live routes build
+ * them with caseHead.ts since the Phase 6 cutover, and the hidden previews
+ * that compared themselves with them are gone): each route's own loader
+ * returns caseHead.ts's head, indexable, whose canonical, og:url and
+ * og:image (and Share, which copies the canonical) name the live page. These
+ * go through the routes' own loaders, so rewiring either route fails here.
  */
 
 const { Route: liveProject } =
   await import("@/src/routes/_landing/portfolio/$slug");
 const { Route: liveVenture } =
   await import("@/src/routes/_landing/ventures/$slug");
-const { Route: previewProject } =
-  await import("@/src/routes/preview/portfolio/$slug");
-const { Route: previewVenture } =
-  await import("@/src/routes/preview/ventures/$slug");
 
 type Loader = (ctx: {
   params: { slug: string };
@@ -37,12 +34,6 @@ async function headOf(route: unknown, slug: string): Promise<HeadTags> {
 
 const robots = (head: HeadTags) =>
   head.meta.find((meta) => isNamedMeta(meta, "robots"))?.content;
-
-/** The head without its robots tag. */
-const unranked = (head: HeadTags): HeadTags => ({
-  ...head,
-  meta: head.meta.filter((meta) => !isNamedMeta(meta, "robots")),
-});
 
 /** A page's live address: the site's origin, as the build sets it. */
 const liveUrl = (path: string) => `${siteConfig.url.replace(/\/$/, "")}${path}`;
@@ -58,31 +49,26 @@ const property = (head: HeadTags, name: string) =>
 
 describe("a case page's head", () => {
   for (const project of getAllPortfolioProjects()) {
-    it(`/portfolio/${project.slug}: the live route's, and the preview's differs only in robots`, async () => {
+    it(`/portfolio/${project.slug}: the live route's, indexable, naming the live page`, async () => {
       const live = await headOf(liveProject, project.slug);
-      const preview = await headOf(previewProject, project.slug);
       expect(projectCaseHead(project)).toEqual(live);
-      expect(unranked(preview)).toEqual(unranked(live));
-      expect(robots(preview)).toBe("noindex, nofollow");
       expect(robots(live) ?? "").not.toMatch(/noindex|nofollow/);
       const url = liveUrl(`/portfolio/${project.slug}`);
-      expect(canonical(preview)).toBe(url);
-      expect(property(preview, "og:url")).toBe(url);
-      expect(property(preview, "og:image")).toBe(`${url}/opengraph-image`);
+      expect(canonical(live)).toBe(url);
+      expect(property(live, "og:url")).toBe(url);
+      expect(property(live, "og:image")).toBe(`${url}/opengraph-image`);
     });
   }
 
   for (const venture of getAllVentures().filter((v) => v.caseStudy)) {
-    it(`/ventures/${venture.slug}: the live route's, and the preview's differs only in robots`, async () => {
+    it(`/ventures/${venture.slug}: the live route's, indexable, naming the live page`, async () => {
       const live = await headOf(liveVenture, venture.slug);
-      const preview = await headOf(previewVenture, venture.slug);
       expect(ventureCaseHead(venture)).toEqual(live);
-      expect(unranked(preview)).toEqual(unranked(live));
-      expect(robots(preview)).toBe("noindex, nofollow");
+      expect(robots(live) ?? "").not.toMatch(/noindex|nofollow/);
       const url = liveUrl(`/ventures/${venture.slug}`);
-      expect(canonical(preview)).toBe(url);
-      expect(property(preview, "og:url")).toBe(url);
-      expect(property(preview, "og:image")).toBe(`${url}/opengraph-image`);
+      expect(canonical(live)).toBe(url);
+      expect(property(live, "og:url")).toBe(url);
+      expect(property(live, "og:image")).toBe(`${url}/opengraph-image`);
     });
   }
 });

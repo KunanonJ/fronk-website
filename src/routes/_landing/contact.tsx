@@ -1,6 +1,6 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
-import ContactPage from "@/components/landing/ContactPage";
+import ContactPage from "@/components/profile/pages/ContactPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import type { Metadata } from "@/lib/seo/types";
 import {
   CONTACT_SEARCH_DEFAULTS,
@@ -35,8 +35,8 @@ function ContactRoute() {
     CONTACT_SEARCH_DEFAULTS.topic,
   );
   return (
-    <PageMain>
+    <ProfileMain>
       <ContactPage intent={intent} />
-    </PageMain>
+    </ProfileMain>
   );
 }

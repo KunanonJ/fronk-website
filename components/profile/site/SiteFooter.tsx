@@ -25,7 +25,13 @@ import {
 
 export default function SiteFooter() {
   return (
-    <footer data-site-chrome lang="en" className="pf-footer">
+    <footer
+      data-site-chrome
+      // The token scope, as on the nav (design spec 2.13).
+      data-design="profile"
+      lang="en"
+      className="pf-footer"
+    >
       <div className="pf-footer__sheet" aria-hidden="true">
         <DitherField className="pf-footer__dither" fade="up" cell={10} />
       </div>

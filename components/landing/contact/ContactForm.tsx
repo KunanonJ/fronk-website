@@ -6,9 +6,8 @@ import {
   type ReactNode,
 } from "react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
-import { BentoCard } from "@/components/bento/Bento";
-import { ctaClasses } from "@/components/bento/Buttons";
 import { CheckIcon } from "@/components/bento/icons";
+import { pillClass } from "@/components/ds/Pill";
 import type { ContactIntent } from "@/lib/contact/search";
 import {
   CONTACT_LIMITS,
@@ -40,7 +39,8 @@ const EMPTY: ContactFormValues = {
   company: "",
 };
 
-const LABEL = "font-mono text-xs tracking-[0.06em] text-ink-2 uppercase";
+// The profile redesign's mono label (design spec 3.2): 12 px, uppercase.
+const LABEL = "t-meta text-ink-60";
 const INPUT =
   "w-full min-w-0 rounded-2xl border border-hairline-strong bg-page px-4 text-base text-ink";
 
@@ -99,8 +99,9 @@ function invalidProps(id: string, error?: string) {
 }
 
 /**
- * The "Say hello" card (bento canvas, design spec 4.3 and gap 21). The form
- * posts to /api/contact, which emails the owner through Resend.
+ * The "Say hello" card (profile redesign, Phase 6 cutover; the bento canvas
+ * before it, design spec 4.3 and gap 21). The form posts to /api/contact,
+ * which emails the owner through Resend.
  *
  * - Validation: the shared Valibot schema (the server's wording) runs on
  *   submit, then on every change once a submit has been tried. Errors show
@@ -216,15 +217,14 @@ export default function ContactForm({
   const sending = status === "sending";
 
   return (
-    <BentoCard
+    <article
       id={contactPage.formId}
-      headingId="card-form"
-      title={contactPage.cardTitle}
-      span={2}
-      gap={4.5}
-      minHeight={false}
-      className="scroll-mt-6 min-[641px]:row-span-2"
+      aria-labelledby="card-form"
+      className="ds-tile ds-tile--paper pf-contact__form"
     >
+      <h2 id="card-form" className="t-h3 pf-contact__title">
+        {contactPage.cardTitle}
+      </h2>
       {status === "sent" ? (
         <div className="my-auto flex flex-col items-start gap-5 px-1 pb-6">
           <div
@@ -264,6 +264,8 @@ export default function ContactForm({
       ) : (
         <form
           aria-labelledby="card-form"
+          // While sending, the form says so (the button reads "Sending...").
+          aria-busy={sending}
           noValidate
           className="m-0 flex flex-col gap-5 px-1 pt-1"
           onSubmit={(e) => {
@@ -454,8 +456,7 @@ export default function ContactForm({
               type="submit"
               aria-disabled={sending}
               className={cn(
-                ctaClasses("primary", "md"),
-                "border-0",
+                pillClass({ variant: "dark", size: "lg" }),
                 sending && "cursor-progress opacity-60",
               )}
             >
@@ -464,6 +465,6 @@ export default function ContactForm({
           </div>
         </form>
       )}
-    </BentoCard>
+    </article>
   );
 }
