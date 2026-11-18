@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Notes from "@/components/profile/home/Notes";
 import PreviewHome from "@/components/profile/preview/PreviewHome";
+import { withRouter } from "@/tests/routerContext";
 import {
   notebookEntries,
   notesCopy,
@@ -49,7 +50,8 @@ describe("Notes", () => {
   });
 
   it("leaves the preview Home without a notebook, a heading or a link to it while fewer than three are cleared", () => {
-    const html = renderToString(<PreviewHome />);
+    // The hero's ScriptOnce reads the router, as in the app.
+    const html = renderToString(withRouter(<PreviewHome />));
     if (notebookEntries().length > 0) {
       expect(html).toContain('aria-labelledby="notes-title"');
       return;
