@@ -21,14 +21,29 @@ describe("profileDesign", () => {
     }
   });
 
+  it("scopes the topic hubs in both languages and the reading pages (Phase 7, D1)", () => {
+    for (const id of [
+      "/_landing/topics/$slug",
+      "/_landing/th/topics/$slug",
+      "/_landing/learn",
+      "/_landing/examples",
+      "/_landing/stack",
+      "/_landing/proof",
+      "/_landing/build",
+    ]) {
+      expect(profileDesign(page(id)), id).toBe("profile");
+    }
+    // A hub slug that does not exist ends in the old 404.
+    expect(profileDesign(page("/_landing/topics/$slug", "notFound"))).toBe(
+      undefined,
+    );
+  });
+
   it("leaves the pages Phase 7 restyles on the old tokens", () => {
     for (const id of [
       "/_landing/resume",
       "/_landing/skills/",
       "/_landing/skills/$slug",
-      "/_landing/topics/$slug",
-      "/_landing/th/topics/$slug",
-      "/_landing/proof",
       "/_system/design",
     ]) {
       expect(profileDesign(page(id)), id).toBe(undefined);

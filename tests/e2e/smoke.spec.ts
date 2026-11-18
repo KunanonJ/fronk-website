@@ -752,27 +752,28 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     );
   });
 
-  test("the FDE hub leaves no section card mostly empty at desktop width", async ({
+  test("the FDE hub sets its four sections as chapters, each body under its heading", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/topics/forward-deployed-ai-engineering", {
       waitUntil: "networkidle",
     });
-    // Each section card: the gap between its kicker and its big number.
+    // Profile redesign, Phase 7 (R17: the bento test's intent, no empty band
+    // in a section): each chapter's body starts right under its heading.
     const gaps = await page
-      .locator('article[aria-labelledby^="card-s"]')
-      .evaluateAll((cards) =>
-        cards.map((card) => {
-          const kicker = card.querySelector("h2")!.getBoundingClientRect();
-          const number = card
-            .querySelector("p[aria-hidden]")!
+      .locator("section.pf-case-chapter:has(> h2.t-h3)")
+      .evaluateAll((chapters) =>
+        chapters.map((chapter) => {
+          const heading = chapter.querySelector("h2")!.getBoundingClientRect();
+          const body = chapter
+            .querySelector("p:not([aria-hidden])")!
             .getBoundingClientRect();
-          return Math.round(number.top - kicker.bottom);
+          return Math.round(body.top - heading.bottom);
         }),
       );
     expect(gaps).toHaveLength(4);
-    for (const gap of gaps) expect(gap).toBeLessThanOrEqual(120);
+    for (const gap of gaps) expect(gap).toBeLessThanOrEqual(40);
   });
 
   test("the Thai FDE hub carries the same pill and buttons, in Thai", async ({
@@ -1432,6 +1433,11 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/portfolio/tbh-intranet",
     "/contact",
     "/resume",
+    // Phase 7 (D1): a hub in each language and the densest reading pages.
+    "/topics/forward-deployed-ai-engineering",
+    "/th/topics/ai-transformation-thailand",
+    "/stack",
+    "/proof",
   ];
 
   test.beforeEach(async ({ page }) => {

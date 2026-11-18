@@ -18,6 +18,14 @@ const PROFILE_ROUTE_IDS: ReadonlySet<string> = new Set([
   "/_landing/ventures/$slug",
   "/_landing/about",
   "/_landing/contact",
+  // Phase 7 (D1): the topic hubs in English and Thai, and the reading pages.
+  "/_landing/topics/$slug",
+  "/_landing/th/topics/$slug",
+  "/_landing/learn",
+  "/_landing/examples",
+  "/_landing/stack",
+  "/_landing/proof",
+  "/_landing/build",
 ]);
 
 /** The part of a route match the scope reads. */

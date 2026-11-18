@@ -1,6 +1,6 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
-import BuildPage from "@/components/landing/library/BuildPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import BuildPage from "@/components/profile/pages/library/BuildPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
   BUILD_SEARCH_DEFAULTS,
@@ -19,7 +19,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /build (bento redesign, phase 7f; design spec 4.14). The venture is the
+ * /build (profile redesign, Phase 7 lane D1). The venture is the
  * typed `?venture=site|gogocash|manut` param (Valibot); the default, all,
  * never shows in the URL and an unknown value falls back to it.
  */
@@ -44,8 +44,8 @@ function BuildRoute() {
   };
 
   return (
-    <PageMain>
+    <ProfileMain>
       <BuildPage venture={venture} onVentureChange={setVenture} />
-    </PageMain>
+    </ProfileMain>
   );
 }

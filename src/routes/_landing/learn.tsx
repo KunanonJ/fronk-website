@@ -1,7 +1,7 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { PageMain } from "@/components/bento/Bento";
-import LearnPage from "@/components/landing/library/LearnPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import LearnPage from "@/components/profile/pages/library/LearnPage";
 import type { Metadata } from "@/lib/seo/types";
 import { routeCacheHeaders } from "@/src/lib/cache";
 import { learnCardsQuery } from "@/src/queries/content";
@@ -22,7 +22,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /learn (bento redesign, phase 7f; design spec 4.10). The hub language is
+ * /learn (profile redesign, Phase 7 lane D1). The hub language is
  * the typed `?lang=th` param (Valibot); the default, English, never shows in
  * the URL and an unknown value falls back to it. /learn renders on request
  * (Sanity-backed, edge-cached per URL), so the server already renders the
@@ -49,8 +49,8 @@ function LearnRoute() {
   };
 
   return (
-    <PageMain>
+    <ProfileMain>
       <LearnPage posts={posts} lang={lang} onLangChange={setLang} />
-    </PageMain>
+    </ProfileMain>
   );
 }

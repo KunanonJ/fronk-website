@@ -1542,11 +1542,34 @@ html.dark[data-design="profile"],
     letter-spacing: normal;
     text-transform: none;
   }
-  :is(.t-body, .t-prose):lang(th) {
+  /* Phase 7 (plan step 7b): Thai sets in Noto Sans Thai, which none of the
+     Latin faces cover. Body text at 1.75, headings at 1.4, no tracking (it
+     breaks the marks above and below), no slanted Thai: Noto Sans Thai has
+     no italic, so the accent lines stay upright instead of a faux oblique.
+     Thai display text is set smaller than the serif: its glyphs are larger
+     on the same body. */
+  :is(.t-body, .t-prose, .t-lead, .t-small):lang(th) {
     line-height: 1.75;
+    letter-spacing: normal;
   }
-  :is(.t-hero, .t-display, .t-title, .t-footer, .t-statement):lang(th) {
+  :is(
+    .t-hero,
+    .t-display,
+    .t-title,
+    .t-footer,
+    .t-statement,
+    .t-h3,
+    .t-card-title,
+    .t-lift-title
+  ):lang(th) {
     line-height: 1.4;
+    letter-spacing: normal;
+  }
+  .t-display:lang(th) {
+    font-size: clamp(2.25rem, 4vw + 0.5rem, 4.5rem);
+  }
+  :lang(th) {
+    font-synthesis-style: none;
   }
 
   /* Layout and the card link pattern (spec 2.11, 6.12). */

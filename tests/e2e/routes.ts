@@ -171,6 +171,17 @@ const PROFILE_ROUTE_NAMES: ReadonlySet<string> = new Set([
   "portfolio-site",
   "venture-hub",
   "venture-hub-manut",
+  // Phase 7 (D1): the topic hubs in English and Thai, and the reading pages.
+  "topic-hub",
+  "topic-hub-fde",
+  "topic-hub-fde-th",
+  "topic-hub-th",
+  "topic-hub-th-short",
+  "learn",
+  "examples",
+  "stack",
+  "proof",
+  "build",
 ]);
 
 export const PROFILE_ROUTES: readonly RouteUnderTest[] = ROUTES.filter(
