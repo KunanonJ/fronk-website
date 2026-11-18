@@ -85,8 +85,9 @@
   }
   /* The filter bar, shared by every page that filters a list: the row
      (.pf-filter-bar, with its live count) and the segmented group
-     (.pf-filter, whose options are buttons with aria-pressed, or links with
-     aria-current where each option is a page). */
+     (.pf-filter, whose options are buttons with aria-pressed). A switch
+     whose options are pages, such as a hub's language links, styles its own
+     aria-current state. */
   .pf-filter-bar {
     display: flex;
     flex-wrap: wrap;

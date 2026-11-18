@@ -541,3 +541,46 @@ answers, stories and case sections among them, is on the new pages. The
 shorter nodes that hold a figure were checked too: "220+ merchants" is
 Home's stat tile ("220+", "Merchants on GoGoCash"), "GMT+7" is the footer,
 and "Next.js 16", "React 19" and "+4" are All work's chips (deviation 6).
+
+## 17. The CI baselines, and a fix they found (19-11-26)
+
+CI run 44369075374 rendered the 92 full-page baselines (23 pages, two
+themes, desktop and mobile), all new since the cutover deleted the old ones,
+and the profile specs' device matrix failed six `#work` captures: 136 px
+shorter at 344, 882 and 1180 px, in both themes.
+
+- **Cause.** The All work page reused Home's block name: `.pf-work` in
+  `cutover.css`, which loads after `home-work-about.css`, reset the padding of
+  Home's `article#work` from 112/160 px to 24/112 px (88 + 48 = 136 px) at
+  every width. Only the matrix had a section baseline for `#work`; on desktop
+  and mobile the full-page baselines were new, so they would have taken the
+  wrong padding in.
+- **Fix** (`fa97bf1`). All work is `.pf-work-index`. Its filter bar became two
+  shared blocks, `.pf-filter-bar` (the row and its live count) and
+  `.pf-filter` (the segmented group and its options), because Phase 7's hub
+  and library pages filter lists with the same bar. All work renders the same:
+  inside the scope the page background is `--paper`, which the borrowed rule
+  also set, and the hero clips its own sky.
+- **Guard.** `globals.test.ts` fails when two profile partials declare the
+  same bare `.pf-` block; a fixture proves it fires, and it fails on the old
+  `cutover.css`. The pixel tones (`.pf-px--ink`, `--tint`, `--coral`) are
+  declared in both `shell.css` and `home-journey.css`, but as modifiers with
+  different properties (`fill` for the footer art, the `--px-*` pair for the
+  icons), so the guard leaves them to Phase 8's cleanup.
+- **Baselines.** The 84 captures of the pages without the renamed classes
+  were reviewed and committed (`2123cfd`); Home and All work were rendered
+  again after the fix.
+- **The second run** (44376473753) wrote Home and All work. The four All work
+  captures are byte for byte those of the first run, so the rename changed
+  nothing there. The four Home captures are 136 px taller, the restored
+  padding. The six matrix `#work` captures match their Phase 3 baselines
+  again, and the other 88 full-page captures pass.
+- **Open for Phase 8 (guards).** The full-page captures do not load a lazy
+  image that lies far below the first screen. On desktop, Home's Manut AI card
+  shows an empty logo frame: the image is `loading="lazy"` and sits about
+  4,100 px down, and after `networkidle` it is never requested. Both CI runs
+  agree, and visitors are unaffected: the image loads as they scroll, and
+  the section captures show it. Making `visual.spec.ts` load every image
+  before the capture (each `loading="lazy"` set to eager, then waiting for
+  `complete`) would let the baselines see these images, and would change
+  every page that has one.
