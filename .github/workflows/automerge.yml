@@ -1,0 +1,49 @@
+# Auto-merge: a pull request labelled `automerge` is squash-merged by GitHub
+# as soon as every required check on `main` passes (typecheck-lint-test-build,
+# e2e-smoke, visual, parity). Every merge to `main` deploys production through
+# Cloudflare Workers Builds, so the label is an explicit opt-in per pull
+# request; removing it switches auto-merge off again.
+#
+# Only pull requests from this repository qualify: a fork's pull_request run
+# gets a read-only token and no secrets, and the job's condition skips it.
+#
+# GitHub starts no workflow from an event made with GITHUB_TOKEN, so a merge
+# enabled with it does not start the push run of ci.yml on `main` (Cloudflare
+# still deploys: its build listens to the push webhook). Add a fine-grained
+# token as the AUTOMERGE_TOKEN secret (contents and pull requests: write) to
+# keep that post-merge run; the job uses it when present.
+name: Auto-merge
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize, labeled, unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  automerge:
+    name: auto-merge
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Enable auto-merge (squash)
+        if: >-
+          contains(github.event.pull_request.labels.*.name, 'automerge') &&
+          !github.event.pull_request.draft
+        run: gh pr merge --auto --squash "$PR_URL"
+
+      - name: Disable auto-merge when the label is removed
+        if: >-
+          github.event.action == 'unlabeled' &&
+          github.event.label.name == 'automerge'
+        run: gh pr merge --disable-auto "$PR_URL"
