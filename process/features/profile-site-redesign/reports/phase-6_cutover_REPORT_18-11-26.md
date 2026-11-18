@@ -511,3 +511,33 @@ these fixes touch, as the lane's settings asked), the fold and tablet
 projects of `profile-case.spec.ts` (they run its baselines only), Firefox
 (not installed), and the Linux baselines (none change). The final one-run
 green browser gate is CI's.
+
+## 16. Visible text against production (19-11-26)
+
+The parity gate compares head tags, JSON-LD, the `lang` attributes, the
+title and the first h1, never the body text. So before the deploy, the
+`<main>` text of the 11 rebuilt pages in this branch's build was compared with
+production, which still served the old design. Every text node of 3 or more
+words on the live page that does not appear in the new page's `<main>` text
+was listed (script kept outside the repo). There were 43 such phrases. None
+is lost content:
+
+| Phrase on production | Pages | Verdict |
+| --- | --- | --- |
+| "Local time in Bangkok:" and "Building fintech and AI operator systems from Bangkok, for Thailand and SEA: ..." | Home, Contact | R14: the Bangkok card is retired. The footer (outside `<main>`, on every page) carries "Bangkok, GMT+7" and the same sentence ("I build fintech and AI operator systems from Bangkok, ...") |
+| The Experience card's lines ("The Binary Holdings · Sep 2025 – Present", "AI Project Manager, Aiden Labs", "Hybrid · Jan – Oct 2025", "Advisor, Aiden Labs", "Remote · Nov – Dec 2024", "The Binary Holdings · Sep – Dec 2024") | Home | Reformatted: the career records card lists the same four roles as organisation, period ("Sep 2025 to now") and role rows. Spec 8.6's rows take the organisation before the résumé's first " · ", so "Hybrid" and "Remote" are not on Home; `/resume` still shows them ("Aiden Labs · Full-time · Hybrid") |
+| "Forward Deployed Engineer and AI engineering · Bangkok or remote" | Home | Reworded: the hero's "Open to roles, Bangkok or remote" and the records card's "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote." |
+| "All work →", "See both ventures →" | Home | Link labels. Home still links `/portfolio`, `/ventures/gogocash`, `/ventures/manut` and `/#ventures` |
+| "A short arc." and the path card's steps ("Coins / Playbux", "AI + tokenomics", GoGoCash's "Founder" since 2023, the "AI Engineering Lead" role since 2025) | About | Deviation 5: the "Selected path" card is replaced by the career records card |
+| "Four operating principles." | About | A heading only; the four principles are the About bento's tiles under `id="principles"` |
+| "View project →", "Tailwind CSS 4", "Avalanche P-Chain RPC" | All work | Deviation 6: the lift cards drop the tech chips and the "View project" label. Each stack is still on its case page |
+| "Illustrative mockup, not real data." | All work, four case pages | Phase 5 wording: the case covers' caption reads "Illustration, not real data." and the All work cards carry an "Illustration" chip |
+| "Top to bottom" | Five case pages | The architecture section's small label; the section now opens with its layers in order ("Users · Web app · API · Services · Build + hosting") |
+| The next case's name and tagline (for example "Email Signature Generator", "Branded Gmail signatures, self-serve.") | Five case pages | Navigation: the old "Next" link becomes the More projects cards (spec 9.12); every tagline stays on its own page and on All work |
+| "Case study →", and the share card's preview of the page title | Both venture pages | A link label, and the share panel, which now opens from the bar (`SharePanelHost`, outside `<main>`) |
+
+Every other old node of 3 or more words, the outcomes, principles, FAQ
+answers, stories and case sections among them, is on the new pages. The
+shorter nodes that hold a figure were checked too: "220+ merchants" is
+Home's stat tile ("220+", "Merchants on GoGoCash"), "GMT+7" is the footer,
+and "Next.js 16", "React 19" and "+4" are All work's chips (deviation 6).
