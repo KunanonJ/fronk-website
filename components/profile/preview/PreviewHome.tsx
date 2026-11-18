@@ -41,7 +41,7 @@ export default function PreviewHome() {
       <section
         id="about"
         aria-labelledby="about-title"
-        className="ds-wrap min-h-[120svh] pt-32 lg:pt-44"
+        className="ds-wrap min-h-[120svh] pt-32 tablet:pt-44"
       >
         <EyebrowRow>Phase 3</EyebrowRow>
         <h2 id="about-title" className="t-title mt-6">

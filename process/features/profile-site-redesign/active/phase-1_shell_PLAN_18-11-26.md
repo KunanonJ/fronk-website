@@ -1,6 +1,6 @@
 # Phase 1: Shell (pill nav, Say hello, theme, phone menu, footer)
 
-**Status:** CODE DONE (18-11-26)
+**Status:** VERIFIED (18-11-26). Reviewed and fixed; see the report
 **Evidence:** `../reports/phase-1_shell_REPORT_18-11-26.md` (gates, deviations, draft copy; visual baselines pending, see its open items 1 and 2).
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`

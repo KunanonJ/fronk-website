@@ -9,7 +9,7 @@ pushed or deployed.
 **Harness:** `.claude/agents/`, `.claude/skills/` and `process/context/` are
 missing. The phase ran alone in one worktree from the shared brief, under the
 Harness-Absent Fallback.
-**Status:** CODE DONE (18-11-26), with the code review fixes in section 9.
+**Status:** VERIFIED (18-11-26). Reviewed and fixed (section 9); every gate passed locally, and CI checks the pull request.
 Visual baselines are not rendered here (the orchestrator batches them, see open
 items 1 and 2).
 
@@ -200,12 +200,10 @@ Also for approval, as microcopy the plan names: "Compose in Gmail", "Open your m
    Popover API is covered by unit tests and the CSS guard in
    `lib/design/globals.test.ts`. The browsers run here (Chromium and WebKit) have
    the API, so the fallback never runs in a browser.
-9. **About eyebrow under the bar at 810 to 1023 px.** `components/profile/preview/PreviewHome.tsx`
-   pads `#about` with `pt-32` below 1024 px; the section needs `pt-44` (176 px)
-   from 810 px up. This phase does not edit that file, and the lane owner applies
-   the change at merge. Until then the browser test "each section lands where its
-   scroll margin puts it" fails at 820 px on one check (`about content at 820`,
-   47.8 px).
+9. **Closed: About eyebrow under the bar at 810 to 1023 px.** `#about` now
+   pads `pt-32 tablet:pt-44`, so its top padding switches at 810 px together
+   with its `scroll-margin-top` (-128 px, then -176 px). Phase 3's About
+   section keeps the same pair.
 
 ## 9. Code review and fixes
 

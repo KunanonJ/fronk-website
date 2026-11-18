@@ -676,17 +676,35 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       if (!found) throw new Error("a card has no box");
       return found;
     };
+    // Each resize re-flows the grid; under load the first read can come
+    // before it settles, so the row checks poll until the layout is at rest.
     // Three columns: the two cards share a row.
     await page.setViewportSize({ width: 1440, height: 900 });
+    await expect
+      .poll(
+        async () => Math.abs((await box(who)).y - (await box(recruiters)).y),
+        {
+          message: "both cards start on one row at 1440 px",
+        },
+      )
+      .toBeLessThan(2);
     const wideWho = await box(who);
-    const wideRecruiters = await box(recruiters);
-    expect(Math.abs(wideWho.y - wideRecruiters.y)).toBeLessThan(2);
-    expect(wideRecruiters.x).toBeGreaterThan(wideWho.x + wideWho.width);
+    expect((await box(recruiters)).x).toBeGreaterThan(
+      wideWho.x + wideWho.width,
+    );
     // Two columns: each takes a whole row, so neither sits beside a gap.
     await page.setViewportSize({ width: 800, height: 900 });
+    await expect
+      .poll(
+        async () => {
+          const midWho = await box(who);
+          return (await box(recruiters)).y - (midWho.y + midWho.height);
+        },
+        { message: "the recruiter card starts below the other at 800 px" },
+      )
+      .toBeGreaterThanOrEqual(0);
     const midWho = await box(who);
     const midRecruiters = await box(recruiters);
-    expect(midRecruiters.y).toBeGreaterThanOrEqual(midWho.y + midWho.height);
     expect(Math.abs(midRecruiters.width - midWho.width)).toBeLessThan(2);
   });
 
