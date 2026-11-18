@@ -29,7 +29,7 @@ export default function SiteFooter() {
       <div className="pf-footer__sheet" aria-hidden="true">
         <DitherField className="pf-footer__dither" fade="up" cell={10} />
       </div>
-      <div className="pf-footer__wrap">
+      <div className="ds-wrap pf-footer__wrap">
         <div className="pf-footer__intro">
           <Reveal rise={12}>
             <EyebrowRow centred>{footerCopy.eyebrow}</EyebrowRow>

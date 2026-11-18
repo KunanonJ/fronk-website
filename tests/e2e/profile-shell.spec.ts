@@ -237,6 +237,34 @@ test.describe("chrome: layout and the pill nav", () => {
     );
   });
 
+  test("the footer keeps the page gutter on a phone and on a desktop", async ({
+    page,
+  }) => {
+    await prepare(page);
+    for (const size of [PHONE, DESKTOP]) {
+      await page.setViewportSize(size);
+      await visit(page);
+      const footer = page.locator("footer[data-site-chrome]");
+      // The intro copy and the card sit inside the page wrap, never against
+      // the screen edge (the gutter is 20 px on phones, more on desktops).
+      for (const part of [
+        footer.locator(".pf-footer__lead"),
+        footer.locator(".pf-footer__card"),
+      ]) {
+        await part.scrollIntoViewIfNeeded();
+        const box = await part.boundingBox();
+        if (!box) throw new Error("a footer part has no box");
+        expect(box.x, `${size.width} px: left gutter`).toBeGreaterThanOrEqual(
+          16,
+        );
+        expect(
+          size.width - (box.x + box.width),
+          `${size.width} px: right gutter`,
+        ).toBeGreaterThanOrEqual(16);
+      }
+    }
+  });
+
   test("the bar sits at the top on one row, with the links on desktop and the Menu button on a phone", async ({
     page,
   }) => {
