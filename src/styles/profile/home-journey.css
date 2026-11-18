@@ -1,1 +1,830 @@
-/* Profile redesign, Phase 4: the Journey, its tool orbit and the notebook (spec 8.6 and 8.7). Empty until Phase 4. */
+/* Profile redesign, Phase 4: the Journey, its tool orbit, the story and records card, and the notebook (spec 8.6 and 8.7).
+ * Design spec 2.3, 2.5, 4.2, 5.2 to 5.4, 8.6, 8.7, 10, 10.1, 11 and 12. Rules
+ * sit in @layer components, so Tailwind utilities still win; the registered
+ * properties and the keyframes sit outside it, as neither is cascaded. Plain
+ * CSS with tokens from globals.css. Breakpoints in rem: 37.5 (600 px), 50.625
+ * (810), 64 (1024), 73.75 (1180). The tiles rise in with Phase 2's kj-file-in.
+ */
+
+/* The orbit's two turns (Orbit.tsx): drags and the buttons, and the spin. */
+@property --orbit-offset {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@property --orbit-spin {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@layer components {
+  /* The stage (spec 8.6): the full screen from 810 px, 640 px on phones,
+     under 112 px of the section's own padding. */
+  .pf-journey__stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    min-block-size: var(--screen);
+    padding: 96px var(--pad);
+    overflow: clip;
+  }
+  .pf-journey__wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        60% 55% at 14% 34%,
+        color-mix(in srgb, var(--tint-3) 60%, transparent) 0%,
+        transparent 72%
+      ),
+      radial-gradient(
+        55% 50% at 86% 40%,
+        color-mix(in srgb, var(--tint-coral) 75%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(180deg, var(--paper) 0%, var(--tint-1) 60%, var(--paper));
+    -webkit-mask-image: linear-gradient(
+      transparent 0%,
+      black 28% 68%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      transparent 0%,
+      black 28% 68%,
+      transparent 100%
+    );
+  }
+
+  /* The centred copy floats over the ring on a soft paper halo. */
+  .pf-journey__copy {
+    position: relative;
+    z-index: 30;
+    display: grid;
+    justify-items: center;
+    gap: 32px;
+    max-inline-size: 40rem;
+    padding: 40px;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--paper) 78%, transparent),
+      transparent
+    );
+    text-align: center;
+  }
+  .pf-journey__copy .pf-section-head {
+    gap: 16px;
+  }
+  .pf-journey__copy .pf-section-head__lead {
+    max-inline-size: 17em;
+  }
+
+  /* The ring (Orbit.tsx). Each item's angle is its slot plus the two turns;
+     cos() and sin() place it on an ellipse of --rx by --ry around the
+     centre. --s is its depth (1 nearest), --k its tile's scale. The ring
+     layer takes the drag; the copy and the controls sit above it. */
+  .pf-orbit {
+    position: absolute;
+    inset: 0;
+    container-type: size;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    --rx: 42cqi;
+    --ry: 35cqb;
+    --tile: clamp(72px, 6.4vw, 100px);
+  }
+  .pf-journey__stage[data-dragging] .pf-orbit {
+    cursor: grabbing;
+  }
+  .pf-orbit__ring {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-orbit__item {
+    --a: calc(
+      var(--i) * 360deg / var(--n) + 20deg + var(--orbit-offset, 0deg) +
+        var(--orbit-spin, 0deg)
+    );
+    --s: sin(var(--a));
+    --k: calc(0.62 + 0.24 * (var(--s) + 1));
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--tile);
+    block-size: var(--tile);
+    translate: calc(-50% + cos(var(--a)) * var(--rx))
+      calc(-50% + var(--s) * var(--ry));
+    z-index: calc(round(var(--s) * 10) + 11);
+  }
+  .pf-orbit__tile {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    scale: var(--k);
+    filter: blur(calc(max(0, 0.4 - (var(--s) + 1) / 2) * 7px));
+  }
+  /* Names show on the near arc only, so no two collide and none sits
+     behind a nearer tile. The fade is narrow enough that a ring at rest has
+     every label fully on or fully off. */
+  .pf-orbit__label {
+    position: absolute;
+    inset-block-start: calc(50% + var(--k) * 50% + 8px);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    inline-size: 8.5rem;
+    text-align: center;
+    opacity: clamp(0, (var(--s) - 0.985) * 200, 1);
+  }
+  .pf-orbit__name {
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .pf-orbit__kind {
+    color: var(--ink-60);
+  }
+  @media (min-width: 73.75rem) {
+    .pf-orbit__label {
+      opacity: clamp(0, (var(--s) - 0.38) * 6, 1);
+    }
+  }
+
+  /* Previous, next and the pause button, at the stage's bottom-right. */
+  .pf-orbit__controls {
+    position: absolute;
+    inset-block-end: 24px;
+    inset-inline-end: var(--pad);
+    z-index: 31;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Pixel tiles (PixelIcon.tsx): a palette pair per tone. */
+  .pf-px {
+    overflow: visible;
+  }
+  .pf-px--violet {
+    --px-fill: var(--accent);
+    --px-ink: var(--on-accent);
+  }
+  .pf-px--ink {
+    --px-fill: var(--ink);
+    --px-ink: var(--paper);
+  }
+  .pf-px--coral {
+    --px-fill: var(--coral);
+    --px-ink: var(--leaf-ink);
+  }
+  .pf-px--tint {
+    --px-fill: var(--tint-3);
+    --px-ink: var(--accent-ink);
+  }
+  .pf-px__body {
+    fill: var(--px-fill);
+  }
+  .pf-px__glyph {
+    fill: var(--px-ink);
+  }
+  .pf-px__shade {
+    fill: var(--leaf-ink);
+    opacity: 0.2;
+  }
+  .pf-px__glint {
+    fill: var(--leaf);
+    opacity: 0.25;
+  }
+  .pf-px__sheet {
+    fill: var(--paper-2);
+  }
+  .pf-px__edge {
+    fill: var(--line-strong);
+  }
+  .pf-px__lines {
+    fill: var(--ink-30);
+  }
+
+  /* The story (spec 4.2, 8.6): text on columns 1 to 7, the records card on
+     9 to 12 from 1024 px; one column under it. */
+  .pf-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
+    padding-block: 40px 128px;
+  }
+  .pf-story__text {
+    display: grid;
+    align-content: start;
+    gap: 20px;
+    max-inline-size: 54ch;
+    color: var(--ink-80);
+  }
+  .pf-story__text p {
+    margin: 0;
+  }
+  .pf-story__key {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-story__roles {
+    max-inline-size: 20ch;
+    margin: 16px 0 0;
+    color: var(--ink);
+  }
+  .pf-story__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The records card: paper 2, radius 16, a dither floor along the bottom. */
+  .pf-records {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-content: start;
+    gap: 36px;
+    padding: clamp(20px, 2.4vw, 36px);
+    padding-block-end: 72px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: var(--radius-mat);
+    background: var(--paper-2);
+    box-shadow:
+      0 0 0 1px var(--line-soft),
+      0 18px 36px -30px color-mix(in srgb, var(--ink) 18%, transparent);
+  }
+  .pf-records__heading {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-records__list {
+    display: grid;
+    gap: 18px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-records__row {
+    display: grid;
+    gap: 3px;
+  }
+  .pf-records__org {
+    color: var(--ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .pf-records__when {
+    color: var(--ink-60);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .pf-records__role {
+    color: var(--ink-60);
+    font-size: 0.875rem;
+  }
+  .pf-records__more {
+    margin: 0;
+  }
+  .pf-records__floor {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: -1;
+    block-size: 56px;
+  }
+
+  @media (min-width: 37.5rem) and (max-width: 63.9375rem) {
+    .pf-records {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 32px;
+    }
+    .pf-records__more {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-story {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 40px;
+      padding-block-end: 176px;
+    }
+    .pf-story__text {
+      grid-column: 1 / span 7;
+    }
+    .pf-records {
+      grid-column: 9 / span 4;
+    }
+  }
+
+  /* Phones (spec 10): the section pads 112 px above a 640 px stage; small
+     tiles; one name at a time, at the front; kinds stay for screen readers. */
+  @media (max-width: 50.5625rem) {
+    .pf-journey {
+      padding-block-start: 112px;
+    }
+    .pf-journey__stage {
+      min-block-size: 640px;
+      padding-block: 72px;
+    }
+    .pf-journey__copy {
+      gap: 24px;
+      padding: 24px;
+    }
+    .pf-journey__copy .pf-section-head__lead {
+      max-inline-size: 15rem;
+    }
+    .pf-orbit {
+      --rx: 44cqi;
+      --ry: 36cqb;
+      --tile: 46px;
+    }
+    .pf-orbit__kind {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* The notebook section (spec 8.7): a centred header over the book. */
+  .pf-notes {
+    padding-block: 160px 176px;
+  }
+  .pf-notes__head .pf-section-head__title {
+    font-size: clamp(2.125rem, 3vw + 0.625rem, 3.5rem);
+  }
+
+  /* The book and its controls. Under 1180 px the three buttons sit under
+     the book, 88 px apart centre to centre; from 1180 previous and next sit
+     beside it at its middle and pause stays under it. */
+  .pf-book-wrap {
+    display: grid;
+    row-gap: 28px;
+    max-inline-size: 1008px;
+    margin: 56px auto 0;
+  }
+  .pf-book {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-block-size: 480px;
+    perspective: 2400px;
+    touch-action: pan-y;
+  }
+  .pf-book[data-ready] {
+    cursor: grab;
+  }
+  .pf-book[data-dragging] {
+    cursor: grabbing;
+  }
+  .pf-book__cover {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 38px 40px;
+    border: 1px solid transparent;
+    border-radius: 20px 6px 6px 20px;
+    background: linear-gradient(160deg, var(--tint-2), var(--tint-3));
+    box-shadow:
+      0 0 0 1px var(--line-soft),
+      0 30px 60px -40px color-mix(in srgb, var(--ink) 35%, transparent);
+  }
+  .pf-book__cover p {
+    margin: 0;
+  }
+  /* Ink 68: ink 60 falls under 4.5:1 on the cover's tint-3 end. */
+  .pf-book__label {
+    color: var(--muted-strong);
+  }
+  .pf-book__line {
+    margin-block-start: 12px;
+    font-size: clamp(1.625rem, 2vw + 0.625rem, 2.5rem);
+    line-height: 1.1;
+  }
+  .pf-book__cover .pf-book__total {
+    margin-block-start: auto;
+  }
+
+  /* Pages pile up in one grid cell, so the book grows to its longest note
+     and no text is ever clipped. A page turns over its left edge (the gap's
+     middle when a hinge splits the spread). */
+  .pf-book__pages {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    display: grid;
+    transform-style: preserve-3d;
+  }
+  .pf-page {
+    position: relative;
+    grid-area: 1 / 1;
+    display: grid;
+    transform-origin: calc(var(--book-gap, 0px) / -2) 50%;
+    transform-style: preserve-3d;
+    transform: translateZ(var(--z, 0px)) rotateY(calc(var(--turn) * -180deg));
+  }
+  .pf-page__face {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 38px 30px 26px 54px;
+    border: 1px solid transparent;
+    border-radius: 6px 20px 20px 6px;
+    color: var(--leaf-ink);
+    background:
+      linear-gradient(
+        90deg,
+        transparent 38px,
+        color-mix(in srgb, var(--coral) 55%, transparent) 38px 39px,
+        transparent 39px
+      ),
+      repeating-linear-gradient(
+        180deg,
+        transparent 0 31px,
+        color-mix(in srgb, var(--accent) 12%, transparent) 31px 32px
+      ),
+      var(--leaf);
+    background-position:
+      0 0,
+      0 38px,
+      0 0;
+    /* One sheet of rules from 38 px down; a repeat would draw one above. */
+    background-repeat: no-repeat;
+    box-shadow:
+      0 0 0 1px var(--line-soft),
+      inset 10px 0 20px -14px
+        color-mix(in srgb, var(--leaf-ink) 20%, transparent),
+      0 20px 40px -30px color-mix(in srgb, var(--leaf-ink) 35%, transparent);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .pf-page__back {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px 6px 6px 20px;
+    transform: rotateY(180deg);
+  }
+  .pf-page__quote {
+    margin: 0;
+    color: var(--leaf-ink);
+  }
+  .pf-page__quote p {
+    margin: 0;
+  }
+  .pf-page__who {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-block-start: auto;
+    padding-block-start: 24px;
+  }
+  .pf-page__avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    inline-size: 36px;
+    block-size: 36px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--leaf-ink) 8%, var(--leaf));
+    color: var(--leaf-ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .pf-page__person {
+    display: grid;
+    min-inline-size: 0;
+  }
+  .pf-page__name {
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  /* Leaf ink 68: 5.76:1 on the leaf (60 would be 4.43). */
+  .pf-page__role,
+  .pf-page__number {
+    color: var(--leaf-ink-68);
+  }
+  .pf-page__role {
+    font-size: 0.8125rem;
+  }
+  .pf-page__number {
+    margin-inline-start: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  /* The moving shadow peaks mid-turn; the cast sweeps the page uncovered. */
+  .pf-page__shade,
+  .pf-page__cast {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px 20px 20px 6px;
+    pointer-events: none;
+  }
+  .pf-page__shade {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--leaf-ink) 28%, transparent),
+      transparent 70%
+    );
+    opacity: calc(sin(var(--turn) * 180deg) * 0.9);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .pf-page__cast {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--leaf-ink) 22%, transparent),
+      transparent 75%
+    );
+    opacity: calc(var(--cast) * 0.9);
+  }
+  .pf-book__spiral {
+    position: absolute;
+    inset-block: 24px;
+    inset-inline-start: 50%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    translate: -50% 0;
+    pointer-events: none;
+  }
+  .pf-book__spiral span {
+    inline-size: 28px;
+    block-size: 9px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(180deg, var(--spiral-1), var(--spiral-2));
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--leaf-ink) 30%, transparent);
+  }
+
+  .pf-book__controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+  }
+  .pf-book__btn {
+    box-shadow: var(--elev-float);
+  }
+  .pf-book__count {
+    position: absolute;
+    inset: -1px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: conic-gradient(
+      var(--accent) calc(var(--count) * 1turn),
+      transparent 0
+    );
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 2px),
+      black calc(100% - 2px)
+    );
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 2px),
+      black calc(100% - 2px)
+    );
+  }
+  @media (min-width: 73.75rem) {
+    .pf-book-wrap {
+      grid-template-columns: 48px minmax(0, 1fr) 48px;
+      column-gap: 24px;
+      max-inline-size: calc(1008px + 2 * (48px + 24px));
+    }
+    .pf-book {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .pf-book__controls {
+      display: contents;
+    }
+    .pf-book__prev {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+    }
+    .pf-book__next {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: center;
+    }
+    .pf-book__pause {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: center;
+    }
+  }
+
+  /* Without JavaScript every note is there to read: the pages line up in a
+     row that scrolls sideways instead of piling up. */
+  .pf-book:not([data-ready]) .pf-book__pages {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    transform-style: flat;
+  }
+  .pf-book:not([data-ready]) .pf-page {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    transform: none;
+  }
+
+  /* Phones (spec 8.7): one page that bleeds to the left edge, a 36 px cover
+     strip, the rings at x 30. The cover's words stay for screen readers. */
+  @media (max-width: 50.5625rem) {
+    .pf-notes {
+      padding-block: 112px 128px;
+    }
+    .pf-book {
+      grid-template-columns: minmax(0, 1fr);
+      inline-size: calc(100% + var(--pad));
+      min-block-size: 591px;
+      margin-inline-start: calc(-1 * var(--pad));
+      padding-inline-start: 30px;
+      overflow-x: clip;
+      perspective: 1800px;
+    }
+    /* No grid placement: an absolute grid child placed in a column takes
+       that column as its box, which starts after the 30 px padding. */
+    .pf-book__cover {
+      position: absolute;
+      grid-column: auto;
+      grid-row: auto;
+      inset-block: 0;
+      inset-inline-start: 0;
+      z-index: 4;
+      inline-size: 36px;
+      padding: 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .pf-book__cover > * {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .pf-book__pages {
+      grid-column: 1;
+    }
+    .pf-book__spiral {
+      inset-inline-start: 30px;
+    }
+    .pf-page__face {
+      padding: 30px 20px 22px 50px;
+      border-radius: 6px 18px 18px 6px;
+    }
+    .pf-page__quote {
+      font-size: 1.1875rem;
+    }
+  }
+
+  /* Spanned across a vertical hinge (spec 10.1): the spread opens across
+     both screens and the hinge, not the spiral, is its spine. */
+  @media (horizontal-viewport-segments: 2) {
+    .pf-book {
+      --book-gap: calc(
+        env(viewport-segment-left 1 0, 0px) -
+          env(viewport-segment-right 0 0, 0px)
+      );
+      column-gap: var(--book-gap);
+    }
+    .pf-book__spiral {
+      display: none;
+    }
+  }
+
+  /* Reader preferences (spec 12, items 26 to 28). In forced colours the
+     art goes and the cards and pages keep a system edge. */
+  @media (forced-colors: active) {
+    .pf-records,
+    .pf-book__cover,
+    .pf-page__face {
+      border-color: CanvasText;
+    }
+    .pf-journey__wash,
+    .pf-orbit__tile,
+    .pf-page__shade,
+    .pf-page__cast,
+    .pf-book__spiral,
+    .pf-book__count {
+      display: none;
+    }
+  }
+}
+
+/* Motion (spec 5.1 to 5.4, 5.7): only with no-preference. Under reduced
+   motion the ring stays still, pages change at once, nothing turns on its
+   own and nothing rises in. */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    /* `data-running` arrives with hydration, with the pause button; the
+       paused rules follow it, as the shorthand resets the play state. */
+    .pf-journey__stage[data-running] .pf-orbit {
+      animation: kj-orbit-spin 60s linear infinite;
+    }
+    .pf-journey__stage[data-running]:is(
+        [data-paused],
+        [data-dragging],
+        [data-offscreen],
+        :focus-within
+      )
+      .pf-orbit {
+      animation-play-state: paused;
+    }
+    .pf-orbit {
+      transition: --orbit-offset 0.7s var(--ease-expo);
+    }
+    .pf-journey__stage[data-dragging] .pf-orbit {
+      transition: none;
+    }
+    .pf-journey__stage[data-pending] .pf-orbit__item {
+      opacity: 0;
+    }
+    .pf-journey__stage[data-entering] .pf-orbit__item {
+      animation: kj-file-in 1.4s var(--ease-expo) calc(var(--i) * 40ms) both;
+    }
+
+    .pf-page {
+      transition: --turn 1s var(--ease-cubic);
+    }
+    .pf-book[data-dragging] .pf-page {
+      transition: none;
+    }
+    .pf-page__cast[data-run] {
+      animation: kj-page-cast 1s var(--ease-cubic);
+    }
+    .pf-book__count {
+      animation: kj-book-count var(--book-ms, 7000ms) linear forwards;
+    }
+    .pf-book__count[data-held] {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-journey__stage[data-running]:hover .pf-orbit {
+      animation-play-state: paused;
+    }
+  }
+
+  /* Print shows the ring even where the stage was never in view: the
+     no-preference query above also matches print. */
+  @media print {
+    .pf-journey__stage[data-pending] .pf-orbit__item {
+      opacity: 1;
+    }
+  }
+}
+
+/* Keyframes: inert until a no-preference rule above uses them. */
+@keyframes kj-orbit-spin {
+  to {
+    --orbit-spin: 360deg;
+  }
+}
+
+@keyframes kj-page-cast {
+  0%,
+  100% {
+    --cast: 0;
+  }
+  50% {
+    --cast: 1;
+  }
+}
+
+@keyframes kj-book-count {
+  from {
+    --count: 0;
+  }
+  to {
+    --count: 1;
+  }
+}

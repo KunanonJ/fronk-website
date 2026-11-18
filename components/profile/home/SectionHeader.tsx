@@ -33,6 +33,14 @@ export interface SectionHeaderProps {
   titleMaxWidth?: number;
   /** "split" (default): lead on the right. "centred": all centred. */
   align?: "split" | "centred";
+  /**
+   * The eyebrow's hairline (true by default). False sets the eyebrow as a
+   * plain mono label, for a header that floats over art, such as the
+   * Journey's stage (Phase 4, spec 8.6).
+   */
+  rule?: boolean;
+  /** The lead's type style: `t-body` (default), or `t-lead` (the Journey). */
+  leadSize?: "body" | "lead";
   className?: string;
 }
 
@@ -44,6 +52,8 @@ export function SectionHeader({
   lead,
   titleMaxWidth = 13,
   align = "split",
+  rule = true,
+  leadSize = "body",
   className,
 }: SectionHeaderProps) {
   const centred = align === "centred";
@@ -55,9 +65,15 @@ export function SectionHeader({
         className,
       )}
     >
-      <EyebrowRow id={eyebrowId} centred={centred}>
-        {eyebrow}
-      </EyebrowRow>
+      {rule ? (
+        <EyebrowRow id={eyebrowId} centred={centred}>
+          {eyebrow}
+        </EyebrowRow>
+      ) : (
+        <p id={eyebrowId} className="t-meta text-ink-2">
+          {eyebrow}
+        </p>
+      )}
       <div className="pf-section-head__row">
         <h2
           id={titleId}
@@ -66,7 +82,17 @@ export function SectionHeader({
         >
           {title}
         </h2>
-        {lead ? <p className="t-body pf-section-head__lead">{lead}</p> : null}
+        {lead ? (
+          <p
+            className={
+              leadSize === "lead"
+                ? "t-lead pf-section-head__lead"
+                : "t-body pf-section-head__lead"
+            }
+          >
+            {lead}
+          </p>
+        ) : null}
       </div>
     </div>
   );

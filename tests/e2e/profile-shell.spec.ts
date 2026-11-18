@@ -398,9 +398,12 @@ test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
           Math.abs(top - LANDING[section]),
           `${section} lands at ${width}`,
         ).toBeLessThanOrEqual(3);
-        // The first content of a section is its eyebrow row, above the heading.
+        // The first content of a section is its eyebrow, above the heading.
+        // (The Journey's stage starts under the bar by design, spec 4.3, so
+        // the eyebrow is read from the section header, not the first child.)
         const content = await page
-          .locator(`#${section} > :first-child`)
+          .locator(`#${section} .pf-section-head > :first-child`)
+          .first()
           .boundingBox();
         expect
           .soft(content?.y ?? 0, `${section} content at ${width}`)

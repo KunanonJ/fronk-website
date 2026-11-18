@@ -1,7 +1,8 @@
-import { EyebrowRow } from "@/components/ds/labels";
 import IntroLoader from "@/components/landing/IntroLoader";
 import AboutBento from "@/components/profile/home/AboutBento";
 import Hero from "@/components/profile/home/Hero";
+import Journey from "@/components/profile/home/Journey";
+import Notes from "@/components/profile/home/Notes";
 import WorkStack from "@/components/profile/home/WorkStack";
 
 /*
@@ -26,18 +27,10 @@ export default function PreviewHome() {
 
       <AboutBento />
 
-      {/* Phase 4: the Journey and the notes, in section#journey. */}
+      {/* Phase 4: the Journey and its story, in section#journey; then the notebook, which renders only with 3 or more cleared quotes. */}
 
-      <section
-        id="journey"
-        aria-labelledby="journey-title"
-        className="ds-wrap min-h-[120svh] pt-28"
-      >
-        <EyebrowRow>Phase 4</EyebrowRow>
-        <h2 id="journey-title" className="t-title mt-6">
-          Journey
-        </h2>
-      </section>
+      <Journey />
+      <Notes />
     </>
   );
 }

@@ -1,6 +1,9 @@
 # Phase 4: Home journey and testimonial notebook
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE".
+**Status:** CODE DONE (18-11-26). Parallel lane (branch
+`feat/home-journey-testimonial-notebook`, from `5721eab`); Linux baselines
+and the review wait for the orchestrator.
+**Evidence:** `../reports/phase-4_home-journey-notes_REPORT_18-11-26.md`
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` section 8 (journey stage,
