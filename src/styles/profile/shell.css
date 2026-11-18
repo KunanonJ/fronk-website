@@ -220,8 +220,9 @@
     gap: 8px;
   }
 
-  /* Tighter from 370 to 809 px so the name, Menu and Say hello fit (spec 10). */
-  @media (min-width: 23.125rem) and (max-width: 50.5625rem) {
+  /* Tighter from 370 to 809 px so the name, Menu and Say hello fit (spec 10).
+     Range syntax: no fractional width falls between this and its neighbours. */
+  @media (23.125rem <= width < 50.625rem) {
     .pf-nav__pill {
       padding-inline: 12px 6px;
     }
@@ -238,7 +239,7 @@
   .pf-say__icon {
     display: none;
   }
-  @media (max-width: 23.124rem) {
+  @media (width < 23.125rem) {
     .pf-say__trigger--nav {
       inline-size: 48px;
       padding-inline: 0;

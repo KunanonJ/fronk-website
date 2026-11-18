@@ -1,6 +1,11 @@
 # Phase 4: Home journey and testimonial notebook
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE".
+**Status:** VERIFIED (18-11-26). Reviewed, and every finding fixed or recorded (report: Code review and fixes); every gate passed on the fixed tree.
+`feat/home-journey-testimonial-notebook`, from `5721eab`); Linux baselines
+and the review wait for the orchestrator.
+**Evidence:** `../reports/phase-4_home-journey-notes_REPORT_18-11-26.md`;
+the review's fixes, and the router's scroll restoration fix, in its section 9
+(branch `fix/profile-case-review-findings`).
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` section 8 (journey stage,

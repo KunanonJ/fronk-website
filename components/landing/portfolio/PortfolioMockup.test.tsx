@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
@@ -43,6 +44,69 @@ describe("PortfolioMockup labels", () => {
       const texts = plain.match(/<text/g)?.length ?? 0;
       const rects = (html: string) => html.match(/<rect/g)?.length ?? 0;
       expect(rects(bars) - rects(plain), mockup.kind).toBe(texts);
+    }
+  });
+
+  it("draws the same default and bars output as before the floor mode (Phase 5)", () => {
+    // sha256 of each mockup's markup, taken before Phase 5 added "floor": the
+    // live project pages render the default, the Home's stack cards the bars.
+    const hash = (html: string) =>
+      createHash("sha256").update(html).digest("hex").slice(0, 16);
+    const seen = getAllPortfolioProjects().flatMap((project) =>
+      project.mockup
+        ? (["text", "bars"] as const).map(
+            (labels) =>
+              `${project.slug} ${labels} ${hash(
+                renderToString(
+                  labels === "text" ? (
+                    <PortfolioMockup
+                      mockup={project.mockup!}
+                      label={`Illustrative mockup of ${project.name}`}
+                    />
+                  ) : (
+                    <PortfolioMockup mockup={project.mockup!} labels="bars" />
+                  ),
+                ),
+              )}`,
+          )
+        : [],
+    );
+    expect(seen).toEqual([
+      "tbh-intranet text f0576b22f76a4984",
+      "tbh-intranet bars e7e265f6c79755ca",
+      "node-validator-automation text 7a13cf8ce9c0c8ea",
+      "node-validator-automation bars a03349100b9bb2e8",
+      "email-signature-generator text 8805426ce3ccdf88",
+      "email-signature-generator bars 1a0f5d8475fe0ba3",
+      "ai-automation text 8740f4443b087c51",
+      "ai-automation bars dff73e9f8107f45a",
+    ]);
+  });
+
+  it("writes only labels of 12 units or more in floor mode, and draws the rest as bars", () => {
+    for (const mockup of mockups) {
+      const plain = renderToString(<PortfolioMockup mockup={mockup} />);
+      const floor = renderToString(
+        <PortfolioMockup mockup={mockup} labels="floor" />,
+      );
+      const sizes = (html: string) =>
+        [...html.matchAll(/<text[^>]*font-size="([\d.]+)"/g)].map((m) =>
+          Number(m[1]),
+        );
+      expect(
+        sizes(floor).every((size) => size >= 12),
+        mockup.kind,
+      ).toBe(true);
+      // Every label of 12 units or more is still written, word for word.
+      expect(sizes(floor), mockup.kind).toEqual(
+        sizes(plain).filter((size) => size >= 12),
+      );
+      // The others became bars: one rect for each label dropped.
+      const texts = (html: string) => html.match(/<text/g)?.length ?? 0;
+      const rects = (html: string) => html.match(/<rect/g)?.length ?? 0;
+      expect(rects(floor) - rects(plain), mockup.kind).toBe(
+        texts(plain) - texts(floor),
+      );
     }
   });
 

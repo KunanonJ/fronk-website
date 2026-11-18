@@ -13,6 +13,8 @@ import { TextLink } from "@/components/ds/TextLink";
 import { Marquee } from "@/components/ds/Marquee";
 import { DitherField } from "@/components/ds/DitherField";
 import { Reveal } from "@/components/ds/Reveal";
+import { Notebook } from "@/components/profile/home/Notebook";
+import { SAMPLE_NOTES } from "@/components/profile/preview/sampleNotes";
 
 /*
  * /preview/system (profile redesign, Phase 0): every token, type style and
@@ -514,6 +516,15 @@ export default function SystemPreview() {
             </Tile>
           </Reveal>
         </div>
+      </Section>
+
+      {/* Phase 4: the testimonial notebook, with labelled samples (plan step 4f). */}
+      <Section id="notebook" title="Notebook, with sample notes">
+        <p className="t-body max-w-[64ch] text-ink-80">
+          These three notes are samples, for reviewing the notebook. The Home
+          shows it only once three or more real recommendations are cleared.
+        </p>
+        <Notebook entries={SAMPLE_NOTES} />
       </Section>
     </div>
   );

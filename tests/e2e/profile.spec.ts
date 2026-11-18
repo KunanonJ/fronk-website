@@ -53,8 +53,17 @@ async function layoutProblems(page: Page): Promise<string[]> {
       if (!text || !el) continue;
       const rect = el.getBoundingClientRect();
       if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
-      const size = parseFloat(getComputedStyle(el).fontSize);
-      if (size < 12) problems.push(`${size}px text: "${text.slice(0, 30)}"`);
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      // SVG text renders at its declared size times the drawing's scale: a
+      // 12-unit label in a 640-unit drawing 580 px wide is about 11 px.
+      if (el instanceof SVGGraphicsElement) {
+        const matrix = el.getScreenCTM();
+        if (matrix) size *= Math.hypot(matrix.a, matrix.b);
+      }
+      if (size < 12) {
+        const px = Math.round(size * 10) / 10;
+        problems.push(`${px}px text: "${text.slice(0, 30)}"`);
+      }
     }
     const targets = document.querySelectorAll<HTMLElement>(
       "a[href], button, input, select, textarea, summary, [role='button']",
@@ -223,6 +232,24 @@ function desktopOnly() {
     "runs once, in desktop Chromium",
   );
 }
+
+test("the 12 px floor reads SVG text at the size it is drawn", async ({
+  page,
+}) => {
+  desktopOnly();
+  // A 12-unit label in a 640-unit drawing: 10.9 px at 580 px wide, 12 px at
+  // its full size.
+  const drawing = (width: number) =>
+    page.setContent(
+      `<svg viewBox="0 0 640 400" style="display:block;width:${width}px"><text x="10" y="40" font-size="12">A 12-unit label</text></svg>`,
+    );
+  await drawing(580);
+  expect(await layoutProblems(page)).toEqual([
+    '10.9px text: "A 12-unit label"',
+  ]);
+  await drawing(640);
+  expect(await layoutProblems(page)).toEqual([]);
+});
 
 test.describe("best practices on the preview (desktop Chromium)", () => {
   for (const path of [SYSTEM, HOME]) {

@@ -33,6 +33,24 @@ export interface SectionHeaderProps {
   titleMaxWidth?: number;
   /** "split" (default): lead on the right. "centred": all centred. */
   align?: "split" | "centred";
+  /**
+   * The eyebrow's hairline (true by default). False sets the eyebrow as a
+   * plain mono label, for a header that floats over art, such as the
+   * Journey's stage (Phase 4, spec 8.6).
+   */
+  rule?: boolean;
+  /** The lead's type style: `t-body` (default), or `t-lead` (the Journey). */
+  leadSize?: "body" | "lead";
+  /**
+   * A class added to the h2, after `t-title`, for a section whose heading
+   * takes its own size (the notebook, spec 8.7).
+   */
+  titleClassName?: string;
+  /**
+   * Links or buttons under the h2 and the lead, such as the Journey's "Read
+   * the story" pill (spec 8.6). None by default.
+   */
+  actions?: ReactNode;
   className?: string;
 }
 
@@ -44,6 +62,10 @@ export function SectionHeader({
   lead,
   titleMaxWidth = 13,
   align = "split",
+  rule = true,
+  leadSize = "body",
+  titleClassName,
+  actions,
   className,
 }: SectionHeaderProps) {
   const centred = align === "centred";
@@ -55,19 +77,38 @@ export function SectionHeader({
         className,
       )}
     >
-      <EyebrowRow id={eyebrowId} centred={centred}>
-        {eyebrow}
-      </EyebrowRow>
+      {rule ? (
+        <EyebrowRow id={eyebrowId} centred={centred}>
+          {eyebrow}
+        </EyebrowRow>
+      ) : (
+        <p id={eyebrowId} className="t-meta text-ink-2">
+          {eyebrow}
+        </p>
+      )}
       <div className="pf-section-head__row">
         <h2
           id={titleId}
-          className="t-title pf-section-head__title"
+          className={cn("t-title pf-section-head__title", titleClassName)}
           style={{ maxInlineSize: `${titleMaxWidth}ch` }}
         >
           {title}
         </h2>
-        {lead ? <p className="t-body pf-section-head__lead">{lead}</p> : null}
+        {lead ? (
+          <p
+            className={
+              leadSize === "lead"
+                ? "t-lead pf-section-head__lead"
+                : "t-body pf-section-head__lead"
+            }
+          >
+            {lead}
+          </p>
+        ) : null}
       </div>
+      {actions ? (
+        <div className="pf-section-head__actions">{actions}</div>
+      ) : null}
     </div>
   );
 }

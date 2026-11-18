@@ -43,6 +43,81 @@ describe("SectionHeader", () => {
     ).toMatch(/<h2[^>]*style="max-inline-size:10ch"/);
   });
 
+  it("keeps its output when the Phase 4 options are left out", () => {
+    const props = {
+      eyebrow: "Selected work",
+      title: "Title",
+      lead: "One line.",
+    };
+    expect(renderToString(<SectionHeader {...props} />)).toBe(
+      renderToString(<SectionHeader {...props} rule leadSize="body" />),
+    );
+    // Nor do the fix pass's options (titleClassName, actions) change it.
+    expect(renderToString(<SectionHeader {...props} />)).toBe(
+      renderToString(
+        <SectionHeader {...props} titleClassName={undefined} actions={null} />,
+      ),
+    );
+    expect(renderToString(<SectionHeader {...props} />)).toMatch(
+      /<h2 class="t-title pf-section-head__title" style="max-inline-size:13ch">Title<\/h2>/,
+    );
+    expect(renderToString(<SectionHeader {...props} />)).not.toContain(
+      "pf-section-head__actions",
+    );
+    const html = renderToString(<SectionHeader {...props} />);
+    expect(html).toContain('<p class="ds-eyebrow t-meta">Selected work</p>');
+    expect(html).toContain(
+      '<p class="t-body pf-section-head__lead">One line.</p>',
+    );
+  });
+
+  it("sets the eyebrow without its hairline, and the lead as t-lead, on request (Phase 4)", () => {
+    render(
+      <SectionHeader
+        eyebrow="Journey"
+        eyebrowId="journey-eyebrow"
+        title="Title"
+        lead="A lead."
+        align="centred"
+        rule={false}
+        leadSize="lead"
+      />,
+    );
+    const eyebrow = screen.getByText("Journey");
+    expect(eyebrow).toHaveClass("t-meta");
+    expect(eyebrow).not.toHaveClass("ds-eyebrow");
+    expect(eyebrow).toHaveAttribute("id", "journey-eyebrow");
+    expect(screen.getByText("A lead.")).toHaveClass(
+      "t-lead",
+      "pf-section-head__lead",
+    );
+  });
+
+  it("adds a class to the h2 and draws actions under the header, on request", () => {
+    render(
+      <SectionHeader
+        eyebrow="Journey"
+        title="Title"
+        titleId="t"
+        lead="A lead."
+        titleClassName="pf-notes__title"
+        actions={<a href="#story">Read the story</a>}
+      />,
+    );
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass(
+      "t-title",
+      "pf-section-head__title",
+      "pf-notes__title",
+    );
+    const link = screen.getByRole("link", { name: "Read the story" });
+    expect(link.parentElement).toHaveClass("pf-section-head__actions");
+    // After the h2 and the lead.
+    expect(
+      screen.getByText("A lead.").compareDocumentPosition(link) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("leaves the lead out when there is none, and centres on request", () => {
     const { container } = render(
       <SectionHeader eyebrow="Notes" title="Title" align="centred" />,

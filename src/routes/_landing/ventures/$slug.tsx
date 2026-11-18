@@ -6,7 +6,10 @@ import {
   buildBreadcrumbJsonLd,
   buildSoftwareApplicationJsonLd,
 } from "@/lib/seo/jsonLd";
-import { getVentureBySlug } from "@/lib/content/ventures";
+import {
+  VENTURE_RELATED_TOPICS,
+  getVentureBySlug,
+} from "@/lib/content/ventures";
 import { fileOg } from "@/src/lib/og";
 import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { pageHead } from "@/src/lib/head";
@@ -14,30 +17,6 @@ import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 
 type Props = { params: Promise<{ slug: string }> };
-
-const RELATED: Record<string, readonly { label: string; href: string }[]> = {
-  manut: [
-    {
-      label: "ERP / CRM / internal systems",
-      href: "/topics/erp-crm-internal-systems",
-    },
-    {
-      label: "AI transformation Thailand",
-      href: "/topics/ai-transformation-thailand",
-    },
-    {
-      label: "Manut automotive case (blog)",
-      href: "/blog/manut-ai-erp-crm-automotive",
-    },
-  ],
-  gogocash: [
-    {
-      label: "Tech startups Bangkok & SEA",
-      href: "/topics/tech-startup-thailand-sea",
-    },
-    { label: "Cashback loops (blog)", href: "/blog/cashback-loops" },
-  ],
-};
 
 async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -86,7 +65,9 @@ function VentureCasePageView({ slug }: { slug: string }) {
       />
       <VentureHubPage
         venture={venture}
-        relatedTopics={withoutHiddenBlogLinks(RELATED[slug] ?? [])}
+        relatedTopics={withoutHiddenBlogLinks(
+          VENTURE_RELATED_TOPICS[slug] ?? [],
+        )}
       />
     </>
   );

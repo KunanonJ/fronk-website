@@ -190,6 +190,38 @@ const VENTURES: readonly Venture[] = [
   },
 ];
 
+/**
+ * The topic hubs a venture's case page links to, by slug, with the blog posts
+ * that are hidden while the blog is (`withoutHiddenBlogLinks` drops them).
+ * Moved here from the live venture route (profile redesign Phase 5), so the
+ * live page and the case-study template read one list.
+ */
+export const VENTURE_RELATED_TOPICS: Readonly<
+  Record<string, readonly { label: string; href: string }[]>
+> = {
+  manut: [
+    {
+      label: "ERP / CRM / internal systems",
+      href: "/topics/erp-crm-internal-systems",
+    },
+    {
+      label: "AI transformation Thailand",
+      href: "/topics/ai-transformation-thailand",
+    },
+    {
+      label: "Manut automotive case (blog)",
+      href: "/blog/manut-ai-erp-crm-automotive",
+    },
+  ],
+  gogocash: [
+    {
+      label: "Tech startups Bangkok & SEA",
+      href: "/topics/tech-startup-thailand-sea",
+    },
+    { label: "Cashback loops (blog)", href: "/blog/cashback-loops" },
+  ],
+};
+
 export function getAllVentures(): readonly Venture[] {
   return [...VENTURES].sort((a, b) => b.year - a.year);
 }
