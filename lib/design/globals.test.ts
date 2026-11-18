@@ -401,6 +401,37 @@ describe("profile stylesheet", () => {
     }
   });
 
+  it("keeps the bar in view for keyboard focus only, and caps the popovers on short screens", () => {
+    const shell = partials.find((sheet) =>
+      sheet.path.endsWith("/shell.css"),
+    )!.css;
+    // A mouse click on a nav control must not pin the bar (only :focus-visible does).
+    expect(shell).not.toMatch(/:not\(:focus-within\)/);
+    expect(shell).toContain(":not(:has(:focus-visible))");
+    // Each popover scrolls within the screen (WCAG 1.4.10, 2.4.11).
+    // The footer's panel inherits the scrolling of .pf-say__panel; it sets its own cap.
+    for (const panel of [
+      ".pf-menu {",
+      ".pf-say__panel {",
+      ".pf-say__panel--footer {",
+    ]) {
+      const block = shell.slice(
+        shell.indexOf(panel),
+        shell.indexOf("}", shell.indexOf(panel)),
+      );
+      expect(block, panel).toContain("max-block-size: calc(100dvh");
+      if (panel !== ".pf-say__panel--footer {") {
+        expect(block, panel).toContain("overflow-y: auto");
+        expect(block, panel).toContain("overscroll-behavior: contain");
+      }
+    }
+    // Without the Popover API the panels wait for data-open.
+    expect(shell).toMatch(
+      /@supports not selector\(:popover-open\) \{\s*\.pf-say__panel,\s*\.pf-menu \{\s*display: none;/,
+    );
+    expect(shell).toMatch(/\.pf-menu\[data-open\] \{\s*display: block;/);
+  });
+
   it("scopes the theme fade to the preview and keeps it behind no-preference", () => {
     const shell = partials.find((sheet) =>
       sheet.path.endsWith("/shell.css"),

@@ -3,7 +3,9 @@
  * Every rule sits in @layer components, so Tailwind utilities still win, except
  * the view-transition rules at the end, which must beat the live site's
  * unlayered reveal and say so. Plain CSS with tokens from globals.css only.
- * Popovers never get a `display` rule: the UA hides them until they open.
+ * Popovers get no `display` rule of their own: the UA hides them until they
+ * open. Engines without the Popover API get the @supports block further down,
+ * which hides the panels until the script sets `data-open` on them.
  */
 
 @layer components {
@@ -60,9 +62,11 @@
   .pf-nav__row > * {
     pointer-events: auto;
   }
-  /* Hidden on scroll, the bar takes no taps until focus or a scroll brings it
-     back (spec 7.3). */
-  .pf-nav[data-away]:not(:focus-within) .pf-nav__row > * {
+  /* Hidden on scroll, the bar takes no taps until keyboard focus or a scroll
+     brings it back (spec 7.3). A mouse click does not pin it: only focus that
+     shows (:focus-visible), so a click on a nav control is not a reason to keep
+     the bar. An open popover keeps it in view in script (see useHideOnScroll). */
+  .pf-nav[data-away]:not(:has(:focus-visible)) .pf-nav__row > * {
     pointer-events: none;
   }
   .pf-nav__pill {
@@ -200,6 +204,13 @@
     display: none;
   }
   .pf-nav__menu[aria-expanded="true"] .pf-nav__menu-close {
+    display: inline;
+  }
+  /* "Close" shows while the menu is open, with or without script. */
+  .pf-nav:has(#site-menu:popover-open) .pf-nav__menu-open {
+    display: none;
+  }
+  .pf-nav:has(#site-menu:popover-open) .pf-nav__menu-close {
     display: inline;
   }
 
@@ -341,10 +352,12 @@
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
+  /* Covers its option, so focusing a radio scrolls the whole option into view in a short menu. */
   .pf-theme__input {
     position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
     margin: 0;
     opacity: 0;
     pointer-events: none;
@@ -368,7 +381,13 @@
     background: var(--paper);
     color: var(--ink);
     box-shadow: var(--elev-pop);
-    overflow: hidden;
+    /* Short screens (landscape phones, 200 to 400% zoom) scroll the panel, so
+       its last row stays reachable (WCAG 1.4.10, 2.4.11). */
+    max-block-size: calc(100vh - 104px);
+    max-block-size: calc(100dvh - 104px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     isolation: isolate;
     pointer-events: auto;
   }
@@ -380,6 +399,8 @@
     bottom: 24px;
     left: 50%;
     translate: -50% 0;
+    max-block-size: calc(100vh - 48px);
+    max-block-size: calc(100dvh - 48px);
   }
   @supports (anchor-name: --pf-say-footer) {
     .pf-say__trigger--footer {
@@ -388,6 +409,7 @@
     .pf-say__panel--footer {
       position-anchor: --pf-say-footer;
       position-area: top;
+      position-try-fallbacks: flip-block;
       inset: auto;
       margin: 0 0 12px;
       translate: none;
@@ -461,7 +483,12 @@
     background: var(--paper);
     color: var(--ink);
     box-shadow: var(--elev-ring);
-    overflow: visible;
+    /* Under the bar and within the screen; a short screen scrolls the card. */
+    max-block-size: calc(100vh - 102px);
+    max-block-size: calc(100dvh - 102px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     pointer-events: auto;
     transform-origin: top;
   }
@@ -632,6 +659,19 @@
     color: var(--ink-60);
   }
 
+  /* Engines without the Popover API: the panels stay hidden until the script
+     sets data-open on them, and the invoker toggles them (popover.ts). */
+  @supports not selector(:popover-open) {
+    .pf-say__panel,
+    .pf-menu {
+      display: none;
+    }
+    .pf-say__panel[data-open],
+    .pf-menu[data-open] {
+      display: block;
+    }
+  }
+
   /* Pixel drawings (spec 7.7): one square per cell, token colours. Shown from
      1280 px; the centred call to action keeps the space under that. */
   .pf-art {
@@ -748,7 +788,7 @@
       transform 0.2s var(--ease-snappy),
       filter 0.2s var(--ease-snappy);
   }
-  .pf-nav[data-away]:not(:focus-within) .pf-nav__row {
+  .pf-nav[data-away]:not(:has(:focus-visible)) .pf-nav__row {
     opacity: 0;
     transform: translateY(-12px);
     filter: blur(6px);
@@ -811,7 +851,7 @@
   .pf-nav__row {
     transition: opacity 0.2s ease-out;
   }
-  .pf-nav[data-away]:not(:focus-within) .pf-nav__row {
+  .pf-nav[data-away]:not(:has(:focus-visible)) .pf-nav__row {
     opacity: 0;
   }
   .pf-nav__active {

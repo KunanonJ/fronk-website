@@ -8,7 +8,7 @@ import {
 
 /*
  * The phone menu (design spec 7.6): a native popover named "Site" with six
- * links and the theme switch; its "Menu" button names change with it.
+ * links and the theme switch. Its "Menu" button names change with it, by script.
  */
 
 const THEME = vi.hoisted(() => ({
@@ -25,7 +25,7 @@ function fireToggle(panel: HTMLElement, newState: "open" | "closed") {
   });
 }
 
-/** jsdom hides closed popovers and will not focus inside them; an open popover is shown. */
+/** jsdom hides closed popovers and will not focus inside them; an open one is shown. */
 function showPopovers(): () => void {
   const style = document.createElement("style");
   style.textContent = "[popover] { display: block !important; }";
@@ -54,12 +54,20 @@ describe("PhoneMenu, server HTML", () => {
     expect(html).toContain('type="radio"');
   });
 
-  it("has a Menu button that controls the popover", () => {
+  it("has a Menu button that controls the popover, and no script state", () => {
     const html = renderToString(<PhoneMenuButton />);
     expect(html).toMatch(/popovertarget="site-menu"/i);
     expect(html).toContain('aria-controls="site-menu"');
-    expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain('aria-label="Open menu"');
+    expect(html).not.toContain("aria-expanded");
+    expect(html).not.toContain("aria-label");
+    // Both labels are in the page; the stylesheet shows "Close" while it is open.
+    expect(html).toContain("pf-nav__menu-open");
+    expect(html).toContain("pf-nav__menu-close");
+  });
+
+  it("marks no section on its links, since the Primary nav carries the section mark", () => {
+    const html = renderToString(<PhoneMenu />);
+    expect(html).not.toContain("aria-current");
   });
 });
 
@@ -73,15 +81,16 @@ describe("PhoneMenu, in the page", () => {
         <PhoneMenu />
       </>,
     );
-    const button = screen.getByRole("button", { name: "Open menu" });
     const menu = document.getElementById("site-menu")!;
+    // The button's names are written by script at mount.
+    const button = screen.getByRole("button", { name: "Open menu" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
 
     fireToggle(menu, "open");
     expect(screen.getByRole("button", { name: "Close menu" })).toHaveAttribute(
       "aria-expanded",
       "true",
     );
-    expect(button.textContent).toBe("MenuClose");
     expect(document.activeElement).toBe(
       screen.getByRole("link", { name: "Work", hidden: true }),
     );

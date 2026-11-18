@@ -95,6 +95,19 @@ export function isCurrentLink(link: ChromeLink, pathname: string): boolean {
 }
 
 /**
+ * The `aria-current` a chrome link carries, and the only source of it: "location"
+ * for the Home section in view (spec 7.2), "page" for the page the reader is on.
+ */
+export function currentOf(
+  link: ChromeLink,
+  section: string | undefined,
+  pathname: string,
+): "location" | "page" | undefined {
+  if (link.section !== undefined && link.section === section) return "location";
+  return isCurrentLink(link, pathname) ? "page" : undefined;
+}
+
+/**
  * Every public page the old site menu links (spec 7.7). The footer lists them
  * from here, so the crawl path for crawlers that run no JavaScript survives.
  */
@@ -153,6 +166,7 @@ export const footerLinks = {
 /** The Say hello popover (spec 7.4). Strings are the repo's where it has them. */
 export const sayHello = {
   label: place.cta.label,
+  // DRAFT, awaiting the owner's approval (umbrella R3, plan step 1c).
   eyebrow: "Email",
   address: site.email,
   name: `Email ${PERSON_NAME}`,

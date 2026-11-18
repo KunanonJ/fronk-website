@@ -5,18 +5,30 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
  * (process/features/profile-site-redesign, phase 1 gates 3, 4, 8 and 9, and the
  * device matrix of design spec 10.1).
  *
- * Behaviour runs in desktop Chromium (1440 px) and the WebKit phone (390 px),
- * which set their own viewports; the matrix widths and the tap areas run in
- * desktop Chromium only. profile.spec.ts holds the widths every preview page
- * must fit, and the best-practice checks.
+ * Most behaviour runs in desktop Chromium (1440 px) and the WebKit phone
+ * (390 px), which set their own viewports. The anchors, the scrollspy and the
+ * focus checks run in desktop Chromium only, at the widths they set, and so do
+ * the matrix widths and the tap areas. profile.spec.ts holds the widths every
+ * preview page must fit, and the best-practice checks.
  */
 
 const HOME = "/preview";
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
-/** The fixed bar's bottom edge: 32 px down and 48 px tall. */
-const BAR_BOTTOM = 80;
+/** A short phone, where an open panel must scroll inside the screen. */
+const SHORT = { width: 320, height: 256 };
+/** The least top a section's first content may have, so that it clears the bar. */
+const CLEAR_OF_BAR = 78;
+/**
+ * Where a section lands when a chrome link is followed, at 810 px and up: the
+ * page's scroll padding (96 px) plus the section's scroll margin (spec 4.3).
+ */
+const LANDING: Record<"work" | "about" | "journey", number> = {
+  work: 176,
+  about: -80,
+  journey: 0,
+};
 
 type Theme = "light" | "dark";
 
@@ -52,20 +64,80 @@ function row(page: Page): Locator {
   return page.locator(".pf-nav__row");
 }
 
-/** Follows a chrome link: the pill's on desktop, the phone menu's below 810 px. */
-async function followChrome(page: Page, label: string) {
-  if (await page.getByRole("navigation", { name: "Primary" }).isVisible()) {
-    await page
-      .getByRole("navigation", { name: "Primary" })
-      .getByRole("link", { name: label, exact: true })
-      .click();
-    return;
-  }
-  await page.getByRole("button", { name: "Open menu" }).click();
-  await page
-    .getByRole("navigation", { name: "Site" })
-    .getByRole("link", { name: label, exact: true })
-    .click();
+/** The Primary links: shown on desktop, hidden below 810 px. */
+function primary(page: Page): Locator {
+  return page.getByRole("navigation", { name: "Primary" });
+}
+
+/** Scrolls at once; the stylesheet makes smooth scrolling the default. */
+async function scrollPage(page: Page, top: number) {
+  await page.evaluate(
+    (y) => window.scrollTo({ top: y, behavior: "instant" }),
+    top,
+  );
+}
+
+/** The page's scroll position, read at the call. */
+function pageY(page: Page): Promise<number> {
+  return page.evaluate(() => window.scrollY);
+}
+
+/**
+ * Waits until the page has stopped moving: the same position for eight
+ * frames, or four seconds at most.
+ */
+async function settle(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((done) => {
+        let last = Number.NaN;
+        let still = 0;
+        let frames = 0;
+        const step = () => {
+          frames += 1;
+          still = window.scrollY === last ? still + 1 : 0;
+          last = window.scrollY;
+          if (still >= 8 || frames >= 240) done();
+          else requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }),
+  );
+}
+
+/**
+ * Scrolls up 24 px, which shows the bar again so that its links take taps. The
+ * bar records a position only after a 6 px move (navAway), so a move of 24 px
+ * is enough whatever position it last recorded.
+ */
+async function revealBar(page: Page) {
+  await page.evaluate(() => window.scrollBy({ top: -24, behavior: "instant" }));
+  await expect(bar(page)).not.toHaveAttribute("data-away", "");
+}
+
+/** A section's top in the viewport, and its top and bottom in the page. */
+function sectionBox(page: Page, id: string) {
+  return page.evaluate((target) => {
+    const box = document.getElementById(target)!.getBoundingClientRect();
+    const offset = window.scrollY;
+    return {
+      top: box.top,
+      pageTop: box.top + offset,
+      pageBottom: box.bottom + offset,
+    };
+  }, id);
+}
+
+/** The links in the bar that carry aria-current, as "Label:value". */
+function marks(page: Page): Promise<string[]> {
+  return bar(page)
+    .locator("[aria-current]")
+    .evaluateAll((els) =>
+      els.map(
+        (el) =>
+          `${el.textContent?.trim() ?? ""}:${el.getAttribute("aria-current")}`,
+      ),
+    );
 }
 
 /**
@@ -75,8 +147,10 @@ async function followChrome(page: Page, label: string) {
  */
 async function tapProblems(page: Page, roots: string[]): Promise<string[]> {
   return page.evaluate((selectors) => {
+    // The theme switch's radios sit under their labels with pointer-events
+    // none, so the labels are the taps to measure.
     const SELECTOR =
-      "a[href], button, input:not([type=hidden]), summary, [role=button]";
+      "a[href], button, input:not([type=hidden]), summary, [role=button], .pf-theme__option";
     const problems: string[] = [];
     const name = (el: HTMLElement) =>
       (el.innerText || el.getAttribute("aria-label") || el.tagName)
@@ -95,6 +169,7 @@ async function tapProblems(page: Page, roots: string[]): Promise<string[]> {
         if (
           style.display !== "none" &&
           style.visibility !== "hidden" &&
+          style.pointerEvents !== "none" &&
           box.width > 1 &&
           box.height > 1
         ) {
@@ -173,9 +248,7 @@ test.describe("chrome: layout and the pill nav", () => {
     const box = await header.boundingBox();
     expect(box?.y).toBeCloseTo(32, 0);
     expect(box?.height).toBeCloseTo(48, 0);
-    await expect(
-      page.getByRole("navigation", { name: "Primary" }),
-    ).toBeVisible();
+    await expect(primary(page)).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Work", exact: true }),
     ).toBeVisible();
@@ -185,9 +258,7 @@ test.describe("chrome: layout and the pill nav", () => {
     ).toBeVisible();
 
     await page.setViewportSize(PHONE);
-    await expect(
-      page.getByRole("navigation", { name: "Primary" }),
-    ).toBeHidden();
+    await expect(primary(page)).toBeHidden();
     await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Switch to night mode" }),
@@ -195,35 +266,6 @@ test.describe("chrome: layout and the pill nav", () => {
     await expect(
       page.getByRole("link", { name: "Kunanon Jarat, home" }),
     ).toBeVisible();
-  });
-
-  test("the page scrolls under the bar, and the anchors land below it", async ({
-    page,
-  }) => {
-    await prepare(page);
-    await page.setViewportSize(DESKTOP);
-    await visit(page);
-    expect(await computed(page.locator("html"), "scroll-padding-top")).toBe(
-      "96px",
-    );
-    for (const [section, link] of [
-      ["work", "Work"],
-      ["about", "About"],
-      ["journey", "Journey"],
-    ] as const) {
-      // Scrolling down hides the bar, so each step starts from the top.
-      await page.evaluate(() =>
-        window.scrollTo({ top: 0, behavior: "instant" }),
-      );
-      await followChrome(page, link);
-      await expect(page).toHaveURL(new RegExp(`#${section}$`));
-      const heading = page.locator(`#${section} h2`);
-      await expect
-        .poll(async () => (await heading.boundingBox())?.y ?? 0, {
-          timeout: 5_000,
-        })
-        .toBeGreaterThanOrEqual(BAR_BOTTOM);
-    }
   });
 
   test("the scrollspy marks the section in view and slides the pill under its link", async ({
@@ -237,9 +279,10 @@ test.describe("chrome: layout and the pill nav", () => {
         .getElementById("about")!
         .scrollIntoView({ block: "start", behavior: "instant" }),
     );
-    const about = page
-      .getByRole("navigation", { name: "Primary" })
-      .getByRole("link", { name: "About", exact: true });
+    const about = primary(page).getByRole("link", {
+      name: "About",
+      exact: true,
+    });
     await expect(about).toHaveAttribute("aria-current", "location");
     const pill = page.locator(".pf-nav__active");
     await expect(pill).toHaveAttribute("data-visible", "");
@@ -267,39 +310,204 @@ test.describe("chrome: layout and the pill nav", () => {
     await expect.poll(() => computed(row(page), "opacity")).toBe("1");
   });
 
-  test("the bar stays in view while Say hello is open, however far the page moves", async ({
+  test("the bar stays in view while Say hello is open, and hides again once it closes", async ({
     page,
   }) => {
     await prepare(page);
     await page.setViewportSize(DESKTOP);
     await visit(page);
     await page.getByRole("button", { name: "Say hello" }).first().click();
-    await expect(
-      page.getByRole("dialog", { name: "Email Kunanon Jarat" }),
-    ).toBeVisible();
-    await page.evaluate(() =>
-      window.scrollTo({ top: 400, behavior: "instant" }),
-    );
+    const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
+    await expect(dialog).toBeVisible();
+    await scrollPage(page, 400);
+    await settle(page);
     await expect(bar(page)).not.toHaveAttribute("data-away", "");
     await expect.poll(() => computed(row(page), "opacity")).toBe("1");
-    await page.keyboard.press("Escape");
+
+    // The control: once Say hello has closed, the same scroll hides the bar.
+    await page.mouse.click(4, 450);
+    await expect(dialog).toBeHidden();
+    await scrollPage(page, 800);
+    await settle(page);
+    await expect(bar(page)).toHaveAttribute("data-away", "");
+    await expect.poll(() => computed(row(page), "opacity")).toBe("0");
+  });
+});
+
+test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "the Chromium desktop, at the widths each test sets",
+    );
   });
 
-  test("focus inside the bar brings it back while the page is scrolled down", async ({
+  test("each section lands where its scroll margin puts it, at 1440 and 820, and its content clears the bar", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page);
+    expect(await computed(page.locator("html"), "scroll-padding-top")).toBe(
+      "96px",
+    );
+    for (const width of [1440, 820]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const [section, label] of [
+        ["work", "Work"],
+        ["about", "About"],
+        ["journey", "Journey"],
+      ] as const) {
+        // A chrome link is followed from the top, where the bar is in view.
+        await scrollPage(page, 0);
+        await settle(page);
+        await primary(page)
+          .getByRole("link", { name: label, exact: true })
+          .click();
+        await expect(page).toHaveURL(new RegExp(`#${section}$`));
+        await settle(page);
+        const { top } = await sectionBox(page, section);
+        expect(
+          Math.abs(top - LANDING[section]),
+          `${section} lands at ${width}`,
+        ).toBeLessThanOrEqual(3);
+        // The first content of a section is its eyebrow row, above the heading.
+        const content = await page
+          .locator(`#${section} > :first-child`)
+          .boundingBox();
+        expect
+          .soft(content?.y ?? 0, `${section} content at ${width}`)
+          .toBeGreaterThanOrEqual(CLEAR_OF_BAR);
+        const heading = await page.locator(`#${section} h2`).boundingBox();
+        expect
+          .soft(heading?.y ?? 0, `${section} heading at ${width}`)
+          .toBeGreaterThanOrEqual(CLEAR_OF_BAR);
+      }
+    }
+  });
+
+  test("the scrollspy hands over from Work to About as Work leaves the band, and back again", async ({
     page,
   }) => {
     await prepare(page);
     await page.setViewportSize(DESKTOP);
     await visit(page);
-    await page.evaluate(() =>
-      window.scrollTo({ top: 400, behavior: "instant" }),
-    );
-    await expect(bar(page)).toHaveAttribute("data-away", "");
-    await page
-      .getByRole("navigation", { name: "Primary" })
+    const work = await sectionBox(page, "work");
+    const workLink = primary(page).getByRole("link", {
+      name: "Work",
+      exact: true,
+    });
+    const aboutLink = primary(page).getByRole("link", {
+      name: "About",
+      exact: true,
+    });
+
+    // Work's top is 300 px down, inside the band, and About is far below it.
+    await scrollPage(page, work.pageTop - 300);
+    await expect(workLink).toHaveAttribute("aria-current", "location");
+    await expect(aboutLink).not.toHaveAttribute("aria-current");
+
+    // Work's bottom is above the band's top, so About takes the mark.
+    await scrollPage(page, work.pageBottom - 150);
+    await expect(aboutLink).toHaveAttribute("aria-current", "location");
+    await expect(workLink).not.toHaveAttribute("aria-current");
+
+    // Work's bottom is back inside the band, and page order gives it the mark.
+    await scrollPage(page, work.pageBottom - 200);
+    await expect(workLink).toHaveAttribute("aria-current", "location");
+    await expect(aboutLink).not.toHaveAttribute("aria-current");
+  });
+
+  test("a click on Journey moves the address to it, and marks it", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    await primary(page)
+      .getByRole("link", { name: "Journey", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#journey$/);
+    await expect.poll(() => marks(page)).toEqual(["Journey:location"]);
+  });
+
+  test("only one link in the bar is marked, and it follows the section in view", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    await primary(page)
       .getByRole("link", { name: "Work", exact: true })
-      .focus();
+      .click();
+    await expect(page).toHaveURL(/#work$/);
+    await expect.poll(() => marks(page)).toEqual(["Work:location"]);
+    await settle(page);
+    await scrollPage(page, 0);
+    await primary(page)
+      .getByRole("link", { name: "About", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#about$/);
+    await expect.poll(() => marks(page)).toEqual(["About:location"]);
+  });
+
+  test("the name goes to the top, from a section and from the top itself", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page, `${HOME}#work`);
+    // The hash scroll must have moved the page, so the name link has work to do.
+    // It is smooth, so wait for it to finish before the bar is revealed.
+    await expect.poll(() => pageY(page)).toBeGreaterThan(0);
+    await settle(page);
+    const name = page.getByRole("link", { name: "Kunanon Jarat, home" });
+    await revealBar(page);
+    await name.click();
+    await expect(page).toHaveURL(/\/preview$/);
+    await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
+
+    await scrollPage(page, 900);
+    await settle(page);
+    await revealBar(page);
+    await name.click();
+    await expect(page).toHaveURL(/\/preview$/);
+    await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
+  });
+
+  test("keyboard focus inside the bar keeps it in view while the page is scrolled down", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    const work = primary(page).getByRole("link", {
+      name: "Work",
+      exact: true,
+    });
+    // Tab until Work has focus, as a keyboard reader would reach it.
+    for (let presses = 0; presses < 10; presses += 1) {
+      if (await work.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press("Tab");
+    }
+    await expect(work).toBeFocused();
+    await scrollPage(page, 400);
+    await settle(page);
+    await expect(bar(page)).toHaveAttribute("data-away", "");
     await expect.poll(() => computed(row(page), "opacity")).toBe("1");
+  });
+
+  test("a mouse click on the theme toggle leaves the bar free to hide", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    await page.getByRole("button", { name: "Switch to night mode" }).click();
+    await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
+    await scrollPage(page, 400);
+    await settle(page);
+    await expect(bar(page)).toHaveAttribute("data-away", "");
+    await expect.poll(() => computed(row(page), "opacity")).toBe("0");
   });
 });
 
@@ -372,6 +580,99 @@ test.describe("chrome: the phone menu", () => {
       .click();
     await expect(page.getByRole("navigation", { name: "Site" })).toBeHidden();
     await expect(page).toHaveURL(/#about$/);
+  });
+
+  test("Back closes the open menu, as the history moves", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "one history check is enough",
+    );
+    await prepare(page);
+    await page.setViewportSize(PHONE);
+    await visit(page);
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await page
+      .getByRole("navigation", { name: "Site" })
+      .getByRole("link", { name: "Work", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#work$/);
+    await settle(page);
+    await scrollPage(page, 0);
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("navigation", { name: "Site" });
+    await expect(menu).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/\/preview$/);
+    await expect(menu).toBeHidden();
+  });
+});
+
+test.describe("chrome: panels in a 320 by 256 screen", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !BEHAVIOUR.has(testInfo.project.name),
+      "desktop and the WebKit phone",
+    );
+  });
+
+  test("the nav's Say hello scrolls inside the screen, and its last link can be reached", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(SHORT);
+    await visit(page);
+    await page.getByRole("button", { name: "Say hello" }).first().click();
+    const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
+    await expect(dialog).toBeVisible();
+    expect(
+      await dialog.evaluate((el) => el.scrollHeight > el.clientHeight),
+      "the panel scrolls",
+    ).toBe(true);
+    const last = dialog.getByRole("link", { name: "Use the contact form" });
+    await last.focus();
+    await expect(last).toBeInViewport();
+  });
+
+  test("the footer's Say hello scrolls inside the screen, and its last link can be reached", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(SHORT);
+    await visit(page);
+    const trigger = page.locator(".pf-say__trigger--footer");
+    await trigger.evaluate((el) =>
+      el.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
+    await trigger.click();
+    const panel = page.locator(".pf-say__panel--footer");
+    await expect(panel).toBeVisible();
+    expect(
+      await panel.evaluate((el) => el.scrollHeight > el.clientHeight),
+      "the panel scrolls",
+    ).toBe(true);
+    const last = panel.getByRole("link", { name: "Use the contact form" });
+    await last.focus();
+    await expect(last).toBeInViewport();
+  });
+
+  test("the phone menu scrolls inside the screen, and its last theme radio can be reached", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(SHORT);
+    await visit(page);
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("navigation", { name: "Site" });
+    await expect(menu).toBeVisible();
+    expect(
+      await menu.evaluate((el) => el.scrollHeight > el.clientHeight),
+      "the menu scrolls",
+    ).toBe(true);
+    const dark = page.getByRole("radio", { name: "Dark" });
+    await dark.focus();
+    await expect(dark).toBeInViewport();
   });
 });
 
@@ -450,6 +751,37 @@ test.describe("chrome: Say hello and the theme", () => {
     const button = await trigger.boundingBox();
     expect(panel!.y + panel!.height).toBeLessThanOrEqual(button!.y + 1);
     await page.keyboard.press("Escape");
+  });
+
+  test("Say hello closes when the history moves, back or forward", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "one history check is enough",
+    );
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    await primary(page)
+      .getByRole("link", { name: "Work", exact: true })
+      .click();
+    await expect(page).toHaveURL(/#work$/);
+    await settle(page);
+    await scrollPage(page, 0);
+    const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
+    await page.getByRole("button", { name: "Say hello" }).first().click();
+    await expect(dialog).toBeVisible();
+    await page.goBack();
+    await expect(page).toHaveURL(/\/preview$/);
+    await expect(dialog).toBeHidden();
+
+    await scrollPage(page, 0);
+    await page.getByRole("button", { name: "Say hello" }).first().click();
+    await expect(dialog).toBeVisible();
+    await page.goForward();
+    await expect(page).toHaveURL(/#work$/);
+    await expect(dialog).toBeHidden();
   });
 
   test("the nav's theme toggle switches the theme and keeps the choice", async ({
@@ -594,9 +926,12 @@ test.describe("chrome: with JavaScript off", () => {
         await expect(dialog).toBeHidden();
 
         if (name === "phone") {
-          await page.getByRole("button", { name: "Open menu" }).click();
+          // Without script the button keeps its text name, "Menu".
+          await page.getByRole("button", { name: "Menu", exact: true }).click();
           const menu = page.getByRole("navigation", { name: "Site" });
           await expect(menu).toBeVisible();
+          await expect(page.locator(".pf-nav__menu-close")).toBeVisible();
+          await expect(page.locator(".pf-nav__menu-open")).toBeHidden();
           await page.keyboard.press("Escape");
           await expect(menu).toBeHidden();
         }

@@ -3,7 +3,9 @@ import { DitherField } from "@/components/ds/DitherField";
 import { EyebrowRow, StatusDot } from "@/components/ds/labels";
 import { Reveal } from "@/components/ds/Reveal";
 import { PixelArt } from "@/components/profile/site/PixelArt";
+import { BROWSER_ART, PHONE_ART } from "@/components/profile/site/footerArt";
 import { SayHello } from "@/components/profile/site/SayHello";
+import { POPOVER_IDS } from "@/components/profile/site/popover";
 import {
   availability,
   brand,
@@ -20,46 +22,6 @@ import {
  * Identical on every page. The two pixel drawings are code-drawn and shown from
  * 1280 px only.
  */
-
-/** A browser window with its cursor, one character per pixel (see PixelArt). */
-const BROWSER_ART = [
-  "kkkkkkkkkkkkkkkk",
-  "ktcattttttttttttk",
-  "kwwwwwwwwwwwwwwk",
-  "kwggggwwwwwwwwwk",
-  "kwggggggwwwwwwwk",
-  "kwggwwwwwwwwwwwk",
-  "kwwwwwwwwwkwwwwk",
-  "kwgggggwwwkkwwwk",
-  "kwggggwwwwkkkwwk",
-  "kwwwwwwwwwkkkkwk",
-  "kwwwwwwwwwwwwwwk",
-  "kkkkkkkkkkkkkkkk",
-];
-
-/** A phone with an accent tile on its screen. */
-const PHONE_ART = [
-  "kkkkkkkkkk",
-  "kwwwwwwwwk",
-  "kwttttttwk",
-  "kwwwwwwwwk",
-  "kwgggwwwwk",
-  "kwggggwwwk",
-  "kwwwwwwwwk",
-  "kwwwwwwwwk",
-  "kwwwwaawwk",
-  "kwwwwwwwwk",
-  "kwgggwwwwk",
-  "kwgggwwwwk",
-  "kwwwwwwwwk",
-  "kwwwwwwwwk",
-  "kwwwwwwwwk",
-  "kwwwkkwwwk",
-  "kwwwwwwwwk",
-  "kkkkkkkkkk",
-];
-
-const SAY_HELLO_FOOTER = "say-hello-footer";
 
 export default function SiteFooter() {
   return (
@@ -85,7 +47,7 @@ export default function SiteFooter() {
           </Reveal>
           <Reveal rise={12}>
             <div className="pf-footer__cta">
-              <SayHello id={SAY_HELLO_FOOTER} placement="footer" />
+              <SayHello id={POPOVER_IDS.footer} placement="footer" />
             </div>
           </Reveal>
         </div>

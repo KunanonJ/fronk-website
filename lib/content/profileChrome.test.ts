@@ -5,6 +5,7 @@ import {
   brand,
   composeHref,
   copyright,
+  currentOf,
   footerCopy,
   footerPages,
   homeHref,
@@ -103,5 +104,26 @@ describe("profile chrome copy", () => {
     expect(footerCopy.paragraphs[0]).toMatch(/^I build /);
     expect(footerCopy.paragraphs[1]).toMatch(/^I’m open to /);
     expect(footerCopy.paragraphs).toHaveLength(2);
+  });
+});
+
+describe("currentOf, the only source of aria-current in the chrome", () => {
+  const [work, about, , resume] = profileNav;
+
+  it("marks the Home section in view as a location, and no other section", () => {
+    expect(currentOf(about!, "about", "/preview")).toBe("location");
+    expect(currentOf(work!, "about", "/preview")).toBeUndefined();
+  });
+
+  it("marks no section when Home is not the page", () => {
+    expect(currentOf(about!, undefined, "/preview/system")).toBeUndefined();
+  });
+
+  it("marks the page the reader is on", () => {
+    expect(currentOf(work!, undefined, "/preview/portfolio/tbh-intranet")).toBe(
+      "page",
+    );
+    expect(currentOf(resume!, undefined, "/resume")).toBe("page");
+    expect(currentOf(resume!, undefined, "/preview")).toBeUndefined();
   });
 });

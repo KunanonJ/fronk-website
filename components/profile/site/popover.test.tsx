@@ -1,14 +1,18 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { usePopover } from "@/components/profile/site/popover";
+import {
+  closePopover,
+  isPopoverOpen,
+  usePopover,
+} from "@/components/profile/site/popover";
 
 /*
- * The popover script (design spec 7.4 to 7.6). jsdom has no Popover API, so
- * the native branch is driven by a stubbed showPopover and hand-made `toggle`
- * events, and the fallback branch by its absence.
+ * The popover script (design spec 7.4 to 7.6). jsdom has no Popover API, so the
+ * native branch is driven by stubs (showPopover, and matches for :popover-open)
+ * and hand-made `toggle` events, and the fallback branch by its absence, where
+ * the panel shows on `data-open`.
  */
 
-/** `native` gives the panel the popover attribute, as an engine with popovers reads it. */
 function Fixture({
   onClose,
   native = true,
@@ -23,11 +27,7 @@ function Fixture({
   const popover = native ? { popover: "auto" as const } : {};
   return (
     <>
-      <button
-        type="button"
-        popoverTarget="panel-under-test"
-        aria-expanded="false"
-      >
+      <button type="button" popoverTarget="panel-under-test">
         Open it
       </button>
       <div id="panel-under-test" {...popover}>
@@ -46,7 +46,7 @@ function fireToggle(panel: HTMLElement, newState: "open" | "closed") {
   });
 }
 
-/** jsdom hides closed popovers and will not focus inside them; an open popover is shown. */
+/** jsdom hides closed popovers and will not focus inside them; an open one is shown. */
 function showPopovers(): () => void {
   const style = document.createElement("style");
   style.textContent = "[popover] { display: block !important; }";
@@ -59,15 +59,17 @@ let unshow: () => void = () => {};
 afterEach(() => {
   unshow();
   delete (HTMLElement.prototype as { showPopover?: unknown }).showPopover;
+  delete (HTMLElement.prototype as { hidePopover?: unknown }).hidePopover;
   vi.restoreAllMocks();
 });
 
-describe("usePopover, native branch", () => {
-  function stubNative() {
-    (HTMLElement.prototype as { showPopover?: unknown }).showPopover = () => {};
-    unshow = showPopovers();
-  }
+function stubNative() {
+  (HTMLElement.prototype as { showPopover?: unknown }).showPopover = () => {};
+  (HTMLElement.prototype as { hidePopover?: unknown }).hidePopover = () => {};
+  unshow = showPopovers();
+}
 
+describe("usePopover, native branch", () => {
   it("mirrors the open state onto the invoker and moves focus in on open", () => {
     stubNative();
     render(<Fixture />);
@@ -92,17 +94,14 @@ describe("usePopover, native branch", () => {
     screen.getByRole("link", { name: "Second", hidden: true }).focus();
 
     fireToggle(panel, "closed");
-    expect(screen.getByRole("button", { name: "Open it" })).toHaveAttribute(
-      "aria-expanded",
-      "false",
-    );
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "Open it" }),
-    );
+    const invoker = screen.getByRole("button", { name: "Open it" });
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
+    expect(invoker).toHaveAttribute("aria-label", "Open it");
+    expect(document.activeElement).toBe(invoker);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("leaves focus where an outside click put it when the popover closes", () => {
+  it("leaves focus where an outside press put it when the popover closes", () => {
     stubNative();
     render(
       <>
@@ -118,41 +117,86 @@ describe("usePopover, native branch", () => {
       screen.getByRole("textbox", { name: "Elsewhere" }),
     );
   });
+
+  it("closePopover hides an open native popover", () => {
+    stubNative();
+    render(<Fixture />);
+    const panel = document.getElementById("panel-under-test")!;
+    const hide = vi.spyOn(panel, "hidePopover");
+    vi.spyOn(panel, "matches").mockImplementation(
+      (selector: string) => selector === ":popover-open",
+    );
+    expect(isPopoverOpen(panel)).toBe(true);
+    closePopover("panel-under-test");
+    expect(hide).toHaveBeenCalledTimes(1);
+  });
 });
 
-describe("usePopover, fallback branch", () => {
-  it("hides the panel until the invoker opens it, then closes on Escape and returns focus", () => {
+describe("usePopover, fallback branch (no Popover API)", () => {
+  it("opens the panel from its invoker, names the state, and moves focus in", () => {
     render(<Fixture native={false} />);
     const invoker = screen.getByRole("button", { name: "Open it" });
     const panel = document.getElementById("panel-under-test")!;
-    expect(panel.hidden).toBe(true);
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
 
     fireEvent.click(invoker);
-    expect(panel.hidden).toBe(false);
+    expect(panel).toHaveAttribute("data-open");
+    expect(isPopoverOpen(panel)).toBe(true);
     expect(invoker).toHaveAttribute("aria-expanded", "true");
+    expect(invoker).toHaveAttribute("aria-label", "Close it");
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: "First" }),
     );
+  });
+
+  it("closes on Escape and returns focus to the invoker", () => {
+    render(<Fixture native={false} />);
+    const invoker = screen.getByRole("button", { name: "Open it" });
+    const panel = document.getElementById("panel-under-test")!;
+    fireEvent.click(invoker);
 
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(panel.hidden).toBe(true);
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
     expect(document.activeElement).toBe(invoker);
   });
 
-  it("closes on a pointer down outside, and stays open for one inside", () => {
+  it("closes on a press outside, and stays open for a press inside", () => {
     render(
       <>
         <Fixture native={false} />
         <p>Outside</p>
       </>,
     );
+    const panel = document.getElementById("panel-under-test")!;
+    fireEvent.click(screen.getByRole("button", { name: "Open it" }));
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "First" }));
+    expect(panel).toHaveAttribute("data-open");
+    fireEvent.pointerDown(screen.getByText("Outside"));
+    expect(panel).not.toHaveAttribute("data-open");
+  });
+
+  it("closePopover closes the open panel the way a link does, with the same bookkeeping", () => {
+    const onClose = vi.fn();
+    render(<Fixture native={false} onClose={onClose} />);
     const invoker = screen.getByRole("button", { name: "Open it" });
     const panel = document.getElementById("panel-under-test")!;
     fireEvent.click(invoker);
+    screen.getByRole("link", { name: "Second" }).focus();
 
-    fireEvent.pointerDown(screen.getByRole("button", { name: "First" }));
-    expect(panel.hidden).toBe(false);
-    fireEvent.pointerDown(screen.getByText("Outside"));
-    expect(panel.hidden).toBe(true);
+    act(() => closePopover("panel-under-test"));
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
+    expect(document.activeElement).toBe(invoker);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves a closed panel alone", () => {
+    const onClose = vi.fn();
+    render(<Fixture native={false} onClose={onClose} />);
+    act(() => closePopover("panel-under-test"));
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

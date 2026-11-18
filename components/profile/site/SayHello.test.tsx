@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SayHello } from "@/components/profile/site/SayHello";
+import { SayHello, SayHelloTrigger } from "@/components/profile/site/SayHello";
 
 /*
  * Say hello (design spec 7.4). Server HTML already has the popover, its
@@ -50,7 +50,8 @@ describe("SayHello, server HTML", () => {
     const html = renderToString(<SayHello id="say-test" placement="nav" />);
 
     expect(html).toContain('aria-haspopup="dialog"');
-    expect(html).toContain('aria-expanded="false"');
+    // Script writes aria-expanded as the state changes; the server HTML has none.
+    expect(html).not.toContain("aria-expanded");
     expect(html).toContain('popover="auto"');
     expect(html).toContain('role="dialog"');
     expect(html).toContain('aria-label="Email Kunanon Jarat"');
@@ -60,6 +61,18 @@ describe("SayHello, server HTML", () => {
     expect(html).toContain('href="/contact"');
     // Copy email needs script, so the server HTML has no copy button.
     expect(html).not.toContain("Copy email");
+  });
+});
+
+describe("SayHello, the trigger", () => {
+  it("is a button that names its popover, with no script state", () => {
+    const html = renderToString(
+      <SayHelloTrigger id="say-only" placement="footer" />,
+    );
+    expect(html).toMatch(/<button[^>]*popovertarget="say-only"/i);
+    expect(html).toContain("pf-say__trigger--footer");
+    expect(html).not.toContain("aria-expanded");
+    expect(html).not.toContain('role="dialog"');
   });
 });
 

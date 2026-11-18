@@ -5,30 +5,36 @@ import {
   type MouseEvent,
   type RefObject,
 } from "react";
-import Link from "@/components/navigation/Link";
 import {
   PhoneMenu,
   PhoneMenuButton,
 } from "@/components/profile/site/PhoneMenu";
-import { SayHello } from "@/components/profile/site/SayHello";
-import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
-import { isPopoverOpen } from "@/components/profile/site/popover";
-import { navAway, type NavScroll } from "@/components/profile/site/navAway";
+import { ProfileLink } from "@/components/profile/site/ProfileLink";
 import {
-  SPY_MARGIN,
-  currentSection,
-  type VisibleSection,
-} from "@/components/profile/site/scrollspy";
+  SayHelloPanel,
+  SayHelloTrigger,
+} from "@/components/profile/site/SayHello";
+import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
+import {
+  POPOVER_IDS,
+  closePopover,
+  isPopoverOpen,
+} from "@/components/profile/site/popover";
+import { navAway, type NavScroll } from "@/components/profile/site/navAway";
+import { useScrollspy } from "@/components/profile/site/scrollspy";
 import {
   HOME_SECTIONS,
   brand,
+  currentOf,
   homeHref,
-  isCurrentLink,
   profileNav,
-  type ChromeLink,
 } from "@/lib/content/profileChrome";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
-import { usePathname } from "@/lib/router/navigation";
+import {
+  useLocationKey,
+  usePathname,
+  useReplaceNavigate,
+} from "@/lib/router/navigation";
 
 /*
  * The pill nav (profile redesign, design spec 7.1 to 7.3): a fixed bar with the
@@ -36,9 +42,11 @@ import { usePathname } from "@/lib/router/navigation";
  * right, and the phone menu's "Menu" button under 810 px. The bar hides on
  * scroll; on Home a scrollspy marks the section in view and slides a pill under
  * its link. Everything is server-rendered, so the links work before script.
+ *
+ * Say hello's panel sits beside the bar's row, not in it: the row takes the
+ * hide-on-scroll opacity and blur, and a panel outside the top layer would
+ * inherit them.
  */
-
-const SAY_HELLO_NAV = "say-hello-nav";
 
 /** The path without a trailing slash, so "/preview/" is Home too. */
 function normalise(path: string): string {
@@ -55,8 +63,8 @@ function useHideOnScroll(bar: RefObject<HTMLElement | null>) {
     const apply = () => {
       frame = 0;
       state = navAway(state, window.scrollY);
-      // An open popover keeps the bar in view, and so does focus inside it
-      // (CSS: :focus-within).
+      // An open popover keeps the bar in view; so does focus inside the bar,
+      // which the stylesheet checks (:has(:focus-visible)).
       const open = Array.from(
         el.querySelectorAll<HTMLElement>("[popover]"),
       ).some(isPopoverOpen);
@@ -77,40 +85,6 @@ function useHideOnScroll(bar: RefObject<HTMLElement | null>) {
   }, [bar]);
 }
 
-/** Reports the Home section in view: the topmost one the observer band holds. */
-function useScrollspy(
-  active: boolean,
-  onSection: (section: string | undefined) => void,
-) {
-  useEffect(() => {
-    if (!active || typeof IntersectionObserver === "undefined") return;
-    const sections = HOME_SECTIONS.map((id) =>
-      document.getElementById(id),
-    ).filter((el): el is HTMLElement => el !== null);
-    if (sections.length === 0) return;
-    const visible = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visible.set(entry.target.id, entry.boundingClientRect.top);
-          } else {
-            visible.delete(entry.target.id);
-          }
-        }
-        onSection(
-          currentSection(
-            [...visible].map(([id, top]): VisibleSection => ({ id, top })),
-          ),
-        );
-      },
-      { rootMargin: SPY_MARGIN, threshold: 0 },
-    );
-    for (const section of sections) observer.observe(section);
-    return () => observer.disconnect();
-  }, [active, onSection]);
-}
-
 /** Slides the pill under the link of `section`, or hides it. */
 function placePill(nav: HTMLElement, section: string | undefined) {
   const pill = nav.querySelector<HTMLElement>(".pf-nav__active");
@@ -127,27 +101,12 @@ function placePill(nav: HTMLElement, section: string | undefined) {
   pill.setAttribute("data-visible", "");
 }
 
-function currentOf(
-  link: ChromeLink,
+/** Keeps the sliding pill under the section in view, on Home only. */
+function usePill(
+  links: RefObject<HTMLElement | null>,
+  home: boolean,
   section: string | undefined,
-  pathname: string,
-): "location" | "page" | undefined {
-  if (link.section !== undefined && link.section === section) return "location";
-  return isCurrentLink(link, pathname) ? "page" : undefined;
-}
-
-export default function SiteNav() {
-  const pathname = usePathname();
-  const home = normalise(pathname) === normalise(homeHref());
-  const bar = useRef<HTMLElement>(null);
-  const links = useRef<HTMLElement>(null);
-  const [spied, setSpied] = useState<string | undefined>(undefined);
-  // The scrollspy's answer only means something on Home.
-  const section = home ? spied : undefined;
-
-  useHideOnScroll(bar);
-  useScrollspy(home, setSpied);
-
+) {
   useEffect(() => {
     const nav = links.current;
     if (!nav) return;
@@ -162,25 +121,63 @@ export default function SiteNav() {
     place();
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
-  }, [home, section]);
+  }, [links, home, section]);
+}
+
+/** Closes every chrome popover whenever the location changes, back and forward included. */
+function useCloseOnRouteChange(locationKey: string) {
+  useEffect(() => {
+    for (const id of Object.values(POPOVER_IDS)) closePopover(id);
+  }, [locationKey]);
+}
+
+export default function SiteNav() {
+  const pathname = usePathname();
+  const locationKey = useLocationKey();
+  const home = normalise(pathname) === normalise(homeHref());
+  const bar = useRef<HTMLElement>(null);
+  const links = useRef<HTMLElement>(null);
+  const [spied, setSpied] = useState<string | undefined>(undefined);
+  // The scrollspy's answer only means something on Home.
+  const section = home ? spied : undefined;
+  const replaceNavigate = useReplaceNavigate();
+
+  useHideOnScroll(bar);
+  useScrollspy(home, HOME_SECTIONS, setSpied);
+  usePill(links, home, section);
+  useCloseOnRouteChange(locationKey);
 
   const onBrand = (event: MouseEvent<HTMLAnchorElement>) => {
+    // A modified click, or a button other than the primary one, is the browser's.
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    // Off Home the router follows the link.
     if (!home) return;
     event.preventDefault();
+    if (window.location.hash) {
+      // The hash has to leave the address, and a plain scroll cannot do that.
+      // The router replaces the entry with the bare path and scrolls to the top.
+      replaceNavigate(brand.home);
+      return;
+    }
     window.scrollTo({
       top: 0,
       behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
-    if (window.location.hash) {
-      window.history.replaceState(window.history.state, "", homeHref());
-    }
   };
 
   return (
     <header ref={bar} data-site-chrome lang="en" className="pf-nav">
       <div className="pf-nav__row">
         <div className="pf-nav__pill">
-          <Link
+          <ProfileLink
             href={brand.home}
             aria-label={brand.label}
             className="pf-nav__name"
@@ -198,28 +195,29 @@ export default function SiteNav() {
               <span className="pf-nav__surname"> {brand.surname}</span>
               <span className="pf-nav__dot">.</span>
             </span>
-          </Link>
+          </ProfileLink>
           <nav ref={links} aria-label="Primary" className="pf-nav__links">
             <span className="pf-nav__active" aria-hidden="true" />
             {profileNav.map((link) => (
-              <Link
+              <ProfileLink
                 key={link.label}
                 href={link.href}
                 data-section={link.section}
-                aria-current={currentOf(link, section, pathname)}
+                current={currentOf(link, section, pathname)}
                 className="pf-nav__link"
               >
                 {link.label}
-              </Link>
+              </ProfileLink>
             ))}
           </nav>
           <PhoneMenuButton />
         </div>
         <div className="pf-nav__right">
           <ThemeToggle />
-          <SayHello id={SAY_HELLO_NAV} placement="nav" />
+          <SayHelloTrigger id={POPOVER_IDS.nav} placement="nav" />
         </div>
       </div>
+      <SayHelloPanel id={POPOVER_IDS.nav} placement="nav" />
       <PhoneMenu />
     </header>
   );

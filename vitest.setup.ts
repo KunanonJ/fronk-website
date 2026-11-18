@@ -55,6 +55,10 @@ vi.mock("@/components/navigation/Link", async () => {
 
 vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => "/",
+  useLocationKey: () => "/",
+  // A chrome link without a router: its address only.
+  useChromeLinkProps: (href: string) => ({ href }),
+  useReplaceNavigate: () => () => {},
   notFound: () => {
     throw new Error("notFound");
   },
