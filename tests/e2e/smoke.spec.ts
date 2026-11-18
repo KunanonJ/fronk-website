@@ -752,28 +752,36 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     );
   });
 
-  test("the FDE hub sets its four sections as chapters, each body under its heading", async ({
+  test("the FDE hub sets its four sections as chapters, each body beside its heading at desktop width", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/topics/forward-deployed-ai-engineering", {
       waitUntil: "networkidle",
     });
-    // Profile redesign, Phase 7 (R17: the bento test's intent, no empty band
-    // in a section): each chapter's body starts right under its heading.
-    const gaps = await page
+    // Profile redesign, Phase 7 (R17: the bento test's intent, no section
+    // left mostly empty): each chapter's body starts level with its kicker,
+    // in the column beside its heading, so no band of the page sits empty.
+    const chapters = await page
       .locator("section.pf-case-chapter:has(> h2.t-h3)")
-      .evaluateAll((chapters) =>
-        chapters.map((chapter) => {
-          const heading = chapter.querySelector("h2")!.getBoundingClientRect();
-          const body = chapter
-            .querySelector("p:not([aria-hidden])")!
-            .getBoundingClientRect();
-          return Math.round(body.top - heading.bottom);
+      .evaluateAll((sections) =>
+        sections.map((chapter) => {
+          const box = (selector: string) =>
+            chapter.querySelector(selector)!.getBoundingClientRect();
+          const kicker = box(".pf-case-kicker");
+          const heading = box("h2");
+          const body = box("p:not([aria-hidden])");
+          return {
+            level: Math.round(Math.abs(body.top - kicker.top)),
+            beside: body.left > heading.right,
+          };
         }),
       );
-    expect(gaps).toHaveLength(4);
-    for (const gap of gaps) expect(gap).toBeLessThanOrEqual(40);
+    expect(chapters).toHaveLength(4);
+    for (const chapter of chapters) {
+      expect(chapter.level).toBeLessThanOrEqual(8);
+      expect(chapter.beside).toBe(true);
+    }
   });
 
   test("the Thai FDE hub carries the same pill and buttons, in Thai", async ({

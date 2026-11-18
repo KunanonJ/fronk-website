@@ -21,7 +21,8 @@ import { pad2 } from "@/lib/utils/pad2";
  * section with its kicker number, the operator proof as a numbered fact
  * strip, the FAQ as native disclosures (every answer stays in the HTML, so
  * the text matches the FAQPage JSON-LD), and the related links beside the
- * contact panel. Thai hubs keep `lang="th"` on <main>; links to English pages
+ * contact panel. From 1024 px each block sets its kicker and heading beside
+ * its content, so the page uses its width. Thai hubs keep `lang="th"` on <main>; links to English pages
  * say so with `lang` and `hreflang`. Styles: `.pf-hub*` in
  * src/styles/profile/pages-hubs.css, with the case template's chapter,
  * kicker, prose and panel classes (case.css) and the FAQ of About
@@ -133,7 +134,7 @@ function Chapter({
   section: TopicPillar["sections"][number];
 }) {
   return (
-    <section className="pf-case-chapter">
+    <section className="pf-case-chapter pf-hub-row">
       <p className="t-kicker pf-case-kicker" aria-hidden="true">
         <PixelMark />
         <span>{pad2(index)}</span>
@@ -149,7 +150,10 @@ function Chapter({
 /** Operator proof: short facts in a numbered strip between hairlines. */
 function Proof({ pillar }: { pillar: TopicPillar }) {
   return (
-    <article aria-labelledby="card-proof" className="pf-case-chapter">
+    <article
+      aria-labelledby="card-proof"
+      className="pf-case-chapter pf-hub-row"
+    >
       <Kicker id="card-proof">{COPY[pillar.locale].proof}</Kicker>
       <ul className="pf-hub-facts">
         {pillar.proof.map((item) => (
@@ -168,7 +172,7 @@ function Faq({ pillar }: { pillar: TopicPillar }) {
     <section
       id="topic-faq"
       aria-labelledby="card-faq"
-      className="pf-case-chapter"
+      className="pf-case-chapter pf-hub-row"
     >
       <Kicker id="card-faq">FAQ</Kicker>
       <div className="pf-faq">
@@ -259,7 +263,7 @@ export default function TopicHubPage({ pillar }: { pillar: TopicPillar }) {
     <ProfileMain lang={th ? "th" : undefined} className="pf-hub">
       <HubHero pillar={pillar} />
       <div className="ds-wrap pf-hub-body">
-        <div className="pf-case-column">
+        <div className="pf-hub-column">
           {pillar.sections.map((section, index) => (
             <Reveal key={section.heading} className="pf-case-step">
               <Chapter index={index + 1} section={section} />

@@ -60,6 +60,10 @@
   .pf-hub-body {
     padding-block: 64px 128px;
   }
+  .pf-hub-column {
+    display: flex;
+    flex-direction: column;
+  }
   /* Operator proof as a fact strip (spec 9.8): numbered in CSS, so each
      item's text is the fact alone; the numbers are not read. */
   .pf-hub-facts {
@@ -144,6 +148,9 @@
   .pf-read-head .pf-case-kicker {
     margin: 0;
   }
+  .pf-read-head + .pf-work__bar {
+    margin-top: 16px;
+  }
   .pf-read-meta,
   .pf-read-path,
   .pf-read-legend {
@@ -181,7 +188,7 @@
     min-inline-size: 0;
   }
   .pf-read-flex--wide > * {
-    flex-basis: 20rem;
+    flex-basis: 28rem;
   }
   .pf-read-flex > .pf-read-lead {
     flex-basis: 100%;
@@ -426,12 +433,28 @@
     }
   }
   @media (min-width: 64rem) {
-    .pf-hub-facts,
     .pf-read-board {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .pf-hub-close {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* A hub block's kicker and heading beside its content (the page's
+       width, not one 64ch column with an empty half). */
+    .pf-hub-row {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(32px, 4vw, 72px);
+      align-items: start;
+    }
+    .pf-hub-row > * {
+      grid-column: 1;
+    }
+    .pf-hub-row > :last-child {
+      grid-row: 1 / span 2;
+      grid-column: 2;
+      margin-top: 0;
     }
     .pf-read-wide {
       grid-column: span 2;
