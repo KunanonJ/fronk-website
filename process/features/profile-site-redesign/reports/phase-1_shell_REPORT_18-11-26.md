@@ -1,14 +1,17 @@
 # Phase 1 report: Shell (pill nav, Say hello, theme, phone menu, footer)
 
 **Plan:** `../active/phase-1_shell_PLAN_18-11-26.md`
-**Date:** 18-11-26, on `feat/profile-site-redesign` at `52e5685` plus the
-uncommitted Phase 1 tree. Nothing is committed, pushed or deployed.
-**Tree:** sha256 of the sorted modified and untracked code files (39 files), excluding this report and the plan: `6ef6b7dc0a754046`.
+**Date:** 18-11-26, on `feat/profile-site-redesign`. The first run was on
+`52e5685` plus the uncommitted Phase 1 tree, which the coordinator committed as
+`a530983`. The review fixes (section 9) are uncommitted on `33d84b5`. Nothing is
+pushed or deployed.
+**Tree:** the hash `6ef6b7dc0a754046` (39 files, sorted, excluding this report and the plan) is from the first run. The review fixes changed 23 code paths more; section 9 lists them.
 **Harness:** `.claude/agents/`, `.claude/skills/` and `process/context/` are
 missing. The phase ran alone in one worktree from the shared brief, under the
 Harness-Absent Fallback.
-**Status:** CODE DONE (18-11-26). Visual baselines are not rendered here (the
-orchestrator batches them, see open items 1 and 2).
+**Status:** CODE DONE (18-11-26), with the code review fixes in section 9.
+Visual baselines are not rendered here (the orchestrator batches them, see open
+items 1 and 2).
 
 ## 1. Research answers (the plan's "Research first")
 
@@ -21,8 +24,9 @@ orchestrator batches them, see open items 1 and 2).
 - **Focus on light dismiss:** Escape returns focus to the trigger. An outside
   click leaves focus where the reader put it (deviation 5).
 - **Hide on scroll with an open popover:** the bar never hides while a popover
-  is open (a script check on `:popover-open`) or while focus is inside it (CSS
-  `:focus-within`). Both are tested.
+  is open (a script check on `:popover-open`) or while keyboard focus is inside
+  it (CSS `:has(:focus-visible)`, so a mouse click does not pin the bar). Both
+  are tested (section 9).
 - **`scrollIntoView({ block: "nearest" })` and `scroll-padding-top`:** honoured
   in Chromium and WebKit. The tap-area checks at 320 and 390 px scroll each
   target into view, and none is covered by the bar with the menu or the popover
@@ -32,7 +36,7 @@ orchestrator batches them, see open items 1 and 2).
 
 | Step | Files | What |
 | --- | --- | --- |
-| 1a Pill nav | `components/profile/site/SiteNav.tsx`, `navAway.ts`, `scrollspy.ts`, `ThemeToggle.tsx` | `header[data-site-chrome][lang="en"]`, fixed at `--bar-top`, 48 px row, `pointer-events` on children only. Left pill: avatar, name (first name under 640 px, surname kept in the accessible name), Primary links at 810 px and up, Menu under 810. Right: theme toggle (48 px, from 810) and Say hello. Sliding `.pf-nav__active` pill (transform and width .28 s, opacity only under reduced motion). Home scrollspy with `rootMargin` `-20% 0px -60% 0px`; `aria-current="page"` elsewhere. Hide on scroll: `navAway` records a position after 6 px, hides past 24 px down, shows 6 px up; CSS handles opacity, blur and offset. |
+| 1a Pill nav | `components/profile/site/SiteNav.tsx`, `navAway.ts`, `scrollspy.ts`, `ThemeToggle.tsx` | `header[data-site-chrome][lang="en"]`, fixed at `--bar-top`, 48 px row, `pointer-events` on children only. Left pill: avatar, name (first name under 640 px, surname kept in the accessible name), Primary links at 810 px and up, Menu under 810. Right: theme toggle (48 px, from 810) and Say hello. Sliding `.pf-nav__active` pill (transform and width .28 s, opacity only under reduced motion). Home scrollspy with `rootMargin` `-20% 0px -60% 0px`; `aria-current` comes only from `currentOf`: `location` for the section in view, `page` on a page (section 9). Hide on scroll: `navAway` records a position after 6 px, hides past 24 px down, shows 6 px up; CSS handles opacity, blur and offset. |
 | 1b Anchors | `src/styles/profile/shell.css` | `scroll-padding-top: 96px` and the per-target `scroll-margin-top` values of spec 4.3 (`#work`, `#about` at -128 px and -176 px from 810, `#journey`, `#ventures`, `#story`, `#ch-*`), all inside the `[data-design="profile"]` scope. No second smooth-scroll rule (smooth scrolling is set once in `globals.css`). |
 | 1c Say hello | `SayHello.tsx`, `popover.ts` | Native `popover="auto"` with `popovertarget`, `role="dialog"` named "Email Kunanon Jarat", width `min(300px, 100vw - 32px)`, radius 20, `elev-pop`, dither foot. Mono label, the address from `site.email`, then Copy email (rendered after hydration only), Compose in Gmail (new tab, announced), Open your mail app (`mailto:`), Use the contact form (`/contact`). Script adds `aria-expanded`, the copy action with a polite live region, focus on the first row, and focus back on Escape. Footer instance opens above its trigger with anchor positioning where supported, else fixed at the bottom centre. |
 | 1d Theme | `ThemeToggle.tsx`, `ThemeSwitch.tsx`, `themeTransition.ts` | next-themes unchanged (`.dark` on `<html>`, `localStorage["theme"]`, light default, system ignored, R20). Moon and sun cross-fade, hover and press states. Switch runs as a View Transition (type `theme`, `kj-vt` class for engines without types) fading the new theme in over .56 s, with a `theme-switching` class that stops transitions for two frames. No transition under reduced motion or without the API. The live circular reveal and the theme-color metas are untouched. |
@@ -85,7 +89,7 @@ with the bar, the menu and the popover open (no target under 24 px, none
 overlapping, none covered). Best-practice checks in `profile.spec.ts` now run on
 `/preview` as well as `/preview/system`: forced colours (the rings keep an edge,
 pixel art hides), text spacing, 200% zoom and 500% text doubling, more contrast,
-request origins, and reveal and print of blocks not yet seen.
+request origins, and reveal and print of blocks not yet seen. Section 9 lists the browser checks the review added or changed.
 
 Screenshots for review were taken in scratch space and were not committed (not
 baselines). Desktop and phone, light and dark, the open popover and menu, and the
@@ -114,8 +118,10 @@ footer were checked by eye against spec 7.
    system's README names `components/ds/ThemeSwitch.tsx`.
 4. **Script fallback for engines without the Popover API.** The umbrella requires
    a fallback for newer features, and Phase 0 kept the scripted fallback the design
-   system names. The panel is hidden with `hidden`, and the invoker toggles it;
-   Escape and an outside press close it. Older phones are not browser-tested.
+   system names. CSS hides both panels until the script sets `data-open`, and the
+   invoker toggles it; Escape and an outside press close it, and each change is
+   reported as a native `toggle` event. The fallback is covered by unit tests and
+   a CSS guard only, not in a browser (open item 8).
 5. **Outside click does not return focus to the trigger.** Spec 7.4 names both
    Escape and an outside click. Returning focus after an outside click would move
    it away from where the reader clicked. Escape does return it.
@@ -190,3 +196,102 @@ Also for approval, as microcopy the plan names: "Compose in Gmail", "Open your m
 7. **Print.** The résumé PDF (`pnpm pdf`) was not run. No print rule changed,
    and the new chrome carries `data-site-chrome`, which the existing print rule
    hides.
+8. **No-Popover fallback in a browser.** The fallback for engines without the
+   Popover API is covered by unit tests and the CSS guard in
+   `lib/design/globals.test.ts`. The browsers run here (Chromium and WebKit) have
+   the API, so the fallback never runs in a browser.
+9. **About eyebrow under the bar at 810 to 1023 px.** `components/profile/preview/PreviewHome.tsx`
+   pads `#about` with `pt-32` below 1024 px; the section needs `pt-44` (176 px)
+   from 810 px up. This phase does not edit that file, and the lane owner applies
+   the change at merge. Until then the browser test "each section lands where its
+   scroll margin puts it" fails at 820 px on one check (`about content at 820`,
+   47.8 px).
+
+## 9. Code review and fixes
+
+The coordinator's review of the first run raised the findings below. Each is
+fixed in the same worktree and left uncommitted on `33d84b5`. Sections 1 to 8
+describe the first run; where a statement there described code that the review
+changed (the bar's focus rule, the source of `aria-current`, the no-Popover
+fallback), it is corrected in place.
+
+### Findings, fixes and tests
+
+| Finding | Fix | Test |
+| --- | --- | --- |
+| **Critical 1.** TanStack marked section links `aria-current="page"` (`includeHash`), overriding the chrome's marks, so `/preview#work` stayed active. | Chrome links are built with `useChromeLinkProps` (`lib/router/navigation.ts`), which sets `activeProps: {}`. `ProfileLink` (`components/profile/site/ProfileLink.tsx`) drops the router's `aria-current` and `data-status` and sets its own `aria-current` from `currentOf` (`lib/content/profileChrome.ts`), the only source. | `ProfileLink.test.tsx`: "drops the router's aria-current and data-status, and sets the chrome's own". `profileChrome.test.ts`: "currentOf, the only source of aria-current in the chrome". Browser: "only one link in the bar is marked, and it follows the section in view" (`Work:location`, then `About:location`). |
+| **Critical 2.** The phone menu and the Say hello panels could not reach their last control at 320 by 256 px or on a landscape phone. | `.pf-menu` is capped at `calc(100dvh - 102px)`, `.pf-say__panel` at `calc(100dvh - 104px)`, and the footer panel at `calc(100dvh - 48px)`, each with a `100vh` fallback. The panels scroll (`overflow-y: auto`, `overscroll-behavior: contain`). The footer panel uses `position-try-fallbacks: flip-block` where anchor positioning exists. `.pf-theme__input` covers its option, so a focused radio scrolls its whole label into view. All in `src/styles/profile/shell.css`. | `globals.test.ts`: "keeps the bar in view for keyboard focus only, and caps the popovers on short screens". Browser (desktop and webkit-phone, at 320 by 256): "the nav's Say hello scrolls inside the screen, and its last link can be reached", "the footer's Say hello scrolls inside the screen, and its last link can be reached", "the phone menu scrolls inside the screen, and its last theme radio can be reached". |
+| **Important 3.** The name link on Home, with a hash, did not return to the top. | `onBrand` in `components/profile/site/SiteNav.tsx` returns early for a non-primary button or a modifier key, so the browser keeps the click. Off Home the router follows the link. On Home it prevents the default: with a hash it replaces the entry with the bare path (`useReplaceNavigate`), and the router's scroll restoration takes the page to the top; without a hash it scrolls to the top, instantly under reduced motion. | `SiteNav.test.tsx`, "SiteNav, the name link" (four tests, including "leaves a modified click to the browser (a new tab), and does not prevent it"). Browser: "the name goes to the top, from a section and from the top itself". |
+| **Important 4.** The scrollspy chose a section by stale positions. | `topmostSection(order, visible)` in `components/profile/site/scrollspy.ts` returns the first visible section in page order. `useScrollspy` keeps the set of visible sections from the IntersectionObserver entries. | `useScrollspy.test.tsx`: "reports the topmost visible section in page order, not the one with the smaller stale position" (a fake observer delivers stale entries). `scrollspy.test.ts`. Browser: "the scrollspy hands over from Work to About as Work leaves the band, and back again" (at Work's bottom minus 150 and minus 200 px, and Work's top minus 300 px), and "a click on Journey moves the address to it, and marks it" (a hash click). |
+| **Important 5.** The no-Popover-API fallback was incomplete. | One state serves both paths (`components/profile/site/popover.ts`): `isPopoverOpen` reads `:popover-open`, or `data-open` without the API. `setFallbackOpen` sets `data-open` and dispatches the same `toggle` event with `newState`. `closePopover` closes either way. The hide-on-scroll check reads `isPopoverOpen`, so an open fallback panel keeps the bar in view. CSS: an `@supports not selector(:popover-open)` block hides both panels until `[data-open]`. The nav's Say hello panel sits beside the bar's row, not in it, so it does not inherit the row's opacity and blur. | `popover.test.tsx`: "usePopover, fallback branch (no Popover API)" (five tests: opens from its invoker; closes on Escape and returns focus; closes on an outside press and stays open for an inside press; `closePopover` with the same bookkeeping; a closed panel is left alone). `globals.test.ts` guards the `@supports` block. Not run in a browser (open item 8). |
+| **Important 6.** Browser tests could pass on broken code. | The anchor test waits for the scroll to settle (eight still frames) and checks the landing at 1440 and 820 px against the scroll margins (work 176, about -80, journey 0, within 3 px), then checks that each section's first content clears the bar. The keep-bar test waits for the scroll to settle and has a control: once Say hello closes, the same scroll hides the bar. Keyboard focus and mouse clicks have separate tests. | "each section lands where its scroll margin puts it, at 1440 and 820, and its content clears the bar" (see the result below). "the bar stays in view while Say hello is open, and hides again once it closes". "keyboard focus inside the bar keeps it in view while the page is scrolled down". "a mouse click on the theme toggle leaves the bar free to hide". |
+| **Minor.** `aria-expanded` was in the server HTML. | Invokers get `aria-expanded` and their names from script only (`usePopover`). The server HTML carries `popovertarget` and `aria-controls`. | `SayHello.test.tsx`: "is a button that names its popover, with no script state". `PhoneMenu.test.tsx`: "has a Menu button that controls the popover, and no script state". |
+| **Minor.** The "Close" label needed script. | `.pf-nav:has(#site-menu:popover-open)` shows "Close" and hides "Menu", with no script. | Browser: "links, Say hello and the phone menu work without script (phone)", which checks that `.pf-nav__menu-close` is visible and `.pf-nav__menu-open` hidden once the menu opens. |
+| **Minor.** Popovers stayed open across a route change, back and forward included. | `useCloseOnRouteChange(useLocationKey())` in `SiteNav.tsx`. The location key is the full `href`, so hash moves count. | Browser: "Say hello closes when the history moves, back or forward", and "Back closes the open menu, as the history moves". |
+| **Minor.** `BROWSER_ART` row 2 had 17 cells. | Row 2 has the same length as the others now. The drawings are in `components/profile/site/footerArt.ts`, which `SiteFooter.tsx` imports. | `footerArt.test.ts`: "footer drawings" (every row of a drawing has the same length, and every filled character has a tone). |
+| **Minor.** `sayHello.eyebrow` was not marked as a draft. | `// DRAFT` on the eyebrow in `lib/content/profileChrome.ts`, and listed in section 7. | Checked by reading the source; no test pins the marker. |
+| **Minor.** `:not(:focus-within)` let a mouse click pin the bar. | `:not(:has(:focus-visible))` in `shell.css`, so only keyboard focus keeps the bar in view. | `globals.test.ts` rejects `:not(:focus-within)` and requires `:not(:has(:focus-visible))`. Browser: the keyboard and mouse tests above. |
+
+Other changes made for the review:
+
+- **`lib/router/navigation.ts`:** adds `useLocationKey`, `useChromeLinkProps` and
+  `useReplaceNavigate`. Nothing existing changed: `usePathname` and `notFound`
+  are as before. The chrome needs the router's link behaviour (its href and its
+  click handling) without its active state, and a replace navigation for the name
+  link. The live link, `components/navigation/Link.tsx`, is not changed.
+- **`vitest.setup.ts`:** the global mock of `@/lib/router/navigation` gains the
+  three helpers (`useLocationKey` returns `"/"`, `useChromeLinkProps` returns
+  `{ href }`, `useReplaceNavigate` returns a no-op), so unit tests that render the
+  chrome need no router. The mock is test-only.
+- **`PhoneMenu`** no longer takes a `section` prop. The header has one section
+  mark, on the Primary links; the phone menu carries only the page mark.
+- **`popover.ts`:** `supportsPopover` is no longer exported (knip).
+- **`components/profile/preview/PreviewHome.tsx`** is not edited, as asked.
+
+### Results of this run
+
+Gates, on the final code:
+
+| Gate | Result |
+| --- | --- |
+| `pnpm typecheck` | pass |
+| `pnpm lint` (`--max-warnings=0`) | pass, 0 warnings |
+| `pnpm knip` | pass |
+| `pnpm test` | 133 files, 1292 tests pass |
+| `pnpm format:check` | pass |
+| `pnpm build` (once) | pass. The Sanity schema deploy is skipped because `SANITY_AUTH_TOKEN` is not set |
+| Playwright: `tests/e2e/profile` on `PORT=3101`, `--workers=1`, projects desktop, mobile, fold-closed, tablet-landscape and webkit-phone, `--grep-invert "matches its baseline"` | 77 passed, 2 failed, 161 skipped by project scope, in 3.0 minutes. The two failures are below |
+| Re-run of the test that failed on a test bug (desktop, `--grep "the name goes to the top"`, same port and workers) | passed |
+| Parity: `GATES_PORT=4271 node scripts/start-gates.mjs --parity-only` | 137 URLs compared, 0 with differences |
+
+The two failures of the full run:
+
+- **Expected: the About eyebrow at 820 px.** "each section lands where its scroll
+  margin puts it, at 1440 and 820" fails on one soft check, `about content at
+  820`, at 47.8 px. That is the eyebrow row above the heading, under the bar (the
+  bar's bottom is at 80 px). Everything else in the test passed: the landing
+  checks (About lands at -80 px at 820), the heading check, and every other
+  section at both widths. The cause is `PreviewHome.tsx` (open item 9), so the
+  test fails at 820 px until the lane owner's change lands.
+- **Fixed in the test: the name link.** This failure was in the test's helper,
+  not the chrome. The hash visit's smooth scroll was still moving when the bar was
+  revealed, so the bar hid again once the scroll ended; and a 10 px reveal is not
+  always enough, because the bar records a position only after a 6 px move
+  (`navAway`). The test now waits for the scroll to settle and reveals the bar
+  with a 24 px scroll. The re-run of that test alone passed.
+
+The other tests in the run passed, including the device matrix at six widths, the
+tap areas at 320 and 390 px, reduced motion, the JavaScript-off checks, and the
+`profile.spec.ts` checks on `/preview`.
+
+### Files changed
+
+All uncommitted on `33d84b5`. Code and tests: `components/profile/site/`
+(`PhoneMenu.tsx`, `PhoneMenu.test.tsx`, `SayHello.tsx`, `SayHello.test.tsx`,
+`SiteFooter.tsx`, `SiteNav.tsx`, `SiteNav.test.tsx`, `popover.ts`,
+`popover.test.tsx`, `scrollspy.ts`, `scrollspy.test.ts`, and the new
+`ProfileLink.tsx`, `ProfileLink.test.tsx`, `footerArt.ts`, `footerArt.test.ts`,
+`useScrollspy.test.tsx`); `lib/content/profileChrome.ts`,
+`lib/content/profileChrome.test.ts`, `lib/design/globals.test.ts`,
+`lib/router/navigation.ts`; `src/styles/profile/shell.css`;
+`tests/e2e/profile-shell.spec.ts`; `vitest.setup.ts`. This report.
