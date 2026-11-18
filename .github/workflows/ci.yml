@@ -207,6 +207,9 @@ jobs:
       # Profile redesign previews (/preview/*): the device matrix, an
       # iPhone-class WebKit phone and the best-practice checks.
       - name: Profile previews (device matrix, WebKit phone, best practices)
+        # Runs even when the screenshot step fails, so one run reports (and
+        # uploads) both sets of baselines.
+        if: ${{ !cancelled() }}
         env:
           CI: "true"
           PLAYWRIGHT_WEB_SERVER: pnpm start
