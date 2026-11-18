@@ -77,18 +77,24 @@
     color: var(--ink-80);
   }
 
-  /* All work: the filter, the count and the lift cards. */
-  .pf-work {
+  /* All work: the filter bar and the lift cards. The block is
+     pf-work-index, not pf-work: Home's article#work owns .pf-work
+     (home-work-about.css), and a second .pf-work rule reset its padding. */
+  .pf-work-index {
     padding-block: 24px 112px;
   }
-  .pf-work__bar {
+  /* The filter bar, shared by every page that filters a list: the row
+     (.pf-filter-bar, with its live count) and the segmented group
+     (.pf-filter, whose options are buttons with aria-pressed, or links with
+     aria-current where each option is a page). */
+  .pf-filter-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 12px 20px;
   }
-  .pf-work__filter {
+  .pf-filter {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
@@ -98,7 +104,7 @@
     background: var(--paper);
     box-shadow: var(--elev-ring);
   }
-  .pf-work__option {
+  .pf-filter__option {
     min-block-size: 44px;
     padding-inline: 16px;
     border: 1px solid transparent;
@@ -111,21 +117,21 @@
     white-space: nowrap;
     cursor: pointer;
   }
-  .pf-work__option[aria-pressed="true"] {
+  .pf-filter__option[aria-pressed="true"] {
     background: var(--ink);
     color: var(--paper);
   }
-  .pf-work__count {
+  .pf-filter-bar__count {
     color: var(--ink-60);
   }
-  .pf-work__grid {
+  .pf-work-index__grid {
     display: grid;
     gap: 56px 24px;
     margin: 32px 0 0;
     padding: 0;
     list-style: none;
   }
-  .pf-work__item {
+  .pf-work-index__item {
     display: flex;
     min-inline-size: 0;
   }
@@ -465,7 +471,7 @@
 
   /* Breakpoints (spec 4.1 and 10.1). */
   @media (min-width: 37.5rem) {
-    .pf-work__grid,
+    .pf-work-index__grid,
     .pf-about-page__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -480,7 +486,7 @@
       grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
       align-items: end;
     }
-    .pf-work__grid {
+    .pf-work-index__grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .pf-about-page__close {
@@ -501,19 +507,19 @@
   @media (prefers-contrast: more) {
     .pf-page-hero__eyebrow,
     .pf-page-hero__lead,
-    .pf-work__count,
-    .pf-work__option {
+    .pf-filter-bar__count,
+    .pf-filter__option {
       color: var(--ink);
     }
   }
   @media (forced-colors: active) {
-    .pf-work__filter,
+    .pf-filter,
     .pf-about-page__portrait,
     .pf-about-page__socials,
     .pf-contact__action {
       border-color: CanvasText;
     }
-    .pf-work__option[aria-pressed="true"] {
+    .pf-filter__option[aria-pressed="true"] {
       border-color: Highlight;
       outline: 2px solid Highlight;
     }

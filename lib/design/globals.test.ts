@@ -35,6 +35,24 @@ const profileSheets = [
   css: readFileSync(join(process.cwd(), path), "utf8"),
 }));
 
+/**
+ * The bare `.pf-` block selectors a sheet declares: a rule whose selector (or
+ * one of its comma parts) is the block class alone, with no element (`__`),
+ * modifier (`--`), state or combinator. Comments are dropped first.
+ */
+function bareBlocks(css: string): Set<string> {
+  const blocks = new Set<string>();
+  const plain = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const [, prelude] of plain.matchAll(/([^{};]+)\{/g)) {
+    if (prelude!.trim().startsWith("@")) continue;
+    for (const selector of prelude!.split(",")) {
+      const name = selector.trim();
+      if (/^\.pf-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name)) blocks.add(name);
+    }
+  }
+  return blocks;
+}
+
 /** The CSS with every `prefers-reduced-motion: no-preference` block removed. */
 function withoutNoPreference(css: string): string {
   let rest = css;
@@ -422,6 +440,31 @@ describe("profile stylesheet", () => {
         `Profile redesign, ${phase}`,
       );
     }
+  });
+
+  it("finds a sheet's bare block rules, and only those", () => {
+    // The guard below must see a bare block rule and ignore elements,
+    // modifiers, states and descendants, or a pass proves nothing.
+    const fixture =
+      ".pf-a, .pf-b-c { x: 1 } .pf-a__d { } .pf-a--e { } .pf-f:hover { } .pf-g .pf-h { } @media (width > 1px) { .pf-i { } }";
+    expect([...bareBlocks(fixture)].sort()).toEqual([
+      ".pf-a",
+      ".pf-b-c",
+      ".pf-i",
+    ]);
+  });
+
+  it("declares each bare .pf- block in one partial only, so pages never share a block", () => {
+    // Phase 6's All work page once reused Home's `.pf-work`: its later rule
+    // reset the padding of Home's article#work. A block's base rule belongs
+    // to one partial; another page names its own block.
+    const owners = new Map<string, string[]>();
+    for (const { path, css } of partials) {
+      for (const block of bareBlocks(css)) {
+        owners.set(block, [...(owners.get(block) ?? []), path]);
+      }
+    }
+    expect([...owners].filter(([, paths]) => paths.length > 1)).toEqual([]);
   });
 
   it("has no raw hex colour in any profile sheet: colour comes from tokens", () => {

@@ -24,8 +24,9 @@ import {
  * `?category=` search param: the prerendered page shows every project and
  * the filter applies after hydration. Each card is an article named by its
  * title whose only link is the call to action; the link's ::after covers the
- * card. Styles: `.pf-work*` in src/styles/profile/cutover.css, and the case
- * template's `.pf-lift*` in case.css.
+ * card. Styles: `.pf-work-index*`, `.pf-work-card*` and the shared filter bar
+ * (`.pf-filter-bar`, `.pf-filter`) in src/styles/profile/cutover.css, and
+ * the case template's `.pf-lift*` in case.css.
  */
 
 /** The filter: all projects, then each category in project order. */
@@ -110,12 +111,15 @@ export default function WorkIndexPage({
         lines={portfolioHeadline}
         lead={portfolioPage.description}
       />
-      <section aria-label={workIndexCopy.projects} className="ds-wrap pf-work">
-        <div className="pf-work__bar">
+      <section
+        aria-label={workIndexCopy.projects}
+        className="ds-wrap pf-work-index"
+      >
+        <div className="pf-filter-bar">
           <div
             role="group"
             aria-label={workIndexCopy.filter}
-            className="pf-work__filter"
+            className="pf-filter"
           >
             {filterOptions(projects).map((option) => (
               <button
@@ -123,19 +127,19 @@ export default function WorkIndexPage({
                 type="button"
                 aria-pressed={option.id === category}
                 onClick={() => onCategoryChange(option.id)}
-                className="pf-work__option"
+                className="pf-filter__option"
               >
                 {option.label}
               </button>
             ))}
           </div>
-          <p aria-live="polite" className="t-meta pf-work__count">
+          <p aria-live="polite" className="t-meta pf-filter-bar__count">
             {workIndexCopy.count(shown.length, projects.length)}
           </p>
         </div>
-        <ul className="pf-work__grid">
+        <ul className="pf-work-index__grid">
           {shown.map((project) => (
-            <li key={project.slug} className="pf-work__item">
+            <li key={project.slug} className="pf-work-index__item">
               <WorkCard project={project} />
             </li>
           ))}
