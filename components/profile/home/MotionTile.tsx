@@ -9,7 +9,8 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * control (WCAG 2.2.2), and like the marquee it moves only once the page has
  * hydrated and motion is allowed, which is when that control exists. The
  * server HTML, a page without JavaScript and reduced motion show the still,
- * gathered grid. Decorative: the blocks are hidden from assistive technology.
+ * gathered grid. Decorative: the blocks are hidden from assistive technology,
+ * and the caption, drawn as a chip, is the tile's h3 (WCAG 1.3.1).
  */
 
 /** The grid is 6 by 6. */
@@ -74,7 +75,7 @@ export function MotionTile({
           />
         ))}
       </div>
-      <span className="ds-chip pf-motion__caption">{caption}</span>
+      <h3 className="ds-chip pf-motion__caption">{caption}</h3>
       <div className="pf-motion__toggle">
         <MotionToggle playing={playing} onToggle={setPlaying} labels={labels} />
       </div>

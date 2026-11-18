@@ -8,14 +8,21 @@ import { getVentureBySlug } from "@/lib/content/ventures";
  * project's outcome in portfolio.ts or a venture's metric in ventures.ts, and
  * never typed. The tile draws a figure in pixel digits, so only a count can
  * stand there: a change ("from 4 to 1") or a dated total, which must carry its
- * month, is refused rather than shown without its words.
+ * month, is refused rather than shown without its words. The label keeps the
+ * source's own words, and the footnote names the cases the figures come from.
  */
 
 export interface AboutStat {
   /** The figure as its source states it, drawn in pixels and kept as text. */
   readonly figure: string;
-  /** What it counts, and where. */
+  /**
+   * What it counts, in its source's words: an outcome's label and unit
+   * ("Adoption: employees on TBH Intranet"), or a metric's label
+   * ("Merchants on GoGoCash").
+   */
   readonly label: string;
+  /** The case the figure comes from: its project's or its venture's name. */
+  readonly source: string;
 }
 
 /** A count the pixel digits can draw: digits, separators, then + or %. */
@@ -23,10 +30,6 @@ const COUNT = /^\d[\d,.]*[+%]?$/;
 
 /** An outcome's value as a count and its unit: "12+ teams". */
 const COUNT_AND_UNIT = /^(\d[\d,.]*[+%]?)\s+(\D+)$/;
-
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
 
 /** One figure of the tile, read from the place `source` names. */
 export function resolveStat(source: StatSource): AboutStat {
@@ -43,7 +46,8 @@ export function resolveStat(source: StatSource): AboutStat {
     }
     return {
       figure: parts[1]!,
-      label: `${capitalise(parts[2]!.trim())} on ${project.name}`,
+      label: `${outcome.label}: ${parts[2]!.trim()} on ${project.name}`,
+      source: project.name,
     };
   }
   const venture = getVentureBySlug(source.venture);
@@ -53,7 +57,11 @@ export function resolveStat(source: StatSource): AboutStat {
       `"${source.metric}" of "${source.venture}" is not an undated, cleared count.`,
     );
   }
-  return { figure: metric.value, label: `${metric.label} on ${venture.name}` };
+  return {
+    figure: metric.value,
+    label: `${metric.label} on ${venture.name}`,
+    source: venture.name,
+  };
 }
 
 /** The tile's figures, in the order `aboutCopy.stats.figures` gives them. */
@@ -61,4 +69,22 @@ export function aboutStats(
   sources: readonly StatSource[] = aboutCopy.stats.figures,
 ): AboutStat[] {
   return sources.map(resolveStat);
+}
+
+/**
+ * The footnote under the figures: the names of the cases they come from, in
+ * order and once each, inside the module's words, so it never names a case
+ * the tile does not draw from ("From the TBH Intranet and GoGoCash case
+ * studies.").
+ */
+export function statsFootnote(
+  stats: readonly AboutStat[],
+  words: { lead: string; one: string; many: string } = aboutCopy.stats.footnote,
+): string {
+  const names = [...new Set(stats.map((stat) => stat.source))];
+  if (names.length === 0) return "";
+  const last = names.at(-1)!;
+  const list =
+    names.length === 1 ? last : `${names.slice(0, -1).join(", ")} and ${last}`;
+  return `${words.lead} ${list} ${names.length === 1 ? words.one : words.many}`;
 }

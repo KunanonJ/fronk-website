@@ -9,21 +9,26 @@ import { getAllPortfolioProjects } from "@/lib/content/portfolio";
  * drawn small enough that its 10 to 18 unit labels would fall under 12 px
  * (the redesigned Home's stack cards, design spec 12 item 5).
  */
-const mockups = getAllPortfolioProjects().flatMap((project) =>
-  project.mockup ? [project.mockup] : [],
+const drawn = getAllPortfolioProjects().flatMap((project) =>
+  project.mockup ? [{ slug: project.slug, mockup: project.mockup }] : [],
 );
+const mockups = drawn.map((each) => each.mockup);
 
 describe("PortfolioMockup labels", () => {
   it("covers every kind of mockup the portfolio draws", () => {
     expect(new Set(mockups.map((mockup) => mockup.kind)).size).toBe(4);
   });
 
-  it("writes its labels by default, the same as asking for text", () => {
-    for (const mockup of mockups) {
+  it("draws every project's mockup by default exactly as the live pages always have (stored)", () => {
+    // The snapshots were written by the file before the label option
+    // (commit 29ad1d7), so a change to the live drawing fails here.
+    for (const { slug, mockup } of drawn) {
       const plain = renderToString(<PortfolioMockup mockup={mockup} />);
-      expect(plain).toContain("<text");
+      expect(plain, slug).toContain("<text");
+      expect(plain).toMatchSnapshot(slug);
       expect(
         renderToString(<PortfolioMockup mockup={mockup} labels="text" />),
+        slug,
       ).toBe(plain);
     }
   });

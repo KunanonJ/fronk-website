@@ -7,17 +7,22 @@ import type { AboutStat } from "@/lib/landing/aboutStats";
  * the dark violet wash with a dither field, up to three cleared figures in
  * pixel digits with mono labels, and a footnote that says where they come
  * from. The wash and its pixels are the same in both themes, so the white
- * text keeps 5.6:1 or more over any of them.
+ * text keeps 5.6:1 or more over any of them. Its h3 is for assistive
+ * technology only and names the list (WCAG 1.3.1).
  */
 
 /** Theme-invariant violets, so the white figures keep their contrast. */
 const SKY = ["--stats-1", "--stats-2"] as const;
 
+const TITLE_ID = "about-stats-title";
+
 export function StatsTile({
   stats,
+  heading,
   footnote,
 }: {
   stats: readonly AboutStat[];
+  heading: string;
   footnote: string;
 }) {
   return (
@@ -25,7 +30,10 @@ export function StatsTile({
       <div className="pf-stats__sky">
         <DitherField stops={SKY} fade="right" cell={12} seed={5} />
       </div>
-      <ul className="pf-stats">
+      <h3 id={TITLE_ID} className="sr-only">
+        {heading}
+      </h3>
+      <ul className="pf-stats" aria-labelledby={TITLE_ID}>
         {stats.map((stat) => (
           <li key={stat.label} className="pf-stats__item">
             <PixelNumber value={stat.figure} />

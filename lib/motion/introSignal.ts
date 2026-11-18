@@ -4,9 +4,11 @@ import { INTRO_SESSION_KEY } from "@/lib/content/introGreetings";
  * The greeting intro hands over to the redesigned hero (profile redesign,
  * design spec 5.6). On a first visit an inline script marks
  * `<html data-intro="pending">` before the hero paints, so the hero shows
- * still under the intro instead of playing its entrance there. IntroLoader
- * marks it "done" when its exit starts (skip included), and the entrance
- * plays under the fading overlay. Later visits never mark it pending.
+ * still under the intro instead of playing its entrance there. A visit made
+ * in the app runs no inline script, so IntroLoader marks it pending itself,
+ * before its first paint. IntroLoader marks it "done" when its exit starts
+ * (skip included), and the entrance plays under the fading overlay. Later
+ * visits never mark it pending.
  */
 
 const ATTRIBUTE = "data-intro";
@@ -17,6 +19,14 @@ const ATTRIBUTE = "data-intro";
  * storage counts as unseen in both.
  */
 export const INTRO_PENDING_SCRIPT = `(function(){var seen;try{seen=sessionStorage.getItem(${JSON.stringify(INTRO_SESSION_KEY)})}catch(e){}try{if(seen!=="1"&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.setAttribute(${JSON.stringify(ATTRIBUTE)},"pending")}}catch(e){}})()`;
+
+/**
+ * The intro is about to cover the page: IntroLoader's mark for a visit made
+ * in the app, where the inline script never runs.
+ */
+export function markIntroPending(): void {
+  document.documentElement.setAttribute(ATTRIBUTE, "pending");
+}
 
 /** The intro has ended, or is ending: the hero may move now. */
 export function markIntroDone(): void {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, type CSSProperties } from "react";
 import { SectionHeader } from "@/components/profile/home/SectionHeader";
 import { StackCard } from "@/components/profile/home/StackCard";
 import {
@@ -8,6 +8,7 @@ import {
 import { workCopy } from "@/lib/content/homeWorkAbout";
 import { stackCards } from "@/lib/landing/stackCards";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
+import { useAfterNavigation } from "@/lib/router/navigation";
 
 /*
  * The work stack (profile redesign Phase 3, design spec 8.4): an article
@@ -15,12 +16,16 @@ import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
  * list of case cards that stick under the nav, each 14 px lower than the one
  * before, so later cards slide over earlier ones.
  *
- * Two small scripts, both progressive: the page is complete without them.
+ * Small scripts, all progressive: the page is complete without them.
  * - Depth: on scroll, each card learns how far later cards cover it
  *   (`--depth`), and CSS scales it back and veils it. Not under reduced
  *   motion, where the cards still stack but never scale.
- * - Focus (WCAG 2.4.11): a link that takes focus inside a covered card
- *   scrolls the page until that card rests uncovered.
+ * - Focus (WCAG 2.4.11): once the browser has scrolled a keyboard-focused
+ *   card link into view, a link the next card covers, or one not wholly on
+ *   screen, scrolls the page until its card rests uncovered.
+ * - Anchors: a jump to #ventures (the GoGoCash card) lands where the list
+ *   says the card rests. The browser and the router measure a stuck card
+ *   where it is stuck, so from inside or below the stack they miss.
  * Stacking itself is CSS, and only on screens tall enough to show a whole
  * card below the nav (`.pf-stack__item` in home-work-about.css).
  */
@@ -28,7 +33,56 @@ import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 /** Each card sticks this much lower than the one before it (spec 8.4). */
 const STEP = 14;
 
+/** The card's id that /#ventures lands on (the GoGoCash card, umbrella R7). */
+const VENTURES = "ventures";
+
 const CARDS = stackCards();
+
+function itemsOf(list: HTMLElement): HTMLElement[] {
+  return [...list.children] as HTMLElement[];
+}
+
+/** True while the items stick; on short screens they simply follow each other. */
+function sticks(items: readonly HTMLElement[]): boolean {
+  return items.length > 0 && getComputedStyle(items[0]!).position === "sticky";
+}
+
+function behavior(): ScrollBehavior {
+  return prefersReducedMotion() ? "instant" : "smooth";
+}
+
+/** Scrolls the page until card `index` rests at its sticky top, uncovered. */
+function scrollToRest(
+  list: HTMLElement,
+  items: readonly HTMLElement[],
+  index: number,
+) {
+  const top = restingScrollTop({
+    listTop: list.getBoundingClientRect().top + window.scrollY,
+    // Fractional heights: offsetHeight rounds, and the error adds up.
+    heights: items.map((each) => each.getBoundingClientRect().height),
+    gap: parseFloat(getComputedStyle(list).rowGap) || 0,
+    index,
+    stickyTop: parseFloat(getComputedStyle(items[index]!).top) || 0,
+  });
+  window.scrollTo({ top, behavior: behavior() });
+}
+
+/** Lands the card carrying `id` where it rests, when the stack sticks. */
+function landOn(list: HTMLElement, id: string) {
+  const items = itemsOf(list);
+  const index = items.findIndex((item) => item.firstElementChild?.id === id);
+  if (index >= 0 && sticks(items)) scrollToRest(list, items, index);
+}
+
+/** Keyboard focus, not a click: only it calls for scrolling (WCAG 2.4.11). */
+function focusVisible(el: Element): boolean {
+  try {
+    return el.matches(":focus-visible");
+  } catch {
+    return true;
+  }
+}
 
 export default function WorkStack() {
   const listRef = useRef<HTMLUListElement>(null);
@@ -36,17 +90,15 @@ export default function WorkStack() {
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
-    const items = [...list.children] as HTMLElement[];
+    const items = itemsOf(list);
     const cards = items.map((item) => item.firstElementChild as HTMLElement);
-    const stuck = () =>
-      items.length > 0 && getComputedStyle(items[0]!).position === "sticky";
 
     let frame = 0;
     const update = () => {
       frame = 0;
       const box = list.getBoundingClientRect();
       if (box.bottom < 0 || box.top > window.innerHeight) return;
-      const depths = stuck()
+      const depths = sticks(items)
         ? stackDepths(
             items.map((item) => item.getBoundingClientRect()),
             STEP,
@@ -66,41 +118,73 @@ export default function WorkStack() {
       schedule();
     }
 
+    // The check waits a frame: focus events fire before the browser scrolls
+    // the focused link into view, and that scroll can leave it under the
+    // next card (or, while smooth, still on its way).
+    let focusFrame = 0;
     const onFocus = (event: FocusEvent) => {
-      const item = (event.target as Element).closest(".pf-stack__item");
-      const index = item ? items.indexOf(item as HTMLElement) : -1;
-      const next = items[index + 1];
-      if (index < 0 || !next || !stuck()) return;
-      // Covered when the next card has slid over this one's lower edge.
-      if (
-        next.getBoundingClientRect().top >=
-        items[index]!.getBoundingClientRect().bottom - 1
-      ) {
-        return;
-      }
-      const top = restingScrollTop({
-        listTop: list.getBoundingClientRect().top + window.scrollY,
-        // Fractional heights: offsetHeight rounds, and the error adds up.
-        heights: items.map((each) => each.getBoundingClientRect().height),
-        gap: parseFloat(getComputedStyle(list).rowGap) || 0,
-        index,
-        stickyTop: parseFloat(getComputedStyle(items[index]!).top) || 0,
-      });
-      window.scrollTo({
-        top,
-        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      const link = event.target as Element;
+      cancelAnimationFrame(focusFrame);
+      focusFrame = requestAnimationFrame(() => {
+        focusFrame = 0;
+        if (document.activeElement !== link || !focusVisible(link)) return;
+        const item = link.closest(".pf-stack__item");
+        const index = item ? items.indexOf(item as HTMLElement) : -1;
+        const next = items[index + 1];
+        if (index < 0 || !next || !sticks(items)) return;
+        const box = link.getBoundingClientRect();
+        // The bar's scroll padding is the top of the clear area.
+        const clear =
+          parseFloat(
+            getComputedStyle(document.documentElement).scrollPaddingTop,
+          ) || 0;
+        const covered =
+          // The next card has slid over this one's lower edge.
+          next.getBoundingClientRect().top <
+            items[index]!.getBoundingClientRect().bottom - 1 ||
+          // Or the link is not wholly on screen.
+          box.top < clear ||
+          box.bottom > window.innerHeight;
+        if (covered) scrollToRest(list, items, index);
       });
     };
     list.addEventListener("focusin", onFocus);
 
     return () => {
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(focusFrame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       list.removeEventListener("focusin", onFocus);
       for (const card of cards) card.style.removeProperty("--depth");
     };
   }, []);
+
+  // A page opened at /#ventures: the browser has jumped already, measured
+  // before the fonts settled (and in WebKit, smoothly, maybe not all the
+  // way), so the card is placed again once they have.
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list || window.location.hash !== `#${VENTURES}`) return;
+    let live = true;
+    const fonts = (document as { fonts?: FontFaceSet }).fonts;
+    void (fonts?.ready ?? Promise.resolve()).then(() => {
+      if (live && window.location.hash === `#${VENTURES}`) {
+        landOn(list, VENTURES);
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  // A navigation in the app to #ventures (a link, Back or Forward): the
+  // router has just scrolled to the card as it stands; place it again.
+  const onNavigated = useCallback((hash: string) => {
+    const list = listRef.current;
+    if (list && hash === VENTURES) landOn(list, VENTURES);
+  }, []);
+  useAfterNavigation(onNavigated);
 
   return (
     <article

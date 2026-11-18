@@ -3,7 +3,9 @@
  * @layer components, so Tailwind utilities still win; only the keyframes at
  * the end are outside it, as keyframes are not cascaded rules. Plain CSS with
  * tokens from globals.css. Breakpoints in rem: 23.125 (370 px), 37.5 (600),
- * 40 (640), 50.625 (810), 64 (1024), 73.75 (1180).
+ * 40 (640), 50.625 (810), 64 (1024), 73.75 (1180). Upper bounds use the
+ * range syntax, `(width < 50.625rem)`, so no fractional width falls between
+ * two queries.
  */
 
 @layer components {
@@ -59,7 +61,7 @@
     flex-direction: column;
     align-items: center;
   }
-  @media (max-width: 50.5625rem) {
+  @media (width < 50.625rem) {
     .pf-section-head__row {
       flex-direction: column;
       align-items: flex-start;
@@ -85,7 +87,10 @@
     /* /#ventures lands the GoGoCash card at its own sticky offset (the bar's
        96 px scroll padding plus 8 + 14 px per card), so it does not shift
        after the jump and the next card stays a gap below it. This replaces
-       shell.css's 0 (spec 4.3), which assumes a target that does not stick. */
+       shell.css's 0 (spec 4.3), which assumes a target that does not stick.
+       The browser measures a stuck card where it is stuck, so a jump from
+       inside or below the stack misses; WorkStack's script then scrolls to
+       the place the list gives. This margin is the page without script. */
     [data-design="profile"] .pf-stack #ventures {
       scroll-margin-top: calc(8px + 14px * var(--i, 0));
     }
@@ -160,8 +165,9 @@
   .pf-card__sky--tall {
     display: none;
   }
+  /* Not positioned: the link's ::after (`.ds-stretch`, z-index 1) then
+     covers the whole card, media included, not only this column. */
   .pf-card__body {
-    position: relative;
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -209,6 +215,12 @@
   .pf-card__link {
     align-self: flex-start;
     margin-block-start: auto;
+  }
+  /* Over the media's Illustration chip (z-index 2) too, so a press anywhere
+     on the card opens the case; the veil (::after of the card) still paints
+     over it, and lets presses through. */
+  .pf-card .pf-card__link::after {
+    z-index: 3;
   }
   .pf-card__media {
     position: relative;
@@ -298,7 +310,7 @@
   }
 
   /* Tablets, the open Fold and small laptops (spec 10.1). */
-  @media (min-width: 50.625rem) and (max-width: 73.6875rem) {
+  @media (50.625rem <= width < 73.75rem) {
     .pf-card {
       gap: 24px;
       min-block-size: min(72vh, 520px);
@@ -313,7 +325,7 @@
      beside a 40 px round arrow pill whose label stays for screen readers;
      chips and summary hidden; the evidence line and the Illustration chip
      stay; the dither over the top 70 %. */
-  @media (max-width: 50.5625rem) {
+  @media (width < 50.625rem) {
     .pf-card {
       grid-template-columns: minmax(0, 1fr);
       gap: 20px;
@@ -508,12 +520,12 @@
     font-size: clamp(1.75rem, 2vw + 0.75rem, 2.5rem);
     line-height: 1.05;
   }
-  @media (max-width: 50.5625rem) {
+  @media (width < 50.625rem) {
     .pf-mess {
       --spread: 0.4;
     }
   }
-  @media (max-width: 23.124rem) {
+  @media (width < 23.125rem) {
     .pf-mess {
       --spread: 0.25;
     }
@@ -627,7 +639,7 @@
   }
 
   /* Phones: the tiles take their content's height (spec 8.5). */
-  @media (max-width: 50.5625rem) {
+  @media (width < 50.625rem) {
     .ds-tile.pf-bento__stats {
       min-block-size: 0;
     }
@@ -737,6 +749,28 @@
     }
     .pf-principle:hover .pf-principle__art {
       animation: kj-pixel-nudge 0.6s var(--ease-back) both;
+    }
+  }
+
+  /* Print: the stack and the bento as the page lays them out, not as the
+     screen last showed them. After the motion rules, which these match in
+     specificity, so they win. */
+  @media print {
+    .pf-stack__item {
+      position: static;
+    }
+    .pf-card {
+      transform: none;
+    }
+    .pf-card::after {
+      opacity: 0;
+    }
+    .pf-mess[data-state] .pf-mess__chip {
+      translate: none;
+      rotate: none;
+    }
+    .pf-motion[data-running] .pf-motion__block {
+      animation: none;
     }
   }
 }

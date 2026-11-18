@@ -54,6 +54,61 @@ function only(projects: readonly string[]) {
   );
 }
 
+/**
+ * Resolves once the page has stopped scrolling: scrollY unchanged for
+ * `quiet` ms, read every frame.
+ */
+function scrollSettles(page: Page, quiet = 500): Promise<number> {
+  return page.evaluate(
+    (ms) =>
+      new Promise<number>((done) => {
+        let last = window.scrollY;
+        let since = performance.now();
+        const tick = () => {
+          if (window.scrollY !== last) {
+            last = window.scrollY;
+            since = performance.now();
+          }
+          if (performance.now() - since >= ms) done(last);
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+    quiet,
+  );
+}
+
+/**
+ * Where the focused element stands: its box, and whether its centre and
+ * edges are its own (nothing over them).
+ */
+function focusedView(page: Page) {
+  return page.evaluate(() => {
+    const el = document.activeElement as HTMLElement;
+    const box = el.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    const y = box.top + box.height / 2;
+    const covered = (
+      [
+        [x, y],
+        [box.left + 2, y],
+        [box.right - 2, y],
+        [x, box.top + 2],
+        [x, box.bottom - 2],
+      ] as const
+    ).filter(([px, py]) => {
+      const hit = document.elementFromPoint(px, py);
+      return !(hit && (hit === el || el.contains(hit)));
+    }).length;
+    return {
+      name: el.getAttribute("aria-label") ?? el.textContent?.trim() ?? "",
+      top: box.top,
+      bottom: box.bottom,
+      covered,
+    };
+  });
+}
+
 /** The CSS animation running on an element, or "none". */
 function animationOf(page: Page, selector: string) {
   return page
@@ -236,6 +291,36 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     expect(await animationOf(page, "h1")).toBe("none");
   });
 
+  test("a first visit made in the app (from another page) still waits, still, under the intro", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await prepare(page, { intro: true });
+    // A full load of another preview page: no intro there, and no inline
+    // script on the Home's hero runs in a visit made in the app.
+    await page.goto(`${HOME}/system`, { waitUntil: "networkidle" });
+    await expect(page.locator("html")).not.toHaveAttribute("data-intro", /.*/);
+    await page.getByRole("link", { name: "Kunanon Jarat, home" }).click();
+    await expect(page).toHaveURL(/\/preview$/);
+    const overlay = page.getByTestId("intro-overlay");
+    await expect(overlay).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("data-intro", "pending");
+    expect(await animationOf(page, ".pf-hero__chips")).toBe("none");
+    expect(await animationOf(page, ".pf-mock-wrap")).toBe("none");
+    // The cursor waits too. By the third greeting (1.44 s in) a tour that
+    // had started at once would have made its first stop (0.9 s).
+    // Read once, not polled: the tour itself ends on frame 0.
+    await expect(overlay).toContainText("Bonjour");
+    expect(
+      await page.locator(".pf-mock__cursor").getAttribute("data-frame"),
+    ).toBe("0");
+
+    await page.getByRole("button", { name: "Skip intro" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-intro", "done");
+    expect(await animationOf(page, ".pf-hero__chips")).toBe("kj-fade-up");
+  });
+
   test("on a later visit the entrance plays at once, and reduced motion has none", async ({
     page,
   }) => {
@@ -279,13 +364,38 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
         await expect(page.locator(".pf-mock__inspector")).toContainText(name);
       }
     }
-    // The inspector's button is for a pointer: not in the tab order.
-    await expect(page.locator(".pf-mock__open")).toHaveAttribute(
-      "tabindex",
-      "-1",
-    );
     const snapshot = await group.ariaSnapshot();
     expect(snapshot).not.toMatch(/Layers|Prototype|Kunanon|just now/);
+    // Nothing inside the hidden panels can take focus (Chrome warns when
+    // aria-hidden holds a focusable element).
+    const focusable = await page.evaluate(
+      () =>
+        [
+          ...document.querySelectorAll<HTMLElement>(
+            ".pf-mock [aria-hidden='true'] :is(a[href], button, input, select, textarea, [tabindex])",
+          ),
+        ].length,
+    );
+    expect(focusable).toBe(0);
+  });
+
+  test("the inspector's Open project is for a pointer: no link of its own, and a press opens the selected frame's case", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const open = page.locator(".pf-mock__open");
+    expect(await open.evaluate((el) => el.tagName)).toBe("SPAN");
+    const second = page.getByRole("link", {
+      name: `${FRAMES[1]}: open the case study`,
+    });
+    await second.hover();
+    await expect(second).toHaveAttribute("data-selected", "");
+    const href = await second.getAttribute("href");
+    await open.click();
+    await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 
   test("the named cursor tours once in under 5 s and rests on the first frame", async ({
@@ -315,14 +425,20 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
       });
     });
     await page.goto(HOME);
-    await page.waitForTimeout(6000);
-    const tour = await page.evaluate(
-      () =>
-        (window as unknown as { __tour: { frame: string; at: number }[] })
-          .__tour,
-    );
-    expect(tour.map((stop) => stop.frame)).toEqual(["2", "1", "0"]);
-    expect(tour.at(-1)!.at - tour[0]!.at).toBeLessThan(5000);
+    const tour = () =>
+      page.evaluate(
+        () =>
+          (window as unknown as { __tour: { frame: string; at: number }[] })
+            .__tour,
+      );
+    await expect
+      .poll(async () => (await tour()).length, { timeout: 10_000 })
+      .toBe(3);
+    const stops = await tour();
+    expect(stops.map((stop) => stop.frame)).toEqual(["2", "1", "0"]);
+    // From the first stop to the end of the last glide (0.9 s, the cursor's
+    // transition), all under the 5 s that would need a pause control.
+    expect(stops.at(-1)!.at - stops[0]!.at + 900).toBeLessThan(5000);
     await expect(
       page.getByRole("link", { name: `${FRAMES[0]}: open the case study` }),
     ).toHaveAttribute("data-selected", "");
@@ -516,6 +632,12 @@ test.describe("hero: the device matrix and the tap areas (spec 10.1, plan gates 
     const mock = await page.locator(".pf-mock-wrap").boundingBox();
     expect(copy!.x + copy!.width).toBeLessThanOrEqual(540);
     expect(mock!.x).toBeGreaterThanOrEqual(574);
+    // The logo strip keeps to the first screen: its centred label and its
+    // row never sit on the hinge.
+    for (const part of [".pf-logos", ".pf-logos__label"]) {
+      const box = (await page.locator(part).boundingBox())!;
+      expect(box.x + box.width, part).toBeLessThanOrEqual(540);
+    }
   });
 });
 
@@ -554,26 +676,75 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
     expect(work).toBeLessThan(1000);
   });
 
-  test("a control focused under the next section scrolls back into the clear (WCAG 2.4.11)", async ({
+  test("at 1024 x 768, Shift+Tab from the stack back onto a frame link leaves each stop in view and uncovered (WCAG 2.4.11)", async ({
     page,
   }) => {
     only(["desktop"]);
     await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1024, height: 768 });
     await prepare(page);
     await visit(page);
-    await page.evaluate(() => window.scrollTo(0, 700));
-    const toggle = page.locator(HERO).getByRole("button", { name: /motion/ });
-    await toggle.focus();
-    const clear = await toggle.evaluate((el) => {
-      const box = el.getBoundingClientRect();
-      const hit = document.elementFromPoint(
-        box.left + box.width / 2,
-        box.top + box.height / 2,
+    // The stage is taller than the screen and stuck under #work, which
+    // covers its lower part.
+    const height = (await page.locator(HERO).boundingBox())!.height;
+    expect(height).toBeGreaterThan(768);
+    await page.evaluate(
+      (y) => window.scrollTo({ top: y, behavior: "instant" }),
+      height - 768 + 400,
+    );
+    // The keyboard path starts on the first control after the hero, the
+    // first case card's link, and walks back into the hero. (A click on a
+    // heading would focus <main>, the skip link's target.)
+    await page.locator(".pf-card__link").first().focus();
+    await scrollSettles(page);
+    const stops: string[] = [];
+    for (let presses = 0; presses < 12; presses += 1) {
+      await page.keyboard.press("Shift+Tab");
+      await scrollSettles(page);
+      const view = await focusedView(page);
+      stops.push(view.name);
+      expect(view.covered, `${view.name} covered`).toBe(0);
+      expect(view.top, `${view.name} under the bar`).toBeGreaterThanOrEqual(80);
+      expect(view.bottom, `${view.name} below the screen`).toBeLessThanOrEqual(
+        768,
       );
-      return el.contains(hit);
-    });
-    expect(clear).toBe(true);
+      if (view.name.endsWith(": open the case study")) break;
+    }
+    expect(stops.at(-1)).toBe(`${FRAMES[2]}: open the case study`);
+  });
+
+  test("at 1024 x 768, Tab from above into Contact me leaves it in view and uncovered (WCAG 2.4.11)", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await prepare(page);
+    await visit(page);
+    // Scrolled down until the stage is stuck and #work covers part of it;
+    // the bar's own links come before the hero in the tab order.
+    const height = (await page.locator(HERO).boundingBox())!.height;
+    await page.evaluate(
+      (y) => window.scrollTo({ top: y, behavior: "instant" }),
+      height - 768 + 400,
+    );
+    const contact = page
+      .locator(HERO)
+      .getByRole("link", { name: "Contact me", exact: true });
+    await page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "Journey", exact: true })
+      .focus();
+    for (let presses = 0; presses < 12; presses += 1) {
+      await page.keyboard.press("Tab");
+      if (await contact.evaluate((el) => el === document.activeElement)) break;
+    }
+    await expect(contact).toBeFocused();
+    await scrollSettles(page);
+    const view = await focusedView(page);
+    expect(view.covered, "Contact me covered").toBe(0);
+    expect(view.top, "Contact me under the bar").toBeGreaterThanOrEqual(80);
+    expect(view.bottom, "Contact me below the screen").toBeLessThanOrEqual(768);
   });
 });
 
@@ -606,6 +777,40 @@ test.describe("hero: forced colours (spec 12 item 26)", () => {
         .map((el) => el.className),
     );
     expect(edgeless).toEqual([]);
+  });
+
+  test("on a phone the pager's dots stay drawn, the current one in Highlight", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({
+      forcedColors: "active",
+      reducedMotion: "reduce",
+    });
+    await prepare(page);
+    await visit(page);
+    const dots = await page.evaluate(() =>
+      [...document.querySelectorAll(".pf-mock__dot")].map((dot) => {
+        const mark = getComputedStyle(dot.querySelector("span")!);
+        return {
+          current: dot.getAttribute("aria-current") === "true",
+          adjust: mark.getPropertyValue("forced-color-adjust"),
+          background: mark.backgroundColor,
+        };
+      }),
+    );
+    expect(dots).toHaveLength(3);
+    const transparent = /^(transparent|rgba\(0, 0, 0, 0\))$/;
+    for (const dot of dots) {
+      expect(dot.adjust).toBe("none");
+      expect(dot.background).not.toMatch(transparent);
+    }
+    const [current] = dots.filter((dot) => dot.current);
+    const others = dots.filter((dot) => !dot.current);
+    expect(current).toBeDefined();
+    for (const other of others)
+      expect(other.background).not.toBe(current!.background);
   });
 });
 

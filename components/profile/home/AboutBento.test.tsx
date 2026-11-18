@@ -10,7 +10,7 @@ import {
 } from "@/components/profile/home/PrincipleTile";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
-import { aboutStats } from "@/lib/landing/aboutStats";
+import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
 
 /*
  * The About bento (design spec 8.5): the story, the mess tile, the stats as
@@ -90,7 +90,35 @@ describe("AboutBento", () => {
         "true",
       );
     });
-    expect(container).toHaveTextContent(aboutCopy.stats.footnote);
+    expect(container).toHaveTextContent(statsFootnote(stats));
+  });
+
+  it("starts every tile with an h3, and names the stats list (WCAG 1.3.1)", () => {
+    const { container } = render(<AboutBento />);
+    const tiles = [...container.querySelectorAll(".pf-bento__tile")];
+    expect(tiles).toHaveLength(8);
+    for (const tile of tiles) {
+      const heading = tile.querySelector("h3");
+      expect(heading, tile.className).not.toBeNull();
+      expect(heading!.textContent!.trim(), tile.className).not.toBe("");
+    }
+    // "In short" is its tile's h3, drawn in the meta style.
+    const brief = screen.getByRole("heading", {
+      level: 3,
+      name: aboutCopy.briefLabel,
+    });
+    expect(brief).toHaveClass("t-meta");
+    // The motion tile's caption chip is its h3.
+    expect(
+      screen.getByRole("heading", { level: 3, name: aboutCopy.motion.caption }),
+    ).toHaveClass("ds-chip");
+    for (const heading of [aboutCopy.mess.heading, aboutCopy.stats.heading])
+      expect(
+        screen.getByRole("heading", { level: 3, name: heading }),
+      ).toHaveClass("sr-only");
+    expect(
+      screen.getByRole("list", { name: aboutCopy.stats.heading }),
+    ).toHaveClass("pf-stats");
   });
 
   it("lists the four principles as /about prints them, each with an icon", () => {
@@ -108,7 +136,11 @@ describe("AboutBento", () => {
 describe("MessTile", () => {
   it("renders the tidy list on the server, which is what stays without script", () => {
     const html = renderToString(
-      <MessTile chips={aboutCopy.mess.chips} line={aboutCopy.mess.line} />,
+      <MessTile
+        heading={aboutCopy.mess.heading}
+        chips={aboutCopy.mess.chips}
+        line={aboutCopy.mess.line}
+      />,
     );
     expect(html).toContain('data-state="tidy"');
     for (const chip of aboutCopy.mess.chips) expect(html).toContain(chip);
@@ -119,7 +151,11 @@ describe("MessTile", () => {
   it("stays tidy under reduced motion", () => {
     stubMotion(true);
     const { container } = render(
-      <MessTile chips={aboutCopy.mess.chips} line={aboutCopy.mess.line} />,
+      <MessTile
+        heading={aboutCopy.mess.heading}
+        chips={aboutCopy.mess.chips}
+        line={aboutCopy.mess.line}
+      />,
     );
     expect(container.querySelector(".pf-mess")).toHaveAttribute(
       "data-state",

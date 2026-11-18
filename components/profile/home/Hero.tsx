@@ -23,7 +23,9 @@ import { homeHero } from "@/lib/content/home";
  * the two buttons, the canvas mock, and the logo strip. From 810 px the stage
  * is sticky and the sections after it slide over it; it scrolls with the
  * page until its last line is in view, so nothing in it is ever out of
- * reach. The recruiter facts (the h1, "Open to roles", Contact me, Résumé)
+ * reach, and keyboard focus inside it unsticks it (home-hero.css), so the
+ * browser scrolls a focused control into view where it really is (WCAG
+ * 2.4.11). The recruiter facts (the h1, "Open to roles", Contact me, Résumé)
  * are at the top of the copy, above the fold at 375 x 812 and 1440 x 900.
  */
 
@@ -42,18 +44,17 @@ function useStageHeight(stage: RefObject<HTMLElement | null>) {
 }
 
 /**
- * A control focused while the next section covers the stuck stage scrolls
- * the page back until it is clear (WCAG 2.4.11).
+ * Focus that holds the headline still: keyboard focus (`:focus-visible`),
+ * so a reader moving through the hero is not chased by a changing line, but
+ * not on the motion toggle, whose own state says whether things move. A
+ * mouse click leaves focus on what it pressed, which holds nothing.
  */
-function keepClear(stage: HTMLElement, target: Element) {
-  const next = stage.nextElementSibling;
-  if (!next) return;
-  const covered =
-    target.getBoundingClientRect().bottom -
-    next.getBoundingClientRect().top +
-    16;
-  if (covered > 16) {
-    window.scrollBy({ top: -covered, behavior: "instant" });
+export function holdsHeadline(el: Element): boolean {
+  if (el.closest(".ds-motion-toggle")) return false;
+  try {
+    return el.matches(":focus-visible");
+  } catch {
+    return true;
   }
 }
 
@@ -65,8 +66,7 @@ export default function Hero() {
   useStageHeight(stage);
 
   const onFocus = (event: FocusEvent<HTMLElement>) => {
-    setFocusInside(true);
-    if (stage.current) keepClear(stage.current, event.target);
+    setFocusInside(holdsHeadline(event.target));
   };
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
@@ -104,7 +104,7 @@ export default function Hero() {
             </Pill>
           </div>
         </div>
-        <CanvasMock ready={ready} />
+        <CanvasMock ready={ready} paused={!playing} />
       </div>
       <LogoStrip playing={playing} onPlayingChange={setPlaying} />
     </section>

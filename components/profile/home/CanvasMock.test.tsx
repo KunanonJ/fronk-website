@@ -79,10 +79,16 @@ describe("CanvasMock", () => {
         "true",
       );
     }
-    // The inspector's button is a pointer's shortcut, out of the tab order.
+    // Nothing in the hidden parts takes focus: the inspector's button is a
+    // pointer's shortcut, a span with no link of its own.
     expect(
-      inspector(container).querySelector("a.pf-mock__open"),
-    ).toHaveAttribute("tabindex", "-1");
+      container.querySelectorAll(
+        "[aria-hidden='true'] :is(a[href], button, input, [tabindex])",
+      ),
+    ).toHaveLength(0);
+    expect(inspector(container).querySelector(".pf-mock__open")?.tagName).toBe(
+      "SPAN",
+    );
   });
 
   it("labels drawn screens as illustrations, and a real screenshot as nothing", () => {
@@ -116,9 +122,11 @@ describe("CanvasMock", () => {
     expect(first).not.toHaveAttribute("data-selected");
     expect(inspector(container)).toHaveTextContent(FRAMES[1]!.category);
     expect(inspector(container)).toHaveTextContent(FRAMES[1]!.period);
-    expect(
-      inspector(container).querySelector("a.pf-mock__open"),
-    ).toHaveAttribute("href", FRAMES[1]!.href);
+    // The inspector's button presses the selected frame's own link.
+    const opened = vi.fn((event: MouseEvent) => event.preventDefault());
+    second!.addEventListener("click", opened);
+    fireEvent.click(inspector(container).querySelector(".pf-mock__open")!);
+    expect(opened).toHaveBeenCalledTimes(1);
 
     fireEvent.focus(third!);
     expect(third).toHaveAttribute("data-selected");
@@ -173,6 +181,20 @@ describe("CanvasMock", () => {
       "0",
     );
     expect(screen.getAllByRole("link")[1]).toHaveAttribute("data-selected");
+  });
+
+  it("ends the tour for good when the hero's motion toggle pauses, as a pick does", () => {
+    const { container, rerender } = render(<CanvasMock ready />);
+    const cursor = () =>
+      container.querySelector(".pf-mock__cursor")!.getAttribute("data-frame");
+    advance(900);
+    expect(cursor()).toBe("2");
+    rerender(<CanvasMock ready paused />);
+    advance(5000);
+    expect(cursor()).toBe("2");
+    rerender(<CanvasMock ready paused={false} />);
+    advance(5000);
+    expect(cursor()).toBe("2");
   });
 
   it("turns the phone row with a pager whose buttons name their frame", () => {

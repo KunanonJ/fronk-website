@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { ScriptOnce } from "@tanstack/react-router";
 import {
   INTRO_PENDING_SCRIPT,
   introPending,
@@ -7,20 +8,16 @@ import {
 
 /*
  * The hero's side of the intro hand-over (design spec 5.6). The script goes
- * first in the hero's server HTML, so it runs before any of the hero paints;
- * it removes itself once it has run, and the client renders nothing in its
- * place, so hydration finds what it expects. Scripts that render on the
- * client never run, so a client-side visit plays the entrance at once.
+ * first in the hero's server HTML, so it runs before any of the hero paints.
+ * TanStack's ScriptOnce writes it on the server only, with the router's CSP
+ * nonce when one is set (`ssr.nonce`), and appends
+ * `;document.currentScript.remove()`, so hydration finds nothing in its
+ * place. Scripts that render on the client never run; IntroLoader marks a
+ * visit made in the app itself (lib/motion/introSignal.ts). The script's
+ * sha256 is pinned in Hero.ssr.test.ts for Phase 8's Content Security Policy.
  */
 export function IntroPendingScript() {
-  if (typeof window !== "undefined") return null;
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `${INTRO_PENDING_SCRIPT};document.currentScript&&document.currentScript.remove()`,
-      }}
-    />
-  );
+  return <ScriptOnce>{INTRO_PENDING_SCRIPT}</ScriptOnce>;
 }
 
 /**

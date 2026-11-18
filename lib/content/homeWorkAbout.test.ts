@@ -44,17 +44,20 @@ describe("homeWorkAbout", () => {
   });
 
   it("types no figure: the stats and evidence are read where they are cleared", () => {
-    const own = {
-      ...workCopy,
-      ...aboutCopy,
-      brief: undefined,
-      principles: undefined,
-    };
-    expect(JSON.stringify(own)).not.toMatch(/\d/);
+    // Each object on its own: spread together, aboutCopy's heading and lead
+    // would replace workCopy's, which would then go unchecked.
+    const { brief: _brief, principles: _principles, ...about } = aboutCopy;
+    // The story and the principles are /about's, held by its own tests.
+    for (const [name, copy] of [
+      ["workCopy", workCopy],
+      ["aboutCopy", about],
+    ] as const) {
+      expect(JSON.stringify(copy), name).not.toMatch(/\d/);
+    }
   });
 
   it("writes its drafts plainly: no em dash, no emoji, sentence case", () => {
-    const drafts = [
+    const sentences = [
       workCopy.heading,
       workCopy.lead,
       workCopy.cta,
@@ -64,17 +67,24 @@ describe("homeWorkAbout", () => {
       aboutCopy.heading,
       aboutCopy.lead,
       aboutCopy.briefLabel,
+      aboutCopy.mess.heading,
       ...aboutCopy.mess.chips,
       aboutCopy.mess.line,
-      aboutCopy.stats.footnote,
+      aboutCopy.stats.heading,
+      aboutCopy.stats.footnote.lead,
       aboutCopy.motion.caption,
       aboutCopy.motion.pause,
       aboutCopy.motion.play,
     ];
-    for (const line of drafts) {
+    // The footnote's endings follow a case's name, so they start lower case.
+    const endings = [
+      aboutCopy.stats.footnote.one,
+      aboutCopy.stats.footnote.many,
+    ];
+    for (const line of [...sentences, ...endings])
       expect(line, line).not.toMatch(/[—–]|\p{Extended_Pictographic}/u);
+    for (const line of sentences)
       expect(line[0], line).toBe(line[0]!.toUpperCase());
-    }
     expect(aboutCopy.mess.chips).toHaveLength(5);
   });
 });

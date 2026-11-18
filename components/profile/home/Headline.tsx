@@ -15,9 +15,10 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * server renders the whole sentence, still, so the h1 reads as the live
  * Home's does and the LCP element never fades. With two or more phrases and
  * motion allowed, the line swaps every 4.2 s: the old line blurs away
- * (`kj-line-out`) and the new words stamp in (`kj-word-*`). Both lines are
- * hidden from assistive technology; the h1's name is the full sentence,
- * whatever phrase shows.
+ * (`kj-line-out`) and is removed when that ends, and the new words stamp in
+ * (`kj-word-*`). Both lines are hidden from assistive technology; the h1's
+ * name is the full sentence, whatever phrase shows. Its text is only what
+ * shows: the sizers draw their phrase from an attribute, in CSS.
  */
 
 /** A phrase as words, numbered on from line 1's for the stamp's stagger. */
@@ -55,6 +56,8 @@ export function Headline({
   const rotating = !reduced && phrases.length > 1;
   const title = useRef<HTMLHeadingElement>(null);
   const [turn, setTurn] = useState({ index: 0, swaps: 0 });
+  /** The last swap whose leaving line has finished its animation. */
+  const [gone, setGone] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [offscreen, setOffscreen] = useState(false);
   const hidden = useSyncExternalStore(
@@ -90,8 +93,12 @@ export function Headline({
 
   const count = phrases.length;
   const current = phrases[turn.index] ?? phrases[0] ?? "";
+  // The line leaving, until its blur ends (never under reduced motion, where
+  // nothing would end it).
   const previous =
-    turn.swaps > 0 ? (phrases[(turn.index - 1 + count) % count] ?? "") : null;
+    rotating && turn.swaps > gone
+      ? (phrases[(turn.index - 1 + count) % count] ?? "")
+      : null;
 
   return (
     <h1
@@ -110,16 +117,27 @@ export function Headline({
         onPointerLeave={() => setHovered(false)}
       >
         {/* Every phrase, unseen, in the same cell: the line keeps the height
-            of the longest, so nothing below it moves on a swap. */}
-        {rotating
+            of the longest, so nothing below it moves on a swap. On the
+            server too, and whatever the motion setting, so the line never
+            grows after hydration. Drawn by CSS from data-text, so the h1's
+            text stays what shows (for copying, and for crawlers that run
+            script). */}
+        {phrases.length > 1
           ? phrases.map((phrase) => (
-              <span key={`size-${phrase}`} className="pf-hero__sizer">
-                {phrase}
-              </span>
+              <span
+                key={`size-${phrase}`}
+                className="pf-hero__sizer"
+                aria-hidden="true"
+                data-text={phrase}
+              />
             ))
           : null}
         {previous !== null ? (
-          <span key={`out-${turn.swaps}`} className="pf-hero__out">
+          <span
+            key={`out-${turn.swaps}`}
+            className="pf-hero__out"
+            onAnimationEnd={() => setGone(turn.swaps)}
+          >
             {previous}
           </span>
         ) : null}

@@ -10,13 +10,16 @@ import {
 } from "@/lib/content/portfolio";
 import { PROFILE_BASE } from "@/lib/content/profileChrome";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
-import { getAllVentureSlugs, getVentureBySlug } from "@/lib/content/ventures";
+import { getVentureBySlug } from "@/lib/content/ventures";
 
 /*
  * Copy of the redesigned Home's top (profile redesign, Phase 2; design spec
- * 8.1 to 8.3 and 15.2): the hero, its canvas mock and the logo strip. Every
- * line is read from the site's cleared content; the few interface labels of
- * the mock (Layers, Design, Share) are generic. Nothing here holds a figure.
+ * 8.1 to 8.3 and 15.2): the hero, its canvas mock and the logo strip. The
+ * hero's own lines are read from the site's cleared content. Lines marked
+ * DRAFT (the strip's eyebrow, the mock's interface labels and the link and
+ * pager wording) wait for the owner's approval, as profileChrome.ts marks
+ * its own, and are not final copy until he gives it. Nothing here holds a
+ * figure.
  */
 
 /** Line 1 of the h1, which never moves: "Hi, I’m Kunanon Jarat." */
@@ -57,8 +60,15 @@ const EMPLOYER_SECTIONS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * The ventures R6 names for the strip, by slug: GoGoCash and Manut AI. A
+ * venture added to ventures.ts later does not join the strip until the
+ * owner adds it here.
+ */
+const STRIP_VENTURES = ["gogocash", "manut"] as const;
+
+/**
  * The logo strip (spec 8.3, umbrella input R6): every employer in the résumé,
- * then the two ventures, as typographic wordmarks until the owner supplies
+ * then R6's two ventures, as typographic wordmarks until the owner supplies
  * SVG ones. Read from the résumé and the ventures, so the strip never names
  * an organisation the site does not already list.
  */
@@ -66,14 +76,16 @@ function logoNames(): readonly string[] {
   const employers = RESUME_TIMELINE_FALLBACK.filter((section) =>
     EMPLOYER_SECTIONS.has(section.title),
   ).flatMap((section) => section.items.map((item) => item.logoName ?? ""));
-  const ventures = getAllVentureSlugs().map(
-    (slug) => getVentureBySlug(slug)?.name ?? "",
-  );
+  const ventures = STRIP_VENTURES.map((slug) => {
+    const venture = getVentureBySlug(slug);
+    if (!venture) throw new Error(`The strip's venture "${slug}" is missing.`);
+    return venture.name;
+  });
   return [...new Set([...employers, ...ventures])].filter(Boolean);
 }
 
 export const logoStrip = {
-  label: "Where I’ve worked",
+  label: "Where I’ve worked", // DRAFT (R6: the strip's eyebrow)
   names: logoNames(),
 } as const;
 
@@ -109,19 +121,20 @@ export function caseHref(kind: "portfolio" | "ventures", slug: string): string {
 /** The canvas mock (spec 8.2, owner decision 3): the three featured projects. */
 export const canvasMock = {
   /** The group that holds the frame links. */
-  label: "Featured projects",
+  label: "Featured projects", // DRAFT
   breadcrumb: { owner: firstName, file: portfolioPage.title },
-  share: "Share",
-  layersTabs: ["Layers", "Assets"],
+  share: "Share", // DRAFT
+  layersTabs: ["Layers", "Assets"], // DRAFT
   layersGroup: portfolioPage.title,
-  inspectorTabs: ["Design", "Prototype"],
-  area: "Area",
-  period: "Period",
-  open: "Open project",
+  inspectorTabs: ["Design", "Prototype"], // DRAFT
+  area: "Area", // DRAFT
+  period: "Period", // DRAFT
+  open: "Open project", // DRAFT
+  /** On every code-drawn picture (owner decision 4 of 18-11-26). */
   illustration: "Illustration",
   comment: {
     initial: firstName.charAt(0),
-    who: `${firstName} · just now`,
+    who: `${firstName} · just now`, // DRAFT
     line: commentLine,
   },
   cursor: firstName,
@@ -135,10 +148,10 @@ export const canvasMock = {
     mockup: project.mockup?.kind,
   })),
   /** A frame link's name: its visible label first (WCAG 2.5.3). */
-  frameName: (name: string) => `${name}: open the case study`,
+  frameName: (name: string) => `${name}: open the case study`, // DRAFT
   /** A pager button's name, on phones. */
-  showName: (name: string) => `Show ${name}`,
+  showName: (name: string) => `Show ${name}`, // DRAFT
   /** What the pager says once a reader turns to a frame. */
   shown: (name: string, index: number, count: number) =>
-    `${name}, ${index + 1} of ${count}`,
+    `${name}, ${index + 1} of ${count}`, // DRAFT
 } as const;

@@ -6,7 +6,7 @@ import {
   getTopicPillar,
 } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
-import { aboutStats } from "@/lib/landing/aboutStats";
+import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
 import { stackCards } from "@/lib/landing/stackCards";
 import { siteSources } from "@/tests/siteSources";
 
@@ -278,6 +278,41 @@ describe("the redesigned Home's work stack and stats", () => {
       );
       expect(outcome || metric, figure).toBe(true);
     }
+  });
+
+  it("labels each figure in its source's own words, and the footnote names exactly the cases they come from", () => {
+    const stats = aboutStats();
+    for (const stat of stats) {
+      const project = projects.find((each) => each.name === stat.source);
+      const venture = getAllVentures().find(
+        (each) => each.name === stat.source,
+      );
+      // An outcome keeps its label and its unit ("Adoption: employees");
+      // a metric keeps its label ("Registered users").
+      const words = project
+        ? (project.outcomes ?? [])
+            .filter((item) => item.value.startsWith(`${stat.figure} `))
+            .map(
+              (item) =>
+                `${item.label}: ${item.value.slice(stat.figure.length + 1)}`,
+            )
+        : (venture?.metrics ?? [])
+            .filter((item) => item.value === stat.figure)
+            .map((item) => item.label);
+      expect(words, stat.label).not.toEqual([]);
+      expect(
+        words.map((each) => `${each} on ${stat.source}`),
+        stat.label,
+      ).toContain(stat.label);
+    }
+    const footnote = statsFootnote(stats);
+    const cases = new Set(stats.map((stat) => stat.source));
+    for (const name of cases) expect(footnote, name).toContain(name);
+    const others = [
+      ...projects.map((each) => each.name),
+      ...getAllVentures().map((each) => each.name),
+    ].filter((name) => !cases.has(name));
+    for (const name of others) expect(footnote, name).not.toContain(name);
   });
 });
 

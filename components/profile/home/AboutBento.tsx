@@ -6,17 +6,19 @@ import { StatsTile } from "@/components/profile/home/StatsTile";
 import Link from "@/components/navigation/Link";
 import type { AboutInline } from "@/lib/content/aboutPage";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
-import { aboutStats } from "@/lib/landing/aboutStats";
+import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
 
 /*
  * The About bento (profile redesign Phase 3, design spec 8.5 and 10.1): a
  * section named "About" by its eyebrow, then a grid of tiles. One column
  * under 600 px; two from 600 (the wide tiles full width, the principles two
  * by two); twelve from 810 with every tile at span 6; and from 1024 the
- * spans 7 + 5, 7 + 5 and 3 + 3 + 3 + 3 (home-work-about.css).
+ * spans 7 + 5, 7 + 5 and 3 + 3 + 3 + 3 (home-work-about.css). Every tile
+ * starts with an h3, shown or for assistive technology only (WCAG 1.3.1).
  */
 
 const STATS = aboutStats();
+const STATS_FOOTNOTE = statsFootnote(STATS);
 
 /**
  * A link inside the story's sentences. The new-tab note sits in the visually
@@ -48,7 +50,7 @@ function StoryLink({ span }: { span: Extract<AboutInline, { type: "link" }> }) {
 function BriefTile() {
   return (
     <div className="ds-tile pf-bento__tile pf-bento__brief">
-      <p className="t-meta pf-tile__label">{aboutCopy.briefLabel}</p>
+      <h3 className="t-meta pf-tile__label">{aboutCopy.briefLabel}</h3>
       <div className="t-lead pf-brief">
         {aboutCopy.brief.map((paragraph, index) => (
           <p key={index}>
@@ -83,8 +85,16 @@ export default function AboutBento() {
       />
       <div className="pf-bento">
         <BriefTile />
-        <MessTile chips={aboutCopy.mess.chips} line={aboutCopy.mess.line} />
-        <StatsTile stats={STATS} footnote={aboutCopy.stats.footnote} />
+        <MessTile
+          heading={aboutCopy.mess.heading}
+          chips={aboutCopy.mess.chips}
+          line={aboutCopy.mess.line}
+        />
+        <StatsTile
+          stats={STATS}
+          heading={aboutCopy.stats.heading}
+          footnote={STATS_FOOTNOTE}
+        />
         <MotionTile
           caption={aboutCopy.motion.caption}
           labels={{

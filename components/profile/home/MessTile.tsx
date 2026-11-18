@@ -13,7 +13,8 @@ import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
  * is scattered (`data-state="mess"`) until it is in view; one already on
  * screen stays tidy, so nothing jumps under the reader's eyes. The scattered
  * look lives in CSS under prefers-reduced-motion: no-preference, and each
- * chip's offset is clamped to the tile (home-work-about.css).
+ * chip's offset is clamped to the tile (home-work-about.css). Its h3 is for
+ * assistive technology only (WCAG 1.3.1).
  */
 
 /** Each chip's scatter: px right, px down, degrees. The CSS scales x down on phones. */
@@ -29,9 +30,11 @@ const SCATTER = [
 const STAGGER = 0.08;
 
 export function MessTile({
+  heading,
   chips,
   line,
 }: {
+  heading: string;
   chips: readonly string[];
   line: string;
 }) {
@@ -71,6 +74,7 @@ export function MessTile({
 
   return (
     <div className="ds-tile ds-tile--tint pf-bento__tile pf-bento__mess">
+      <h3 className="sr-only">{heading}</h3>
       <ul ref={listRef} className="pf-mess" data-state="tidy">
         {chips.map((chip, index) => {
           const scatter = SCATTER[index % SCATTER.length]!;

@@ -47,12 +47,22 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** The server's HTML (our own render, never page input) as a document body. */
+function parse(html: string): HTMLElement {
+  return new DOMParser().parseFromString(html, "text/html").body;
+}
+
+/** The text an element holds, as copying it or a crawler reads it. */
+function textOf(html: string): string {
+  return parse(html).textContent ?? "";
+}
+
 describe("Headline", () => {
-  it("renders the whole sentence on the server, still, with no alternate", () => {
+  it("renders the whole sentence on the server, still; the alternate only sizes the line, as an attribute", () => {
     const html = renderToString(<Headline phrases={TWO} ready />);
-    expect(html).toContain(CANONICAL);
-    expect(html).not.toContain(ALTERNATE);
+    expect(textOf(html)).toBe(`${homeHero.greetingLine} ${CANONICAL}`);
     expect(html).not.toContain("data-stamp");
+    expect(html).toContain(`data-text="${ALTERNATE}"`);
   });
 
   it("swaps every 4.2 s once the hero can be seen", () => {
@@ -69,6 +79,19 @@ describe("Headline", () => {
 
     advance(homeHero.rotateMs);
     expect(shown(container)).toBe(CANONICAL);
+  });
+
+  it("removes the leaving line once its blur ends, so the h1 holds only what shows", () => {
+    const { container } = render(<Headline phrases={TWO} ready />);
+    advance(homeHero.rotateMs);
+    const out = container.querySelector(".pf-hero__out")!;
+    expect(out).toHaveTextContent(CANONICAL);
+    // The blur's end. jsdom has no AnimationEvent, so React listens for the
+    // WebKit name there; browsers send "animationend".
+    fireEvent.animationEnd(out);
+    fireEvent(out, new Event("webkitAnimationEnd", { bubbles: true }));
+    expect(container.querySelector(".pf-hero__out")).toBeNull();
+    expect(heading().textContent).toBe(`${homeHero.greetingLine} ${ALTERNATE}`);
   });
 
   it("keeps the canonical name whatever line shows", () => {
@@ -122,6 +145,7 @@ describe("Headline", () => {
     const single = render(<Headline phrases={[CANONICAL]} ready />);
     advance(homeHero.rotateMs * 3);
     expect(shown(single.container)).toBe(CANONICAL);
+    // One phrase sizes its own line.
     expect(single.container.querySelector(".pf-hero__sizer")).toBeNull();
     single.unmount();
 
@@ -129,7 +153,7 @@ describe("Headline", () => {
     const reduced = render(<Headline phrases={TWO} ready />);
     advance(homeHero.rotateMs * 3);
     expect(shown(reduced.container)).toBe(CANONICAL);
-    expect(reduced.container.querySelector(".pf-hero__sizer")).toBeNull();
+    expect(reduced.container.querySelector(".pf-hero__out")).toBeNull();
   });
 
   it("stamps the new words on from line 1's count, alternating sides", () => {
@@ -146,9 +170,30 @@ describe("Headline", () => {
     expect(stampWords("Hi, I’m Kunanon Jarat.", 0)).toHaveLength(4);
   });
 
-  it("keeps the line's height on every swap: all phrases size one cell", () => {
-    const { container } = render(<Headline phrases={TWO} ready />);
-    const sizers = [...container.querySelectorAll(".pf-hero__sizer")];
-    expect(sizers.map((sizer) => sizer.textContent)).toEqual([...TWO]);
+  it("keeps the line's height on every swap: all phrases size one cell, from the server on, whatever the motion setting", () => {
+    // Empty, hidden spans that CSS draws from data-text: on the server (where
+    // reduced motion is assumed), and on the client either way, so the
+    // line's height never changes at hydration.
+    const sizersOf = (root: ParentNode) =>
+      [...root.querySelectorAll(".pf-hero__sizer")].map((sizer) => ({
+        text: sizer.textContent,
+        hidden: sizer.getAttribute("aria-hidden"),
+        phrase: sizer.getAttribute("data-text"),
+      }));
+    const expected = TWO.map((phrase) => ({
+      text: "",
+      hidden: "true",
+      phrase,
+    }));
+    const server = parse(renderToString(<Headline phrases={TWO} ready />));
+    expect(sizersOf(server)).toEqual(expected);
+
+    const moving = render(<Headline phrases={TWO} ready />);
+    expect(sizersOf(moving.container)).toEqual(expected);
+    moving.unmount();
+
+    stubMotion(true);
+    const still = render(<Headline phrases={TWO} ready />);
+    expect(sizersOf(still.container)).toEqual(expected);
   });
 });

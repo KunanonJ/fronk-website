@@ -79,6 +79,10 @@
   .pf-hero__sizer {
     visibility: hidden;
   }
+  /* The phrase is drawn, not written, so the h1's text stays what shows. */
+  .pf-hero__sizer::before {
+    content: attr(data-text);
+  }
   .pf-hero__out {
     opacity: 0;
     pointer-events: none;
@@ -476,9 +480,17 @@
     .pf-hero {
       position: sticky;
       /* Scrolls until its last line is in view, then holds. Before the
-         script measures it, the offset is too large to ever stick. */
-      top: min(0px, calc(100svh - var(--pf-hero-h, 200svh)));
+         script measures it (and without script), the fallback height puts
+         the offset so far up that the stage never sticks. */
+      top: min(0px, calc(100svh - var(--pf-hero-h, 100000px)));
       min-block-size: var(--screen);
+    }
+    /* Keyboard focus inside the stage unsticks it, so the browser scrolls
+       the focused control into view where it really is, and the next
+       section never covers it (WCAG 2.4.11). */
+    .pf-hero:has(:focus-visible) {
+      position: relative;
+      top: auto;
     }
     .pf-hero__sheet {
       inset: 12px 12px 0;
@@ -625,7 +637,7 @@
       background: var(--cta);
       color: var(--oncta);
       font-weight: 500;
-      text-decoration: none;
+      cursor: pointer;
       pointer-events: auto;
     }
     .pf-mock__comment {
@@ -756,10 +768,17 @@
     .pf-mock-wrap {
       max-inline-size: none;
     }
+    /* The strip stays on the first screen, so its centred label and its
+       row never sit on the hinge. */
+    .pf-logos.ds-wrap {
+      max-width: env(viewport-segment-right 0 0, 100%);
+      margin-inline: 0;
+    }
   }
 
   /* Forced colours: the rings vanish, so ringed parts take system borders
-     (spec 12, item 26). */
+     (spec 12, item 26). The pager's dots are drawn by background, which
+     forced colours remove, so they keep system colours of their own. */
   @media (forced-colors: active) {
     .pf-mock,
     .pf-mock__panel,
@@ -767,6 +786,13 @@
     .pf-mock__tools,
     .pf-thumb {
       border: 1px solid CanvasText;
+    }
+    .pf-mock__dot span {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+    .pf-mock__dot[aria-current="true"] span {
+      background: Highlight;
     }
   }
 }

@@ -53,7 +53,10 @@ export const workCopy = {
   eyebrow: portfolioPage.title,
   heading: "Projects and ventures, from problem to outcome.", // DRAFT
   lead: "Internal tools and AI agents at The Binary Holdings, and two ventures of my own.", // DRAFT
-  /** The card's call to action; the case's name follows it, visually hidden. */
+  /**
+   * The card's call to action. The link's name is this label, then the
+   * case's name, in an aria-label ("Read the case study: TBH Intranet").
+   */
   cta: "Read the case study", // DRAFT (plan step 3c, the design system's card)
   /** A venture's first chip (spec 8.4); its second is "Since" and its year. */
   venture: "Venture", // DRAFT
@@ -76,10 +79,13 @@ export const aboutCopy = {
   eyebrow: "About", // DRAFT (the nav's label)
   heading: "AI engineering, close to the work.", // DRAFT
   lead: "How I work, and the results so far.", // DRAFT
+  /** The "In short" tile's h3, shown in the meta style. */
   briefLabel: "In short", // DRAFT
   /** Today's About story, as /about prints it. */
   brief: aboutPage.story.paragraphs,
   mess: {
+    /** The tile's h3, for assistive technology only (WCAG 1.3.1). */
+    heading: "What one system has to hold", // DRAFT
     // DRAFT: the mess a system has to hold, each in the case copy's words:
     // TBH Intranet's "The problem" (portfolio.ts) for the first three, Manut
     // AI's description and "What it is" (ventures.ts) for the last two.
@@ -93,14 +99,26 @@ export const aboutCopy = {
     line: "Then one system holds it.", // DRAFT
   },
   stats: {
+    /** The tile's h3, for assistive technology only; it names the list. */
+    heading: "Results so far", // DRAFT
     figures: [
       { project: "tbh-intranet", outcome: "Adoption" },
       { venture: "gogocash", metric: "Registered users" },
       { venture: "gogocash", metric: "Merchants" },
     ] satisfies readonly StatSource[],
-    footnote: "From the TBH Intranet and GoGoCash case studies.", // DRAFT
+    /**
+     * The footnote's words around the names of the cases the figures come
+     * from, which lib/landing/aboutStats.ts reads from those cases:
+     * "From the TBH Intranet and GoGoCash case studies."
+     */
+    footnote: {
+      lead: "From the", // DRAFT
+      one: "case study.", // DRAFT
+      many: "case studies.", // DRAFT
+    },
   },
   motion: {
+    /** The tile's h3, shown as its chip. */
     caption: "The mess, then the system", // DRAFT
     pause: "Pause the animation",
     play: "Play the animation",

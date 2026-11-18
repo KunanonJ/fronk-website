@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it, vi } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { OPEN_TO_ROLES } from "@/lib/content/availability";
 import { canvasMock, caseHref, homeHero, logoStrip } from "@/lib/content/home";
@@ -63,6 +65,60 @@ describe("logoStrip", () => {
     ]);
     for (const name of logoStrip.names) expect(known).toContain(name);
     expect(logoStrip.label).toBe("Where I’ve worked");
+  });
+
+  it("takes R6's two ventures only: one added to ventures.ts later does not join unapproved", async () => {
+    vi.resetModules();
+    vi.doMock("@/lib/content/ventures", async (importOriginal) => {
+      const actual =
+        await importOriginal<typeof import("@/lib/content/ventures")>();
+      const extra = {
+        ...actual.getVentureBySlug("manut")!,
+        slug: "newco",
+        name: "NewCo",
+      };
+      return {
+        ...actual,
+        getAllVentureSlugs: () => [...actual.getAllVentureSlugs(), "newco"],
+        getAllVentures: () => [...actual.getAllVentures(), extra],
+        getVentureBySlug: (slug: string) =>
+          slug === "newco" ? extra : actual.getVentureBySlug(slug),
+      };
+    });
+    try {
+      const fresh = await import("@/lib/content/home");
+      expect(fresh.logoStrip.names).not.toContain("NewCo");
+      expect(fresh.logoStrip.names.slice(-2)).toEqual(["GoGoCash", "Manut AI"]);
+    } finally {
+      vi.doUnmock("@/lib/content/ventures");
+      vi.resetModules();
+    }
+  });
+});
+
+describe("drafts", () => {
+  it("marks every line that waits for the owner's approval as a DRAFT in its source", () => {
+    const source = readFileSync(
+      join(process.cwd(), "lib/content/home.ts"),
+      "utf8",
+    ).split("\n");
+    for (const fragment of [
+      'label: "Where I’ve worked"',
+      'label: "Featured projects"',
+      'share: "Share"',
+      "layersTabs: [",
+      "inspectorTabs: [",
+      'area: "Area"',
+      'period: "Period"',
+      'open: "Open project"',
+      "· just now",
+      ": open the case study",
+      "`Show ${name}`",
+      "of ${count}",
+    ]) {
+      const line = source.find((each) => each.includes(fragment));
+      expect(line, fragment).toMatch(/\/\/ DRAFT/);
+    }
   });
 });
 

@@ -89,14 +89,19 @@ function Shot({ frame }: { frame: MockFrame }) {
 
 export function CanvasMock({
   ready,
+  paused = false,
   frames = canvasMock.frames,
 }: {
   /** The hero can be seen: the cursor may start its tour. */
   ready: boolean;
+  /** The hero's motion toggle is on pause: the tour ends, as on a pick. */
+  paused?: boolean;
   frames?: readonly MockFrame[];
 }) {
   const reduced = useReducedMotion();
   const row = useRef<HTMLUListElement>(null);
+  /** Set once the hero's toggle pauses: like a pick, it ends the tour. */
+  const halted = useRef(false);
   const [selected, setSelected] = useState(0);
   const [cursorAt, setCursorAt] = useState(0);
   const [touched, setTouched] = useState(false);
@@ -104,9 +109,10 @@ export function CanvasMock({
   const current = frames[selected] ?? frames[0];
 
   // The cursor's one tour, on the full canvas only; a reader's own choice
-  // ends it.
+  // ends it: a pick, or a pause on the hero's motion toggle.
   useEffect(() => {
-    if (!ready || reduced || touched) return;
+    if (paused) halted.current = true;
+    if (!ready || reduced || touched || halted.current) return;
     if (!window.matchMedia(PANELS_QUERY).matches) return;
     const timers = TOUR.map((frame, step) =>
       window.setTimeout(
@@ -118,7 +124,7 @@ export function CanvasMock({
       ),
     );
     return () => timers.forEach((id) => window.clearTimeout(id));
-  }, [ready, reduced, touched]);
+  }, [ready, reduced, touched, paused]);
 
   // On the swipeable row, the frame in the middle is the selected one.
   useEffect(() => {
@@ -142,6 +148,13 @@ export function CanvasMock({
   const pick = (index: number) => {
     setTouched(true);
     setSelected(index);
+  };
+
+  /** The inspector's button: the selected frame's own link does the work. */
+  const openSelected = () => {
+    row.current?.children[selected]
+      ?.querySelector<HTMLAnchorElement>("a.pf-mock__frame")
+      ?.click();
   };
 
   const show = (index: number) => {
@@ -246,11 +259,13 @@ export function CanvasMock({
               <span>{canvasMock.period}</span>
               {current.period}
             </p>
-            {/* For a pointer only: the frame link before it is the same
-                link for the keyboard and for screen readers. */}
-            <Link href={current.href} tabIndex={-1} className="pf-mock__open">
+            {/* For a pointer only, and no link of its own: inside
+                aria-hidden nothing may take focus, so it passes its click
+                to the selected frame's link, which is the same link for the
+                keyboard and for screen readers. */}
+            <span className="pf-mock__open" onClick={openSelected}>
               {canvasMock.open}
-            </Link>
+            </span>
           </div>
           <div className="pf-mock__comment" aria-hidden="true">
             <span className="pf-mock__avatar">

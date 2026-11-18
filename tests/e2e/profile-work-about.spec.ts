@@ -109,6 +109,39 @@ function itemTops(page: Page): Promise<number[]> {
   );
 }
 
+/**
+ * Resolves once the page has stopped scrolling: scrollY unchanged for
+ * `quiet` ms, read every frame. A smooth scroll the page started (the
+ * browser's own, the router's or the stack's) has then ended.
+ */
+function scrollSettles(page: Page, quiet = 500): Promise<number> {
+  return page.evaluate(
+    (ms) =>
+      new Promise<number>((done) => {
+        let last = window.scrollY;
+        let since = performance.now();
+        const tick = () => {
+          if (window.scrollY !== last) {
+            last = window.scrollY;
+            since = performance.now();
+          }
+          if (performance.now() - since >= ms) done(last);
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+    quiet,
+  );
+}
+
+/** The GoGoCash card (`#ventures`): where it sits, and what covers it. */
+async function venturesAtRest(page: Page) {
+  await scrollSettles(page);
+  near((await page.locator("#ventures").boundingBox())?.y, 146, "#ventures");
+  expect(await uncovered(page, "#ventures")).toEqual([]);
+  expect(await uncovered(page, "#ventures .pf-card__link")).toEqual([]);
+}
+
 /** True when the element's centre and edges are the topmost thing there. */
 function uncovered(page: Page, selector: string): Promise<string[]> {
   return page.evaluate((sel) => {
@@ -181,10 +214,8 @@ test.describe("work stack: sticking, depth and focus", () => {
   test("/preview#ventures lands on the GoGoCash card, below the bar", async ({
     page,
   }) => {
-    // The jump itself is measured, under reduced motion. With motion, WebKit
-    // scrolls to a fragment smoothly (the page's scroll-behavior); unloaded it
-    // lands on the same spot, but with two workers busy it once stopped short
-    // of it, an engine timing question recorded in the phase report.
+    // Under reduced motion: the jump is instant. The test after this one
+    // opens the same address with motion allowed.
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
     await visit(page, `${HOME}#ventures`);
@@ -201,6 +232,165 @@ test.describe("work stack: sticking, depth and focus", () => {
     expect((await card.boundingBox())!.y).toBeGreaterThanOrEqual(BAR_BOTTOM);
     // Nothing lies over it: its centre and its edges are its own.
     expect(await uncovered(page, "#ventures")).toEqual([]);
+  });
+
+  test("/preview#ventures with motion allowed: once the page stops scrolling, the card rests at 146 px", async ({
+    page,
+  }) => {
+    // The default path: smooth scrolling, in Chromium and WebKit. The browser
+    // jumps on load, and the stack places the card again once the fonts are
+    // in (WorkStack), so a jump that measured early or stopped short ends
+    // where the list says the card rests.
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await prepare(page);
+    await visit(page, `${HOME}#ventures`);
+    await venturesAtRest(page);
+  });
+
+  test("a jump to #ventures while GoGoCash lies covered lands it uncovered", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page);
+    // Manut AI rests on GoGoCash: the jump starts from inside the stack,
+    // where the browser and the router measure GoGoCash where it is stuck.
+    await scrollToY(page, (await restingY(page, CASES.length - 1)) + 20);
+    expect(
+      (await uncovered(page, "#ventures .pf-card__link")).length,
+    ).toBeGreaterThan(0);
+    // The in-app navigation a /#ventures link makes (TanStack Router's own).
+    await page.evaluate(() =>
+      (
+        window as unknown as {
+          __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
+        }
+      ).__TSR_ROUTER__.navigate({ to: "/preview", hash: "ventures" }),
+    );
+    await expect(page).toHaveURL(/\/preview#ventures$/);
+    await venturesAtRest(page);
+  });
+
+  test("a jump to #ventures from the footer, below the stack, lands it uncovered", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page);
+    // The footer's Ventures link points at the live Home (/#ventures) until
+    // Phase 6 serves this Home there; it then makes this navigation.
+    const footerLink = page
+      .getByRole("contentinfo")
+      .getByRole("link", { name: "Ventures", exact: true });
+    await footerLink.scrollIntoViewIfNeeded();
+    await scrollSettles(page);
+    await expect(footerLink).toBeInViewport();
+    const href = await footerLink.getAttribute("href");
+    expect(href).toBe("/#ventures");
+    await page.evaluate(
+      (hash) =>
+        (
+          window as unknown as {
+            __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
+          }
+        ).__TSR_ROUTER__.navigate({ to: "/preview", hash }),
+      href!.split("#")[1],
+    );
+    await expect(page).toHaveURL(/\/preview#ventures$/);
+    await venturesAtRest(page);
+  });
+
+  test("Tab from above into the first card, then on from card to card: each focused link rests uncovered (1440 x 900)", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "the 1440 x 900 screen the review measured",
+    );
+    await prepare(page);
+    await visit(page);
+    // The keyboard path starts on the control just before the stack, the
+    // hero's motion toggle; the first Tab then enters the first card. (A
+    // click on the section's heading would focus <main>, the skip link's
+    // target, and start the path at the top of the page.)
+    await page.locator("section.pf-hero .ds-motion-toggle").focus();
+    await scrollSettles(page);
+    for (let i = 0; i < CASES.length; i += 1) {
+      await page.keyboard.press("Tab");
+      const link = page.getByRole("link", {
+        name: `Read the case study: ${CASES[i]}`,
+      });
+      await expect(link).toBeFocused();
+      await scrollSettles(page);
+      const selector = `.pf-stack__item:nth-child(${i + 1}) .pf-card__link`;
+      expect(await uncovered(page, selector), `${CASES[i]} covered`).toEqual(
+        [],
+      );
+      const box = (await link.boundingBox())!;
+      expect(box.y, `${CASES[i]} under the bar`).toBeGreaterThanOrEqual(
+        BAR_BOTTOM,
+      );
+      expect(box.y + box.height, `${CASES[i]} below the screen`).toBeLessThan(
+        page.viewportSize()!.height,
+      );
+    }
+  });
+
+  test("Shift+Tab back from About through the cards: each focused link rests uncovered (1440 x 900)", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "the 1440 x 900 screen the review measured",
+    );
+    await prepare(page);
+    await visit(page);
+    // The keyboard path starts on the first link after the stack, in About's
+    // story, and walks back up the cards.
+    await page.locator("#about a[href]").first().focus();
+    await scrollSettles(page);
+    for (let i = CASES.length - 1; i >= 0; i -= 1) {
+      await page.keyboard.press("Shift+Tab");
+      const link = page.getByRole("link", {
+        name: `Read the case study: ${CASES[i]}`,
+      });
+      await expect(link).toBeFocused();
+      await scrollSettles(page);
+      const selector = `.pf-stack__item:nth-child(${i + 1}) .pf-card__link`;
+      expect(await uncovered(page, selector), `${CASES[i]} covered`).toEqual(
+        [],
+      );
+      const box = (await link.boundingBox())!;
+      expect(box.y, `${CASES[i]} under the bar`).toBeGreaterThanOrEqual(
+        BAR_BOTTOM,
+      );
+      expect(box.y + box.height, `${CASES[i]} below the screen`).toBeLessThan(
+        page.viewportSize()!.height,
+      );
+    }
+  });
+
+  test("a press anywhere on a card opens its case: the media's centre and its chip are the card's link", async ({
+    page,
+  }) => {
+    // 1440 px in desktop Chromium, 390 px on the WebKit phone.
+    await prepare(page);
+    await visit(page);
+    for (let i = 0; i < CASES.length; i += 1) {
+      await scrollToY(page, await restingY(page, i));
+      const misses = await page.evaluate((n) => {
+        const item = document.querySelectorAll(".pf-stack__item")[n]!;
+        const link = item.querySelector(".pf-card__link")!;
+        const centre = (el: Element) => {
+          const box = el.getBoundingClientRect();
+          return [box.left + box.width / 2, box.top + box.height / 2] as const;
+        };
+        return [".pf-card__media", ".ds-chip--illustration"].filter((part) => {
+          const [x, y] = centre(item.querySelector(part)!);
+          const hit = document.elementFromPoint(x, y);
+          return !(hit && (hit === link || link.contains(hit)));
+        });
+      }, i);
+      expect(misses, CASES[i]).toEqual([]);
+    }
   });
 
   test("a link that takes focus in a covered card brings its card back", async ({
@@ -253,6 +443,53 @@ test.describe("work stack: sticking, depth and focus", () => {
     const tops = await itemTops(page);
     near(tops[0], 104, "first card");
     near(tops[2], 132, "third card");
+  });
+
+  test("print lays the stack and the mess out flat, as the page sets them, not as the screen last showed them", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "one engine is enough");
+    await prepare(page);
+    await visit(page);
+    // Two cards covered (scaled and veiled), the mess still scattered.
+    await scrollToY(page, (await restingY(page, 2)) + 20);
+    const read = () =>
+      page.evaluate(() => {
+        const all = (selector: string) => [
+          ...document.querySelectorAll<HTMLElement>(selector),
+        ];
+        return {
+          positions: all(".pf-stack__item").map(
+            (el) => getComputedStyle(el).position,
+          ),
+          transforms: all(".pf-card").map(
+            (el) => getComputedStyle(el).transform,
+          ),
+          veils: all(".pf-card").map(
+            (el) => getComputedStyle(el, "::after").opacity,
+          ),
+          chips: all(".pf-mess__chip").map((el) => {
+            const style = getComputedStyle(el);
+            return `${style.translate} ${style.rotate}`;
+          }),
+          state: document.querySelector(".pf-mess")!.getAttribute("data-state"),
+        };
+      });
+    await expect
+      .poll(async () => (await read()).transforms[0])
+      .not.toBe("none");
+    const screen = await read();
+    expect(screen.state).toBe("mess");
+    expect(screen.positions[0]).toBe("sticky");
+    expect(screen.veils[0]).not.toBe("0");
+    expect(screen.chips[0]).not.toBe("none none");
+
+    await page.emulateMedia({ media: "print" });
+    const paper = await read();
+    expect(new Set(paper.positions)).toEqual(new Set(["static"]));
+    expect(new Set(paper.transforms)).toEqual(new Set(["none"]));
+    expect(new Set(paper.veils)).toEqual(new Set(["0"]));
+    expect(new Set(paper.chips)).toEqual(new Set(["none none"]));
   });
 
   test("the cards link to the preview case pages that Phase 5 builds", async ({

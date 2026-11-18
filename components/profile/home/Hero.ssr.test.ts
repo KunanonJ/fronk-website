@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { createElement, forwardRef, type AnchorHTMLAttributes } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -5,6 +6,7 @@ import Hero from "@/components/profile/home/Hero";
 import { canvasMock, homeHero, logoStrip } from "@/lib/content/home";
 import { extractPage } from "@/lib/parity/parity.mjs";
 import parity from "@/tests/fixtures/site-parity.json";
+import { withRouter } from "@/tests/routerContext";
 
 /*
  * The hero as the server sends it (profile redesign, Phase 2; design spec
@@ -12,6 +14,15 @@ import parity from "@/tests/fixtures/site-parity.json";
  * runs: the inline intro script is there, the h1 reads as the live Home's,
  * nothing moves, and no alternate phrase leaks into the HTML.
  */
+
+/**
+ * The inline intro script's hash, for the Content Security Policy that
+ * Phase 8 ships (umbrella R21: report-only, with hashes for the inline theme
+ * and intro scripts). A change to the script, or to the line TanStack's
+ * ScriptOnce appends, fails here until the policy's hash follows.
+ */
+const INTRO_SCRIPT_SHA256 =
+  "sha256-CghRNdW2EBQ2lw/75ZwokCydff27JGPd+J+AgtjKjpk=";
 
 vi.mock("@/components/navigation/Link", () => ({
   default: forwardRef<
@@ -22,7 +33,7 @@ vi.mock("@/components/navigation/Link", () => ({
   }),
 }));
 
-const html = renderToString(createElement(Hero));
+const html = renderToString(withRouter(createElement(Hero)));
 
 describe("Hero, server HTML", () => {
   it("keeps the live Home's h1 text, as the parity gate reads it", () => {
@@ -40,6 +51,15 @@ describe("Hero, server HTML", () => {
     );
     expect(html).toContain('"data-intro","pending"');
     expect(html).toContain("document.currentScript.remove()");
+  });
+
+  it("writes the intro script with the hash Phase 8's policy will allow", () => {
+    const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+    expect(scripts).toHaveLength(1);
+    const body = scripts[0]![1]!;
+    expect(`sha256-${createHash("sha256").update(body).digest("base64")}`).toBe(
+      INTRO_SCRIPT_SHA256,
+    );
   });
 
   it("is still: no stamp, no leaving line, no running marquee, no pause control", () => {
