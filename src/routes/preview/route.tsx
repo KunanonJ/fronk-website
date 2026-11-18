@@ -2,6 +2,7 @@ import { Outlet, createFileRoute } from "@tanstack/react-router";
 import PreviewLayout from "@/components/profile/preview/PreviewLayout";
 import onestLatin from "../../fonts/onest-latin.woff2?url";
 import instrumentSerifLatin from "../../fonts/instrument-serif-latin.woff2?url";
+import profileCss from "../../styles/profile.css?url";
 
 /**
  * Hidden previews of the profile redesign (Phases 0 to 5): noindex and
@@ -28,6 +29,8 @@ export const Route = createFileRoute("/preview")({
         type: "font/woff2",
         crossOrigin: "anonymous",
       },
+      // The preview-only stylesheet: the chrome and the Home sections.
+      { rel: "stylesheet", href: profileCss },
     ],
   }),
   component: () => (

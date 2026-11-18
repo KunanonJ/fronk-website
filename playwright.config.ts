@@ -71,11 +71,11 @@ export default defineConfig({
       },
     },
     // Profile redesign device matrix (design spec 10.1) and an iPhone-class
-    // WebKit phone, for the hidden /preview pages only (profile.spec.ts):
+    // WebKit phone, for the hidden /preview pages only (profile*.spec.ts):
     // the Galaxy Z Fold closed and open, and a tablet in landscape.
     {
       name: "fold-closed",
-      testMatch: /profile\.spec\.ts/,
+      testMatch: /profile(-[a-z-]+)?\.spec\.ts$/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 344, height: 882 },
@@ -83,7 +83,7 @@ export default defineConfig({
     },
     {
       name: "fold-open",
-      testMatch: /profile\.spec\.ts/,
+      testMatch: /profile(-[a-z-]+)?\.spec\.ts$/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 882, height: 1104 },
@@ -91,7 +91,7 @@ export default defineConfig({
     },
     {
       name: "tablet-landscape",
-      testMatch: /profile\.spec\.ts/,
+      testMatch: /profile(-[a-z-]+)?\.spec\.ts$/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1180, height: 820 },
@@ -99,7 +99,7 @@ export default defineConfig({
     },
     {
       name: "webkit-phone",
-      testMatch: /profile\.spec\.ts/,
+      testMatch: /profile(-[a-z-]+)?\.spec\.ts$/,
       use: {
         ...devices["iPhone 13"],
         viewport: { width: 390, height: 844 },

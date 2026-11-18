@@ -214,7 +214,7 @@ jobs:
           NEXT_PUBLIC_SANITY_PROJECT_ID: nkspfk4b
           NEXT_PUBLIC_SANITY_DATASET: production
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
-        run: pnpm exec playwright test profile.spec.ts --project=desktop --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone
+        run: pnpm exec playwright test tests/e2e/profile --project=desktop --project=fold-closed --project=fold-open --project=tablet-landscape --project=webkit-phone
 
       - name: Upload snapshots and diffs
         if: always()
@@ -223,7 +223,7 @@ jobs:
           name: visual-snapshots
           path: |
             tests/e2e/visual.spec.ts-snapshots/
-            tests/e2e/profile.spec.ts-snapshots/
+            tests/e2e/profile*.spec.ts-snapshots/
             test-results/
           retention-days: 7
 

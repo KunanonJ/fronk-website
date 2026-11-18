@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { read, sourceFiles } from "@/lib/design/sourceScan";
@@ -19,6 +19,39 @@ const landingLayout = readFileSync(
   join(process.cwd(), "components/landing/LandingLayout.tsx"),
   "utf8",
 );
+
+/*
+ * The preview-only stylesheet (profile redesign, Phase 1): profile.css and its
+ * partials. Every guard that reads globals.css also reads these.
+ */
+const profileSheets = [
+  "src/styles/profile.css",
+  ...readdirSync(join(process.cwd(), "src/styles/profile"))
+    .filter((name) => name.endsWith(".css"))
+    .sort()
+    .map((name) => `src/styles/profile/${name}`),
+].map((path) => ({
+  path,
+  css: readFileSync(join(process.cwd(), path), "utf8"),
+}));
+
+/** The CSS with every `prefers-reduced-motion: no-preference` block removed. */
+function withoutNoPreference(css: string): string {
+  let rest = css;
+  for (;;) {
+    const at = rest.search(
+      /@media [^{]*prefers-reduced-motion: no-preference\)/,
+    );
+    if (at === -1) return rest;
+    let depth = 0;
+    let end = rest.indexOf("{", at);
+    for (; end < rest.length; end += 1) {
+      if (rest[end] === "{") depth += 1;
+      if (rest[end] === "}" && --depth === 0) break;
+    }
+    rest = rest.slice(0, at) + rest.slice(end + 1);
+  }
+}
 
 /**
  * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
@@ -175,32 +208,25 @@ describe("bento motion contract", () => {
   });
 
   it("keeps every entrance and loop behind no-preference", () => {
-    // Drop each no-preference block (brace-matched); nothing left may animate.
-    let rest = globalsCss;
-    for (;;) {
-      const at = rest.search(
-        /@media [^{]*prefers-reduced-motion: no-preference\)/,
-      );
-      if (at === -1) break;
-      let depth = 0;
-      let end = rest.indexOf("{", at);
-      for (; end < rest.length; end += 1) {
-        if (rest[end] === "{") depth += 1;
-        if (rest[end] === "}" && --depth === 0) break;
-      }
-      rest = rest.slice(0, at) + rest.slice(end + 1);
-    }
     // Widened in the profile redesign (Phase 0, design spec 5.1): any
-    // animation outside no-preference fails, not only kj- and intro- names.
-    // Two exceptions, each never started under reduced motion: the theme
-    // reveal is a view transition the toggle skips (and the reduced-motion
-    // block below disables), and the intro's words belong to an overlay that
-    // IntroLoader does not mount under reduced motion.
+    // animation outside no-preference fails, not only kj- and intro- names,
+    // and Phase 1 reads the preview stylesheet too. Two exceptions, each never
+    // started under reduced motion: the theme reveal is a view transition the
+    // toggle skips (and the reduced-motion block below disables), and the
+    // intro's words belong to an overlay that IntroLoader does not mount under
+    // reduced motion.
     const allowed = /^(none\b|kj-reveal\b|intro-word-in\b)/;
-    const loose = [...rest.matchAll(/animation:\s*([^;]+);/g)]
-      .map((m) => m[1]!.trim())
-      .filter((value) => !allowed.test(value));
-    expect(loose).toEqual([]);
+    for (const { path, css } of [
+      { path: "src/styles/globals.css", css: globalsCss },
+      ...profileSheets,
+    ]) {
+      const loose = [
+        ...withoutNoPreference(css).matchAll(/animation:\s*([^;]+);/g),
+      ]
+        .map((m) => m[1]!.trim())
+        .filter((value) => !allowed.test(value));
+      expect(loose, path).toEqual([]);
+    }
     expect(globalsCss).toMatch(/animation: kj-rise/);
   });
 
@@ -210,6 +236,13 @@ describe("bento motion contract", () => {
     );
     expect(names.length).toBeGreaterThan(0);
     expect(names.filter((n) => !/^(kj|intro)-/.test(n))).toEqual([]);
+    for (const { path, css } of profileSheets) {
+      const own = [...css.matchAll(/@keyframes ([\w-]+)/g)].map((m) => m[1]!);
+      expect(
+        own.filter((n) => !/^kj-/.test(n)),
+        path,
+      ).toEqual([]);
+    }
   });
 
   it("scopes the circular reveal to theme switches and turns view transitions off under reduced motion", () => {
@@ -286,5 +319,98 @@ describe("profile redesign scope", () => {
     ]) {
       expect(globalsCss, query).toContain(`@media (${query})`);
     }
+  });
+});
+
+/**
+ * Profile redesign, Phase 1 (process/features/profile-site-redesign): the
+ * preview stylesheet is layered and plain. profile.css fixes the layer order
+ * before any other sheet can, each phase owns one partial, the partials hold no
+ * raw hex colour, and no build-time CSS leaks in: they read tokens only.
+ */
+describe("profile stylesheet", () => {
+  const entry = profileSheets[0]!.css;
+  const partials = profileSheets.slice(1);
+
+  it("declares the layer order first, then imports each phase's partial in order", () => {
+    expect(entry).toMatch(/^@layer theme, base, components, utilities;/m);
+    expect(entry.indexOf("@layer")).toBeLessThan(entry.indexOf("@import"));
+    const imports = [
+      ...entry.matchAll(/@import "\.\/(profile\/[\w-]+\.css)";/g),
+    ].map((m) => m[1]);
+    expect(imports).toEqual([
+      "profile/shell.css",
+      "profile/home-hero.css",
+      "profile/home-work-about.css",
+      "profile/home-journey.css",
+      "profile/case.css",
+    ]);
+  });
+
+  it("names its phase in each partial's first line, so a lane edits only its own", () => {
+    const phases: Record<string, string> = {
+      "shell.css": "Phase 1",
+      "home-hero.css": "Phase 2",
+      "home-work-about.css": "Phase 3",
+      "home-journey.css": "Phase 4",
+      "case.css": "Phase 5",
+    };
+    for (const [name, phase] of Object.entries(phases)) {
+      const partial = partials.find((sheet) => sheet.path.endsWith(`/${name}`));
+      expect(partial, name).toBeDefined();
+      // The header may run to several lines; the phase is named in its first five.
+      expect(partial!.css.split("\n").slice(0, 5).join("\n"), name).toContain(
+        `Profile redesign, ${phase}`,
+      );
+    }
+  });
+
+  it("has no raw hex colour in any profile sheet: colour comes from tokens", () => {
+    for (const { path, css } of profileSheets) {
+      expect(css.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [], path).toEqual([]);
+    }
+  });
+
+  it("uses plain CSS only: no @apply, theme(), @utility or Tailwind imports", () => {
+    for (const { path, css } of profileSheets) {
+      expect(css, path).not.toMatch(
+        /@apply|theme\(|@utility|@tailwind|@import "tailwindcss"/,
+      );
+    }
+  });
+
+  it("fails the motion guard on a fixture with a loose animation", () => {
+    // The guard must fire on a known-bad sheet, or a pass proves nothing.
+    const fixture =
+      "a { animation: kj-loose 1s; } @media (prefers-reduced-motion: no-preference) { b { animation: kj-fine 1s; } }";
+    const loose = [
+      ...withoutNoPreference(fixture).matchAll(/animation:\s*([^;]+);/g),
+    ].map((m) => m[1]!.trim());
+    expect(loose).toEqual(["kj-loose 1s"]);
+  });
+
+  it("keeps movement and its transitions behind no-preference", () => {
+    // Opacity and colour may move under reduced motion (spec 5.1); transform,
+    // filter, width and registered custom properties may not.
+    for (const { path, css } of profileSheets) {
+      const outside = withoutNoPreference(css);
+      const moving = [...outside.matchAll(/transition:\s*([^;]+);/g)]
+        .map((m) => m[1]!)
+        .filter((value) => /transform|filter|width|height|--/.test(value));
+      expect(moving, path).toEqual([]);
+    }
+  });
+
+  it("scopes the theme fade to the preview and keeps it behind no-preference", () => {
+    const shell = partials.find((sheet) =>
+      sheet.path.endsWith("/shell.css"),
+    )!.css;
+    const fade = withoutNoPreference(shell);
+    expect(fade).not.toMatch(/animation:[^;]*kj-theme-fade/);
+    expect(shell).toMatch(
+      // Whitespace is allowed inside the pseudo-class argument: prettier wraps it.
+      /@media \(prefers-reduced-motion: no-preference\) \{\s*html\[data-design="profile"\]:active-view-transition-type\(\s*theme\s*\)::view-transition-old\(root\)/,
+    );
+    expect(shell).toMatch(/animation: kj-theme-fade 0\.56s/);
   });
 });

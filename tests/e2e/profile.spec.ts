@@ -20,6 +20,7 @@ import { PREVIEW_ROUTES } from "./routes";
 const THEMES = ["light", "dark"] as const;
 const MATRIX = new Set(["fold-closed", "fold-open", "tablet-landscape"]);
 const SYSTEM = "/preview/system";
+const HOME = "/preview";
 
 async function prepare(page: Page, theme: (typeof THEMES)[number]) {
   await page.addInitScript((value) => {
@@ -81,7 +82,7 @@ async function forcedColorsProblems(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const out: string[] = [];
     const ringed = document.querySelectorAll<HTMLElement>(
-      ".ds-pill, .ds-chip, .ds-badge, .ds-tile, .ds-motion-toggle",
+      ".ds-pill, .ds-chip, .ds-badge, .ds-tile, .ds-motion-toggle, .pf-nav__pill, .pf-theme-toggle, .pf-theme, .pf-say__panel, .pf-menu, .pf-footer__card",
     );
     for (const el of ringed) {
       const s = getComputedStyle(el);
@@ -224,114 +225,121 @@ function desktopOnly() {
 }
 
 test.describe("best practices on the preview (desktop Chromium)", () => {
-  test("forced colors: ringed parts keep an edge, pixel art hides", async ({
-    page,
-  }) => {
-    desktopOnly();
-    await page.emulateMedia({ forcedColors: "active" });
-    await page.setContent(
-      `<a class="ds-pill" href="#x" style="border:0;box-shadow:0 0 0 1px #000">x</a>`,
-    );
-    expect(await forcedColorsProblems(page)).not.toEqual([]);
+  for (const path of [SYSTEM, HOME]) {
+    test(`forced colors: ringed parts keep an edge, pixel art hides (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.emulateMedia({ forcedColors: "active" });
+      await page.setContent(
+        `<a class="ds-pill" href="#x" style="border:0;box-shadow:0 0 0 1px #000">x</a>`,
+      );
+      expect(await forcedColorsProblems(page)).not.toEqual([]);
 
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    expect(await forcedColorsProblems(page)).toEqual([]);
-  });
-
-  test("text spacing (WCAG 1.4.12) clips no text", async ({ page }) => {
-    desktopOnly();
-    await page.setContent(
-      `<div style="width:120px;height:20px;overflow:hidden;font-size:16px">Text that cannot fit in this box</div>`,
-    );
-    expect(await clippedText(page)).not.toEqual([]);
-
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    expect(await clippedText(page)).toEqual([]);
-  });
-
-  test("zoom (WCAG 1.4.4, 1.4.10): text doubles and nothing scrolls sideways", async ({
-    page,
-  }) => {
-    desktopOnly();
-    await page.setContent(
-      `<p class="t-fixture" style="font-size:5vw;margin:0">Viewport-only text</p>`,
-    );
-    expect(await zoomShortfalls(page)).not.toEqual([]);
-
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    expect(await zoomShortfalls(page)).toEqual([]);
-  });
-
-  test("more contrast raises the small-text floor", async ({ page }) => {
-    desktopOnly();
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    expect(await inkFloorRaised(page)).toBe(false);
-
-    await page.emulateMedia({ contrast: "more" });
-    expect(await inkFloorRaised(page)).toBe(true);
-  });
-
-  test("requests stay on the site", async ({ page, baseURL }) => {
-    desktopOnly();
-    const base = baseURL ?? "http://127.0.0.1:3000";
-    expect(
-      foreignOrigins([`${base}/a.css`, "https://example.com/x.png"], base),
-    ).toEqual(["https://example.com"]);
-
-    const urls: string[] = [];
-    page.on("request", (request) => urls.push(request.url()));
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    expect(foreignOrigins(urls, base)).toEqual([]);
-  });
-
-  test("scrolling through the page reveals every waiting block", async ({
-    page,
-  }) => {
-    desktopOnly();
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    // Half a screen at a time, as a reader scrolls, ending at the very bottom
-    // where a short last block must still count as seen.
-    await page.evaluate(async () => {
-      const frame = () =>
-        new Promise((done) =>
-          requestAnimationFrame(() => requestAnimationFrame(done)),
-        );
-      const end = () => document.documentElement.scrollHeight;
-      for (let y = 0; y < end(); y += window.innerHeight / 2) {
-        window.scrollTo({ top: y, behavior: "instant" });
-        await frame();
-      }
-      window.scrollTo({ top: end(), behavior: "instant" });
-      await frame();
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(await forcedColorsProblems(page)).toEqual([]);
     });
-    await expect(page.locator("[data-reveal]").first()).toBeAttached();
-    await expect(page.locator("[data-reveal].is-pending")).toHaveCount(0);
-  });
 
-  test("print shows blocks that were never scrolled into view", async ({
-    page,
-  }) => {
-    desktopOnly();
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await prepare(page, "light");
-    await page.goto(SYSTEM, { waitUntil: "networkidle" });
-    await expect(
-      page.locator("[data-reveal].is-pending").first(),
-    ).toBeAttached();
-    await page.emulateMedia({ media: "print" });
-    const hidden = await page.$$eval(
-      "[data-reveal].is-pending",
-      (els) => els.filter((el) => getComputedStyle(el).opacity !== "1").length,
-    );
-    expect(hidden).toBe(0);
-  });
+    test(`text spacing (WCAG 1.4.12) clips no text (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.setContent(
+        `<div style="width:120px;height:20px;overflow:hidden;font-size:16px">Text that cannot fit in this box</div>`,
+      );
+      expect(await clippedText(page)).not.toEqual([]);
+
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(await clippedText(page)).toEqual([]);
+    });
+
+    test(`zoom (WCAG 1.4.4, 1.4.10): text doubles and nothing scrolls sideways (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.setContent(
+        `<p class="t-fixture" style="font-size:5vw;margin:0">Viewport-only text</p>`,
+      );
+      expect(await zoomShortfalls(page)).not.toEqual([]);
+
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(await zoomShortfalls(page)).toEqual([]);
+    });
+
+    test(`more contrast raises the small-text floor (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(await inkFloorRaised(page)).toBe(false);
+
+      await page.emulateMedia({ contrast: "more" });
+      expect(await inkFloorRaised(page)).toBe(true);
+    });
+
+    test(`requests stay on the site (${path})`, async ({ page, baseURL }) => {
+      desktopOnly();
+      const base = baseURL ?? "http://127.0.0.1:3000";
+      expect(
+        foreignOrigins([`${base}/a.css`, "https://example.com/x.png"], base),
+      ).toEqual(["https://example.com"]);
+
+      const urls: string[] = [];
+      page.on("request", (request) => urls.push(request.url()));
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(foreignOrigins(urls, base)).toEqual([]);
+    });
+
+    test(`scrolling through the page reveals every waiting block (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      // Half a screen at a time, as a reader scrolls, ending at the very bottom
+      // where a short last block must still count as seen.
+      await page.evaluate(async () => {
+        const frame = () =>
+          new Promise((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(done)),
+          );
+        const end = () => document.documentElement.scrollHeight;
+        for (let y = 0; y < end(); y += window.innerHeight / 2) {
+          window.scrollTo({ top: y, behavior: "instant" });
+          await frame();
+        }
+        window.scrollTo({ top: end(), behavior: "instant" });
+        await frame();
+      });
+      await expect(page.locator("[data-reveal]").first()).toBeAttached();
+      await expect(page.locator("[data-reveal].is-pending")).toHaveCount(0);
+    });
+
+    test(`print shows blocks that were never scrolled into view (${path})`, async ({
+      page,
+    }) => {
+      desktopOnly();
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await prepare(page, "light");
+      await page.goto(path, { waitUntil: "networkidle" });
+      await expect(
+        page.locator("[data-reveal].is-pending").first(),
+      ).toBeAttached();
+      await page.emulateMedia({ media: "print" });
+      const hidden = await page.$$eval(
+        "[data-reveal].is-pending",
+        (els) =>
+          els.filter((el) => getComputedStyle(el).opacity !== "1").length,
+      );
+      expect(hidden).toBe(0);
+    });
+  }
 });
 
 for (const theme of THEMES) {

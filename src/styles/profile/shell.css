@@ -1,0 +1,847 @@
+/*
+ * Profile redesign, Phase 1: the site chrome (design spec 4.3 and 7 to 12).
+ * Every rule sits in @layer components, so Tailwind utilities still win, except
+ * the view-transition rules at the end, which must beat the live site's
+ * unlayered reveal and say so. Plain CSS with tokens from globals.css only.
+ * Popovers never get a `display` rule: the UA hides them until they open.
+ */
+
+@layer components {
+  /* Anchors and focus (spec 4.3, native scrolling): the fixed bar covers the
+     top 96 px, so anchored sections, focused elements and scrolled targets
+     land below it. Smooth scrolling is set once, in globals.css. */
+  [data-design="profile"] {
+    scroll-padding-top: 96px;
+  }
+  [data-design="profile"] #work {
+    scroll-margin-top: 80px;
+  }
+  [data-design="profile"] #about {
+    scroll-margin-top: -128px;
+  }
+  [data-design="profile"] #journey {
+    scroll-margin-top: -96px;
+  }
+  [data-design="profile"] #ventures,
+  [data-design="profile"] #story {
+    scroll-margin-top: 0;
+  }
+  [data-design="profile"] [id^="ch-"] {
+    scroll-margin-top: 16px;
+  }
+  @media (min-width: 50.625rem) {
+    [data-design="profile"] #about {
+      scroll-margin-top: -176px;
+    }
+  }
+
+  .pf-main {
+    padding-top: var(--nav-h);
+  }
+
+  /* The pill nav (spec 7.1): fixed at --bar-top, one 48 px row. Only its
+     children take pointer events, so the empty bar never covers a tap. */
+  .pf-nav {
+    position: fixed;
+    inset-block-start: var(--bar-top);
+    inset-inline: 0;
+    z-index: 80;
+    block-size: var(--bar-row);
+    padding-inline: var(--pad);
+    pointer-events: none;
+  }
+  .pf-nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    block-size: 100%;
+  }
+  .pf-nav__row > * {
+    pointer-events: auto;
+  }
+  /* Hidden on scroll, the bar takes no taps until focus or a scroll brings it
+     back (spec 7.3). */
+  .pf-nav[data-away]:not(:focus-within) .pf-nav__row > * {
+    pointer-events: none;
+  }
+  .pf-nav__pill {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    block-size: var(--bar-row);
+    min-inline-size: 0;
+    padding-inline: 16px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: var(--elev-nav);
+  }
+  .pf-nav__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding-inline-end: 12px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .pf-nav__avatar {
+    display: block;
+    flex: none;
+    inline-size: 32px;
+    block-size: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .pf-nav__dot {
+    color: var(--accent);
+  }
+  /* First name only under 640 px; the surname stays in the link's name. */
+  .pf-nav__surname {
+    display: none;
+  }
+  @media (min-width: 40rem) {
+    .pf-nav__surname {
+      display: inline;
+    }
+  }
+
+  .pf-nav__links {
+    position: relative;
+    display: none;
+    align-items: center;
+    gap: 2px;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-nav__links {
+      display: flex;
+    }
+  }
+  .pf-nav__link {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    block-size: 36px;
+    padding-inline: 12px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-60);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .pf-nav__link[aria-current] {
+    color: var(--accent-ink);
+  }
+  /* A static tint for the current page; on Home the sliding pill takes over. */
+  .pf-nav__link[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--tint-2);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+  .pf-nav__links[data-slide] .pf-nav__link::before {
+    display: none;
+  }
+  .pf-nav__active {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 0;
+    block-size: 36px;
+    width: 0;
+    border-radius: var(--radius-pill);
+    background: var(--tint-2);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--accent) 16%, transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .pf-nav__active[data-visible] {
+    opacity: 1;
+  }
+
+  .pf-nav__menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 36px;
+    min-inline-size: 63px;
+    padding-inline: 12px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--ink-60);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-nav__menu {
+      display: none;
+    }
+  }
+  .pf-nav__menu-close {
+    display: none;
+  }
+  .pf-nav__menu[aria-expanded="true"] .pf-nav__menu-open {
+    display: none;
+  }
+  .pf-nav__menu[aria-expanded="true"] .pf-nav__menu-close {
+    display: inline;
+  }
+
+  .pf-nav__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Tighter from 370 to 809 px so the name, Menu and Say hello fit (spec 10). */
+  @media (min-width: 23.125rem) and (max-width: 50.5625rem) {
+    .pf-nav__pill {
+      padding-inline: 12px 6px;
+    }
+    .pf-nav__menu {
+      padding-inline: 10px;
+    }
+    .pf-nav__right .ds-pill {
+      padding-inline: 14px;
+    }
+  }
+
+  /* Under 370 px, Say hello is a round mail icon; its name stays for screen
+     readers (spec 7.1, 10). */
+  .pf-say__icon {
+    display: none;
+  }
+  @media (max-width: 23.124rem) {
+    .pf-say__trigger--nav {
+      inline-size: 48px;
+      padding-inline: 0;
+    }
+    .pf-say__trigger--nav .pf-say__text {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .pf-say__trigger--nav .ds-swap {
+      display: none;
+    }
+    .pf-say__trigger--nav .pf-say__icon {
+      display: block;
+    }
+  }
+
+  /* The theme toggle (spec 7.5): from 810 px, a 48 px round button. */
+  .pf-theme-toggle {
+    display: none;
+    place-items: center;
+    inline-size: 48px;
+    block-size: 48px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--elev-nav);
+    cursor: pointer;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-theme-toggle {
+      display: grid;
+    }
+  }
+  .pf-theme-toggle__glyph {
+    display: grid;
+    place-items: center;
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  .pf-theme-toggle__icon {
+    grid-area: 1 / 1;
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  /* Light shows the moon; dark shows the sun. CSS picks it, so the right icon
+     is there before hydration. */
+  .pf-theme-toggle__icon--sun {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+  .dark .pf-theme-toggle__icon--moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+  .dark .pf-theme-toggle__icon--sun {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The phone switch (spec 7.5): native radios in a fieldset. */
+  .pf-theme {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    block-size: 52px;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper-2);
+    box-shadow: inset 0 0 0 1px var(--line-soft);
+  }
+  .pf-theme__thumb {
+    position: absolute;
+    inset: 4px auto 4px 4px;
+    inline-size: calc(50% - 4px);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    box-shadow: var(--elev-thumb);
+  }
+  .pf-theme[data-mode="dark"] .pf-theme__thumb {
+    transform: translateX(100%);
+    background: var(--paper-3);
+  }
+  .pf-theme__option {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    block-size: 44px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-60);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .pf-theme__option:has(.pf-theme__input:checked) {
+    color: var(--ink);
+  }
+  .pf-theme__option:has(.pf-theme__input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .pf-theme__input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Say hello (spec 7.4): the popover's panel. Native, so it is positioned
+     here and never given a display value. */
+  .pf-say__panel {
+    position: fixed;
+    inset: auto;
+    width: auto;
+    height: auto;
+    top: calc(var(--bar-top) + var(--bar-row) + 12px);
+    right: var(--pad);
+    z-index: 85;
+    inline-size: min(300px, 100vw - 32px);
+    margin: 0;
+    padding: 16px 16px 40px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-well);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--elev-pop);
+    overflow: hidden;
+    isolation: isolate;
+    pointer-events: auto;
+  }
+  /* Above the footer's trigger, centred on it: anchor positioning where the
+     engine has it, else the bottom centre of the viewport. */
+  .pf-say__panel--footer {
+    top: auto;
+    right: auto;
+    bottom: 24px;
+    left: 50%;
+    translate: -50% 0;
+  }
+  @supports (anchor-name: --pf-say-footer) {
+    .pf-say__trigger--footer {
+      anchor-name: --pf-say-footer;
+    }
+    .pf-say__panel--footer {
+      position-anchor: --pf-say-footer;
+      position-area: top;
+      inset: auto;
+      margin: 0 0 12px;
+      translate: none;
+    }
+  }
+  .pf-say__body {
+    position: relative;
+    z-index: 1;
+    display: grid;
+  }
+  .pf-say__eyebrow {
+    color: var(--ink-60);
+  }
+  .pf-say__address {
+    margin-block-start: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    user-select: all;
+  }
+  .pf-say__rows {
+    display: grid;
+    gap: 6px;
+    margin-block-start: 16px;
+  }
+  .pf-say__row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-block-size: 40px;
+    padding-inline: 16px;
+    border-radius: var(--radius-pill);
+    color: var(--ink);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .pf-say__row.pf-say__copy {
+    inline-size: 100%;
+    block-size: 40px;
+    background: var(--cta);
+    color: var(--oncta);
+  }
+  .pf-say__dither {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 0;
+    block-size: 22%;
+  }
+
+  /* The phone menu (spec 7.6): a card under the bar. */
+  /* A popover's UA size is fit-content: the card is stretched between its
+     insets instead. */
+  .pf-menu {
+    position: fixed;
+    inset: auto;
+    top: calc(var(--bar-top) + var(--bar-row) + 10px);
+    left: var(--pad);
+    right: var(--pad);
+    width: auto;
+    height: auto;
+    z-index: 85;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--elev-ring);
+    overflow: visible;
+    pointer-events: auto;
+    transform-origin: top;
+  }
+  .pf-menu__list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-menu__link {
+    display: flex;
+    align-items: center;
+    min-block-size: 48px;
+    padding-inline: 16px;
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 1.1875rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-decoration: none;
+  }
+  .pf-menu__link[aria-current] {
+    background: var(--tint-2);
+    color: var(--accent-ink);
+  }
+  .pf-menu__sep {
+    margin-block-start: 8px;
+    padding: 12px 4px 4px;
+    border-block-start: 1px solid var(--line-soft);
+  }
+
+  /* The footer (spec 7.7). */
+  .pf-footer {
+    position: relative;
+    overflow: hidden;
+    padding-block-start: 40px;
+  }
+  .pf-footer__sheet {
+    position: absolute;
+    inset: 0;
+    background: var(--footer-sheet);
+  }
+  .pf-footer__dither {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 60%;
+  }
+  .pf-footer__wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-block-size: var(--screen);
+    padding-block: clamp(96px, 14vh, 160px) 32px;
+  }
+  .pf-footer__intro {
+    display: grid;
+    max-inline-size: 760px;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .pf-footer__headline {
+    margin-block-start: 20px;
+    color: var(--ink);
+  }
+  .pf-footer__lead {
+    max-inline-size: 46ch;
+    margin: 32px auto 0;
+    color: var(--ink-60);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+  .pf-footer__lead p + p {
+    margin-block-start: 12px;
+  }
+  .pf-footer__last {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-footer__cta {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 40px;
+  }
+  .pf-footer__card {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 32px;
+    margin-block: 96px 32px;
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid transparent;
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    backdrop-filter: blur(10px);
+    text-align: start;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-footer__card {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-footer__card {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) minmax(0, 1fr);
+    }
+    .pf-footer__block--pages .pf-footer__list {
+      display: block;
+      columns: 2;
+      column-gap: 24px;
+    }
+    .pf-footer__block--pages .pf-footer__list li {
+      break-inside: avoid;
+    }
+  }
+  .pf-footer__name-block {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+  }
+  .pf-footer__name {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 0.5rem + 2.4vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .pf-footer__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+  .pf-footer__block {
+    min-inline-size: 0;
+  }
+  .pf-footer__label {
+    color: var(--ink-60);
+  }
+  .pf-footer__list {
+    display: grid;
+    gap: 4px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-footer__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 28px;
+    min-inline-size: 24px;
+    color: var(--ink-80);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    text-decoration: none;
+  }
+  .pf-footer__side {
+    display: grid;
+    align-content: start;
+    gap: 32px;
+  }
+  .pf-footer__copyright {
+    margin-block-start: 40px;
+    color: var(--ink-60);
+  }
+
+  /* Pixel drawings (spec 7.7): one square per cell, token colours. Shown from
+     1280 px; the centred call to action keeps the space under that. */
+  .pf-art {
+    display: block;
+    block-size: auto;
+    overflow: visible;
+  }
+  .pf-px--ink {
+    fill: var(--ink);
+  }
+  .pf-px--paper {
+    fill: var(--paper);
+  }
+  .pf-px--soft {
+    fill: var(--tint-2);
+  }
+  .pf-px--tint {
+    fill: var(--tint-3);
+  }
+  .pf-px--accent {
+    fill: var(--accent);
+  }
+  .pf-px--coral {
+    fill: var(--coral);
+  }
+  .pf-footer__art {
+    position: absolute;
+    z-index: 0;
+    display: none;
+    inline-size: clamp(9.375rem, 14vw, 15rem);
+  }
+  @media (min-width: 80rem) {
+    .pf-footer__art {
+      display: block;
+    }
+    .pf-footer__art--browser {
+      inset-inline-start: calc(
+        50% - clamp(16.25rem, 25vw, 23.75rem) - clamp(9.375rem, 14vw, 15rem)
+      );
+      inset-block-start: clamp(8.75rem, 22vh, 15rem);
+    }
+    .pf-footer__art--phone {
+      inset-inline-start: calc(50% + clamp(16.25rem, 25vw, 23.75rem));
+      inset-block-start: clamp(12.5rem, 30vh, 20rem);
+    }
+  }
+
+  /* Hover only where a fine pointer can hover (spec 5.3). */
+  @media (hover: hover) and (pointer: fine) {
+    .pf-nav__link:not([aria-current]):hover {
+      color: var(--ink);
+    }
+    .pf-theme-toggle:hover {
+      background: var(--paper-2);
+    }
+    .pf-menu__link:hover,
+    .pf-say__row:not(.pf-say__copy):hover {
+      background: var(--paper-2);
+    }
+    .pf-footer__link:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  /* Reader preferences (spec 12, items 27 and 28). */
+  @media (prefers-reduced-transparency: reduce) {
+    .pf-footer__card {
+      background: var(--paper);
+      backdrop-filter: none;
+    }
+  }
+
+  /* Forced colours: the rings vanish, so ringed parts take system borders, and
+     the current link is underlined (spec 12, item 26). Pixel art goes away. */
+  @media (forced-colors: active) {
+    .pf-nav__pill,
+    .pf-theme-toggle,
+    .pf-theme,
+    .pf-say__panel,
+    .pf-menu,
+    .pf-footer__card {
+      border-color: CanvasText;
+    }
+    .pf-theme__option:has(.pf-theme__input:checked) {
+      outline: 2px solid Highlight;
+    }
+    .pf-nav__link[aria-current],
+    .pf-menu__link[aria-current] {
+      text-decoration-line: underline;
+      text-underline-offset: 4px;
+    }
+    .pf-art {
+      display: none;
+    }
+  }
+
+  /* Theme changes land at once: no transition runs for two frames (spec 7.5). */
+  html.theme-switching,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition: none !important;
+  }
+}
+
+/* Motion (spec 5.1 and 5.7): movement only with no-preference. Opacity-only
+   rules are the reduced-motion versions. */
+@media (prefers-reduced-motion: no-preference) {
+  .pf-nav__row {
+    transition:
+      opacity 0.2s var(--ease-snappy),
+      transform 0.2s var(--ease-snappy),
+      filter 0.2s var(--ease-snappy);
+  }
+  .pf-nav[data-away]:not(:focus-within) .pf-nav__row {
+    opacity: 0;
+    transform: translateY(-12px);
+    filter: blur(6px);
+    transition-duration: 0.15s;
+  }
+  .pf-nav__active {
+    transition:
+      transform 0.28s var(--ease-snappy),
+      width 0.28s var(--ease-snappy),
+      opacity 0.16s ease-out;
+  }
+  .pf-theme-toggle {
+    transition:
+      background-color 0.1s ease-out,
+      transform 0.14s var(--ease-snappy);
+  }
+  .pf-theme-toggle:active {
+    transform: scale(0.94);
+  }
+  .pf-theme-toggle__glyph {
+    transition: transform 0.24s var(--ease-smooth);
+  }
+  .pf-theme-toggle__icon {
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.32s var(--ease-back);
+  }
+  .pf-theme__thumb {
+    transition: transform 0.26s var(--ease-snappy);
+  }
+  .pf-menu {
+    transition:
+      opacity 0.22s var(--ease-expo),
+      transform 0.22s var(--ease-expo);
+  }
+  .pf-say__panel {
+    transition:
+      opacity 0.2s var(--ease-expo),
+      transform 0.2s var(--ease-expo);
+  }
+  @starting-style {
+    .pf-menu:popover-open {
+      opacity: 0;
+      transform: translateY(-16px) scale(0.98);
+    }
+    .pf-say__panel:popover-open {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+    }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .pf-theme-toggle:hover .pf-theme-toggle__glyph {
+    transform: rotate(-14deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-nav__row {
+    transition: opacity 0.2s ease-out;
+  }
+  .pf-nav[data-away]:not(:focus-within) .pf-nav__row {
+    opacity: 0;
+  }
+  .pf-nav__active {
+    transition: opacity 0.16s ease-out;
+  }
+}
+
+/* The theme fade (spec 7.5) replaces the live site's circular reveal inside
+   the scope only. These rules are unlayered on purpose: the live reveal in
+   globals.css is unlayered, and a layered rule would lose to it whatever its
+   specificity. Each selector here is more specific than the live one. */
+@keyframes kj-theme-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-design="profile"]:active-view-transition-type(
+      theme
+    )::view-transition-old(root),
+  html[data-design="profile"].kj-vt::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  html[data-design="profile"]:active-view-transition-type(
+      theme
+    )::view-transition-new(root),
+  html[data-design="profile"].kj-vt::view-transition-new(root) {
+    animation: kj-theme-fade 0.56s cubic-bezier(0.4, 0, 0.2, 1) both;
+    mix-blend-mode: normal;
+  }
+}
