@@ -1,0 +1,310 @@
+import { useEffect, useRef, useState } from "react";
+import {
+  Frame,
+  MessageCircle,
+  MousePointer2,
+  PenTool,
+  Type,
+} from "lucide-react";
+import Link from "@/components/navigation/Link";
+import { Chip } from "@/components/ds/labels";
+import { canvasMock, type MockFrame } from "@/lib/content/home";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+
+/*
+ * The hero's design-tool canvas (profile redesign, owner decision 3; design
+ * spec 8.2 and 12, item 16): the three featured projects as frames on a
+ * dotted canvas, between a Layers panel and an inspector. Only the frames
+ * are exposed, as named links; the window chrome, panels, comment, cursor
+ * and toolbar are decoration. Hovering or focusing a frame selects it. Under
+ * 810 px the panels go and the frames become a swipeable row with a pager.
+ * Frames show a real screenshot where one is registered, else a textless
+ * drawing labelled "Illustration".
+ */
+
+/**
+ * The frames the named cursor visits once the hero can be seen, ending on
+ * the first, which is selected at rest: the last stop lands by 4.2 s, under
+ * the 5 s that would need a pause control (WCAG 2.2.2).
+ */
+const TOUR = [2, 1, 0] as const;
+const TOUR_START_MS = 900;
+const TOUR_STEP_MS = 1200;
+
+/** Wide enough for the panels; under it the frames swipe (spec 10). */
+const PANELS_QUERY = "(min-width: 50.625rem)";
+
+/** The frame whose centre is nearest the row's, on the swipeable row. */
+function centredFrame(row: HTMLElement): number {
+  const middle = row.scrollLeft + row.clientWidth / 2;
+  let best = 0;
+  let distance = Infinity;
+  Array.from(row.children).forEach((child, index) => {
+    const item = child as HTMLElement;
+    const gap = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
+    if (gap < distance) {
+      distance = gap;
+      best = index;
+    }
+  });
+  return best;
+}
+
+const CELLS: Record<NonNullable<MockFrame["mockup"]>, number> = {
+  "app-shell": 6,
+  "review-queue": 5,
+  "email-report": 6,
+  "form-preview": 5,
+};
+
+/**
+ * The frame's picture: the screenshot, or a textless drawing of the screen
+ * (labelled "Illustration" by the frame's tags, outside the link).
+ */
+function Shot({ frame }: { frame: MockFrame }) {
+  if (frame.cover) {
+    return (
+      <img
+        className="pf-mock__cover"
+        src={frame.cover.src}
+        alt=""
+        width={frame.cover.width}
+        height={frame.cover.height}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
+  const kind = frame.mockup ?? "app-shell";
+  return (
+    <span className={`pf-thumb pf-thumb--${kind}`}>
+      <span className="pf-thumb__screen">
+        {Array.from({ length: CELLS[kind] }, (_, i) => (
+          <i key={i} />
+        ))}
+      </span>
+    </span>
+  );
+}
+
+export function CanvasMock({
+  ready,
+  frames = canvasMock.frames,
+}: {
+  /** The hero can be seen: the cursor may start its tour. */
+  ready: boolean;
+  frames?: readonly MockFrame[];
+}) {
+  const reduced = useReducedMotion();
+  const row = useRef<HTMLUListElement>(null);
+  const [selected, setSelected] = useState(0);
+  const [cursorAt, setCursorAt] = useState(0);
+  const [touched, setTouched] = useState(false);
+  const [shown, setShown] = useState("");
+  const current = frames[selected] ?? frames[0];
+
+  // The cursor's one tour, on the full canvas only; a reader's own choice
+  // ends it.
+  useEffect(() => {
+    if (!ready || reduced || touched) return;
+    if (!window.matchMedia(PANELS_QUERY).matches) return;
+    const timers = TOUR.map((frame, step) =>
+      window.setTimeout(
+        () => {
+          setCursorAt(frame);
+          setSelected(frame);
+        },
+        TOUR_START_MS + step * TOUR_STEP_MS,
+      ),
+    );
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, [ready, reduced, touched]);
+
+  // On the swipeable row, the frame in the middle is the selected one.
+  useEffect(() => {
+    const el = row.current;
+    if (!el) return;
+    let frame = 0;
+    const settle = () => {
+      frame = 0;
+      setSelected(centredFrame(el));
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(settle);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  const pick = (index: number) => {
+    setTouched(true);
+    setSelected(index);
+  };
+
+  const show = (index: number) => {
+    const el = row.current;
+    const item = el?.children[index] as HTMLElement | undefined;
+    if (el && item) {
+      el.scrollTo?.({
+        left: item.offsetLeft - (el.clientWidth - item.offsetWidth) / 2,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    }
+    pick(index);
+    const frame = frames[index];
+    if (frame) setShown(canvasMock.shown(frame.name, index, frames.length));
+  };
+
+  if (!current) return null;
+
+  return (
+    <div className="pf-mock-wrap">
+      <div className="pf-mock" role="group" aria-label={canvasMock.label}>
+        <div className="pf-mock__bar" aria-hidden="true">
+          <span className="pf-mock__lights">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="pf-mock__title">
+            <b>{canvasMock.breadcrumb.owner}</b>
+            {" / "}
+            {canvasMock.breadcrumb.file}
+          </span>
+          <span className="pf-mock__share">{canvasMock.share}</span>
+        </div>
+        <div className="pf-mock__canvas">
+          <div className="pf-mock__panel pf-mock__layers" aria-hidden="true">
+            <p className="pf-mock__tabs">
+              <b>{canvasMock.layersTabs[0]}</b>
+              <span>{canvasMock.layersTabs[1]}</span>
+            </p>
+            <p className="pf-mock__group">{canvasMock.layersGroup}</p>
+            <ul className="pf-mock__layer-list">
+              {frames.map((frame, index) => (
+                <li
+                  key={frame.slug}
+                  className="pf-mock__layer"
+                  data-selected={index === selected ? "" : undefined}
+                >
+                  <span className="pf-mock__hash">#</span>
+                  <span>{frame.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <ul ref={row} className="pf-mock__frames">
+            {frames.map((frame, index) => (
+              <li key={frame.slug} className="pf-mock__item">
+                <Link
+                  href={frame.href}
+                  className="pf-mock__frame"
+                  data-selected={index === selected ? "" : undefined}
+                  aria-label={canvasMock.frameName(frame.name)}
+                  onPointerEnter={() => pick(index)}
+                  onFocus={() => pick(index)}
+                >
+                  <span className="pf-mock__label" aria-hidden="true">
+                    <span className="pf-mock__hash">#</span>
+                    {frame.name}
+                  </span>
+                  <span className="pf-mock__shot" aria-hidden="true">
+                    <Shot frame={frame} />
+                    <span className="pf-mock__handles">
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                  </span>
+                </Link>
+                {/* Over the picture but outside the link, so the link's
+                    visible text is its name alone (WCAG 2.5.3). */}
+                <span className="pf-mock__tags" aria-hidden="true">
+                  {frame.cover ? null : (
+                    <Chip kind="illustration">{canvasMock.illustration}</Chip>
+                  )}
+                  <span className="pf-mock__badge">{frame.category}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="pf-mock__panel pf-mock__inspector" aria-hidden="true">
+            <p className="pf-mock__tabs">
+              <b>{canvasMock.inspectorTabs[0]}</b>
+              <span>{canvasMock.inspectorTabs[1]}</span>
+            </p>
+            <p className="pf-mock__name">{current.name}</p>
+            <p className="pf-mock__field">
+              <span>{canvasMock.area}</span>
+              {current.category}
+            </p>
+            <p className="pf-mock__field">
+              <span>{canvasMock.period}</span>
+              {current.period}
+            </p>
+            {/* For a pointer only: the frame link before it is the same
+                link for the keyboard and for screen readers. */}
+            <Link href={current.href} tabIndex={-1} className="pf-mock__open">
+              {canvasMock.open}
+            </Link>
+          </div>
+          <div className="pf-mock__comment" aria-hidden="true">
+            <span className="pf-mock__avatar">
+              {canvasMock.comment.initial}
+            </span>
+            <span className="pf-mock__bubble">
+              <span className="pf-mock__who">{canvasMock.comment.who}</span>
+              <span>{canvasMock.comment.line}</span>
+            </span>
+          </div>
+          <div
+            className="pf-mock__cursor"
+            data-frame={cursorAt}
+            aria-hidden="true"
+          >
+            <MousePointer2 size={18} strokeWidth={1.6} />
+            <span className="pf-mock__cursor-name">{canvasMock.cursor}</span>
+          </div>
+          <div className="pf-mock__tools" aria-hidden="true">
+            <span data-on="">
+              <MousePointer2 size={15} strokeWidth={1.8} />
+            </span>
+            <span>
+              <Frame size={15} strokeWidth={1.8} />
+            </span>
+            <span>
+              <PenTool size={15} strokeWidth={1.8} />
+            </span>
+            <span>
+              <Type size={15} strokeWidth={1.8} />
+            </span>
+            <span>
+              <MessageCircle size={15} strokeWidth={1.8} />
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="pf-mock__pager">
+        {frames.map((frame, index) => (
+          <button
+            key={frame.slug}
+            type="button"
+            className="pf-mock__dot"
+            aria-label={canvasMock.showName(frame.name)}
+            aria-current={index === selected ? "true" : undefined}
+            onClick={() => show(index)}
+          >
+            <span />
+          </button>
+        ))}
+      </div>
+      <p className="sr-only" aria-live="polite">
+        {shown}
+      </p>
+    </div>
+  );
+}

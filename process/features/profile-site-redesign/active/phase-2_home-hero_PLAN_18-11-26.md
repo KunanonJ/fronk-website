@@ -1,6 +1,7 @@
 # Phase 2: Home hero and logo strip
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE".
+**Status:** CODE DONE (18-11-26)
+**Evidence:** `../reports/phase-2_home-hero_REPORT_18-11-26.md` (gates, deviations, draft copy; visual baselines pending, see its open item 1).
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` section 8 (hero, canvas

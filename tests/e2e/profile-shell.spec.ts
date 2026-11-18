@@ -842,10 +842,13 @@ test.describe("chrome: Say hello and the theme", () => {
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "one check is enough");
+    // Stylesheets only: a script chunk named after a profile module (such as
+    // profileChrome) may be preloaded too.
+    const sheet = 'link[rel="stylesheet"][href*="/assets/profile"]';
     await page.goto("/", { waitUntil: "networkidle" });
-    expect(await page.locator('link[href*="/assets/profile"]').count()).toBe(0);
+    expect(await page.locator(sheet).count()).toBe(0);
     await page.goto(HOME, { waitUntil: "networkidle" });
-    await expect(page.locator('link[href*="/assets/profile"]')).toHaveCount(1);
+    await expect(page.locator(sheet)).toHaveCount(1);
   });
 });
 

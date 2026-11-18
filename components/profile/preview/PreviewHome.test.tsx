@@ -9,9 +9,9 @@ import PreviewHome from "@/components/profile/preview/PreviewHome";
 describe("PreviewHome", () => {
   const html = renderToString(<PreviewHome />);
 
-  it("keeps its h1", () => {
+  it("keeps one h1: the hero's (Phase 2)", () => {
     expect(html.match(/<h1/g)).toHaveLength(1);
-    expect(html).toContain("Profile preview");
+    expect(html).toContain('<h1 id="hero-title"');
   });
 
   it("has the three labelled sections, in order", () => {

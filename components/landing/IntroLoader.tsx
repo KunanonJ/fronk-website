@@ -7,6 +7,7 @@ import {
   INTRO_TIMING,
   introExitStartMs,
 } from "@/lib/content/introGreetings";
+import { markIntroDone } from "@/lib/motion/introSignal";
 
 type Phase = "off" | "cycling" | "exiting";
 
@@ -72,6 +73,8 @@ export default function IntroLoader() {
   useEffect(() => {
     if (phase !== "exiting") return;
     markSeen();
+    // The intro-finished signal: a hero waiting on it starts its entrance now.
+    markIntroDone();
     const id = window.setTimeout(() => setPhase("off"), INTRO_TIMING.exitMs);
     return () => window.clearTimeout(id);
   }, [phase]);
