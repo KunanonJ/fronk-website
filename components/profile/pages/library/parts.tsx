@@ -9,7 +9,8 @@ import { pad2 } from "@/lib/utils/pad2";
  * /build; profile redesign, Phase 7 lane D1, plan step 7d): a block's kicker
  * and count, the filter bar of the portfolio index, and a text link that can
  * name its language or open a new tab. Styles: `.pf-read*` in
- * src/styles/profile/pages-hubs.css, `.pf-work__*` in cutover.css.
+ * src/styles/profile/pages-hubs.css; the shared filter bar (`.pf-filter-bar`,
+ * `.pf-filter`) in cutover.css.
  */
 
 /** "03 tools", "01 ticket". */
@@ -91,15 +92,15 @@ export function FilterBar<T extends string>({
   result: string;
 }) {
   return (
-    <div className="pf-work__bar">
-      <div role="group" aria-label={label} className="pf-work__filter">
+    <div className="pf-filter-bar">
+      <div role="group" aria-label={label} className="pf-filter">
         {options.map((option) => (
           <button
             key={option.id}
             type="button"
             aria-pressed={option.id === value}
             onClick={() => onChange(option.id)}
-            className="pf-work__option"
+            className="pf-filter__option"
           >
             <span lang={option.lang}>{option.label}</span>
             {option.count === undefined ? null : (
@@ -119,7 +120,7 @@ export function FilterBar<T extends string>({
           </button>
         ))}
       </div>
-      <p aria-live="polite" className="t-meta pf-work__count">
+      <p aria-live="polite" className="t-meta pf-filter-bar__count">
         {result}
       </p>
     </div>

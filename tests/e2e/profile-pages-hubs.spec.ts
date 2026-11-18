@@ -199,7 +199,7 @@ async function forcedColorsProblems(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const out: string[] = [];
     const ringed = document.querySelectorAll<HTMLElement>(
-      "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-work__filter, .pf-case-hire, .pf-read-stat, .pf-read-ticket)",
+      "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-filter, .pf-case-hire, .pf-read-stat, .pf-read-ticket)",
     );
     for (const el of ringed) {
       const s = getComputedStyle(el);

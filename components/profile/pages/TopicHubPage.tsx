@@ -63,7 +63,7 @@ function LanguageNav({ pillar }: { pillar: TopicPillar }) {
     <nav
       aria-label="Language"
       lang={th ? "en" : undefined}
-      className="pf-work__filter"
+      className="pf-filter"
     >
       {options.map((option) => {
         const current = (option.lang === "th") === th;
@@ -74,7 +74,7 @@ function LanguageNav({ pillar }: { pillar: TopicPillar }) {
             hrefLang={option.lang}
             lang={option.lang}
             aria-current={current ? "page" : undefined}
-            className="pf-work__option pf-hub-lang"
+            className="pf-filter__option pf-hub-lang"
           >
             {option.label}
           </Link>

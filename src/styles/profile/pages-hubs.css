@@ -158,7 +158,7 @@
   .pf-read-head .pf-case-kicker {
     margin: 0;
   }
-  .pf-read-head + .pf-work__bar {
+  .pf-read-head + .pf-filter-bar {
     margin-top: 16px;
   }
   .pf-read-meta,
