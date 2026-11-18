@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { ROUTES } from "./routes";
+import { PREVIEW_ROUTES, ROUTES } from "./routes";
 
 /**
  * Behavioral smoke + accessibility/motion guard. These run on every phase to
@@ -18,7 +18,7 @@ function isRealError(text: string): boolean {
 }
 
 test.describe("smoke > every route renders without JS errors", () => {
-  for (const route of ROUTES) {
+  for (const route of [...ROUTES, ...PREVIEW_ROUTES]) {
     test(`${route.name} renders an <h1> and throws no JS errors`, async ({
       page,
     }) => {

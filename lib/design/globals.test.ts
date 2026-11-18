@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 const globalsCss = readFileSync(
   join(process.cwd(), "src/styles/globals.css"),
@@ -72,7 +73,7 @@ describe("visual-redesign foundation", () => {
     }
   });
 
-  it("uses Geist, Geist Mono and Noto Sans Thai, and drops the retired fonts", () => {
+  it("uses Geist, Geist Mono, Noto Sans Thai and the profile fonts, and drops the retired fonts", () => {
     const families = [
       ...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g),
     ].map((m) => m[1]!.trim());
@@ -84,11 +85,20 @@ describe("visual-redesign foundation", () => {
         "Geist Mono Fallback",
         "Noto Sans Thai",
         "Noto Sans Thai Fallback",
+        // Profile redesign (umbrella plan of 18-11-26, owner decisions 1 and 8
+        // and "What these reverse"): the reference's type joins Geist, which
+        // Phase 8 removes. Instrument Serif leaves the retired list below.
+        "Instrument Serif",
+        "Instrument Serif Fallback",
+        "Onest",
+        "Onest Fallback",
+        "JetBrains Mono",
+        "JetBrains Mono Fallback",
+        "Patrick Hand",
       ]),
     );
     for (const retired of [
       "Hanken Grotesk",
-      "Instrument Serif",
       "Space Mono",
       "Almarai",
       "Inter",
@@ -180,12 +190,26 @@ describe("bento motion contract", () => {
       }
       rest = rest.slice(0, at) + rest.slice(end + 1);
     }
-    // (The theme reveal is a view transition: the toggle never starts one
-    // under reduced motion, and the reduced-motion block below disables it.)
-    expect(rest).not.toMatch(
-      /animation:\s*(kj-(?!reveal)|intro-(confetti|sparkle|pop|flash))/,
-    );
+    // Widened in the profile redesign (Phase 0, design spec 5.1): any
+    // animation outside no-preference fails, not only kj- and intro- names.
+    // Two exceptions, each never started under reduced motion: the theme
+    // reveal is a view transition the toggle skips (and the reduced-motion
+    // block below disables), and the intro's words belong to an overlay that
+    // IntroLoader does not mount under reduced motion.
+    const allowed = /^(none\b|kj-reveal\b|intro-word-in\b)/;
+    const loose = [...rest.matchAll(/animation:\s*([^;]+);/g)]
+      .map((m) => m[1]!.trim())
+      .filter((value) => !allowed.test(value));
+    expect(loose).toEqual([]);
     expect(globalsCss).toMatch(/animation: kj-rise/);
+  });
+
+  it("names every keyframe kj- (or the intro's own intro-), so the guard covers it", () => {
+    const names = [...globalsCss.matchAll(/@keyframes ([\w-]+)/g)].map(
+      (m) => m[1]!,
+    );
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.filter((n) => !/^(kj|intro)-/.test(n))).toEqual([]);
   });
 
   it("scopes the circular reveal to theme switches and turns view transitions off under reduced motion", () => {
@@ -207,5 +231,60 @@ describe("bento motion contract", () => {
     expect(globalsCss).not.toContain("smooth-cursor");
     expect(globalsCss).not.toContain(".keyword");
     expect(layoutTsx).not.toContain("RouteFade");
+  });
+});
+
+/**
+ * Profile redesign, Phase 0 (process/features/profile-site-redesign): the new
+ * tokens live in one scope, `data-design="profile"` on <html>, until the
+ * cutover. Contrast pairs for the scope are in contrast.test.ts.
+ */
+describe("profile redesign scope", () => {
+  it("defines the scope in both themes", () => {
+    expect(globalsCss).toMatch(/^\[data-design="profile"\] \{/m);
+    expect(globalsCss).toMatch(
+      /^html\.dark\[data-design="profile"\],\n\.dark \[data-design="profile"\] \{/m,
+    );
+  });
+
+  it("never fakes bold or italic Instrument Serif", () => {
+    const scope =
+      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
+      "";
+    expect(scope).toMatch(/font-synthesis-weight: none;/);
+  });
+
+  it("sets the scope on <html> from the matched routes, for the preview only", () => {
+    expect(layoutTsx).toContain("data-design={design}");
+    expect(layoutTsx).toMatch(/profileDesign\(s\.matches\.map/);
+    expect(read("lib/design/scope.ts")).toMatch(/new Set\(\["\/preview"\]\)/);
+  });
+
+  it("points Tailwind's preflight fonts at the scope's own stacks", () => {
+    const scope =
+      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
+      "";
+    expect(scope).toContain("--default-font-family: var(--font-sans);");
+    expect(scope).toContain("--default-mono-font-family: var(--font-mono);");
+  });
+
+  it("keeps the frozen font utilities out of the redesign's components", () => {
+    // `@theme inline` bakes the Geist stacks into font-sans, font-mono and
+    // font-display, so inside the scope they would render the old fonts.
+    const offenders = sourceFiles([
+      "components/ds",
+      "components/profile",
+    ]).filter((f) => /\bfont-(?:sans|mono|display)\b/.test(read(f)));
+    expect(offenders).toEqual([]);
+  });
+
+  it("keeps the preview's reader-preference blocks", () => {
+    for (const query of [
+      "prefers-contrast: more",
+      "prefers-reduced-transparency: reduce",
+      "forced-colors: active",
+    ]) {
+      expect(globalsCss, query).toContain(`@media (${query})`);
+    }
   });
 });

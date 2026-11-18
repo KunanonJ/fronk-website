@@ -52,7 +52,9 @@ function robotsOrigin(): string {
 
 export default function robots(): Robots {
   const base = robotsOrigin();
-  const sharedDisallow = ["/studio", "/api"] as const;
+  // /preview: the hidden profile-redesign previews (Phases 0 to 5), also
+  // noindex and unlinked, until Phase 6 deletes them.
+  const sharedDisallow = ["/studio", "/api", "/preview"] as const;
 
   return {
     comment: "Content signals: https://contentsignals.org",

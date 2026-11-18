@@ -39,6 +39,16 @@ const MARKETING_BUDGET_KB = 200;
 // lands here and costs every page, so it gets its own cap.
 const ENTRY_BUDGET_KB = 120;
 
+// Stylesheets and preloaded fonts (profile redesign, Phase 0; best-practices
+// audit, section 8): every stylesheet a page links (gzip), and the woff2
+// files it preloads (already compressed, counted as served). Set at the
+// 18-11-26 measurement plus 10%, with the scoped profile block in
+// globals.css: 20.1 KB of stylesheets and 51.2 KB of preloaded fonts (both on
+// /about). They only go down: Phase 8 deletes the old design. The new Home
+// preloads Onest and Instrument Serif (48.8 KB) instead of Geist, not beside it.
+const CSS_BUDGET_KB = 22;
+const FONT_PRELOAD_BUDGET_KB = 56;
+
 const MARKETING_EXACT = new Set([
   "/",
   "/about",
@@ -164,6 +174,73 @@ console.log(
 if (!entry || entryKb > ENTRY_BUDGET_KB) {
   console.error(
     `\n[perf] FAIL — entry chunk ${entryKb.toFixed(1)}KB > ${ENTRY_BUDGET_KB}KB budget: a content module is probably imported from a route head() or the root route.`,
+  );
+  process.exit(1);
+}
+
+// Stylesheets (gzip) and preloaded fonts (bytes), worst page each.
+function assetRefs(htmlPath, pattern) {
+  const html = fs.readFileSync(htmlPath, "utf8");
+  return [...new Set([...html.matchAll(pattern)].map((m) => m[1]))];
+}
+// Both checks fail loudly rather than read 0 KB when the markup or the build
+// layout changes: a missing asset or a page with no stylesheet is an error.
+function failAssets(message) {
+  console.error(`\n[perf] FAIL — ${message}`);
+  process.exit(1);
+}
+function bytesKb(names, gzip) {
+  let total = 0;
+  for (const name of names) {
+    const p = path.join("dist/client/assets", name);
+    if (!fs.existsSync(p)) {
+      failAssets(
+        `${name} is referenced by a page but missing from dist/client/assets.`,
+      );
+    }
+    const body = fs.readFileSync(p);
+    total += gzip ? zlib.gzipSync(body).length : body.length;
+  }
+  return total / 1024;
+}
+const pages = findRouteHtml();
+const cssWorst = pages
+  .map((html) => {
+    const refs = assetRefs(html, /href="\/assets\/([^"]+?\.css)"/g);
+    if (refs.length === 0) {
+      failAssets(
+        `${html} links no stylesheet under /assets/: the markup probably changed.`,
+      );
+    }
+    return { html, kb: bytesKb(refs, true) };
+  })
+  .sort((a, b) => b.kb - a.kb)[0];
+const fontWorst = pages
+  .map((html) => ({
+    html,
+    kb: bytesKb(
+      assetRefs(
+        html,
+        /<link[^>]*rel="preload"[^>]*href="\/assets\/([^"]+?\.woff2)"/g,
+      ),
+      false,
+    ),
+  }))
+  .sort((a, b) => b.kb - a.kb)[0];
+if (!fontWorst || fontWorst.kb === 0) {
+  failAssets(
+    "no page preloads a font: the preload markup (rel before href) probably changed.",
+  );
+}
+console.log(
+  `\n  ${cssWorst.kb > CSS_BUDGET_KB ? "❌" : "✅"} ${cssWorst.kb.toFixed(1).padStart(6)} KB / ${CSS_BUDGET_KB} KB  stylesheets, worst page (${path.relative(APP_DIR, cssWorst.html)})`,
+);
+console.log(
+  `  ${fontWorst.kb > FONT_PRELOAD_BUDGET_KB ? "❌" : "✅"} ${fontWorst.kb.toFixed(1).padStart(6)} KB / ${FONT_PRELOAD_BUDGET_KB} KB  preloaded fonts, worst page (${path.relative(APP_DIR, fontWorst.html)})`,
+);
+if (cssWorst.kb > CSS_BUDGET_KB || fontWorst.kb > FONT_PRELOAD_BUDGET_KB) {
+  console.error(
+    "\n[perf] FAIL — stylesheets or preloaded fonts over budget: the old design must shrink before the new one grows.",
   );
   process.exit(1);
 }

@@ -152,3 +152,18 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /Manut AI/i,
   },
 ];
+
+/**
+ * Hidden previews of the profile redesign (Phases 0 to 5). They have no site
+ * chrome yet, so the header and menu checks in smoke.spec skip them; the
+ * render, axe (with WCAG 2.2) and visual checks cover them, and
+ * profile.spec.ts adds the device matrix and the best-practice checks.
+ * Phase 6 deletes them.
+ */
+export const PREVIEW_ROUTES: readonly RouteUnderTest[] = [
+  {
+    path: "/preview/system",
+    name: "preview-system",
+    expectsHeadingPattern: /Design system preview/,
+  },
+];
