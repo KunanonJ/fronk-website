@@ -777,10 +777,21 @@ test.describe("work and about: baselines on the device matrix", () => {
         await prepare(page, theme);
         await visit(page);
         // A section taller than the viewport is captured beyond it, where
-        // the parked skip link and the fixed bar would be drawn over it.
+        // the parked skip link and the fixed bar would be drawn over it,
+        // and where the sticky cards would stack mid-capture. The cards are
+        // laid out in flow here, as in print; the stacking itself has its
+        // own behaviour tests above.
         await page.addStyleTag({
-          content:
+          content: [
             "[data-site-chrome], .ds-skip { visibility: hidden !important; }",
+            ...(id === "work"
+              ? [
+                  ".pf-stack__item { position: static !important; }",
+                  ".pf-card { transform: none !important; }",
+                  ".pf-card::after { opacity: 0 !important; }",
+                ]
+              : []),
+          ].join("\n"),
         });
         await expect(page.locator(`#${id}`)).toHaveScreenshot(
           `preview-${id}-${theme}.png`,
