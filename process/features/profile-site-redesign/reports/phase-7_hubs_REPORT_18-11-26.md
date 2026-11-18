@@ -304,3 +304,36 @@ The review of `5c2803c` found these; each fix is in `fb452f8`.
 | 9 | `/proof`'s metric tiles lost the site's hand cursor (`cursor: pointer`) | The declaration is gone; the partial sets no cursor | browser: the metric and persona tiles' computed cursor holds `hand.svg`; `pagesHubs.test.ts` rejects any `cursor` |
 | 10 | `--shadow-logo` and `--elev-logo` are now unused | Left in `globals.css`, as asked | open item 9 |
 | 11 | The report: keyboard coverage, deviation 6, section 10 | The keyboard claim held only after fix 3 (section 4 now says how it is driven); deviation 6 names the layout's share panel; section 10 accounts for what was removed and restored, not only what was added | |
+
+## 13. Brought onto `main` (19-11-26, the orchestrator)
+
+The lane's eight commits were cherry-picked onto the cutover's tip, then
+rebased onto `main` once PR #125 merged as `7d9b4b4`. They applied cleanly.
+
+- **The filter classes (deviation 10, open item 9).** The cutover's last fix
+  renamed the borrowed classes: `.pf-work__bar` is `.pf-filter-bar`,
+  `.pf-work__filter` is `.pf-filter`, `.pf-work__option` is
+  `.pf-filter__option` and `.pf-work__count` is `.pf-filter-bar__count`.
+  The hub language switch, the library pages' filters, the reading header's
+  spacing rule and the hubs' contrast check now use those names (`3c836a1`);
+  with the old ones they matched no rule.
+- **The Journey orbit flake (open item 10): a Safari bug, fixed.** An event
+  log in the failing runs showed that no `pointerout` or `pointerleave`
+  reached the orbit's stage after Play was pressed. The motion toggle swaps
+  its icon (`Pause` for `Play`), so the hovered `<svg>` is removed, and macOS
+  WebKit then loses the hover chain. The stage's Play flag (`data-play`) stuck,
+  and neither hover nor keyboard focus held the ring again. The notebook's
+  pause button swaps its icon the same way, and its hover hold would stick.
+  Both icons are now `pointer-events: none` (`b0667a3`). The check failed
+  5 of 6 runs alone on the WebKit phone before the fix and passed 8 of 8
+  after; the Journey and shell specs pass on desktop, mobile and the WebKit
+  phone (76 passed).
+- **Gates on the combined tree** (the cutover's tip plus this lane, before the
+  Safari fix): types, lint, format and knip clean; 163 files, 1,525 unit tests
+  pass; build; budgets (entry 111.3 / 120 KB, stylesheets 35.2 / 37 KB,
+  preloaded fonts 51.2 / 56 KB, worst route 197.1 / 200 KB); the browser gate
+  on six projects, 1,002 passed with the one orbit failure above; parity, 137
+  URLs with 0 differences.
+- **Baselines.** The 40 interim baselines of these ten pages, rendered at the
+  cutover with the new chrome around the old bodies, were removed, so CI
+  writes them again in this PR.
