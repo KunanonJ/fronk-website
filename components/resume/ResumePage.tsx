@@ -92,8 +92,7 @@ export default function ResumePage({
           </span>
         </p>
         <div className="pf-cat-hero__actions pf-resume__actions">
-          {/* On phones the PDF takes the first row, so Contact and the Share
-              icon share the second instead of the icon wrapping alone. */}
+          {/* Full width on phones (pages-catalog.css). */}
           <a
             href={RESUME_PDF_HREF}
             download={RESUME_PDF_NAME}

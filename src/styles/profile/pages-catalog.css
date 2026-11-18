@@ -607,6 +607,11 @@
   .pf-resume__availability .ds-dot {
     transform: translateY(-1px);
   }
+  /* On phones the PDF takes the first row, so Contact and the Share icon
+     share the second instead of the icon wrapping alone. */
+  .pf-resume__pdf {
+    inline-size: 100%;
+  }
   .pf-resume__detail {
     align-self: flex-start;
     inline-size: fit-content;
@@ -1187,6 +1192,11 @@
   }
 
   /* Breakpoints (spec 4.1 and 10.1). */
+  @media (min-width: 40rem) {
+    .pf-resume__pdf {
+      inline-size: auto;
+    }
+  }
   @media (min-width: 37.5rem) {
     .pf-status__grid,
     .pf-skill-steps,
