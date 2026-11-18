@@ -171,8 +171,8 @@ for body text.
 
 Comparison image (not committed, like earlier phases' screenshots): the
 Thai FDE and AI-transformation h1s in each face at display size, beside the
-Latin serif, rendered from the self-hosted files:
-`/private/tmp/claude-501/-Users-kunanonjarat--t3-worktrees-fronk-website-t3-8e28336e-8c52ff2e516be201/f5cf5a55-2336-425a-8efd-bb7f505ce871/scratchpad/noto-serif-thai-comparison.png`.
+Latin serif, rendered from the self-hosted files; it stayed in the lane's
+scratch folder, outside the repo.
 
 Recommendation: keep Noto Sans Thai unless the owner wants the Thai
 headings to echo the Latin serif; then ship Noto Serif Thai **400**, Thai
