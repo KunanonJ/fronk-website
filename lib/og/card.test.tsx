@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { brand } from "@/lib/brand/tokens";
-import { OG_SIZE, OgCard } from "@/lib/og/card";
+import { OG_SIZE, OgCard, clampText } from "@/lib/og/card";
 import { siteConfig } from "@/lib/site";
 
 function flattenText(node: unknown): string {
@@ -74,5 +74,16 @@ describe("OgCard", () => {
     }
     // Each title draws its own band.
     expect(JSON.stringify(expand(OgCard({ title: "Another" })))).not.toBe(json);
+  });
+
+  it("cuts a long subtitle at a word, with an ellipsis", () => {
+    expect(clampText("Short enough.", 118)).toBe("Short enough.");
+    const long =
+      "Use when reviewing a branch, PR, or WIP since a commit, tag, or merge-base. Two-axis Standards and Spec review via parallel sub-agents.";
+    const cut = clampText(long, 118);
+    expect(cut.length).toBeLessThanOrEqual(118);
+    expect(cut.endsWith("…")).toBe(true);
+    expect(long.startsWith(cut.slice(0, -1))).toBe(true);
+    expect(cut).not.toMatch(/[\s,.]…$/);
   });
 });

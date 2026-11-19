@@ -12,9 +12,22 @@ export interface OgCardProps {
 }
 
 const CELL = 20;
-const BAND = { width: OG_SIZE.width, height: 160 };
+const BAND = { width: OG_SIZE.width, height: 120 };
+/** About two lines of the 28 px subtitle across the card's 940 px measure. */
+const SUBTITLE_MAX = 118;
 /** The site's dither stops (DitherField's default), dense edge first. */
 const STOPS = [brand.peach, brand.tint4, brand.tint3] as const;
+
+/**
+ * Cuts `text` to at most `max` characters at a word boundary, with an
+ * ellipsis, so a long summary never runs into the card's foot.
+ */
+export function clampText(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max / 2 ? cut.slice(0, space) : cut).replace(/[\s,;:.—-]+$/, "")}…`;
+}
 
 /** Stable seed from the title, so each page gets its own pattern. */
 function seedFrom(text: string): number {
@@ -90,7 +103,7 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "64px 72px 196px",
+        padding: "64px 72px 152px",
         background: brand.paper,
         color: brand.ink,
         fontFamily: "Onest",
@@ -155,7 +168,7 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
           style={{
             display: "flex",
             fontFamily: "Instrument Serif",
-            fontSize: title.length > 28 ? 72 : 92,
+            fontSize: title.length > 40 ? 60 : title.length > 28 ? 72 : 92,
             lineHeight: 1.02,
             letterSpacing: "-0.01em",
           }}
@@ -171,7 +184,7 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
               color: brand.inkMuted,
             }}
           >
-            {subtitle}
+            {clampText(subtitle, SUBTITLE_MAX)}
           </div>
         ) : null}
       </div>
