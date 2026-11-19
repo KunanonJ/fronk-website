@@ -524,6 +524,96 @@ test.describe("blog > tag and search are typed search params", () => {
 });
 
 /**
+ * Filters move their cards (polish pass, F3): with motion allowed, a filter
+ * click runs a view transition of type "filter" that gets ready without an
+ * error (two elements sharing a transition name would abort it), the list
+ * changes in place, and the page keeps its scroll.
+ */
+test.describe("filters > a click moves the cards, with no page error", () => {
+  const FILTERS = [
+    {
+      path: "/portfolio",
+      group: "Filter projects by category",
+      option: /^Ops automation$/,
+      item: ".pf-work-index__item",
+    },
+    {
+      path: "/skills",
+      group: "Show",
+      option: /^You invoke/,
+      item: ".pf-skill-card__item",
+    },
+    {
+      path: "/blog",
+      group: "Filter by tag",
+      option: /^SME \d+$/,
+      item: ".pf-blog-list__item",
+    },
+  ] as const;
+
+  for (const { path, group, option, item } of FILTERS) {
+    test(`${path}: the filter transition runs and the list changes`, async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(
+        browserName !== "chromium",
+        "view-transition types are checked in Chromium",
+      );
+      const errors: string[] = [];
+      page.on("pageerror", (err) => errors.push(err.message));
+      page.on("console", (msg) => {
+        if (msg.type() === "error" && isRealError(msg.text()))
+          errors.push(msg.text());
+      });
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      // Logs each view transition the page starts, with its types and
+      // whether it got ready or was aborted.
+      await page.addInitScript(() => {
+        const log: string[] = [];
+        (window as unknown as { __vt: string[] }).__vt = log;
+        const doc = document as unknown as {
+          startViewTransition?: (arg: unknown) => {
+            ready: Promise<void>;
+          };
+        };
+        const start = doc.startViewTransition?.bind(document);
+        if (!start) return;
+        doc.startViewTransition = (arg) => {
+          const transition = start(arg);
+          const types = (arg as { types?: string[] } | undefined)?.types;
+          log.push(`start ${types?.join(",") ?? ""}`);
+          transition.ready.then(
+            () => log.push("ready"),
+            (err: Error) => log.push(`aborted ${err.name}`),
+          );
+          return transition;
+        };
+      });
+
+      await page.goto(path, { waitUntil: "networkidle" });
+      const filter = page.getByRole("group", { name: group });
+      await filter.scrollIntoViewIfNeeded();
+      const top = await page.evaluate(() => window.scrollY);
+      const before = await page.locator(item).count();
+
+      await filter.getByRole("button", { name: option }).click();
+      await expect(
+        filter.getByRole("button", { name: option }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await expect.poll(() => page.locator(item).count()).not.toBe(before);
+      await expect
+        .poll(() =>
+          page.evaluate(() => (window as unknown as { __vt: string[] }).__vt),
+        )
+        .toEqual(["start filter", "ready"]);
+      expect(await page.evaluate(() => window.scrollY)).toBe(top);
+      expect(errors, errors.join("\n")).toEqual([]);
+    });
+  }
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

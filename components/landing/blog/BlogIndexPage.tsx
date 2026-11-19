@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { Search } from "lucide-react";
 import { TextLink } from "@/components/ds/TextLink";
 import Link from "@/components/navigation/Link";
@@ -331,7 +331,12 @@ export default function BlogIndexPage({
             {filtered.length > 0 ? (
               <ol className="pf-blog-list">
                 {filtered.map((post, i) => (
-                  <li key={post.id} className="pf-blog-list__item">
+                  <li
+                    key={post.id}
+                    className="pf-blog-list__item"
+                    // Its name in a filter's view transition (globals.css).
+                    style={{ "--vt": `pf-p-${post.slug}` } as CSSProperties}
+                  >
                     <PostRow post={post} index={i + 1} showTags />
                   </li>
                 ))}

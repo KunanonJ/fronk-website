@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "@/components/navigation/Link";
 import { DownloadIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
@@ -23,7 +24,11 @@ export default function SkillCard({ skill }: { skill: Skill }) {
   const headingId = `skill-${skill.slug}`;
 
   return (
-    <li className="pf-skill-card__item">
+    <li
+      className="pf-skill-card__item"
+      // Its name in a filter's view transition (globals.css).
+      style={{ "--vt": `pf-s-${skill.slug}` } as CSSProperties}
+    >
       <article aria-labelledby={headingId} className="pf-skill-card">
         <h3 id={headingId} className="pf-skill-card__name">
           <Link

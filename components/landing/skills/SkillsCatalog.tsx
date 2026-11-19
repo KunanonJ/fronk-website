@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import SkillCard from "@/components/landing/skills/SkillCard";
 import { NOTE } from "@/components/landing/skills/SkillParts";
 import {
@@ -92,7 +93,11 @@ export default function SkillsCatalog({
           aria-labelledby={`stage-${stage.id}`}
           className="pf-skill-stage"
         >
-          <div className="pf-skill-stage__head">
+          <div
+            className="pf-skill-stage__head"
+            // Moves with its cards in a filter's view transition (globals.css).
+            style={{ "--vt": `pf-st-${stage.id}` } as CSSProperties}
+          >
             <h2 id={`stage-${stage.id}`} className="t-h3 pf-cat-title">
               {stage.label}
             </h2>

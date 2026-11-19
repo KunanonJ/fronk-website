@@ -463,16 +463,17 @@ a {
 }
 
 /* ─── View transitions ───────────────────────────────────────────────────────
- * Two kinds, told apart by view-transition types: the router starts page
- * navigations with type "page" (a short cross-fade, the UA default), and the
- * theme toggle starts its switch with type "theme". The toggle also sets
+ * Three kinds, told apart by view-transition types: the router starts page
+ * navigations with type "page" (a short cross-fade, the UA default), a list
+ * filter's change with type "filter" (below), and the theme toggle starts
+ * its switch with type "theme". The toggle also sets
  * html.kj-vt for the duration, which stops CSS transitions blending into the
  * snapshot and carries the theme switch in browsers that lack view-transition
  * types. Since the profile redesign's cutover (Phase 6, design spec 7.5 and
  * 13 items 6 and 23) the theme switch is the .56 s fade on every page, not
  * the circular reveal, `kj-theme-fade`, defined below. Movement-free, and
  * still only with no-preference: the toggle starts no transition under
- * reduced motion, and the block after this one turns them all off.
+ * reduced motion, and the reduced-motion block below turns them all off.
  * ─────────────────────────────────────────────────────────────────────────── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -504,6 +505,74 @@ html.kj-vt *::after {
   @keyframes kj-theme-fade {
     from {
       opacity: 0;
+    }
+  }
+}
+
+/* A list filter's change (type "filter", src/lib/filterParam.ts): the page
+   swaps at once, and only the cards move. Each listed card carries its name
+   in `--vt` (portfolio, skills and blog), applied only while a filter
+   transition runs; a card that stays slides to its new place, one that
+   leaves or arrives fades and scales. The pressed option slides to its new
+   place (one pressed route filter per page: a name used twice aborts the
+   transition). The bar keeps a layer of its own, so cards pass under it. */
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(filter)::view-transition-old(root) {
+    animation: none;
+    opacity: 0;
+  }
+  html:active-view-transition-type(filter)::view-transition-new(root) {
+    animation: none;
+  }
+  html:active-view-transition-type(filter)
+    :is(
+      .pf-work-index__item,
+      .pf-skill-card__item,
+      .pf-skill-stage__head,
+      .pf-blog-list__item
+    ) {
+    view-transition-name: var(--vt);
+    view-transition-class: pf-filter-card;
+  }
+  html:active-view-transition-type(filter)
+    .pf-filter__option[aria-pressed="true"] {
+    view-transition-name: pf-filter-pick;
+  }
+  html:active-view-transition-type(filter) .pf-nav {
+    view-transition-name: pf-nav;
+  }
+  ::view-transition-group(.pf-filter-card) {
+    animation-duration: 0.32s;
+    animation-timing-function: var(--ease-expo);
+  }
+  ::view-transition-group(pf-filter-pick) {
+    animation-duration: 0.28s;
+    animation-timing-function: var(--ease-snappy);
+  }
+  /* The two options differ in width: each keeps its own size, centred, so
+     a short label is never scaled up to a long one's box. */
+  ::view-transition-old(pf-filter-pick),
+  ::view-transition-new(pf-filter-pick) {
+    block-size: 100%;
+    object-fit: none;
+  }
+  ::view-transition-new(.pf-filter-card):only-child {
+    animation: kj-filter-in 0.24s var(--ease-expo) both;
+  }
+  ::view-transition-old(.pf-filter-card):only-child {
+    animation: kj-filter-out 0.16s ease-out both;
+  }
+
+  @keyframes kj-filter-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes kj-filter-out {
+    to {
+      opacity: 0;
+      transform: scale(0.96);
     }
   }
 }
