@@ -4,9 +4,8 @@ import SharePill from "@/components/bento/SharePill";
 import type { ShareTarget } from "@/components/bento/ShareRows";
 import { StatusDot } from "@/components/ds/labels";
 import { pillClass } from "@/components/ds/Pill";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
 import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
-import { Headline } from "@/components/profile/pages/PageHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import {
   ResumeSectionCard,
@@ -75,12 +74,10 @@ export default function ResumePage({
 }) {
   return (
     <>
-      <CatalogHero
+      <PageHero
         data-print-hide
         eyebrow="Résumé"
-        title={
-          <Headline lines={headlineLines(profile.name, profile.headline)} />
-        }
+        lines={headlineLines(profile.name, profile.headline)}
         titleClassName="pf-resume__title"
         lead={profile.summary}
       >
@@ -121,7 +118,7 @@ export default function ResumePage({
           }))}
           className="pf-resume__detail"
         />
-      </CatalogHero>
+      </PageHero>
 
       <div data-print-hide className="ds-wrap pf-cat-section pf-cat-end">
         <div className="pf-resume">

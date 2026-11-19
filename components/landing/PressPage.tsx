@@ -1,7 +1,6 @@
 import type { BentoSpan } from "@/components/bento/Bento";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
 import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
-import { Headline } from "@/components/profile/pages/PageHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import Image from "@/components/ui/Image";
 import {
   PRESS_TYPES,
@@ -154,20 +153,16 @@ export default function PressPage({
 
   return (
     <>
-      <CatalogHero
+      <PageHero
         eyebrow={pressPage.eyebrow}
-        title={
-          <Headline
-            lines={[
-              [
-                { text: headline.muted, tone: "muted" },
-                { text: headline.middle },
-                { text: headline.joiner, tone: "muted" },
-              ],
-              [{ text: headline.accent, tone: "accent" }],
-            ]}
-          />
-        }
+        lines={[
+          [
+            { text: headline.muted, tone: "muted" },
+            { text: headline.middle },
+            { text: headline.joiner, tone: "muted" },
+          ],
+          [{ text: headline.accent, tone: "accent" }],
+        ]}
         lead={pressPage.lead}
       />
 
