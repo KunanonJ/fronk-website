@@ -10,7 +10,11 @@ import {
   EMPLOYER_ORGANIZATION,
   PERSON_ID,
 } from "./jsonLd";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { SITE_UPDATED } from "@/lib/content/freshness";
+import { getAllVentures } from "@/lib/content/ventures";
+import { siteUrl } from "@/lib/site";
 import { PERSON_SUMMARY } from "@/lib/content/identity";
 
 type Node = Record<string, unknown> & { "@type"?: string; "@id"?: string };
@@ -43,6 +47,21 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     for (const org of orgs) {
       expect(org.name).toBeTruthy();
       expect(String(org.url)).toMatch(/^https?:\/\//);
+    }
+  });
+
+  it("gives every founded Organization its venture's PNG mark as its logo", () => {
+    const founded = graph().filter(
+      (n) =>
+        n["@type"] === "Organization" && n.name !== EMPLOYER_ORGANIZATION.name,
+    );
+    for (const org of founded) {
+      const venture = getAllVentures().find((v) => v.name === org.name);
+      expect(venture, String(org.name)).toBeDefined();
+      expect(org.logo).toBe(siteUrl(venture!.logoPng));
+      expect(existsSync(join(process.cwd(), "public", venture!.logoPng))).toBe(
+        true,
+      );
     }
   });
 

@@ -9,12 +9,17 @@ export interface OgCardProps {
   eyebrow?: string;
   title: string;
   subtitle?: string;
+  /** A brand mark beside the title (a venture's logo), as a data URL. */
+  mark?: string;
 }
 
 const CELL = 20;
 const BAND = { width: OG_SIZE.width, height: 120 };
 /** About two lines of the 28 px subtitle across the card's 940 px measure. */
 const SUBTITLE_MAX = 118;
+/** The brand mark's side and its gap; the text keeps the rest of the measure. */
+const MARK = 176;
+const MARK_GAP = 56;
 /** The site's dither stops (DitherField's default), dense edge first. */
 const STOPS = [brand.peach, brand.tint4, brand.tint3] as const;
 
@@ -83,7 +88,7 @@ export function DitherBand({ seed }: { seed: number }) {
  * Onest, the eyebrow in the accent's text colour with its two-pixel mark.
  * Callers wrap it in an ImageResponse with loadOgFonts().
  */
-export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
+export function OgCard({ eyebrow, title, subtitle, mark }: OgCardProps) {
   const label = {
     display: "flex",
     fontSize: 17,
@@ -92,6 +97,56 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
     textTransform: "uppercase" as const,
     color: brand.inkMuted,
   };
+
+  // Eyebrow, title, subtitle. Beside a mark the block takes the room left.
+  const text = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 18,
+        maxWidth: mark ? 940 - MARK - MARK_GAP : 940,
+      }}
+    >
+      <div
+        style={{
+          ...label,
+          alignItems: "center",
+          gap: 12,
+          color: brand.accentInk,
+        }}
+      >
+        <div style={{ display: "flex", gap: 3 }}>
+          <div style={{ width: 8, height: 8, background: brand.accent }} />
+          <div style={{ width: 8, height: 8, background: brand.tint4 }} />
+        </div>
+        {eyebrow ?? "Bangkok · Thailand"}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          fontFamily: "Instrument Serif",
+          fontSize: title.length > 40 ? 60 : title.length > 28 ? 72 : 92,
+          lineHeight: 1.02,
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {title}
+      </div>
+      {subtitle ? (
+        <div
+          style={{
+            display: "flex",
+            fontSize: 28,
+            lineHeight: 1.4,
+            color: brand.inkMuted,
+          }}
+        >
+          {clampText(subtitle, SUBTITLE_MAX)}
+        </div>
+      ) : null}
+    </div>
+  );
 
   return (
     <div
@@ -140,53 +195,28 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
         </div>
       </div>
 
-      {/* Eyebrow, title, subtitle */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 18,
-          maxWidth: 940,
-        }}
-      >
-        <div
-          style={{
-            ...label,
-            alignItems: "center",
-            gap: 12,
-            color: brand.accentInk,
-          }}
-        >
-          <div style={{ display: "flex", gap: 3 }}>
-            <div style={{ width: 8, height: 8, background: brand.accent }} />
-            <div style={{ width: 8, height: 8, background: brand.tint4 }} />
-          </div>
-          {eyebrow ?? "Bangkok · Thailand"}
-        </div>
+      {/* Eyebrow, title, subtitle; a brand mark, if any, to their right. */}
+      {mark ? (
         <div
           style={{
             display: "flex",
-            fontFamily: "Instrument Serif",
-            fontSize: title.length > 40 ? 60 : title.length > 28 ? 72 : 92,
-            lineHeight: 1.02,
-            letterSpacing: "-0.01em",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: MARK_GAP,
           }}
         >
-          {title}
+          {text}
+          <img
+            src={mark}
+            width={MARK}
+            height={MARK}
+            alt=""
+            style={{ borderRadius: 40 }}
+          />
         </div>
-        {subtitle ? (
-          <div
-            style={{
-              display: "flex",
-              fontSize: 28,
-              lineHeight: 1.4,
-              color: brand.inkMuted,
-            }}
-          >
-            {clampText(subtitle, SUBTITLE_MAX)}
-          </div>
-        ) : null}
-      </div>
+      ) : (
+        text
+      )}
 
       {/* A rule, then the name and the domain. */}
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

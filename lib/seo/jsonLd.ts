@@ -40,6 +40,7 @@ function foundedOrganizations(): Record<string, unknown>[] {
       "@id": orgId(v.url),
       name: v.name,
       url: v.url,
+      logo: siteUrl(v.logoPng),
       description: v.description,
       founder: { "@id": PERSON_ID },
     }));
