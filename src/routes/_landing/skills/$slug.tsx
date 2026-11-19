@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
 import type { Metadata } from "@/lib/seo/types";
@@ -34,25 +34,16 @@ function SkillRouteView({ slug }: { slug: string }) {
   const skill = getSkillBySlug(slug);
   if (!skill) throw notFound();
 
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Skills", path: "/skills" },
-      { name: skill.name, path: `/skills/${slug}` },
-    ]),
-  );
-  const codeLd = serializeJsonLd(buildSkillJsonLd(skill));
-
   return (
     <ProfileMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Skills", path: "/skills" },
+          { name: skill.name, path: `/skills/${slug}` },
+        ])}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: codeLd }}
-      />
+      <JsonLd data={buildSkillJsonLd(skill)} />
       <SkillDetailPage skill={skill} />
     </ProfileMain>
   );

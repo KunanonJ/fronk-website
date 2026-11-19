@@ -6,6 +6,7 @@ import {
 import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
 import { getVentureBySlug } from "@/lib/content/ventures";
 import { buildPortfolioProjectJsonLd } from "@/lib/seo/portfolioJsonLd";
+import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 
 /*
  * The preview case pages carry the live pages' structured data (plan step
@@ -16,8 +17,8 @@ import { buildPortfolioProjectJsonLd } from "@/lib/seo/portfolioJsonLd";
 describe("the case pages' JSON-LD", () => {
   it("gives a project its breadcrumb, then its CreativeWork, at the live addresses", () => {
     const project = getPortfolioProjectBySlug("tbh-intranet")!;
-    const [crumbs, work] = projectJsonLd(project).map((json) =>
-      JSON.parse(json),
+    const [crumbs, work] = projectJsonLd(project).map((data) =>
+      JSON.parse(serializeJsonLd(data)),
     );
     expect(crumbs["@type"]).toBe("BreadcrumbList");
     expect(
@@ -37,8 +38,8 @@ describe("the case pages' JSON-LD", () => {
 
   it("gives a venture its SoftwareApplication with the offer, then its breadcrumb", () => {
     const venture = getVentureBySlug("gogocash")!;
-    const [app, crumbs] = ventureJsonLd(venture).map((json) =>
-      JSON.parse(json),
+    const [app, crumbs] = ventureJsonLd(venture).map((data) =>
+      JSON.parse(serializeJsonLd(data)),
     );
     expect(app["@type"]).toBe("SoftwareApplication");
     expect(app.name).toBe("GoGoCash");

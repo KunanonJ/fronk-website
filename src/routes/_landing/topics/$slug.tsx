@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import TopicHubPage from "@/components/profile/pages/TopicHubPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -40,37 +40,24 @@ function TopicPillarPageView({ slug }: { slug: string }) {
   const pillar = getTopicPillar(slug, "en");
   if (!pillar) throw notFound();
 
-  const articleLd = serializeJsonLd(
-    buildTopicArticleJsonLd({
-      path: `/topics/${slug}`,
-      headline: pillar.h1,
-      description: pillar.description,
-      inLanguage: "en",
-      datePublished: TOPIC_PUBLISHED[slug],
-      image: `/topics/${slug}/opengraph-image`,
-    }),
-  );
-  const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: pillar.h1, path: `/topics/${slug as TopicSlug}` },
-    ]),
-  );
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: articleLd }}
+      <JsonLd
+        data={buildTopicArticleJsonLd({
+          path: `/topics/${slug}`,
+          headline: pillar.h1,
+          description: pillar.description,
+          inLanguage: "en",
+          datePublished: TOPIC_PUBLISHED[slug],
+          image: `/topics/${slug}/opengraph-image`,
+        })}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd data={buildFaqJsonLd(pillar.faqs)} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: pillar.h1, path: `/topics/${slug as TopicSlug}` },
+        ])}
       />
       <TopicHubPage pillar={pillar} />
     </>

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { pageHead } from "../../lib/head";
+import { JsonLd } from "@/components/JsonLd";
 import AboutPage from "@/components/profile/pages/AboutPage";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import type { Metadata } from "@/lib/seo/types";
@@ -28,19 +28,10 @@ const metadata: Metadata = {
  * JSON-LD are unchanged.
  */
 function AboutRoute() {
-  const profileLd = serializeJsonLd(buildProfilePageJsonLd());
-  const faqLd = serializeJsonLd(buildFaqJsonLd(FAQ_ITEMS));
-
   return (
     <ProfileMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: profileLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqLd }}
-      />
+      <JsonLd data={buildProfilePageJsonLd()} />
+      <JsonLd data={buildFaqJsonLd(FAQ_ITEMS)} />
       <AboutPage />
     </ProfileMain>
   );

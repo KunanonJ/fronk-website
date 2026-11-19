@@ -5,7 +5,6 @@ import {
   buildSoftwareApplicationJsonLd,
 } from "@/lib/seo/jsonLd";
 import { buildPortfolioProjectJsonLd } from "@/lib/seo/portfolioJsonLd";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 
 /*
  * The case pages' structured data (profile redesign Phase 5, plan step 5h,
@@ -15,37 +14,33 @@ import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
  */
 
 /** A project page's two scripts: its breadcrumb, then the work. */
-export function projectJsonLd(project: PortfolioProject): string[] {
+export function projectJsonLd(
+  project: PortfolioProject,
+): Record<string, unknown>[] {
   return [
-    serializeJsonLd(
-      buildBreadcrumbJsonLd([
-        { name: "Home", path: "/" },
-        { name: "Portfolio", path: "/portfolio" },
-        { name: project.name, path: `/portfolio/${project.slug}` },
-      ]),
-    ),
-    serializeJsonLd(buildPortfolioProjectJsonLd(project)),
+    buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Portfolio", path: "/portfolio" },
+      { name: project.name, path: `/portfolio/${project.slug}` },
+    ]),
+    buildPortfolioProjectJsonLd(project),
   ];
 }
 
 /** A venture page's two scripts: the application, then its breadcrumb. */
-export function ventureJsonLd(venture: Venture): string[] {
+export function ventureJsonLd(venture: Venture): Record<string, unknown>[] {
   return [
-    serializeJsonLd(
-      buildSoftwareApplicationJsonLd({
-        name: venture.name,
-        description: venture.description,
-        url: venture.url,
-        pagePath: `/ventures/${venture.slug}`,
-        offer: venture.offer,
-      }),
-    ),
-    serializeJsonLd(
-      buildBreadcrumbJsonLd([
-        { name: "Home", path: "/" },
-        { name: "Ventures", path: "/#ventures" },
-        { name: venture.name, path: `/ventures/${venture.slug}` },
-      ]),
-    ),
+    buildSoftwareApplicationJsonLd({
+      name: venture.name,
+      description: venture.description,
+      url: venture.url,
+      pagePath: `/ventures/${venture.slug}`,
+      offer: venture.offer,
+    }),
+    buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Ventures", path: "/#ventures" },
+      { name: venture.name, path: `/ventures/${venture.slug}` },
+    ]),
   ];
 }

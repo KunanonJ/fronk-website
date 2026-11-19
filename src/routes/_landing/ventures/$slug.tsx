@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { JsonLd } from "@/components/JsonLd";
 import CasePage from "@/components/profile/case/CasePage";
 import { ventureJsonLd } from "@/components/profile/case/caseJsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
@@ -19,12 +20,8 @@ function VentureCasePageView({ slug }: { slug: string }) {
 
   return (
     <ProfileMain>
-      {ventureJsonLd(venture).map((json) => (
-        <script
-          key={json}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: json }}
-        />
+      {ventureJsonLd(venture).map((data, i) => (
+        <JsonLd key={i} data={data} />
       ))}
       <CasePage key={slug} study={ventureCase(venture)} />
     </ProfileMain>

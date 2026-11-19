@@ -1,5 +1,5 @@
 import { notFound } from "@/lib/router/navigation";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import BlogPostPage from "@/components/landing/blog/BlogPostPage";
 import {
   FALLBACK_BLOG_POSTS,
@@ -29,24 +29,20 @@ export default function BlogPostView({
     : FALLBACK_BLOG_POSTS.find((p) => p.slug === slug);
   if (!card) notFound();
 
-  const articleLd = serializeJsonLd(
-    buildArticleJsonLd({
-      title: card.title,
-      description: card.excerpt,
-      slug: card.slug,
-      publishedAt: card.publishedAt,
-      imageUrl: card.bannerSrc,
-      tags: card.tags,
-    }),
-  );
   const body = post?.body ?? null;
   const paragraphs = post ? [] : (card.bodyParagraphs ?? []);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: articleLd }}
+      <JsonLd
+        data={buildArticleJsonLd({
+          title: card.title,
+          description: card.excerpt,
+          slug: card.slug,
+          publishedAt: card.publishedAt,
+          imageUrl: card.bannerSrc,
+          tags: card.tags,
+        })}
       />
       <BlogPostPage
         post={card}

@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import TopicHubPage from "@/components/profile/pages/TopicHubPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
@@ -39,38 +39,25 @@ function ThaiTopicPillarPageView({ slug }: { slug: string }) {
   const pillar = getTopicPillar(slug, "th");
   if (!pillar) throw notFound();
 
-  const articleLd = serializeJsonLd(
-    buildTopicArticleJsonLd({
-      path: `/th/topics/${slug}`,
-      headline: pillar.h1,
-      description: pillar.description,
-      inLanguage: "th",
-      datePublished: TOPIC_PUBLISHED[slug],
-      // The Thai hubs share the English hub's OG card.
-      image: `/topics/${slug}/opengraph-image`,
-    }),
-  );
-  const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: pillar.h1, path: `/th/topics/${slug as TopicSlug}` },
-    ]),
-  );
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: articleLd }}
+      <JsonLd
+        data={buildTopicArticleJsonLd({
+          path: `/th/topics/${slug}`,
+          headline: pillar.h1,
+          description: pillar.description,
+          inLanguage: "th",
+          datePublished: TOPIC_PUBLISHED[slug],
+          // The Thai hubs share the English hub's OG card.
+          image: `/topics/${slug}/opengraph-image`,
+        })}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd data={buildFaqJsonLd(pillar.faqs)} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: pillar.h1, path: `/th/topics/${slug as TopicSlug}` },
+        ])}
       />
       <TopicHubPage pillar={pillar} />
     </>
