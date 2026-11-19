@@ -1,6 +1,6 @@
 # Phase 0 report: Foundation (fonts, tokens, primitives)
 
-**Plan:** `../active/phase-0_foundation_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-0_foundation_PLAN_18-11-26.md`
 **Date:** 18-11-26, on `feat/profile-site-redesign` at `563b2a3` plus the
 uncommitted Phase 0 tree (nothing committed, pushed or deployed).
 **Harness:** `.claude/agents/`, `.claude/skills/` and `process/context/` are

@@ -1,13 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { PREVIEW_ROUTES, ROUTES } from "./routes";
+import { ROUTES } from "./routes";
 
 const WCAG_21 = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
-// Pages rebuilt in the profile redesign also run WCAG 2.2 AA (best-practices
-// audit, section 6): the previews now, each page family as it moves. axe-core
-// leaves its WCAG 2.2 rule (target-size) off unless this tag is named.
+// Every page runs WCAG 2.2 AA too (best-practices audit, section 6): the
+// profile redesign rebuilt them all. axe-core leaves its WCAG 2.2 rule
+// (target-size) off unless this tag is named.
 const WCAG_22 = [...WCAG_21, "wcag22aa"];
-const PREVIEW_PATHS = new Set(PREVIEW_ROUTES.map((route) => route.path));
 
 test("the WCAG 2.2 tag really runs target-size: two 10 px buttons fail it", async ({
   page,
@@ -43,7 +42,7 @@ for (const theme of THEMES) {
       }, theme);
     });
 
-    for (const route of [...ROUTES, ...PREVIEW_ROUTES]) {
+    for (const route of ROUTES) {
       test(`${route.name} has no serious or critical axe violations`, async ({
         page,
       }) => {
@@ -55,7 +54,7 @@ for (const theme of THEMES) {
         );
 
         const results = await new AxeBuilder({ page })
-          .withTags(PREVIEW_PATHS.has(route.path) ? WCAG_22 : WCAG_21)
+          .withTags(WCAG_22)
           .analyze();
 
         const blocking = results.violations.filter((v) =>

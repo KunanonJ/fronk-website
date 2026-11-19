@@ -83,34 +83,16 @@ export const primaryNav: readonly NavItem[] = [
   // Press hidden 04-11-26 (owner request); /press stays reachable but noindex.
 ];
 
-/**
- * The links the header shows inline at 1024 px and wider (owner, 10-11-26):
- * what a recruiter opens first, one click from every page. `match` lists the
- * path prefixes that mark a link as the current section. The menu still
- * holds every page.
- */
-export const headerLinks = [
-  { label: "Work", href: "/portfolio", match: ["/portfolio/"] },
-  { label: "Résumé", href: "/resume", match: [] },
-  {
-    label: "AI engineering",
-    href: "/topics/forward-deployed-ai-engineering",
-    match: [],
-  },
-] as const satisfies readonly {
-  label: string;
-  href: string;
-  match: readonly string[];
-}[];
-
 /** The site menu's closing call to action (canvas: "Contact me"). */
 export const navCta = { label: "Contact me", href: "/contact" } as const;
 
 /**
  * Site menu rows in canvas order (bento redesign, phase 7a): Home, the flat
- * primary links, then the Library group. `match` lists the path prefixes that
- * mark a row as the current page (a project marks Portfolio, a skill Skills,
- * a topic hub Learn, a venture Ventures).
+ * primary links, then the Library group. Since the profile redesign's
+ * cutover (Phase 6) the footer's Pages list reads them (lib/content/
+ * profileChrome.ts, `footerPages`), the crawl path for crawlers that run no
+ * JavaScript. `match` marked the current row in the old menu, which the
+ * cutover removed; Phase 8 drops the field.
  */
 export const siteMenu = {
   rows: [
@@ -136,8 +118,7 @@ export const siteMenu = {
     href: item.href,
     match:
       item.href === "/learn"
-        ? // Thai hubs (/th/topics/...) match too: isCurrentRow drops the /th.
-          (["/topics/"] as readonly string[])
+        ? (["/topics/"] as readonly string[])
         : ([] as readonly string[]),
   })),
   cta: navCta,

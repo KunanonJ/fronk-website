@@ -1,9 +1,10 @@
-import { useCallback, type ComponentPropsWithRef } from "react";
+import { useCallback, useEffect, type ComponentPropsWithRef } from "react";
 import {
   notFound as routerNotFound,
   useLinkProps,
   useLocation,
   useNavigate,
+  useRouter,
 } from "@tanstack/react-router";
 
 /** The current path, for components that mark the active nav item. */
@@ -36,6 +37,23 @@ export function useChromeLinkProps(href: string): ComponentPropsWithRef<"a"> {
     hash: hash || undefined,
     activeProps: {},
   } as never);
+}
+
+/**
+ * Calls back with the new location's hash (without "#") after each
+ * navigation has rendered, once the router has done its own scrolling: the
+ * router scrolls to a hash from its own "onRendered" listener, which it adds
+ * before any component's. Same-page hash links and Back included. `callback`
+ * should keep its identity (useCallback).
+ */
+export function useAfterNavigation(callback: (hash: string) => void): void {
+  const router = useRouter({ warn: false });
+  useEffect(() => {
+    if (!router) return;
+    return router.subscribe("onRendered", (event) =>
+      callback(event.toLocation.hash),
+    );
+  }, [router, callback]);
 }
 
 /** Navigates within the app and replaces the current history entry. */

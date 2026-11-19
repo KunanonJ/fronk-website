@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import type { PortfolioMockup as Mockup } from "@/lib/content/portfolio";
 
 /**
@@ -10,6 +10,57 @@ import type { PortfolioMockup as Mockup } from "@/lib/content/portfolio";
 
 const W = 640;
 const H = 400;
+
+/**
+ * How the mockup draws its labels. "text" (the default) writes them; "bars"
+ * draws each as a rounded bar of about its length instead, for a mockup drawn
+ * so small that its 10 to 18 unit labels would render under the 12 px text
+ * floor (the redesigned Home's stack cards, design spec 12 item 5). "floor"
+ * writes the labels of 12 units or more and draws the smaller ones as bars,
+ * for a mockup drawn at its full size or larger (the case-study cover once
+ * the picture is 640 px wide, Phase 5), where every written label renders at
+ * 12 px or more.
+ */
+type LabelStyle = "text" | "bars" | "floor";
+
+/** The smallest label "floor" still writes, in viewBox units. */
+const FLOOR = 12;
+
+const LabelStyleContext = createContext<LabelStyle>("text");
+
+/** A label's run as a bar: about its text's length, centred on its x-height. */
+function LabelBar({
+  x,
+  y,
+  size,
+  chars,
+  anchor,
+  caps,
+  tone,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  chars: number;
+  anchor: "start" | "middle" | "end";
+  caps: boolean;
+  tone: string;
+}) {
+  const w = Math.max(size, chars * size * (caps ? 0.68 : 0.54));
+  const h = Math.max(4, Math.round(size * 0.5));
+  const left = anchor === "start" ? x : anchor === "middle" ? x - w / 2 : x - w;
+  return (
+    <rect
+      x={left}
+      y={y - size * 0.36 - h / 2}
+      width={w}
+      height={h}
+      rx={h / 2}
+      opacity={0.42}
+      className={tone}
+    />
+  );
+}
 
 function Bar({
   x,
@@ -46,6 +97,20 @@ function Label({
   anchor?: "start" | "middle" | "end";
   caps?: boolean;
 }) {
+  const style = useContext(LabelStyleContext);
+  if (style === "bars" || (style === "floor" && size < FLOOR)) {
+    return (
+      <LabelBar
+        x={x}
+        y={y}
+        size={size}
+        chars={String(children ?? "").length}
+        anchor={anchor}
+        caps={caps}
+        tone={tone}
+      />
+    );
+  }
   return (
     <text
       x={x}
@@ -563,12 +628,20 @@ type PortfolioMockupProps = {
   /** Accessible name; omit for decorative use (e.g. on cards next to the title). */
   label?: string;
   className?: string;
+  /**
+   * "text" (default) writes every label. "bars" draws them as bars, for a
+   * mockup drawn small enough that its labels would fall under 12 px.
+   * "floor" writes only the labels of 12 units or more, for a mockup drawn at
+   * its full size or larger.
+   */
+  labels?: LabelStyle;
 };
 
 export default function PortfolioMockup({
   mockup,
   label,
   className = "",
+  labels = "text",
 }: PortfolioMockupProps) {
   const decorative = !label;
   return (
@@ -581,10 +654,18 @@ export default function PortfolioMockup({
       focusable="false"
     >
       {label ? <title>{label}</title> : null}
-      {mockup.kind === "app-shell" ? <AppShell mockup={mockup} /> : null}
-      {mockup.kind === "email-report" ? <EmailReport mockup={mockup} /> : null}
-      {mockup.kind === "form-preview" ? <FormPreview mockup={mockup} /> : null}
-      {mockup.kind === "review-queue" ? <ReviewQueue mockup={mockup} /> : null}
+      <LabelStyleContext.Provider value={labels}>
+        {mockup.kind === "app-shell" ? <AppShell mockup={mockup} /> : null}
+        {mockup.kind === "email-report" ? (
+          <EmailReport mockup={mockup} />
+        ) : null}
+        {mockup.kind === "form-preview" ? (
+          <FormPreview mockup={mockup} />
+        ) : null}
+        {mockup.kind === "review-queue" ? (
+          <ReviewQueue mockup={mockup} />
+        ) : null}
+      </LabelStyleContext.Provider>
     </svg>
   );
 }

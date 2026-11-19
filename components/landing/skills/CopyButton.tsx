@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckIcon, CopyIcon } from "@/components/bento/icons";
+import { pillClass } from "@/components/ds/Pill";
 import { cn } from "@/lib/utils/cn";
 import { writeClipboard } from "@/lib/utils/clipboard";
 
-/** Canvas sizes: command rows, the agent prompt, and the skill wells. */
+/** Ghost pills: 44 px for command rows and the agent prompt, 36 px in a skill tile. */
 const SIZE = {
-  row: { className: "min-w-[104px] px-3.5 text-sm", icon: 16 },
-  prompt: { className: "min-w-[136px] px-4 text-sm", icon: 16 },
-  card: { className: "min-w-[112px] px-[11px] text-meta", icon: 14 },
+  row: { size: "md", icon: 16 },
+  prompt: { size: "md", icon: 16 },
+  card: { size: "sm", icon: 14 },
 } as const;
 
 type CopyButtonProps = {
@@ -28,10 +29,11 @@ type Status = "idle" | "copied" | "error";
 const RESET_MS = 2000;
 
 /**
- * Copy-to-clipboard pill (bento canvas, design spec 3.7). The icon turns into
- * the accent check and the label into "Copied" (or "Failed", with the Ember
- * failure square) for two seconds, in a slot sized for every word, so the
- * button never changes width. A polite live region announces the result.
+ * Copy-to-clipboard pill (profile redesign Phase 7c; design spec 6.1, the
+ * ghost pill). The icon turns into the accent check and the label into
+ * "Copied" (or "Failed", with the coral failure square) for two seconds, in
+ * a cell sized for every word, so the pill never changes width. A polite
+ * live region announces the result.
  */
 export default function CopyButton({
   text,
@@ -58,7 +60,7 @@ export default function CopyButton({
     copied: "Copied",
     error: "Failed",
   };
-  const { className: sizeClass, icon } = SIZE[size];
+  const { size: pill, icon } = SIZE[size];
 
   return (
     <>
@@ -68,29 +70,25 @@ export default function CopyButton({
         aria-label={accessibleLabel}
         data-status={status}
         className={cn(
-          "inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-hairline-strong bg-surface font-medium text-ink",
-          sizeClass,
+          pillClass({ variant: "ghost", size: pill }),
+          "pf-cat-copy",
           className,
         )}
       >
-        {status === "copied" ? (
-          <CheckIcon size={icon} className="shrink-0 text-mark" />
-        ) : status === "error" ? (
-          // Ember marks a failure, always next to the word "Failed".
-          <span aria-hidden className="mx-[3px] size-2 shrink-0 bg-ember" />
-        ) : (
-          <CopyIcon size={icon} className="shrink-0" />
-        )}
-        {/* Every word shares one grid cell, so the button keeps its width. */}
-        <span className="grid" aria-hidden>
+        <span className="ds-pill__icon" aria-hidden="true">
+          {status === "copied" ? (
+            <CheckIcon size={icon} className="pf-cat-copy__done" />
+          ) : status === "error" ? (
+            // Coral marks a failure, always next to the word "Failed".
+            <span className="pf-cat-copy__failed" />
+          ) : (
+            <CopyIcon size={icon} />
+          )}
+        </span>
+        {/* Every word shares one grid cell, so the pill keeps its width. */}
+        <span className="pf-cat-copy__words" aria-hidden>
           {(Object.keys(words) as Status[]).map((key) => (
-            <span
-              key={key}
-              className={cn(
-                "col-start-1 row-start-1",
-                key !== status && "invisible",
-              )}
-            >
+            <span key={key} data-off={key !== status ? "" : undefined}>
               {words[key]}
             </span>
           ))}

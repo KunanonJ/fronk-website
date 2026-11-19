@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { PREVIEW_ROUTES, ROUTES } from "./routes";
+import { ROUTES } from "./routes";
 
 /**
  * Behavioral smoke + accessibility/motion guard. These run on every phase to
@@ -18,7 +18,7 @@ function isRealError(text: string): boolean {
 }
 
 test.describe("smoke > every route renders without JS errors", () => {
-  for (const route of [...ROUTES, ...PREVIEW_ROUTES]) {
+  for (const route of ROUTES) {
     test(`${route.name} renders an <h1> and throws no JS errors`, async ({
       page,
     }) => {
@@ -38,6 +38,73 @@ test.describe("smoke > every route renders without JS errors", () => {
       ).toEqual([]);
     });
   }
+});
+
+/**
+ * The report-only Content Security Policy (best-practices audit R21,
+ * src/server/http.ts): every page sends it, and nothing on a page breaks it,
+ * lazy parts included. A violation fires securitypolicyviolation even though
+ * a report-only policy blocks nothing, so this fails before enforcing could.
+ * Only the site's own policy counts (the one that reports to
+ * /api/csp-report): on the live site, Cloudflare's script monitor adds its
+ * own report-only policy to some responses, and that one reports every
+ * script by design.
+ */
+test.describe("csp > every route sends the policy and breaks none of it", () => {
+  for (const route of ROUTES) {
+    test(`${route.name} reports no Content Security Policy violation`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        const seen: string[] = [];
+        (window as unknown as { __csp: string[] }).__csp = seen;
+        document.addEventListener("securitypolicyviolation", (event) => {
+          if (!event.originalPolicy.includes("/api/csp-report")) return;
+          seen.push(
+            `${event.effectiveDirective} ${event.blockedURI || "inline"}`,
+          );
+        });
+      });
+      const response = await page.goto(route.path, {
+        waitUntil: "networkidle",
+      });
+      expect(
+        response?.headers()["content-security-policy-report-only"],
+        route.path,
+      ).toContain("report-uri /api/csp-report");
+      expect(response?.headers()["reporting-endpoints"], route.path).toBe(
+        'csp="/api/csp-report"',
+      );
+      await page.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
+          scrollTo(0, y);
+          await new Promise((done) => setTimeout(done, 50));
+        }
+      });
+      await page.waitForLoadState("networkidle");
+      const violations = await page.evaluate(
+        () => (window as unknown as { __csp: string[] }).__csp,
+      );
+      expect(violations, route.path).toEqual([]);
+    });
+  }
+});
+
+test("csp > the report endpoint takes a browser's report", async ({
+  request,
+}) => {
+  const report = await request.post("/api/csp-report", {
+    headers: { "Content-Type": "application/csp-report" },
+    data: JSON.stringify({
+      "csp-report": {
+        "document-uri": "https://kunanonj.com/about",
+        "effective-directive": "img-src",
+        "blocked-uri": "https://example.com/x.png",
+      },
+    }),
+  });
+  expect(report.status()).toBe(204);
+  expect((await request.get("/api/csp-report")).status()).toBe(405);
 });
 
 test.describe("a11y > reduced-motion users get a static, usable page", () => {
@@ -340,7 +407,7 @@ test.describe("library > list filters are typed search params", () => {
     await expect(thai).toBeVisible();
     const count = Number((await thai.textContent())?.match(/\d+/)?.[0]);
     expect(count).toBeGreaterThan(0);
-    await expect(page.locator('h2[lang="th"]')).toHaveCount(count);
+    await expect(page.locator('h3[lang="th"]')).toHaveCount(count);
     await page
       .getByRole("group", { name: "Hub language" })
       .getByRole("button", { name: "English" })
@@ -557,42 +624,69 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("the header links appear at 1024 px, on one row, and not below it", async ({
+  // Rewritten at the profile redesign's cutover (Phase 6; umbrella input
+  // R17, design spec 13 item 23), to the same intent: the pill nav shows its
+  // Primary links from 810 px (the old header from 1024), in one 48 px row,
+  // with no email link and no Share button of its own.
+  test("the nav's links appear from 810 px, on one row, and not below it", async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1023, height: 800 });
+    await page.setViewportSize({ width: 809, height: 800 });
     await page.goto("/portfolio", { waitUntil: "networkidle" });
     const nav = page.getByRole("navigation", { name: "Primary" });
     await expect(nav).toBeHidden();
-    await page.setViewportSize({ width: 1024, height: 800 });
-    await expect(nav).toBeVisible();
-    // The links sit between the email and the buttons and touch neither.
     const chrome = page.locator("header[data-site-chrome]");
     const box = async (target: Locator) => {
       const found = await target.boundingBox();
       if (!found) throw new Error("a header part has no box");
       return found;
     };
-    const header = await box(chrome);
-    const email = await box(chrome.locator('a[href^="mailto:"]'));
-    const links = await box(nav);
-    const share = await box(
-      chrome.getByRole("button", { name: "Share this page" }),
-    );
-    expect(links.x).toBeGreaterThan(email.x + email.width);
-    expect(links.x + links.width).toBeLessThanOrEqual(share.x);
-    // One row: a wrapped header would be about twice this tall.
-    expect(header.height).toBeLessThan(60);
-    expect(
-      await page.evaluate(
-        () =>
-          document.documentElement.scrollWidth -
-          document.documentElement.clientWidth,
-      ),
-    ).toBe(0);
-    // The current section is marked for the eye as well as for a reader.
-    await expect(nav.locator('a[aria-current="page"]')).toHaveText("Work");
-    await expect(nav.locator('a[aria-current="page"] .bg-mark')).toBeVisible();
+    for (const width of [810, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 800 });
+      await expect(nav).toBeVisible();
+      // The links sit between the name and the buttons and touch neither.
+      const name = await box(
+        chrome.getByRole("link", { name: "Kunanon Jarat, home" }),
+      );
+      const links = await box(nav);
+      const buttons = await box(chrome.locator(".pf-nav__right"));
+      expect(links.x, `${width}`).toBeGreaterThanOrEqual(name.x + name.width);
+      expect(links.x + links.width, `${width}`).toBeLessThanOrEqual(buttons.x);
+      // One row: a wrapped bar would be about twice this tall.
+      expect((await box(chrome)).height, `${width}`).toBeLessThan(60);
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        ),
+        `${width}`,
+      ).toBe(0);
+    }
+    // The old header's email link and Share button are gone from the bar.
+    await expect(chrome.locator('a[href^="mailto:"]:visible')).toHaveCount(0);
+    await expect(chrome.getByRole("button", { name: /share/i })).toHaveCount(0);
+    // The current section is marked for the eye as well as for a reader. The
+    // tint is drawn, not only declared: the ::before has content and a box
+    // the link's size (a hidden one keeps its colour but has neither).
+    const current = nav.locator('a[aria-current="page"]');
+    await expect(current).toHaveText("Work");
+    const mark = await current.evaluate((el) => {
+      const tint = getComputedStyle(el, "::before");
+      const link = el.getBoundingClientRect();
+      return {
+        content: tint.content,
+        display: tint.display,
+        width: parseFloat(tint.width) - link.width,
+        height: parseFloat(tint.height) - link.height,
+        background: tint.backgroundColor,
+      };
+    });
+    expect(mark.content).toBe('""');
+    expect(mark.display).not.toBe("none");
+    expect(Math.abs(mark.width)).toBeLessThan(1);
+    expect(Math.abs(mark.height)).toBeLessThan(1);
+    expect(mark.background).not.toBe("rgba(0, 0, 0, 0)");
   });
 
   test("a hiring button opens the contact form ready for a recruiter", async ({
@@ -725,27 +819,36 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     );
   });
 
-  test("the FDE hub leaves no section card mostly empty at desktop width", async ({
+  test("the FDE hub sets its four sections as chapters, each body beside its heading at desktop width", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/topics/forward-deployed-ai-engineering", {
       waitUntil: "networkidle",
     });
-    // Each section card: the gap between its kicker and its big number.
-    const gaps = await page
-      .locator('article[aria-labelledby^="card-s"]')
-      .evaluateAll((cards) =>
-        cards.map((card) => {
-          const kicker = card.querySelector("h2")!.getBoundingClientRect();
-          const number = card
-            .querySelector("p[aria-hidden]")!
-            .getBoundingClientRect();
-          return Math.round(number.top - kicker.bottom);
+    // Profile redesign, Phase 7 (R17: the bento test's intent, no section
+    // left mostly empty): each chapter's body starts level with its kicker,
+    // in the column beside its heading, so no band of the page sits empty.
+    const chapters = await page
+      .locator("section.pf-case-chapter:has(> h2.t-h3)")
+      .evaluateAll((sections) =>
+        sections.map((chapter) => {
+          const box = (selector: string) =>
+            chapter.querySelector(selector)!.getBoundingClientRect();
+          const kicker = box(".pf-case-kicker");
+          const heading = box("h2");
+          const body = box("p:not([aria-hidden])");
+          return {
+            level: Math.round(Math.abs(body.top - kicker.top)),
+            beside: body.left > heading.right,
+          };
         }),
       );
-    expect(gaps).toHaveLength(4);
-    for (const gap of gaps) expect(gap).toBeLessThanOrEqual(120);
+    expect(chapters).toHaveLength(4);
+    for (const chapter of chapters) {
+      expect(chapter.level).toBeLessThanOrEqual(8);
+      expect(chapter.beside).toBe(true);
+    }
   });
 
   test("the Thai FDE hub carries the same pill and buttons, in Thai", async ({
@@ -1122,11 +1225,11 @@ test.describe("worker cache > what the edge may keep", () => {
     await page.goto("/", { waitUntil: "networkidle" });
     // Count only what the visit to Learn fetches.
     answers.length = 0;
-    // Learn is in the site menu's Library group.
-    await page.getByRole("button", { name: "Open menu" }).click();
+    // Learn is in the footer's Pages list since the Phase 6 cutover (the old
+    // header's menu held it before): an in-app navigation either way.
     await page
-      .getByRole("navigation", { name: "Site" })
-      .getByRole("link", { name: "Learn" })
+      .getByRole("contentinfo")
+      .getByRole("link", { name: "Learn", exact: true })
       .click();
     await expect(page).toHaveURL(/\/learn$/);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -1368,9 +1471,20 @@ function tapAreas({ min, root }: { min: number; root: string }) {
       [x, top + 1],
       [x, bottom - 1],
     ];
+    // The phone menu's theme radios (Phase 6 cutover) are the one exception:
+    // their labels take the pointer and check the radio, so a tap anywhere on
+    // the label is a tap on the radio. Any other control a label covers
+    // counts as covered.
+    const labels =
+      el.matches("#site-menu input.pf-theme__input[type=radio]") &&
+      "labels" in el &&
+      el.labels
+        ? [...(el.labels as NodeListOf<HTMLLabelElement>)]
+        : [];
     for (const [px, py] of points) {
       const hit = document.elementFromPoint(px, py);
       if (hit && el.contains(hit)) continue;
+      if (hit && labels.some((label) => label.contains(hit))) continue;
       covered.push(
         `${name(el)} at ${Math.round(px)},${Math.round(py)}: ${hit?.tagName ?? "nothing"}`,
       );
@@ -1394,6 +1508,11 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/portfolio/tbh-intranet",
     "/contact",
     "/resume",
+    // Phase 7 (D1): a hub in each language and the densest reading pages.
+    "/topics/forward-deployed-ai-engineering",
+    "/th/topics/ai-transformation-thailand",
+    "/stack",
+    "/proof",
   ];
 
   test.beforeEach(async ({ page }) => {
@@ -1401,7 +1520,8 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     await page.emulateMedia({ reducedMotion: "reduce" });
   });
 
-  for (const width of [320, 390]) {
+  // 344: the Galaxy Z Fold closed (design spec 10.1; Phase 6 device matrix).
+  for (const width of [320, 344, 390]) {
     for (const path of PAGES) {
       test(`${path} at ${width} px`, async ({ page }) => {
         await page.setViewportSize({ width, height: 800 });
@@ -1450,7 +1570,7 @@ test.describe("share pill > a round icon on phones, the labelled pill from 640 p
     test(`at ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/skills", { waitUntil: "networkidle" });
-      // The hero pill; the header's own button is "Share this page".
+      // The hero pill: the pill nav has no Share button (Phase 6 cutover).
       const share = page
         .getByRole("main")
         .getByRole("button", { name: "Share", exact: true });
@@ -1469,4 +1589,73 @@ test.describe("share pill > a round icon on phones, the labelled pill from 640 p
       }
     });
   }
+});
+
+/*
+ * The share panel of the pages Phase 7 restyles (the layout's
+ * SharePanelHost; Phase 6 review, finding 1). It is fixed under the bar and
+ * last in the page, so focus that leaves it must close it, or it would cover
+ * the skip link, the nav and whatever the page scrolls to under the bar
+ * (WCAG 2.4.11).
+ */
+test.describe("share panel > focus that leaves it closes it", () => {
+  test("Tab past the last row on /skills at 390 px closes the panel", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/skills", { waitUntil: "networkidle" });
+    const share = page
+      .getByRole("main")
+      .getByRole("button", { name: "Share", exact: true });
+    // By keyboard: the pill takes focus, then Enter opens the panel, and
+    // focus moves to its first row.
+    await share.focus();
+    await page.keyboard.press("Enter");
+    const panel = page.getByRole("region", { name: "Share this page" });
+    await expect(panel).toBeVisible();
+    await expect(
+      panel.getByRole("button", { name: /Copy link/ }),
+    ).toBeFocused();
+    // Through every row, then past the last one. The panel is last in the
+    // page, so that Tab hands focus to the browser's own UI (nothing on the
+    // page has focus, so the panel covers nothing yet), and the next one
+    // brings it back at the skip link, with the nav and the page after it:
+    // by then the panel must be gone.
+    const rows = await panel.locator("button, a[href]").count();
+    expect(rows).toBeGreaterThanOrEqual(4);
+    for (let row = 0; row <= rows; row += 1) await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: "Skip to content" });
+    await expect(skip).toBeFocused();
+    await expect(panel).toHaveCount(0);
+    await expect(share).toHaveAttribute("aria-expanded", "false");
+    // What has focus is what is drawn at its centre.
+    expect(
+      await skip.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          box.left + box.width / 2,
+          box.top + box.height / 2,
+        );
+        return Boolean(hit && el.contains(hit));
+      }),
+    ).toBe(true);
+  });
+
+  test("Escape from a row closes it and returns focus to the pill", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/skills", { waitUntil: "networkidle" });
+    const share = page
+      .getByRole("main")
+      .getByRole("button", { name: "Share", exact: true });
+    await share.focus();
+    await page.keyboard.press("Enter");
+    const panel = page.getByRole("region", { name: "Share this page" });
+    await expect(panel).toBeVisible();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect(share).toBeFocused();
+  });
 });

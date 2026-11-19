@@ -29,18 +29,18 @@ vi.mock("@/lib/router/navigation", () => ({
 describe("ProfileLink", () => {
   it("drops the router's aria-current and data-status, and sets the chrome's own", () => {
     render(
-      <ProfileLink href="/preview#about" current="location">
+      <ProfileLink href="/#about" current="location">
         About
       </ProfileLink>,
     );
     const link = screen.getByRole("link", { name: "About" });
-    expect(link).toHaveAttribute("href", "/preview#about");
+    expect(link).toHaveAttribute("href", "/#about");
     expect(link).toHaveAttribute("aria-current", "location");
     expect(link).not.toHaveAttribute("data-status");
   });
 
   it("carries no aria-current when the chrome marks nothing", () => {
-    render(<ProfileLink href="/preview#work">Work</ProfileLink>);
+    render(<ProfileLink href="/#work">Work</ProfileLink>);
     expect(screen.getByRole("link", { name: "Work" })).not.toHaveAttribute(
       "aria-current",
     );
@@ -50,7 +50,7 @@ describe("ProfileLink", () => {
     ROUTER.routerClick.mockClear();
     const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
     render(
-      <ProfileLink href="/preview" onClick={onClick}>
+      <ProfileLink href="/" onClick={onClick}>
         Home
       </ProfileLink>,
     );

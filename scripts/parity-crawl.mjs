@@ -158,6 +158,20 @@ for (const path of [...REDIRECTS, ...NOT_FOUND, ...API_GET]) {
   await res.arrayBuffer().catch(() => {});
   records[path] = record;
 }
+// Icons that only the web manifest names (pages link /favicon.ico, /icon.svg
+// and /apple-icon), so they are recorded like the ones the heads link.
+let manifestIcons = [];
+try {
+  const manifest = await (await fetch(base + "/manifest.webmanifest")).json();
+  manifestIcons = manifest.icons ?? [];
+} catch (error) {
+  console.warn(`[parity] no web manifest icons: ${error}`);
+}
+for (const icon of manifestIcons) {
+  const real = new URL(icon.src, base);
+  if (real.origin === origin)
+    assets.set(normaliseUrl(real.pathname), real.pathname + real.search);
+}
 for (const [key, real] of assets) {
   if (records[key]) continue;
   const { res, record } = await get(real);

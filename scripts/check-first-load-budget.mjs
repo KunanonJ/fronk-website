@@ -44,10 +44,22 @@ const ENTRY_BUDGET_KB = 120;
 // files it preloads (already compressed, counted as served). Set at the
 // 18-11-26 measurement plus 10%, with the scoped profile block in
 // globals.css: 20.1 KB of stylesheets and 51.2 KB of preloaded fonts (both on
-// /about). They only go down: Phase 8 deletes the old design. The new Home
-// preloads Onest and Instrument Serif (48.8 KB) instead of Geist, not beside it.
-const CSS_BUDGET_KB = 22;
-const FONT_PRELOAD_BUDGET_KB = 56;
+// /about). Every page preloads Onest and Instrument Serif; Geist went in
+// Phase 8.
+//
+// Raised deliberately at the Phase 6 cutover (18-11-26), from 22 KB to 37 KB:
+// every public page now renders the new chrome, so every page links
+// src/styles/profile.css (15.2 KB gzip) beside globals.css (17.6 KB) and
+// fonts.css (1.2 KB), while the pages Phase 7 has not restyled still need the
+// old design in globals.css. Measured 34.0 KB (about.html, the worst page),
+// plus 10%.
+//
+// Lowered in Phase 8 (19-11-26), once the old design's CSS and Geist were
+// gone: 33.8 KB of stylesheets and 47.7 KB of preloaded fonts (about.html,
+// the worst page for both), every page in the new design. 36 KB and 52 KB
+// leave a little room; neither goes back up.
+const CSS_BUDGET_KB = 36;
+const FONT_PRELOAD_BUDGET_KB = 52;
 
 const MARKETING_EXACT = new Set([
   "/",
@@ -75,6 +87,12 @@ function isMarketingRoute(route) {
   if (MARKETING_EXACT.has(route)) return true;
   if (route.startsWith("/blog/")) return true;
   if (route.startsWith("/portfolio/")) return true;
+  // The venture pages (profile redesign, Phase 6 cutover): they render the
+  // same case-study template as /portfolio/<slug> (the rail, the showcase
+  // viewer, the More projects cards), so they take the same class. Measured
+  // 176.1 KB on 18-11-26, as the project pages (176.2 KB). The budgets
+  // themselves are unchanged.
+  if (route.startsWith("/ventures/")) return true;
   if (route.startsWith("/skills/")) return true;
   return false;
 }

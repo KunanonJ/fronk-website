@@ -1,6 +1,6 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
-import StackPage from "@/components/landing/library/StackPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import StackPage from "@/components/profile/pages/library/StackPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
   STACK_SEARCH_DEFAULTS,
@@ -19,7 +19,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /stack (bento redesign, phase 7f; design spec 4.12). The tool group is the
+ * /stack (profile redesign, Phase 7 lane D1). The tool group is the
  * typed `?group=build|ship|operate` param (Valibot); the default, all, never
  * shows in the URL and an unknown value falls back to it.
  */
@@ -44,8 +44,8 @@ function StackRoute() {
   };
 
   return (
-    <PageMain>
+    <ProfileMain>
       <StackPage group={group} onGroupChange={setGroup} />
-    </PageMain>
+    </ProfileMain>
   );
 }

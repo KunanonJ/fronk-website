@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { pageHead } from "../../lib/head";
-import { PageMain } from "@/components/bento/Bento";
-import AboutHero from "@/components/landing/about/AboutHero";
-import AboutPageContent from "@/components/landing/AboutPageContent";
+import AboutPage from "@/components/profile/pages/AboutPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import type { Metadata } from "@/lib/seo/types";
 import { buildFaqJsonLd, buildProfilePageJsonLd } from "@/lib/seo/jsonLd";
 import { FAQ_ITEMS } from "@/lib/content/faq";
@@ -24,16 +23,16 @@ const metadata: Metadata = {
 };
 
 /**
- * About (bento redesign, phase 7b; design spec 4.2): the hero beside the
- * portrait, then one dense bento. The JSON-LD scripts render nothing, so
- * they add no gap to the column.
+ * About (profile redesign, Phase 6 cutover; plan step 6d): the hero beside
+ * the portrait, then the redesign's parts. The ProfilePage and FAQPage
+ * JSON-LD are unchanged.
  */
-function AboutPage() {
+function AboutRoute() {
   const profileLd = serializeJsonLd(buildProfilePageJsonLd());
   const faqLd = serializeJsonLd(buildFaqJsonLd(FAQ_ITEMS));
 
   return (
-    <PageMain>
+    <ProfileMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: profileLd }}
@@ -42,19 +41,19 @@ function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqLd }}
       />
-      <AboutHero />
-      <AboutPageContent />
-    </PageMain>
+      <AboutPage />
+    </ProfileMain>
   );
 }
 
 export const Route = createFileRoute("/_landing/about")({
   head: () =>
     pageHead(metadata, {
+      // profileCardAlt(ABOUT_CARD); lib/og/profileCards.test.ts checks it.
       fileOgImage: fileOg(
         "/about",
-        "Kunanon Jarat: AI Engineering Lead in Bangkok",
+        "Kunanon Jarat’s portrait beside “About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok.”",
       ),
     }),
-  component: AboutPage,
+  component: AboutRoute,
 });

@@ -1,75 +1,45 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import { PageMain } from "@/components/bento/Bento";
-import PortfolioProjectPage from "@/components/landing/portfolio/PortfolioProjectPage";
-import type { Metadata } from "@/lib/seo/types";
+import CasePage from "@/components/profile/case/CasePage";
+import { projectJsonLd } from "@/components/profile/case/caseJsonLd";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import { projectCase } from "@/lib/content/caseStudy";
 import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
-import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
-import { buildPortfolioProjectJsonLd } from "@/lib/seo/portfolioJsonLd";
-import { fileOg } from "@/src/lib/og";
-import { namedPageTitle } from "@/lib/seo/pageTitle";
-import { pageHead } from "@/src/lib/head";
-import { routeShareMeta } from "@/lib/seo/routeMeta";
+import { projectCaseHead } from "@/src/lib/caseHead";
 
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const project = getPortfolioProjectBySlug(slug);
-  if (!project) return { title: "Portfolio" };
-
-  return routeShareMeta({
-    title: namedPageTitle(project.name, project.tagline),
-    description: project.summary,
-    path: `/portfolio/${slug}`,
-    hasOwnOgImage: true,
-    markdownPath: `/portfolio/${slug}.md`,
-  });
-}
-
-/** The page body for one slug; shared with the TanStack Start route. */
+/**
+ * The page body for one slug (profile redesign, Phase 6 cutover; design spec
+ * 9): the case-study template, under the same JSON-LD as before (the
+ * breadcrumb, then the work, from the same builders). Keyed on the slug: the
+ * router keeps this component when only the slug changes, and the template's
+ * state (the chapter in view, an open viewer) belongs to one case.
+ */
 function PortfolioProjectRouteView({ slug }: { slug: string }) {
   const project = getPortfolioProjectBySlug(slug);
   if (!project) throw notFound();
 
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Portfolio", path: "/portfolio" },
-      { name: project.name, path: `/portfolio/${slug}` },
-    ]),
-  );
-  const workLd = serializeJsonLd(buildPortfolioProjectJsonLd(project));
-
   return (
-    <PageMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: workLd }}
-      />
-      <PortfolioProjectPage project={project} />
-    </PageMain>
+    <ProfileMain>
+      {projectJsonLd(project).map((json) => (
+        <script
+          key={json}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: json }}
+        />
+      ))}
+      <CasePage key={slug} study={projectCase(project)} />
+    </ProfileMain>
   );
 }
 
 export const Route = createFileRoute("/_landing/portfolio/$slug")({
-  loader: async ({ params }) => {
-    if (!getPortfolioProjectBySlug(params.slug)) throw notFound();
-    return {
-      head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
-        {
-          fileOgImage: fileOg(
-            `/portfolio/${params.slug}`,
-            `${getPortfolioProjectBySlug(params.slug)?.name ?? "Portfolio project"}: by Kunanon Jarat`,
-          ),
-        },
-      ),
-    };
+  // The head (title, description, canonical, Open Graph and Twitter, the
+  // Markdown twin and the share image) comes from src/lib/caseHead.ts, which
+  // caseHead.test.ts pins. Built in the loader, so the content modules stay
+  // in the loader's chunk and out of the entry chunk.
+  loader: ({ params }) => {
+    const project = getPortfolioProjectBySlug(params.slug);
+    if (!project) throw notFound();
+    return { head: projectCaseHead(project) };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: SlugPage,

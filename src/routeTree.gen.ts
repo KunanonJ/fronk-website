@@ -22,7 +22,6 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
 import { Route as OperatingModelDotmdRouteImport } from './routes/operating-model[.]md'
-import { Route as PreviewRouteRouteImport } from './routes/preview/route'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotmdRouteImport } from './routes/sitemap[.]md'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -43,8 +42,6 @@ import { Route as SystemDesignRouteImport } from './routes/_system/design'
 import { Route as AboutOpengraphImageRouteImport } from './routes/about.opengraph-image'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as PortfolioChar123slugChar125DotmdRouteImport } from './routes/portfolio.{$slug}[.]md'
-import { Route as PreviewIndexRouteImport } from './routes/preview/index'
-import { Route as PreviewSystemRouteImport } from './routes/preview/system'
 import { Route as DotwellKnownAgentSkillsIndexDotjsonRouteImport } from './routes/[.]well-known/agent-skills/index[.]json'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
 import { Route as LandingBlogSlugRouteImport } from './routes/_landing/blog/$slug'
@@ -122,11 +119,6 @@ const OpengraphImageRoute = OpengraphImageRouteImport.update({
 const OperatingModelDotmdRoute = OperatingModelDotmdRouteImport.update({
   id: '/operating-model.md',
   path: '/operating-model.md',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PreviewRouteRoute = PreviewRouteRouteImport.update({
-  id: '/preview',
-  path: '/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -231,16 +223,6 @@ const PortfolioChar123slugChar125DotmdRoute =
     path: '/portfolio/{$slug}.md',
     getParentRoute: () => rootRouteImport,
   } as any)
-const PreviewIndexRoute = PreviewIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PreviewRouteRoute,
-} as any)
-const PreviewSystemRoute = PreviewSystemRouteImport.update({
-  id: '/system',
-  path: '/system',
-  getParentRoute: () => PreviewRouteRoute,
-} as any)
 const DotwellKnownAgentSkillsIndexDotjsonRoute =
   DotwellKnownAgentSkillsIndexDotjsonRouteImport.update({
     id: '/.well-known/agent-skills/index.json',
@@ -323,7 +305,6 @@ const LandingThTopicsSlugRoute = LandingThTopicsSlugRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/preview': typeof PreviewRouteRouteWithChildren
   '/': typeof LandingIndexRoute
   '/about.md': typeof AboutDotmdRoute
   '/agents.md': typeof AgentsDotmdRoute
@@ -355,8 +336,6 @@ export interface FileRoutesByFullPath {
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
-  '/preview/system': typeof PreviewSystemRoute
-  '/preview/': typeof PreviewIndexRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -405,8 +384,6 @@ export interface FileRoutesByTo {
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
-  '/preview/system': typeof PreviewSystemRoute
-  '/preview': typeof PreviewIndexRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
   '/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -425,7 +402,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/preview': typeof PreviewRouteRouteWithChildren
   '/_landing': typeof LandingRouteWithChildren
   '/_system': typeof SystemRouteWithChildren
   '/about.md': typeof AboutDotmdRoute
@@ -458,9 +434,7 @@ export interface FileRoutesById {
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
   '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
-  '/preview/system': typeof PreviewSystemRoute
   '/_landing/': typeof LandingIndexRoute
-  '/preview/': typeof PreviewIndexRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/_landing/blog/$slug': typeof LandingBlogSlugRoute
   '/_landing/portfolio/$slug': typeof LandingPortfolioSlugRoute
@@ -480,7 +454,6 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/preview'
     | '/'
     | '/about.md'
     | '/agents.md'
@@ -512,8 +485,6 @@ export interface FileRouteTypes {
     | '/about/opengraph-image'
     | '/api/contact'
     | '/portfolio/{$slug}.md'
-    | '/preview/system'
-    | '/preview/'
     | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -562,8 +533,6 @@ export interface FileRouteTypes {
     | '/about/opengraph-image'
     | '/api/contact'
     | '/portfolio/{$slug}.md'
-    | '/preview/system'
-    | '/preview'
     | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
     | '/portfolio/$slug'
@@ -581,7 +550,6 @@ export interface FileRouteTypes {
     | '/th/topics/$slug'
   id:
     | '__root__'
-    | '/preview'
     | '/_landing'
     | '/_system'
     | '/about.md'
@@ -614,9 +582,7 @@ export interface FileRouteTypes {
     | '/about/opengraph-image'
     | '/api/contact'
     | '/portfolio/{$slug}.md'
-    | '/preview/system'
     | '/_landing/'
-    | '/preview/'
     | '/.well-known/agent-skills/index.json'
     | '/_landing/blog/$slug'
     | '/_landing/portfolio/$slug'
@@ -635,7 +601,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  PreviewRouteRoute: typeof PreviewRouteRouteWithChildren
   LandingRoute: typeof LandingRouteWithChildren
   SystemRoute: typeof SystemRouteWithChildren
   AboutDotmdRoute: typeof AboutDotmdRoute
@@ -757,13 +722,6 @@ declare module '@tanstack/react-router' {
       path: '/operating-model.md'
       fullPath: '/operating-model.md'
       preLoaderRoute: typeof OperatingModelDotmdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/preview': {
-      id: '/preview'
-      path: '/preview'
-      fullPath: '/preview'
-      preLoaderRoute: typeof PreviewRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -906,20 +864,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioChar123slugChar125DotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/preview/': {
-      id: '/preview/'
-      path: '/'
-      fullPath: '/preview/'
-      preLoaderRoute: typeof PreviewIndexRouteImport
-      parentRoute: typeof PreviewRouteRoute
-    }
-    '/preview/system': {
-      id: '/preview/system'
-      path: '/system'
-      fullPath: '/preview/system'
-      preLoaderRoute: typeof PreviewSystemRouteImport
-      parentRoute: typeof PreviewRouteRoute
-    }
     '/.well-known/agent-skills/index.json': {
       id: '/.well-known/agent-skills/index.json'
       path: '/.well-known/agent-skills/index.json'
@@ -1028,20 +972,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface PreviewRouteRouteChildren {
-  PreviewSystemRoute: typeof PreviewSystemRoute
-  PreviewIndexRoute: typeof PreviewIndexRoute
-}
-
-const PreviewRouteRouteChildren: PreviewRouteRouteChildren = {
-  PreviewSystemRoute: PreviewSystemRoute,
-  PreviewIndexRoute: PreviewIndexRoute,
-}
-
-const PreviewRouteRouteWithChildren = PreviewRouteRoute._addFileChildren(
-  PreviewRouteRouteChildren,
-)
-
 interface LandingRouteChildren {
   LandingAboutRoute: typeof LandingAboutRoute
   LandingBuildRoute: typeof LandingBuildRoute
@@ -1101,7 +1031,6 @@ const SystemRouteWithChildren =
   SystemRoute._addFileChildren(SystemRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  PreviewRouteRoute: PreviewRouteRouteWithChildren,
   LandingRoute: LandingRouteWithChildren,
   SystemRoute: SystemRouteWithChildren,
   AboutDotmdRoute: AboutDotmdRoute,

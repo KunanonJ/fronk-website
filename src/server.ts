@@ -1,6 +1,11 @@
 import handler from "@tanstack/react-start/server-entry";
 import { redirectFor } from "./lib/redirects";
-import { withSecurityHeaders, withServerFnNoStore } from "./server/http";
+import { handleCspReport } from "./server/cspReport";
+import {
+  CSP_REPORT_PATH,
+  withSecurityHeaders,
+  withServerFnNoStore,
+} from "./server/http";
 import { markdownPathFor, negotiate } from "./server/negotiate";
 import { handleSanityWebhook, type CachePurger } from "./server/revalidate";
 
@@ -9,7 +14,8 @@ import { handleSanityWebhook, type CachePurger } from "./server/revalidate";
  * server entry. It owns what needs the Worker's env and ctx, which Start does
  * not pass to routes: redirects, the Sanity webhook purge, and the choice
  * between a page's HTML and its Markdown for the pages that run the Worker
- * first. Everything else goes to Start. Every response it returns carries
+ * first. It also takes the Content Security Policy's violation reports,
+ * which need no page framework. Everything else goes to Start. Every response it returns carries
  * the security headers (public/_headers covers static files), and a server
  * function's answer that sets no Cache-Control is marked no-store.
  *
@@ -29,11 +35,12 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     return withSecurityHeaders(
       withServerFnNoStore(request, await route(request, env, ctx)),
+      new URL(request.url).pathname,
     );
   },
 };
 
-/** Redirects, the Worker-only endpoint and negotiation; everything else is Start. */
+/** Redirects, the Worker-only endpoints and negotiation; everything else is Start. */
 async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
   const url = new URL(request.url);
   const to = redirectFor(url.pathname);
@@ -48,6 +55,7 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
       ctx.cache,
     );
   }
+  if (url.pathname === CSP_REPORT_PATH) return handleCspReport(request);
   const markdownPath = markdownPathFor(url.pathname);
   if (markdownPath && (request.method === "GET" || request.method === "HEAD")) {
     return negotiate(

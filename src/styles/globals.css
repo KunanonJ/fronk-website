@@ -11,14 +11,18 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  /* visual-redesign Phase 0: Geist + Geist Mono, Noto Sans Thai for Thai. */
+  /* The profile redesign's stacks (design spec 3.1), the same as the
+   * --font-* tokens in :root, so the font-sans, font-mono and font-display
+   * utilities set them too; Noto Sans Thai for Thai. */
   --font-sans:
-    var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif, system-ui,
+    "Onest", "Onest Fallback", var(--font-noto-thai), ui-sans-serif, system-ui,
     sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --font-mono:
+    "JetBrains Mono", "JetBrains Mono Fallback", var(--font-noto-thai),
+    ui-monospace, monospace;
   --font-display:
-    var(--font-geist-sans), var(--font-noto-thai), ui-sans-serif, system-ui,
-    sans-serif;
+    "Instrument Serif", "Instrument Serif Fallback", var(--font-noto-thai),
+    ui-serif, Georgia, serif;
 
   /* Role colours (visual-redesign Phase 0). */
   --color-page: var(--page);
@@ -36,8 +40,6 @@
   --color-link: var(--link);
   --color-focus: var(--focus);
   --color-ember: var(--ember);
-  --color-error: var(--error-text);
-  --color-success: var(--success-text);
   /* Bento redesign (phase 7a). Primary buttons are ink (owner, 09-11-26):
    * --cta is Ink by day and Glaze by night. --accent (utility "mark") is the
    * theme-aware marker colour; --muted (utility "ink-3") is for the muted
@@ -46,20 +48,11 @@
   --color-on-cta: var(--oncta);
   --color-mark: var(--accent);
   --color-ink-3: var(--muted);
-  --color-on-photo: var(--onphoto);
-  --color-on-photo-2: var(--onphoto2);
-  --color-glass: var(--glass);
-  --color-glass-2: var(--glass2);
-  --color-water: var(--water2);
-  /* Palette colours for art (pixel grids, diagrams), never for text. */
-  --color-signal: var(--palette-signal);
-  --color-glaze: var(--palette-glaze);
-  --color-clay: var(--palette-clay);
+  /* White in both themes: the tile behind the company logos. */
   --color-paper: var(--palette-paper);
 
   --shadow-card: var(--elev-card);
   --shadow-pop: var(--elev-pop);
-  --shadow-logo: var(--elev-logo);
 
   --radius-chip: 8px;
   --radius-input: 12px;
@@ -114,15 +107,9 @@
   --text-card: 0.9375rem;
   --text-card--line-height: 1.5;
 
-  /* helumi and the intro use this curve; not "--ease-out", which Tailwind already defines. */
-  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  /* Bento canvas curves: "soft" is the canvas --ease, "spring" overshoots. */
-  --ease-soft: var(--ease);
-  --ease-spring: var(--spring);
-
-  /* Profile redesign (Phase 0, spec 2.12): names for the scoped tokens. They
-   * resolve only inside data-design="profile" and avoid the substrings the
-   * foundation guard bans; the existing paper colour name stays as it is. */
+  /* Profile redesign (spec 2.12): names for the new tokens. They avoid the
+   * substrings the foundation guard bans; the existing paper colour name
+   * stays as it is. */
   --color-mark-ink: var(--accent-ink);
   --color-mark-deep: var(--accent-deep);
   --color-mark-soft: var(--accent-soft);
@@ -145,163 +132,23 @@
   --breakpoint-tablet: 50.625rem;
 }
 
-/* ─── Palette (owner, visual-redesign 09-11-26) ─────────────────────────────
- * Raw values. Components never use these directly; they use the role tokens
- * below (or Tailwind colours mapped to them in @theme). Ember only marks
- * something live or failed, as small squares with a text label, on Paper or
- * Ink (it fails 3:1 on Glaze, Clay and Mist).
+/* ─── Tokens kept from the earlier design ──────────────────────────────────
+ * Still read by live parts: the white tile behind the company logos
+ * (bg-paper), the card shadow (shadow-card), the bento curve (--ease) and
+ * the intro burst's golds (art only, never text).
+ * Everything else is the profile redesign's, further down.
  * ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --palette-signal: #2b3bff;
-  --palette-signal-hover: #1e2bd6;
-  --palette-glaze: #e8ebff;
   --palette-paper: #ffffff;
-  --palette-ink: #0b0d17;
-  --palette-clay: #ffe3d6;
-  --palette-ember: #ff5a1f;
-  --palette-mist: #e9eaf0;
-  /* Bento canvas motion curves (theme-independent). */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* ─── Roles: light (default since 09-11-26) ─────────────────────────────────
- * Contrast for every text and non-text pair is enforced by
- * lib/design/contrast.test.ts.
- * ─────────────────────────────────────────────────────────────────────────── */
-:root {
-  --page: #f5f6fa;
-  --surface: var(--palette-paper);
-  --surface-tint: var(--palette-glaze);
-  --surface-warm: var(--palette-clay);
-  --well: var(--palette-mist);
-  --ink: var(--palette-ink);
-  --ink-2: #565b70;
-  --hairline: rgba(11, 13, 23, 0.08);
-  --hairline-strong: rgba(11, 13, 23, 0.16);
-  --action: var(--palette-signal);
-  --action-hover: var(--palette-signal-hover);
-  --on-action: var(--palette-paper);
-  /* Theme-aware marker colour (Signal by day); links and focus follow it. */
-  --accent: var(--palette-signal);
-  --link: var(--accent);
-  --focus: var(--accent);
-  --muted: #80859b;
-  /* Primary buttons, pressed chips and active segments: ink. */
-  --cta: var(--palette-ink);
-  --oncta: var(--palette-paper);
-  --ember: var(--palette-ember);
-  --error-text: #b3360a;
-  --success-text: #137036;
   --elev-card:
     0 1px 2px rgba(11, 13, 23, 0.04), 0 16px 40px -16px rgba(11, 13, 23, 0.12);
-  --elev-pop: 0 24px 60px -24px rgba(11, 13, 23, 0.28);
-  --elev-logo: 0 14px 30px -12px rgba(11, 13, 23, 0.35);
-  --elev-avatar: 0 8px 24px -8px rgba(11, 13, 23, 0.35);
-  --sheen: rgba(255, 255, 255, 0.5);
-}
-
-/* ─── Roles: dark (toggle) ─────────────────────────────────────────────────
- * Signal fails on Ink (2.93), so links and focus use a lighter blue.
- * ─────────────────────────────────────────────────────────────────────────── */
-.dark {
-  --page: var(--palette-ink);
-  --surface: #151829;
-  --surface-tint: #1d2136;
-  /* Clay at 8% over #151829 */
-  --surface-warm: #282837;
-  --well: #0f1220;
-  --ink: var(--palette-glaze);
-  --ink-2: #a1a6bd;
-  --hairline: rgba(232, 235, 255, 0.08);
-  --hairline-strong: rgba(232, 235, 255, 0.16);
-  --action: var(--palette-signal);
-  --action-hover: var(--palette-signal-hover);
-  --on-action: var(--palette-paper);
-  --accent: #8e97ff;
-  --link: var(--accent);
-  --focus: var(--accent);
-  --muted: #7d83a0;
-  --cta: var(--palette-glaze);
-  --oncta: var(--palette-ink);
-  --ember: var(--palette-ember);
-  --error-text: #ff7a45;
-  --success-text: #4ade80;
-  --elev-card: none;
-  --elev-pop: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
-  --sheen: rgba(255, 255, 255, 0.08);
-}
-
-/* ─── Bangkok scene and photo overlays (bento redesign, phase 7a) ─────────
- * Art-only colours for the "Based in Bangkok" card (components/bento/
- * BangkokScene.tsx). The sky and water follow the site theme through these
- * tokens, so no JS picks a gradient and there is no hydration flash. Text on
- * the scene uses --onphoto / --onphoto2 over the scrim (contrast-tested).
- * ─────────────────────────────────────────────────────────────────────────── */
-:root {
-  --onphoto: #ffffff;
-  --onphoto2: rgba(255, 255, 255, 0.74);
-  --glass: rgba(255, 255, 255, 0.14);
-  --glass2: rgba(255, 255, 255, 0.26);
-  --glowop: 0.6;
-  --starop: 0;
-  --scene-sky-1: #56648f;
-  --scene-sky-2: #a9a3bb;
-  --scene-sky-3: #e9c39b;
-  --scene-water-1: #5c6584;
-  --water2: #232a3f;
-  --scene-gold-1: #5e3a1e;
   --scene-gold-2: #c8904a;
   --scene-gold-3: #f4d391;
-  --scene-gold-4: #55341b;
-  --scene-tiers: rgba(58, 30, 12, 0.5);
-  --scene-base: #7a5636;
-  --scene-door: #3a2414;
-  --scene-band: #f6dc9c;
-  --scene-spire: #e9c27a;
-  --scene-finial: #f3d79a;
-  --scene-light: #fff1c4;
-  --scene-tree: #121619;
-  --scene-bank: #1c1d26;
-  --scene-hull: #2b1d18;
-  --scene-trim: #b8322a;
-  --scene-cabin: #3a2a24;
-  --scene-halo: rgba(255, 196, 120, 0.55);
-  --scene-halo-0: rgba(255, 196, 120, 0);
-  --scene-mist: rgba(34, 38, 64, 0.55);
-  --scene-reflect: rgba(240, 192, 112, 0.42);
-  --scene-reflect-2: rgba(240, 192, 112, 0.3);
-  --scene-shimmer: rgba(255, 255, 255, 0.1);
-  /* Scrim stops behind the card text (side layout, then stacked layout). */
-  --scene-scrim-1: rgba(9, 11, 24, 0.9);
-  --scene-scrim-2: rgba(9, 11, 24, 0.64);
-  --scene-scrim-3: rgba(9, 11, 24, 0.96);
-  --scene-scrim-4: rgba(9, 11, 24, 0.8);
-  --scene-scrim-0: rgba(9, 11, 24, 0);
 }
 
 .dark {
-  --glowop: 1;
-  --starop: 0.85;
-  --scene-sky-1: #0d1230;
-  --scene-sky-2: #2b2f5a;
-  --scene-sky-3: #7a5a74;
-  --scene-water-1: #1d2244;
-  --water2: #070a18;
-}
-
-/* ─── Map art (bento redesign, phase 7c) ───────────────────────────────────
- * Art-only colours for the small map drawings (the Venture "Related topics"
- * card): street lines and the river. Never text.
- * ─────────────────────────────────────────────────────────────────────────── */
-:root {
-  --map: #d5d8e3;
-  --river: #c9cefc;
-}
-
-.dark {
-  --map: #2a2f48;
-  --river: #2b3a8f;
+  --elev-card: none;
 }
 
 html {
@@ -340,11 +187,6 @@ body {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-}
-
-::selection {
-  background: var(--action);
-  color: var(--on-action);
 }
 
 .landing-root {
@@ -596,374 +438,14 @@ a {
   }
 }
 
-/* ─── Bento redesign: surfaces and motion (phase 7a) ─────────────────────────
- * `.kj` is the canvas root class. Here it marks a redesigned surface: the
- * site header and footer now, each page as Phase 7 restyles it. The rules
- * follow the canvas helmet CSS (design spec section 2), with three changes:
- *   - every animation sits behind prefers-reduced-motion: no-preference;
- *   - the LCP h1 never starts invisible or blurred: its lines only slide up,
- *     and only the bento cards below it fade in;
- *   - cards rise without the blur filter (paint cost on low-end phones).
- * Bento rules are unlayered so they beat the card's Tailwind utilities, as
- * the canvas CSS beat its inline styles.
+/* ─── Share and menu panels (bento redesign, phase 7a) ───────────────────────
+ * The share panel (components/bento/classes.ts, PANEL) pops from the top
+ * right; the rest of the bento canvas's motion went with its components.
  * ─────────────────────────────────────────────────────────────────────────── */
-
-@layer base {
-  .kj a {
-    color: var(--link);
-  }
-
-  .kj a:hover {
-    color: var(--ink);
-  }
-
-  .kj :focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 3px;
-  }
-
-  .kj button {
-    font: inherit;
-    cursor: pointer;
-  }
-}
-
-.kj a,
-.kj button {
-  transition:
-    transform 0.35s var(--spring),
-    background-color 0.3s var(--ease),
-    color 0.3s var(--ease),
-    border-color 0.3s var(--ease),
-    box-shadow 0.35s var(--ease),
-    opacity 0.3s var(--ease);
-}
-
-.kj .kj-row {
-  transition:
-    background-color 0.25s var(--ease),
-    transform 0.4s var(--ease);
-}
-
-.kj .kj-row:not([aria-current]):hover {
-  background: var(--page);
-}
-
-.kj .kj-icon:hover {
-  border-color: var(--hairline-strong);
-}
-
-.kj-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Bangkok card: a size container; the scrim and blur keep the text legible. */
-.kj-place {
-  container-type: inline-size;
-}
-
-.kj-place-scrim {
-  background: linear-gradient(
-    90deg,
-    var(--scene-scrim-1) 0%,
-    var(--scene-scrim-2) 40%,
-    var(--scene-scrim-0) 72%
-  );
-}
-
-.kj-place-blur {
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  -webkit-mask-image: linear-gradient(90deg, #000 28%, transparent 60%);
-  mask-image: linear-gradient(90deg, #000 28%, transparent 60%);
-}
-
-.kj-glass:hover {
-  background: var(--glass2);
-}
-
-.kj .kj-glass,
-.kj .kj-glass:hover {
-  color: var(--onphoto);
-}
-
-@container (max-width: 560px) {
-  .kj-place-body {
-    min-height: 680px;
-    justify-content: flex-end;
-    padding: 24px;
-  }
-
-  .kj-place-art {
-    bottom: auto;
-    height: 64%;
-  }
-
-  .kj-place-scrim {
-    background: linear-gradient(
-      0deg,
-      var(--scene-scrim-3) 0%,
-      var(--scene-scrim-4) 44%,
-      var(--scene-scrim-0) 74%
-    );
-  }
-
-  .kj-place-blur {
-    -webkit-mask-image: linear-gradient(0deg, #000 26%, transparent 54%);
-    mask-image: linear-gradient(0deg, #000 26%, transparent 54%);
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  /* Press feedback and hover nudges. */
-  .kj a:active,
-  .kj button:active {
-    transform: scale(0.97);
-  }
-
-  .kj .kj-row:hover {
-    transform: translateX(4px);
-  }
-
-  .kj .kj-icon:hover {
-    transform: translateY(-2px);
-  }
-
-  .kj .kj-icon svg {
-    animation: kj-spin 0.6s var(--spring) backwards;
-  }
-
-  /* Page entrance: header drop, h1 lines slide (never fade), cards rise. */
-  .kj-header {
-    animation: kj-drop 0.8s var(--ease) backwards;
-  }
-
-  .kj-lines > * {
-    animation: kj-line 1s var(--ease) backwards;
-  }
-
-  .kj-lines > :nth-child(2) {
-    animation-delay: 0.1s;
-  }
-
-  .kj-lines > :nth-child(3) {
-    animation-delay: 0.2s;
-  }
-
-  .kj-lines > :nth-child(n + 4) {
-    animation-delay: 0.3s;
-  }
-
-  .kj-lines img {
-    transition: transform 0.6s var(--spring);
-  }
-
-  .kj-lines img:hover {
-    transform: rotate(-8deg) scale(1.12);
-  }
-
-  .bento > *,
-  .bento-2 > * {
-    animation: kj-rise 0.9s var(--ease) backwards;
-  }
-
-  .bento > :nth-child(1) {
-    animation-delay: 0.16s;
-  }
-
-  .bento > :nth-child(2) {
-    animation-delay: 0.24s;
-  }
-
-  .bento > :nth-child(3) {
-    animation-delay: 0.32s;
-  }
-
-  .bento > :nth-child(4) {
-    animation-delay: 0.4s;
-  }
-
-  .bento > :nth-child(5) {
-    animation-delay: 0.48s;
-  }
-
-  .bento > :nth-child(6) {
-    animation-delay: 0.56s;
-  }
-
-  .bento > :nth-child(n + 7) {
-    animation-delay: 0.64s;
-  }
-
-  /* Header panels pop from the top right; menu rows slide in. */
   .kj-panel {
     transform-origin: top right;
     animation: kj-pop 0.42s var(--ease) backwards;
-  }
-
-  .kj-menu .kj-row {
-    animation: kj-in 0.5s var(--ease) backwards;
-  }
-
-  .kj-menu .kj-row:nth-child(2) {
-    animation-delay: 0.03s;
-  }
-
-  .kj-menu .kj-row:nth-child(3) {
-    animation-delay: 0.06s;
-  }
-
-  .kj-menu .kj-row:nth-child(4) {
-    animation-delay: 0.09s;
-  }
-
-  .kj-menu .kj-row:nth-child(5) {
-    animation-delay: 0.12s;
-  }
-
-  .kj-menu .kj-row:nth-child(n + 6) {
-    animation-delay: 0.15s;
-  }
-
-  .kj-live {
-    animation: kj-pulse 2.4s var(--ease) infinite;
-  }
-
-  /* Bangkok scene loops. */
-  .kj-place-art svg {
-    transform-origin: 72% 78%;
-    animation: kj-drift 28s ease-in-out infinite alternate;
-  }
-
-  .kj-clouds {
-    animation: kj-clouds 70s linear infinite alternate;
-  }
-
-  .kj-halo {
-    animation: kj-breathe 6s ease-in-out infinite;
-  }
-
-  .kj-stars circle {
-    animation: kj-twinkle 3.4s ease-in-out infinite;
-  }
-
-  .kj-stars circle:nth-child(3n) {
-    animation-delay: 1.1s;
-  }
-
-  .kj-stars circle:nth-child(3n + 1) {
-    animation-delay: 2.2s;
-  }
-
-  .kj-boat {
-    animation: kj-boat 22s ease-in-out infinite alternate;
-  }
-
-  .kj-shimmer {
-    animation: kj-shimmer 7s ease-in-out infinite alternate;
-  }
-
-  .kj-badge {
-    transition: transform 0.6s var(--spring);
-  }
-
-  .kj-place:hover .kj-badge {
-    transform: translateY(-3px) rotate(-6deg);
-  }
-}
-
-/* Card hover lift and sheen, pointer devices only. A `bento-row` (cards side
- * by side in one bento cell) stays put; the cards in it lift instead. */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .bento > :not(.bento-row),
-  .bento-2 > *,
-  .bento-row > * {
-    transition:
-      transform 0.55s var(--ease),
-      box-shadow 0.55s var(--ease),
-      border-color 0.4s var(--ease),
-      background-color 0.4s var(--ease);
-  }
-
-  .bento > :not(.bento-row):hover,
-  .bento-2 > :hover,
-  .bento-row > :hover {
-    transform: translateY(-4px);
-    box-shadow: var(--elev-pop);
-    border-color: var(--hairline-strong);
-  }
-
-  .bento > article::after,
-  .bento-2 > article::after,
-  .bento-row > article::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(
-      110deg,
-      transparent 38%,
-      var(--sheen) 50%,
-      transparent 62%
-    );
-    opacity: 0;
-    transform: translateX(-70%);
-    transition:
-      transform 1.1s var(--ease),
-      opacity 0.5s var(--ease);
-  }
-
-  .bento > article:hover::after,
-  .bento-2 > article:hover::after,
-  .bento-row > article:hover::after {
-    opacity: 0.6;
-    transform: translateX(70%);
-  }
-
-  .kj .btn-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--elev-pop);
-  }
-}
-
-@keyframes kj-rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* Transform only: the h1 is the LCP element and stays visible throughout. */
-@keyframes kj-line {
-  from {
-    transform: translateY(0.3em);
-  }
-  to {
-    transform: none;
-  }
-}
-
-@keyframes kj-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -980,104 +462,17 @@ a {
   }
 }
 
-@keyframes kj-in {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes kj-spin {
-  from {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes kj-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ember) 55%, transparent);
-  }
-  70% {
-    box-shadow: 0 0 0 9px color-mix(in srgb, var(--ember) 0%, transparent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ember) 0%, transparent);
-  }
-}
-
-@keyframes kj-drift {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.07) translateX(-1.5%);
-  }
-}
-
-@keyframes kj-clouds {
-  to {
-    transform: translateX(-70px);
-  }
-}
-
-@keyframes kj-breathe {
-  0%,
-  100% {
-    opacity: var(--glowop);
-  }
-  50% {
-    opacity: calc(var(--glowop) * 0.55);
-  }
-}
-
-@keyframes kj-twinkle {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.25;
-  }
-}
-
-@keyframes kj-boat {
-  to {
-    transform: translateX(-90px);
-  }
-}
-
-@keyframes kj-shimmer {
-  to {
-    transform: translateX(26px);
-    opacity: 0.45;
-  }
-}
-
-@keyframes kj-reveal {
-  from {
-    clip-path: circle(0 at var(--vtx, 92%) var(--vty, 4%));
-  }
-  to {
-    clip-path: circle(150% at var(--vtx, 92%) var(--vty, 4%));
-  }
-}
-
 /* ─── View transitions ───────────────────────────────────────────────────────
  * Two kinds, told apart by view-transition types: the router starts page
  * navigations with type "page" (a short cross-fade, the UA default), and the
- * theme toggle starts its switch with type "theme" (the circular reveal from
- * the click point). The toggle also sets html.kj-vt for the duration, which
- * stops CSS transitions blending into the snapshot and carries the reveal in
- * browsers that lack view-transition types.
+ * theme toggle starts its switch with type "theme". The toggle also sets
+ * html.kj-vt for the duration, which stops CSS transitions blending into the
+ * snapshot and carries the theme switch in browsers that lack view-transition
+ * types. Since the profile redesign's cutover (Phase 6, design spec 7.5 and
+ * 13 items 6 and 23) the theme switch is the .56 s fade on every page, not
+ * the circular reveal, `kj-theme-fade`, defined below. Movement-free, and
+ * still only with no-preference: the toggle starts no transition under
+ * reduced motion, and the block after this one turns them all off.
  * ─────────────────────────────────────────────────────────────────────────── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -1091,23 +486,26 @@ html.kj-vt *::after {
   transition: none !important;
 }
 
-html.kj-vt::view-transition-old(root),
-html.kj-vt::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
+@media (prefers-reduced-motion: no-preference) {
+  html.kj-vt::view-transition-old(root),
+  html:active-view-transition-type(theme)::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
 
-html.kj-vt::view-transition-new(root) {
-  animation: kj-reveal 0.8s var(--ease);
-}
+  html.kj-vt::view-transition-new(root),
+  html:active-view-transition-type(theme)::view-transition-new(root) {
+    animation: kj-theme-fade 0.56s cubic-bezier(0.4, 0, 0.2, 1) both;
+    mix-blend-mode: normal;
+  }
 
-html:active-view-transition-type(theme)::view-transition-old(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-html:active-view-transition-type(theme)::view-transition-new(root) {
-  animation: kj-reveal 0.8s var(--ease);
+  /* Defined here, beside its only rule: this sheet loads on every page and
+     must not lean on the profile stylesheet for it. */
+  @keyframes kj-theme-fade {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1120,10 +518,10 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
 
 /* ─── Profile redesign: tokens and primitives (Phase 0, 18-11-26) ────────────
  * The design of process/features/profile-site-redesign (design spec sections
- * 2 to 6) in one scope until the cutover: `data-design="profile"` on <html>,
- * which src/routes/__root.tsx sets for /preview/* only, so nothing below
- * matches a live page. Role tokens keep their names and take new values in
- * the scope (spec 2.12); Phase 8 folds the scope into :root and .dark.
+ * 2 to 6). Until Phase 8 it lived in a scope (`data-design="profile"` on
+ * <html>); every page is in it since Phase 7, so the values below are the
+ * site's :root and .dark. Role tokens keep their names and take the new
+ * values (spec 2.12).
  * Contrast pairs: lib/design/contrast.test.ts ("profile scope").
  * Primitives are `ds-*` classes in @layer components, so Tailwind utilities
  * still override them; the type classes keep the spec's `t-*` names. Type
@@ -1160,7 +558,7 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
   initial-value: 1;
 }
 
-[data-design="profile"] {
+:root {
   /* Palette (spec 2.1). */
   --ink: #120e1f;
   --paper: #ffffff;
@@ -1316,9 +714,7 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
     ui-monospace, monospace;
   --font-hand: "Patrick Hand", var(--font-noto-thai), cursive;
   /* Tailwind's preflight reads these for html and for code, kbd, samp and
-     pre; `@theme inline` froze them to the Geist stacks at :root. The
-     font-sans, font-mono and font-display utilities stay frozen too, so a
-     guard keeps them out of components/ds and components/profile. */
+     pre. */
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
 
@@ -1339,6 +735,9 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
   --cta: var(--ink);
   --oncta: var(--paper);
   --ember: var(--coral-deep);
+  /* Form states: unchanged from the earlier design (the reference draws none). */
+  --error-text: #b3360a;
+  --success-text: #137036;
 
   color: var(--ink);
   font-family: var(--font-sans);
@@ -1346,8 +745,7 @@ html:active-view-transition-type(theme)::view-transition-new(root) {
   font-synthesis-weight: none;
 }
 
-html.dark[data-design="profile"],
-.dark [data-design="profile"] {
+.dark {
   --ink: #f1edfa;
   --paper: #0f0c18;
   --paper-2: #17131f;
@@ -1392,13 +790,14 @@ html.dark[data-design="profile"],
   --material-301-a: oklch(0.27 0.05 301);
   --material-301-b: oklch(0.22 0.075 301);
   --elev-nav: 0 0 0 1px var(--line), 0 10px 28px -14px #000000b3;
+  --error-text: #ff7a45;
+  --success-text: #4ade80;
 }
 
 /* More contrast on request: the small-text floor and every ring step up. */
 @media (prefers-contrast: more) {
-  [data-design="profile"],
-  html.dark[data-design="profile"],
-  .dark [data-design="profile"] {
+  :root,
+  .dark {
     --ink-60: var(--ink-80);
     --muted: var(--ink-80);
     --line: var(--line-strong);
@@ -1406,14 +805,14 @@ html.dark[data-design="profile"],
   }
 }
 
-/* Unlayered, like the site-wide ::selection it overrides inside the scope. */
-[data-design="profile"] ::selection {
+/* Unlayered, so no layer can override it. */
+::selection {
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
 
 @layer components {
-  [data-design="profile"] :focus-visible {
+  :root :focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 3px;
   }
@@ -1541,11 +940,34 @@ html.dark[data-design="profile"],
     letter-spacing: normal;
     text-transform: none;
   }
-  :is(.t-body, .t-prose):lang(th) {
+  /* Phase 7 (plan step 7b): Thai sets in Noto Sans Thai, which none of the
+     Latin faces cover. Body text at 1.75, headings at 1.4, no tracking (it
+     breaks the marks above and below), no slanted Thai: Noto Sans Thai has
+     no italic, so the accent lines stay upright instead of a faux oblique.
+     Thai display text is set smaller than the serif: its glyphs are larger
+     on the same body. */
+  :is(.t-body, .t-prose, .t-lead, .t-small):lang(th) {
     line-height: 1.75;
+    letter-spacing: normal;
   }
-  :is(.t-hero, .t-display, .t-title, .t-footer, .t-statement):lang(th) {
+  :is(
+    .t-hero,
+    .t-display,
+    .t-title,
+    .t-footer,
+    .t-statement,
+    .t-h3,
+    .t-card-title,
+    .t-lift-title
+  ):lang(th) {
     line-height: 1.4;
+    letter-spacing: normal;
+  }
+  .t-display:lang(th) {
+    font-size: clamp(2.25rem, 4vw + 0.5rem, 4.5rem);
+  }
+  :lang(th) {
+    font-synthesis-style: none;
   }
 
   /* Layout and the card link pattern (spec 2.11, 6.12). */
@@ -1840,6 +1262,13 @@ html.dark[data-design="profile"],
     box-shadow: var(--elev-ring);
     cursor: pointer;
   }
+  /* The icon is swapped on every press (Pause for Play), so it must never be
+     the node under the pointer: macOS WebKit loses the hover chain when the
+     hovered node is removed, and the region around the toggle then never
+     gets pointerleave, so its hover and focus holds stick. */
+  .ds-motion-toggle > svg {
+    pointer-events: none;
+  }
   .ds-text-link,
   .ds-back {
     display: inline-flex;
@@ -1964,12 +1393,12 @@ html.dark[data-design="profile"],
      forced colors or with a contrast preference, where a large or
      high-contrast system pointer must stay. */
   @media (hover: hover) and (pointer: fine) and (forced-colors: none) and (prefers-contrast: no-preference) {
-    [data-design="profile"] {
+    :root {
       cursor:
         url("/cursors/arrow.svg") 2 1,
         auto;
     }
-    [data-design="profile"] :is(a, button, label, summary, [role="button"]) {
+    :root :is(a, button, label, summary, [role="button"]) {
       cursor:
         url("/cursors/hand.svg") 10 2,
         pointer;
@@ -2007,7 +1436,7 @@ html.dark[data-design="profile"],
     .ds-dither {
       display: none;
     }
-    [data-design="profile"] [aria-current] {
+    :root [aria-current] {
       text-decoration-line: underline;
       text-underline-offset: 4px;
     }

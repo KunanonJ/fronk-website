@@ -71,8 +71,10 @@ export default defineConfig({
       },
     },
     // Profile redesign device matrix (design spec 10.1) and an iPhone-class
-    // WebKit phone, for the hidden /preview pages only (profile*.spec.ts):
-    // the Galaxy Z Fold closed and open, and a tablet in landscape.
+    // WebKit phone, for the profile specs only (profile*.spec.ts): the pages
+    // the Phase 6 cutover rebuilt (Home, the portfolio, the case pages, About
+    // and Contact). The Galaxy Z Fold closed and open, and a tablet in
+    // landscape.
     {
       name: "fold-closed",
       testMatch: /profile(-[a-z-]+)?\.spec\.ts$/,

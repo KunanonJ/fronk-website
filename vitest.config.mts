@@ -10,6 +10,7 @@ const DOM_TS_TESTS = [
   "lib/hooks/useReducedMotion.test.ts",
   "lib/hooks/useFinePointer.test.ts",
   "lib/motion/motionRuntime.test.ts",
+  "src/lib/scrollRestoration.test.ts",
 ];
 
 export default defineConfig({

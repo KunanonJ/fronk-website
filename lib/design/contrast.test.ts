@@ -30,21 +30,6 @@ function block(selector: ":root" | ".dark"): Record<string, string> {
 const light = block(":root");
 const dark = { ...light, ...block(".dark") };
 
-function resolve(
-  vars: Record<string, string>,
-  name: string,
-  depth = 0,
-): string {
-  const value = vars[name];
-  if (value === undefined) throw new Error(`Missing token ${name}`);
-  const ref = value.match(/^var\((--[\w-]+)\)$/);
-  if (ref) {
-    if (depth > 8) throw new Error(`Cycle at ${name}`);
-    return resolve(vars, ref[1]!, depth + 1);
-  }
-  return value;
-}
-
 const themes = { light, dark } as const;
 
 /** Text pairs (fg on bg) that must reach 4.5:1 in both themes. */
@@ -114,11 +99,7 @@ describe("design tokens meet WCAG AA in both themes", () => {
   for (const [theme, vars] of Object.entries(themes)) {
     for (const [fg, bg] of TEXT_PAIRS) {
       it(`${theme}: ${fg} on ${bg} >= 4.5`, () => {
-        const ratio = contrastRatio(
-          resolve(vars, fg),
-          resolve(vars, bg),
-          resolve(vars, "--page"),
-        );
+        const ratio = profileRatio(vars, fg, bg);
         expect(
           ratio,
           `${fg} on ${bg} = ${ratio.toFixed(2)}`,
@@ -127,11 +108,7 @@ describe("design tokens meet WCAG AA in both themes", () => {
     }
     for (const [fg, bg] of LARGE_TEXT_PAIRS) {
       it(`${theme}: ${fg} on ${bg} >= 3 (display text only)`, () => {
-        const ratio = contrastRatio(
-          resolve(vars, fg),
-          resolve(vars, bg),
-          resolve(vars, "--page"),
-        );
+        const ratio = profileRatio(vars, fg, bg);
         expect(
           ratio,
           `${fg} on ${bg} = ${ratio.toFixed(2)}`,
@@ -140,11 +117,7 @@ describe("design tokens meet WCAG AA in both themes", () => {
     }
     for (const [fg, bg] of NON_TEXT_PAIRS[theme as keyof typeof themes]) {
       it(`${theme}: ${fg} on ${bg} >= 3`, () => {
-        const ratio = contrastRatio(
-          resolve(vars, fg),
-          resolve(vars, bg),
-          resolve(vars, "--page"),
-        );
+        const ratio = profileRatio(vars, fg, bg);
         expect(
           ratio,
           `${fg} on ${bg} = ${ratio.toFixed(2)}`,
@@ -154,65 +127,17 @@ describe("design tokens meet WCAG AA in both themes", () => {
   }
 });
 
-describe("text on the Bangkok scene (phase 7a)", () => {
-  // The card text sits in the scrim's dense band; the weakest point is the
-  // 0.64 stop over the brightest sky colour, before the 18 px blur helps.
-  for (const [theme, vars] of Object.entries(themes)) {
-    for (const scrim of ["--scene-scrim-2", "--scene-scrim-4"]) {
-      it(`${theme}: --onphoto2 over ${scrim} on the sky >= 4.5`, () => {
-        const ratio = contrastRatio(
-          resolve(vars, "--onphoto2"),
-          resolve(vars, scrim),
-          resolve(vars, "--scene-sky-3"),
-        );
-        expect(ratio, ratio.toFixed(2)).toBeGreaterThanOrEqual(AA_TEXT);
-      });
-    }
-  }
-});
-
-describe("palette rules the components rely on", () => {
-  it("Signal fails on Ink, which is why dark mode uses a lighter link colour", () => {
-    expect(contrastRatio("#2b3bff", "#0b0d17")).toBeLessThan(AA_NON_TEXT);
-    expect(resolve(dark, "--link")).not.toBe(resolve(light, "--link"));
-  });
-
-  it("Ember fails 3:1 on the light tints, so markers never sit on them", () => {
-    for (const tint of [
-      "--palette-glaze",
-      "--palette-clay",
-      "--palette-mist",
-    ]) {
-      expect(
-        contrastRatio(resolve(light, "--palette-ember"), resolve(light, tint)),
-      ).toBeLessThan(AA_NON_TEXT);
-    }
-  });
-});
-
 /*
- * Profile redesign scope (Phase 0, process/features/profile-site-redesign).
- * The tokens sit on <html data-design="profile">, so the browser resolves
- * them in this order: :root, .dark (dark only), the scope, the scope's dark
- * block (dark only). Mixes (color-mix with transparent) and the oklch case
- * materials are evaluated as CSS computes them.
+ * The profile redesign's tokens (process/features/profile-site-redesign).
+ * Phase 8 folded its scope into :root and .dark, so they are the themes
+ * above. Mixes (color-mix with transparent) and the oklch case materials are
+ * evaluated as CSS computes them.
  */
-function scopeBlock(selectorLine: string): Record<string, string> {
-  const re = new RegExp(`^${selectorLine}\\s*\\{([\\s\\S]*?)^\\}`, "gm");
-  const out: Record<string, string> = {};
-  for (const match of css.matchAll(re)) {
-    const body = match[1]!.replace(/\/\*[\s\S]*?\*\//g, "");
-    for (const decl of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
-      out[decl[1]!] = decl[2]!.trim().replace(/\s+/g, " ");
-    }
-  }
-  return out;
-}
 
-/** The scope's token overrides inside one @media block. */
+/** The token overrides inside one @media block. */
 function mediaScope(query: string): Record<string, string> {
-  const at = css.indexOf(`@media (${query}) {\n  [data-design="profile"],`);
-  if (at === -1) throw new Error(`No scoped ${query} block`);
+  const at = css.indexOf(`@media (${query}) {\n  :root,\n  .dark {`);
+  if (at === -1) throw new Error(`No ${query} token block`);
   const body = css.slice(css.indexOf("{", css.indexOf("{", at) + 1) + 1);
   const out: Record<string, string> = {};
   for (const decl of body
@@ -223,14 +148,7 @@ function mediaScope(query: string): Record<string, string> {
   return out;
 }
 
-const scopeLight = scopeBlock(String.raw`\[data-design="profile"\]`);
-const scopeDark = scopeBlock(
-  String.raw`html\.dark\[data-design="profile"\],\n\.dark \[data-design="profile"\]`,
-);
-const profileThemes = {
-  light: { ...light, ...scopeLight },
-  dark: { ...dark, ...scopeLight, ...scopeDark },
-} as const;
+const profileThemes = themes;
 
 function substitute(
   vars: Record<string, string>,
@@ -396,13 +314,13 @@ describe("profile scope under prefers-contrast: more", () => {
 describe("profile scope theme colour", () => {
   // The values Phase 6 puts in the theme-color metas (design spec 2.1).
   it("matches the browser-chrome colours in both themes", () => {
-    expect(scopeLight["--theme-color"]).toBe("#f7f3ff");
-    expect(scopeDark["--theme-color"]).toBe("#0f0c18");
+    expect(light["--theme-color"]).toBe("#f7f3ff");
+    expect(dark["--theme-color"]).toBe("#0f0c18");
   });
 });
 
 describe("profile type stays zoom-safe (WCAG 1.4.4)", () => {
-  const sizes = Object.entries(scopeLight).filter(([name]) =>
+  const sizes = Object.entries(light).filter(([name]) =>
     name.startsWith("--type-"),
   );
 

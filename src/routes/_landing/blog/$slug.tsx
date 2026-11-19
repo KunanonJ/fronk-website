@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import BlogPostView from "@/components/landing/blog/BlogPostView";
 import type { Post } from "@/lib/sanity/types";
 import { routeCacheHeaders } from "@/src/lib/cache";
@@ -25,8 +25,8 @@ function BlogPostRoute() {
   const result = useSuspenseQuery(blogPostQuery(slug)).data;
   const post = result?.postJson ? (JSON.parse(result.postJson) as Post) : null;
   return (
-    <PageMain>
+    <ProfileMain>
       <BlogPostView slug={slug} post={post} />
-    </PageMain>
+    </ProfileMain>
   );
 }

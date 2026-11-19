@@ -18,7 +18,9 @@ export const DEFAULT_OG_IMAGE = {
   url: "/opengraph-image",
   width: OG_SIZE.width,
   height: OG_SIZE.height,
-  alt: `${siteConfig.name}: ${siteConfig.tagline}`,
+  // profileCardAlt(HOME_CARD), written out: lib/og/profileCards.ts stays
+  // server-only (lib/og/profileCards.test.ts keeps the two equal).
+  alt: "Kunanon Jarat’s portrait beside “Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok.”",
 };
 
 type RouteShareInput = {

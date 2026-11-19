@@ -1,12 +1,6 @@
-import { cn } from "@/lib/utils/cn";
-import {
-  Bento,
-  Kicker,
-  bentoSpan,
-  type BentoSpan,
-} from "@/components/bento/Bento";
-import { MonoEyebrow } from "@/components/bento/MonoEyebrow";
-import { Segmented } from "@/components/bento/Segmented";
+import type { BentoSpan } from "@/components/bento/Bento";
+import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import Image from "@/components/ui/Image";
 import {
   PRESS_TYPES,
@@ -20,13 +14,13 @@ import {
   matchesPressFilter,
   type PressFilter,
 } from "@/lib/press/search";
-import { CARD_SURFACE } from "@/components/bento/classes";
-import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /*
- * /press (bento canvas Press, design spec 4.19). Hidden: noindex and no
- * links from public pages. Banners stay the current images until the owner
- * supplies new ones (spec 6, gap 11).
+ * /press (profile redesign Phase 7h, a light restyle of the bento canvas
+ * Press). Hidden: noindex and no links from public pages. The hero on the
+ * pixel sky, the type filter as toggle pills, and each piece as a tile in
+ * the canvas's spans. Banners stay the current images until the owner
+ * supplies new ones. Styles: `.pf-press*` in pages-catalog.css.
  */
 
 const EXTERNAL = { target: "_blank", rel: "noopener noreferrer" } as const;
@@ -76,23 +70,19 @@ function PressCard({
   return (
     <article
       aria-labelledby={titleId}
-      className={cn(
-        CARD_SURFACE,
-        "flex min-w-0 flex-col gap-4",
-        bentoSpan(span),
-      )}
+      data-span={span}
+      className="ds-tile ds-tile--paper pf-press-card"
     >
-      <div className="flex items-center justify-between gap-3">
-        <Kicker id={`press-type-${item.id}`}>{item.source}</Kicker>
-        <time
-          dateTime={item.date}
-          className="font-mono text-xs tracking-[0.04em] text-ink-2"
-        >
+      <div className="pf-press-card__head">
+        <h2 id={`press-type-${item.id}`} className="t-meta pf-cat-kicker">
+          {item.source}
+        </h2>
+        <time dateTime={item.date} className="t-meta pf-cat-note">
           {formatPressDate(item.date)}
         </time>
       </div>
-      <div className="flex flex-auto flex-wrap gap-x-5 gap-y-4">
-        <figure className="relative m-0 min-h-[180px] min-w-0 flex-[1_1_260px] overflow-hidden rounded-well border border-hairline bg-surface-tint">
+      <div className="pf-press-card__body">
+        <figure className="pf-press-card__banner">
           {/* Eager: four images on a hidden page, and full-page captures
               never catch a lazy one half loaded. */}
           <Image
@@ -102,28 +92,33 @@ function PressCard({
             loading="eager"
             sizes="(min-width: 1024px) 400px, 100vw"
           />
-          <figcaption className="absolute bottom-3 left-3 rounded-full border border-hairline bg-surface px-2.5 py-1.5 font-mono text-xs leading-none text-ink-2">
+          <figcaption className="ds-chip pf-press-card__domain">
             {domain}
           </figcaption>
         </figure>
-        <div className="flex min-w-0 flex-[1_1_240px] flex-col gap-2.5">
+        <div className="pf-press-card__copy">
           <h3
             id={titleId}
-            className={`m-0 leading-[1.3] font-semibold tracking-[-0.02em] ${lead ? "text-[22px]" : "text-xl"}`}
+            className={lead ? "t-h3 pf-cat-title" : "t-lift-title pf-cat-title"}
           >
-            <a href={item.href} {...EXTERNAL} className="text-ink no-underline">
+            <a
+              href={item.href}
+              {...EXTERNAL}
+              className="pf-press-card__title-link"
+            >
               {item.title}
             </a>
           </h3>
-          <p className="m-0 text-card leading-[1.55] text-ink-2">
-            {item.description}
-          </p>
+          <p className="t-small pf-cat-note">{item.description}</p>
           <a
             href={item.href}
             {...EXTERNAL}
-            className="mt-auto inline-flex min-h-11 items-center self-start text-sm font-medium [overflow-wrap:anywhere] no-underline"
+            className="ds-text-link pf-press-card__view"
           >
-            View on {domain} →
+            <span>View on {domain}</span>
+            <span className="ds-text-link__arrow" aria-hidden="true">
+              →
+            </span>
           </a>
         </div>
       </div>
@@ -158,40 +153,35 @@ export default function PressPage({
 
   return (
     <>
-      <section
-        aria-labelledby="hero-title"
-        className="flex flex-col gap-[22px]"
-      >
-        <MonoEyebrow>{pressPage.eyebrow}</MonoEyebrow>
-        <PageTitle>
-          <span className="block">
-            <span className="text-ink-3">{headline.muted}</span>{" "}
-            {headline.middle}{" "}
-            <span className="text-ink-3">{headline.joiner}</span>
-          </span>{" "}
-          <span className="block text-mark">{headline.accent}</span>
-        </PageTitle>
-        <HeroLead>{pressPage.lead}</HeroLead>
-      </section>
+      <PageHero
+        eyebrow={pressPage.eyebrow}
+        lines={[
+          [
+            { text: headline.muted, tone: "muted" },
+            { text: headline.middle },
+            { text: headline.joiner, tone: "muted" },
+          ],
+          [{ text: headline.accent, tone: "accent" }],
+        ]}
+        lead={pressPage.lead}
+      />
 
-      <section aria-label="Coverage" className="flex flex-col gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
-          <Segmented
+      <section
+        aria-label="Coverage"
+        className="ds-wrap pf-cat-section pf-cat-end pf-press"
+      >
+        <div className="pf-filter-bar pf-press__bar">
+          <ToggleGroup
             label="Filter coverage by type"
             options={options}
             value={type}
             onChange={onTypeChange}
-            tone="surface"
-            className="max-w-full shadow-card"
           />
-          <p
-            aria-live="polite"
-            className="m-0 font-mono text-xs tracking-[0.06em] text-ink-2 uppercase"
-          >
+          <p aria-live="polite" className="t-meta pf-filter-bar__count">
             Showing {visible.length} of {pressItems.length}
           </p>
         </div>
-        <Bento>
+        <div className="pf-press__grid">
           {visible.map((item, i) => (
             <PressCard
               key={item.id}
@@ -200,7 +190,7 @@ export default function PressPage({
               lead={i === 0}
             />
           ))}
-        </Bento>
+        </div>
       </section>
     </>
   );

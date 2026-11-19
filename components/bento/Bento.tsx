@@ -1,38 +1,13 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import Link from "@/components/navigation/Link";
 import { cn } from "@/lib/utils/cn";
 import { CARD_SURFACE } from "@/components/bento/classes";
 
 /*
- * Bento grid and cards (bento canvas, design spec 3.5 and 5). Mobile first:
- * one column to 640px, two from 641px, three from 1024px. `span` 2 and 3
- * follow the canvas breakpoints (span 3 becomes 2 between 641 and 1023px).
- * The `bento` class hooks the card stagger and hover lift in globals.css.
+ * The bento card (bento canvas, design spec 3.5 and 5), as About's
+ * contributions card still uses it, and the column spans its grids used:
+ * `span` 2 and 3 follow the canvas breakpoints (span 3 becomes 2 between 641
+ * and 1023 px).
  */
-
-/**
- * A redesigned page's <main> (the canvas `.kj-col` body): the 1000 px column,
- * 56 px between the hero and the bento (44 px and 16 px gutters at <=380px).
- * LandingLayout puts the header and footer on the same column.
- */
-export function PageMain({
-  className,
-  children,
-  ...rest
-}: ComponentPropsWithoutRef<"main">) {
-  return (
-    <main
-      id="main"
-      className={cn(
-        "kj mx-auto flex w-full max-w-[1000px] flex-col gap-14 px-6 pt-14 pb-14 max-[381px]:gap-11 max-[381px]:px-4",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </main>
-  );
-}
 
 export type BentoSpan = 1 | 2 | 3;
 
@@ -50,78 +25,13 @@ const LG_SPAN = {
 } as const;
 
 /**
- * Column-span classes for a card in a `Bento` grid (one column to 640 px).
+ * Column-span classes for a card in a bento grid (one column to 640 px).
  * A plain span takes two columns at 641 px when it is wider than one.
  */
 export function bentoSpan(span: BentoSpan | BentoSpans): string {
   const { md, lg }: BentoSpans =
     typeof span === "number" ? { md: span === 1 ? 1 : 2, lg: span } : span;
   return lg === md ? MD_SPAN[md] : cn(MD_SPAN[md], LG_SPAN[lg]);
-}
-
-export function Bento({
-  dense = false,
-  className,
-  children,
-  ...rest
-}: { dense?: boolean } & ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      className={cn(
-        "bento grid grid-cols-1 gap-5 min-[641px]:grid-cols-2 lg:grid-cols-3",
-        dense && "grid-flow-row-dense",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** Two-column variant (`bento-2`): stays two columns from 641px. */
-export function BentoPair({
-  className,
-  children,
-  ...rest
-}: ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      className={cn(
-        "bento-2 grid grid-cols-1 gap-5 min-[641px]:grid-cols-2",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-
-/**
- * A full-width bento cell holding cards side by side in a wrapping flex row
- * (About FAQ + Next, Résumé Skills + Share). The cards size by their
- * `flex` basis, so the row wraps without media queries. The row itself
- * never lifts on hover; its cards do (`bento-row` in globals.css).
- */
-export function BentoRow({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "bento-row flex min-w-0 flex-wrap gap-5",
-        bentoSpan(3),
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
 }
 
 /**
@@ -232,53 +142,5 @@ export function BentoCard({
       <Kicker id={headingId}>{title}</Kicker>
       {children}
     </article>
-  );
-}
-
-/**
- * The card's text link ("Résumé →"): 14 px, link colour, 44 px target.
- * `corner` pins it to the bottom right, as on the Experience card.
- */
-export function CardLink({
-  href,
-  corner = false,
-  className,
-  children,
-}: {
-  href: string;
-  corner?: boolean;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "inline-flex min-h-11 items-center text-sm font-medium no-underline",
-        corner && "absolute right-5 bottom-4",
-        className,
-      )}
-    >
-      {children}
-    </Link>
-  );
-}
-
-/** Inner well: a borderless-shadow tile on the page colour inside a card. */
-export function Well({
-  className,
-  children,
-  ...rest
-}: ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      className={cn(
-        "rounded-well border border-hairline bg-page p-3.5",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </div>
   );
 }

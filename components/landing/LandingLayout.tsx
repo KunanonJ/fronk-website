@@ -1,14 +1,19 @@
 import { ChromeProvider } from "@/components/bento/ChromeContext";
-import SiteFooter from "@/components/bento/SiteFooter";
-import SiteHeader from "@/components/bento/SiteHeader";
-
-/** The canvas page column: 1000 px, 24 px gutters (16 px at <=380px). */
-const COLUMN = "mx-auto w-full max-w-[1000px] px-6 max-[381px]:px-4";
+import SharePanelHost from "@/components/bento/SharePanelHost";
+import SiteFooter from "@/components/profile/site/SiteFooter";
+import SiteNav from "@/components/profile/site/SiteNav";
 
 /**
- * Public site shell (bento canvas): skip link, the header and footer around
- * every page on the 1000 px column the page bodies use. Pages render their
- * own <main id="main">. Also wraps the 404 page.
+ * Public site shell (profile redesign, Phase 6 cutover; design spec 7 and
+ * 13 items 25 and 32): the skip link above the fixed pill nav, the page, and
+ * the footer, on every public page and the 404. The nav and the footer carry
+ * the redesign's token scope themselves, so they look the same around the
+ * pages Phase 7 has not restyled yet; those pages keep the old tokens and get
+ * the bar's height as a top offset (src/styles/profile/cutover.css). Pages
+ * render their own <main id="main">. `data-site-chrome` on the header and the
+ * footer lets print drop them, so the printed résumé (`pnpm pdf`) starts at
+ * the top. ChromeProvider and the share panel serve the hero Share pills of
+ * the pages Phase 7 restyles.
  */
 export default function LandingLayout({
   children,
@@ -17,22 +22,16 @@ export default function LandingLayout({
 }) {
   return (
     <ChromeProvider>
-      <div className="landing-root min-h-[100svh] bg-page font-sans text-ink antialiased">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:rounded-chip focus:bg-ink focus:px-3 focus:py-2 focus:text-page"
-        >
+      <div className="landing-root min-h-[100svh] bg-page text-ink antialiased">
+        {/* Fixed and moved off screen, so print would draw it: the print
+            rule in globals.css drops [data-print-hide]. */}
+        <a href="#main" className="ds-skip" lang="en" data-print-hide>
           Skip to content
         </a>
-        {/* data-site-chrome: print drops the header and footer with their
-            padding, so the printed résumé (`pnpm pdf`) starts at the top. */}
-        <div data-site-chrome className={`${COLUMN} pt-10`}>
-          <SiteHeader />
-        </div>
+        <SiteNav />
         {children}
-        <div data-site-chrome className={`${COLUMN} pb-24`}>
-          <SiteFooter />
-        </div>
+        <SiteFooter />
+        <SharePanelHost />
       </div>
     </ChromeProvider>
   );

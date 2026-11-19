@@ -30,6 +30,6 @@ Notes:
   "→" renders in Onest and the file loads only on pages that show an arrow.
 - Fallback faces (`Onest Fallback` on Arial, `Instrument Serif Fallback` on
   Times New Roman, `JetBrains Mono Fallback` on Courier New) use the metric
-  overrides that next/font computes from `@capsizecss/metrics` 4.5.0, the same
-  method behind the existing Geist fallbacks. Patrick Hand has none: it loads
+  overrides that next/font computes from `@capsizecss/metrics` 4.5.0, as the
+  Noto Sans Thai fallback does. Patrick Hand has none: it loads
   only with the notebook.

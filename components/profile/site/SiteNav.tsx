@@ -48,7 +48,7 @@ import {
  * inherit them.
  */
 
-/** The path without a trailing slash, so "/preview/" is Home too. */
+/** The path without a trailing slash, so a trailing slash is the same page. */
 function normalise(path: string): string {
   return path.length > 1 ? path.replace(/\/+$/, "") : path;
 }

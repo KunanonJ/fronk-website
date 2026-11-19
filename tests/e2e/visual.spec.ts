@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { PREVIEW_ROUTES, ROUTES } from "./routes";
+import { expect, test, type Page } from "@playwright/test";
+import { ROUTES } from "./routes";
 
 /**
  * Full-page visual baselines for every public route, in both themes
@@ -27,9 +27,10 @@ import { PREVIEW_ROUTES, ROUTES } from "./routes";
  * older than the code, and Press varies from run to run.
  *
  * Reduced motion keeps captures deterministic (it also turns off every
- * entrance animation and the Bangkok scene loops), the clock is frozen so the
- * Home "Based in Bangkok" card always reads 10:30 AM, and the first-visit
- * intro is marked as seen so it never covers a capture. Chromium only: WebKit and
+ * entrance animation), the clock is frozen so a page that prints the time or
+ * the year always draws the same (the Bangkok card that read 10:30 AM went
+ * with the old Home at the Phase 6 cutover), and the first-visit intro is
+ * marked as seen so it never covers a capture. Chromium only: WebKit and
  * Firefox rasterise fonts too differently for pixel diffs (smoke.spec covers
  * them). CMS-driven routes are skipped: an owner edit in Sanity would
  * otherwise fail unrelated pull requests. The résumé is one of them, though
@@ -57,6 +58,23 @@ const CONTRIBUTIONS = {
   })),
 };
 
+/**
+ * A full-page capture never scrolls, so a lazy image far below the first
+ * screen (the kunanonj.com cover in More projects, say) would stay a blank
+ * box. Every image loads and decodes first; one that fails to load is drawn
+ * as the page would draw it.
+ */
+async function loadEveryImage(page: Page) {
+  await page.evaluate(() =>
+    Promise.all(
+      [...document.images].map((image) => {
+        image.loading = "eager";
+        return image.decode().catch(() => {});
+      }),
+    ),
+  );
+}
+
 test.skip(
   ({ browserName }) => browserName !== "chromium",
   "visual baselines are captured on Chromium only",
@@ -81,7 +99,7 @@ for (const theme of THEMES) {
       }, theme);
     });
 
-    for (const route of [...ROUTES, ...PREVIEW_ROUTES]) {
+    for (const route of ROUTES) {
       test(`${route.name} matches its baseline`, async ({ page }) => {
         test.skip(CMS_DRIVEN.has(route.name), "content comes from Sanity");
         await page.goto(route.path, { waitUntil: "networkidle" });
@@ -90,6 +108,7 @@ for (const theme of THEMES) {
         );
         // Settle web fonts so glyph metrics are stable across runs.
         await page.evaluate(() => document.fonts.ready);
+        await loadEveryImage(page);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
           fullPage: true,
         });

@@ -268,7 +268,10 @@ export function rootHead(viewport: Viewport, iconVersion = ""): HeadTags {
       });
   }
   const links: HeadLink[] = [
-    { rel: "icon", href: `/icon${v}`, type: "image/png", sizes: "64x64" },
+    // The K monogram (public/icon.svg): favicon.ico for browsers and readers
+    // that ask for it (16, 32 and 48 px), the SVG wherever it is supported.
+    { rel: "icon", href: `/favicon.ico${v}`, sizes: "32x32" },
+    { rel: "icon", href: `/icon.svg${v}`, type: "image/svg+xml" },
     {
       rel: "apple-touch-icon",
       href: `/apple-icon${v}`,

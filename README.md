@@ -7,17 +7,19 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
-and AI workspaces (GoGoCash, Manut AI). The public UI uses the
-visual-redesign system (09-11-26): light by default with a dark toggle, the
-Signal/Glaze/Ink palette and Geist; resume and Sanity Studio remain as system
-surfaces. Built with TanStack Start and deployed on Cloudflare Workers.
+and AI workspaces (GoGoCash, Manut AI). The whole site uses the profile
+redesign (`process/features/profile-site-redesign/`, live since 19-11-26):
+light by default with a dark toggle, an ink, paper and violet palette with
+coral and peach, Instrument Serif over Onest, a fixed pill nav and pixel
+details; Sanity Studio stays its own app. Built with TanStack Start and
+deployed on Cloudflare Workers.
 
 ```
 Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
 Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache, rate limiting)
-Style:     Light by default; Signal/Glaze/Ink palette, Geist + Geist Mono (visual-redesign)
+Style:     Light by default; ink/paper/violet tokens, Instrument Serif + Onest + JetBrains Mono (profile redesign)
 ```
 
 ## Useful links
@@ -282,7 +284,8 @@ src/
                          #   server functions (Sanity reads), cache purge, form guard
   queries/               # TanStack Query options for Sanity content
   lib/                   # head() from metadata, cache headers, redirects, OG helpers
-  styles/                # globals.css (design tokens), fonts.css (self-hosted fonts)
+  styles/                # globals.css (tokens, primitives), fonts.css (self-hosted fonts),
+                         #   profile.css + profile/*.css (one partial per page family)
 components/              # React components (landing, ui, navigation, studio, resume)
 lib/                     # Framework-free content, SEO, Sanity client, utilities
 tests/e2e/               # Playwright smoke, axe and Linux visual baselines

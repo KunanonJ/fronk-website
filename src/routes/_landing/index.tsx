@@ -1,15 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageHead } from "../../lib/head";
-import { Bento, PageMain } from "@/components/bento/Bento";
-import PlaceCard from "@/components/bento/PlaceCard";
-import IntroLoader from "@/components/landing/IntroLoader";
-import {
-  ExperienceCard,
-  HowIWorkCard,
-  SelectedWorkCard,
-  VenturesCard,
-} from "@/components/landing/home/HomeCards";
-import HomeHero from "@/components/landing/home/HomeHero";
+import HomePage from "@/components/profile/home/HomePage";
 import type { Metadata } from "@/lib/seo/types";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 import { site } from "@/lib/content/landing";
@@ -24,27 +15,10 @@ const metadata: Metadata = {
 };
 
 /**
- * Home (bento redesign, phase 7a; reweighted in recruiter-fit phase 2): the
- * hero, then one dense bento that leads with the evidence:
- * Selected work (2) | Experience / Ventures | How I work (2) / Bangkok (3).
- * The Bangkok card closes the page, as it does on Contact.
+ * Home (profile redesign, Phase 6 cutover; design spec 8): the hero after the
+ * first-visit intro, the stacked work cards, the About bento, the Journey and
+ * the notebook. The head is unchanged (umbrella Public Contracts).
  */
-function HomePage() {
-  return (
-    <PageMain>
-      <IntroLoader />
-      <HomeHero />
-      <Bento dense>
-        <SelectedWorkCard />
-        <ExperienceCard />
-        <VenturesCard />
-        <HowIWorkCard />
-        <PlaceCard span={3} />
-      </Bento>
-    </PageMain>
-  );
-}
-
 export const Route = createFileRoute("/_landing/")({
   head: () => pageHead(metadata),
   component: HomePage,

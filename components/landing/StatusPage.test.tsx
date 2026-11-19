@@ -11,28 +11,43 @@ vi.mock("@/lib/utils/clipboard", () => ({
 
 import NotFound from "@/components/NotFound";
 import RouteError from "@/components/RouteError";
+import { ERROR_ART, NOT_FOUND_ART } from "@/components/landing/statusArt";
 
 function hrefs(): string[] {
   return screen.getAllByRole("link").map((a) => a.getAttribute("href") ?? "");
 }
 
-describe("NotFound (bento 404)", () => {
-  it("keeps the h1 text and draws the canvas hero", () => {
-    render(<NotFound />);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Nothing lives here.",
-    );
+describe("NotFound (profile redesign, Phase 7f)", () => {
+  it("keeps the h1 text in the new hero, and draws its own pixel picture", () => {
+    const { container } = render(<NotFound />);
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1).toHaveTextContent("Nothing lives here.");
+    expect(h1).toHaveClass("t-display");
+    expect(h1.closest("section")).toHaveClass("pf-page-hero");
     expect(screen.getByText("Page not found")).toBeInTheDocument();
-    expect(
-      screen.getByRole("article", { name: "404 · Not found" }),
-    ).toBeInTheDocument();
+    const status = screen.getByRole("article", { name: "404 · Not found" });
+    // Decorative: hidden from screen readers, drawn one square per cell.
+    const art = status.querySelector("svg.pf-art");
+    expect(art).toHaveAttribute("aria-hidden", "true");
+    expect(art?.querySelectorAll("rect").length).toBeGreaterThan(100);
+    // The page is the skip link's target, under the fixed bar.
+    expect(container.querySelector("main#main.pf-main")).not.toBeNull();
   });
 
-  it("brings the site header and footer, on the canvas column", () => {
+  it("brings the site's pill nav and footer, which carry the redesign's scope", () => {
+    // The 404 wears the site's chrome around the new status page.
     const { container } = render(<NotFound />);
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    const chrome = container.querySelectorAll("[data-site-chrome]");
-    expect(chrome[0]?.className).toMatch(/max-w-\[1000px\]/);
+    const chrome = [...container.querySelectorAll("[data-site-chrome]")];
+    expect(chrome.map((el) => el.tagName)).toEqual(["HEADER", "FOOTER"]);
+    expect(container.querySelector("header.pf-nav")).not.toBeNull();
+    expect(
+      screen.getByRole("navigation", { name: "Primary" }),
+    ).toBeInTheDocument();
+    const skip = screen.getByRole("link", { name: "Skip to content" });
+    expect(skip).toHaveAttribute("href", "#main");
+    // Fixed and moved off screen, it would print: print drops it (pnpm pdf).
+    expect(skip).toHaveAttribute("data-print-hide");
   });
 
   it("offers Home, Portfolio, Ventures and Contact, and no hidden pages", () => {
@@ -84,9 +99,28 @@ describe("RouteError", () => {
       screen.getByRole("navigation", { name: "Recovery links" }),
     ).toBeInTheDocument();
     const retry = screen.getByRole("button", { name: "Try again" });
-    expect(retry.className).toMatch(/bg-cta/);
+    // The dark pill: the one action the error state exists for.
+    expect(retry).toHaveClass("ds-pill");
+    expect(retry).not.toHaveClass("ds-pill--ghost");
     fireEvent.click(retry);
     expect(reset).toHaveBeenCalledOnce();
     expect(invalidate).toHaveBeenCalledOnce();
+  });
+});
+
+describe("the status pages' pixel drawings", () => {
+  it("keep every row of a drawing the same length", () => {
+    for (const art of [NOT_FOUND_ART, ERROR_ART]) {
+      const widths = new Set(art.map((row) => row.length));
+      expect(widths.size).toBe(1);
+    }
+  });
+
+  it("draw the 404 and the error differently", () => {
+    expect(NOT_FOUND_ART.join("\n")).not.toBe(ERROR_ART.join("\n"));
+    render(<RouteError error={new Error("x")} reset={() => {}} />);
+    expect(
+      screen.getByRole("article", { name: "Error · Didn't load" }),
+    ).toBeInTheDocument();
   });
 });

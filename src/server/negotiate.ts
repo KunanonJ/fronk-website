@@ -10,14 +10,7 @@ import { EDGE_LIFETIME } from "@/src/lib/cache";
  * methods to Start, as before.
  */
 
-/** The address of a page's Markdown version, or null when it has none. */
-export function markdownPathFor(pathname: string): string | null {
-  if (pathname === "/") return "/index.md";
-  if (pathname === "/about") return "/about.md";
-  return /^\/portfolio\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname)
-    ? `${pathname}.md`
-    : null;
-}
+export { markdownPathFor } from "@/lib/agents/markdownPaths";
 
 type MediaRange = { type: string; subtype: string; q: number };
 

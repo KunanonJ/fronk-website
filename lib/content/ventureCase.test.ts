@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { getAllVentureSlugs, getVentureBySlug } from "@/lib/content/ventures";
+import { aboutStats } from "@/lib/landing/aboutStats";
+import { stackCards } from "@/lib/landing/stackCards";
 import { siteSources as sources } from "@/tests/siteSources";
 
 /**
@@ -260,5 +262,43 @@ describe("GoGoCash's dated totals", () => {
     // No other venture borrows them.
     for (const slug of getAllVentureSlugs().filter((s) => s !== "gogocash"))
       expect(JSON.stringify(getVentureBySlug(slug)), slug).not.toMatch(TOTAL);
+  });
+});
+
+/*
+ * GoGoCash on the redesigned Home (profile redesign Phase 3): the work stack's
+ * card and the About stats tile read the venture's figures through
+ * lib/landing/stackCards.ts and aboutStats.ts. They count the users as the
+ * venture does, and show no running total, so none can appear without its
+ * month.
+ */
+describe("GoGoCash on the redesigned Home", () => {
+  const gogocash = getVentureBySlug("gogocash")!;
+  const users = gogocash.metrics!.find(
+    (metric) => metric.label === "Registered users",
+  )!;
+  const card = stackCards().find((each) => each.slug === "gogocash")!;
+
+  it("counts the users as the venture does, on the card and in the stats", () => {
+    expect(statesFigure(card.evidence ?? "", "1,000 registered users")).toBe(
+      true,
+    );
+    expect(card.evidence).toBe(`${users.value} registered users`);
+    const stat = aboutStats().find((each) =>
+      each.label.startsWith(users.label),
+    );
+    expect(stat?.figure).toBe(users.value);
+  });
+
+  it("shows no running total on the card or in the stats", () => {
+    const shown = [
+      ...stackCards().map((each) => each.evidence ?? ""),
+      ...aboutStats().map((stat) => `${stat.figure} ${stat.label}`),
+    ];
+    for (const line of shown) expect(line).not.toMatch(TOTAL);
+  });
+
+  it("keeps id=ventures on its card, where /#ventures lands", () => {
+    expect(card.anchor).toBe("ventures");
   });
 });

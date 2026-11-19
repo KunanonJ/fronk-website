@@ -51,9 +51,11 @@ export const rootMetadata: Metadata = {
 };
 
 export const rootViewport: Viewport = {
-  // Ink (dark) and the light page colour (globals.css --page).
+  // The profile redesign's browser-chrome colours (design spec 2.1, Phase 6
+  // cutover): the dark paper and the light lavender wash, `--theme-color` in
+  // the scoped token block of globals.css (contrast.test.ts pins both).
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b0d17" },
-    { media: "(prefers-color-scheme: light)", color: "#f5f6fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0c18" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f3ff" },
   ],
 };

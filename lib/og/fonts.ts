@@ -1,9 +1,15 @@
-import geistBold from "./fonts/Geist-Bold.ttf?inline";
-import geistRegular from "./fonts/Geist-Regular.ttf?inline";
+import instrumentSerifItalic from "./fonts/InstrumentSerif-Italic.ttf?inline";
+import instrumentSerif from "./fonts/InstrumentSerif-Regular.ttf?inline";
+import onestMedium from "./fonts/Onest-Medium.ttf?inline";
+import onestRegular from "./fonts/Onest-Regular.ttf?inline";
 
 /*
- * The two Geist faces for OG images (satori). The Worker has no filesystem,
- * so the TTFs are bundled as data URLs and decoded once per isolate.
+ * The share cards' and icons' faces (satori): Instrument Serif for titles
+ * and the monogram (its italic for the profile cards' accent line), Onest at
+ * 400 and 500 for the rest, as the site sets them (design spec 3.1). Static TrueType cuts of the site's own latin woff2 files
+ * (Onest instantiated at each weight; satori reads no variable fonts), under
+ * the OFL beside them. The Worker has no filesystem, so they are bundled as
+ * data URLs and decoded once per isolate.
  */
 function decode(dataUrl: string): ArrayBuffer {
   const binary = atob(dataUrl.slice(dataUrl.indexOf(",") + 1));
@@ -12,14 +18,31 @@ function decode(dataUrl: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-let fonts:
-  | { name: string; data: ArrayBuffer; weight: 400 | 800; style: "normal" }[]
-  | null = null;
+type OgFont = {
+  name: "Instrument Serif" | "Onest";
+  data: ArrayBuffer;
+  weight: 400 | 500;
+  style: "normal" | "italic";
+};
 
-export function loadOgFonts() {
+let fonts: OgFont[] | null = null;
+
+export function loadOgFonts(): OgFont[] {
   fonts ??= [
-    { name: "Geist", data: decode(geistRegular), weight: 400, style: "normal" },
-    { name: "Geist", data: decode(geistBold), weight: 800, style: "normal" },
+    {
+      name: "Instrument Serif",
+      data: decode(instrumentSerif),
+      weight: 400,
+      style: "normal",
+    },
+    {
+      name: "Instrument Serif",
+      data: decode(instrumentSerifItalic),
+      weight: 400,
+      style: "italic",
+    },
+    { name: "Onest", data: decode(onestRegular), weight: 400, style: "normal" },
+    { name: "Onest", data: decode(onestMedium), weight: 500, style: "normal" },
   ];
   return fonts;
 }

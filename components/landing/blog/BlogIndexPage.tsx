@@ -1,8 +1,10 @@
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Search } from "lucide-react";
-import { Bento, BentoCard, CardLink } from "@/components/bento/Bento";
-import { EyebrowChip } from "@/components/bento/Chips";
+import { TextLink } from "@/components/ds/TextLink";
+import Link from "@/components/navigation/Link";
 import { BannerFigure, PostRow } from "@/components/landing/blog/BlogParts";
+import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import {
   BLOG_VENTURE_TAGS,
   blogPage,
@@ -17,74 +19,69 @@ import {
 } from "@/lib/content/blog";
 import { getVentureBySlug } from "@/lib/content/ventures";
 import { cn } from "@/lib/utils/cn";
-import { MONO_LABEL } from "@/components/bento/classes";
-import { PageTitle, HeroLead } from "@/components/bento/PageHero";
 
 /*
- * /blog (bento canvas Blog, design spec 4.17). Hidden while BLOG_PUBLIC is
- * false: noindex, and no public page links here. Posts come from Sanity
- * merged with the cornerstone fallbacks (the route's loader).
+ * /blog (profile redesign Phase 7h, a light restyle of the bento canvas
+ * Blog). Hidden while BLOG_PUBLIC is false: noindex, and no public page links
+ * here. Posts come from Sanity merged with the cornerstone fallbacks (the
+ * route's loader). The hero on the pixel sky, then tiles. Styles: `.pf-blog*`
+ * in src/styles/profile/pages-catalog.css.
  */
 
-const TONE = {
-  muted: "text-ink-3",
-  accent: "text-mark",
-} as const;
+/** A tile named by its mono heading; `span` places it in the grid. */
+function BlogTile({
+  id,
+  title,
+  span = 1,
+  className,
+  children,
+}: {
+  id: string;
+  title: string;
+  span?: 1 | 2 | 3;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <article
+      aria-labelledby={id}
+      data-span={span}
+      className={cn("ds-tile pf-blog-tile", className)}
+    >
+      <h2 id={id} className="t-meta pf-cat-kicker">
+        {title}
+      </h2>
+      {children}
+    </article>
+  );
+}
 
 function BlogHero({ eyebrow }: { eyebrow: string }) {
   return (
-    <section
-      aria-labelledby="hero-title"
-      className="flex flex-col items-start gap-6"
-    >
-      <EyebrowChip>{eyebrow}</EyebrowChip>
-      {/* Each line is a block child, so `kj-lines` slides them in turn. */}
-      <PageTitle>
-        {blogPage.headline.map((line, i) => (
-          <Fragment key={i}>
-            {i > 0 ? " " : null}
-            <span className="block">
-              {line.map((part, j) => (
-                <Fragment key={j}>
-                  {j > 0 ? " " : null}
-                  {part.tone ? (
-                    <span className={TONE[part.tone]}>{part.text}</span>
-                  ) : (
-                    part.text
-                  )}
-                </Fragment>
-              ))}
-            </span>
-          </Fragment>
-        ))}
-      </PageTitle>
-      <HeroLead>{blogPage.lead}</HeroLead>
-    </section>
+    <PageHero
+      eyebrow={eyebrow}
+      lines={blogPage.headline}
+      lead={blogPage.lead}
+    />
   );
 }
 
 function CornerstoneCard({ post }: { post: BlogCard }) {
   return (
-    <BentoCard
-      headingId="card-featured"
+    <BlogTile
+      id="card-featured"
       title="Cornerstone"
       span={2}
-      minHeight={false}
-      className="min-h-80"
+      className="pf-blog-feature"
     >
-      <div className="flex flex-auto flex-wrap gap-5">
+      <div className="pf-blog-feature__body">
         <BannerFigure
           post={post}
           sizes="(min-width: 1024px) 320px, 100vw"
-          className="min-h-[200px] min-w-0 flex-[1_1_240px]"
+          className="pf-blog-feature__banner"
         />
-        <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-3">
-          <p
-            className={cn(
-              MONO_LABEL,
-              "m-0 flex flex-wrap items-center gap-x-2 gap-y-1.5",
-            )}
-          >
+        <div className="pf-blog-feature__copy">
+          <p className="t-meta pf-cat-note pf-blog-feature__meta">
             <time dateTime={post.publishedAt.slice(0, 10)}>
               {formatBlogDate(post.publishedAt)}
             </time>
@@ -95,18 +92,14 @@ function CornerstoneCard({ post }: { post: BlogCard }) {
               </span>
             ))}
           </p>
-          <h3 className="m-0 text-[clamp(24px,3vw,30px)] leading-[1.15] font-semibold tracking-[-0.03em]">
-            {post.title}
-          </h3>
-          <p className="m-0 text-card leading-[1.55] text-ink-2">
-            {post.excerpt}
-          </p>
-          <CardLink href={`/blog/${post.slug}`} className="mt-auto self-start">
+          <h3 className="t-h3 pf-cat-title">{post.title}</h3>
+          <p className="t-small pf-cat-note">{post.excerpt}</p>
+          <Link href={`/blog/${post.slug}`} className="ds-text-link">
             Read<span className="sr-only">: {post.title}</span>&nbsp;→
-          </CardLink>
+          </Link>
         </div>
       </div>
-    </BentoCard>
+    </BlogTile>
   );
 }
 
@@ -128,31 +121,21 @@ function ArchiveCard({
     { label: "First", post: first },
   ];
   return (
-    <BentoCard
-      headingId="card-archive"
-      title="Archive"
-      minHeight={false}
-      className="min-h-80"
-    >
-      <dl className="m-0 mt-auto grid grid-cols-2 gap-3">
+    <BlogTile id="card-archive" title="Archive">
+      <dl className="pf-blog-stats">
         {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col-reverse">
-            <dt className={cn(MONO_LABEL, "mt-0.5")}>{stat.label}</dt>
-            <dd className="m-0 text-[40px] leading-[1.05] font-semibold tracking-[-0.03em] tabular-nums">
-              {stat.value}
-            </dd>
+          <div key={stat.label} className="pf-blog-stats__item">
+            <dt className="t-meta pf-cat-note">{stat.label}</dt>
+            <dd className="t-title pf-cat-title">{stat.value}</dd>
           </div>
         ))}
       </dl>
-      <dl className="m-0 flex flex-col">
+      <dl className="pf-blog-dates">
         {dates.map(({ label, post }) =>
           post ? (
-            <div
-              key={label}
-              className="flex justify-between gap-3 border-t border-hairline py-2.5"
-            >
-              <dt className={MONO_LABEL}>{label}</dt>
-              <dd className="m-0 font-mono text-meta">
+            <div key={label} className="pf-blog-dates__row">
+              <dt className="t-meta pf-cat-note">{label}</dt>
+              <dd className="pf-cat-code">
                 <time dateTime={post.publishedAt.slice(0, 10)}>
                   {formatBlogDate(post.publishedAt)}
                 </time>
@@ -161,7 +144,7 @@ function ArchiveCard({
           ) : null,
         )}
       </dl>
-    </BentoCard>
+    </BlogTile>
   );
 }
 
@@ -183,17 +166,11 @@ function VenturesCard({
   });
   if (rows.length === 0) return null;
   return (
-    <BentoCard
-      headingId="card-ventures"
-      title="In these notes"
-      gap={3}
-      minHeight={false}
-      className="min-h-[300px]"
-    >
+    <BlogTile id="card-ventures" title="In these notes">
       <div
         role="group"
         aria-label="Filter by venture"
-        className="mt-1 flex flex-col gap-1.5"
+        className="pf-blog-ventures"
       >
         {rows.map((row) => {
           const on = active === row.name;
@@ -203,23 +180,18 @@ function VenturesCard({
               type="button"
               aria-pressed={on}
               onClick={() => onPick(on ? "" : row.name)}
-              className={cn(
-                "kj-row flex min-h-16 w-full items-center gap-3 rounded-[18px] border px-2.5 py-2 text-left text-ink",
-                on
-                  ? "border-hairline-strong bg-surface-tint"
-                  : "border-hairline bg-transparent",
-              )}
+              className="pf-blog-venture"
             >
               <img
                 src={row.logo}
                 alt=""
                 width={44}
                 height={44}
-                className="size-11 shrink-0 rounded-tile border border-hairline object-cover"
+                className="pf-blog-venture__logo"
               />
-              <span className="flex min-w-0 flex-col items-start">
-                <span className="text-card font-semibold">{row.name}</span>
-                <span className="text-meta text-ink-2">
+              <span className="pf-blog-venture__copy">
+                <span className="pf-blog-venture__name">{row.name}</span>
+                <span className="t-small pf-cat-note">
                   {row.count} {row.count === 1 ? "post" : "posts"} tagged{" "}
                   {row.name}
                 </span>
@@ -228,46 +200,10 @@ function VenturesCard({
           );
         })}
       </div>
-      <CardLink href="/#ventures" className="mt-auto self-start">
-        Ventures →
-      </CardLink>
-    </BentoCard>
-  );
-}
-
-const CHIP =
-  "inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 text-sm font-medium";
-
-function TagChip({
-  label,
-  count,
-  on,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  on: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={cn(
-        CHIP,
-        on
-          ? "border-cta bg-cta text-on-cta"
-          : "border-hairline-strong bg-surface text-ink",
-      )}
-    >
-      {label}{" "}
-      <span
-        className={cn("font-mono text-xs", on ? "text-on-cta" : "text-ink-2")}
-      >
-        {count}
-      </span>
-    </button>
+      <div className="pf-blog-tile__end">
+        <TextLink href="/#ventures">Ventures</TextLink>
+      </div>
+    </BlogTile>
   );
 }
 
@@ -291,27 +227,17 @@ function SearchCard({
   shown: number;
 }) {
   return (
-    <BentoCard
-      headingId="card-find"
-      title="Search or filter"
-      span={2}
-      gap={3.5}
-      minHeight={false}
-      className="min-h-[300px]"
-    >
-      <div className="flex flex-col gap-2">
-        <label
-          htmlFor="blog-search"
-          className="text-meta font-medium text-ink-2"
-        >
+    <BlogTile id="card-find" title="Search or filter" span={2}>
+      <div className="pf-cat-stack">
+        <label htmlFor="blog-search" className="t-small pf-cat-note">
           {blogPage.searchLabel}
         </label>
-        <div className="relative">
+        <div className="pf-blog-search">
           <Search
             aria-hidden
             size={16}
             strokeWidth={1.8}
-            className="pointer-events-none absolute top-[18px] left-[18px] text-ink-2"
+            className="pf-blog-search__icon"
           />
           <input
             id="blog-search"
@@ -320,39 +246,29 @@ function SearchCard({
             onChange={(e) => onQuery(e.target.value)}
             placeholder={blogPage.searchPlaceholder}
             autoComplete="off"
-            className="h-[52px] w-full rounded-full border border-hairline-strong bg-page pr-[18px] pl-11 text-base text-ink placeholder:text-ink-2"
+            className="pf-blog-search__input"
           />
         </div>
       </div>
-      <div
-        role="group"
-        aria-label="Filter by tag"
-        className="flex flex-wrap gap-1.5"
-      >
-        <TagChip
-          label={blogPage.allTagsLabel}
-          count={total}
-          on={active === null}
-          onClick={() => onPick("")}
-        />
-        {tags.map((tag) => (
-          <TagChip
-            key={tag}
-            label={tag}
-            count={counts.get(tag) ?? 0}
-            on={active === tag}
-            onClick={() => onPick(active === tag ? "" : tag)}
-          />
-        ))}
-      </div>
-      <p
-        aria-live="polite"
-        className={cn(MONO_LABEL, "m-0 mt-auto flex items-center gap-2")}
-      >
-        <span aria-hidden className="size-1.5 shrink-0 bg-mark" />
+      {/* A tag is a toggle: picking the pressed one again clears it. */}
+      <ToggleGroup
+        label="Filter by tag"
+        value={active ?? ""}
+        onChange={(tag) => onPick(tag === active ? "" : tag)}
+        options={[
+          { value: "", label: blogPage.allTagsLabel, count: total },
+          ...tags.map((tag) => ({
+            value: tag,
+            label: tag,
+            count: counts.get(tag) ?? 0,
+          })),
+        ]}
+      />
+      <p aria-live="polite" className="t-meta pf-cat-note pf-blog-result">
+        <span aria-hidden className="pf-skill-tag__mark" />
         Showing {shown} of {total} posts{active ? ` tagged ${active}` : ""}
       </p>
-    </BentoCard>
+    </BlogTile>
   );
 }
 
@@ -388,51 +304,44 @@ export default function BlogIndexPage({
   return (
     <>
       <BlogHero eyebrow={eyebrow} />
-      <Bento>
-        {cornerstone ? <CornerstoneCard post={cornerstone} /> : null}
-        <ArchiveCard posts={sorted} tagCount={tags.length} />
-        <VenturesCard
-          tags={tags}
-          counts={counts}
-          active={active}
-          onPick={onTagChange}
-        />
-        <SearchCard
-          query={draft}
-          onQuery={(value) => {
-            setDraft(value);
-            onQueryChange(value);
-          }}
-          tags={tags}
-          counts={counts}
-          total={sorted.length}
-          active={active}
-          onPick={onTagChange}
-          shown={filtered.length}
-        />
-        <BentoCard
-          headingId="card-posts"
-          title="Posts"
-          span={3}
-          gap={2.5}
-          minHeight={false}
-          className="pb-3"
-        >
-          {filtered.length > 0 ? (
-            <ol className="m-0 flex list-none flex-col p-0">
-              {filtered.map((post, i) => (
-                <li key={post.id} className="border-b border-hairline">
-                  <PostRow post={post} index={i + 1} showTags />
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="mx-3 mt-2 mb-4 text-card text-ink-2">
-              {blogPage.emptyLabel}
-            </p>
-          )}
-        </BentoCard>
-      </Bento>
+      <div className="ds-wrap pf-cat-section pf-cat-end">
+        <div className="pf-blog-grid">
+          {cornerstone ? <CornerstoneCard post={cornerstone} /> : null}
+          <ArchiveCard posts={sorted} tagCount={tags.length} />
+          <VenturesCard
+            tags={tags}
+            counts={counts}
+            active={active}
+            onPick={onTagChange}
+          />
+          <SearchCard
+            query={draft}
+            onQuery={(value) => {
+              setDraft(value);
+              onQueryChange(value);
+            }}
+            tags={tags}
+            counts={counts}
+            total={sorted.length}
+            active={active}
+            onPick={onTagChange}
+            shown={filtered.length}
+          />
+          <BlogTile id="card-posts" title="Posts" span={3}>
+            {filtered.length > 0 ? (
+              <ol className="pf-blog-list">
+                {filtered.map((post, i) => (
+                  <li key={post.id} className="pf-blog-list__item">
+                    <PostRow post={post} index={i + 1} showTags />
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="t-small pf-cat-note">{blogPage.emptyLabel}</p>
+            )}
+          </BlogTile>
+        </div>
+      </div>
     </>
   );
 }

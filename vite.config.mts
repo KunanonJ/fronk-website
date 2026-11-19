@@ -80,13 +80,16 @@ export default defineConfig(({ command, mode }) => {
       tanstackStart({
         router: {
           // Loaders and their content imports (topics, skills, portfolio
-          // data) get their own chunks instead of the entry chunk every page
-          // loads. Client navigations fetch the loader chunk first; intent
-          // preloading (router defaultPreload) hides that on hover.
+          // data) stay out of the entry chunk every page loads, in one chunk
+          // with their route's component. A loader in a chunk of its own was
+          // preloaded on every server-rendered page but never imported there
+          // (hydration reuses the server's data), which Safari reports as an
+          // unused preload; beside the component, hydration imports it.
+          // Intent preloading (router defaultPreload) still fetches the
+          // chunk on hover for client navigations.
           codeSplittingOptions: {
             defaultBehavior: [
-              ["loader"],
-              ["component"],
+              ["loader", "component"],
               ["pendingComponent"],
               ["errorComponent"],
               ["notFoundComponent"],

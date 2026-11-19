@@ -1,11 +1,14 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 /**
- * The bento card surface, the mono label and the hero shells each live in
- * one place (components/bento/classes.ts and PageHero.tsx). Copies drift:
- * before this guard there were seven card surfaces, three mono labels with
- * two line heights, and nine hand-written hero h1s.
+ * The bento card surface lives in one place (components/bento/classes.ts),
+ * and no page writes the old hero h1 or lead by hand. Copies drift: before
+ * this guard there were seven card surfaces and nine hand-written hero h1s.
+ * The mono label and the bento PageHero went once Phase 7 restyled their
+ * last pages.
  */
 const files = sourceFiles(["components", "src/routes"]);
 
@@ -24,19 +27,48 @@ describe("shared bento primitives", () => {
     ).toEqual([]);
   });
 
-  it("defines the mono label only in classes.ts", () => {
-    expect(filesContaining(/(const|let) MONO_LABEL\b/)).toEqual([]);
-  });
-
-  it("renders the standard hero h1 and lead through PageHero", () => {
+  it("writes no old hero h1 or lead by hand", () => {
     expect(
       filesContaining(/<h1 id="hero-title" className="kj-lines m-0 text-title/),
     ).toEqual([]);
     expect(
       filesContaining(
         /"m-0 max-w-\[620px\] text-lg leading-\[1\.55\] text-ink-2"/,
-        ["components/bento/PageHero.tsx"],
       ),
     ).toEqual([]);
+  });
+});
+
+/**
+ * The profile redesign's primitives (design spec 5) live in one place: the
+ * `ds-` and `t-` classes in src/styles/globals.css, and pillClass() in
+ * components/ds/Pill.tsx for every pill's class list. A page applies them; it
+ * never redeclares one in its partial or builds a pill's classes by hand.
+ */
+describe("the design system's primitives", () => {
+  it("draws every pill through pillClass, never a hand-written ds-pill", () => {
+    expect(
+      files.filter(
+        (f) =>
+          !f.startsWith("components/ds/") &&
+          /(?<![\w-])ds-pill(?![\w-])/.test(read(f)),
+      ),
+    ).toEqual([]);
+  });
+
+  it("declares the ds- and t- blocks in globals.css only, never in a page partial", () => {
+    const dir = join(process.cwd(), "src/styles/profile");
+    for (const name of readdirSync(dir)) {
+      const css = readFileSync(join(dir, name), "utf8").replace(
+        /\/\*[\s\S]*?\*\//g,
+        "",
+      );
+      const bare = [...css.matchAll(/([^{};]+)\{/g)]
+        .map((m) => m[1]!.trim())
+        .filter((prelude) => !prelude.startsWith("@"))
+        .flatMap((prelude) => prelude.split(",").map((s) => s.trim()))
+        .filter((selector) => /^\.(?:ds|t)-[a-z0-9-]+$/.test(selector));
+      expect(bare, name).toEqual([]);
+    }
   });
 });

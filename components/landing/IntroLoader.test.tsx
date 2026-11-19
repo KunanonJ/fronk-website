@@ -68,6 +68,25 @@ describe("IntroLoader", () => {
     expect(sessionStorage.getItem(INTRO_SESSION_KEY)).toBe("1");
   });
 
+  it("signals that it is finishing when its exit starts, and not before", () => {
+    // Profile redesign, design spec 5.6: the new hero waits for this mark.
+    document.documentElement.setAttribute("data-intro", "pending");
+    try {
+      render(<IntroLoader />);
+      advance(20);
+      advance(introExitStartMs() - INTRO_TIMING.wordMs);
+      expect(document.documentElement.getAttribute("data-intro")).toBe(
+        "pending",
+      );
+
+      advance(INTRO_TIMING.wordMs);
+      expect(overlay()).toHaveClass("is-exiting");
+      expect(document.documentElement.getAttribute("data-intro")).toBe("done");
+    } finally {
+      document.documentElement.removeAttribute("data-intro");
+    }
+  });
+
   it("does not show again in the same session", () => {
     sessionStorage.setItem(INTRO_SESSION_KEY, "1");
     render(<IntroLoader />);

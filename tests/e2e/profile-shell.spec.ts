@@ -1,7 +1,8 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
- * Profile redesign, Phase 1: the site chrome on the hidden /preview Home
+ * Profile redesign, Phase 1: the site chrome, on Home since the Phase 6
+ * cutover (on the hidden /preview Home before it)
  * (process/features/profile-site-redesign, phase 1 gates 3, 4, 8 and 9, and the
  * device matrix of design spec 10.1).
  *
@@ -9,10 +10,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
  * (390 px), which set their own viewports. The anchors, the scrollspy and the
  * focus checks run in desktop Chromium only, at the widths they set, and so do
  * the matrix widths and the tap areas. profile.spec.ts holds the widths every
- * preview page must fit, and the best-practice checks.
+ * profile page must fit, and the best-practice checks.
  */
 
-const HOME = "/preview";
+const HOME = "/";
+/** Home's address with nothing after the slash: no hash, no query. */
+const HOME_URL = /^https?:\/\/[^/]+\/$/;
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
@@ -43,9 +46,47 @@ async function prepare(page: Page, theme: Theme = "light") {
   }, theme);
 }
 
+/**
+ * Say hello's copy button renders only on the client, so it is there once the
+ * page has hydrated, after the router's own scroll restore has run.
+ */
+function hydrated(page: Page) {
+  return expect(page.locator(".pf-say__copy").first()).toBeAttached();
+}
+
+/**
+ * Waits for a panel's opening transition (0.2 s of opacity and transform from
+ * its starting style) to end. Focusing a part of it mid-transition lets
+ * WebKit scroll the page while the footer panel's anchored position can
+ * still flip, which left the focused link off screen about once in 40 runs.
+ */
+async function settled(panel: Locator) {
+  await panel.evaluate((el) =>
+    Promise.all(el.getAnimations().map((animation) => animation.finished)),
+  );
+}
+
+/** Opens a page and waits until it has hydrated and its fonts are in. */
 async function visit(page: Page, path = HOME) {
   await page.goto(path, { waitUntil: "networkidle" });
+  await hydrated(page);
   await page.evaluate(() => document.fonts.ready);
+}
+
+/**
+ * Holds every script of the page until the returned function is called, so
+ * the page stays as the server sent it: parsed and drawn, not hydrated.
+ */
+async function holdScripts(page: Page): Promise<() => void> {
+  let release!: () => void;
+  const gate = new Promise<void>((done) => {
+    release = done;
+  });
+  await page.route(/\/assets\/[^?]+\.js(\?.*)?$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  return release;
 }
 
 /** The computed value of one CSS property of an element, read at the call. */
@@ -324,6 +365,7 @@ test.describe("chrome: layout and the pill nav", () => {
   }) => {
     await prepare(page);
     await page.setViewportSize(PHONE);
+    // Scrolls only once the page has hydrated (visit waits for it).
     await visit(page);
     const header = bar(page);
     await page.evaluate(() =>
@@ -398,9 +440,12 @@ test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
           Math.abs(top - LANDING[section]),
           `${section} lands at ${width}`,
         ).toBeLessThanOrEqual(3);
-        // The first content of a section is its eyebrow row, above the heading.
+        // The first content of a section is its eyebrow, above the heading.
+        // (The Journey's stage starts under the bar by design, spec 4.3, so
+        // the eyebrow is read from the section header, not the first child.)
         const content = await page
-          .locator(`#${section} > :first-child`)
+          .locator(`#${section} .pf-section-head > :first-child`)
+          .first()
           .boundingBox();
         expect
           .soft(content?.y ?? 0, `${section} content at ${width}`)
@@ -491,14 +536,14 @@ test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
     const name = page.getByRole("link", { name: "Kunanon Jarat, home" });
     await revealBar(page);
     await name.click();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
 
     await scrollPage(page, 900);
     await settle(page);
     await revealBar(page);
     await name.click();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect.poll(() => pageY(page), { timeout: 5_000 }).toBe(0);
   });
 
@@ -632,7 +677,7 @@ test.describe("chrome: the phone menu", () => {
     const menu = page.getByRole("navigation", { name: "Site" });
     await expect(menu).toBeVisible();
     await page.goBack();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect(menu).toBeHidden();
   });
 });
@@ -654,6 +699,7 @@ test.describe("chrome: panels in a 320 by 256 screen", () => {
     await page.getByRole("button", { name: "Say hello" }).first().click();
     const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
     await expect(dialog).toBeVisible();
+    await settled(dialog);
     expect(
       await dialog.evaluate((el) => el.scrollHeight > el.clientHeight),
       "the panel scrolls",
@@ -676,6 +722,7 @@ test.describe("chrome: panels in a 320 by 256 screen", () => {
     await trigger.click();
     const panel = page.locator(".pf-say__panel--footer");
     await expect(panel).toBeVisible();
+    await settled(panel);
     expect(
       await panel.evaluate((el) => el.scrollHeight > el.clientHeight),
       "the panel scrolls",
@@ -801,7 +848,7 @@ test.describe("chrome: Say hello and the theme", () => {
     await page.getByRole("button", { name: "Say hello" }).first().click();
     await expect(dialog).toBeVisible();
     await page.goBack();
-    await expect(page).toHaveURL(/\/preview$/);
+    await expect(page).toHaveURL(HOME_URL);
     await expect(dialog).toBeHidden();
 
     await scrollPage(page, 0);
@@ -838,14 +885,44 @@ test.describe("chrome: Say hello and the theme", () => {
     await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
   });
 
-  test("the preview's stylesheet is linked on /preview only", async ({
+  test("every page links the profile stylesheet once, and preloads the new fonts", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "one check is enough");
-    await page.goto("/", { waitUntil: "networkidle" });
-    expect(await page.locator('link[href*="/assets/profile"]').count()).toBe(0);
-    await page.goto(HOME, { waitUntil: "networkidle" });
-    await expect(page.locator('link[href*="/assets/profile"]')).toHaveCount(1);
+    // The chrome is on every public page, so the root links profile.css
+    // everywhere, after globals.css, and every page preloads Onest and
+    // Instrument Serif. Only stylesheets count: a profile module may also
+    // have a script chunk of its own.
+    const preloads = () =>
+      page
+        .locator('link[rel="preload"][as="font"]')
+        .evaluateAll((links) =>
+          links.map((link) =>
+            (link.getAttribute("href") ?? "").replace(
+              /^.*\/assets\/([a-z-]+)-[\w-]+\.woff2$/,
+              "$1",
+            ),
+          ),
+        );
+    for (const path of ["/", "/portfolio/tbh-intranet", "/skills", "/design"]) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      const sheets = page.locator('link[rel="stylesheet"]');
+      await expect(
+        page.locator('link[rel="stylesheet"][href*="/assets/profile"]'),
+        path,
+      ).toHaveCount(1);
+      const hrefs = await sheets.evaluateAll((links) =>
+        links.map((link) => link.getAttribute("href") ?? ""),
+      );
+      const globals = hrefs.findIndex((href) => /\/globals-/.test(href));
+      const profile = hrefs.findIndex((href) => /\/profile-/.test(href));
+      expect(globals, path).toBeGreaterThanOrEqual(0);
+      expect(profile, path).toBeGreaterThan(globals);
+      expect((await preloads()).sort(), path).toEqual([
+        "instrument-serif-latin",
+        "onest-latin",
+      ]);
+    }
   });
 });
 
@@ -1049,7 +1126,7 @@ test.describe("chrome: the device matrix and the tap areas", () => {
   });
 });
 
-test.describe("chrome: the layer order of the preview stylesheet", () => {
+test.describe("chrome: the layer order of the profile stylesheet", () => {
   test("component rules lose to Tailwind utilities and beat the base layer", async ({
     page,
   }, testInfo) => {
@@ -1082,5 +1159,67 @@ test.describe("chrome: the layer order of the preview stylesheet", () => {
       // The page body is a flex column, so the span blockifies to flex.
       componentDisplay: "flex",
     });
+  });
+});
+
+/**
+ * The router's scroll restoration (src/lib/scrollRestoration.ts): TanStack
+ * restores the scroll once more as the page hydrates, which pulled a reader
+ * who had scrolled before hydration back to the top (WebKit hydrates late
+ * enough to show it). Scripts are held, so the page is parsed and drawn but
+ * not hydrated while the reader scrolls.
+ */
+test.describe("router: a scroll made before hydration", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !BEHAVIOUR.has(testInfo.project.name),
+      "desktop and the WebKit phone",
+    );
+  });
+
+  test("survives hydration on Home", async ({ page }) => {
+    await prepare(page);
+    const release = await holdScripts(page);
+    await page.goto(HOME, { waitUntil: "commit" });
+    await page.waitForFunction(() => document.readyState !== "loading");
+    await expect(page.locator(".pf-say__copy")).toHaveCount(0);
+    await scrollPage(page, 600);
+    expect(await pageY(page)).toBe(600);
+    release();
+    await hydrated(page);
+    await settle(page);
+    expect(await pageY(page)).toBe(600);
+  });
+
+  test("survives hydration on About", async ({ page }) => {
+    // The old header's theme button, which this test read on /about before
+    // the Phase 6 cutover, is gone, and the pill nav hides its toggle on
+    // phones; the nav's Say hello copy row (rendered once hydrated) marks
+    // hydration here, as on Home.
+    await prepare(page, "dark");
+    const release = await holdScripts(page);
+    await page.goto("/about", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.readyState !== "loading");
+    await expect(page.locator(".pf-say__copy")).toHaveCount(0);
+    await scrollPage(page, 600);
+    expect(await pageY(page)).toBe(600);
+    release();
+    await hydrated(page);
+    await settle(page);
+    expect(await pageY(page)).toBe(600);
+  });
+
+  test("a deep link still lands on its target and stays there", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/portfolio/tbh-intranet#ch-03");
+    await settle(page);
+    // The contents' landing: 96 px of scroll padding and a 16 px margin.
+    const top = await page.evaluate(
+      () => document.getElementById("ch-03")!.getBoundingClientRect().top,
+    );
+    expect(Math.abs(top - 112)).toBeLessThanOrEqual(3);
   });
 });

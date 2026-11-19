@@ -1,6 +1,6 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
-import ExamplesPage from "@/components/landing/library/ExamplesPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import ExamplesPage from "@/components/profile/pages/library/ExamplesPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
   EXAMPLES_SEARCH_DEFAULTS,
@@ -19,7 +19,7 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /examples (bento redesign, phase 7f; design spec 4.11). The persona is the
+ * /examples (profile redesign, Phase 7 lane D1). The persona is the
  * typed `?persona=operators|founders` param (Valibot); the default, builders,
  * never shows in the URL and an unknown value falls back to it.
  */
@@ -44,8 +44,8 @@ function ExamplesRoute() {
   };
 
   return (
-    <PageMain>
+    <ProfileMain>
       <ExamplesPage persona={persona} onPersonaChange={setPersona} />
-    </PageMain>
+    </ProfileMain>
   );
 }

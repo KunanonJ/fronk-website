@@ -1,5 +1,9 @@
 # Redesign Design System — matveyan → Fronk
 
+> **Superseded (19-11-26).** The live site follows the profile redesign:
+> `process/features/profile-site-redesign/references/design-spec_18-11-26.md`.
+> This file is kept as history.
+
 > The new token layer that replaces "Soft Brutalism" with the matveyan "terminal/HUD" language.
 > Grounds every value in either matveyan's **measured** styles (`01-matveyan-teardown.md`) or the current `app/globals.css`.
 > This is the **single source of truth** for Phase 1 of `04-upgrade-plan.md`.
