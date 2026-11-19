@@ -614,6 +614,97 @@ test.describe("filters > a click moves the cards, with no page error", () => {
 });
 
 /**
+ * The tile-to-case morph (plan morph-count-up_PLAN_20-11-26): opening a case
+ * from its card runs the page transition with the card's title, and a
+ * venture's logo, morphing into the h1. A name used twice would abort the
+ * transition, so the log must show it ready.
+ */
+test.describe("case cards > opening a case morphs the card into its h1", () => {
+  const CARDS = [
+    {
+      from: "/portfolio",
+      card: ".pf-work-card",
+      parts: ["pf-morph-title"],
+    },
+    {
+      from: "/",
+      card: ".pf-card:has(.pf-venture-art__logo)",
+      parts: ["pf-morph-title", "pf-morph-logo"],
+    },
+  ] as const;
+
+  for (const { from, card, parts } of CARDS) {
+    test(`${from}: a card's ${parts.join(" and ")} morph into the case`, async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(
+        browserName !== "chromium",
+        "view-transition types are checked in Chromium",
+      );
+      const errors: string[] = [];
+      page.on("pageerror", (err) => errors.push(err.message));
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.addInitScript(() => {
+        try {
+          sessionStorage.setItem("fronk-intro-seen", "1");
+        } catch {
+          // Storage can be unavailable; the intro then plays first.
+        }
+        // Logs each view transition with its types and, once ready, the
+        // morph groups it animates (or why it was aborted).
+        const log: string[] = [];
+        (window as unknown as { __vt: string[] }).__vt = log;
+        const doc = document as unknown as {
+          startViewTransition?: (arg: unknown) => { ready: Promise<void> };
+        };
+        const start = doc.startViewTransition?.bind(document);
+        if (!start) return;
+        doc.startViewTransition = (arg) => {
+          const transition = start(arg);
+          const types = (arg as { types?: string[] } | undefined)?.types;
+          log.push(`start ${types?.join(",") ?? ""}`);
+          transition.ready.then(
+            () => {
+              const groups = document
+                .getAnimations()
+                .map((a) => (a.effect as KeyframeEffect | null)?.pseudoElement)
+                .filter((name): name is string =>
+                  Boolean(name?.startsWith("::view-transition-group(pf-")),
+                )
+                .map((name) =>
+                  name.replace(/^::view-transition-group\((.*)\)$/, "$1"),
+                )
+                .sort();
+              log.push(`ready ${[...new Set(groups)].join(" ")}`);
+            },
+            (err: Error) => log.push(`aborted ${err.name}`),
+          );
+          return transition;
+        };
+      });
+
+      await page.goto(from, { waitUntil: "networkidle" });
+      const link = page.locator(card).first().locator("a.ds-stretch");
+      const href = await link.getAttribute("href");
+      await link.scrollIntoViewIfNeeded();
+      await link.click();
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
+      await expect
+        .poll(() =>
+          page.evaluate(() => (window as unknown as { __vt: string[] }).__vt),
+        )
+        .toEqual(["start page", `ready ${[...parts].sort().join(" ")}`]);
+      await expect(page.locator(".pf-case-hero__title")).toHaveAttribute(
+        "data-morph",
+        "",
+      );
+      expect(errors, errors.join("\n")).toEqual([]);
+    });
+  }
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

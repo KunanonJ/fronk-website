@@ -4,6 +4,7 @@ import { Chip } from "@/components/ds/labels";
 import { CtaArrow, pillClass } from "@/components/ds/Pill";
 import PortfolioMockup from "@/components/landing/portfolio/PortfolioMockup";
 import Link from "@/components/navigation/Link";
+import { morphFromCard } from "@/components/profile/case/caseMorph";
 import { workCopy } from "@/lib/content/homeWorkAbout";
 import type {
   StackArt,
@@ -19,7 +20,8 @@ import { cn } from "@/lib/utils/cn";
  * case. The link's name is its visible label and the case's name. The media
  * repeats what the words say, so it is hidden from assistive technology; a
  * code-drawn picture wears a visible "Illustration" chip (owner decision 4).
- * Styles: `.pf-card*` in src/styles/profile/home-work-about.css.
+ * Opening the case morphs the title and a venture's logo into its h1
+ * (caseMorph.ts). Styles: `.pf-card*` in src/styles/profile/home-work-about.css.
  */
 
 /**
@@ -104,6 +106,7 @@ export function StackCard({
       aria-labelledby={titleId}
       className={cn("pf-card ds-stretch-card", !card.media && "pf-card--text")}
       data-hue={card.hue}
+      data-morph-card
     >
       <div className="pf-card__sky pf-card__sky--wide">
         <DitherField stops={SKY} fade="right" seed={index * 5} />
@@ -134,6 +137,7 @@ export function StackCard({
           href={card.href}
           className="ds-stretch pf-card__link"
           aria-label={`${workCopy.cta}: ${card.name}`}
+          onClick={morphFromCard}
         >
           <span className={cn(pillClass(), "pf-card__cta")}>
             <span className="pf-card__cta-label">{workCopy.cta}</span>

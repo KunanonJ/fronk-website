@@ -3,6 +3,7 @@ import { CtaArrow, pillClass } from "@/components/ds/Pill";
 import { TextLink } from "@/components/ds/TextLink";
 import Link from "@/components/navigation/Link";
 import { CaseMediaView } from "@/components/profile/case/CaseMedia";
+import { morphFromCard } from "@/components/profile/case/caseMorph";
 import { caseCopy, type CaseMoreCard } from "@/lib/content/caseStudy";
 import { cn } from "@/lib/utils/cn";
 
@@ -13,14 +14,20 @@ import { cn } from "@/lib/utils/cn";
  * ::after covers the card. The picture repeats the title, so it is hidden
  * from assistive technology; a drawn one wears the "Illustration" chip. The
  * link is named by `aria-label`, its visible label first (WCAG 2.5.3), as the
- * Home's stack cards are. Styles: `.pf-case-more*`, `.pf-lift*` in case.css.
+ * Home's stack cards are. Opening the case morphs the title and a venture's
+ * logo into its h1 (caseMorph.ts). Styles: `.pf-case-more*`, `.pf-lift*` in
+ * case.css.
  */
 
 function LiftCard({ card }: { card: CaseMoreCard }) {
   const titleId = `more-${card.slug}`;
   const drawn = card.media?.kind === "illustration";
   return (
-    <article className="pf-lift ds-stretch-card" aria-labelledby={titleId}>
+    <article
+      className="pf-lift ds-stretch-card"
+      aria-labelledby={titleId}
+      data-morph-card
+    >
       <div
         className="pf-lift__mat"
         data-kind={card.media?.kind ?? "none"}
@@ -49,6 +56,7 @@ function LiftCard({ card }: { card: CaseMoreCard }) {
         href={card.href}
         className="ds-stretch pf-lift__link"
         aria-label={`${caseCopy.moreCta}: ${card.name}`}
+        onClick={morphFromCard}
       >
         <span className={cn(pillClass({ variant: "ghost", size: "sm" }))}>
           {caseCopy.moreCta}

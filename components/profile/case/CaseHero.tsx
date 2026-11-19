@@ -6,6 +6,7 @@ import { CaseActions } from "@/components/profile/case/CaseActions";
 import { CaseCover } from "@/components/profile/case/CaseCover";
 import { CaseEvidence } from "@/components/profile/case/CaseEvidence";
 import { CaseMeta } from "@/components/profile/case/CaseMeta";
+import { useMorphTarget } from "@/components/profile/case/caseMorph";
 import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
 
 /*
@@ -14,7 +15,9 @@ import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
  * evidence rows, the cover and the meta row. The h1 holds today's text (R12):
  * the name as the display line and the tagline as a smaller line inside it,
  * with a literal space between, so it reads "{name}. {tagline}" for a project
- * and "{name} {tagline}" for a venture. It never fades or moves (LCP).
+ * and "{name} {tagline}" for a venture. It never fades or moves (LCP),
+ * except inside a page transition from a case card: the card's title and logo
+ * then morph into the name and the logo (caseMorph.ts).
  * Styles: `.pf-case-hero*` in src/styles/profile/case.css.
  */
 
@@ -25,6 +28,7 @@ import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
 const SKY = ["--peach", "--tint-3", "--tint-2"] as const;
 
 export function CaseHero({ study }: { study: CaseStudy }) {
+  const morph = useMorphTarget(study.href);
   return (
     <section className="pf-case-hero" aria-labelledby="hero-title">
       <div className="pf-case-hero__sky" aria-hidden="true">
@@ -40,7 +44,11 @@ export function CaseHero({ study }: { study: CaseStudy }) {
           <StatusDot />
           <span>{study.eyebrow}</span>
         </p>
-        <h1 id="hero-title" className="t-display pf-case-hero__title">
+        <h1
+          id="hero-title"
+          className="t-display pf-case-hero__title"
+          data-morph={morph ? "" : undefined}
+        >
           {study.logo ? (
             <img
               className="pf-case-hero__logo"

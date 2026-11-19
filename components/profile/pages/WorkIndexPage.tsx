@@ -3,6 +3,7 @@ import { Chip, PixelMark } from "@/components/ds/labels";
 import { CtaArrow, pillClass } from "@/components/ds/Pill";
 import Link from "@/components/navigation/Link";
 import { CaseMediaView } from "@/components/profile/case/CaseMedia";
+import { morphFromCard } from "@/components/profile/case/caseMorph";
 import { PageHero } from "@/components/profile/pages/PageHero";
 import { caseAccess, caseCopy, projectCase } from "@/lib/content/caseStudy";
 import { portfolioHeadline, workIndexCopy } from "@/lib/content/corePages";
@@ -25,7 +26,8 @@ import {
  * `?category=` search param: the prerendered page shows every project and
  * the filter applies after hydration. Each card is an article named by its
  * title whose only link is the call to action; the link's ::after covers the
- * card. Styles: `.pf-work-index*`, `.pf-work-card*` and the shared filter bar
+ * card; opening the case morphs the title into its h1 (caseMorph.ts).
+ * Styles: `.pf-work-index*`, `.pf-work-card*` and the shared filter bar
  * (`.pf-filter-bar`, `.pf-filter`) in src/styles/profile/cutover.css, and
  * the case template's `.pf-lift*` in case.css.
  */
@@ -47,6 +49,7 @@ function WorkCard({ project }: { project: PortfolioProject }) {
     <article
       className="pf-lift ds-stretch-card pf-work-card"
       aria-labelledby={titleId}
+      data-morph-card
     >
       <div
         className="pf-lift__mat"
@@ -83,6 +86,7 @@ function WorkCard({ project }: { project: PortfolioProject }) {
         href={study.href}
         className="ds-stretch pf-lift__link"
         aria-label={`${caseCopy.moreCta}: ${project.name}`}
+        onClick={morphFromCard}
       >
         <span className={pillClass({ variant: "ghost", size: "sm" })}>
           {caseCopy.moreCta}
