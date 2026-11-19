@@ -812,6 +812,12 @@ test.describe("the Home's notebook: hidden below three cleared quotes", () => {
       page.getByRole("group", { name: "Recommendations" }),
     ).toHaveCount(0);
     await expect(page.locator("a[href*='#notes']")).toHaveCount(0);
+    // The story ends the page, so its padding no longer adds to the footer's.
+    expect(
+      await page
+        .locator("#story")
+        .evaluate((el) => getComputedStyle(el).paddingBottom),
+    ).toBe("48px");
   });
 });
 
