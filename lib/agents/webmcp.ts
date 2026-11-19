@@ -1,5 +1,6 @@
 import { markdownPathFor } from "@/lib/agents/markdownPaths";
 import type { ContactDraft } from "@/lib/agents/contactDraft";
+import { firstContactIssue } from "@/lib/contact/schema";
 import { CONTACT_LIMITS } from "@/lib/content/contact";
 import { siteConfig } from "@/lib/site";
 
@@ -50,6 +51,12 @@ const failure = (value: string): ToolResult => ({
   content: [{ type: "text", text: value }],
   isError: true,
 });
+
+/** The first `max` UTF-16 units, without a lone half of a surrogate pair. */
+function clip(value: string, max: number): string {
+  const cut = value.slice(0, max);
+  return /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut;
+}
 
 /**
  * A path on this site an agent may open: one leading slash and no scheme,
@@ -217,10 +224,14 @@ export function siteTools(deps: ToolDeps): SiteTool[] {
           return failure("Give a name, an email address and a message.");
         }
         const draft = {
-          name: name.slice(0, CONTACT_LIMITS.nameMax),
-          email: email.slice(0, CONTACT_LIMITS.emailMax),
-          message: message.slice(0, CONTACT_LIMITS.messageMax),
+          name: clip(name.trim(), CONTACT_LIMITS.nameMax),
+          email: clip(email.trim(), CONTACT_LIMITS.emailMax),
+          message: clip(message.trim(), CONTACT_LIMITS.messageMax),
         };
+        // The form's own rules, so a draft that Send would refuse comes back
+        // to the agent instead of reaching the visitor.
+        const issue = firstContactIssue({ ...draft, topics: [], company: "" });
+        if (issue) return failure(`${issue.field}: ${issue.message}`);
         if (!(await deps.draftContact(draft))) {
           return failure(
             `The contact form did not open. The visitor can write to ${siteConfig.email} instead.`,

@@ -4,7 +4,7 @@ import Link from "@/components/navigation/Link";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import SharePill from "@/components/bento/SharePill";
 import { pillClass } from "@/components/ds/Pill";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import InstallTabs from "@/components/landing/skills/InstallTabs";
 import SkillSourceCard from "@/components/landing/skills/SkillSourceCard";
 import {
@@ -59,7 +59,7 @@ function orderedFiles(skill: Skill) {
 
 function SkillHero({ skill, stage }: { skill: Skill; stage: SkillStage }) {
   return (
-    <CatalogHero
+    <PageHero
       back={
         <nav aria-label="Breadcrumb">
           <ol className="pf-skill-crumbs">
@@ -125,7 +125,7 @@ function SkillHero({ skill, stage }: { skill: Skill; stage: SkillStage }) {
         </a>
         <SharePill />
       </div>
-    </CatalogHero>
+    </PageHero>
   );
 }
 
@@ -314,7 +314,7 @@ function FilesCard({ skill }: { skill: Skill }) {
               <span className="sr-only">
                 , {formatBytes(file.size)}, opens on GitHub
               </span>
-              <span aria-hidden className="pf-cat-count pf-cat-note">
+              <span aria-hidden className="pf-count pf-cat-note">
                 {formatBytes(file.size)}
               </span>
             </a>

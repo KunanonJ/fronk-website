@@ -1,6 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
+import {
+  clippedText,
+  forcedColorsProblems,
+  layoutProblems,
+  prepare,
+  tabTo,
+  zoomShortfalls,
+} from "./matrix";
 import { extractPage } from "../../lib/parity/parity.mjs";
 
 /**
@@ -50,17 +58,6 @@ const BEST_PRACTICE_PAGES = [
   "/proof",
 ] as const;
 
-async function prepare(page: Page, theme: "light" | "dark" = "light") {
-  await page.addInitScript((value) => {
-    try {
-      localStorage.setItem("theme", value);
-      sessionStorage.setItem("fronk-intro-seen", "1");
-    } catch {
-      // Storage can be unavailable; the site then uses its default theme.
-    }
-  }, theme);
-}
-
 /**
  * Puts the keyboard's starting point on `place` (a heading, say), as reading
  * up to it would: a script focus on plain text, which the next Tab leaves.
@@ -72,97 +69,19 @@ async function startAt(place: Locator) {
   });
 }
 
-/**
- * Presses Tab until `target` has focus, as a keyboard reader moves; WebKit
- * moves to links and buttons with Option+Tab, as Safari does by default.
- */
-async function tabTo(page: Page, target: Locator, most = 12) {
-  const webkit = page.context().browser()?.browserType().name() === "webkit";
-  for (let presses = 0; presses < most; presses += 1) {
-    if (await target.evaluate((el) => el === document.activeElement)) break;
-    await page.keyboard.press(webkit ? "Alt+Tab" : "Tab");
-  }
-  await expect(target).toBeFocused();
-}
-
 function only(projects: ReadonlySet<string>, why: string) {
   test.skip(!projects.has(test.info().project.name), `runs in ${why}`);
 }
 const DESKTOP = new Set(["desktop"]);
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 
-/** Sideways scroll, text under 12 px and targets under 24 px. */
-async function layoutProblems(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const problems: string[] = [];
-    const width = document.documentElement.scrollWidth;
-    if (width > window.innerWidth + 1) {
-      problems.push(
-        `${width}px of content in a ${window.innerWidth}px viewport`,
-      );
-    }
-    // A part that crosses its .ds-wrap's padding into the side gutter. Font
-    // metrics differ between machines, so a part 19 px into the gutter on a
-    // Mac was 8 px past the screen in CI. A rotated mark's box overhangs by
-    // up to 3 px, hence the 4 px allowance.
-    // Decoration may overhang: a part with no text whose every element is
-    // hidden from assistive tech (a pixel mark set beside a word, say).
-    const decorative = (node: Element): boolean =>
-      !node.textContent?.trim() &&
-      (node.closest("[aria-hidden='true']") !== null ||
-        (node.children.length > 0 && [...node.children].every(decorative)));
-    for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
-      const box = wrap.getBoundingClientRect();
-      const style = getComputedStyle(wrap);
-      const start = box.left + parseFloat(style.paddingLeft) - 4;
-      const end = box.right - parseFloat(style.paddingRight) + 4;
-      for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
-        const rect = el.getBoundingClientRect();
-        if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
-        if (decorative(el)) continue;
-        if (rect.left < start || rect.right > end) {
-          const name = el.classList[0] ? `.${el.classList[0]}` : "";
-          problems.push(
-            `${el.tagName.toLowerCase()}${name} crosses the gutter`,
-          );
-          break;
-        }
-      }
-    }
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-    );
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      const text = node.textContent?.trim();
-      const el = node.parentElement;
-      if (!text || !el) continue;
-      const rect = el.getBoundingClientRect();
-      if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
-      if (parseFloat(getComputedStyle(el).fontSize) < 12) {
-        problems.push(`small text: "${text.slice(0, 30)}"`);
-      }
-    }
-    const targets = document.querySelectorAll<HTMLElement>(
-      "a[href], button, input, select, textarea, summary, [role='button']",
-    );
-    for (const el of targets) {
-      const rect = el.getBoundingClientRect();
-      if (rect.width <= 1 && rect.height <= 1) continue; // visually hidden
-      // WCAG 2.5.8 exempts links that sit inside a run of text.
-      if (getComputedStyle(el).display === "inline" && el.closest("p, li")) {
-        continue;
-      }
-      if (rect.width < 24 || rect.height < 24) {
-        const name = el.getAttribute("aria-label") ?? el.textContent?.trim();
-        problems.push(
-          `${Math.round(rect.width)}x${Math.round(rect.height)} target: ${name}`,
-        );
-      }
-    }
-    return problems;
-  });
-}
+/** The hubs' choices for the shared checks (./matrix.ts). */
+const HUB_LAYOUT = { moreTargets: "[role='button']" };
+const HUB_FORCED = {
+  ringed:
+    "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-filter, .pf-case-hire, .pf-read-stat, .pf-read-ticket)",
+  art: "main :is(.ds-px-mark, .ds-px-dot, .ds-dither, .pf-page-hero__sky)",
+};
 
 const reference = JSON.parse(
   readFileSync(join(process.cwd(), "tests/fixtures/site-parity.json"), "utf8"),
@@ -217,101 +136,14 @@ test.describe("the device matrix (desktop Chromium)", () => {
             ),
         );
         await page.evaluate(() => document.fonts.ready);
-        expect(await layoutProblems(page), `${path} at ${width}px`).toEqual([]);
+        expect(
+          await layoutProblems(page, HUB_LAYOUT),
+          `${path} at ${width}px`,
+        ).toEqual([]);
       }
     });
   }
 });
-
-/** In forced colors, ringed parts keep an edge and pixel art goes away. */
-async function forcedColorsProblems(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const out: string[] = [];
-    const ringed = document.querySelectorAll<HTMLElement>(
-      "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-filter, .pf-case-hire, .pf-read-stat, .pf-read-ticket)",
-    );
-    for (const el of ringed) {
-      const s = getComputedStyle(el);
-      const edge =
-        s.borderTopStyle !== "none" &&
-        parseFloat(s.borderTopWidth) >= 1 &&
-        s.borderTopColor !== "rgba(0, 0, 0, 0)" &&
-        s.borderTopColor !== "transparent";
-      if (!edge) out.push(`no edge: .${[...el.classList].join(".")}`);
-    }
-    const art = document.querySelectorAll<HTMLElement>(
-      "main :is(.ds-px-mark, .ds-px-dot, .ds-dither, .pf-page-hero__sky)",
-    );
-    for (const el of art) {
-      if (getComputedStyle(el).display !== "none") {
-        out.push(`still drawn: .${[...el.classList].join(".")}`);
-      }
-    }
-    return out;
-  });
-}
-
-/** WCAG 1.4.12 text spacing; then any text its box clips. */
-async function clippedText(page: Page): Promise<string[]> {
-  await page.addStyleTag({
-    content:
-      "*, *::before, *::after { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }",
-  });
-  return page.evaluate(() => {
-    const out: string[] = [];
-    for (const el of document.querySelectorAll<HTMLElement>("main *")) {
-      const ownText = [...el.childNodes].some(
-        (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
-      );
-      if (!ownText) continue;
-      const s = getComputedStyle(el);
-      if (!/hidden|clip/.test(s.overflowX + s.overflowY)) continue;
-      if (el.clientWidth <= 1) continue; // visually hidden
-      if (
-        el.scrollHeight > el.clientHeight + 1 ||
-        el.scrollWidth > el.clientWidth + 1
-      ) {
-        out.push(`clipped: "${el.textContent?.trim().slice(0, 30)}"`);
-      }
-    }
-    return out;
-  });
-}
-
-/**
- * WCAG 1.4.4 and 1.4.10 through zoom: at 500% (a 1280 px window shows 256
- * CSS px) text reaches twice its size at 100%, and at 200% (640 px) nothing
- * scrolls sideways.
- */
-async function zoomShortfalls(page: Page): Promise<string[]> {
-  const sizes = () =>
-    page.evaluate(() => {
-      const out: Record<string, number> = {};
-      document.querySelectorAll<HTMLElement>("main *").forEach((el, i) => {
-        const style = [...el.classList].find((c) => c.startsWith("t-"));
-        if (style)
-          out[`${i} .${style}`] = parseFloat(getComputedStyle(el).fontSize);
-      });
-      return out;
-    });
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const base = await sizes();
-  await page.setViewportSize({ width: 640, height: 400 });
-  const out: string[] = [];
-  const reflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - window.innerWidth,
-  );
-  if (reflow > 1) out.push(`${reflow}px sideways at 200% zoom`);
-  await page.setViewportSize({ width: 256, height: 160 });
-  const zoomed = await sizes();
-  for (const [key, px] of Object.entries(base)) {
-    const at500 = (zoomed[key] ?? 0) * 5;
-    if (at500 < px * 2 - 0.5) {
-      out.push(`${key}: ${px}px at 100%, at most ${at500.toFixed(1)}px zoomed`);
-    }
-  }
-  return out;
-}
 
 test.describe("best practices on a page per family (desktop Chromium)", () => {
   for (const path of BEST_PRACTICE_PAGES) {
@@ -322,7 +154,7 @@ test.describe("best practices on a page per family (desktop Chromium)", () => {
       await page.emulateMedia({ forcedColors: "active" });
       await prepare(page);
       await page.goto(path, { waitUntil: "networkidle" });
-      expect(await forcedColorsProblems(page)).toEqual([]);
+      expect(await forcedColorsProblems(page, HUB_FORCED)).toEqual([]);
     });
 
     test(`text spacing clips no text (${path})`, async ({ page }) => {
@@ -330,7 +162,7 @@ test.describe("best practices on a page per family (desktop Chromium)", () => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page);
       await page.goto(path, { waitUntil: "networkidle" });
-      expect(await clippedText(page)).toEqual([]);
+      expect(await clippedText(page, { scope: "main" })).toEqual([]);
     });
 
     test(`zoom doubles the text and scrolls nothing sideways (${path})`, async ({
@@ -339,7 +171,7 @@ test.describe("best practices on a page per family (desktop Chromium)", () => {
       only(DESKTOP, "desktop Chromium");
       await prepare(page);
       await page.goto(path, { waitUntil: "networkidle" });
-      expect(await zoomShortfalls(page)).toEqual([]);
+      expect(await zoomShortfalls(page, "main")).toEqual([]);
     });
   }
 

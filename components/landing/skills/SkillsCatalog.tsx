@@ -79,8 +79,7 @@ export default function SkillsCatalog({
                 onClick={() => onShowChange(filter.id)}
                 className="pf-filter__option"
               >
-                {filter.label}{" "}
-                <span className="pf-cat-count">{filter.count}</span>
+                {filter.label} <span className="pf-count">{filter.count}</span>
               </button>
             ))}
           </div>

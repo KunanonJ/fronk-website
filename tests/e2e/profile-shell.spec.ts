@@ -54,6 +54,18 @@ function hydrated(page: Page) {
   return expect(page.locator(".pf-say__copy").first()).toBeAttached();
 }
 
+/**
+ * Waits for a panel's opening transition (0.2 s of opacity and transform from
+ * its starting style) to end. Focusing a part of it mid-transition lets
+ * WebKit scroll the page while the footer panel's anchored position can
+ * still flip, which left the focused link off screen about once in 40 runs.
+ */
+async function settled(panel: Locator) {
+  await panel.evaluate((el) =>
+    Promise.all(el.getAnimations().map((animation) => animation.finished)),
+  );
+}
+
 /** Opens a page and waits until it has hydrated and its fonts are in. */
 async function visit(page: Page, path = HOME) {
   await page.goto(path, { waitUntil: "networkidle" });
@@ -687,6 +699,7 @@ test.describe("chrome: panels in a 320 by 256 screen", () => {
     await page.getByRole("button", { name: "Say hello" }).first().click();
     const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
     await expect(dialog).toBeVisible();
+    await settled(dialog);
     expect(
       await dialog.evaluate((el) => el.scrollHeight > el.clientHeight),
       "the panel scrolls",
@@ -709,6 +722,7 @@ test.describe("chrome: panels in a 320 by 256 screen", () => {
     await trigger.click();
     const panel = page.locator(".pf-say__panel--footer");
     await expect(panel).toBeVisible();
+    await settled(panel);
     expect(
       await panel.evaluate((el) => el.scrollHeight > el.clientHeight),
       "the panel scrolls",

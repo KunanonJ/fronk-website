@@ -106,13 +106,13 @@ export function FilterBar<T extends string>({
             {option.count === undefined ? null : (
               <>
                 {" "}
-                <span className="pf-read-count">{option.count}</span>
+                <span className="pf-count">{option.count}</span>
               </>
             )}
             {option.code ? (
               <>
                 {" "}
-                <span className="pf-read-count" aria-hidden="true">
+                <span className="pf-count" aria-hidden="true">
                   {option.code}
                 </span>
               </>

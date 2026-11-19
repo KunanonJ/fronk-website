@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils/cn";
  * the group is named for screen readers. A count, when given, follows the
  * label after a space, so the name reads "SME 3". Styles: the shared filter
  * bar's `.pf-filter` and `.pf-filter__option` (src/styles/profile/
- * cutover.css), and `.pf-cat-count` (pages-catalog.css).
+ * cutover.css), and `.pf-count` (cutover.css).
  */
 
 export interface ToggleOption<T extends string> {
@@ -45,8 +45,7 @@ export function ToggleGroup<T extends string>({
             option.label
           ) : (
             <Fragment>
-              {option.label}{" "}
-              <span className="pf-cat-count">{option.count}</span>
+              {option.label} <span className="pf-count">{option.count}</span>
             </Fragment>
           )}
         </button>

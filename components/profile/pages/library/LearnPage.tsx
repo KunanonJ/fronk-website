@@ -153,19 +153,15 @@ export default function LearnPage({
       >
         <ul aria-label="On this page" className="pf-read-chips">
           <li className="ds-chip">
-            <span className="pf-read-count">{pad2(hubs.length)}</span> Topic
-            hubs
+            <span className="pf-count">{pad2(hubs.length)}</span> Topic hubs
           </li>
           {writing.length > 0 ? (
             <li className="ds-chip">
-              <span className="pf-read-count">{pad2(writing.length)}</span>{" "}
-              Writing
+              <span className="pf-count">{pad2(writing.length)}</span> Writing
             </li>
           ) : null}
           <li className="ds-chip">
-            <span className="pf-read-count">
-              {pad2(learnOperatorNotes.length)}
-            </span>{" "}
+            <span className="pf-count">{pad2(learnOperatorNotes.length)}</span>{" "}
             Operator notes
           </li>
           <li className="ds-chip">

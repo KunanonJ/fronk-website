@@ -2,8 +2,7 @@ import { useState, type ReactNode } from "react";
 import Link from "@/components/navigation/Link";
 import { CheckIcon, CopyIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
-import { Headline } from "@/components/profile/pages/PageHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import { PixelArt } from "@/components/profile/site/PixelArt";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import { siteConfig } from "@/lib/site";
@@ -115,24 +114,20 @@ export default function StatusPage({
   const { headline } = copy;
   return (
     <ProfileMain className="pf-status">
-      <CatalogHero
+      <PageHero
         role={alert ? "alert" : undefined}
         eyebrow={copy.eyebrow}
-        title={
-          <Headline
-            lines={[
-              [
-                { text: headline.muted, tone: "muted" },
-                { text: headline.middle },
-                { text: headline.accent, tone: "accent" },
-              ],
-            ]}
-          />
-        }
+        lines={[
+          [
+            { text: headline.muted, tone: "muted" },
+            { text: headline.middle },
+            { text: headline.accent, tone: "accent" },
+          ],
+        ]}
         lead={copy.lead}
       >
         {actions ? <div className="pf-cat-hero__actions">{actions}</div> : null}
-      </CatalogHero>
+      </PageHero>
       <div className="ds-wrap pf-status__grid">
         <article
           aria-labelledby="card-status"

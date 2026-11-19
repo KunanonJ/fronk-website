@@ -13,7 +13,7 @@ import { TextLink } from "@/components/ds/TextLink";
 import { Marquee } from "@/components/ds/Marquee";
 import { DitherField } from "@/components/ds/DitherField";
 import { Reveal } from "@/components/ds/Reveal";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import { Notebook } from "@/components/profile/home/Notebook";
 import { SAMPLE_NOTES } from "@/components/profile/preview/sampleNotes";
 import { ThemeSwitch } from "@/components/profile/site/ThemeSwitch";
@@ -200,7 +200,7 @@ export default function DesignSystemPage() {
       <div className="pf-design__bar">
         <ThemeSwitch />
       </div>
-      <CatalogHero
+      <PageHero
         eyebrow="Tokens and primitives"
         title="Design system"
         lead="Everything the profile redesign builds with, in both themes. Switch the theme above. Under reduced motion every part stays still and complete."

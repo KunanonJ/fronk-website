@@ -68,6 +68,20 @@
     margin-top: 24px;
     color: var(--ink-80);
   }
+  .pf-page-hero__back {
+    margin-bottom: 28px;
+  }
+
+  /* A count beside a filter's label, a file size, a tally in a chip: the
+     mono face at 12 px with even figures (catalog, hubs and library). */
+  .pf-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .ds-chip > .pf-count {
+    color: var(--accent-ink);
+  }
 
   /* All work: the filter bar and the lift cards. The block is
      pf-work-index, not pf-work: Home's article#work owns .pf-work

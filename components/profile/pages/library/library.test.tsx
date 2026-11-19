@@ -153,7 +153,7 @@ describe("LearnPage", () => {
       within(group).getByRole("button", { name: "ไทย" }),
     ).toHaveTextContent("ไทย TH");
     expect(
-      [...group.querySelectorAll(".pf-read-count")].map((code) => [
+      [...group.querySelectorAll(".pf-count")].map((code) => [
         code.textContent,
         code.getAttribute("aria-hidden"),
       ]),

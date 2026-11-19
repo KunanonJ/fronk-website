@@ -3,9 +3,8 @@ import { Search } from "lucide-react";
 import { TextLink } from "@/components/ds/TextLink";
 import Link from "@/components/navigation/Link";
 import { BannerFigure, PostRow } from "@/components/landing/blog/BlogParts";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
 import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
-import { Headline } from "@/components/profile/pages/PageHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import {
   BLOG_VENTURE_TAGS,
   blogPage,
@@ -59,9 +58,9 @@ function BlogTile({
 
 function BlogHero({ eyebrow }: { eyebrow: string }) {
   return (
-    <CatalogHero
+    <PageHero
       eyebrow={eyebrow}
-      title={<Headline lines={blogPage.headline} />}
+      lines={blogPage.headline}
       lead={blogPage.lead}
     />
   );

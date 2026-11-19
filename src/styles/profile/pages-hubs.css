@@ -47,14 +47,6 @@
   .pf-read-avail {
     color: var(--ink-80);
   }
-  .pf-read-count {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-  }
-  .ds-chip > .pf-read-count {
-    color: var(--accent-ink);
-  }
 
   /* The hub's column (spec 9.6 and 9.7): chapters, proof, FAQ, the close. */
   .pf-hub-body {

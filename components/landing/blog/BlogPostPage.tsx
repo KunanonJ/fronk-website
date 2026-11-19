@@ -9,7 +9,7 @@ import {
   BannerFigure,
   PostRow,
 } from "@/components/landing/blog/BlogParts";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
 import { PortableText } from "@/components/PortableText";
 import {
@@ -62,7 +62,7 @@ const RELATED_LIMIT = 3;
 
 function PostHero({ post }: { post: BlogCard }) {
   return (
-    <CatalogHero
+    <PageHero
       back={
         <TextLink href="/blog" arrow="left">
           Back to Blog
@@ -88,7 +88,7 @@ function PostHero({ post }: { post: BlogCard }) {
       <div className="pf-cat-hero__actions">
         <SharePill />
       </div>
-    </CatalogHero>
+    </PageHero>
   );
 }
 

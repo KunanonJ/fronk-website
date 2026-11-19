@@ -90,7 +90,7 @@ export function DownloadCta({
         {label.includes(asset.name) ? "" : `: ${asset.name}`},{" "}
         {formatBytes(asset.size)}
       </span>
-      <span aria-hidden className="pf-cat-count">
+      <span aria-hidden className="pf-count">
         {formatBytes(asset.size)}
       </span>
     </a>

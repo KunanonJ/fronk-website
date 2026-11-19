@@ -37,8 +37,7 @@ import {
 import type { SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
-import { CatalogHero } from "@/components/profile/catalog/CatalogHero";
-import { Headline } from "@/components/profile/pages/PageHero";
+import { PageHero } from "@/components/profile/pages/PageHero";
 
 const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 
@@ -54,16 +53,12 @@ const TOTAL = ORIGINAL_COUNT + ADAPTED_COUNT;
 function SkillsHero() {
   const { headline } = skillsPage;
   return (
-    <CatalogHero
+    <PageHero
       eyebrow={skillsPage.eyebrow}
-      title={
-        <Headline
-          lines={[
-            [{ text: headline.muted, tone: "muted" }, { text: headline.rest }],
-            [{ text: headline.accent, tone: "accent" }],
-          ]}
-        />
-      }
+      lines={[
+        [{ text: headline.muted, tone: "muted" }, { text: headline.rest }],
+        [{ text: headline.accent, tone: "accent" }],
+      ]}
       lead={skillsPage.description}
     >
       <div className="pf-cat-hero__actions">
@@ -106,7 +101,7 @@ function SkillsHero() {
           {skillsPage.maintainer.name}
         </Link>
       </p>
-    </CatalogHero>
+    </PageHero>
   );
 }
 
