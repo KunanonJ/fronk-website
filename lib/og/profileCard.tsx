@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site";
 import portrait from "./portrait.jpg?inline";
 
 /** A headline word or phrase; `muted` ones take the secondary text colour. */
-export type HeadlineSegment = string | { muted: string };
+type HeadlineSegment = string | { muted: string };
 
 export interface ProfileCardProps {
   /** The accent pill's label, for example "Open to roles". */

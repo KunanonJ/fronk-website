@@ -52,7 +52,7 @@ export interface SkillStage {
   blurb: string;
 }
 
-export interface SkillFile {
+interface SkillFile {
   /** Path inside the skill folder, e.g. `references/rubric.md`. */
   path: string;
   size: number;
@@ -106,11 +106,11 @@ export const SKILLS_RELEASE_MONTH = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   timeZone: "UTC",
 }).format(new Date(snapshot.publishedAt));
-export const SKILLS_ROOT = snapshot.skillsRoot;
+const SKILLS_ROOT = snapshot.skillsRoot;
 export const SKILLS_LICENSE = "MIT";
 export const PLUGIN_ZIP: SkillAsset = snapshot.pluginZip;
 /** The plugin folder at the tag (Cursor copies this whole folder). */
-export const PLUGIN_FOLDER = SKILLS_ROOT.replace(/\/skills$/, "");
+const PLUGIN_FOLDER = SKILLS_ROOT.replace(/\/skills$/, "");
 
 const blob = (repoPath: string) =>
   `${SKILLS_REPO_URL}/blob/${SKILLS_TAG}/${repoPath}`;

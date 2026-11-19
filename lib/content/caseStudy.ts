@@ -41,7 +41,7 @@ import { pad2 } from "@/lib/utils/pad2";
  * DRAFT for the owner's approval.
  */
 
-export type CaseKind = "project" | "venture";
+type CaseKind = "project" | "venture";
 
 export interface CaseLink {
   readonly label: string;

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils/cn";
 /** The viewer opens from 810 px (spec 9.10): the `tablet` breakpoint. */
 export const VIEWER_QUERY = "(min-width: 50.625rem)";
 
-export function viewerAllowed(): boolean {
+function viewerAllowed(): boolean {
   return (
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&

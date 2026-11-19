@@ -49,7 +49,7 @@ const SCROLL_KEYS = new Set([
  * A pinch (two fingers or more) or a ctrl-wheel: a zoom, which stays the
  * reader's while the viewer holds the page still (WCAG 1.4.4).
  */
-export function isZoomGesture(event: Event): boolean {
+function isZoomGesture(event: Event): boolean {
   if (event.type === "wheel") return (event as WheelEvent).ctrlKey;
   if (event.type === "touchmove") {
     return ((event as TouchEvent).touches?.length ?? 0) > 1;

@@ -7,7 +7,7 @@ import { enumParam } from "@/lib/search/enumParam";
  */
 
 /** Why the visitor came: `hiring` opens the form with the Hiring topic chosen. */
-export const CONTACT_INTENTS = ["general", "hiring"] as const;
+const CONTACT_INTENTS = ["general", "hiring"] as const;
 export type ContactIntent = (typeof CONTACT_INTENTS)[number];
 
 /** The default intent; stripped from the URL, so /contact stays clean. */

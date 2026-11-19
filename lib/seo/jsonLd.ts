@@ -17,14 +17,11 @@ export const PERSON_ID = `${BASE}/#person`;
 export const WEBSITE_ID = `${BASE}/#website`;
 
 /** Alternate site names for Google's site-name display (WebSite.alternateName). */
-export const WEBSITE_ALTERNATE_NAMES = [
+const WEBSITE_ALTERNATE_NAMES = [
   "Kunanon Jarat",
   "KunanonJ",
   "kunanonj.com",
 ] as const;
-
-/** Identity values live in lib/content/identity.ts; re-exported for existing callers. */
-export { PERSON_ALTERNATE_NAMES, PERSON_KNOWS_ABOUT };
 
 function sameAs(): readonly string[] {
   const s = siteConfig.socials;

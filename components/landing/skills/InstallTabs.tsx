@@ -1,7 +1,7 @@
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
-export type InstallTab = {
+type InstallTab = {
   /** Stable, URL-safe id, unique within this tab set. */
   id: string;
   label: string;

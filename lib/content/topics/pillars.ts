@@ -12,7 +12,7 @@ export const SUPERSTACKS_SKILL_COUNT = 20;
 export type TopicLocale = "en" | "th";
 
 /** A run of h1 text: plain, or a muted connector word. */
-export type HeadlineSegment = string | { readonly muted: string };
+type HeadlineSegment = string | { readonly muted: string };
 
 /** One display line of the h1. */
 export type HeadlineLine = readonly HeadlineSegment[];

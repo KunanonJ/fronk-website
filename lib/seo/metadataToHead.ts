@@ -30,7 +30,7 @@ export function isNamedMeta(meta: HeadMeta, name: string): meta is NamedMeta {
 }
 
 /** One <link> for a route's head(). */
-export type HeadLink = {
+type HeadLink = {
   rel: string;
   href: string;
   type?: string;

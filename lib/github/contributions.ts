@@ -1,11 +1,11 @@
-export type ContributionDay = {
+type ContributionDay = {
   date: string;
   count: number;
   /** 0–4 intensity bucket for cream heatmap cells. */
   level: number;
 };
 
-export type ContributionWeek = {
+type ContributionWeek = {
   days: readonly ContributionDay[];
 };
 
