@@ -238,8 +238,8 @@ describe("motion contract", () => {
         .filter((value) => !allowed.test(value));
       expect(loose, path).toEqual([]);
     }
-    // The scan sees the share panel's pop, so it is not vacuous.
-    expect(globalsCss).toMatch(/animation: kj-pop/);
+    // The scan sees the status dot's ping, so it is not vacuous.
+    expect(globalsCss).toMatch(/animation: kj-ping/);
   });
 
   it("names every keyframe kj- (or the intro's own intro-), so the guard covers it", () => {
@@ -513,6 +513,36 @@ describe("profile stylesheet", () => {
       /@supports not selector\(:popover-open\) \{\s*\.pf-say__panel,\s*\.pf-menu \{\s*display: none;/,
     );
     expect(shell).toMatch(/\.pf-menu\[data-open\] \{\s*display: block;/);
+  });
+
+  it("gives the popovers one motion, with exits only where `overlay` keeps them in the top layer", () => {
+    const shell = partials.find((sheet) =>
+      sheet.path.endsWith("/shell.css"),
+    )!.css;
+    // Both popovers enter from --pop-from, and the footer's from below.
+    expect(shell).toMatch(
+      /@starting-style \{\s*\.pf-menu:popover-open,\s*\.pf-say__panel:popover-open \{\s*opacity: 0;\s*transform: var\(--pop-from\);/,
+    );
+    expect(shell).toMatch(
+      /\.pf-say__panel--footer \{\s*--pop-from: translateY\(6px\)/,
+    );
+    // The exit: Chromium only, and a closing panel takes no clicks.
+    const exit = shell.match(
+      /@supports \(overlay: auto\) \{[\s\S]*?\n {2}\}/,
+    )?.[0];
+    expect(exit).toBeDefined();
+    expect(exit).toContain("overlay 0.2s allow-discrete");
+    expect(exit).toContain("display 0.2s allow-discrete");
+    expect(exit).toMatch(
+      /\.pf-say__panel:not\(:popover-open\) \{[^}]*pointer-events: none;/,
+    );
+    // Every transition of theirs waits for no-preference.
+    expect(withoutNoPreference(shell)).not.toContain("allow-discrete");
+    // The share panel enters the same way, with no keyframes of its own.
+    expect(globalsCss).toMatch(
+      /@starting-style \{\s*\.kj-panel \{\s*opacity: 0;\s*transform: translateY\(-6px\) scale\(0\.97\);/,
+    );
+    expect(globalsCss).not.toContain("kj-pop");
   });
 
   it("runs the theme fade once, in globals.css, behind no-preference", () => {

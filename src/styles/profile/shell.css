@@ -820,24 +820,47 @@
   .pf-theme__thumb {
     transition: transform 0.26s var(--ease-snappy);
   }
-  .pf-menu {
-    transition:
-      opacity 0.22s var(--ease-expo),
-      transform 0.22s var(--ease-expo);
-  }
+  /* One popover motion for Say hello and the phone menu (the share panel
+     enters the same way, globals.css): in from 6 px above at 0.97 over
+     0.2 s, out the same way over 0.14 s. The footer's panel opens upward,
+     so it moves from below. */
+  .pf-menu,
   .pf-say__panel {
+    --pop-from: translateY(-6px) scale(0.97);
     transition:
       opacity 0.2s var(--ease-expo),
       transform 0.2s var(--ease-expo);
   }
+  .pf-say__panel--footer {
+    --pop-from: translateY(6px) scale(0.97);
+  }
   @starting-style {
-    .pf-menu:popover-open {
-      opacity: 0;
-      transform: translateY(-16px) scale(0.98);
-    }
+    .pf-menu:popover-open,
     .pf-say__panel:popover-open {
       opacity: 0;
-      transform: translateY(-6px) scale(0.97);
+      transform: var(--pop-from);
+    }
+  }
+  /* The exit keeps a closing panel shown and in the top layer while it
+     fades (`display` and `overlay`, allow-discrete). Only Chromium has
+     `overlay`; other engines close the panels at once, as before. A
+     closing panel takes no clicks. */
+  @supports (overlay: auto) {
+    .pf-menu,
+    .pf-say__panel {
+      transition:
+        opacity 0.2s var(--ease-expo),
+        transform 0.2s var(--ease-expo),
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+    }
+    .pf-menu:not(:popover-open),
+    .pf-say__panel:not(:popover-open) {
+      opacity: 0;
+      transform: var(--pop-from);
+      transition-duration: 0.14s;
+      transition-timing-function: ease-in;
+      pointer-events: none;
     }
   }
 }
