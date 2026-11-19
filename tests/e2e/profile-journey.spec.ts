@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { notebookEntries } from "../../lib/content/testimonials";
+import { settleDither } from "./screenshots";
 
 /**
  * Profile redesign, Phase 4: the Journey (stage, tool orbit, story, records
@@ -1124,6 +1125,7 @@ test.describe("journey and notebook: baselines on the device matrix", () => {
       await prepare(page, theme);
       await visit(page);
       await hideChrome(page);
+      await settleDither(page);
       await expect(page.locator(".pf-journey__stage")).toHaveScreenshot(
         `preview-journey-${theme}.png`,
       );
@@ -1136,6 +1138,7 @@ test.describe("journey and notebook: baselines on the device matrix", () => {
       await prepare(page, theme);
       await visit(page);
       await hideChrome(page);
+      await settleDither(page);
       await expect(page.locator("#story")).toHaveScreenshot(
         `preview-story-${theme}.png`,
       );
@@ -1148,6 +1151,7 @@ test.describe("journey and notebook: baselines on the device matrix", () => {
       await prepare(page, theme);
       await visit(page, SYSTEM);
       await hideChrome(page);
+      await settleDither(page);
       await expect(page.locator(`${NOTEBOOK} .pf-book-wrap`)).toHaveScreenshot(
         `preview-notebook-${theme}.png`,
       );

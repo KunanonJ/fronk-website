@@ -1,5 +1,9 @@
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
+
+/** The full pages hide the dither canvases (screenshot-no-dither.css). */
+const NO_DITHER = join(process.cwd(), "tests/e2e/screenshot-no-dither.css");
 
 /**
  * Full-page visual baselines for every public route, in both themes
@@ -111,6 +115,7 @@ for (const theme of THEMES) {
         await loadEveryImage(page);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
           fullPage: true,
+          stylePath: NO_DITHER,
         });
       });
     }

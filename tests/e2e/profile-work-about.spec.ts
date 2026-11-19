@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { settleDither } from "./screenshots";
 
 /**
  * Profile redesign, Phase 3: the Home work stack and About bento on the
@@ -791,6 +792,7 @@ test.describe("work and about: baselines on the device matrix", () => {
               : []),
           ].join("\n"),
         });
+        await settleDither(page);
         await expect(page.locator(`#${id}`)).toHaveScreenshot(
           `preview-${id}-${theme}.png`,
         );
