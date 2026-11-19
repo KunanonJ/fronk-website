@@ -1523,7 +1523,9 @@ html.kj-vt *::after {
 }
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .ds-pill--ghost:hover {
+  /* Not while pressed: this rule comes after .ds-pill:active and would
+     replace its 0.97 press with the lift. */
+  .ds-pill--ghost:hover:not(:active) {
     transform: translateY(-1px);
   }
   .ds-text-link:hover .ds-text-link__arrow {
