@@ -5,14 +5,12 @@ import { OG_SIZE } from "@/lib/og/card";
 import { siteConfig } from "@/lib/site";
 
 /**
- * Site-wide share card served by `app/opengraph-image.tsx`.
+ * The site-wide share card, served at /opengraph-image (src/server/og).
  *
- * A page-level `openGraph` object replaces the inherited one wholesale, which
- * drops the image Next.js derives from the root `opengraph-image` file. Routes
- * that pass no `images` fall back to this card so they still ship `og:image`.
- * Routes that ship their own `opengraph-image` file must pass
- * `hasOwnOgImage: true`: in Next.js 16.4 a config-based `openGraph.images`
- * replaces the file-based image (verified in the build output).
+ * A page's `openGraph` replaces the root's wholesale (metadataToHead), so
+ * routes that pass no `images` get this card and still ship `og:image`.
+ * Routes that serve their own `opengraph-image` must pass
+ * `hasOwnOgImage: true`: `openGraph.images` win over a route's own image.
  */
 export const DEFAULT_OG_IMAGE = {
   url: "/opengraph-image",
@@ -111,8 +109,8 @@ export function routeShareMeta({
       site: "@fkj98",
       title,
       description,
-      // Without explicit images, Next.js copies the route's resolved openGraph
-      // images (including its own opengraph-image file) into the Twitter card.
+      // Without explicit images, metadataToHead copies the route's resolved
+      // openGraph images (its own opengraph-image too) into the Twitter card.
       ...(images?.length ? { images: [...images] } : {}),
     },
   };

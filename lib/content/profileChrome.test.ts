@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  PROFILE_BASE,
   availability,
   brand,
   composeHref,
@@ -20,9 +19,7 @@ import { siteMenu } from "@/lib/content/landing";
  * site's own menus, so a renamed page cannot leave the chrome pointing at it.
  */
 describe("profile chrome links", () => {
-  it("reads Home and its sections from the one base path, the site's root since the cutover", () => {
-    // Phase 6 moved the redesign from /preview to the live routes.
-    expect(PROFILE_BASE).toBe("");
+  it("puts Home and its sections at the site's root", () => {
     expect(homeHref()).toBe("/");
     expect(homeHref("work")).toBe("/#work");
   });

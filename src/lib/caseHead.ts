@@ -2,7 +2,6 @@ import type { PortfolioProject } from "@/lib/content/portfolio";
 import type { Venture } from "@/lib/content/ventures";
 import { namedPageTitle } from "@/lib/seo/pageTitle";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
-import type { Metadata } from "@/lib/seo/types";
 import { pageHead } from "./head";
 import { fileOg } from "./og";
 
@@ -15,14 +14,10 @@ import { fileOg } from "./og";
  * through them, and the parity gate pins the served tags.
  */
 
-function head(metadata: Metadata, ogImage: ReturnType<typeof fileOg>) {
-  return pageHead(metadata, { fileOgImage: ogImage });
-}
-
 /** The head of /portfolio/<slug>, as `_landing/portfolio/$slug.tsx` builds it. */
 export function projectCaseHead(project: PortfolioProject) {
   const path = `/portfolio/${project.slug}`;
-  return head(
+  return pageHead(
     routeShareMeta({
       title: namedPageTitle(project.name, project.tagline),
       description: project.summary,
@@ -30,20 +25,20 @@ export function projectCaseHead(project: PortfolioProject) {
       hasOwnOgImage: true,
       markdownPath: `${path}.md`,
     }),
-    fileOg(path, `${project.name}: by Kunanon Jarat`),
+    { fileOgImage: fileOg(path, `${project.name}: by Kunanon Jarat`) },
   );
 }
 
 /** The head of /ventures/<slug>, as `_landing/ventures/$slug.tsx` builds it. */
 export function ventureCaseHead(venture: Venture) {
   const path = `/ventures/${venture.slug}`;
-  return head(
+  return pageHead(
     routeShareMeta({
       title: namedPageTitle(venture.name, venture.tagline),
       description: venture.description,
       path,
       hasOwnOgImage: true,
     }),
-    fileOg(path, "Venture hub"),
+    { fileOgImage: fileOg(path, "Venture hub") },
   );
 }

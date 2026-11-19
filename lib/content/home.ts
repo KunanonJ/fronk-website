@@ -8,7 +8,7 @@ import {
   type PortfolioImage,
   type PortfolioMockup,
 } from "@/lib/content/portfolio";
-import { PROFILE_BASE } from "@/lib/content/profileChrome";
+import { caseHref } from "@/lib/content/profileChrome";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { getVentureBySlug } from "@/lib/content/ventures";
 
@@ -111,11 +111,6 @@ export interface MockFrame {
   readonly cover?: PortfolioImage;
   /** Otherwise a textless drawing of this kind of screen. */
   readonly mockup?: PortfolioMockup["kind"];
-}
-
-/** A case study's address, on the preview until the Phase 6 cutover. */
-export function caseHref(kind: "portfolio" | "ventures", slug: string): string {
-  return `${PROFILE_BASE}/${kind}/${slug}`;
 }
 
 /** The canvas mock (spec 8.2, owner decision 3): the three featured projects. */

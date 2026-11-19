@@ -10,7 +10,7 @@ import {
   type PortfolioImage,
   type PortfolioMockup,
 } from "@/lib/content/portfolio";
-import { PROFILE_BASE } from "@/lib/content/profileChrome";
+import { caseHref } from "@/lib/content/profileChrome";
 import { getVentureBySlug } from "@/lib/content/ventures";
 
 /*
@@ -84,7 +84,7 @@ function projectCard(entry: StackEntry, index: number): StackCardModel {
   return {
     kind: "project",
     slug: project.slug,
-    href: `${PROFILE_BASE}/portfolio/${project.slug}`,
+    href: caseHref("portfolio", project.slug),
     name: project.name,
     chips: [project.category, project.period],
     summary: project.tagline,
@@ -110,7 +110,7 @@ function ventureCard(entry: StackEntry, index: number): StackCardModel {
   return {
     kind: "venture",
     slug: venture.slug,
-    href: `${PROFILE_BASE}/ventures/${venture.slug}`,
+    href: caseHref("ventures", venture.slug),
     name: venture.name,
     chips: [workCopy.venture, `${workCopy.since} ${venture.year}`],
     summary: venture.tagline,

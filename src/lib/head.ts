@@ -4,12 +4,12 @@ import { metadataToHead, type FileOgImage } from "@/lib/seo/metadataToHead";
 import { rootMetadata } from "@/lib/seo/rootMetadata";
 import { fileOg } from "./og";
 
-/** app/opengraph-image: Next uses it for any page without OG images of its own. */
+/** The site's share card (/opengraph-image): the og:image of a page that names none. */
 const ROOT_OG = fileOg("", `${siteConfig.name} — ${siteConfig.tagline}`);
 
 /**
- * A route's head() from the same Metadata object its Next page exports, with
- * the root layout's metadata merged in the way Next merges it.
+ * A route's head() from its page Metadata, merged over the site's root
+ * metadata (lib/seo/rootMetadata.ts) by metadataToHead.
  */
 export function pageHead(
   page: Metadata,

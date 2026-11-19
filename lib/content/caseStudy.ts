@@ -20,7 +20,7 @@ import {
   type PortfolioMockup,
   type PortfolioProject,
 } from "@/lib/content/portfolio";
-import { PROFILE_BASE, homeHref } from "@/lib/content/profileChrome";
+import { caseHref, homeHref } from "@/lib/content/profileChrome";
 import {
   VENTURE_RELATED_TOPICS,
   getAllVentures,
@@ -333,9 +333,6 @@ function caseHue(kind: CaseKind, slug: string): MaterialHue {
   return materialHue(STACK_ENTRIES.length + Math.max(at, 0));
 }
 
-const projectHref = (slug: string) => `${PROFILE_BASE}/portfolio/${slug}`;
-const ventureHref = (slug: string) => `${PROFILE_BASE}/ventures/${slug}`;
-
 /** "01", "02": chapters are numbered in page order. */
 function numbered(
   drafts: readonly Omit<CaseChapter, "id" | "number">[],
@@ -534,7 +531,7 @@ function projectCard(project: PortfolioProject): CaseMoreCard {
   return {
     kind: "project",
     slug: project.slug,
-    href: projectHref(project.slug),
+    href: caseHref("portfolio", project.slug),
     name: project.name,
     meta: [project.category, project.period],
     summary: project.tagline,
@@ -547,7 +544,7 @@ function ventureCard(venture: Venture): CaseMoreCard {
   return {
     kind: "venture",
     slug: venture.slug,
-    href: ventureHref(venture.slug),
+    href: caseHref("ventures", venture.slug),
     name: venture.name,
     meta: [
       caseCopy.venture,
@@ -576,7 +573,7 @@ export function projectCase(project: PortfolioProject): CaseStudy {
     kind: "project",
     slug: project.slug,
     path: `/portfolio/${project.slug}`,
-    href: projectHref(project.slug),
+    href: caseHref("portfolio", project.slug),
     name: project.name,
     tagline: project.tagline,
     titleName: `${project.name}.`,
@@ -706,7 +703,7 @@ export function ventureCase(venture: Venture): CaseStudy {
     kind: "venture",
     slug: venture.slug,
     path: `/ventures/${venture.slug}`,
-    href: ventureHref(venture.slug),
+    href: caseHref("ventures", venture.slug),
     name: venture.name,
     tagline: venture.tagline,
     titleName: venture.name,

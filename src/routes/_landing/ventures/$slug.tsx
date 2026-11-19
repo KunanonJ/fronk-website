@@ -8,13 +8,14 @@ import { getVentureBySlug } from "@/lib/content/ventures";
 import { ventureCaseHead } from "@/src/lib/caseHead";
 
 /**
- * The page body for one slug (profile redesign, Phase 6 cutover; design spec
+ * One venture's page (profile redesign, Phase 6 cutover; design spec
  * 9): the case-study template, under the same JSON-LD as before (the
  * application, then the breadcrumb, from the same builders). Only a venture
  * with a case study has a page. Keyed on the slug, as the project pages are:
  * the router keeps this component when only the slug changes.
  */
-function VentureCasePageView({ slug }: { slug: string }) {
+function VentureCaseRoute() {
+  const { slug } = Route.useParams();
   const venture = getVentureBySlug(slug);
   if (!venture?.caseStudy) throw notFound();
 
@@ -37,10 +38,5 @@ export const Route = createFileRoute("/_landing/ventures/$slug")({
     return { head: ventureCaseHead(venture) };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: VentureCaseRoute,
 });
-
-function SlugPage() {
-  const { slug } = Route.useParams();
-  return <VentureCasePageView slug={slug} />;
-}

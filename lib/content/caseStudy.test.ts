@@ -17,7 +17,6 @@ import {
   getAllPortfolioProjects,
   outcomeLine,
 } from "@/lib/content/portfolio";
-import { PROFILE_BASE } from "@/lib/content/profileChrome";
 import {
   VENTURE_RELATED_TOPICS,
   getAllVentures,
@@ -113,11 +112,11 @@ describe("the case-study view model", () => {
     }
   });
 
-  it("serves each case under the profile base and keeps its live address", () => {
+  it("serves each case at its live address", () => {
     for (const study of studies) {
       const section = study.kind === "project" ? "portfolio" : "ventures";
       expect(study.path).toBe(`/${section}/${study.slug}`);
-      expect(study.href).toBe(`${PROFILE_BASE}/${section}/${study.slug}`);
+      expect(study.href).toBe(study.path);
     }
   });
 
@@ -300,7 +299,7 @@ describe("the hero, cover and meta row (spec 9.2, 9.4, 9.5)", () => {
     // Home's ventures card: /#ventures since the cutover (Phase 6).
     expect(findVentureCase("manut")!.back).toEqual({
       label: "Ventures",
-      href: `${PROFILE_BASE || "/"}#ventures`,
+      href: "/#ventures",
     });
   });
 
@@ -488,11 +487,11 @@ describe("More projects (spec 9.12)", () => {
     ]);
   });
 
-  it("links each card to its case under the profile base, with its meta and tagline", () => {
+  it("links each card to its case, with its meta and tagline", () => {
     const [card] = findProjectCase("tbh-intranet")!.more;
     const project = projects.find((p) => p.slug === card!.slug)!;
     expect(card).toMatchObject({
-      href: `${PROFILE_BASE}/portfolio/${project.slug}`,
+      href: `/portfolio/${project.slug}`,
       name: project.name,
       meta: [project.category, project.period],
       summary: project.tagline,

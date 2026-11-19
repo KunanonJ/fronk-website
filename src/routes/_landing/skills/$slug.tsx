@@ -13,8 +13,9 @@ import { fileOg } from "@/src/lib/og";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-/** The page body for one slug; shared with the TanStack Start route. */
-function SkillRouteView({ slug }: { slug: string }) {
+/** One skill's page: its breadcrumb and skill JSON-LD, then the skill. */
+function SkillRoute() {
+  const { slug } = Route.useParams();
   const skill = getSkillBySlug(slug);
   if (!skill) throw notFound();
 
@@ -50,10 +51,5 @@ export const Route = createFileRoute("/_landing/skills/$slug")({
     };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: SkillRoute,
 });
-
-function SlugPage() {
-  const { slug } = Route.useParams();
-  return <SkillRouteView slug={slug} />;
-}
