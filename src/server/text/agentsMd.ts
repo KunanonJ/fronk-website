@@ -6,6 +6,7 @@ import {
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
 import { siteConfig } from "@/lib/site";
+import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
  * /agents.md: the index of agent-facing surfaces, generated from lib/content
@@ -94,7 +95,5 @@ export function buildAgentsMd(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildAgentsMd(), {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(buildAgentsMd());
 }

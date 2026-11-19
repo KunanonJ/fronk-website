@@ -5,6 +5,7 @@ import { getAllSkills } from "@/lib/content/skills";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
+import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
  * /sitemap.md: a human- and agent-readable route map, generated from
@@ -113,7 +114,5 @@ export function buildSitemapMd(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildSitemapMd(), {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(buildSitemapMd());
 }

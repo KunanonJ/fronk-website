@@ -28,9 +28,18 @@ export function paragraphToMarkdown(
     .join("");
 }
 
-export function markdownResponse(body: string, status = 200): Response {
+/** A UTF-8 text body of media type `type` (the route sets the cache headers). */
+export function textResponse(
+  body: string,
+  type: string,
+  status = 200,
+): Response {
   return new Response(body, {
     status,
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+    headers: { "Content-Type": `${type}; charset=utf-8` },
   });
+}
+
+export function markdownResponse(body: string, status = 200): Response {
+  return textResponse(body, "text/markdown", status);
 }

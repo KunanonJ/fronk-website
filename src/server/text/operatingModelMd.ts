@@ -7,6 +7,7 @@ import {
   getAllSkills,
 } from "@/lib/content/skills";
 import { siteConfig } from "@/lib/site";
+import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
  * /operating-model.md: the solopreneur operating model as a reusable
@@ -60,7 +61,5 @@ export function buildOperatingModelMd(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildOperatingModelMd(), {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(buildOperatingModelMd());
 }

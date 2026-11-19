@@ -18,6 +18,7 @@ import {
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { siteConfig } from "@/lib/site";
+import { textResponse } from "@/src/server/text/markdown";
 import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 
 /**
@@ -126,7 +127,5 @@ export function buildLlmsFull(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildLlmsFull(), {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+  return textResponse(buildLlmsFull(), "text/plain");
 }

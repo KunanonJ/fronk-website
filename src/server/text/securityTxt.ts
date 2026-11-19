@@ -1,8 +1,7 @@
 import { buildSecurityTxt } from "@/lib/seo/securityTxt";
+import { textResponse } from "@/src/server/text/markdown";
 
 /** Its cache headers are set by its route (src/routes/[.]well-known/security[.]txt.ts). */
 export function GET() {
-  return new Response(buildSecurityTxt(), {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+  return textResponse(buildSecurityTxt(), "text/plain");
 }
