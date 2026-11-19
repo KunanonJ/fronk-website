@@ -13,7 +13,6 @@ import {
   CONTACT_LIMITS,
   CONTACT_TOPICS,
   HIRING_TOPIC,
-  contactMessages,
   contactPage,
 } from "@/lib/content/contact";
 import {
@@ -21,24 +20,25 @@ import {
   firstContactIssue,
   type ContactFormValues,
 } from "@/lib/contact/schema";
+import { composeContactEmail, type ContactEmail } from "@/lib/contact/compose";
 import { onContactDraft } from "@/lib/agents/contactDraft";
-import { getTurnstileToken } from "@/lib/turnstile/client";
+import { writeClipboard } from "@/lib/utils/clipboard";
 import { cn } from "@/lib/utils/cn";
 
-type Status = "idle" | "sending" | "sent" | "error";
+type Copy = "idle" | "copied" | "failed";
 
 export const contactMailto = `mailto:${contactPage.email}?subject=${encodeURIComponent(contactPage.mailtoSubject)}`;
 
-/** Turnstile runs only once a site key is configured; until then nothing loads. */
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const EMPTY: ContactFormValues = { name: "", message: "", topics: [] };
 
-const EMPTY: ContactFormValues = {
-  name: "",
-  email: "",
-  message: "",
-  topics: [],
-  company: "",
-};
+const COPY_RESET_MS = 2000;
+
+/** Opens a mailto: link the way a click on it would: the email app takes it. */
+function openEmail(href: string) {
+  const link = document.createElement("a");
+  link.href = href;
+  link.click();
+}
 
 // The profile redesign's mono label (design spec 3.2): 12 px, uppercase.
 const LABEL = "t-meta text-ink-60";
@@ -101,21 +101,19 @@ function invalidProps(id: string, error?: string) {
 
 /**
  * The "Say hello" card (profile redesign, Phase 6 cutover; the bento canvas
- * before it, design spec 4.3 and gap 21). The form posts to /api/contact,
- * which emails the owner through Resend.
+ * before it, design spec 4.3 and gap 21). The form prepares an email to the
+ * public address and opens it in the visitor's own email app
+ * (lib/contact/compose.ts): the site sends nothing and keeps nothing, so it
+ * needs no mail server, spam check or secrets.
  *
- * - Validation: the shared Valibot schema (the server's wording) runs on
- *   submit, then on every change once a submit has been tried. Errors show
- *   under each field and the first invalid field takes focus.
- * - Spam: a honeypot field, the time since mount, and Cloudflare Turnstile,
- *   which loads only on submit and only once a site key is configured.
- * - Sending: the button reads "Sending..." and ignores repeat presses.
- * - Sent: shown only after the server confirms; focus moves to it.
- * - Failed: the server's message (not connected, rate limited, spam check,
- *   too large, or failed) with the email address as a fallback; the
- *   visitor's text stays in the form.
+ * - Validation: the shared Valibot schema runs on submit, then on every
+ *   change once a submit has been tried. Errors show under each field and
+ *   the first invalid field takes focus.
+ * - Ready: after the button, a status panel says the email is in the
+ *   visitor's app, offers to open it again or copy it (a browser with no
+ *   email app opens nothing), and focus moves to it.
  * - Intent: `hiring` (from `/contact?topic=hiring`) chooses the Hiring topic
- *   on arrival and again after "Send another message". It only ever adds
+ *   on arrival and again after "Write another message". It only ever adds
  *   the topic: the chips stay the visitor's to change.
  * - Prompt: the message label follows the Hiring chip, not the URL, so it
  *   asks about the role exactly while Hiring is chosen.
@@ -125,33 +123,33 @@ export default function ContactForm({
 }: {
   intent?: ContactIntent;
 }) {
-  const [status, setStatus] = useState<Status>("idle");
-  const [error, setError] = useState("");
-  const mountedAt = useRef<number | null>(null);
-  /** Set when a WebMCP agent's draft fills the form. */
-  const drafted = useRef(false);
-  const turnstileRef = useRef<HTMLDivElement>(null);
-  const sentRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState<ContactEmail | null>(null);
+  const [copy, setCopy] = useState<Copy>("idle");
+  const readyRef = useRef<HTMLDivElement>(null);
+  const copyAreaRef = useRef<HTMLTextAreaElement>(null);
   const focusNameNext = useRef(false);
+  const copyTimer = useRef<number | undefined>(undefined);
 
+  // The form gives way to the ready panel, so focus follows it; after
+  // "Write another message" it returns to the first field.
   useEffect(() => {
-    mountedAt.current = performance.now();
-  }, []);
-
-  // The form disappears on success, so focus follows the confirmation; after
-  // "Send another message" it returns to the first field.
-  useEffect(() => {
-    if (status === "sent") sentRef.current?.focus();
-    if (status === "idle" && focusNameNext.current) {
+    if (ready) readyRef.current?.focus();
+    else if (focusNameNext.current) {
       focusNameNext.current = false;
       document.getElementById("contact-name")?.focus();
     }
-  }, [status]);
-
-  const fail = (message: string) => {
-    setError(message);
-    setStatus("error");
-  };
+  }, [ready]);
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+  // A refused copy hands the visitor the email, focused and selected, so
+  // its label is read out and one keypress copies it: once it appears, and
+  // again on each later refusal.
+  const selectCopyArea = useCallback(() => {
+    copyAreaRef.current?.focus();
+    copyAreaRef.current?.select();
+  }, []);
+  useEffect(() => {
+    if (copy === "failed") selectCopyArea();
+  }, [copy, selectCopyArea]);
 
   const form = useForm({
     defaultValues: EMPTY,
@@ -161,52 +159,12 @@ export default function ContactForm({
       const issue = firstContactIssue(value);
       if (issue) document.getElementById(`contact-${issue.field}`)?.focus();
     },
-    onSubmit: async ({ value }) => {
-      setStatus("sending");
-      setError("");
-      // A message sent sooner than CONTACT_LIMITS.minFillMs after the form
-      // appeared reads as a bot's and is dropped with a fake success
-      // (lib/contact/sendContactMessage.ts). An agent's draft fills the form
-      // at once and moves the focus to Send, so a visitor who sends it
-      // straight away waits out the rest of that time instead of losing it.
-      if (drafted.current && mountedAt.current !== null) {
-        const left =
-          CONTACT_LIMITS.minFillMs - (performance.now() - mountedAt.current);
-        if (left > 0) await new Promise((done) => setTimeout(done, left + 50));
-      }
-      const elapsedMs =
-        mountedAt.current === null
-          ? null
-          : performance.now() - mountedAt.current;
-
-      let turnstileToken: string | undefined;
-      if (TURNSTILE_SITE_KEY && turnstileRef.current) {
-        const token = await getTurnstileToken(
-          turnstileRef.current,
-          TURNSTILE_SITE_KEY,
-        );
-        if (!token) return fail(contactMessages.botCheck);
-        turnstileToken = token;
-      }
-
-      try {
-        const response = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...value, elapsedMs, turnstileToken }),
-        });
-        const data = (await response.json().catch(() => null)) as {
-          ok?: boolean;
-          message?: string;
-        } | null;
-        if (response.ok && data?.ok) {
-          setStatus("sent");
-          return;
-        }
-        fail(data?.message ?? contactMessages.failed);
-      } catch {
-        fail(contactMessages.failed);
-      }
+    onSubmit: ({ value }) => {
+      const email = composeContactEmail(value);
+      setCopy("idle");
+      setReady(email);
+      // Too long for an email link: the panel asks for a copy first.
+      if (email.complete) openEmail(email.href);
     },
   });
 
@@ -227,17 +185,16 @@ export default function ContactForm({
     state.values.topics.includes(HIRING_TOPIC),
   );
 
-  // A WebMCP agent's draft (draft_contact_message, lib/agents/webmcp.ts):
-  // the visible fields only, never the honeypot, and the focus moves to
-  // Send, which the visitor presses after reviewing it.
+  // A WebMCP agent's draft (draft_contact_message, lib/agents/webmcp.ts)
+  // fills the fields, and the focus moves to the button, which the visitor
+  // presses after reviewing it.
   useEffect(
     () =>
       onContactDraft((draft) => {
-        drafted.current = true;
-        setStatus("idle");
+        setReady(null);
         form.setFieldValue("name", draft.name);
-        form.setFieldValue("email", draft.email);
         form.setFieldValue("message", draft.message);
+        if (draft.topics) form.setFieldValue("topics", [...draft.topics]);
         requestAnimationFrame(() =>
           document.getElementById("contact-send")?.focus(),
         );
@@ -245,7 +202,20 @@ export default function ContactForm({
     [form],
   );
 
-  const sending = status === "sending";
+  const copyMessage = (email: ContactEmail) => {
+    const text = `To: ${email.to}\nSubject: ${email.subject}\n\n${email.body}`;
+    void writeClipboard(text).then((ok) => {
+      if (!ok) selectCopyArea();
+      setCopy(ok ? "copied" : "failed");
+      window.clearTimeout(copyTimer.current);
+      if (ok) {
+        copyTimer.current = window.setTimeout(
+          () => setCopy("idle"),
+          COPY_RESET_MS,
+        );
+      }
+    });
+  };
 
   return (
     <article
@@ -256,10 +226,10 @@ export default function ContactForm({
       <h2 id="card-form" className="t-h3 pf-contact__title">
         {contactPage.cardTitle}
       </h2>
-      {status === "sent" ? (
+      {ready ? (
         <div className="my-auto flex flex-col items-start gap-5 px-1 pb-6">
           <div
-            ref={sentRef}
+            ref={readyRef}
             tabIndex={-1}
             role="status"
             className="flex flex-col items-start gap-3 focus:outline-none"
@@ -271,98 +241,118 @@ export default function ContactForm({
               <CheckIcon size={24} />
             </span>
             <p className="m-0 text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">
-              {contactPage.successTitle}
+              {ready.complete ? contactPage.readyTitle : contactPage.longTitle}
             </p>
             <p className="m-0 text-base leading-[1.55] text-ink-2">
-              {contactPage.successBody}
+              {ready.complete ? contactPage.readyBody : contactPage.longBody}
+            </p>
+            <p className="m-0 text-sm leading-normal text-ink-2">
+              {ready.complete
+                ? contactPage.readyFallback
+                : contactPage.longFallback}{" "}
+              <span className="font-semibold text-ink select-all">
+                {ready.to}
+              </span>
+              .
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              form.reset();
-              // A recruiter who writes again is still a recruiter.
-              if (hiring) chooseHiring();
-              setError("");
-              focusNameNext.current = true;
-              setStatus("idle");
-            }}
-            className="inline-flex h-12 items-center rounded-full border border-hairline-strong bg-surface px-[22px] text-card font-medium text-ink"
-          >
-            {contactPage.sendAnother}
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              id="contact-open"
+              href={ready.href}
+              className={pillClass({
+                variant: ready.complete ? "dark" : "ghost",
+                size: "lg",
+              })}
+            >
+              {ready.complete ? contactPage.openAgain : contactPage.openApp}
+            </a>
+            <button
+              type="button"
+              onClick={() => copyMessage(ready)}
+              className={pillClass({
+                variant: ready.complete ? "ghost" : "dark",
+                size: "lg",
+              })}
+            >
+              <span aria-live="polite">
+                {copy === "copied"
+                  ? contactPage.messageCopied
+                  : contactPage.copyMessage}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                form.reset();
+                // A recruiter who writes again is still a recruiter.
+                if (hiring) chooseHiring();
+                focusNameNext.current = true;
+                setReady(null);
+              }}
+              className="inline-flex h-12 items-center rounded-full border border-hairline-strong bg-surface px-[22px] text-card font-medium text-ink"
+            >
+              {contactPage.writeAnother}
+            </button>
+          </div>
+          {copy === "failed" ? (
+            // The clipboard refused: the email, to copy by hand.
+            <div className="flex w-full flex-col gap-2">
+              <label
+                htmlFor="contact-copy"
+                className="text-sm leading-normal text-ink-2"
+              >
+                {contactPage.copyFailed}
+              </label>
+              <textarea
+                id="contact-copy"
+                ref={copyAreaRef}
+                readOnly
+                rows={6}
+                value={`To: ${ready.to}\nSubject: ${ready.subject}\n\n${ready.body}`}
+                className={cn(INPUT, "py-3 leading-normal")}
+              />
+            </div>
+          ) : null}
         </div>
       ) : (
         <form
           aria-labelledby="card-form"
-          // While sending, the form says so (the button reads "Sending...").
-          aria-busy={sending}
           noValidate
           className="m-0 flex flex-col gap-5 px-1 pt-1"
           onSubmit={(e) => {
             e.preventDefault();
-            if (sending) return;
             void form.handleSubmit();
           }}
         >
           <p className="m-0 text-card font-medium">{contactPage.formLabel}</p>
 
-          <div className="flex flex-wrap gap-5">
-            <form.Field name="name">
-              {(field) => {
-                const fieldError = errorText(field.state.meta.errors);
-                return (
-                  <Field
+          <form.Field name="name">
+            {(field) => {
+              const fieldError = errorText(field.state.meta.errors);
+              return (
+                <Field
+                  id="contact-name"
+                  label={contactPage.namePlaceholder}
+                  error={fieldError}
+                >
+                  <input
                     id="contact-name"
-                    label={contactPage.namePlaceholder}
-                    error={fieldError}
-                    className="flex-[1_1_220px]"
-                  >
-                    <input
-                      id="contact-name"
-                      type="text"
-                      name="name"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      autoComplete="name"
-                      maxLength={CONTACT_LIMITS.nameMax}
-                      required
-                      {...invalidProps("contact-name", fieldError)}
-                      className={cn(INPUT, "h-[52px]")}
-                    />
-                  </Field>
-                );
-              }}
-            </form.Field>
-            <form.Field name="email">
-              {(field) => {
-                const fieldError = errorText(field.state.meta.errors);
-                return (
-                  <Field
-                    id="contact-email"
-                    label={contactPage.emailPlaceholder}
-                    error={fieldError}
-                    className="flex-[1_1_220px]"
-                  >
-                    <input
-                      id="contact-email"
-                      type="email"
-                      name="email"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      autoComplete="email"
-                      maxLength={CONTACT_LIMITS.emailMax}
-                      required
-                      {...invalidProps("contact-email", fieldError)}
-                      className={cn(INPUT, "h-[52px]")}
-                    />
-                  </Field>
-                );
-              }}
-            </form.Field>
-          </div>
+                    type="text"
+                    name="name"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="name"
+                    maxLength={CONTACT_LIMITS.nameMax}
+                    required
+                    {...invalidProps("contact-name", fieldError)}
+                    className={cn(INPUT, "h-[52px]")}
+                  />
+                </Field>
+              );
+            }}
+          </form.Field>
 
           <form.Field name="message">
             {(field) => {
@@ -397,30 +387,6 @@ export default function ContactForm({
               );
             }}
           </form.Field>
-
-          {/* Honeypot: hidden from people and assistive tech, tempting to bots.
-              Its name and label avoid anything browser autofill recognises
-              (a "company" field got filled from address profiles, silently
-              dropping real messages); it still maps to `company`. */}
-          <div
-            aria-hidden
-            className="absolute -left-[9999px] h-px w-px overflow-hidden"
-          >
-            <label htmlFor="contact-hp">Leave this field empty</label>
-            <form.Field name="company">
-              {(field) => (
-                <input
-                  id="contact-hp"
-                  type="text"
-                  name="hp_field"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              )}
-            </form.Field>
-          </div>
 
           <fieldset className="m-0 min-w-0 border-0 p-0">
             <legend className={cn(LABEL, "mb-2.5 p-0")}>
@@ -463,37 +429,21 @@ export default function ContactForm({
             </form.Field>
           </fieldset>
 
-          {/* Turnstile mounts here only when configured; invisible unless it needs the visitor. */}
-          {TURNSTILE_SITE_KEY ? <div ref={turnstileRef} /> : null}
-
-          <div aria-live="polite">
-            {status === "error" && error ? (
-              <p className="m-0 flex items-start gap-2.5 rounded-2xl border border-hairline-strong bg-surface px-3.5 py-3 text-sm leading-normal text-ink">
-                {/* Ember marks the failure on the surface; the words carry it. */}
-                <span aria-hidden className="mt-1.5 size-2 shrink-0 bg-ember" />
-                <span>
-                  {error} {contactPage.errorFallbackLead}{" "}
-                  <a href={contactMailto} className="font-semibold">
-                    {contactPage.email}
-                  </a>
-                  .
-                </span>
-              </p>
-            ) : null}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          <div className="flex flex-col items-start gap-3">
             <button
               id="contact-send"
               type="submit"
-              aria-disabled={sending}
-              className={cn(
-                pillClass({ variant: "dark", size: "lg" }),
-                sending && "cursor-progress opacity-60",
-              )}
+              aria-describedby="contact-note"
+              className={pillClass({ variant: "dark", size: "lg" })}
             >
-              {sending ? contactPage.sending : contactPage.submit}
+              {contactPage.submit}
             </button>
+            <p
+              id="contact-note"
+              className="m-0 text-sm leading-normal text-ink-2"
+            >
+              {contactPage.formNote}
+            </p>
           </div>
         </form>
       )}

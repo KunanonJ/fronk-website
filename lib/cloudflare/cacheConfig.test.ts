@@ -18,7 +18,6 @@ type WranglerConfig = {
   main: string;
   cache?: { enabled?: boolean };
   triggers?: { crons?: string[] };
-  ratelimits?: { name: string }[];
   assets?: { binding?: string; run_worker_first?: string[] };
   durable_objects?: { bindings?: { class_name: string }[] };
   migrations?: {
@@ -49,12 +48,6 @@ describe("production Worker config (TanStack Start)", () => {
     expect(staging.main).toBe("src/server.ts");
     expect(staging.cache?.enabled).toBe(true);
     expect(staging.triggers).toEqual({ crons: [] });
-  });
-
-  it("rate-limits the forms", () => {
-    expect(wrangler.ratelimits?.map((r) => r.name)).toContain(
-      "FORM_RATE_LIMIT",
-    );
   });
 
   it("runs the Worker first for trailing slashes and every page with a Markdown version", () => {

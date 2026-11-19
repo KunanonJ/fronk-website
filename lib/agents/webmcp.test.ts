@@ -126,36 +126,72 @@ describe("the WebMCP tools", () => {
     const draft = tool(d, "draft_contact_message");
     const ok = await draft.execute({
       name: "Ada",
-      email: "ada@example.com",
       message: "Hello from an agent.",
+      topics: ["Hiring"],
     });
     expect(ok.isError).toBeUndefined();
-    expect(textOf(ok)).toMatch(/press Send/);
+    expect(textOf(ok)).toMatch(/email app/);
     expect(d.draftContact).toHaveBeenCalledWith({
       name: "Ada",
-      email: "ada@example.com",
       message: "Hello from an agent.",
+      topics: ["Hiring"],
+    });
+    // Without topics, the form keeps the chips it has.
+    await draft.execute({ name: "Ada", message: "Hello from an agent." });
+    expect(d.draftContact).toHaveBeenLastCalledWith({
+      name: "Ada",
+      message: "Hello from an agent.",
+    });
+    // One line for the name, each topic once.
+    await draft.execute({
+      name: "Ada\nLovelace",
+      message: "Hello from an agent.",
+      topics: ["Hiring", "Hiring"],
+    });
+    expect(d.draftContact).toHaveBeenLastCalledWith({
+      name: "Ada Lovelace",
+      message: "Hello from an agent.",
+      topics: ["Hiring"],
     });
     expect((await draft.execute({ name: "Ada" })).isError).toBe(true);
     const closed = await tool(
       deps({ draftContact: async () => false }),
       "draft_contact_message",
-    ).execute({ name: "A", email: "a@example.com", message: "Hello there." });
+    ).execute({ name: "A", message: "Hello there." });
     expect(closed.isError).toBe(true);
     expect(textOf(closed)).toMatch(/@/);
   });
 });
 
 describe("draft_contact_message's checks", () => {
-  it("returns the form's own complaint instead of a draft Send would refuse", async () => {
+  it("returns the form's own complaint instead of a draft its button would refuse", async () => {
     const d = deps();
     const result = await tool(d, "draft_contact_message").execute({
       name: "Ada",
-      email: "ada.example.com",
-      message: "Hello from an agent.",
+      message: "Hi.",
     });
     expect(result.isError).toBe(true);
-    expect(textOf(result)).toMatch(/^email: /);
+    expect(textOf(result)).toMatch(/^message: /);
+    expect(d.draftContact).not.toHaveBeenCalled();
+  });
+
+  it("names the form's topics when a draft asks for one it does not offer", async () => {
+    const d = deps();
+    const draft = tool(d, "draft_contact_message");
+    const unknown = await draft.execute({
+      name: "Ada",
+      message: "Hello from an agent.",
+      topics: ["Hiring", "Not a topic"],
+    });
+    expect(unknown.isError).toBe(true);
+    expect(textOf(unknown)).toMatch(/^topics\.1: .*"Manut AI"/);
+    const notAList = await draft.execute({
+      name: "Ada",
+      message: "Hello from an agent.",
+      topics: "Hiring",
+    });
+    expect(notAList.isError).toBe(true);
+    expect(textOf(notAList)).toMatch(/^topics: /);
     expect(d.draftContact).not.toHaveBeenCalled();
   });
 
@@ -163,11 +199,7 @@ describe("draft_contact_message's checks", () => {
     const d = deps();
     const emoji = "\u{1F600}"; // two UTF-16 units
     const message = "a".repeat(CONTACT_LIMITS.messageMax - 1) + emoji + "tail";
-    await tool(d, "draft_contact_message").execute({
-      name: "Ada",
-      email: "ada@example.com",
-      message,
-    });
+    await tool(d, "draft_contact_message").execute({ name: "Ada", message });
     const sent = vi.mocked(d.draftContact).mock.calls[0]![0].message;
     expect(sent).toHaveLength(CONTACT_LIMITS.messageMax - 1);
     expect(sent.at(-1)).toBe("a");
@@ -186,7 +218,7 @@ describe("sitePath", () => {
 
 describe("the contact form's draft bridge", () => {
   it("hands a draft to the mounted form only", () => {
-    const draft: ContactDraft = { name: "A", email: "a@b.co", message: "Hi." };
+    const draft: ContactDraft = { name: "A", message: "Hi there." };
     expect(fillContactDraft(draft)).toBe(false);
     const got: ContactDraft[] = [];
     const stop = onContactDraft((d) => got.push(d));

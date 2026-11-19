@@ -18,7 +18,7 @@ deployed on Cloudflare Workers.
 Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
-Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache, rate limiting)
+Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache)
 Style:     Light by default; ink/paper/violet tokens, Instrument Serif + Onest + JetBrains Mono (profile redesign)
 ```
 
@@ -223,9 +223,9 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
   `Referrer-Policy` and `Permissions-Policy` on every response: Worker responses
   get them from `src/server/http.ts`, static files from `public/_headers`. Keep
   the two lists the same.
-- **Forms:** `/api/contact` accepts only same-site JSON POSTs under 20 KB, with
-  `FORM_RATE_LIMIT` (5 per minute per IP);
-  Turnstile once `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are set.
+- **Contact:** the form on `/contact` prepares an email to the public address
+  and opens it in the visitor's own email app (`lib/contact/compose.ts`). The
+  site sends no email, keeps nothing, and has no form endpoint.
 - **Migrations:** the old Next.js build's two Durable Object classes were created
   in migration `v1` and deleted in `v2`. Migrations are append-only: add a new tag,
   never edit an old one.
@@ -244,8 +244,6 @@ How the Worker is put together (`src/server.ts`, `wrangler.jsonc`):
 | `NEXT_PUBLIC_SANITY_STUDIO_URL`              | yes\*    | yes     | Hosted Sanity Studio URL used by `/studio`              |
 | `SANITY_REVALIDATE_SECRET`                   | yes\*    | no      | Webhook HMAC secret                                     |
 | `SANITY_AUTH_TOKEN`                          | optional | no      | Schema deploy on build                                  |
-| `TURNSTILE_SECRET_KEY`                       | optional | no      | Turnstile siteverify (contact form)                      |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`             | optional | yes     | Turnstile widget (build-time)                           |
 | `NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN` | optional | yes     | Cloudflare Web Analytics token                          |
 
 \*Required if you use Studio, the resume CMS or the Sanity webhook. The

@@ -1,12 +1,15 @@
+import type { ContactTopic } from "@/lib/content/contact";
+
 /**
  * A bridge from the WebMCP draft_contact_message tool to the contact form:
- * the form, while it is on screen, takes a draft into its own fields. Only
- * the visible fields; the visitor reviews the draft and presses Send.
+ * the form, while it is on screen, takes a draft into its own fields. The
+ * visitor reviews it, and the form's button opens it in their email app.
  */
 export interface ContactDraft {
   name: string;
-  email: string;
   message: string;
+  /** The "What's it about?" chips to choose; the form's own stay otherwise. */
+  topics?: readonly ContactTopic[];
 }
 
 type DraftHandler = (draft: ContactDraft) => void;
