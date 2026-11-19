@@ -120,9 +120,9 @@
   --ease-soft: var(--ease);
   --ease-spring: var(--spring);
 
-  /* Profile redesign (Phase 0, spec 2.12): names for the scoped tokens. They
-   * resolve only inside data-design="profile" and avoid the substrings the
-   * foundation guard bans; the existing paper colour name stays as it is. */
+  /* Profile redesign (spec 2.12): names for the new tokens. They avoid the
+   * substrings the foundation guard bans; the existing paper colour name
+   * stays as it is. */
   --color-mark-ink: var(--accent-ink);
   --color-mark-deep: var(--accent-deep);
   --color-mark-soft: var(--accent-soft);
@@ -170,34 +170,13 @@
  * lib/design/contrast.test.ts.
  * ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --page: #f5f6fa;
-  --surface: var(--palette-paper);
-  --surface-tint: var(--palette-glaze);
-  --surface-warm: var(--palette-clay);
-  --well: var(--palette-mist);
-  --ink: var(--palette-ink);
-  --ink-2: #565b70;
-  --hairline: rgba(11, 13, 23, 0.08);
-  --hairline-strong: rgba(11, 13, 23, 0.16);
-  --action: var(--palette-signal);
-  --action-hover: var(--palette-signal-hover);
-  --on-action: var(--palette-paper);
   /* Theme-aware marker colour (Signal by day); links and focus follow it. */
-  --accent: var(--palette-signal);
-  --link: var(--accent);
-  --focus: var(--accent);
-  --muted: #80859b;
   /* Primary buttons, pressed chips and active segments: ink. */
-  --cta: var(--palette-ink);
-  --oncta: var(--palette-paper);
-  --ember: var(--palette-ember);
   --error-text: #b3360a;
   --success-text: #137036;
   --elev-card:
     0 1px 2px rgba(11, 13, 23, 0.04), 0 16px 40px -16px rgba(11, 13, 23, 0.12);
-  --elev-pop: 0 24px 60px -24px rgba(11, 13, 23, 0.28);
   --elev-logo: 0 14px 30px -12px rgba(11, 13, 23, 0.35);
-  --elev-avatar: 0 8px 24px -8px rgba(11, 13, 23, 0.35);
   --sheen: rgba(255, 255, 255, 0.5);
 }
 
@@ -205,30 +184,10 @@
  * Signal fails on Ink (2.93), so links and focus use a lighter blue.
  * ─────────────────────────────────────────────────────────────────────────── */
 .dark {
-  --page: var(--palette-ink);
-  --surface: #151829;
-  --surface-tint: #1d2136;
   /* Clay at 8% over #151829 */
-  --surface-warm: #282837;
-  --well: #0f1220;
-  --ink: var(--palette-glaze);
-  --ink-2: #a1a6bd;
-  --hairline: rgba(232, 235, 255, 0.08);
-  --hairline-strong: rgba(232, 235, 255, 0.16);
-  --action: var(--palette-signal);
-  --action-hover: var(--palette-signal-hover);
-  --on-action: var(--palette-paper);
-  --accent: #8e97ff;
-  --link: var(--accent);
-  --focus: var(--accent);
-  --muted: #7d83a0;
-  --cta: var(--palette-glaze);
-  --oncta: var(--palette-ink);
-  --ember: var(--palette-ember);
   --error-text: #ff7a45;
   --success-text: #4ade80;
   --elev-card: none;
-  --elev-pop: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
   --sheen: rgba(255, 255, 255, 0.08);
 }
 
@@ -244,34 +203,10 @@
   --glass: rgba(255, 255, 255, 0.14);
   --glass2: rgba(255, 255, 255, 0.26);
   --glowop: 0.6;
-  --starop: 0;
-  --scene-sky-1: #56648f;
-  --scene-sky-2: #a9a3bb;
   --scene-sky-3: #e9c39b;
-  --scene-water-1: #5c6584;
   --water2: #232a3f;
-  --scene-gold-1: #5e3a1e;
   --scene-gold-2: #c8904a;
   --scene-gold-3: #f4d391;
-  --scene-gold-4: #55341b;
-  --scene-tiers: rgba(58, 30, 12, 0.5);
-  --scene-base: #7a5636;
-  --scene-door: #3a2414;
-  --scene-band: #f6dc9c;
-  --scene-spire: #e9c27a;
-  --scene-finial: #f3d79a;
-  --scene-light: #fff1c4;
-  --scene-tree: #121619;
-  --scene-bank: #1c1d26;
-  --scene-hull: #2b1d18;
-  --scene-trim: #b8322a;
-  --scene-cabin: #3a2a24;
-  --scene-halo: rgba(255, 196, 120, 0.55);
-  --scene-halo-0: rgba(255, 196, 120, 0);
-  --scene-mist: rgba(34, 38, 64, 0.55);
-  --scene-reflect: rgba(240, 192, 112, 0.42);
-  --scene-reflect-2: rgba(240, 192, 112, 0.3);
-  --scene-shimmer: rgba(255, 255, 255, 0.1);
   /* Scrim stops behind the card text (side layout, then stacked layout). */
   --scene-scrim-1: rgba(9, 11, 24, 0.9);
   --scene-scrim-2: rgba(9, 11, 24, 0.64);
@@ -282,11 +217,7 @@
 
 .dark {
   --glowop: 1;
-  --starop: 0.85;
-  --scene-sky-1: #0d1230;
-  --scene-sky-2: #2b2f5a;
   --scene-sky-3: #7a5a74;
-  --scene-water-1: #1d2244;
   --water2: #070a18;
 }
 
@@ -295,12 +226,10 @@
  * card): street lines and the river. Never text.
  * ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --map: #d5d8e3;
   --river: #c9cefc;
 }
 
 .dark {
-  --map: #2a2f48;
   --river: #2b3a8f;
 }
 
@@ -340,11 +269,6 @@ body {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-}
-
-::selection {
-  background: var(--action);
-  color: var(--on-action);
 }
 
 .landing-root {
@@ -1070,8 +994,7 @@ a {
  * snapshot and carries the theme switch in browsers that lack view-transition
  * types. Since the profile redesign's cutover (Phase 6, design spec 7.5 and
  * 13 items 6 and 23) the theme switch is the .56 s fade on every page, not
- * the circular reveal: `kj-theme-fade` is defined with the chrome, in
- * src/styles/profile/shell.css, which every page links. Movement-free, and
+ * the circular reveal, `kj-theme-fade`, defined below. Movement-free, and
  * still only with no-preference: the toggle starts no transition under
  * reduced motion, and the block after this one turns them all off.
  * ─────────────────────────────────────────────────────────────────────────── */
@@ -1119,12 +1042,10 @@ html.kj-vt *::after {
 
 /* ─── Profile redesign: tokens and primitives (Phase 0, 18-11-26) ────────────
  * The design of process/features/profile-site-redesign (design spec sections
- * 2 to 6) in one scope: `data-design="profile"` on <html>, which
- * src/routes/__root.tsx sets for the pages moved so far (lib/design/scope.ts;
- * the hidden /preview pages until the Phase 6 cutover, the core pages
- * since), and on the site's nav and footer themselves, so they look the same
- * around the pages Phase 7 restyles. Role tokens keep their names and take new values in
- * the scope (spec 2.12); Phase 8 folds the scope into :root and .dark.
+ * 2 to 6). Until Phase 8 it lived in a scope (`data-design="profile"` on
+ * <html>); every page is in it since Phase 7, so the values below are the
+ * site's :root and .dark. Role tokens keep their names and take the new
+ * values (spec 2.12).
  * Contrast pairs: lib/design/contrast.test.ts ("profile scope").
  * Primitives are `ds-*` classes in @layer components, so Tailwind utilities
  * still override them; the type classes keep the spec's `t-*` names. Type
@@ -1161,7 +1082,7 @@ html.kj-vt *::after {
   initial-value: 1;
 }
 
-[data-design="profile"] {
+:root {
   /* Palette (spec 2.1). */
   --ink: #120e1f;
   --paper: #ffffff;
@@ -1347,8 +1268,7 @@ html.kj-vt *::after {
   font-synthesis-weight: none;
 }
 
-html.dark[data-design="profile"],
-.dark [data-design="profile"] {
+.dark {
   --ink: #f1edfa;
   --paper: #0f0c18;
   --paper-2: #17131f;
@@ -1397,9 +1317,8 @@ html.dark[data-design="profile"],
 
 /* More contrast on request: the small-text floor and every ring step up. */
 @media (prefers-contrast: more) {
-  [data-design="profile"],
-  html.dark[data-design="profile"],
-  .dark [data-design="profile"] {
+  :root,
+  .dark {
     --ink-60: var(--ink-80);
     --muted: var(--ink-80);
     --line: var(--line-strong);
@@ -1407,14 +1326,14 @@ html.dark[data-design="profile"],
   }
 }
 
-/* Unlayered, like the site-wide ::selection it overrides inside the scope. */
-[data-design="profile"] ::selection {
+/* Unlayered, so no layer can override it. */
+::selection {
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
 
 @layer components {
-  [data-design="profile"] :focus-visible {
+  :root :focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 3px;
   }
@@ -1995,12 +1914,12 @@ html.dark[data-design="profile"],
      forced colors or with a contrast preference, where a large or
      high-contrast system pointer must stay. */
   @media (hover: hover) and (pointer: fine) and (forced-colors: none) and (prefers-contrast: no-preference) {
-    [data-design="profile"] {
+    :root {
       cursor:
         url("/cursors/arrow.svg") 2 1,
         auto;
     }
-    [data-design="profile"] :is(a, button, label, summary, [role="button"]) {
+    :root :is(a, button, label, summary, [role="button"]) {
       cursor:
         url("/cursors/hand.svg") 10 2,
         pointer;
@@ -2038,7 +1957,7 @@ html.dark[data-design="profile"],
     .ds-dither {
       display: none;
     }
-    [data-design="profile"] [aria-current] {
+    :root [aria-current] {
       text-decoration-line: underline;
       text-underline-offset: 4px;
     }

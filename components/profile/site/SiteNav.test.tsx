@@ -36,10 +36,6 @@ describe("SiteNav, server HTML", () => {
     expect(html).toContain('class="pf-nav"');
   });
 
-  it("carries the redesign's token scope itself, for the pages Phase 7 restyles", () => {
-    expect(html).toMatch(/<header[^>]*data-design="profile"/);
-  });
-
   it("names the name link and the Primary links, with their live addresses", () => {
     expect(html).toContain('aria-label="Kunanon Jarat, home"');
     expect(html).toContain('aria-label="Primary"');

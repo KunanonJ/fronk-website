@@ -97,7 +97,7 @@
        The browser measures a stuck card where it is stuck, so a jump from
        inside or below the stack misses; WorkStack's script then scrolls to
        the place the list gives. This margin is the page without script. */
-    [data-design="profile"] .pf-stack #ventures {
+    :root .pf-stack #ventures {
       scroll-margin-top: calc(8px + 14px * var(--i, 0));
     }
   }

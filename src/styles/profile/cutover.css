@@ -9,14 +9,6 @@
  */
 
 @layer components {
-  /* Old bodies under the fixed bar (spec 13 item 32): outside the scope the
-     token is not defined, so its value is the fallback. Screens only: print
-     drops the bar, and the printed résumé starts at the top (pnpm pdf). */
-  @media screen {
-    html:not([data-design="profile"]) .landing-root {
-      padding-top: var(--nav-h, 92px);
-    }
-  }
   /* Focus and anchors land below the bar on every page with the chrome
      (spec 4.3, 12 item 9); the scope sets the same on its own pages. */
   html:has(.pf-nav) {

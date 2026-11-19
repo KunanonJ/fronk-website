@@ -329,10 +329,6 @@ test.describe("case pages render (plan gate 2)", () => {
       const h1 = page.getByRole("heading", { level: 1 });
       await expect(h1).toBeVisible();
       await expect(h1).toContainText(name);
-      await expect(page.locator("html")).toHaveAttribute(
-        "data-design",
-        "profile",
-      );
       // Live and indexable since the cutover: no noindex.
       await expect(
         page.locator('meta[name="robots"][content*="noindex"]'),

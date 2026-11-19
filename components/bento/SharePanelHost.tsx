@@ -73,15 +73,14 @@ export default function SharePanelHost() {
 
   if (!open) return null;
   return (
-    // The bar's row, in the chrome's token scope as the bar is: --bar-top
-    // from the top, --bar-row tall, inside the page gutter (--pad). The
+    // The bar's row: --bar-top from the top, --bar-row tall, inside the
+    // page gutter (--pad). The
     // panel hangs 60 px below the row's top, right-aligned, as before.
     // Fixed, so print would draw it over the page: the print rule in
     // globals.css drops [data-print-hide].
     <div
       ref={ref}
       lang="en"
-      data-design="profile"
       data-print-hide
       className="pointer-events-none fixed top-[var(--bar-top)] right-[var(--pad)] z-[85] h-[var(--bar-row)] w-[min(340px,calc(100vw-32px))] [&>*]:pointer-events-auto"
     >

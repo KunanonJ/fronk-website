@@ -1,7 +1,6 @@
 /**
- * Minimal chrome for system pages (/design): no nav or footer. The page sits
- * in the redesign's token scope (lib/design/scope.ts), whose font and colour
- * it inherits from <html>.
+ * Minimal chrome for system pages (/design): no nav or footer. The page
+ * inherits the site's font and colour from <html>.
  */
 export default function SystemLayout({
   children,

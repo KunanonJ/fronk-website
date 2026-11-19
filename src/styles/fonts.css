@@ -170,9 +170,9 @@
  * Profile redesign (Phase 0, 18-11-26): Instrument Serif, Onest, JetBrains Mono
  * and Patrick Hand, self-hosted from Google Fonts with their OFL licences
  * (src/fonts/LICENSES/README.md lists source, version and SHA-256 per file).
- * Only pages inside the `data-design="profile"` scope use these families, and
- * a browser downloads a face only when text needs it, so live pages fetch
- * nothing new. Preloads live on the opted-in routes, never in __root.tsx.
+ * Every page uses these families; a browser downloads a face only when text
+ * needs it. The root route preloads the two the first screen sets (Onest and
+ * Instrument Serif, latin).
  */
 @font-face {
   font-family: Instrument Serif;

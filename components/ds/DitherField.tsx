@@ -68,7 +68,7 @@ export function DitherField({
     const theme = new MutationObserver(schedule);
     theme.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "data-design"],
+      attributeFilter: ["class"],
     });
     return () => {
       cancelAnimationFrame(frame);
