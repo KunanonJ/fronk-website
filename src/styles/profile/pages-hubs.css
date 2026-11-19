@@ -100,8 +100,11 @@
   .pf-hub .pf-faq {
     margin-top: 0;
   }
+  /* minmax(0, 1fr): a wide part of one block cannot widen the column, and
+     with it the other block, past the page's gutter. */
   .pf-hub-close {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 48px 40px;
     align-items: start;
   }

@@ -12,8 +12,8 @@ import { extractPage } from "../../lib/parity/parity.mjs";
  *   languages and JSON-LD the parity reference holds, the way
  *   scripts/parity-crawl.mjs reads them.
  * - The device matrix (design spec 10.1): every page at 344, 390, 820, 882,
- *   1180 and 1440 px, with no sideways scroll, no text under 12 px and no
- *   control under 24 px.
+ *   1180 and 1440 px, with no sideways scroll, nothing in the side gutter,
+ *   no text under 12 px and no control under 24 px.
  * - The best-practice checks (forced colors, text spacing, zoom, request
  *   origins) on a hub in each language, the short Thai hub and two reading
  *   pages (plan gate 7: one page per family, the Thai hubs among them).
@@ -101,6 +101,27 @@ async function layoutProblems(page: Page): Promise<string[]> {
         `${width}px of content in a ${window.innerWidth}px viewport`,
       );
     }
+    // A part that crosses its .ds-wrap's padding into the side gutter. Font
+    // metrics differ between machines, so a part 19 px into the gutter on a
+    // Mac was 8 px past the screen in CI. A rotated mark's box overhangs by
+    // up to 3 px, hence the 4 px allowance.
+    for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
+      const box = wrap.getBoundingClientRect();
+      const style = getComputedStyle(wrap);
+      const start = box.left + parseFloat(style.paddingLeft) - 4;
+      const end = box.right - parseFloat(style.paddingRight) + 4;
+      for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
+        if (rect.left < start || rect.right > end) {
+          const name = el.classList[0] ? `.${el.classList[0]}` : "";
+          problems.push(
+            `${el.tagName.toLowerCase()}${name} crosses the gutter`,
+          );
+          break;
+        }
+      }
+    }
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,
@@ -187,6 +208,14 @@ test.describe("the device matrix (desktop Chromium)", () => {
       await page.goto(path, { waitUntil: "networkidle" });
       for (const width of [344, 390, 820, 882, 1180, 1440]) {
         await page.setViewportSize({ width, height: 900 });
+        // Chromium can resolve vw units at the old width until its next
+        // frame (--pad stayed 72 px at 344 px), so measure two frames on.
+        await page.evaluate(
+          () =>
+            new Promise<void>((done) =>
+              requestAnimationFrame(() => requestAnimationFrame(() => done())),
+            ),
+        );
         await page.evaluate(() => document.fonts.ready);
         expect(await layoutProblems(page), `${path} at ${width}px`).toEqual([]);
       }
