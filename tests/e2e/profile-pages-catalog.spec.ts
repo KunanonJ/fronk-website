@@ -94,6 +94,12 @@ function layoutProblems(page: Page): Promise<string[]> {
     // the skill credits' links widen their hit area with a -6 px margin while
     // their text stays on the edge.
     const bleeds = ".pf-book, .ds-marquee__track, .pf-skill-credits__skill";
+    // Decoration may overhang: a part with no text whose every element is
+    // hidden from assistive tech (a pixel mark set beside a word, say).
+    const decorative = (node: Element): boolean =>
+      !node.textContent?.trim() &&
+      (node.closest("[aria-hidden='true']") !== null ||
+        (node.children.length > 0 && [...node.children].every(decorative)));
     for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
       const box = wrap.getBoundingClientRect();
       const style = getComputedStyle(wrap);
@@ -102,6 +108,7 @@ function layoutProblems(page: Page): Promise<string[]> {
       for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
         const rect = el.getBoundingClientRect();
         if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
+        if (decorative(el)) continue;
         if (el.closest(bleeds)) continue;
         if (rect.left < start || rect.right > end) {
           const name = el.classList[0] ? `.${el.classList[0]}` : "";

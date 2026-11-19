@@ -105,6 +105,12 @@ async function layoutProblems(page: Page): Promise<string[]> {
     // metrics differ between machines, so a part 19 px into the gutter on a
     // Mac was 8 px past the screen in CI. A rotated mark's box overhangs by
     // up to 3 px, hence the 4 px allowance.
+    // Decoration may overhang: a part with no text whose every element is
+    // hidden from assistive tech (a pixel mark set beside a word, say).
+    const decorative = (node: Element): boolean =>
+      !node.textContent?.trim() &&
+      (node.closest("[aria-hidden='true']") !== null ||
+        (node.children.length > 0 && [...node.children].every(decorative)));
     for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
       const box = wrap.getBoundingClientRect();
       const style = getComputedStyle(wrap);
@@ -113,6 +119,7 @@ async function layoutProblems(page: Page): Promise<string[]> {
       for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
         const rect = el.getBoundingClientRect();
         if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
+        if (decorative(el)) continue;
         if (rect.left < start || rect.right > end) {
           const name = el.classList[0] ? `.${el.classList[0]}` : "";
           problems.push(
