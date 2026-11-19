@@ -45,6 +45,10 @@ test.describe("smoke > every route renders without JS errors", () => {
  * src/server/http.ts): every page sends it, and nothing on a page breaks it,
  * lazy parts included. A violation fires securitypolicyviolation even though
  * a report-only policy blocks nothing, so this fails before enforcing could.
+ * Only the site's own policy counts (the one that reports to
+ * /api/csp-report): on the live site, Cloudflare's script monitor adds its
+ * own report-only policy to some responses, and that one reports every
+ * script by design.
  */
 test.describe("csp > every route sends the policy and breaks none of it", () => {
   for (const route of ROUTES) {
@@ -54,11 +58,12 @@ test.describe("csp > every route sends the policy and breaks none of it", () => 
       await page.addInitScript(() => {
         const seen: string[] = [];
         (window as unknown as { __csp: string[] }).__csp = seen;
-        document.addEventListener("securitypolicyviolation", (event) =>
+        document.addEventListener("securitypolicyviolation", (event) => {
+          if (!event.originalPolicy.includes("/api/csp-report")) return;
           seen.push(
             `${event.effectiveDirective} ${event.blockedURI || "inline"}`,
-          ),
-        );
+          );
+        });
       });
       const response = await page.goto(route.path, {
         waitUntil: "networkidle",
