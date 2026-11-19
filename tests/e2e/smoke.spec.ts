@@ -795,9 +795,15 @@ test.describe("recruiter path > the role, the availability and the résumé are 
         { message: "the recruiter card starts below the other at 800 px" },
       )
       .toBeGreaterThanOrEqual(0);
-    const midWho = await box(who);
-    const midRecruiters = await box(recruiters);
-    expect(Math.abs(midRecruiters.width - midWho.width)).toBeLessThan(2);
+    // The widths settle with the same re-flow, so they are polled too: a
+    // single read straight after the row check once caught them 64 px apart.
+    await expect
+      .poll(
+        async () =>
+          Math.abs((await box(recruiters)).width - (await box(who)).width),
+        { message: "both cards take the whole row at 800 px" },
+      )
+      .toBeLessThan(2);
   });
 
   test("an unknown contact topic falls back to the general form without an error", async ({
