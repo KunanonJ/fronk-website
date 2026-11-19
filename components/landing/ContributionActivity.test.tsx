@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ContributionActivity from "@/components/landing/ContributionActivity";
 import {
@@ -62,6 +62,63 @@ describe("ContributionActivity", () => {
     expect(
       screen.getByRole("region", { name: /scrolls sideways/ }),
     ).toHaveAttribute("tabindex", "0");
+  });
+});
+
+describe("ContributionActivity's fill-in", () => {
+  /** An observer the test can trigger, and a grid placed below the fold. */
+  function belowTheFold() {
+    const observed: { fire: () => void } = { fire: () => {} };
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(callback: IntersectionObserverCallback) {
+          observed.fire = () =>
+            callback(
+              [{ isIntersecting: true } as IntersectionObserverEntry],
+              this as unknown as IntersectionObserver,
+            );
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      top: 5000,
+    } as DOMRect);
+    return observed;
+  }
+  const grid = () => screen.getByRole("img", { name: /GitHub contribution/ });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("holds a year below the fold empty until it comes into view", async () => {
+    const observed = belowTheFold();
+    render(<ContributionActivity />);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    expect(grid()).toHaveAttribute("data-wait");
+    act(() => observed.fire());
+    expect(grid()).not.toHaveAttribute("data-wait");
+  });
+
+  it("never holds it under reduced motion", async () => {
+    belowTheFold();
+    vi.spyOn(window, "matchMedia").mockReturnValue({
+      matches: true,
+    } as MediaQueryList);
+    render(<ContributionActivity />);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    expect(grid()).not.toHaveAttribute("data-wait");
+  });
+
+  it("gives each week its place in the fill-in", () => {
+    render(<ContributionActivity />);
+    const weeks = grid().querySelectorAll<HTMLElement>(".pf-activity__week");
+    expect(weeks).toHaveLength(53);
+    expect(weeks[0]!.style.getPropertyValue("--w")).toBe("0");
+    expect(weeks[52]!.style.getPropertyValue("--w")).toBe("52");
   });
 });
 

@@ -271,6 +271,28 @@
   .pf-about-page__activity {
     padding-top: 112px;
   }
+  /* The GitHub year (ContributionActivity.tsx): one column a week, square
+     cells across the tile's width, 8 px at least (under 528 px its region
+     scrolls sideways) and about 19 px at most. The weeks lay their days
+     straight into the grid. */
+  .pf-activity__grid {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    grid-template-rows: repeat(7, auto);
+    gap: clamp(2px, 0.3vw, 4px);
+    inline-size: 100%;
+    min-inline-size: 528px;
+    max-inline-size: calc(53 * 19px + 52 * 4px);
+    margin-inline: auto;
+  }
+  .pf-activity__week {
+    display: contents;
+  }
+  .pf-activity__day {
+    aspect-ratio: 1;
+    border-radius: 2px;
+  }
   .pf-about-page__close {
     display: grid;
     gap: 32px;
@@ -548,5 +570,17 @@
 @media (prefers-reduced-motion: no-preference) {
   .pf-faq__mark {
     transition: rotate 0.2s var(--ease-snappy);
+  }
+  /* The GitHub year fills in week by week, left to right. Outside the
+     layer, so the wait beats the cells' Tailwind colours; screen only, so
+     print shows the year. */
+  .pf-activity__day {
+    transition: background-color 0.3s ease-out;
+    transition-delay: calc(var(--w, 0) * 12ms);
+  }
+  @media screen {
+    .pf-activity__grid[data-wait] .pf-activity__day {
+      background-color: var(--hairline-strong);
+    }
   }
 }
