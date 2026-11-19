@@ -21,6 +21,7 @@ import {
   firstContactIssue,
   type ContactFormValues,
 } from "@/lib/contact/schema";
+import { onContactDraft } from "@/lib/agents/contactDraft";
 import { getTurnstileToken } from "@/lib/turnstile/client";
 import { cn } from "@/lib/utils/cn";
 
@@ -212,6 +213,23 @@ export default function ContactForm({
   // What the message field asks follows the chip the visitor sees pressed.
   const hiringChosen = useStore(form.store, (state) =>
     state.values.topics.includes(HIRING_TOPIC),
+  );
+
+  // A WebMCP agent's draft (draft_contact_message, lib/agents/webmcp.ts):
+  // the visible fields only, never the honeypot, and the focus moves to
+  // Send, which the visitor presses after reviewing it.
+  useEffect(
+    () =>
+      onContactDraft((draft) => {
+        setStatus("idle");
+        form.setFieldValue("name", draft.name);
+        form.setFieldValue("email", draft.email);
+        form.setFieldValue("message", draft.message);
+        requestAnimationFrame(() =>
+          document.getElementById("contact-send")?.focus(),
+        );
+      }),
+    [form],
   );
 
   const sending = status === "sending";
@@ -453,6 +471,7 @@ export default function ContactForm({
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <button
+              id="contact-send"
               type="submit"
               aria-disabled={sending}
               className={cn(
