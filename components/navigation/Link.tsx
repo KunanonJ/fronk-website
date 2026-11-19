@@ -1,6 +1,8 @@
 import { Link as RouterLink } from "@tanstack/react-router";
 import { forwardRef, type AnchorHTMLAttributes } from "react";
 
+import { safeHref } from "@/lib/utils/safeHref";
+
 /*
  * The site's Link: TanStack Router's Link behind the `next/link` props the
  * components were written against. Off-site links, files (llms.txt,
@@ -56,8 +58,9 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
   const url = toHref(href);
   // Off-site, protocol and fragment-only links stay plain anchors, as in Next.
   // Checked before parsing: a malformed CMS URL must not throw during render.
+  // A scheme outside http(s), mailto and tel loses its href (safeHref).
   if (!url.startsWith("/") || url.startsWith("//")) {
-    return <a ref={ref} href={url} {...rest} />;
+    return <a ref={ref} href={safeHref(url)} {...rest} />;
   }
   let parsed: URL;
   try {

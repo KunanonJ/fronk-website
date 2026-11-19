@@ -7,6 +7,7 @@ import {
   FALLBACK_BLOG_POSTS,
   filterBlogPosts,
   formatBlogDate,
+  isBlogSlug,
   matchBlogTag,
   pickCornerstone,
   relatedBlogPosts,
@@ -27,6 +28,51 @@ describe("resolveBlogCards > given empty Sanity posts", () => {
         b.publishedAt.localeCompare(a.publishedAt),
       ),
     );
+  });
+});
+
+describe("isBlogSlug", () => {
+  it("accepts lowercase words joined by single hyphens", () => {
+    for (const slug of FALLBACK_BLOG_POSTS.map((p) => p.slug)) {
+      expect(isBlogSlug(slug)).toBe(true);
+    }
+    expect(isBlogSlug("hello-world")).toBe(true);
+  });
+
+  it("refuses anything else", () => {
+    for (const slug of [
+      "",
+      "Hello",
+      "a--b",
+      "-a",
+      "a-",
+      "a/b",
+      "a</loc>",
+      "a".repeat(97),
+      42,
+      null,
+      Symbol("x"),
+    ]) {
+      expect(isBlogSlug(slug)).toBe(false);
+    }
+  });
+});
+
+describe("resolveBlogCards > given a Sanity post with an unsafe slug", () => {
+  it("keeps that post off the site", () => {
+    const cards = resolveBlogCards([
+      {
+        _id: "cms-bad",
+        slug: "a</loc><script>alert(1)</script>",
+        title: "Bad",
+        excerpt: "",
+        publishedAt: "2026-07-11",
+        tags: [],
+        coverImage: null,
+      },
+    ]);
+    expect(cards.map((c) => c.id)).not.toContain("cms-bad");
+    expect(cards).toHaveLength(FALLBACK_BLOG_POSTS.length);
   });
 });
 

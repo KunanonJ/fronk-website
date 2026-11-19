@@ -1,16 +1,8 @@
 import type { BlogCard } from "@/lib/content/blog";
+import { escapeXml } from "@/lib/utils/xml";
 
 /** Canonical feed URL path. `/rss.xml` 308-redirects here for old subscribers. */
 export const FEED_PATH = "/feed.xml";
-
-function escapeXml(input: string): string {
-  return input
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
 
 type RssFeedInput = {
   /** Same set the /blog index renders (Sanity + fallbacks), newest first. */

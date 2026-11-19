@@ -58,4 +58,16 @@ describe("metadata route serialisers (match the site reference)", () => {
       ),
     ).toBe(true);
   });
+
+  it("escapes markup in a sitemap URL", () => {
+    const xml = sitemapToXml([
+      {
+        url: 'https://kunanonj.com/blog/a</loc><x:script xmlns:x="http://www.w3.org/1999/xhtml">alert(1)</x:script>&b',
+      },
+    ]);
+    expect(xml).not.toContain("<x:script");
+    expect(xml).toContain(
+      "<loc>https://kunanonj.com/blog/a&lt;/loc&gt;&lt;x:script xmlns:x=&quot;http://www.w3.org/1999/xhtml&quot;&gt;alert(1)&lt;/x:script&gt;&amp;b</loc>",
+    );
+  });
 });

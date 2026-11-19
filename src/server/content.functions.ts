@@ -4,6 +4,7 @@ import { NO_STORE } from "@/src/lib/cache";
 import { pageHead } from "@/src/lib/head";
 import {
   FALLBACK_BLOG_POSTS,
+  isBlogSlug,
   mapPostToBlogCard,
   resolveBlogCards,
 } from "@/lib/content/blog";
@@ -103,9 +104,15 @@ export const getBlogIndex = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/**
+ * One post, or null for a 404. The slug arrives from the URL or a client
+ * call, so anything that is not a plain slug (isBlogSlug) is a 404 before it
+ * reaches Sanity or a log line.
+ */
 export const getBlogPost = createServerFn({ method: "GET" })
-  .validator((slug: string) => slug)
+  .validator((slug: string) => (isBlogSlug(slug) ? slug : null))
   .handler(async ({ data: slug }) => {
+    if (slug === null) return null;
     const post = await fetchPostBySlug(slug);
     if (!post && !FALLBACK_BLOG_POSTS.some((p) => p.slug === slug)) return null;
     const metadata = blogPostMetadata(slug, post);

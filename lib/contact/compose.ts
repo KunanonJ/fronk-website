@@ -31,6 +31,16 @@ export interface ContactEmail {
 export const oneLine = (value: string) => value.replace(/\s+/g, " ").trim();
 
 /**
+ * `value` with each lone surrogate replaced by U+FFFD, as
+ * String.prototype.toWellFormed does: encodeURIComponent throws on one, and
+ * an agent's draft (WebMCP) can carry one into the form.
+ */
+const wellFormed = (value: string) =>
+  value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, (unit) =>
+    unit.length === 2 ? unit : "�",
+  );
+
+/**
  * The subject names the topics and the sender ("Hiring: Ada Lovelace via
  * kunanonj.com"), so the owner can sort the inbox; the body is the message,
  * then the name as a sign-off. Line breaks become CRLF, as mailto bodies
@@ -45,9 +55,9 @@ export function composeContactEmail({
   message: string;
   topics: readonly string[];
 }): ContactEmail {
-  const who = oneLine(name);
+  const who = oneLine(wellFormed(name));
   const subject = `${topics.length ? `${topics.join(", ")}: ` : ""}${who} via kunanonj.com`;
-  const body = `${message.trim()}\n\n${who}`;
+  const body = `${wellFormed(message).trim()}\n\n${who}`;
   const to = contactPage.email;
   const head = `mailto:${to}?subject=${encodeURIComponent(subject)}`;
   const whole = `${head}&body=${encodeURIComponent(body.replace(/\r?\n/g, "\r\n"))}`;
