@@ -3,7 +3,7 @@
 **Created:** 18-11-26
 **Feature:** profile-site-redesign (`process/features/profile-site-redesign/`, phases 0 to 8)
 **Sources:** a two-part teardown of the reference site (captured 18-11-26, kept outside the repo) and `references/codebase-inventory_18-11-26.md` (this repo at `563b2a3`). Repo facts marked with a file path were re-read on 18-11-26.
-**Status:** Reference for every phase. Nothing here is implemented yet. When a phase decides something marked "(not captured)" or "(ours)", it records the decision here.
+**Status:** Live (19-11-26): every page of kunanonj.com implements it, the tokens in `src/styles/globals.css` `:root` and `.dark` since Phase 8 folded section 2.13's scope. When a later change decides something marked "(not captured)" or "(ours)", it records the decision here; the phase reports in `../reports/` record each phase's decisions.
 
 ---
 
