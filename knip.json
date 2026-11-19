@@ -2,6 +2,5 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["src/routes/**/*.{ts,tsx}!", "scripts/*.mjs"],
   "ignore": [".codex/**"],
-  "ignoreDependencies": ["cloudflare"],
   "ignoreExportsUsedInFile": true
 }

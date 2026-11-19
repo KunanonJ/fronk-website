@@ -2,11 +2,11 @@
 
 The program closed on 09-11-26 (see `../completed/ux-experience_UMBRELLA_PLAN_06-11-26.md`). These items were not finished, and they aren't covered by the `visual-redesign` program.
 
-## 1. Production email test for Phase 0 (owner action)
+## 1. Production email test for Phase 0 (closed 19-11-26)
 
-- **What:** confirm that a message sent from `/contact` in production reaches the inbox, and that Reply goes to the visitor.
-- **Why open:** it needs the owner's Resend setup: `kunanonj.com` verified as a sending domain, and the Worker secrets `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL`. Without them, `/api/contact` returns 503, and the form shows the honest error with the mailto fallback.
-- **How:** send one test message from https://kunanonj.com/contact, or POST to Resend's test inbox `delivered@resend.dev` from a local preview with the secrets in `.dev.vars`.
+- **What it was:** confirm that a message sent from `/contact` in production reaches the inbox, and that Reply goes to the visitor.
+- **Why it stayed open:** it needed a Resend sending domain and three Worker secrets, and `kunanonj.com` was never set up to send mail, so `/api/contact` answered 503 and the form showed its email fallback.
+- **Closed by design (owner's choice, 19-11-26):** the form no longer sends through the site. It prepares an email to the public address and opens it in the visitor's own email app (`lib/contact/compose.ts`), with "Open it again" and "Copy message" for a browser that opens nothing. `/api/contact`, Resend, Turnstile, the form guard and the contact rate limiter are gone, so there is nothing left to test or configure. Replies go to the visitor's own address, since they send it.
 
 ## 2. Blog-dependent items, deferred while the blog is hidden
 

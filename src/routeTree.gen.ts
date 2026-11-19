@@ -40,7 +40,6 @@ import { Route as LandingResumeRouteImport } from './routes/_landing/resume'
 import { Route as LandingStackRouteImport } from './routes/_landing/stack'
 import { Route as SystemDesignRouteImport } from './routes/_system/design'
 import { Route as AboutOpengraphImageRouteImport } from './routes/about.opengraph-image'
-import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as PortfolioChar123slugChar125DotmdRouteImport } from './routes/portfolio.{$slug}[.]md'
 import { Route as DotwellKnownAgentSkillsIndexDotjsonRouteImport } from './routes/[.]well-known/agent-skills/index[.]json'
 import { Route as LandingBlogIndexRouteImport } from './routes/_landing/blog/index'
@@ -212,11 +211,6 @@ const AboutOpengraphImageRoute = AboutOpengraphImageRouteImport.update({
   path: '/about/opengraph-image',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiContactRoute = ApiContactRouteImport.update({
-  id: '/api/contact',
-  path: '/api/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PortfolioChar123slugChar125DotmdRoute =
   PortfolioChar123slugChar125DotmdRouteImport.update({
     id: '/portfolio/{$slug}.md',
@@ -334,7 +328,6 @@ export interface FileRoutesByFullPath {
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
-  '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
@@ -382,7 +375,6 @@ export interface FileRoutesByTo {
   '/stack': typeof LandingStackRoute
   '/design': typeof SystemDesignRoute
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
-  '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   '/blog/$slug': typeof LandingBlogSlugRoute
@@ -432,7 +424,6 @@ export interface FileRoutesById {
   '/_landing/stack': typeof LandingStackRoute
   '/_system/design': typeof SystemDesignRoute
   '/about/opengraph-image': typeof AboutOpengraphImageRoute
-  '/api/contact': typeof ApiContactRoute
   '/portfolio/{$slug}.md': typeof PortfolioChar123slugChar125DotmdRoute
   '/_landing/': typeof LandingIndexRoute
   '/.well-known/agent-skills/index.json': typeof DotwellKnownAgentSkillsIndexDotjsonRoute
@@ -483,7 +474,6 @@ export interface FileRouteTypes {
     | '/stack'
     | '/design'
     | '/about/opengraph-image'
-    | '/api/contact'
     | '/portfolio/{$slug}.md'
     | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
@@ -531,7 +521,6 @@ export interface FileRouteTypes {
     | '/stack'
     | '/design'
     | '/about/opengraph-image'
-    | '/api/contact'
     | '/portfolio/{$slug}.md'
     | '/.well-known/agent-skills/index.json'
     | '/blog/$slug'
@@ -580,7 +569,6 @@ export interface FileRouteTypes {
     | '/_landing/stack'
     | '/_system/design'
     | '/about/opengraph-image'
-    | '/api/contact'
     | '/portfolio/{$slug}.md'
     | '/_landing/'
     | '/.well-known/agent-skills/index.json'
@@ -621,7 +609,6 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   DotwellKnownSecurityDottxtRoute: typeof DotwellKnownSecurityDottxtRoute
   AboutOpengraphImageRoute: typeof AboutOpengraphImageRoute
-  ApiContactRoute: typeof ApiContactRoute
   PortfolioChar123slugChar125DotmdRoute: typeof PortfolioChar123slugChar125DotmdRoute
   DotwellKnownAgentSkillsIndexDotjsonRoute: typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
@@ -850,13 +837,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutOpengraphImageRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/contact': {
-      id: '/api/contact'
-      path: '/api/contact'
-      fullPath: '/api/contact'
-      preLoaderRoute: typeof ApiContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/portfolio/{$slug}.md': {
       id: '/portfolio/{$slug}.md'
       path: '/portfolio/{$slug}.md'
@@ -1051,7 +1031,6 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   DotwellKnownSecurityDottxtRoute: DotwellKnownSecurityDottxtRoute,
   AboutOpengraphImageRoute: AboutOpengraphImageRoute,
-  ApiContactRoute: ApiContactRoute,
   PortfolioChar123slugChar125DotmdRoute: PortfolioChar123slugChar125DotmdRoute,
   DotwellKnownAgentSkillsIndexDotjsonRoute:
     DotwellKnownAgentSkillsIndexDotjsonRoute,

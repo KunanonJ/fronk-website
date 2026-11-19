@@ -62,7 +62,11 @@ by a test; Sanity Studio is left out in both. `default-src 'self'`; scripts
 from the site plus Cloudflare Web Analytics and Turnstile; images from the
 site, `data:`, Sanity's CDN and Unsplash; fonts and connections from the site
 (plus the analytics beacon); Turnstile's frame; `object-src 'none'`;
-`base-uri`, `form-action` and `frame-ancestors` kept to the site.
+`base-uri`, `form-action` and `frame-ancestors` kept to the site. (Since
+19-11-26 the contact form no longer uses Turnstile, and its host
+`challenges.cloudflare.com` has left `script-src` and `frame-src`: Cloudflare
+ties it to Turnstile only, and its challenge scripts load from the site's own
+`/cdn-cgi/challenge-platform/`, which `'self'` covers.)
 
 - **Deviation from the plan:** no script hashes. TanStack Start streams
   per-page hydration scripts into the HTML (their contents differ on every
@@ -175,6 +179,19 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
     test focused a link while the panel was still opening and failed about
     once in 40 runs. **Done** in the cleanup pull request after #129: both
     Say hello tests wait for the opening transition (80 of 80 passed).
+12. **The contact form could not deliver** (found 19-11-26): `/api/contact`
+    answered 503 in production, because `kunanonj.com` was never set up as a
+    Resend sending domain and the Worker had no mail secrets. The visitor saw
+    the honest error with the email fallback, but no message arrived.
+    **Done** 19-11-26, by the owner's choice of the simpler fix: the form now
+    prepares the email and opens it in the visitor's own email app
+    (`lib/contact/compose.ts`), and the server path (Resend, Turnstile, the
+    form guard, the rate limiter) is removed. The WebMCP
+    `draft_contact_message` tool fills the same form; the visitor presses
+    the button. A message too long for an email link (Chrome and Edge on
+    Windows open none over 2,048 characters, and a Thai letter encodes to 9)
+    opens nothing by itself: the panel asks for a copy first, and its link
+    carries the address and subject only.
 
 ## 8. Merge, deploy and live checks
 

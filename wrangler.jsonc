@@ -47,14 +47,6 @@
   // place when the key is missing.
   "cache": { "enabled": true },
   "triggers": { "crons": [] },
-  // Contact and subscribe: 5 posts per minute per IP.
-  "ratelimits": [
-    {
-      "name": "FORM_RATE_LIMIT",
-      "namespace_id": "1001",
-      "simple": { "limit": 5, "period": 60 },
-    },
-  ],
   // The old Next.js (OpenNext) build's two Durable Object classes: created in
   // v1, deleted in v2 once the TanStack Start cutover had held. Migrations are
   // append-only history; never edit or reuse a tag.

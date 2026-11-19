@@ -88,6 +88,31 @@ async function visit(page: Page, path = "/") {
 
 const textOf = (result: Result) => result.content.map((c) => c.text).join("");
 
+const DRAFT = "Hello from an agent, on the visitor's behalf.";
+
+/**
+ * Notes each mailto: link the page opens (the contact form hands its email
+ * to the visitor's email app by clicking one) instead of launching an app.
+ */
+async function recordOpenedEmails(page: Page) {
+  await page.addInitScript(() => {
+    const opened: string[] = [];
+    Object.assign(window, { __openedEmails: opened });
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function (this: HTMLAnchorElement) {
+      // The attribute as written: .href re-encodes it (' becomes %27).
+      if (this.protocol === "mailto:") opened.push(this.getAttribute("href")!);
+      else click.call(this);
+    };
+  });
+}
+
+function openedEmails(page: Page) {
+  return page.evaluate(
+    () => (window as unknown as { __openedEmails: string[] }).__openedEmails,
+  );
+}
+
 test.describe("WebMCP tools", () => {
   test("registers the site's tools once, and keeps them across client navigations", async ({
     page,
@@ -132,48 +157,56 @@ test.describe("WebMCP tools", () => {
     await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
   });
 
-  test("drafts a contact message for the visitor to send, and sends nothing", async ({
+  test("drafts a contact message for the visitor to review, and opens nothing by itself", async ({
     page,
   }) => {
-    const posts: string[] = [];
-    page.on("request", (r) => r.method() === "POST" && posts.push(r.url()));
+    await recordOpenedEmails(page);
     await visit(page);
     const result = await run(page, "draft_contact_message", {
       name: "Ada Agent",
-      email: "ada@example.com",
-      message: "Hello from an agent, on the visitor's behalf.",
+      message: DRAFT,
+      topics: ["Manut AI"],
     });
     expect(result.isError, textOf(result)).toBe(undefined);
     await expect(page).toHaveURL(/\/contact$/);
     await expect(page.locator("#contact-name")).toHaveValue("Ada Agent");
-    await expect(page.locator("#contact-email")).toHaveValue("ada@example.com");
-    await expect(page.locator("#contact-message")).toHaveValue(
-      "Hello from an agent, on the visitor's behalf.",
-    );
-    await expect(page.locator("#contact-hp")).toHaveValue("");
+    await expect(page.locator("#contact-message")).toHaveValue(DRAFT);
+    await expect(
+      page.getByRole("button", { name: "Manut AI" }),
+    ).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("#contact-send")).toBeFocused();
-    expect(posts.filter((url) => url.includes("/api/contact"))).toEqual([]);
+    // The visitor sends it, not the agent: nothing opens until they press.
+    expect(await openedEmails(page)).toEqual([]);
   });
 
-  test("a draft sent at once waits out the form's fill time instead of being dropped", async ({
+  test("pressing the button after a draft opens that email, addressed to the owner", async ({
     page,
   }) => {
-    // The server drops, with a fake success, anything sent sooner than
-    // CONTACT_LIMITS.minFillMs (3 s) after the form appeared.
-    const sent: { elapsedMs: number }[] = [];
-    await page.route("**/api/contact", async (route) => {
-      sent.push(route.request().postDataJSON());
-      await route.fulfill({ json: { ok: true } });
-    });
+    await recordOpenedEmails(page);
     await visit(page);
     await run(page, "draft_contact_message", {
       name: "Ada Agent",
-      email: "ada@example.com",
-      message: "Hello from an agent, on the visitor's behalf.",
+      message: DRAFT,
+      topics: ["Hiring"],
     });
     await expect(page.locator("#contact-send")).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect.poll(() => sent.length, { timeout: 10_000 }).toBe(1);
-    expect(sent[0]!.elapsedMs).toBeGreaterThanOrEqual(3000);
+    const status = page
+      .getByRole("article", { name: "Say hello", exact: true })
+      .getByRole("status");
+    await expect(status).toContainText("Your email is ready.");
+    await expect(status).toBeFocused();
+    const opened = await openedEmails(page);
+    expect(opened).toHaveLength(1);
+    const email = new URL(opened[0]!);
+    expect(email.pathname).toBe("fronk.kunanon@gmail.com");
+    expect(email.searchParams.get("subject")).toBe(
+      "Hiring: Ada Agent via kunanonj.com",
+    );
+    expect(email.searchParams.get("body")).toBe(`${DRAFT}\r\n\r\nAda Agent`);
+    await expect(page.locator("#contact-open")).toHaveAttribute(
+      "href",
+      opened[0]!,
+    );
   });
 });

@@ -231,7 +231,7 @@ async function inkFloorRaised(page: Page): Promise<boolean> {
 /**
  * Origins outside the site. Allowed: the site itself, and the beacon hosts
  * that components/CloudflareAnalytics.tsx loads (cookieless analytics, only
- * when its token is set). Turnstile's host is allowed on /contact only.
+ * when its token is set).
  */
 function foreignOrigins(urls: readonly string[], base: string): string[] {
   const allowed = new Set([

@@ -11,18 +11,19 @@ export async function writeClipboard(value: string): Promise<boolean> {
   } catch {
     // Fall through to the legacy path (permissions, older browsers).
   }
+  const area = document.createElement("textarea");
   try {
-    const area = document.createElement("textarea");
     area.value = value;
     area.setAttribute("readonly", "");
     area.style.position = "fixed";
     area.style.opacity = "0";
     document.body.appendChild(area);
     area.select();
-    const ok = document.execCommand("copy");
-    area.remove();
-    return ok;
+    return document.execCommand("copy");
   } catch {
     return false;
+  } finally {
+    // Never leave the hidden copy in the page, even when the copy throws.
+    area.remove();
   }
 }

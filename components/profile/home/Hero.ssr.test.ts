@@ -16,10 +16,11 @@ import { withRouter } from "@/tests/routerContext";
  */
 
 /**
- * The inline intro script's hash, for the Content Security Policy that
- * Phase 8 ships (umbrella R21: report-only, with hashes for the inline theme
- * and intro scripts). A change to the script, or to the line TanStack's
- * ScriptOnce appends, fails here until the policy's hash follows.
+ * The inline intro script's hash, pinning its exact bytes: a change to the
+ * script, or to the line TanStack's ScriptOnce appends, fails here and gets
+ * a look. The Content Security Policy uses no hash (src/server/http.ts):
+ * adding one to script-src would switch 'unsafe-inline' off and block the
+ * streamed hydration scripts on every page.
  */
 const INTRO_SCRIPT_SHA256 =
   "sha256-CghRNdW2EBQ2lw/75ZwokCydff27JGPd+J+AgtjKjpk=";

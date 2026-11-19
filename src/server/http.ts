@@ -19,14 +19,14 @@ export const CSP_REPORT_PATH = "/api/csp-report";
  */
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  // Cloudflare Web Analytics, and Turnstile on /contact.
-  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  // Cloudflare Web Analytics. Cloudflare's challenge scripts load from the
+  // site's own /cdn-cgi/challenge-platform/, which 'self' covers.
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   // Sanity's image CDN (the banners are self-hosted in public/banners).
   "img-src 'self' data: https://cdn.sanity.io",
   "font-src 'self'",
   "connect-src 'self' https://cloudflareinsights.com",
-  "frame-src https://challenges.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -151,16 +151,4 @@ export async function readBodyText(
 /** 405 for a route that only answers `allow`. */
 export function methodNotAllowed(allow: string): Response {
   return new Response(null, { status: 405, headers: { Allow: allow } });
-}
-
-/**
- * True when a browser says the request came from another site. Browsers send
- * Sec-Fetch-Site and Origin on POSTs; non-browser clients may send neither,
- * which is allowed (CSRF needs a victim's browser).
- */
-export function isCrossSite(request: Request): boolean {
-  const site = request.headers.get("sec-fetch-site");
-  if (site && site !== "same-origin" && site !== "none") return true;
-  const origin = request.headers.get("origin");
-  return origin !== null && origin !== new URL(request.url).origin;
 }

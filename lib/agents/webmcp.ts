@@ -1,7 +1,12 @@
 import { markdownPathFor } from "@/lib/agents/markdownPaths";
 import type { ContactDraft } from "@/lib/agents/contactDraft";
+import { oneLine } from "@/lib/contact/compose";
 import { firstContactIssue } from "@/lib/contact/schema";
-import { CONTACT_LIMITS } from "@/lib/content/contact";
+import {
+  CONTACT_LIMITS,
+  CONTACT_TOPICS,
+  isContactTopic,
+} from "@/lib/content/contact";
 import { siteConfig } from "@/lib/site";
 
 /*
@@ -10,9 +15,9 @@ import { siteConfig } from "@/lib/site";
  * tools return the text the site already publishes for agents (llms.txt,
  * llms-full.txt, sitemap.md, the Markdown versions of pages, skills.json); the
  * others do what the visitor could do (open a page, switch the theme, fill in
- * the contact form for the visitor to review and send). Nothing here sends a
- * message or changes data on the server. components/agents/WebMcpTools.tsx
- * registers them with the browser.
+ * the contact form for the visitor to review and open in their email app).
+ * Nothing here sends a message or changes data on the server.
+ * components/agents/WebMcpTools.tsx registers them with the browser.
  */
 
 export interface ToolResult {
@@ -190,7 +195,7 @@ export function siteTools(deps: ToolDeps): SiteTool[] {
       name: "draft_contact_message",
       title: "Draft a message to Kunanon",
       description:
-        "Fill in the contact form on /contact with the visitor's name, email address and message, for the visitor to review and send. It never sends anything: the visitor presses Send after the form's anti-spam check.",
+        "Fill in the contact form on /contact with the visitor's name, the message and, optionally, what it is about, for the visitor to review. Its button opens the visitor's own email app with the message addressed to Kunanon; nothing is sent until the visitor presses Send there.",
       inputSchema: {
         type: "object",
         properties: {
@@ -199,46 +204,51 @@ export function siteTools(deps: ToolDeps): SiteTool[] {
             description: "The visitor's name.",
             maxLength: CONTACT_LIMITS.nameMax,
           },
-          email: {
-            type: "string",
-            format: "email",
-            description: "The address Kunanon should reply to.",
-            maxLength: CONTACT_LIMITS.emailMax,
-          },
           message: {
             type: "string",
             description: "The message, in the visitor's words.",
             minLength: CONTACT_LIMITS.messageMin,
             maxLength: CONTACT_LIMITS.messageMax,
           },
+          topics: {
+            type: "array",
+            description: "What it is about, from the form's own list.",
+            items: { type: "string", enum: [...CONTACT_TOPICS] },
+          },
         },
-        required: ["name", "email", "message"],
+        required: ["name", "message"],
       },
       annotations: ACTS,
-      execute: async ({ name, email, message }) => {
-        if (
-          typeof name !== "string" ||
-          typeof email !== "string" ||
-          typeof message !== "string"
-        ) {
-          return failure("Give a name, an email address and a message.");
+      execute: async ({ name, message, topics }) => {
+        if (typeof name !== "string" || typeof message !== "string") {
+          return failure("Give a name and a message.");
         }
-        const draft = {
-          name: clip(name.trim(), CONTACT_LIMITS.nameMax),
-          email: clip(email.trim(), CONTACT_LIMITS.emailMax),
+        const values = {
+          // One line, as the form's input shows it and the subject needs.
+          name: clip(oneLine(name), CONTACT_LIMITS.nameMax),
           message: clip(message.trim(), CONTACT_LIMITS.messageMax),
+          topics: topics ?? [],
         };
-        // The form's own rules, so a draft that Send would refuse comes back
-        // to the agent instead of reaching the visitor.
-        const issue = firstContactIssue({ ...draft, topics: [], company: "" });
+        // The form's own rules (its topic list among them), so a draft its
+        // button would refuse comes back to the agent instead of reaching
+        // the visitor.
+        const issue = firstContactIssue(values);
         if (issue) return failure(`${issue.field}: ${issue.message}`);
+        const draft: ContactDraft = {
+          name: values.name,
+          message: values.message,
+          // Topics given replace the form's choices; none given keeps them.
+          ...(Array.isArray(topics)
+            ? { topics: [...new Set(topics.filter(isContactTopic))] }
+            : {}),
+        };
         if (!(await deps.draftContact(draft))) {
           return failure(
             `The contact form did not open. The visitor can write to ${siteConfig.email} instead.`,
           );
         }
         return text(
-          "The draft is in the contact form on /contact. Ask the visitor to check it and press Send.",
+          "The draft is in the contact form on /contact. Ask the visitor to check it and press its button, which opens their email app; they send it from there.",
         );
       },
     },

@@ -8,7 +8,6 @@ import {
   REPORTING_ENDPOINTS,
   SECURITY_HEADERS,
   SERVER_FN_PATH,
-  isCrossSite,
   methodNotAllowed,
   readBodyText,
   withSecurityHeaders,
@@ -16,7 +15,7 @@ import {
 } from "./http";
 
 const post = (body: BodyInit | null, headers: Record<string, string> = {}) =>
-  new Request("https://kunanonj.com/api/contact", {
+  new Request("https://kunanonj.com/api/csp-report", {
     method: "POST",
     headers,
     body,
@@ -184,30 +183,6 @@ describe("readBodyText", () => {
 
   it("returns an empty string with no body", async () => {
     expect(await readBodyText(post(null), 100)).toBe("");
-  });
-});
-
-describe("isCrossSite", () => {
-  it("allows same-origin browsers and clients without fetch metadata", () => {
-    expect(
-      isCrossSite(
-        post("", {
-          "sec-fetch-site": "same-origin",
-          origin: "https://kunanonj.com",
-        }),
-      ),
-    ).toBe(false);
-    expect(isCrossSite(post(""))).toBe(false);
-  });
-
-  it("rejects cross-site and same-site requests and foreign origins", () => {
-    expect(isCrossSite(post("", { "sec-fetch-site": "cross-site" }))).toBe(
-      true,
-    );
-    expect(isCrossSite(post("", { "sec-fetch-site": "same-site" }))).toBe(true);
-    expect(isCrossSite(post("", { origin: "https://evil.example" }))).toBe(
-      true,
-    );
   });
 });
 

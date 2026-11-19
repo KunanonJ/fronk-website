@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   fireEvent,
   render,
@@ -9,14 +9,12 @@ import {
 import ContactPage from "./ContactPage";
 import { composeHref } from "@/lib/content/profileChrome";
 import { contactMessages, contactPage } from "@/lib/content/contact";
-
-const fetchMock = vi.fn();
+import { MAILTO_MAX } from "@/lib/contact/compose";
 
 const MESSAGE = "I'd like to talk about Manut AI for our dealership.";
 
 function fill({
   name = "Ada Lovelace",
-  email = "ada@example.com",
   message = MESSAGE,
   // The message field's label depends on whether Hiring is chosen.
   messageLabel = contactPage.messagePlaceholder as string,
@@ -24,37 +22,55 @@ function fill({
   fireEvent.change(screen.getByLabelText(contactPage.namePlaceholder), {
     target: { value: name },
   });
-  fireEvent.change(screen.getByLabelText(contactPage.emailPlaceholder), {
-    target: { value: email },
-  });
   fireEvent.change(screen.getByLabelText(messageLabel), {
     target: { value: message },
   });
 }
 
 const submitButton = () =>
-  screen.getByRole("button", {
-    name: new RegExp(`^(${contactPage.submit}|${contactPage.sending})$`),
-  });
+  screen.getByRole("button", { name: contactPage.submit });
 
-function fillAndSubmit() {
-  fill();
-  fireEvent.click(screen.getByRole("button", { name: "Manut AI" }));
-  fireEvent.click(submitButton());
+/**
+ * Records the links the form opens. jsdom cannot hand a mailto: link to an
+ * email app, so the click is noted instead of followed.
+ */
+function recordOpenedLinks() {
+  const opened: string[] = [];
+  vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    // The attribute as written: .href is the browser's re-encoding.
+    opened.push(this.getAttribute("href")!);
+  });
+  return opened;
 }
 
-function respond(status: number, body: unknown) {
-  fetchMock.mockResolvedValue(new Response(JSON.stringify(body), { status }));
+/** Who a mailto: link writes to, and the subject and body it carries. */
+function mailtoParts(href: string) {
+  const url = new URL(href);
+  return {
+    to: url.pathname,
+    subject: url.searchParams.get("subject"),
+    body: url.searchParams.get("body"),
+  };
+}
+
+/** The prepared email as the Copy message button puts it on the clipboard. */
+const copiedText = (subject: string) =>
+  `To: ${contactPage.email}\nSubject: ${subject}\n\n${MESSAGE}\n\nAda Lovelace`;
+
+function stubClipboard(writeText: (text: string) => Promise<void>) {
+  Object.defineProperty(navigator, "clipboard", {
+    value: { writeText },
+    configurable: true,
+  });
+  vi.stubGlobal("isSecureContext", true);
 }
 
 describe("ContactPage", () => {
-  beforeEach(() => {
-    fetchMock.mockReset();
-    vi.stubGlobal("fetch", fetchMock);
-  });
-
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("leads with the h1, word for word the live page's, and the founder-voice lead", () => {
@@ -120,11 +136,7 @@ describe("ContactPage", () => {
 
   it("copies the email address and says so", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText },
-      configurable: true,
-    });
-    vi.stubGlobal("isSecureContext", true);
+    stubClipboard(writeText);
     render(<ContactPage />);
     fireEvent.click(
       screen.getByRole("button", { name: contactPage.copyEmail }),
@@ -190,8 +202,8 @@ describe("ContactPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("keeps the form ready for a recruiter who sends another message", async () => {
-    respond(200, { ok: true, message: contactMessages.sent });
+  it("keeps the form ready for a recruiter who writes another message", async () => {
+    const opened = recordOpenedLinks();
     render(<ContactPage intent="hiring" />);
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
@@ -202,11 +214,12 @@ describe("ContactPage", () => {
     fill({ messageLabel: contactPage.hiringPlaceholder });
     fireEvent.click(submitButton());
     await screen.findByRole("status");
-    const [, init] = fetchMock.mock.calls[0]!;
-    expect(JSON.parse(init.body as string).topics).toEqual(["Hiring"]);
+    expect(mailtoParts(opened[0]!).subject).toBe(
+      "Hiring: Ada Lovelace via kunanonj.com",
+    );
 
     fireEvent.click(
-      screen.getByRole("button", { name: contactPage.sendAnother }),
+      screen.getByRole("button", { name: contactPage.writeAnother }),
     );
     // An empty form again, still a hiring one.
     expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
@@ -265,22 +278,21 @@ describe("ContactPage", () => {
     expect(card.parentElement).toHaveClass("pf-contact__row");
   });
 
-  it("shows each problem under its field and focuses the first, sending nothing", async () => {
+  it("shows each problem under its field and focuses the first, opening nothing", async () => {
+    const opened = recordOpenedLinks();
     render(<ContactPage />);
-    fill({ name: "", email: "nope", message: "short" });
+    fill({ name: "", message: "short" });
     fireEvent.click(submitButton());
 
     const name = screen.getByLabelText(contactPage.namePlaceholder);
     await waitFor(() => expect(name).toHaveAttribute("aria-invalid", "true"));
     expect(name).toHaveAccessibleDescription(contactMessages.invalidName);
     expect(
-      screen.getByLabelText(contactPage.emailPlaceholder),
-    ).toHaveAccessibleDescription(contactMessages.invalidEmail);
-    expect(
       screen.getByLabelText(contactPage.messagePlaceholder),
     ).toHaveAccessibleDescription(contactMessages.messageTooShort);
     expect(document.activeElement).toBe(name);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(opened).toEqual([]);
+    expect(screen.queryByRole("status")).toBeNull();
 
     // After a submit, each field rechecks as it changes.
     fireEvent.change(name, { target: { value: "Ada" } });
@@ -288,104 +300,124 @@ describe("ContactPage", () => {
     expect(screen.queryByText(contactMessages.invalidName)).toBeNull();
   });
 
-  it("reads Sending... while the message is on its way", async () => {
-    let finish: (r: Response) => void = () => {};
-    fetchMock.mockReturnValue(new Promise<Response>((r) => (finish = r)));
+  it("prepares the email and opens it in the visitor's email app, sending nothing itself", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const opened = recordOpenedLinks();
     render(<ContactPage />);
-    fillAndSubmit();
-
-    const busy = await screen.findByRole("button", {
-      name: contactPage.sending,
-    });
-    expect(busy).toHaveAttribute("aria-disabled", "true");
-    fireEvent.click(busy);
-    expect(fetchMock).toHaveBeenCalledOnce();
-    finish(new Response(JSON.stringify({ ok: true }), { status: 200 }));
-    expect(
-      await screen.findByText(contactPage.successTitle),
-    ).toBeInTheDocument();
-  });
-
-  it("posts the message and shows success only after the server confirms", async () => {
-    respond(200, { ok: true, message: contactMessages.sent });
-    render(<ContactPage />);
-    fillAndSubmit();
+    // The button says where the message goes before it is pressed.
+    expect(submitButton()).toHaveAccessibleDescription(contactPage.formNote);
+    fill();
+    fireEvent.click(screen.getByRole("button", { name: "Manut AI" }));
+    fireEvent.click(submitButton());
 
     const status = await screen.findByRole("status");
-    expect(status).toHaveTextContent(contactPage.successTitle);
+    expect(status).toHaveTextContent(contactPage.readyTitle);
+    expect(status).toHaveTextContent(contactPage.email);
     expect(document.activeElement).toBe(status);
-    expect(fetchMock).toHaveBeenCalledOnce();
-    const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toBe("/api/contact");
-    const body = JSON.parse(init.body as string);
-    expect(body).toMatchObject({
-      name: "Ada Lovelace",
-      email: "ada@example.com",
-      topics: ["Manut AI"],
-      company: "",
+    expect(opened).toHaveLength(1);
+    // The topics lead the subject so the owner can sort the inbox; the
+    // body is the message signed with the name, in CRLF lines (RFC 6068).
+    expect(mailtoParts(opened[0]!)).toEqual({
+      to: contactPage.email,
+      subject: "Manut AI: Ada Lovelace via kunanonj.com",
+      body: `${MESSAGE}\r\n\r\nAda Lovelace`,
     });
-    expect(typeof body.elapsedMs).toBe("number");
+    // "Open it again" is the same email, for a browser that opened nothing.
+    expect(
+      screen.getByRole("link", { name: contactPage.openAgain }),
+    ).toHaveAttribute("href", opened[0]);
+    expect(fetchMock).not.toHaveBeenCalled();
 
-    // "Send another message" brings back an empty form, focus on the name.
+    // "Write another message" brings back an empty form, focus on the name.
     fireEvent.click(
-      screen.getByRole("button", { name: contactPage.sendAnother }),
+      screen.getByRole("button", { name: contactPage.writeAnother }),
     );
     const name = screen.getByLabelText(contactPage.namePlaceholder);
     expect(name).toHaveValue("");
     await waitFor(() => expect(document.activeElement).toBe(name));
   });
 
-  it("keeps the visitor's text and offers email when sending fails", async () => {
-    respond(502, { ok: false, message: contactMessages.failed });
+  it("copies the prepared email for a visitor whose browser opened nothing", async () => {
+    recordOpenedLinks();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    stubClipboard(writeText);
     render(<ContactPage />);
-    fillAndSubmit();
-
-    expect(
-      await screen.findByText(new RegExp(contactMessages.failed)),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(contactPage.successTitle)).toBeNull();
-    // Ember marks the failure, always beside the words.
-    expect(document.querySelector("[aria-live] .bg-ember")).not.toBeNull();
-    expect(screen.getByLabelText(contactPage.messagePlaceholder)).toHaveValue(
-      MESSAGE,
+    fill();
+    fireEvent.click(submitButton());
+    fireEvent.click(
+      await screen.findByRole("button", { name: contactPage.copyMessage }),
     );
-    const fallbacks = screen.getAllByRole("link", { name: contactPage.email });
-    expect(fallbacks.length).toBeGreaterThanOrEqual(2);
-    expect(fallbacks.at(-1)).toHaveAttribute(
-      "href",
-      expect.stringMatching(/^mailto:/),
+    expect(
+      await screen.findByRole("button", { name: contactPage.messageCopied }),
+    ).toBeInTheDocument();
+    expect(writeText).toHaveBeenCalledWith(
+      copiedText("Ada Lovelace via kunanonj.com"),
     );
   });
 
-  it.each([
-    [503, contactMessages.notConfigured],
-    [429, contactMessages.rateLimited],
-    [403, contactMessages.botCheck],
-    [413, contactMessages.tooLarge],
-  ])(
-    "shows the server's %i message with the email fallback",
-    async (code, message) => {
-      respond(code, { ok: false, message });
-      render(<ContactPage />);
-      fillAndSubmit();
-      const notice = await screen.findByText(message, { exact: false });
-      expect(notice).toHaveTextContent(contactPage.errorFallbackLead);
-    },
-  );
-
-  it("treats a network error as a failure, not a success", async () => {
-    fetchMock.mockRejectedValue(new Error("offline"));
+  it("shows the email to copy by hand when the clipboard refuses", async () => {
+    recordOpenedLinks();
+    stubClipboard(vi.fn().mockRejectedValue(new Error("denied")));
     render(<ContactPage />);
-    fillAndSubmit();
-
-    await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: contactPage.submit }),
-      ).toHaveAttribute("aria-disabled", "false"),
+    fill();
+    fireEvent.click(submitButton());
+    fireEvent.click(
+      await screen.findByRole("button", { name: contactPage.copyMessage }),
     );
-    expect(
-      screen.getByText(new RegExp(contactMessages.failed)),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(contactPage.successTitle)).toBeNull();
+    const text = await screen.findByRole("textbox", {
+      name: contactPage.copyFailed,
+    });
+    expect(text).toHaveAttribute("readonly");
+    const email = copiedText("Ada Lovelace via kunanonj.com");
+    expect(text).toHaveValue(email);
+    // Focused and selected: its label is read out, and one keypress copies.
+    await waitFor(() => expect(document.activeElement).toBe(text));
+    const area = text as HTMLTextAreaElement;
+    expect([area.selectionStart, area.selectionEnd]).toEqual([0, email.length]);
+    // The button never claims a copy that did not happen.
+    const again = screen.getByRole("button", { name: contactPage.copyMessage });
+    expect(again).toBeInTheDocument();
+
+    // A second refusal hands the email back, selected again.
+    again.focus();
+    area.setSelectionRange(0, 0);
+    fireEvent.click(again);
+    await waitFor(() => expect(document.activeElement).toBe(text));
+    expect([area.selectionStart, area.selectionEnd]).toEqual([0, email.length]);
+  });
+
+  it("asks for a copy first when the message is too long for an email link", async () => {
+    const opened = recordOpenedLinks();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    stubClipboard(writeText);
+    render(<ContactPage />);
+    // Thai letters take 9 characters each in a link: 400 of them is over.
+    const long = "สวัสดีครับ ".repeat(40).trim();
+    fill({ message: long });
+    fireEvent.click(submitButton());
+
+    const status = await screen.findByRole("status");
+    expect(status).toHaveTextContent(contactPage.longTitle);
+    expect(status).toHaveTextContent(contactPage.email);
+    expect(document.activeElement).toBe(status);
+    // Nothing opens on its own: a Windows browser would open nothing at all.
+    expect(opened).toEqual([]);
+    const open = screen.getByRole("link", { name: contactPage.openApp });
+    const href = open.getAttribute("href")!;
+    expect(href.length).toBeLessThanOrEqual(MAILTO_MAX);
+    expect(mailtoParts(href)).toEqual({
+      to: contactPage.email,
+      subject: "Ada Lovelace via kunanonj.com",
+      body: null,
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: contactPage.copyMessage }),
+    );
+    await screen.findByRole("button", { name: contactPage.messageCopied });
+    expect(writeText).toHaveBeenCalledWith(
+      `To: ${contactPage.email}\nSubject: Ada Lovelace via kunanonj.com\n\n${long}\n\nAda Lovelace`,
+    );
   });
 });

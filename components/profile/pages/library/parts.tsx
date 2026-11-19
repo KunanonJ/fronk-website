@@ -139,6 +139,8 @@ export function ArrowLink({
   hrefLang,
   external = false,
   label,
+  id,
+  labelledBy,
 }: {
   href: string;
   children: ReactNode;
@@ -147,6 +149,12 @@ export function ArrowLink({
   external?: boolean;
   /** A fuller name than the words shown, when they repeat on the page. */
   label?: string;
+  id?: string;
+  /**
+   * Names the link from elements on the page (aria-labelledby), when the
+   * fuller name holds text in another language: the elements keep theirs.
+   */
+  labelledBy?: string;
 }) {
   const newTab = external ? { target: "_blank", rel: "noopener" } : {};
   return (
@@ -154,7 +162,9 @@ export function ArrowLink({
       href={href}
       lang={lang}
       hrefLang={hrefLang}
+      id={id}
       aria-label={label}
+      aria-labelledby={labelledBy}
       className="ds-text-link pf-read-link"
       {...newTab}
     >

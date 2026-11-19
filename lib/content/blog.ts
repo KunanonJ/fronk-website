@@ -59,7 +59,7 @@ export const BLOG_VENTURE_TAGS = [
 /**
  * Banners: photos from Unsplash (Unsplash License: free to use and modify,
  * no attribution required), self-hosted in public/banners at 1200 px so the
- * pages load nothing from a third party.
+ * banners load nothing from a third party.
  */
 const STOCK_BANNER = "/banners/city-skyline.webp";
 

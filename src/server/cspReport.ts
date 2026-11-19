@@ -4,8 +4,8 @@ import { methodNotAllowed, readBodyText } from "./http";
  * POST /api/csp-report (CSP_REPORT_PATH): where browsers send the
  * Content Security Policy's violations (CONTENT_SECURITY_POLICY in ./http.ts).
  * Each violation becomes one line in the Worker's logs (wrangler.jsonc
- * `observability`), so the owner can see what enforcing the policy would
- * block before deciding to. Nothing is stored. Only what places a violation
+ * `observability`), so the owner sees what the enforced policy blocks on
+ * live pages. Nothing is stored. Only what places a violation
  * is logged: the page's path, the directive, and where the blocked thing
  * came from, without query strings, referrers or user agents.
  */

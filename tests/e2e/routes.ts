@@ -25,7 +25,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
   {
     path: "/contact",
     name: "contact",
-    expectsHeadingPattern: /Say hello|Send message|Let[’']s talk/i,
+    expectsHeadingPattern: /Say hello|Let[’']s talk/i,
   },
   {
     path: "/press",
