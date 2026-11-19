@@ -233,3 +233,88 @@ preview's sample lines and the notebook's samples come back unchanged.
 8. **Phase 8:** the duplicated best-practice check functions (section 4),
    the bento CSS these pages left behind, `sampleNotes.ts`'s folder.
 9. **Firefox** is not installed here and was not run.
+
+## 10. Brought onto `main` (19-11-26, the orchestrator)
+
+### Rebase
+
+The lane's five commits were replayed onto group D1's tip with
+`git rebase --onto <D1 tip> 09ee95b` (a plain rebase would have replayed the
+local phase commits under `09ee95b` too), then onto `main` once D1 merged as
+#126. Five files conflicted, all in the first commit:
+
+| File | Resolution |
+| --- | --- |
+| `components/NotFound.tsx` | Comment only: this lane's. |
+| `lib/design/scope.ts` | Both route lists. The function body had merged to this lane's (`showsStatusPage`: a 404 or an error is in the scope); D1 still had the old rule. The header now says what is true after both groups: every page is in the scope; only Sanity Studio and the files the site serves are not. |
+| `lib/design/scope.test.ts` | Both groups' checks. D1's "ends in the old 404" assertion and this lane's "not restyled yet" list are gone; a new check keeps Sanity Studio, a bare layout and an empty match list unscoped. |
+| `tests/e2e/profile-journey.spec.ts` | Comment only: this lane's. The test bodies merged to `main`'s newer ones (`page.clock.pauseAt`, the transition-duration check) with this lane's `/design` path and un-skips. |
+| `tests/e2e/routes.ts` | Both lists. |
+
+`lib/content/testimonials.test.ts` lost its notebook tripwire: it failed if
+three quotes were cleared while the notebook's browser checks were parked,
+and none is parked now.
+
+### Independent review (seven findings) and what was done
+
+1. **The scope rules of D1 and D2 contradicted each other** at the merge:
+   resolved as above.
+2. **`main` still held 16 old-look baselines** of skills, a skill, the 404
+   and press (rendered at the cutover), and the notebook's 6 were rendered on
+   the deleted `/preview/system`: all 22 removed so CI renders them
+   (`8761c84`).
+3. **A copy of the shared filter bar** (`.pf-cat-filter`, `.pf-cat-option`,
+   `.pf-press__bar`): the skills filter, `ToggleGroup` (résumé, press, blog)
+   and the install tabs now use `.pf-filter*`; the shared option's pressed
+   state also answers `aria-selected`, for tabs (`1ded28e`). Counts follow
+   their label after a space, so the skills filter's names read "All 16",
+   not "All16".
+4. **The device matrix could not see a part in the gutter:** ported from the
+   hubs' spec, with the two-frame wait after each resize (`46983eb`). Its
+   first run, and a probe of every part on the two pages it flagged, found
+   three parts that leave the column on purpose, now exempt:
+   the notebook, which bleeds to the left edge on phones (design spec 8.7);
+   the logo marquee's track, which runs past its clipped frame; and the skill
+   credits' links, whose -6 px margin widens their hit area while their text
+   stays on the edge.
+5. **The notebook checks' bodies:** `main`'s kept (above).
+6. **`CatalogHero` copies Phase 6's `PageHero`:** carried to Phase 8 (8a).
+7. **The blog search box's edge** used `--line-strong` (about 1.4:1): now
+   `--ink-45`, 3.05:1, as design spec 2.2 keeps for inputs on paper
+   (`5b0c7bd`).
+
+Also found on the combined tree:
+
+- **knip:** the old bento `PageHero`, `PageMain` and `MONO_LABEL` lost their
+  last users once both groups landed; removed with the two guard checks
+  whose subject they were (`28bca27`).
+- **The `/skills` release pill** is about 300 of 304 px on a 344 px phone, so
+  slightly wider text (CI's Linux fonts, a reader's larger text) would push
+  it into the gutter. It may now wrap inside the pill; a pill that fits keeps
+  its single 44 px line.
+
+### Gates on the combined tree (D1 plus this group)
+
+| Gate | Result |
+| --- | --- |
+| Types, lint, format, knip | pass (knip after `28bca27`) |
+| Unit | 165 files, 1,532 tests pass |
+| Build | pass |
+| Budgets | entry 108.7 / 120 KB; worst route 195.1 / 200 KB (`/skills/code-review`); preloaded fonts 47.7 / 56 KB; stylesheets **36.96 / 37 KB** (37,843 bytes gzip, about 45 bytes to spare) |
+| Browser gate | Six projects, `--workers=2`, on the build of `28bca27`: 2,548 tests, 1,136 passed, 1,410 skipped by project scope, 2 failed: the gutter check's first run on `/skills` and `/design`, the intended parts named above, now exempt. On the build of `3f79a39` (the release pill and the exemptions): this group's spec 39 passed (desktop); the `/skills` fit and axe checks 24 passed (desktop, mobile, fold-closed, WebKit phone) |
+| Stress check | `/skills` at 344 px with the release pill's text widened by 0.08 em of letter spacing: nothing in the gutter |
+| Parity | 137 URLs compared, 0 with differences |
+
+### Open items, updated
+
+- **Item 1, the stylesheet budget:** under it, by about 45 bytes. The old
+  design's CSS is now dead weight in `globals.css`; Phase 8a deletes it before
+  anything else grows, then lowers the budget to the new measurement.
+- **Item 4:** with D1 merged, every page is in the scope, so
+  `profile-shell.spec.ts`'s Geist branch and `GEIST_FONTS` in
+  `src/routes/__root.tsx` are unreachable: Phase 8a.
+- **Item 8, Phase 8 adds:** `CatalogHero` folds into Phase 6's `PageHero`;
+  `.pf-cat-count` (this group) and `.pf-read-count` (D1) are the same rule
+  and become one; the device-matrix helpers (`layoutProblems`, the gutter
+  check and its named exemptions) are copied in two specs and move to one
+  helper module.
