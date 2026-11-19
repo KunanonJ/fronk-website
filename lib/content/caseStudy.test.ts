@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { accessDetail } from "@/components/landing/portfolio/PortfolioParts";
 import { BLOG_PUBLIC, isBlogHref } from "@/lib/content/blogVisibility";
 import {
   allCaseStudies,
@@ -343,9 +342,8 @@ describe("the hero, cover and meta row (spec 9.2, 9.4, 9.5)", () => {
   });
 
   it("prints the Access value the live pages print", () => {
-    for (const access of ["internal", "public"] as const) {
-      expect(caseAccess(access)).toBe(accessDetail(access));
-    }
+    expect(caseAccess("internal")).toBe("Internal tool (no public link)");
+    expect(caseAccess("public")).toBe("Public");
   });
 
   it("lists Role, Organisation, Period and Access, or Role, Started, Status and Offer", () => {

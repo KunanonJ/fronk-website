@@ -11,10 +11,6 @@
 export const CARD_SURFACE =
   "relative overflow-hidden rounded-bento border border-hairline bg-surface px-5 pt-[18px] pb-5 text-ink shadow-card";
 
-/** 48 px round icon button (44 px at <=380px), surface fill and hairline. */
-export const ICON_BUTTON =
-  "kj-icon inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-hairline bg-surface text-ink shadow-card max-[381px]:size-11";
-
 /** Header panel shell (share panel, site menu): pops from the top right. */
 export const PANEL =
   "kj-panel absolute top-[60px] right-0 flex max-w-full flex-col gap-0.5 rounded-sheet border border-hairline bg-surface p-3 shadow-pop";

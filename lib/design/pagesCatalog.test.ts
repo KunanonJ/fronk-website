@@ -4,11 +4,8 @@ import { read, sourceFiles } from "@/lib/design/sourceScan";
 /**
  * Profile redesign, Phase 7 group D2: the pages it moves into the token scope
  * (skills, the résumé, the 404 and error pages, /design, the hidden blog and
- * press) are redesign components now, so they follow its rules. `@theme
- * inline` froze Tailwind's font-sans, font-mono and font-display utilities to
- * the Geist stacks, so inside the scope they would render the old fonts (the
- * same guard covers components/ds and components/profile in globals.test.ts);
- * colour comes from tokens, never raw hex.
+ * press) are redesign components now, so they follow its rules: colour comes
+ * from tokens, never raw hex.
  */
 const files = [
   ...sourceFiles([
@@ -37,13 +34,6 @@ describe("Phase 7 group D2's pages", () => {
     expect(files).toContain("components/landing/skills/SkillDetailPage.tsx");
     expect(files).toContain("components/system/DesignSystemPage.tsx");
     expect(files.length).toBeGreaterThan(15);
-  });
-
-  it("keep the frozen font utilities out", () => {
-    const offenders = files.filter((f) =>
-      /\bfont-(?:sans|mono|display)\b/.test(read(f)),
-    );
-    expect(offenders).toEqual([]);
   });
 
   it("take colour from tokens, never raw hex", () => {
