@@ -9,7 +9,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
  * in desktop Chromium:
  *
  * - the device matrix (design spec 10.1): every page holds at 344, 390, 820,
- *   882, 1180 and 1440 px;
+ *   882, 1180 and 1440 px, with nothing in the side gutter;
  * - one page per family through the best-practice checks of
  *   references/best-practices-audit_18-11-26.md (forced colors, text
  *   spacing, zoom, more contrast, request origins; plan gate 7). Each check
@@ -73,13 +73,38 @@ async function tabTo(page: Page, target: Locator) {
   await expect(target).toBeFocused();
 }
 
-/** Sideways scroll, text under 12 px and targets under 24 px. */
+/**
+ * Sideways scroll, a part in the side gutter, text under 12 px and targets
+ * under 24 px.
+ */
 function layoutProblems(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const problems: string[] = [];
     const width = document.documentElement.scrollWidth;
     if (width > window.innerWidth + 1) {
       problems.push(`${width}px of content in ${window.innerWidth}px`);
+    }
+    // A part that crosses its .ds-wrap's padding into the side gutter. Font
+    // metrics differ between machines, and a tile's overflow: hidden keeps
+    // a part that is too wide from scrolling, so this catches on a Mac what
+    // only CI's wider text would push off screen. A rotated mark's box
+    // overhangs by up to 3 px, hence the 4 px allowance.
+    for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
+      const box = wrap.getBoundingClientRect();
+      const style = getComputedStyle(wrap);
+      const start = box.left + parseFloat(style.paddingLeft) - 4;
+      const end = box.right - parseFloat(style.paddingRight) + 4;
+      for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
+        if (rect.left < start || rect.right > end) {
+          const name = el.classList[0] ? `.${el.classList[0]}` : "";
+          problems.push(
+            `${el.tagName.toLowerCase()}${name} crosses the gutter`,
+          );
+          break;
+        }
+      }
     }
     const walker = document.createTreeWalker(
       document.body,
@@ -257,6 +282,14 @@ test.describe("group D2's pages across the device matrix (desktop Chromium)", ()
       );
       for (const width of MATRIX) {
         await page.setViewportSize({ width, height: 900 });
+        // Chromium can resolve vw units at the old width until its next
+        // frame (--pad stayed 72 px at 344 px), so measure two frames on.
+        await page.evaluate(
+          () =>
+            new Promise<void>((done) =>
+              requestAnimationFrame(() => requestAnimationFrame(() => done())),
+            ),
+        );
         await page.evaluate(() => document.fonts.ready);
         expect(await layoutProblems(page), `${path} at ${width}px`).toEqual([]);
       }
