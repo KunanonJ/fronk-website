@@ -1,6 +1,6 @@
 # Security review and refactor (19-11-26)
 
-Status: code complete (#133 merged and live; refactor PR follows). Owner console actions pending.
+Status: done in code (#133 security, #139 refactor; both merged and live 19-11-26). Owner console actions pending.
 Owner request: "review all security concerns and do code refactor".
 
 Harness note: `.claude/agents`, `.claude/skills` and `process/context/all-context.md`
