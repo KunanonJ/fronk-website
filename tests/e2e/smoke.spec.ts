@@ -705,6 +705,48 @@ test.describe("case cards > opening a case morphs the card into its h1", () => {
 });
 
 /**
+ * Count-ups (plan morph-count-up_PLAN_20-11-26): a figure below the fold
+ * waits at zero, counts up once in view and lands on the figure; its text is
+ * the real figure all along, and under reduced motion nothing counts.
+ */
+test.describe("figures > count up once in view, the text always the real figure", () => {
+  const figure = ".pf-read-pick .ds-count";
+
+  test("/proof: a metric counts up as it comes into view", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/proof", { waitUntil: "networkidle" });
+    const first = page.locator(figure).first();
+    const value = (await first.textContent()) ?? "";
+    expect(value).toMatch(/\d/);
+    await expect(first).toHaveAttribute("data-shown", /^\D*0\D*$/);
+
+    // Samples the frames from the moment it scrolls into view.
+    const frames = await first.evaluate(async (el) => {
+      const seen: string[] = [];
+      el.scrollIntoView({ block: "center", behavior: "instant" });
+      const end = performance.now() + 2000;
+      while (performance.now() < end) {
+        seen.push(`${el.getAttribute("data-shown")}|${el.textContent}`);
+        await new Promise(requestAnimationFrame);
+      }
+      return seen;
+    });
+    const shown = frames.map((frame) => frame.split("|")[0]);
+    expect(new Set(shown).size).toBeGreaterThan(3);
+    expect(shown.at(-1)).toBe("null");
+    for (const frame of frames) expect(frame.split("|")[1]).toBe(value);
+  });
+
+  test("/proof: under reduced motion, nothing counts", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/proof", { waitUntil: "networkidle" });
+    await expect(page.locator(`${figure}[data-shown]`)).toHaveCount(0);
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

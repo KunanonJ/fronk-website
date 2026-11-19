@@ -1669,6 +1669,26 @@ html.kj-vt *::after {
   }
 }
 
+/* Count-ups (components/ds/CountUp.tsx): while `data-shown` holds a frame,
+   the real figure keeps its place unpainted and the frame is drawn over it
+   with empty alt text, so only the real figure is ever read. Only where alt
+   text for `content` works, on screens, with motion allowed and no forced
+   colours; anywhere else the real figure shows. */
+@supports (content: "a" / "") {
+  @media screen and (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    .ds-count[data-shown] {
+      position: relative;
+      -webkit-text-fill-color: transparent;
+    }
+    .ds-count[data-shown]::after {
+      content: attr(data-shown) / "";
+      position: absolute;
+      inset: 0;
+      -webkit-text-fill-color: currentcolor;
+    }
+  }
+}
+
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   /* Not while pressed: this rule comes after .ds-pill:active and would
      replace its 0.97 press with the lift. */

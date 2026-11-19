@@ -580,6 +580,19 @@
     inline-size: auto;
     fill: currentColor;
   }
+  /* A count-up's frames (PixelNumber): the second path draws them while the
+     real drawing waits; on paper or with motion reduced, the real one shows. */
+  .pf-pixel-number__count {
+    display: none;
+  }
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .pf-pixel-number svg[data-counting] .pf-pixel-number__figure {
+      display: none;
+    }
+    .pf-pixel-number svg[data-counting] .pf-pixel-number__count {
+      display: inline;
+    }
+  }
 
   /* The motion tile: a still, gathered grid until the loop runs. */
   .ds-tile.pf-bento__motion {

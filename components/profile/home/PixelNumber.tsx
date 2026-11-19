@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { useCountUp } from "@/lib/hooks/useCountUp";
 import { cn } from "@/lib/utils/cn";
 
 /*
@@ -5,6 +7,10 @@ import { cn } from "@/lib/utils/cn";
  * and 12 item 30). The drawing is an SVG hidden from assistive technology;
  * the figure is also real text, visually hidden, so screen readers and
  * search read "1,000", not a picture. It fills with the text colour.
+ * Below the fold it counts up once as it comes into view (useCountUp): the
+ * frames go in a second path inside the figure's own box, left-aligned, and
+ * the real drawing is hidden meanwhile (`.pf-pixel-number*` in
+ * home-work-about.css).
  */
 
 /** One glyph per character: rows top to bottom, "#" a lit pixel. */
@@ -45,6 +51,18 @@ export function pixelFigure(value: string): { width: number; path: string } {
   return { width: Math.max(0, x - 1), path: squares.join("") };
 }
 
+/** Draws a count-up frame in the second path, or with null takes it away. */
+function drawFrame(svg: SVGSVGElement, frame: string | null): void {
+  const count = svg.querySelector(".pf-pixel-number__count");
+  if (frame === null) {
+    svg.removeAttribute("data-counting");
+    count?.removeAttribute("d");
+    return;
+  }
+  count?.setAttribute("d", pixelFigure(frame).path);
+  svg.setAttribute("data-counting", "");
+}
+
 export function PixelNumber({
   value,
   className,
@@ -54,17 +72,21 @@ export function PixelNumber({
   className?: string;
 }) {
   const { width, path } = pixelFigure(value);
+  const svg = useRef<SVGSVGElement>(null);
+  useCountUp(svg, value, drawFrame);
   return (
     <span className={cn("pf-pixel-number", className)}>
       <span className="sr-only">{value}</span>
       <svg
+        ref={svg}
         viewBox={`0 0 ${width} ${ROWS}`}
         style={{ aspectRatio: `${width} / ${ROWS}` }}
         aria-hidden="true"
         focusable="false"
         shapeRendering="crispEdges"
       >
-        <path d={path} />
+        <path className="pf-pixel-number__figure" d={path} />
+        <path className="pf-pixel-number__count" />
       </svg>
     </span>
   );
