@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
 
 /**
@@ -58,6 +58,24 @@ const CONTRIBUTIONS = {
   })),
 };
 
+/**
+ * A full-page capture never scrolls, so a lazy image far below the first
+ * screen (the kunanonj.com cover in More projects, say) would stay a blank
+ * box. Every image loads and decodes first; one that fails to load is drawn
+ * as the page would draw it.
+ */
+async function loadEveryImage(page: Page) {
+  await page.evaluate(() =>
+    Promise.all(
+      [...document.images].map((image) => {
+        image.loading = "eager";
+        return image.decode().catch(() => {});
+      }),
+    ),
+  );
+  await page.waitForLoadState("networkidle");
+}
+
 test.skip(
   ({ browserName }) => browserName !== "chromium",
   "visual baselines are captured on Chromium only",
@@ -91,6 +109,7 @@ for (const theme of THEMES) {
         );
         // Settle web fonts so glyph metrics are stable across runs.
         await page.evaluate(() => document.fonts.ready);
+        await loadEveryImage(page);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
           fullPage: true,
         });
