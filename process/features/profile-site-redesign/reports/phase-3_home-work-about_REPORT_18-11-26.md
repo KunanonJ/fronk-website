@@ -1,6 +1,6 @@
 # Phase 3 report: Home work stack and About bento
 
-**Plan:** `../active/phase-3_home-work-about_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-3_home-work-about_PLAN_18-11-26.md`
 **Date:** 18-11-26. A parallel lane beside Phase 2, in the worktree
 `t3-d754e545-956bbfbe9c58ffba` on the local branch
 `feat/profile-work-stack-about-bento`, from `33d84b5` (Phases 0 and 1). One

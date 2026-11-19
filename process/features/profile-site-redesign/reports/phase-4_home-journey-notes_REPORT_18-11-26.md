@@ -1,6 +1,6 @@
 # Phase 4 report: Home journey and testimonial notebook
 
-**Plan:** `../active/phase-4_home-journey-notes_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-4_home-journey-notes_PLAN_18-11-26.md`
 **Date:** 18-11-26. A parallel lane beside Phase 5, in the worktree
 `t3-7173b6a5-2e448b31155db157` on the local branch
 `feat/home-journey-testimonial-notebook`, from `5721eab` (Phases 0 to 3

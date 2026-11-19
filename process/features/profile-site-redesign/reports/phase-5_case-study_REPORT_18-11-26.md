@@ -1,6 +1,6 @@
 # Phase 5 report: Case-study template
 
-**Plan:** `../active/phase-5_case-study_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-5_case-study_PLAN_18-11-26.md`
 **Date:** 18-11-26. A parallel lane beside Phase 4, in the worktree
 `t3-c658071c-4268a8338de60af6` on the local branch
 `feat/profile-case-study-template`, from `5721eab` (Phases 0 to 3 merged,

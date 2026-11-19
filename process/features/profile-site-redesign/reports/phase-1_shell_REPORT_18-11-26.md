@@ -1,6 +1,6 @@
 # Phase 1 report: Shell (pill nav, Say hello, theme, phone menu, footer)
 
-**Plan:** `../active/phase-1_shell_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-1_shell_PLAN_18-11-26.md`
 **Date:** 18-11-26, on `feat/profile-site-redesign`. The first run was on
 `52e5685` plus the uncommitted Phase 1 tree, which the coordinator committed as
 `a530983`. The review fixes (section 9) are uncommitted on `33d84b5`. Nothing is

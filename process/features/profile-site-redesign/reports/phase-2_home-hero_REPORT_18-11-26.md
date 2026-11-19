@@ -1,6 +1,6 @@
 # Phase 2 report: Home hero and logo strip
 
-**Plan:** `../active/phase-2_home-hero_PLAN_18-11-26.md`
+**Plan:** `../completed/phase-2_home-hero_PLAN_18-11-26.md`
 **Date:** 18-11-26. Parallel lane in its own worktree, branch
 `feat/profile-home-hero-logo-strip`, started at `33d84b5` (Phases 0 and 1
 committed). One local commit (amended once to record the final gate runs);

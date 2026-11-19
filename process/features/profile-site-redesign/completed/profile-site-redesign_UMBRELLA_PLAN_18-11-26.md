@@ -1,8 +1,8 @@
 # Profile site redesign: umbrella plan
 
-**Status:** PLANNED (18-11-26). The owner approved the program shape and four
-design choices in the planning session. No phase is approved for execution:
-Phase 0 needs its own "ENTER EXECUTE MODE".
+**Status:** COMPLETE (19-11-26). Every phase is VERIFIED and live (PRs #121
+to #128); the table below has each one. Planned 18-11-26, when the owner
+approved the program shape and four design choices.
 **Created:** 18-11-26, at `563b2a3` on `feat/profile-site-redesign` (the same
 commit as `main`).
 **Owner goal:** "learn about this profile website https://www.tanvirux.com/
@@ -246,7 +246,7 @@ owner's answers. These are the choices it produced.
 | 5. Case-study template | `phase-5_case-study_PLAN_18-11-26.md` | Phase 1; R10, R12, R13 | All 5 projects and 2 ventures render in the template from today's content with nothing dropped; the rail, the viewer and the Hiring block work by keyboard | VERIFIED (18-11-26; parallel lane, reviewed and fixed; report in `../reports/`) |
 | 6. Cutover | `phase-6_cutover_PLAN_18-11-26.md` | Phases 2 to 5; R14, R16, R17; the owner's go on the preview URL | Production serves the new Home, case studies, portfolio index, About and Contact; every other page gets the new chrome around its old body until Phase 7; parity, smoke, axe, budgets and all baselines are green | VERIFIED (19-11-26; reviewed and fixed; PR #125, merged as `7d9b4b4` and deployed by hand while Workers Builds fails; report in `../reports/`) |
 | 7. Remaining pages | `phase-7_remaining-pages_PLAN_18-11-26.md` | Phase 6 | Topic hubs in English and Thai, skills, learn, examples, stack, proof, build, résumé, 404 and `/design` use the new layouts, and the Thai pages pass | VERIFIED (19-11-26; two page-group lanes, reviewed and fixed; PR #126 merged as `660af3e`, PR #127 as `cb1dd6c`, each deployed by hand while Workers Builds fails; reports in `../reports/`) |
-| 8. Cleanup and guards | `phase-8_cleanup_PLAN_18-11-26.md` | Phase 7 | No old design code or font remains; the guards pin the new system; share images and icons use it; the speed budget is met | PLANNED |
+| 8. Cleanup and guards | `phase-8_cleanup_PLAN_18-11-26.md` | Phase 7 | No old design code or font remains; the guards pin the new system; share images and icons use it; the speed budget is met | VERIFIED (19-11-26; PR #128 merged as `f50d573` and deployed by hand while Workers Builds fails; report in `../reports/`) |
 
 Phase 5 depends only on Phase 1, so it may run before or beside Phases 2 to 4
 if the owner wants the case studies first.
@@ -324,7 +324,7 @@ new surface beside the spec section it implements, and deviations. None yet.
   design system artifact and the best-practices audit were added the same
   day; the audit's fixes are already in the phase plans and the spec.
 - **Execute anchor:**
-  `process/features/profile-site-redesign/active/phase-0_foundation_PLAN_18-11-26.md`.
+  `process/features/profile-site-redesign/completed/phase-0_foundation_PLAN_18-11-26.md`.
 - **Before EXECUTE of Phase 0:** re-read that plan, the design spec sections
   it names, and sections 1.3, 1.4, 3 and 8 of the inventory. Check drift
   since `563b2a3`; recruiter-fit Phase 4 may have merged.
