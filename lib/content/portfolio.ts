@@ -779,7 +779,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     // Capture it again when Home changes.
     cover: {
       src: "/portfolio/kunanonj-com/cover.webp",
-      alt: "The Home page of kunanonj.com: the headline Forward deployed AI engineering from Bangkok, the Open to roles line, the Contact me and Résumé buttons, and the Selected work and Experience cards",
+      alt: "The Home page of kunanonj.com: the headline Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok, the Open to roles and Bangkok or remote chips, the Contact me and Résumé buttons, a design canvas showing three selected projects, and the row of places he has worked",
       width: 1440,
       height: 900,
     },
