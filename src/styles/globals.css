@@ -845,8 +845,13 @@ html.kj-vt *::after {
   --tile-brand: color-mix(in srgb, #dde7f4 16%, var(--tile));
   --material-253-a: oklch(0.27 0.05 253);
   --material-253-b: oklch(0.22 0.075 253);
-  --material-79-a: oklch(0.27 0.05 79);
-  --material-79-b: oklch(0.22 0.075 79);
+  /* Hue 79 keeps its name but not its hue in dark: at this lightness hue 79
+     reads olive (#332305), and its end falls outside sRGB and clips to a
+     brown (#2c1400). Copper at the peach's hue, 50 (#392316), to ember at
+     25 (#2e0d0c) stays warm, sits in sRGB and keeps the contrast floors
+     (ink 12.79 and 15.47, ink-60 5.54 and 6.11). Spec 2.4. */
+  --material-79-a: oklch(0.28 0.04 50);
+  --material-79-b: oklch(0.215 0.055 25);
   --material-292-a: oklch(0.27 0.05 292);
   --material-292-b: oklch(0.22 0.075 292);
   --material-327-a: oklch(0.27 0.05 327);

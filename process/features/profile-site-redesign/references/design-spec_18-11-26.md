@@ -88,13 +88,14 @@ Each stacked case card is filled with a per-card hue:
 - Dark: `linear-gradient(160deg, oklch(.27 .05 H) 0%, oklch(.22 .075 H) 100%)`
 - General form: `oklch(L1 C H)` to `oklch(L2 C+.025 H)`; light L1 .95, L2 .9, C .03; dark L1 .27, L2 .22, C .05.
 - Hues in card order: 253, 79, 292, 327, 266, 301. A seventh card wraps to 253 (ours).
+- One exception (polish pass, 19-11-26): hue 79 in dark is `oklch(.28 .04 50)` to `oklch(.215 .055 25)`, copper to ember. At dark lightness hue 79 read olive, and its end fell outside sRGB and clipped to brown; the tokens keep the name `--material-79-*`.
 
 Approximate sRGB endpoints and contrast (computed, ours; the CSS uses `oklch()`):
 
 | H | Light start to end | Dark start to end | Ink (lowest) | `--ink-60` lowest | `--muted-strong` lowest |
 |---|---|---|---|---|---|
 | 253 | `#e1f0ff` to `#c5e1ff` | `#14273e` to `#001a3c` | 14.06 light, 13.08 dark | 4.50 light, 5.63 dark | light 5.74 or more on every hue |
-| 79 | `#faedd9` to `#f2dbb6` | `#332305` to `#2c1400` | 14.01, 13.15 | 4.50, 5.65 | |
+| 79 | `#faedd9` to `#f2dbb6` | `#392316` to `#2e0d0c` (was `#332305` to `#2c1400`) | 14.01, 12.79 | 4.50, 5.54 | dark 6.68 or more |
 | 292 | `#eeebff` to `#ded8ff` | `#27223d` to `#1c113a` | 13.88, 13.25 | 4.47, 5.70 | |
 | 327 | `#fae8f9` to `#f2d2f1` | `#331d33` to `#2c0a2c` | 13.78, 13.33 | 4.46, 5.70 | |
 | 266 | `#e5efff` to `#cddeff` | `#1b253f` to `#0a173d` | 13.98, 13.14 | 4.48, 5.66 | |
