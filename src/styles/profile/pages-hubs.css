@@ -1,1 +1,543 @@
 /* Profile redesign, Phase 7 lane D1: the topic hubs (English and Thai) and the reading pages (/learn, /examples, /stack, /proof, /build). Only that lane edits this partial. */
+/*
+ * Design spec 6, 9 (chapters, fact strip, panel), 10, 11 and 12; plan steps
+ * 7a, 7b and 7d. The pages reuse the parts that already exist: Phase 6's page
+ * hero, filter and FAQ (cutover.css), the case template's column, chapters,
+ * kicker, prose and panel (case.css), the tiles, chips and pills of
+ * globals.css, and Phase 4's pixel badges (home-journey.css). This file adds
+ * only what those lack. Plain CSS on tokens, phones first, rem breakpoints;
+ * every rule in @layer components; movement waits for no-preference at the
+ * end.
+ */
+
+@layer components {
+  /* Hero (spec 9.2): the eyebrow beside the hubs' language switch, the FDE
+     hubs' availability, the pills, the chips that say what a page holds. */
+  .pf-read-hero__top,
+  .pf-read-head,
+  .pf-read-meta,
+  .pf-read-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .pf-hub-lang {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .pf-hub-lang[aria-current="page"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .pf-read-avail,
+  .pf-read-actions,
+  .pf-read-chips,
+  .pf-read-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-read-avail {
+    color: var(--ink-80);
+  }
+  .pf-read-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .ds-chip > .pf-read-count {
+    color: var(--accent-ink);
+  }
+
+  /* The hub's column (spec 9.6 and 9.7): chapters, proof, FAQ, the close. */
+  .pf-hub-body {
+    padding-block: 64px 128px;
+  }
+  .pf-hub-column {
+    display: flex;
+    flex-direction: column;
+  }
+  /* Operator proof as a fact strip (spec 9.8): numbered in CSS, so each
+     item's text is the fact alone; the numbers are not read. */
+  .pf-hub-facts {
+    display: grid;
+    gap: 14px 32px;
+    margin: 0;
+    padding: 18px 0;
+    border-block: 1px solid var(--line);
+    list-style: none;
+    counter-reset: pf-fact;
+  }
+  .pf-hub-facts__item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-inline-size: 0;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    counter-increment: pf-fact;
+  }
+  .pf-hub-facts__item::before {
+    flex: none;
+    color: var(--ink-60);
+    font: 500 0.75rem / 1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    content: counter(pf-fact, decimal-leading-zero);
+    content: counter(pf-fact, decimal-leading-zero) / "";
+  }
+  .pf-hub .pf-faq {
+    margin-top: 0;
+  }
+  /* minmax(0, 1fr): a wide part of one block cannot widen the column, and
+     with it the other block, past the page's gutter. */
+  .pf-hub-close {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px 40px;
+    align-items: start;
+  }
+  .pf-hub-links {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .pf-hub-links > li {
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-hub-links__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-block-size: 52px;
+    padding-block: 12px;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .pf-hub-links__arrow {
+    flex: none;
+    color: var(--accent-ink);
+  }
+  .pf-hub-links__number,
+  .pf-faq__number {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-hub-links__label,
+  .pf-faq__number + .pf-faq__heading {
+    flex: 1;
+    min-inline-size: 0;
+  }
+  .pf-hub-contact__text {
+    color: var(--ink-80);
+  }
+  .pf-hub-contact__mail {
+    min-block-size: 44px;
+    overflow-wrap: anywhere;
+  }
+
+  /* The reading pages: blocks down the page, tiles in wrapping rows (a tile
+     alone on its row fills it), the shared kicker header. */
+  .pf-read-body {
+    display: grid;
+    gap: clamp(80px, 9vw, 112px);
+    padding-block: 24px 128px;
+  }
+  .pf-read-head .pf-case-kicker {
+    margin: 0;
+  }
+  .pf-read-head + .pf-filter-bar {
+    margin-top: 16px;
+  }
+  .pf-read-meta,
+  .pf-read-path,
+  .pf-read-legend {
+    color: var(--ink-60);
+  }
+  .pf-read-path {
+    letter-spacing: 0.02em;
+    text-transform: none;
+    overflow-wrap: anywhere;
+  }
+  .pf-read-marker {
+    flex: none;
+    inline-size: 7px;
+    block-size: 7px;
+  }
+  .pf-read-marker--ink {
+    background: var(--ink);
+  }
+  .pf-read-marker--accent {
+    background: var(--accent);
+  }
+  .pf-read-marker--line {
+    background: var(--ink-30);
+  }
+  .pf-read-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-read-flex > * {
+    flex: 1 1 16rem;
+    min-inline-size: 0;
+  }
+  .pf-read-flex > .pf-read-lead {
+    flex-basis: 100%;
+  }
+  /* Two by two from 810 px: the four outcomes, the two venture cases. */
+  .pf-read-pair {
+    display: grid;
+    gap: 16px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-read-item {
+    display: flex;
+  }
+  .pf-read-item > * {
+    flex: 1;
+  }
+  .pf-read-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-inline-size: 0;
+  }
+  .pf-read-title,
+  .pf-read-figure {
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .pf-read-text {
+    color: var(--ink-80);
+  }
+  .pf-read-links {
+    gap: 4px 24px;
+    margin-top: auto;
+  }
+  .pf-read-tile > .pf-read-chips {
+    margin-top: 0;
+  }
+  .pf-read-link {
+    min-block-size: 32px;
+  }
+  .pf-read-foot {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Stack and Build: a group or a column per tile. */
+  .pf-read-board {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .pf-read-tools,
+  .pf-read-tickets {
+    display: grid;
+    gap: 0 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-read-tool {
+    min-inline-size: 0;
+    border-top: 1px solid var(--line);
+  }
+  .pf-read-tool__link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-block: 12px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-read-tool__text {
+    display: grid;
+    gap: 2px;
+    min-inline-size: 0;
+  }
+  .pf-read-tool__name {
+    font-weight: 500;
+  }
+  .pf-read-badge {
+    flex: none;
+    inline-size: 36px;
+    block-size: 36px;
+  }
+  .pf-read-badge--lg {
+    inline-size: 64px;
+    block-size: 64px;
+  }
+  .pf-read-lead-tool {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-inline-size: 0;
+  }
+  .pf-read-stats,
+  .pf-read-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+  }
+  .pf-read-stat,
+  .pf-read-ticket {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-mat);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-read-stat {
+    flex: 1 1 7.5rem;
+    flex-direction: column-reverse;
+  }
+  .pf-read-bar {
+    display: flex;
+    gap: 3px;
+    block-size: 10px;
+  }
+  .pf-read-bar__part {
+    flex-basis: 0;
+    border-radius: var(--radius-pill);
+  }
+  .pf-read-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+  .pf-read-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-read-tickets {
+    gap: 10px;
+  }
+  .pf-read-ticket--empty {
+    border-style: dashed;
+    border-color: var(--line-strong);
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink-60);
+  }
+
+  /* Proof: figure tiles (the label is read first, the figure drawn on top).
+     Pickable tiles: Proof's metrics, which pick their source (the dated
+     running totals wider), and Examples' personas. They keep the site's hand
+     cursor (globals.css, spec 6.9). */
+  .pf-read-figure-tile,
+  .pf-read-pick {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-block-size: 120px;
+    color: var(--ink);
+    text-align: start;
+    text-decoration: none;
+  }
+  .pf-read-figure-tile .pf-read-figure {
+    order: 1;
+  }
+  .pf-read-figure-tile__label {
+    order: 2;
+    color: var(--ink-60);
+  }
+  .pf-read-figure-tile__cta {
+    order: 3;
+    margin-top: auto;
+    color: var(--accent-ink);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .pf-read-note {
+    margin-top: 20px;
+  }
+  .pf-read-flex > .pf-read-pick {
+    flex-basis: 11.25rem;
+    font: inherit;
+  }
+  .pf-read-flex > .pf-read-pick--wide {
+    flex-basis: 21.25rem;
+  }
+  .pf-read-pick--persona {
+    justify-content: space-between;
+  }
+  .pf-read-pick[aria-pressed="true"] {
+    background: var(--tint-2);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .pf-read-asof {
+    display: block;
+    margin-top: 4px;
+  }
+  .pf-read-source {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .pf-read-quote {
+    max-inline-size: 760px;
+    color: var(--ink);
+  }
+  .pf-read-logo {
+    flex: none;
+    inline-size: 72px;
+    block-size: 72px;
+    border-radius: var(--radius-well);
+    object-fit: cover;
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-read-facts {
+    gap: 12px 32px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-read-live {
+    inline-size: 7px;
+    block-size: 7px;
+    background: var(--ember);
+  }
+
+  /* Thai (plan step 7b; spec 3.4): body text at 1.75, no tracking. */
+  .pf-hub-facts__item:lang(th),
+  .pf-read-avail:lang(th) {
+    line-height: 1.75;
+    letter-spacing: normal;
+  }
+  .pf-faq__heading:lang(th) {
+    line-height: 1.6;
+  }
+
+  /* Breakpoints (spec 4.1 and 10.1). */
+  @media (min-width: 37.5rem) {
+    .pf-hub-facts,
+    .pf-read-board,
+    .pf-read-tools--two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pf-read-wide,
+    .pf-read-board--one > .pf-read-tile {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (37.5rem <= width < 64rem) {
+    /* Shipped takes the row Next and In progress leave. */
+    .pf-read-board--build > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 50.625rem) {
+    .pf-read-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf-read-board {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .pf-hub-close {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* A hub block's kicker and heading beside its content (the page's
+       width, not one 64ch column with an empty half). */
+    .pf-hub-row {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(32px, 4vw, 72px);
+      align-items: start;
+    }
+    .pf-hub-row > * {
+      grid-column: 1;
+    }
+    .pf-hub-row > :last-child {
+      grid-row: 1 / span 2;
+      grid-column: 2;
+      margin-top: 0;
+    }
+    .pf-read-wide {
+      grid-column: span 2;
+    }
+  }
+
+  /* Print shows every FAQ answer: FaqList opens the closed ones before
+     printing; engines with ::details-content show them without it. */
+  @media print {
+    .pf-faq__item::details-content {
+      content-visibility: visible;
+    }
+  }
+
+  /* Reader preferences (spec 12 items 26 to 28). */
+  @media (prefers-contrast: more) {
+    .pf-read-avail,
+    .pf-hub-contact__text,
+    .pf-read-meta,
+    .pf-read-path,
+    .pf-read-legend,
+    .pf-read-figure-tile__label {
+      color: var(--ink);
+    }
+  }
+  @media (forced-colors: active) {
+    .pf-read-stat,
+    .pf-read-ticket {
+      border-color: CanvasText;
+    }
+    .pf-hub-lang[aria-current="page"],
+    .pf-read-pick[aria-pressed="true"] {
+      border-color: Highlight;
+      outline: 2px solid Highlight;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pf-hub-links__link:hover,
+    .pf-read-tool__link:hover .pf-read-tool__name {
+      color: var(--accent-ink);
+    }
+  }
+}
+
+/* Movement waits for no-preference (spec 5.1 and 5.3). */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-hub-links__arrow {
+      transition: transform 0.24s var(--ease-smooth);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-hub-links__link:hover .pf-hub-links__arrow {
+      transform: translateX(4px);
+    }
+  }
+}

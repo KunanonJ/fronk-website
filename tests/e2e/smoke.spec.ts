@@ -340,7 +340,7 @@ test.describe("library > list filters are typed search params", () => {
     await expect(thai).toBeVisible();
     const count = Number((await thai.textContent())?.match(/\d+/)?.[0]);
     expect(count).toBeGreaterThan(0);
-    await expect(page.locator('h2[lang="th"]')).toHaveCount(count);
+    await expect(page.locator('h3[lang="th"]')).toHaveCount(count);
     await page
       .getByRole("group", { name: "Hub language" })
       .getByRole("button", { name: "English" })
@@ -752,27 +752,36 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     );
   });
 
-  test("the FDE hub leaves no section card mostly empty at desktop width", async ({
+  test("the FDE hub sets its four sections as chapters, each body beside its heading at desktop width", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/topics/forward-deployed-ai-engineering", {
       waitUntil: "networkidle",
     });
-    // Each section card: the gap between its kicker and its big number.
-    const gaps = await page
-      .locator('article[aria-labelledby^="card-s"]')
-      .evaluateAll((cards) =>
-        cards.map((card) => {
-          const kicker = card.querySelector("h2")!.getBoundingClientRect();
-          const number = card
-            .querySelector("p[aria-hidden]")!
-            .getBoundingClientRect();
-          return Math.round(number.top - kicker.bottom);
+    // Profile redesign, Phase 7 (R17: the bento test's intent, no section
+    // left mostly empty): each chapter's body starts level with its kicker,
+    // in the column beside its heading, so no band of the page sits empty.
+    const chapters = await page
+      .locator("section.pf-case-chapter:has(> h2.t-h3)")
+      .evaluateAll((sections) =>
+        sections.map((chapter) => {
+          const box = (selector: string) =>
+            chapter.querySelector(selector)!.getBoundingClientRect();
+          const kicker = box(".pf-case-kicker");
+          const heading = box("h2");
+          const body = box("p:not([aria-hidden])");
+          return {
+            level: Math.round(Math.abs(body.top - kicker.top)),
+            beside: body.left > heading.right,
+          };
         }),
       );
-    expect(gaps).toHaveLength(4);
-    for (const gap of gaps) expect(gap).toBeLessThanOrEqual(120);
+    expect(chapters).toHaveLength(4);
+    for (const chapter of chapters) {
+      expect(chapter.level).toBeLessThanOrEqual(8);
+      expect(chapter.beside).toBe(true);
+    }
   });
 
   test("the Thai FDE hub carries the same pill and buttons, in Thai", async ({
@@ -1432,6 +1441,11 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/portfolio/tbh-intranet",
     "/contact",
     "/resume",
+    // Phase 7 (D1): a hub in each language and the densest reading pages.
+    "/topics/forward-deployed-ai-engineering",
+    "/th/topics/ai-transformation-thailand",
+    "/stack",
+    "/proof",
   ];
 
   test.beforeEach(async ({ page }) => {

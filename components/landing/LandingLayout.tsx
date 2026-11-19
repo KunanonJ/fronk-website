@@ -25,7 +25,7 @@ export default function LandingLayout({
       <div className="landing-root min-h-[100svh] bg-page text-ink antialiased">
         {/* Fixed and moved off screen, so print would draw it: the print
             rule in globals.css drops [data-print-hide]. */}
-        <a href="#main" className="ds-skip" data-print-hide>
+        <a href="#main" className="ds-skip" lang="en" data-print-hide>
           Skip to content
         </a>
         <SiteNav />

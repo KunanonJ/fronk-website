@@ -1,15 +1,28 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
-import BuildPage from "@/components/landing/library/BuildPage";
-import ExamplesPage from "@/components/landing/library/ExamplesPage";
-import LearnPage from "@/components/landing/library/LearnPage";
-import ProofPage from "@/components/landing/library/ProofPage";
-import StackPage from "@/components/landing/library/StackPage";
+import BuildPage from "@/components/profile/pages/library/BuildPage";
+import ExamplesPage from "@/components/profile/pages/library/ExamplesPage";
+import LearnPage from "@/components/profile/pages/library/LearnPage";
+import ProofPage from "@/components/profile/pages/library/ProofPage";
+import StackPage from "@/components/profile/pages/library/StackPage";
 import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
-import { examplesByPersona } from "@/lib/content/examples";
-import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
 import { buildBoard } from "@/lib/content/buildBoard";
+import { examplesByPersona } from "@/lib/content/examples";
+import { stackItems } from "@/lib/content/stack";
+import { orbitRing } from "@/lib/landing/journey";
+import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
+
+/*
+ * The reading pages (profile redesign, Phase 7 lane D1, plan step 7d). The
+ * intents of the bento pages' tests, on the new layouts: the h1s word for
+ * word, each filter's labels, counts and result line, Delivery before the
+ * venture metrics with the running totals dated, and no link to the hidden
+ * blog or press.
+ */
 
 /** Every href on the page: none may point at the hidden blog or press. */
 function expectNoHiddenLinks(container: HTMLElement) {
@@ -20,6 +33,53 @@ function expectNoHiddenLinks(container: HTMLElement) {
       expect(href, a.textContent ?? "").not.toMatch(/^\/blog(\/|$|\?|#)/);
   }
 }
+
+const reference = JSON.parse(
+  readFileSync(join(process.cwd(), "tests/fixtures/site-parity.json"), "utf8"),
+) as Record<string, { h1: string | null }>;
+
+describe("the reading pages' h1s", () => {
+  it.each([
+    [
+      "/learn",
+      <LearnPage
+        key="learn"
+        posts={FALLBACK_BLOG_POSTS}
+        lang="en"
+        onLangChange={() => {}}
+      />,
+    ],
+    [
+      "/examples",
+      <ExamplesPage
+        key="examples"
+        persona="builders"
+        onPersonaChange={() => {}}
+      />,
+    ],
+    ["/stack", <StackPage key="stack" group="all" onGroupChange={() => {}} />],
+    ["/proof", <ProofPage key="proof" />],
+    [
+      "/build",
+      <BuildPage key="build" venture="all" onVentureChange={() => {}} />,
+    ],
+  ] as [string, ReactElement][])(
+    "%s reads as the parity reference, in the hero's sky",
+    (path, page) => {
+      render(page);
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(1);
+      // The parity gate strips the tags and collapses the spaces.
+      expect(h1s[0]!.textContent!.replace(/\s+/g, " ").trim()).toBe(
+        reference[path]!.h1,
+      );
+      expect(h1s[0]).toHaveClass("t-display");
+      expect(h1s[0]!.closest("section")).toHaveClass("pf-page-hero");
+      // The last line is the accent.
+      expect(h1s[0]!.lastElementChild).toHaveClass("pf-page-hero__accent");
+    },
+  );
+});
 
 describe("LearnPage", () => {
   const renderLearn = (lang: "en" | "th", onLangChange = vi.fn()) =>
@@ -38,15 +98,31 @@ describe("LearnPage", () => {
     );
     const ai = getTopicPillar("ai-transformation-thailand", "en");
     const card = screen.getByRole("article", { name: ai?.h1 });
+    // The first hub leads: its path and the other language.
+    expect(card).toHaveClass("pf-read-lead");
+    expect(card).toHaveTextContent("EN · /topics/ai-transformation-thailand");
     expect(
-      within(card).getByRole("link", { name: "Open hub →" }),
+      within(card).getByRole("link", { name: "Open hub" }),
     ).toHaveAttribute("href", "/topics/ai-transformation-thailand");
-    expect(
-      within(card).getByRole("link", { name: "อ่านภาษาไทย →" }),
-    ).toHaveAttribute("href", "/th/topics/ai-transformation-thailand");
+    const thai = within(card).getByRole("link", { name: "อ่านภาษาไทย" });
+    expect(thai).toHaveAttribute(
+      "href",
+      "/th/topics/ai-transformation-thailand",
+    );
+    expect(thai).toHaveAttribute("lang", "th");
+    expect(thai).toHaveAttribute("hreflang", "th");
     expect(
       screen.getByText(`Showing ${TOPIC_SLUGS.length} hubs in English`),
-    ).toBeInTheDocument();
+    ).toHaveAttribute("aria-live", "polite");
+    // The other hubs follow, each with its own link.
+    expect(
+      screen
+        .getAllByRole("article")
+        .filter((article) => article.classList.contains("pf-read-lead")),
+    ).toHaveLength(1);
+    expect(screen.getAllByRole("link", { name: "Open hub" })).toHaveLength(
+      TOPIC_SLUGS.length,
+    );
     expectNoHiddenLinks(container);
   });
 
@@ -54,16 +130,42 @@ describe("LearnPage", () => {
     renderLearn("th");
     for (const slug of TOPIC_SLUGS) {
       const th = getTopicPillar(slug, "th");
-      const heading = screen.getByRole("heading", { level: 2, name: th?.h1 });
+      // Under the h2 "Read the hubs in", each hub's title is an h3.
+      const heading = screen.getByRole("heading", { level: 3, name: th?.h1 });
       expect(heading).toHaveAttribute("lang", "th");
     }
     expect(
+      screen.getByRole("heading", { level: 2, name: "Read the hubs in" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText(`Showing ${TOPIC_SLUGS.length} hubs in Thai`),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ไทย" })).toHaveAttribute(
+    const group = screen.getByRole("group", { name: "Hub language" });
+    expect(within(group).getByRole("button", { name: "ไทย" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
+    expect(
+      within(group).getByRole("button", { name: "English" }),
+    ).toHaveAttribute("aria-pressed", "false");
+    // The codes are drawn, as before, and not read: the names stay the words.
+    expect(
+      within(group).getByRole("button", { name: "ไทย" }),
+    ).toHaveTextContent("ไทย TH");
+    expect(
+      [...group.querySelectorAll(".pf-read-count")].map((code) => [
+        code.textContent,
+        code.getAttribute("aria-hidden"),
+      ]),
+    ).toEqual([
+      ["EN", "true"],
+      ["TH", "true"],
+    ]);
+    // The header shows the chosen language's code.
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Read the hubs in" })
+        .parentElement,
+    ).toHaveTextContent("Read the hubs inTH");
   });
 
   it("asks the route to switch the language", () => {
@@ -76,10 +178,17 @@ describe("LearnPage", () => {
   it("lists the operator notes and no writing while the blog is hidden", () => {
     renderLearn("en");
     const notes = screen.getByRole("article", { name: "Operator notes" });
-    expect(within(notes).getAllByRole("link")).toHaveLength(3);
+    const links = within(notes).getAllByRole("link");
+    expect(links).toHaveLength(3);
+    // Each "Open" link names its note.
+    expect(links[0]).toHaveAccessibleName("Open: Four operating principles");
+    expect(notes).toHaveTextContent("03 notes");
     expect(screen.queryByRole("article", { name: "Writing" }) !== null).toBe(
       BLOG_PUBLIC,
     );
+    expect(
+      screen.getByRole("list", { name: "On this page" }),
+    ).toHaveTextContent("Topic hubs");
   });
 });
 
@@ -89,16 +198,41 @@ describe("ExamplesPage", () => {
       <ExamplesPage persona="operators" onPersonaChange={() => {}} />,
     );
     for (const card of examplesByPersona.operators) {
+      const article = screen.getByRole("article", { name: card.title });
+      expect(article).toHaveTextContent(card.body);
       expect(
-        screen.getByRole("article", { name: card.title }),
-      ).toBeInTheDocument();
+        within(article).getByRole("link", { name: card.ctaLabel }),
+      ).toHaveAttribute("href", card.href);
     }
-    expect(screen.getByText("3 examples for Operators")).toBeInTheDocument();
+    expect(screen.getByText("3 examples for Operators")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
     expect(screen.getByRole("button", { name: /Operators/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
     expectNoHiddenLinks(container);
+  });
+
+  it("asks who the examples are for, each persona with its number and count", () => {
+    render(<ExamplesPage persona="builders" onPersonaChange={() => {}} />);
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Show examples for",
+    });
+    // The picker is named by that heading.
+    const group = screen.getByRole("group", { name: "Show examples for" });
+    expect(group).toHaveAttribute("aria-labelledby", heading.id);
+    expect(
+      within(group)
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual([
+      "01 · 3 examplesBuilders",
+      "02 · 3 examplesOperators",
+      "03 · 3 examplesFounders",
+    ]);
   });
 
   it("asks the route to switch persona", () => {
@@ -112,7 +246,7 @@ describe("ExamplesPage", () => {
 });
 
 describe("StackPage", () => {
-  const groupCards = () =>
+  const groupTiles = () =>
     ["Build", "Ship", "Operate"].filter(
       (name) => screen.queryByRole("article", { name }) !== null,
     );
@@ -121,21 +255,58 @@ describe("StackPage", () => {
     const { container } = render(
       <StackPage group="all" onGroupChange={() => {}} />,
     );
-    expect(groupCards()).toEqual(["Build", "Ship", "Operate"]);
+    expect(groupTiles()).toEqual(["Build", "Ship", "Operate"]);
     expect(
       screen.getByRole("article", { name: "Through-line" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Showing all 16 tools")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^NestJS/ })).toHaveAttribute(
-      "href",
-      "https://nestjs.com",
-    );
+    const nest = screen.getByRole("link", { name: /^NestJS/ });
+    expect(nest).toHaveAttribute("href", "https://nestjs.com");
+    // A new tab says so.
+    expect(nest).toHaveAttribute("target", "_blank");
+    expect(nest).toHaveTextContent("(opens in a new tab)");
     expectNoHiddenLinks(container);
+  });
+
+  it("draws each tool's pixel badge from the Journey orbit, hidden from readers", () => {
+    const { container } = render(
+      <StackPage group="all" onGroupChange={() => {}} />,
+    );
+    const badges = container.querySelectorAll(
+      "a svg.pf-px[aria-hidden='true']",
+    );
+    expect(badges).toHaveLength(stackItems.length);
+    // Every tool wears the colour it has in the Home's orbit.
+    const tones = new Map(
+      orbitRing().flatMap((item) =>
+        item.type === "tool" ? [[item.name, item.tone] as const] : [],
+      ),
+    );
+    expect(new Set(tones.values()).size).toBeGreaterThan(1);
+    for (const item of stackItems) {
+      const link = screen.getByRole("link", {
+        name: new RegExp(
+          `^${item.name.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}`,
+        ),
+      });
+      expect(link.querySelector("svg"), item.name).toHaveClass(
+        `pf-px--${tones.get(item.name)}`,
+      );
+    }
+    // Two that are not the violet the code falls back to.
+    expect(
+      screen.getByRole("link", { name: /^Next\.js/ }).querySelector("svg"),
+    ).toHaveClass("pf-px--ink");
+    expect(
+      screen
+        .getByRole("link", { name: /^Expo \/ React Native/ })
+        .querySelector("svg"),
+    ).toHaveClass("pf-px--coral");
   });
 
   it("narrows to one group under ?group=", () => {
     render(<StackPage group="ship" onGroupChange={() => {}} />);
-    expect(groupCards()).toEqual(["Ship"]);
+    expect(groupTiles()).toEqual(["Ship"]);
     expect(
       screen.getByText("Showing 8 of 16 tools · Ship"),
     ).toBeInTheDocument();
@@ -194,7 +365,7 @@ describe("ProofPage", () => {
     expect(delivery).toHaveTextContent(
       "04 outcomes · TBH Intranet · AI Automation",
     );
-    // They are his own figures: the card says where he states them.
+    // They are his own figures: the block says where he states them.
     expect(
       within(delivery).getByRole("link", { name: "As stated in the résumé →" }),
     ).toHaveAttribute("href", "/resume");
@@ -229,6 +400,7 @@ describe("ProofPage", () => {
       expect(tile).toHaveTextContent(
         `${value}${label} · GoGoCashAs of October 2026`,
       );
+      expect(tile).toHaveClass("pf-read-pick--wide");
       fireEvent.click(tile);
       expect(
         screen.getByText(/Source · GoGoCash case · Where it stands/),
@@ -238,12 +410,12 @@ describe("ProofPage", () => {
       );
     }
     // An undated figure carries no date.
-    expect(screen.getByRole("button", { name: /220\+/ })).not.toHaveTextContent(
-      "As of",
-    );
+    const undated = screen.getByRole("button", { name: /220\+/ });
+    expect(undated).not.toHaveTextContent("As of");
+    expect(undated).not.toHaveClass("pf-read-pick--wide");
   });
 
-  it("shows a case card per venture with its live site and case page", () => {
+  it("shows a case tile per venture with its live site and case page", () => {
     render(<ProofPage />);
     for (const [name, slug] of [
       ["Manut AI", "manut"],
@@ -268,6 +440,9 @@ describe("BuildPage", () => {
       screen.getByText(`${total} tickets on the board`),
     ).toBeInTheDocument();
     expect(screen.queryByText("Nothing here for this filter.")).toBeNull();
+    for (const name of ["Next", "In progress", "Shipped"]) {
+      expect(screen.getByRole("article", { name })).toHaveClass("ds-tile");
+    }
     expectNoHiddenLinks(container);
   });
 
@@ -290,16 +465,5 @@ describe("BuildPage", () => {
     render(<BuildPage venture="all" onVentureChange={onVentureChange} />);
     fireEvent.click(screen.getByRole("button", { name: /^GoGoCash/ }));
     expect(onVentureChange).toHaveBeenCalledWith("gogocash");
-  });
-});
-
-describe("hubLayout", () => {
-  it("keeps the canvas layout for three hubs and fills every row after", async () => {
-    const { hubLayout } =
-      await import("@/components/landing/library/LearnPage");
-    expect([0, 1, 2].map((i) => hubLayout(i, 3).span)).toEqual([2, 1, 2]);
-    expect(hubLayout(3, 4).span).toBe(3);
-    expect([3, 4].map((i) => hubLayout(i, 5).span)).toEqual([1, 2]);
-    expect(hubLayout(5, 6).span).toBe(3);
   });
 });

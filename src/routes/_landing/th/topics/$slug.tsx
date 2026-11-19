@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import TopicHubPage from "@/components/landing/discovery/TopicHubPage";
+import TopicHubPage from "@/components/profile/pages/TopicHubPage";
 import type { Metadata } from "@/lib/seo/types";
 import {
   getTopicPillar,

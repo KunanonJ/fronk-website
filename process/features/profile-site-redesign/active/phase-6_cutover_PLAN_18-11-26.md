@@ -1,10 +1,11 @@
 # Phase 6: Cutover
 
-**Status:** CODE DONE (18-11-26). Steps 6a to 6i done in the lane
-`feat/profile-redesign-phase-6-cutover` (local commits). The owner's go of
-18-11-26 ("please continue working until done then deploy to production for
-me") covers the merge; step 6j (merge, deploy, live check) is the
-orchestrator's, after the Linux baselines and gate 8 on the preview URL.
+**Status:** VERIFIED (19-11-26). Steps 6a to 6j done: reviewed and every
+finding fixed or recorded; the CI baselines reviewed (they caught a class
+collision, fixed in `fa97bf1`); the visible text checked against production;
+PR #125 merged as `7d9b4b4` and deployed by hand with `pnpm run deploy`
+(version `26188e19`) while Workers Builds fails; the live check passed
+(report sections 15 to 18). The owner's manual checks (section 12) remain.
 **Evidence:** `../reports/phase-6_cutover_REPORT_18-11-26.md`
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`

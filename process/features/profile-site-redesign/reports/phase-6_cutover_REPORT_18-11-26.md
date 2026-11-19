@@ -584,3 +584,34 @@ shorter at 344, 882 and 1180 px, in both themes.
   before the capture (each `loading="lazy"` set to eager, then waiting for
   `complete`) would let the baselines see these images, and would change
   every page that has one.
+
+## 18. Merge, deploy and live check (19-11-26)
+
+- **Merge.** PR #125 merged as `7d9b4b4` with an admin squash merge, after
+  every GitHub check passed on `09c8394` (typecheck, lint, unit, build,
+  e2e-smoke, visual, parity, AccessLint). The required `Workers Builds:
+  fronk-website` check fails in under a second on every commit since 18 Nov
+  16:20 UTC, unchanged trees included, so the cause is on Cloudflare's side
+  and has to be read in its dashboard.
+- **Deploy, by hand.** From a clean checkout of `main` at `7d9b4b4`:
+  `pnpm run deploy` (the README's production deploy: the same build and
+  `wrangler deploy` that Workers Builds runs). Version
+  `26188e19-0161-4b3a-b759-024bedba0ca6` replaced `63b688ed` (main at
+  `e7df826`), which is the rollback target
+  (`wrangler rollback 63b688ed-0a5e-447d-8410-ddb1cf82e267`).
+- **Live check (step 6j).** Nine pages answer 200 in the new design and an
+  unknown path 404; `/portfolio` carries `pf-work-index`, so the last build
+  is the one live. `PLAYWRIGHT_BASE_URL=https://kunanonj.com` with
+  `smoke.spec.ts --project=desktop --grep "recruiter path"`: 62 passed.
+  `pnpm probe` on the live site (390 x 844, 4x CPU, about 1.6 Mbps, 150 ms
+  RTT, cold cache):
+
+| Page | Status | LCP | LCP element | CLS | TBT | JS | CSS | Fonts | Text under 12 px | Targets under 24 px |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/` | 200 | 1,704 ms | `span` | 0.000 | 63 ms | 204 KB | 38 KB | 5 (122 KB) | 0 | 0 |
+| `/about` | 200 | 1,612 ms | `img` | 0.000 | 38 ms | 195 KB | 38 KB | 6 (145 KB) | 0 | 0 |
+| `/portfolio/tbh-intranet` | 200 | 1,600 ms | `p` | 0.000 | 31 ms | 195 KB | 38 KB | 5 (122 KB) | 0 | 0 |
+
+  These are the live numbers after the cutover. The local lab pair in
+  section 7 served CSS and JavaScript uncompressed, so its absolute LCP is
+  higher; Phase 8 (step 8d) compares the live numbers.

@@ -7,6 +7,7 @@ import Link from "@/components/navigation/Link";
 import AboutBento from "@/components/profile/home/AboutBento";
 import { SectionHeader } from "@/components/profile/home/SectionHeader";
 import { Story } from "@/components/profile/home/Story";
+import { FaqList } from "@/components/profile/pages/FaqList";
 import { PageHero } from "@/components/profile/pages/PageHero";
 import {
   RecruiterLines,
@@ -306,7 +307,8 @@ function OperatingModelSection() {
 
 /**
  * FAQ: a native disclosure per question, the first one open. Every answer
- * stays in the HTML, so the page text matches the FAQPage JSON-LD.
+ * stays in the HTML, so the page text matches the FAQPage JSON-LD, and
+ * printing opens them all (FaqList, shared with the topic hubs).
  */
 function FaqTile() {
   const { faq } = aboutPage;
@@ -322,21 +324,7 @@ function FaqTile() {
         titleId="faq-title"
         titleMaxWidth={16}
       />
-      <div className="pf-faq">
-        {FAQ_ITEMS.map((item, index) => (
-          <details
-            key={item.question}
-            open={index === 0}
-            className="pf-faq__item"
-          >
-            <summary className="pf-faq__question">
-              <h3 className="pf-faq__heading">{item.question}</h3>
-              <span className="pf-faq__mark" aria-hidden="true" />
-            </summary>
-            <p className="t-body pf-faq__answer">{item.answer}</p>
-          </details>
-        ))}
-      </div>
+      <FaqList items={FAQ_ITEMS} />
     </section>
   );
 }

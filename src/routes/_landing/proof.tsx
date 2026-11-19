@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
-import ProofPage from "@/components/landing/library/ProofPage";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
+import ProofPage from "@/components/profile/pages/library/ProofPage";
 import type { Metadata } from "@/lib/seo/types";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
@@ -14,14 +14,14 @@ const metadata: Metadata = routeShareMeta({
 
 function ProofRoute() {
   return (
-    <PageMain>
+    <ProfileMain>
       <ProofPage />
-    </PageMain>
+    </ProfileMain>
   );
 }
 
 /**
- * /proof (bento redesign, phase 7f; design spec 4.13). No URL state: the
+ * /proof (profile redesign, Phase 7 lane D1). No URL state: the
  * metric tiles pick a quote locally (owner default 09-11-26).
  */
 export const Route = createFileRoute("/_landing/proof")({
