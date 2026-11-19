@@ -15,6 +15,12 @@ export interface Venture {
   /** Square logo (public path) for the hub h1 and the "Also building" card. */
   logo: string;
   /**
+   * The same mark as a 256 px PNG (public path): the Organization's `logo`
+   * in structured data (Google wants 112 px or more) and the share card's
+   * mark (lib/og/ventureMarks.ts), where a PNG renders everywhere.
+   */
+  logoPng: string;
+  /**
    * Headline figures for the case-row instrument panel. Honest only — every
    * value must be corroborated by the description / a published claim. Omit
    * entirely when a venture has no real numbers yet (no fabricated metrics).
@@ -102,6 +108,7 @@ const VENTURES: readonly Venture[] = [
     url: "https://gogocash.co",
     urlLabel: "gogocash.co",
     logo: "/brand/gogocash.svg",
+    logoPng: "/brand/gogocash.png",
     // The first three are corroborated by the description above — not
     // invented. The two dated totals are not in the description: they restate
     // the owner's CV (the résumé's GoGoCash line), as of the month he gave
@@ -160,6 +167,7 @@ const VENTURES: readonly Venture[] = [
     url: "https://manut.xyz",
     urlLabel: "manut.xyz",
     logo: "/brand/manut-144.webp",
+    logoPng: "/brand/manut.png",
     offer: FREE_TO_START,
     featured: true,
     featuredOrder: 2,

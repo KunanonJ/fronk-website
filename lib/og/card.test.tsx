@@ -76,6 +76,32 @@ describe("OgCard", () => {
     expect(JSON.stringify(expand(OgCard({ title: "Another" })))).not.toBe(json);
   });
 
+  it("draws a brand mark beside the text only when given one", () => {
+    const find = (node: unknown): { props: Record<string, unknown> }[] => {
+      if (Array.isArray(node)) return node.flatMap(find);
+      if (!node || typeof node !== "object" || !("props" in node)) return [];
+      const el = node as { type: unknown; props: { children?: unknown } };
+      return [
+        ...(el.type === "img"
+          ? [el as { props: Record<string, unknown> }]
+          : []),
+        ...find(el.props.children),
+      ];
+    };
+    const plain = expand(<OgCard eyebrow="Venture" title="GoGoCash" />);
+    expect(find(plain)).toHaveLength(0);
+    const marked = expand(
+      <OgCard
+        eyebrow="Venture"
+        title="GoGoCash"
+        mark="data:image/png;base64,AA"
+      />,
+    );
+    const [img] = find(marked);
+    expect(img.props.src).toBe("data:image/png;base64,AA");
+    expect(img.props.width).toBe(img.props.height);
+  });
+
   it("cuts a long subtitle at a word, with an ellipsis", () => {
     expect(clampText("Short enough.", 118)).toBe("Short enough.");
     const long =

@@ -1,5 +1,6 @@
 import { getVentureBySlug } from "@/lib/content/ventures";
 import { renderSlugCard } from "@/lib/og/render";
+import { ventureMark } from "@/lib/og/ventureMarks";
 
 export default function VentureOgImage(slug: string): Response {
   const venture = getVentureBySlug(slug);
@@ -8,6 +9,7 @@ export default function VentureOgImage(slug: string): Response {
       eyebrow: "Venture",
       title: venture.name,
       subtitle: venture.tagline,
+      mark: ventureMark(venture.slug),
     },
   );
 }
