@@ -8,10 +8,6 @@ import { NO_STORE } from "@/src/lib/cache";
 import { pageHead } from "@/src/lib/head";
 import { viewportContent } from "@/lib/seo/metadataToHead";
 
-/** CSP from next.config.ts headers(): Studio may be framed by sanity.io. */
-const STUDIO_CSP =
-  "frame-ancestors 'self' https://www.sanity.io https://*.sanity.io";
-
 /**
  * The Studio page is static: it links to the external Studio, whose URL is
  * set at build time. It changes only on a deploy, which empties the cache: a
@@ -34,10 +30,8 @@ export const Route = createFileRoute("/studio")({
       ],
     };
   },
-  headers: ({ match }) => ({
-    "Content-Security-Policy": STUDIO_CSP,
-    ...(match.status === "success" ? STUDIO_CACHE : NO_STORE),
-  }),
+  headers: ({ match }) =>
+    match.status === "success" ? STUDIO_CACHE : NO_STORE,
   component: () => (
     <StudioLayout>
       <StudioPage />

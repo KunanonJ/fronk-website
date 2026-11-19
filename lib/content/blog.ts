@@ -50,6 +50,14 @@ export const blogPage = {
  */
 export const BLOG_CORNERSTONE_SLUG = "ai-transformation-thailand-smes";
 
+/** A post slug: lowercase words joined by single hyphens, at most 96 characters. */
+const BLOG_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** True for a string that can be a post's slug (BLOG_SLUG). */
+export function isBlogSlug(slug: unknown): slug is string {
+  return typeof slug === "string" && slug.length <= 96 && BLOG_SLUG.test(slug);
+}
+
 /** Venture tags the index offers as filter rows ("In these notes"). */
 export const BLOG_VENTURE_TAGS = [
   { tag: "GoGoCash", venture: "gogocash" },
@@ -349,6 +357,10 @@ export function resolveBlogCards(
     bySlug.set(fallback.slug, fallback);
   }
   for (const post of posts) {
+    // A slug from Sanity lands in URLs, the sitemap and the feed: one that
+    // is not a plain slug (Studio checks can be skipped by an API write)
+    // keeps its post off the site.
+    if (!isBlogSlug(post.slug)) continue;
     bySlug.set(post.slug, mapPostToBlogCard(post));
   }
   return [...bySlug.values()].sort((a, b) =>

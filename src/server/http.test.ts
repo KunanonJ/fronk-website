@@ -51,16 +51,12 @@ describe("withSecurityHeaders", () => {
 });
 
 describe("the Content Security Policy (enforced)", () => {
-  it("rides on every Worker response but Sanity Studio's", () => {
-    const page = withSecurityHeaders(new Response("ok"), "/about");
+  it("rides on every Worker response, /studio's included", () => {
+    const page = withSecurityHeaders(new Response("ok"));
     expect(CSP_HEADER).toBe("Content-Security-Policy");
     expect(page.headers.get(CSP_HEADER)).toBe(CONTENT_SECURITY_POLICY);
     expect(page.headers.get("content-security-policy-report-only")).toBeNull();
-    for (const path of ["/studio", "/studio/structure"]) {
-      const studio = withSecurityHeaders(new Response("ok"), path);
-      expect(studio.headers.get(CSP_HEADER), path).toBeNull();
-      expect(studio.headers.get("x-content-type-options")).toBe("nosniff");
-    }
+    expect(page.headers.get("cross-origin-opener-policy")).toBe("same-origin");
   });
 
   it("blocks plug-ins and foreign bases, forms and frames", () => {
@@ -81,22 +77,19 @@ describe("the Content Security Policy (enforced)", () => {
     expect(CONTENT_SECURITY_POLICY).toContain(`report-uri ${CSP_REPORT_PATH}`);
     expect(CONTENT_SECURITY_POLICY).toContain("report-to csp");
     expect(REPORTING_ENDPOINTS).toBe(`csp="${CSP_REPORT_PATH}"`);
-    const page = withSecurityHeaders(new Response("ok"), "/about");
+    const page = withSecurityHeaders(new Response("ok"));
     expect(page.headers.get("reporting-endpoints")).toBe(REPORTING_ENDPOINTS);
   });
 
-  it("is the same policy in public/_headers, detached for Sanity Studio", () => {
+  it("is the same in public/_headers, with no path detached from it", () => {
     const headers = readFileSync(
       join(process.cwd(), "public/_headers"),
       "utf8",
     );
-    expect(headers).toContain(`  ${CSP_HEADER}: ${CONTENT_SECURITY_POLICY}\n`);
-    expect(headers).toContain(
-      `  Reporting-Endpoints: ${REPORTING_ENDPOINTS}\n`,
-    );
-    for (const path of ["/studio", "/studio/*"]) {
-      expect(headers).toContain(`\n${path}\n  ! ${CSP_HEADER}\n`);
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+      expect(headers).toContain(`  ${name}: ${value}\n`);
     }
+    expect(headers).not.toContain(`! ${CSP_HEADER}`);
   });
 });
 

@@ -1,5 +1,5 @@
 import handler from "@tanstack/react-start/server-entry";
-import { redirectFor } from "./lib/redirects";
+import { queryFreeRedirect, redirectFor } from "./lib/redirects";
 import { handleCspReport } from "./server/cspReport";
 import {
   CSP_REPORT_PATH,
@@ -35,7 +35,6 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     return withSecurityHeaders(
       withServerFnNoStore(request, await route(request, env, ctx)),
-      new URL(request.url).pathname,
     );
   },
 };
@@ -47,6 +46,10 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
   if (to) {
     const location = to.includes("#") ? to : `${to}${url.search}`;
     return new Response(null, { status: 308, headers: { Location: location } });
+  }
+  const bare = queryFreeRedirect(url, request.method);
+  if (bare) {
+    return new Response(null, { status: 308, headers: { Location: bare } });
   }
   if (url.pathname === "/api/revalidate" && request.method === "POST") {
     return handleSanityWebhook(

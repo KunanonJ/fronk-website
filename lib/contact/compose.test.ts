@@ -63,6 +63,19 @@ describe("composeContactEmail", () => {
     expect(email.href.split("&body=")[0]).not.toMatch(/%0[AD]/);
   });
 
+  it("encodes a draft that carries a lone surrogate instead of throwing", () => {
+    const email = composeContactEmail({
+      name: "Ada \uD800",
+      message: "Hi \uDC00 there 😀",
+      topics: [],
+    });
+    expect(email.subject).toBe("Ada � via kunanonj.com");
+    expect(email.body).toBe("Hi � there 😀\n\nAda �");
+    expect(decodeURIComponent(email.href.split("&body=")[1])).toBe(
+      "Hi � there 😀\r\n\r\nAda �",
+    );
+  });
+
   it("leaves the body out of a link that would pass the Windows limit", () => {
     const fits = composeContactEmail({
       name: "Ada",

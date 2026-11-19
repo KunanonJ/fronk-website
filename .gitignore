@@ -61,3 +61,6 @@ next-env.d.ts
 # local dev-preview config (per-machine, not part of the build)
 /.claude/
 /.vibecode-backup/
+
+# Coding-agent hook logs (tool names, blocked paths, search patterns).
+/.codex/hooks/.logs/

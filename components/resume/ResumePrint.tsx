@@ -6,6 +6,7 @@ import type {
 } from "@/lib/content/resumeProfile";
 import { isLiveBullet, linkLabel, printGroups } from "@/lib/resume/view";
 import { siteConfig } from "@/lib/site";
+import { safeHref } from "@/lib/utils/safeHref";
 
 export type ResumeProfileView = ReturnType<typeof resolveResumeProfile>;
 
@@ -163,7 +164,7 @@ function PrintEntry({ item }: { item: ResolvedTimelineItem }) {
       </div>
       <p className="m-0 text-ink-2">
         {item.org}
-        {item.href ? (
+        {item.href && safeHref(item.href) ? (
           <>
             {" | "}
             <a href={item.href}>{linkLabel(item.href)}</a>

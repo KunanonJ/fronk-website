@@ -1,4 +1,5 @@
 import type { Manifest, Robots, Sitemap } from "@/lib/seo/types";
+import { escapeXml } from "@/lib/utils/xml";
 
 /*
  * Text output of Next's metadata routes (robots.ts, sitemap.ts, manifest.ts),
@@ -28,18 +29,22 @@ export function robotsToText(robots: Robots): string {
   return out;
 }
 
+/**
+ * Every value is escaped: post URLs carry slugs from Sanity, and the sitemap
+ * is served from the site's own origin as XML, where markup would run.
+ */
 export function sitemapToXml(entries: Sitemap): string {
   let out =
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   for (const entry of entries) {
     out += "<url>\n";
-    out += `<loc>${entry.url}</loc>\n`;
+    out += `<loc>${escapeXml(entry.url)}</loc>\n`;
     if (entry.lastModified) {
       const date =
         entry.lastModified instanceof Date
           ? entry.lastModified.toISOString()
           : entry.lastModified;
-      out += `<lastmod>${date}</lastmod>\n`;
+      out += `<lastmod>${escapeXml(date)}</lastmod>\n`;
     }
     if (entry.changeFrequency)
       out += `<changefreq>${entry.changeFrequency}</changefreq>\n`;

@@ -10,9 +10,11 @@
 import { createClient } from "@sanity/client";
 import { randomBytes } from "node:crypto";
 
-const token = process.env.SANITY_TOKEN ?? process.env.SANITY_API_READ_TOKEN;
+// Writes need an editor token of their own: a read token must never carry
+// write rights, so there is no fallback to one.
+const token = process.env.SANITY_TOKEN;
 if (!token) {
-  console.error("Missing SANITY_TOKEN (or SANITY_API_READ_TOKEN). Aborting.");
+  console.error("Missing SANITY_TOKEN (an editor token). Aborting.");
   process.exit(1);
 }
 

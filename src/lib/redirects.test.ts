@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { redirectFor } from "./redirects";
+import { queryFreeRedirect, redirectFor } from "./redirects";
 
 describe("redirectFor (next.config.ts redirects + trailing slash)", () => {
   it.each([
@@ -32,4 +32,48 @@ describe("redirectFor (next.config.ts redirects + trailing slash)", () => {
       expect(redirectFor(path)).toBeNull();
     },
   );
+});
+
+describe("queryFreeRedirect (endpoints whose output ignores the query)", () => {
+  const at = (path: string) => new URL(path, "https://kunanonj.com");
+
+  it.each([
+    ["/opengraph-image?x=1", "/opengraph-image"],
+    [
+      "/portfolio/tbh-intranet/opengraph-image?v=2",
+      "/portfolio/tbh-intranet/opengraph-image",
+    ],
+    ["/icon?x", "/icon"],
+    ["/apple-icon?x", "/apple-icon"],
+    ["/llms.txt?audit=1", "/llms.txt"],
+    ["/about.md?x=1", "/about.md"],
+    ["/sitemap.xml?x=1", "/sitemap.xml"],
+    ["/skills.json?x=1", "/skills.json"],
+    ["/manifest.webmanifest?x=1", "/manifest.webmanifest"],
+    [
+      "/.well-known/agent-skills/index.json?x=1",
+      "/.well-known/agent-skills/index.json",
+    ],
+    ["/api/github/contributions?x=1", "/api/github/contributions"],
+  ])("%s -> %s", (from, to) => {
+    expect(queryFreeRedirect(at(from), "GET")).toBe(to);
+    expect(queryFreeRedirect(at(from), "HEAD")).toBe(to);
+  });
+
+  it.each([
+    "/opengraph-image",
+    "/llms.txt",
+    "/blog?tag=ai",
+    "/portfolio?kind=fintech",
+    "/resume?x=1",
+    "/_serverFn/abc?payload=1",
+    "/api/csp-report?x=1",
+    "/iconography?x=1",
+  ])("%s is left alone", (path) => {
+    expect(queryFreeRedirect(at(path), "GET")).toBeNull();
+  });
+
+  it("leaves other methods alone", () => {
+    expect(queryFreeRedirect(at("/llms.txt?x=1"), "POST")).toBeNull();
+  });
 });

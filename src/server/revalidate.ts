@@ -4,6 +4,7 @@ import {
   isValidSignature,
 } from "@sanity/webhook";
 import { getRevalidationTagsForType } from "@/lib/sanity/revalidation";
+import { readBodyText } from "./http";
 
 /*
  * Sanity webhook → Worker cache purge (replaces Next's revalidateTag). Runs in
@@ -44,21 +45,30 @@ async function purgeTags(
  */
 export const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000;
 
+/** The largest body read: a webhook carries one document's projection. */
+export const MAX_WEBHOOK_BYTES = 1024 * 1024;
+
 export async function handleSanityWebhook(
   request: Request,
   secret: string | undefined,
   cache: CachePurger | undefined,
   now: number = Date.now(),
 ): Promise<Response> {
-  if (!secret)
-    return Response.json(
-      { message: "Missing SANITY_REVALIDATE_SECRET" },
-      { status: 500 },
-    );
+  // The caller is not known yet: the setting's name goes to the log only.
+  if (!secret) {
+    console.error("revalidate: SANITY_REVALIDATE_SECRET is not set");
+    return Response.json({ message: "Not configured" }, { status: 500 });
+  }
 
-  const payload = await request.text();
+  // An unsigned request is refused before its body is read, and a signed
+  // one is read up to MAX_WEBHOOK_BYTES: the endpoint is public.
   const signature = request.headers.get(SIGNATURE_HEADER_NAME) ?? "";
-  if (!signature || !(await isValidSignature(payload, signature, secret))) {
+  if (!signature)
+    return Response.json({ message: "Invalid signature" }, { status: 401 });
+  const payload = await readBodyText(request, MAX_WEBHOOK_BYTES);
+  if (payload === null)
+    return Response.json({ message: "Payload too large" }, { status: 413 });
+  if (!(await isValidSignature(payload, signature, secret))) {
     return Response.json({ message: "Invalid signature" }, { status: 401 });
   }
   // The signature is valid, so the header decodes; its timestamp is in ms.

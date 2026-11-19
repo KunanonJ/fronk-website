@@ -12,8 +12,12 @@ import { methodNotAllowed, readBodyText } from "./http";
 
 /** One browser's batch is a few KB; a body past this is not a browser's. */
 const MAX_BYTES = 64 * 1024;
-/** Log lines per request at most. */
-const MAX_VIOLATIONS = 20;
+/**
+ * Log lines per request at most, after repeats are dropped: a browser's batch
+ * holds a few distinct violations, and the endpoint is public, so one request
+ * must not fill the logs.
+ */
+const MAX_VIOLATIONS = 5;
 /** Characters kept of any one logged value. */
 const MAX_FIELD = 200;
 
@@ -134,7 +138,7 @@ export function cspViolations(body: unknown): CspViolation[] {
   });
 }
 
-/** Logs each violation in the body (up to MAX_VIOLATIONS) and answers 204. */
+/** Logs each distinct violation in the body (up to MAX_VIOLATIONS) and answers 204. */
 export async function handleCspReport(request: Request): Promise<Response> {
   if (request.method !== "POST") return methodNotAllowed("POST");
   const type = (request.headers.get("content-type") ?? "")
@@ -150,8 +154,11 @@ export async function handleCspReport(request: Request): Promise<Response> {
   } catch {
     return new Response(null, { status: 400 });
   }
-  for (const found of cspViolations(body).slice(0, MAX_VIOLATIONS)) {
-    console.warn(JSON.stringify({ event: "csp-violation", ...found }));
-  }
+  const lines = new Set(
+    cspViolations(body).map((found) =>
+      JSON.stringify({ event: "csp-violation", ...found }),
+    ),
+  );
+  for (const line of [...lines].slice(0, MAX_VIOLATIONS)) console.warn(line);
   return new Response(null, { status: 204 });
 }
