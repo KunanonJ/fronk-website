@@ -66,7 +66,10 @@ test.describe("csp > every route sends the policy and breaks none of it", () => 
       expect(
         response?.headers()["content-security-policy-report-only"],
         route.path,
-      ).toContain("default-src 'self'");
+      ).toContain("report-uri /api/csp-report");
+      expect(response?.headers()["reporting-endpoints"], route.path).toBe(
+        'csp="/api/csp-report"',
+      );
       await page.evaluate(async () => {
         for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
           scrollTo(0, y);
@@ -80,6 +83,23 @@ test.describe("csp > every route sends the policy and breaks none of it", () => 
       expect(violations, route.path).toEqual([]);
     });
   }
+});
+
+test("csp > the report endpoint takes a browser's report", async ({
+  request,
+}) => {
+  const report = await request.post("/api/csp-report", {
+    headers: { "Content-Type": "application/csp-report" },
+    data: JSON.stringify({
+      "csp-report": {
+        "document-uri": "https://kunanonj.com/about",
+        "effective-directive": "img-src",
+        "blocked-uri": "https://example.com/x.png",
+      },
+    }),
+  });
+  expect(report.status()).toBe(204);
+  expect((await request.get("/api/csp-report")).status()).toBe(405);
 });
 
 test.describe("a11y > reduced-motion users get a static, usable page", () => {

@@ -2,9 +2,13 @@
  * Small request/response helpers shared by the Worker entry and the API routes.
  */
 
+/** Where browsers send the policy's violation reports (./cspReport.ts). */
+export const CSP_REPORT_PATH = "/api/csp-report";
+
 /**
  * The site's Content Security Policy (best-practices audit R21), sent
- * report-only: browsers report what it would block and block nothing.
+ * report-only: browsers block nothing and report what it would block to
+ * CSP_REPORT_PATH, which logs each violation.
  * Scripts keep 'unsafe-inline': TanStack Start streams per-page hydration
  * scripts into the HTML, which no hash can cover, the prerendered pages
  * cannot carry a per-response nonce, and any hash would switch
@@ -26,7 +30,15 @@ export const CONTENT_SECURITY_POLICY = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'self'",
+  // Where reports go: report-to (its endpoint named in Reporting-Endpoints)
+  // where the Reporting API is supported, report-uri elsewhere. Safari logs
+  // an error for a report-only policy with neither, and drops the policy.
+  `report-uri ${CSP_REPORT_PATH}`,
+  "report-to csp",
 ].join("; ");
+
+/** The Reporting-Endpoints header: the endpoint report-to's "csp" names. */
+export const REPORTING_ENDPOINTS = `csp="${CSP_REPORT_PATH}"`;
 
 /** The policy's header: report-only until the owner decides to enforce it. */
 export const CSP_HEADER = "Content-Security-Policy-Report-Only";
@@ -40,6 +52,7 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "Permissions-Policy":
     "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   [CSP_HEADER]: CONTENT_SECURITY_POLICY,
+  "Reporting-Endpoints": REPORTING_ENDPOINTS,
 };
 
 /**

@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import {
   CONTENT_SECURITY_POLICY,
   CSP_HEADER,
+  CSP_REPORT_PATH,
+  REPORTING_ENDPOINTS,
   SECURITY_HEADERS,
   SERVER_FN_PATH,
   isCrossSite,
@@ -73,12 +75,25 @@ describe("the Content Security Policy (report-only)", () => {
     }
   });
 
+  it("sends its reports to the Worker's report endpoint", () => {
+    // Safari drops a report-only policy that names no report destination.
+    expect(CSP_REPORT_PATH).toBe("/api/csp-report");
+    expect(CONTENT_SECURITY_POLICY).toContain(`report-uri ${CSP_REPORT_PATH}`);
+    expect(CONTENT_SECURITY_POLICY).toContain("report-to csp");
+    expect(REPORTING_ENDPOINTS).toBe(`csp="${CSP_REPORT_PATH}"`);
+    const page = withSecurityHeaders(new Response("ok"), "/about");
+    expect(page.headers.get("reporting-endpoints")).toBe(REPORTING_ENDPOINTS);
+  });
+
   it("is the same policy in public/_headers, detached for Sanity Studio", () => {
     const headers = readFileSync(
       join(process.cwd(), "public/_headers"),
       "utf8",
     );
     expect(headers).toContain(`  ${CSP_HEADER}: ${CONTENT_SECURITY_POLICY}\n`);
+    expect(headers).toContain(
+      `  Reporting-Endpoints: ${REPORTING_ENDPOINTS}\n`,
+    );
     for (const path of ["/studio", "/studio/*"]) {
       expect(headers).toContain(`\n${path}\n  ! ${CSP_HEADER}\n`);
     }
