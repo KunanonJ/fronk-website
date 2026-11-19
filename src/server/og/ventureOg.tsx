@@ -1,15 +1,13 @@
 import { getVentureBySlug } from "@/lib/content/ventures";
-import { renderOgCard } from "@/lib/og/render";
+import { renderSlugCard } from "@/lib/og/render";
 
-type Props = { params: Promise<{ slug: string }> };
-
-export default async function VentureOgImage({ params }: Props) {
-  const { slug } = await params;
+export default function VentureOgImage(slug: string): Response {
   const venture = getVentureBySlug(slug);
-  if (!venture) return new Response("Not found", { status: 404 });
-  return renderOgCard({
-    eyebrow: "Venture",
-    title: venture.name,
-    subtitle: venture.tagline,
-  });
+  return renderSlugCard(
+    venture && {
+      eyebrow: "Venture",
+      title: venture.name,
+      subtitle: venture.tagline,
+    },
+  );
 }

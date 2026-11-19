@@ -1,3 +1,4 @@
+import { OG_SIZE } from "@/lib/og/card";
 import type { FileOgImage } from "@/lib/seo/metadataToHead";
 
 /**
@@ -7,8 +8,8 @@ import type { FileOgImage } from "@/lib/seo/metadataToHead";
 export function fileOg(path: string, alt: string): FileOgImage {
   return {
     url: `${path}/opengraph-image`,
-    width: 1200,
-    height: 630,
+    width: OG_SIZE.width,
+    height: OG_SIZE.height,
     alt,
     type: "image/png",
   };
