@@ -337,3 +337,34 @@ rebased onto `main` once PR #125 merged as `7d9b4b4`. They applied cleanly.
 - **Baselines.** The 40 interim baselines of these ten pages, rendered at the
   cutover with the new chrome around the old bodies, were removed, so CI
   writes them again in this PR.
+
+## 14. CI on PR #126: one overflow at 344 px, fixed (19-11-26)
+
+The first CI run wrote the 40 baselines and passed every live screenshot,
+but one device-matrix check failed on both tries:
+`/topics/erp-crm-internal-systems at 344px: 352px of content in a 344px
+viewport`.
+
+- **Cause.** The contact panel's pill ("Discuss your internal system") keeps
+  one line (`white-space: nowrap`). On a 344 px phone it is wider than the
+  panel. The closing grid (`.pf-hub-close`) had an implicit `auto` column,
+  which took the pill's width as its minimum and pushed the panel and the
+  links list beside it into the right gutter: 19 px on a Mac, still inside
+  the screen, and 8 px past it in CI, whose Linux text is a little wider.
+  The Thai AI hub had the same fault on a Mac (8.5 px into the gutter).
+- **Fix (`9c56bd2`).** The hiring panel's pills may now wrap (`case.css`);
+  a pill that fits keeps its single 44 px line. On a case page the pills
+  measure the same as production (same position, width and height; the
+  label's centre moves 0.005 px). The closing grid's column is
+  `minmax(0, 1fr)`.
+- **The check now sees this on any machine.** The hubs' device matrix flags a
+  part that crosses its `.ds-wrap` padding into the side gutter (4 px allowed
+  for a rotated mark's box). It failed on both pages against the old build on
+  a Mac and passes after the fix. A run of 78 then showed 4 failures at
+  344 px, all straight after the resize: Chromium can resolve `vw` units at
+  the old width until its next frame (`--pad` read 72 px at 344 px). The check
+  now waits two frames after each resize; 130 runs of 130 passed.
+- **Second CI run (`9c56bd2`).** Only the 40 `writing actual` failures; the
+  device matrix passed (539), the case pages' baselines among them. The 40
+  renders were reviewed on contact sheets (all ten pages, both themes,
+  desktop and mobile) and committed (`8d99d1c`).
