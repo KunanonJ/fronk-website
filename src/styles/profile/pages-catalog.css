@@ -970,7 +970,8 @@
     inline-size: 100%;
     block-size: 52px;
     padding-inline: 44px 18px;
-    border: 1px solid var(--line-strong);
+    /* --ink-45: an input's edge on paper needs 3:1 (spec 2.2, WCAG 1.4.11). */
+    border: 1px solid var(--ink-45);
     border-radius: var(--radius-pill);
     background: var(--paper);
     color: var(--ink);
