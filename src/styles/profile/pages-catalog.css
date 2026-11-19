@@ -937,6 +937,8 @@
     font-family: var(--font-sans);
     text-align: start;
     cursor: pointer;
+    /* A row is wider than a pill: a card's press (ds-press in globals.css). */
+    --press: 0.985;
   }
   .pf-blog-venture[aria-pressed="true"] {
     border-color: var(--ink);

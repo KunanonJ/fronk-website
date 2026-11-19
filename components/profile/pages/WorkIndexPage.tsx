@@ -127,7 +127,7 @@ export default function WorkIndexPage({
                 type="button"
                 aria-pressed={option.id === category}
                 onClick={() => onCategoryChange(option.id)}
-                className="pf-filter__option"
+                className="pf-filter__option ds-press"
               >
                 {option.label}
               </button>

@@ -1511,6 +1511,28 @@ html.kj-vt *::after {
   [data-reveal="scale"].is-pending {
     transform: scale(0.98);
   }
+  .ds-press {
+    transition:
+      transform 0.14s var(--ease-snappy),
+      background-color 0.1s ease-out,
+      color 0.1s ease-out;
+  }
+  .ds-press:active {
+    transform: scale(var(--press, 0.97));
+  }
+}
+
+/* Press and hover for controls that are not pills (the filters, the contact
+   topics, the blog's venture rows, the Share pill), in the Pill's language:
+   the ghost pill's paper-2 fill and ink on hover, its press, and with
+   ds-press--lift its 1 px lift. A pressed or selected option keeps its own
+   fill. Outside any layer, like the Pill's motion, so the fill beats a
+   Tailwind bg- utility on the same element. */
+@media (hover: hover) and (pointer: fine) {
+  .ds-press:not([aria-pressed="true"], [aria-selected="true"]):hover {
+    background-color: var(--paper-2);
+    color: var(--ink);
+  }
 }
 
 /* Print shows everything. The no-preference query above also matches print,
@@ -1525,7 +1547,8 @@ html.kj-vt *::after {
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   /* Not while pressed: this rule comes after .ds-pill:active and would
      replace its 0.97 press with the lift. */
-  .ds-pill--ghost:hover:not(:active) {
+  .ds-pill--ghost:hover:not(:active),
+  .ds-press--lift:hover:not(:active) {
     transform: translateY(-1px);
   }
   .ds-text-link:hover .ds-text-link__arrow {

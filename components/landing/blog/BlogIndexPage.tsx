@@ -180,7 +180,7 @@ function VenturesCard({
               type="button"
               aria-pressed={on}
               onClick={() => onPick(on ? "" : row.name)}
-              className="pf-blog-venture"
+              className="pf-blog-venture ds-press"
             >
               <img
                 src={row.logo}

@@ -77,7 +77,7 @@ export default function SkillsCatalog({
                 type="button"
                 aria-pressed={filter.id === show}
                 onClick={() => onShowChange(filter.id)}
-                className="pf-filter__option"
+                className="pf-filter__option ds-press"
               >
                 {filter.label} <span className="pf-count">{filter.count}</span>
               </button>

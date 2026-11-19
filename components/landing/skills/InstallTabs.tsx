@@ -78,7 +78,7 @@ export default function InstallTabs({
               tabIndex={active ? 0 : -1}
               onClick={() => setSelected(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
-              className="pf-filter__option"
+              className="pf-filter__option ds-press"
             >
               {tab.label}
             </button>
