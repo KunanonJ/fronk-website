@@ -200,8 +200,17 @@
     block-size: 6px;
     background: var(--accent);
   }
+  /* About 300 of 304 px on a 344 px phone, so a wider font or larger text
+     wraps it inside the pill rather than into the gutter. A pill that fits
+     keeps its single 44 px line. */
   .pf-skill-release {
     gap: 8px;
+    max-inline-size: 100%;
+    block-size: auto;
+    min-block-size: 44px;
+    padding-block: 10px;
+    line-height: 1.25;
+    white-space: normal;
   }
   .pf-skill-sibling {
     max-inline-size: 100%;
