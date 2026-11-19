@@ -1,3 +1,5 @@
+import { withHeaders } from "@/src/lib/response";
+
 /*
  * Small request/response helpers shared by the Worker entry and the API routes.
  */
@@ -89,27 +91,19 @@ export function withServerFnNoStore(
     !new URL(request.url).pathname.startsWith(SERVER_FN_PATH)
   )
     return response;
-  const headers = new Headers(response.headers);
-  headers.set("Cache-Control", "no-store");
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  return withHeaders(response, (headers) =>
+    headers.set("Cache-Control", "no-store"),
+  );
 }
 
 /** Copy of `response` with SECURITY_HEADERS added where the response has not set them. */
 export function withSecurityHeaders(response: Response): Response {
   // A WebSocket upgrade (101) cannot be rebuilt; the site has none, but be safe.
   if (response.status === 101) return response;
-  const headers = new Headers(response.headers);
-  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
-    if (!headers.has(name)) headers.set(name, value);
-  }
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
+  return withHeaders(response, (headers) => {
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+      if (!headers.has(name)) headers.set(name, value);
+    }
   });
 }
 

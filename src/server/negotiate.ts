@@ -1,4 +1,5 @@
 import { DEPLOY_LIFETIME, EDGE_LIFETIME } from "@/src/lib/cache";
+import { withHeaders } from "@/src/lib/response";
 
 /*
  * Markdown content negotiation (agent-readiness plan, step 4). These pages
@@ -99,28 +100,28 @@ function withVersionHeaders(
   keep = true,
 ): Response {
   if (!(response.ok || response.status === 304)) return response;
-  const headers = new Headers(response.headers);
-  const vary = headers.get("Vary");
-  if (!vary || !/(^|,)\s*accept\s*(,|$)/i.test(vary))
-    headers.set("Vary", vary ? `${vary}, Accept` : "Accept");
-  if (keep) {
-    for (const [name, value] of Object.entries(
-      edgeHeadersFor(pathname, markdownPath !== null),
-    ))
-      headers.set(name, value);
-  } else {
-    // HTML in place of Markdown that failed: kept nowhere, or the cache
-    // would answer that Accept value with HTML long after the failure.
-    headers.delete("CDN-Cache-Control");
-    headers.set("Cache-Control", "no-store");
-  }
-  if (markdownPath) headers.set("Content-Location", markdownPath);
-  if (pathname === "/") headers.set("Link", HOME_LINKS);
-  return new Response(bodyless ? null : response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  return withHeaders(
+    response,
+    (headers) => {
+      const vary = headers.get("Vary");
+      if (!vary || !/(^|,)\s*accept\s*(,|$)/i.test(vary))
+        headers.set("Vary", vary ? `${vary}, Accept` : "Accept");
+      if (keep) {
+        for (const [name, value] of Object.entries(
+          edgeHeadersFor(pathname, markdownPath !== null),
+        ))
+          headers.set(name, value);
+      } else {
+        // HTML in place of Markdown that failed: kept nowhere, or the cache
+        // would answer that Accept value with HTML long after the failure.
+        headers.delete("CDN-Cache-Control");
+        headers.set("Cache-Control", "no-store");
+      }
+      if (markdownPath) headers.set("Content-Location", markdownPath);
+      if (pathname === "/") headers.set("Link", HOME_LINKS);
+    },
+    bodyless ? null : response.body,
+  );
 }
 
 /**

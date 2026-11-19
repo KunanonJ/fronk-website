@@ -1,4 +1,5 @@
 import type { RevalidationTag } from "@/lib/sanity/revalidation";
+import { withHeaders } from "./response";
 
 /*
  * Worker cache headers (wrangler.jsonc `cache.enabled`). The edge reads
@@ -68,13 +69,9 @@ export async function withEdgeCache(
 ): Promise<Response> {
   const res = await response;
   if (!res.ok) return res;
-  const headers = new Headers(res.headers);
-  for (const [key, value] of Object.entries(edgeCacheHeaders(tags)))
-    headers.set(key, value);
-  return new Response(res.body, {
-    status: res.status,
-    statusText: res.statusText,
-    headers,
+  return withHeaders(res, (headers) => {
+    for (const [key, value] of Object.entries(edgeCacheHeaders(tags)))
+      headers.set(key, value);
   });
 }
 
@@ -91,13 +88,9 @@ export async function withEdgeLifetime(
 ): Promise<Response> {
   const res = await response;
   if (!res.ok) return res;
-  const headers = new Headers(res.headers);
-  headers.set("CDN-Cache-Control", lifetime);
-  if (browser) headers.set("Cache-Control", browser);
-  return new Response(res.body, {
-    status: res.status,
-    statusText: res.statusText,
-    headers,
+  return withHeaders(res, (headers) => {
+    headers.set("CDN-Cache-Control", lifetime);
+    if (browser) headers.set("Cache-Control", browser);
   });
 }
 
