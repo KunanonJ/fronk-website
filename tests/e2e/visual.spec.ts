@@ -73,7 +73,6 @@ async function loadEveryImage(page: Page) {
       }),
     ),
   );
-  await page.waitForLoadState("networkidle");
 }
 
 test.skip(
