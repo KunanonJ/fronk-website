@@ -1,4 +1,4 @@
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN, siteConfig } from "@/lib/site";
 
 /**
  * RFC 9116 security.txt, served at /.well-known/security.txt.
@@ -9,13 +9,12 @@ import { siteConfig } from "@/lib/site";
 export const SECURITY_TXT_EXPIRES = "2027-11-01T00:00:00.000Z";
 
 export function buildSecurityTxt(): string {
-  const base = siteConfig.url.replace(/\/$/, "");
   return [
     `Contact: mailto:${siteConfig.email}`,
-    `Contact: ${base}/contact`,
+    `Contact: ${SITE_ORIGIN}/contact`,
     `Expires: ${SECURITY_TXT_EXPIRES}`,
     "Preferred-Languages: en, th",
-    `Canonical: ${base}/.well-known/security.txt`,
+    `Canonical: ${SITE_ORIGIN}/.well-known/security.txt`,
     "",
   ].join("\n");
 }

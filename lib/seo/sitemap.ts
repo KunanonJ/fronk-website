@@ -5,7 +5,7 @@ import { getAllPortfolioSlugs } from "@/lib/content/portfolio";
 import { getAllSkillSlugs } from "@/lib/content/skills";
 import { TOPIC_SLUGS } from "@/lib/content/topics/pillars";
 import { getAllVentureSlugs } from "@/lib/content/ventures";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 
@@ -56,11 +56,10 @@ const STATIC_ROUTES: readonly {
 ];
 
 export default async function sitemap(): Promise<Sitemap> {
-  const base = siteConfig.url.replace(/\/$/, "");
   const staticUpdated = new Date(`${SITE_UPDATED}T00:00:00Z`);
 
   const staticEntries: Sitemap = STATIC_ROUTES.map((route) => ({
-    url: `${base}${route.path}`,
+    url: `${SITE_ORIGIN}${route.path}`,
     lastModified: staticUpdated,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
@@ -78,7 +77,7 @@ export default async function sitemap(): Promise<Sitemap> {
     seen.add(card.slug);
     const published = new Date(card.publishedAt);
     postEntries.push({
-      url: `${base}/blog/${card.slug}`,
+      url: `${SITE_ORIGIN}/blog/${card.slug}`,
       lastModified: Number.isNaN(published.getTime())
         ? staticUpdated
         : published,

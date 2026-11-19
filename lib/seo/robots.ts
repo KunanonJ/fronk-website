@@ -39,7 +39,7 @@ const BLOCKED_USER_AGENTS = ["CCBot", "Bytespider"] as const;
 
 /** Robots Host/Sitemap must never advertise the local placeholder. */
 function robotsOrigin(): string {
-  const resolved = resolvePublicSiteUrl().replace(/\/$/, "");
+  const resolved = resolvePublicSiteUrl();
   if (
     resolved === PLACEHOLDER_SITE_URL ||
     resolved.includes("example.com") ||

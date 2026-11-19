@@ -2,7 +2,7 @@ import type { Metadata } from "@/lib/seo/types";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { FEED_PATH } from "@/lib/content/rss";
 import { OG_SIZE } from "@/lib/og/card";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, sitePath, siteUrl } from "@/lib/site";
 
 /**
  * The site-wide share card, served at /opengraph-image (src/server/og).
@@ -63,9 +63,7 @@ export function routeShareMeta({
   locale = "en_US",
   markdownPath,
 }: RouteShareInput): Metadata {
-  const url = path.startsWith("http")
-    ? path
-    : `${siteConfig.url.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = siteUrl(path);
 
   const ogImages = images?.length
     ? images.map((src) => ({ url: src }))
@@ -73,7 +71,7 @@ export function routeShareMeta({
       ? undefined
       : [DEFAULT_OG_IMAGE];
 
-  const canonical = path.startsWith("/") ? path : `/${path}`;
+  const canonical = sitePath(path);
 
   return {
     title,

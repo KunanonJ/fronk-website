@@ -6,7 +6,7 @@ import {
   SKILLS_REPO_URL,
   getAllSkills,
 } from "@/lib/content/skills";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
 import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
@@ -16,12 +16,11 @@ import { markdownResponse } from "@/src/server/text/markdown";
  * it in another project.
  */
 export function buildOperatingModelMd(): string {
-  const base = siteConfig.url.replace(/\/$/, "");
   const skills = new Map(getAllSkills().map((s) => [s.slug, s]));
   const out: string[] = [
     `# The solopreneur operating model: ${PERSON_NAME}`,
     "",
-    `Source: ${base}/about#how-i-ship  `,
+    `Source: ${SITE_ORIGIN}/about#how-i-ship  `,
     `Updated: ${SITE_UPDATED}`,
     "",
     PERSON_SOLOPRENEUR,
@@ -37,12 +36,12 @@ export function buildOperatingModelMd(): string {
     for (const slug of stage.skills) {
       const skill = skills.get(slug);
       out.push(
-        `- [${slug}](${base}/skills/${slug})${skill ? `: ${skill.description}` : ""}`,
+        `- [${slug}](${SITE_ORIGIN}/skills/${slug})${skill ? `: ${skill.description}` : ""}`,
       );
     }
     out.push("");
     out.push(
-      `Seen in: ${stage.evidence.map((e) => `[${e.label}](${base}${e.href})`).join(", ")}`,
+      `Seen in: ${stage.evidence.map((e) => `[${e.label}](${SITE_ORIGIN}${e.href})`).join(", ")}`,
       "",
     );
   });

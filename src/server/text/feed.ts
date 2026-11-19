@@ -1,7 +1,7 @@
 import { resolveBlogCards } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildRssFeed } from "@/lib/content/rss";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN, siteConfig } from "@/lib/site";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 
 export async function GET(): Promise<Response> {
@@ -11,7 +11,7 @@ export async function GET(): Promise<Response> {
 
   const xml = buildRssFeed({
     cards,
-    base: siteConfig.url.replace(/\/$/, ""),
+    base: SITE_ORIGIN,
     title: `${siteConfig.name} — Blog`,
     description: siteConfig.description,
     buildDate: new Date(),

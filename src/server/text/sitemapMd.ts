@@ -4,7 +4,7 @@ import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getAllSkills } from "@/lib/content/skills";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
 import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
@@ -26,7 +26,6 @@ function table(rows: readonly Row[]): string[] {
 }
 
 export function buildSitemapMd(): string {
-  const base = siteConfig.url.replace(/\/$/, "");
   const pages: Row[] = [
     ["/", "Home", "Who he is, experience, ventures, selected work, Bangkok"],
     [
@@ -85,7 +84,7 @@ export function buildSitemapMd(): string {
   return [
     `# Sitemap: ${PERSON_NAME} (Fronk / KunanonJ)`,
     "",
-    `Canonical site: ${base}  `,
+    `Canonical site: ${SITE_ORIGIN}  `,
     `Updated: ${SITE_UPDATED}`,
     "",
     "## Pages",

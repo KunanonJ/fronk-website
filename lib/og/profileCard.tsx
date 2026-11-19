@@ -1,6 +1,6 @@
 import { brand } from "@/lib/brand/tokens";
 import { DitherBand, seedFrom } from "@/lib/og/card";
-import { siteConfig } from "@/lib/site";
+import { SITE_DOMAIN } from "@/lib/site";
 import portrait from "./portrait.jpg?inline";
 
 /** A headline word or phrase; `muted` ones take the secondary text colour. */
@@ -28,8 +28,6 @@ const HEADLINE_SIZE = 60;
  * other pages use OgCard.
  */
 export function ProfileCard({ pill, lines, accent, lead }: ProfileCardProps) {
-  const domain = siteConfig.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-
   return (
     <div
       style={{
@@ -73,7 +71,7 @@ export function ProfileCard({ pill, lines, accent, lead }: ProfileCardProps) {
             color: brand.inkMuted,
           }}
         >
-          {domain}
+          {SITE_DOMAIN}
         </div>
       </div>
 

@@ -6,7 +6,8 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildAboutMd, GET as aboutMd } from "./aboutMd";
-import { absoluteUrl, SITE_BASE } from "./markdown";
+import { SITE_ORIGIN } from "@/lib/site";
+import { absoluteUrl } from "./markdown";
 import { buildPortfolioProjectMd, GET as portfolioMd } from "./portfolioMd";
 
 /** Every Markdown link target must be absolute: agents read these out of context. */
@@ -19,8 +20,8 @@ function relativeLinks(md: string): string[] {
 describe("absoluteUrl", () => {
   it("keeps external links, prefixes site paths and resolves anchors", () => {
     expect(absoluteUrl("https://gogocash.co")).toBe("https://gogocash.co");
-    expect(absoluteUrl("/resume")).toBe(`${SITE_BASE}/resume`);
-    expect(absoluteUrl("#story", "/about")).toBe(`${SITE_BASE}/about#story`);
+    expect(absoluteUrl("/resume")).toBe(`${SITE_ORIGIN}/resume`);
+    expect(absoluteUrl("#story", "/about")).toBe(`${SITE_ORIGIN}/about#story`);
   });
 });
 
@@ -58,8 +59,8 @@ describe("about.md", () => {
 
   it("never links legacy /writing, and links /blog only while it is public", () => {
     expect(md).not.toContain("/writing");
-    if (BLOG_PUBLIC) expect(md).toContain(`${SITE_BASE}/blog`);
-    else expect(md).not.toContain(`${SITE_BASE}/blog`);
+    if (BLOG_PUBLIC) expect(md).toContain(`${SITE_ORIGIN}/blog`);
+    else expect(md).not.toContain(`${SITE_ORIGIN}/blog`);
   });
 
   it("is served as Markdown", () => {
@@ -76,7 +77,7 @@ describe("portfolio/<slug>.md", () => {
     for (const project of getAllPortfolioProjects()) {
       const md = buildPortfolioProjectMd(project);
       expect(md.startsWith(`# ${project.name}`)).toBe(true);
-      expect(md).toContain(`Source: ${SITE_BASE}/portfolio/${project.slug}`);
+      expect(md).toContain(`Source: ${SITE_ORIGIN}/portfolio/${project.slug}`);
       expect(md).toContain(project.summary);
       for (const s of project.sections) expect(md).toContain(`## ${s.heading}`);
       expect(relativeLinks(md)).toEqual([]);
@@ -97,9 +98,9 @@ describe("portfolio/<slug>.md", () => {
       for (const outcome of outcomes)
         expect(md).toContain(`- **${outcome.label}:** ${outcome.value}`);
       // The figures are his own statement: the twin names where they are.
-      expect(md.includes(`As stated in the résumé: ${SITE_BASE}/resume`)).toBe(
-        outcomes.length > 0,
-      );
+      expect(
+        md.includes(`As stated in the résumé: ${SITE_ORIGIN}/resume`),
+      ).toBe(outcomes.length > 0);
       expect(md.includes("## My part")).toBe(Boolean(project.myPart));
       expect(md).toContain(project.myPart ?? "");
     }
