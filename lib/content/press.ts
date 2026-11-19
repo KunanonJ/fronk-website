@@ -39,8 +39,7 @@ export const pressItems: readonly PressItem[] = [
       "A short look at shipping cashback and AI workspaces for Southeast Asia from Bangkok.",
     date: "2026-07-09",
     href: "https://gogocash.co",
-    bannerSrc:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/city-skyline.webp",
     bannerAlt: "City skyline at dusk",
     source: "Feature",
   },
@@ -51,8 +50,7 @@ export const pressItems: readonly PressItem[] = [
       "How a Bangkok-built cashback layer helps shoppers earn back across everyday brands.",
     date: "2026-05-18",
     href: "https://gogocash.co",
-    bannerSrc:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/retail-shopping.webp",
     bannerAlt: "Shopping and payments",
     source: "Product",
   },
@@ -63,8 +61,7 @@ export const pressItems: readonly PressItem[] = [
       "ERP/CRM and AI in one place — built for operators who need focus, not another tab.",
     date: "2026-03-02",
     href: "https://manut.xyz",
-    bannerSrc:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/digital-interface.webp",
     bannerAlt: "Digital workspace interface",
     source: "Product",
   },
@@ -75,8 +72,7 @@ export const pressItems: readonly PressItem[] = [
       "Notes on building in public from Thailand’s startup scene — ventures, pace, and craft.",
     date: "2025-11-20",
     href: "https://kunanonj.com",
-    bannerSrc:
-      "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/bangkok-night.webp",
     bannerAlt: "Bangkok street at night",
     source: "Profile",
   },
