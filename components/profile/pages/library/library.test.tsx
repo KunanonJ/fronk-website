@@ -102,7 +102,7 @@ describe("LearnPage", () => {
     expect(card).toHaveClass("pf-read-lead");
     expect(card).toHaveTextContent("EN · /topics/ai-transformation-thailand");
     expect(
-      within(card).getByRole("link", { name: `Open hub: ${ai?.h1}` }),
+      within(card).getByRole("link", { name: `Open hub ${ai?.h1}` }),
     ).toHaveAttribute("href", "/topics/ai-transformation-thailand");
     const thai = within(card).getByRole("link", { name: "อ่านภาษาไทย" });
     expect(thai).toHaveAttribute(
@@ -121,7 +121,7 @@ describe("LearnPage", () => {
         .filter((article) => article.classList.contains("pf-read-lead")),
     ).toHaveLength(1);
     // Each named after its hub, so a links list tells them apart.
-    expect(screen.getAllByRole("link", { name: /^Open hub: / })).toHaveLength(
+    expect(screen.getAllByRole("link", { name: /^Open hub / })).toHaveLength(
       TOPIC_SLUGS.length,
     );
     expectNoHiddenLinks(container);
@@ -134,6 +134,12 @@ describe("LearnPage", () => {
       // Under the h2 "Read the hubs in", each hub's title is an h3.
       const heading = screen.getByRole("heading", { level: 3, name: th?.h1 });
       expect(heading).toHaveAttribute("lang", "th");
+      // The link's name reads the Thai title from that heading, so the title
+      // keeps lang="th" for screen readers.
+      const link = screen.getByRole("link", { name: `Open hub ${th?.h1}` });
+      expect(link.getAttribute("aria-labelledby")?.split(" ")).toContain(
+        heading.id,
+      );
     }
     expect(
       screen.getByRole("heading", { level: 2, name: "Read the hubs in" }),

@@ -69,7 +69,13 @@ function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
         {hub.lede}
       </p>
       <div className="pf-read-links">
-        <ArrowLink href={hub.href} label={`Open hub: ${hub.title}`}>
+        {/* Named "Open hub" plus the hub's title, read from the h3 so a
+            Thai title keeps lang="th". */}
+        <ArrowLink
+          href={hub.href}
+          id={`${id}-open`}
+          labelledBy={`${id}-open ${id}`}
+        >
           Open hub
         </ArrowLink>
         {lead ? (
