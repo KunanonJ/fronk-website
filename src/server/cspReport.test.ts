@@ -134,12 +134,26 @@ describe("handleCspReport", () => {
     });
   });
 
-  it("logs at most twenty violations from one request", async () => {
+  it("logs a repeated violation once", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const many = Array.from({ length: 50 }, () => safariReportTo);
     const res = await handleCspReport(post(JSON.stringify(many)));
     expect(res.status).toBe(204);
-    expect(warn).toHaveBeenCalledTimes(20);
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs at most five distinct violations from one request", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const many = Array.from({ length: 50 }, (_, i) => ({
+      ...safariReportTo,
+      body: {
+        ...safariReportTo.body,
+        documentURL: `https://kunanonj.com/skills/${i}`,
+      },
+    }));
+    const res = await handleCspReport(post(JSON.stringify(many)));
+    expect(res.status).toBe(204);
+    expect(warn).toHaveBeenCalledTimes(5);
   });
 
   it("refuses other methods, content types, large bodies and bad JSON", async () => {

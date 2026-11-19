@@ -48,6 +48,13 @@ describe("the Worker entry", () => {
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
   });
 
+  it("sends a query string on a query-free endpoint to the bare path", async () => {
+    const res = await worker.fetch(at("/opengraph-image?audit=1"), env, ctx);
+    expect(res.status).toBe(308);
+    expect(res.headers.get("location")).toBe("/opengraph-image");
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+  });
+
   it("leaves the cache headers of every other response to its route", async () => {
     const res = await worker.fetch(at("/learn"), env, ctx);
     expect(res.headers.get("cache-control")).toBeNull();

@@ -14,8 +14,8 @@ export const CSP_REPORT_PATH = "/api/csp-report";
  * scripts into the HTML, which no hash can cover, the prerendered pages
  * cannot carry a per-response nonce, and any hash would switch
  * 'unsafe-inline' off. A nonce-based policy (every page rendered on request)
- * would tighten scripts further, at the cost of prerendering. Sanity Studio,
- * a separate app, is left out.
+ * would tighten scripts further, at the cost of prerendering. /studio is a
+ * static page linking to the hosted Studio, so it carries the policy too.
  */
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
@@ -51,6 +51,8 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy":
     "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  // No window this site opens, or that opens it, keeps a handle on the other.
+  "Cross-Origin-Opener-Policy": "same-origin",
   [CSP_HEADER]: CONTENT_SECURITY_POLICY,
   "Reporting-Endpoints": REPORTING_ENDPOINTS,
 };
@@ -96,20 +98,12 @@ export function withServerFnNoStore(
   });
 }
 
-/**
- * Copy of `response` with SECURITY_HEADERS added where the response has not
- * set them. Sanity Studio (`/studio`) gets no Content Security Policy.
- */
-export function withSecurityHeaders(
-  response: Response,
-  pathname = "/",
-): Response {
+/** Copy of `response` with SECURITY_HEADERS added where the response has not set them. */
+export function withSecurityHeaders(response: Response): Response {
   // A WebSocket upgrade (101) cannot be rebuilt; the site has none, but be safe.
   if (response.status === 101) return response;
   const headers = new Headers(response.headers);
-  const studio = pathname === "/studio" || pathname.startsWith("/studio/");
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
-    if (studio && name === CSP_HEADER) continue;
     if (!headers.has(name)) headers.set(name, value);
   }
   return new Response(response.body, {
