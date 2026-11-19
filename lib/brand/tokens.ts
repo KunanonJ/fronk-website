@@ -1,21 +1,25 @@
 /**
- * Brand values for renderers that can't read CSS variables (favicon, Apple
- * touch icon, OG share cards via Satori). Mirrors the palette in
- * app/globals.css (visual-redesign, 09-11-26); keep the two in sync.
+ * Brand values for renderers that cannot read CSS variables: the favicon,
+ * the Apple touch icon and the share cards (satori). A mirror of the light
+ * theme's tokens in src/styles/globals.css (profile redesign, design spec
+ * 2.1 and 2.2); lib/brand/tokens.test.ts fails when the two drift.
  */
 export const brand = {
-  ink: "#0b0d17",
+  ink: "#120e1f",
   paper: "#ffffff",
-  page: "#f5f6fa",
-  glaze: "#e8ebff",
-  signal: "#2b3bff",
-  clay: "#ffe3d6",
-  /** Secondary text on Paper (6.7:1). */
-  inkMuted: "#565b70",
-  /** Hairline on Paper. */
-  hairline: "rgba(11, 13, 23, 0.12)",
-  /** Wordmark used in chrome + share cards */
-  wordmark: "KunanonJ",
-  /** Monogram for favicon / apple touch */
+  accent: "#6e3cff",
+  /** Accent text on paper (--accent-ink). */
+  accentInk: "#4b23c2",
+  tint2: "#f3eeff",
+  tint3: "#ddd0ff",
+  tint4: "#c9b6ff",
+  peach: "#ffd9c4",
+  /** Secondary text: --ink-60 composited on paper. */
+  inkMuted: "#716e79",
+  /** A rule: --line composited on paper. */
+  hairline: "#e7e7e9",
+  /** The name, as the site's nav sets it. */
+  wordmark: "Kunanon Jarat.",
+  /** The favicon's and touch icon's letter. */
   monogram: "K",
 } as const;

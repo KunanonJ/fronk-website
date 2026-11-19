@@ -29,10 +29,4 @@ describe("type floor ratchet", () => {
       counts.map(([f, n]) => `${n} ${f}`).join("\n"),
     ).toBeLessThanOrEqual(MAX_SUB_12PX);
   });
-
-  it("new design-system primitives use no sub-12 px text", () => {
-    for (const f of ["PixelGrid"]) {
-      expect(sub12(read(`components/ui/${f}.tsx`)), f).toBe(0);
-    }
-  });
 });

@@ -134,8 +134,8 @@
 
 /* ─── Tokens kept from the earlier design ──────────────────────────────────
  * Still read by live parts: the white tile behind the company logos
- * (bg-paper), the card shadow (shadow-card), the bento curve (--ease), the
- * intro burst's golds and the pixel motif's river (art only, never text).
+ * (bg-paper), the card shadow (shadow-card), the bento curve (--ease) and
+ * the intro burst's golds (art only, never text).
  * Everything else is the profile redesign's, further down.
  * ─────────────────────────────────────────────────────────────────────────── */
 :root {
@@ -145,12 +145,10 @@
     0 1px 2px rgba(11, 13, 23, 0.04), 0 16px 40px -16px rgba(11, 13, 23, 0.12);
   --scene-gold-2: #c8904a;
   --scene-gold-3: #f4d391;
-  --river: #c9cefc;
 }
 
 .dark {
   --elev-card: none;
-  --river: #2b3a8f;
 }
 
 html {
