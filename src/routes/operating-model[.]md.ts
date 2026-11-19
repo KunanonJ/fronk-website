@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { withEdgeLifetime } from "@/src/lib/cache";
+import { withDeployCache } from "@/src/lib/cache";
 import { GET } from "@/src/server/text/operatingModelMd";
 
 /**
@@ -9,12 +9,7 @@ import { GET } from "@/src/server/text/operatingModelMd";
 export const Route = createFileRoute("/operating-model.md")({
   server: {
     handlers: {
-      GET: () =>
-        withEdgeLifetime(
-          GET(),
-          "public, max-age=86400",
-          "public, max-age=3600",
-        ),
+      GET: () => withDeployCache(GET()),
     },
   },
 });

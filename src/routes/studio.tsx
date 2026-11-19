@@ -4,7 +4,7 @@ import StudioLayout, {
   viewport,
 } from "@/components/studio/StudioLayout";
 import StudioPage from "@/components/studio/StudioPage";
-import { NO_STORE } from "@/src/lib/cache";
+import { DEPLOY_LIFETIME, NO_STORE } from "@/src/lib/cache";
 import { pageHead } from "@/src/lib/head";
 import { viewportContent } from "@/lib/seo/metadataToHead";
 
@@ -16,7 +16,7 @@ import { viewportContent } from "@/lib/seo/metadataToHead";
  */
 const STUDIO_CACHE = {
   "Cache-Control": "public, max-age=0, must-revalidate",
-  "CDN-Cache-Control": "public, max-age=86400",
+  "CDN-Cache-Control": DEPLOY_LIFETIME,
 };
 
 export const Route = createFileRoute("/studio")({

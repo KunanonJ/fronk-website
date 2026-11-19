@@ -102,14 +102,29 @@ export async function withEdgeLifetime(
 }
 
 /**
+ * A day: the lifetime of what changes only on a deploy, which empties the
+ * cache (the Worker's version is part of its key).
+ */
+export const DEPLOY_LIFETIME = "public, max-age=86400";
+
+/**
  * Generated images (OG cards, icons): a day at the edge, whose cache key
  * includes the deploy version, and a day in browsers, since the URLs carry no
  * content hash.
  */
-const IMAGE_LIFETIME = "public, max-age=86400";
-
 export function withImageCache(
   response: Response | Promise<Response>,
 ): Promise<Response> {
-  return withEdgeLifetime(response, IMAGE_LIFETIME, IMAGE_LIFETIME);
+  return withEdgeLifetime(response, DEPLOY_LIFETIME, DEPLOY_LIFETIME);
+}
+
+/**
+ * Text built from the repo alone (robots.txt, the manifest, security.txt,
+ * skills.json, the Markdown twins): a day at the edge and an hour in
+ * browsers. An error passes through uncached.
+ */
+export function withDeployCache(
+  response: Response | Promise<Response>,
+): Promise<Response> {
+  return withEdgeLifetime(response, DEPLOY_LIFETIME, "public, max-age=3600");
 }

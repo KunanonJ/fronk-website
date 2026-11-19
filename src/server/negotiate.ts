@@ -1,4 +1,4 @@
-import { EDGE_LIFETIME } from "@/src/lib/cache";
+import { DEPLOY_LIFETIME, EDGE_LIFETIME } from "@/src/lib/cache";
 
 /*
  * Markdown content negotiation (agent-readiness plan, step 4). These pages
@@ -72,9 +72,6 @@ export const HOME_LINKS = [
   '</llms.txt>; rel="describedby"; type="text/plain"',
   '</sitemap.xml>; rel="sitemap"; type="application/xml"',
 ].join(", ");
-
-/** Pages and Markdown built from lib/content change only on a deploy, which empties the cache. */
-const DEPLOY_LIFETIME = "public, max-age=86400";
 
 /**
  * Edge headers for one version of a page. Every version gets a day, except
