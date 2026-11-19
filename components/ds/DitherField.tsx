@@ -6,9 +6,11 @@ import { cn } from "@/lib/utils/cn";
  * A dither field on a canvas (profile redesign, design spec 6.8). Decorative:
  * aria-hidden and without pointer events. Colours come from tokens read with
  * getComputedStyle, so it follows the theme and holds no raw hex. It draws
- * once per size and theme: a ResizeObserver and a theme observer schedule a
- * single redraw in requestAnimationFrame. Never a loop; the backing store is
- * the device pixel ratio capped at 2.
+ * once per size and theme, never in a loop: the first draw and each resize
+ * wait for an idle moment (design spec 8d), so they stay off hydration's busy
+ * frames; a theme flip redraws on the next frame, before the theme fade
+ * snapshots the page. The backing store is the device pixel ratio capped
+ * at 2.
  */
 export function DitherField({
   stops = ["--peach", "--tint-4", "--tint-3"],
@@ -31,10 +33,10 @@ export function DitherField({
     const canvas = ref.current;
     if (!canvas) return;
     const tokens = stopKey.split(" ");
-    let frame = 0;
+    let pending: (() => void) | null = null;
 
     const draw = () => {
-      frame = 0;
+      pending = null;
       const { width, height } = canvas.getBoundingClientRect();
       const context = canvas.getContext("2d");
       if (!context || width === 0 || height === 0) return;
@@ -55,23 +57,37 @@ export function DitherField({
       }
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(draw);
+    /** Draws at the next idle moment, within 300 ms. */
+    const whenIdle = () => {
+      if (pending) return;
+      if (typeof requestIdleCallback === "function") {
+        const id = requestIdleCallback(draw, { timeout: 300 });
+        pending = () => cancelIdleCallback(id);
+      } else {
+        const id = window.setTimeout(draw, 50);
+        pending = () => window.clearTimeout(id);
+      }
     };
-    schedule();
+    /** Draws on the next frame, dropping a pending idle draw. */
+    const nextFrame = () => {
+      pending?.();
+      const id = requestAnimationFrame(draw);
+      pending = () => cancelAnimationFrame(id);
+    };
+    whenIdle();
     const resize =
       typeof ResizeObserver === "undefined"
         ? null
-        : new ResizeObserver(schedule);
+        : new ResizeObserver(whenIdle);
     resize?.observe(canvas);
     // The theme is the class on <html> (next-themes); redraw when it flips.
-    const theme = new MutationObserver(schedule);
+    const theme = new MutationObserver(nextFrame);
     theme.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "data-design"],
+      attributeFilter: ["class"],
     });
     return () => {
-      cancelAnimationFrame(frame);
+      pending?.();
       resize?.disconnect();
       theme.disconnect();
     };

@@ -1,10 +1,12 @@
 import { ImageResponse } from "@cf-wasm/og";
 import { brand } from "@/lib/brand/tokens";
+import { loadOgFonts } from "@/lib/og/fonts";
 
 const size = { width: 180, height: 180 };
 
 /**
- * Glaze "K" on an Ink tile with one Signal pixel (visual-redesign palette).
+ * The paper "K" in Instrument Serif on an ink tile, with one accent pixel
+ * (profile redesign palette, design spec 2.1).
  */
 export default function AppleIcon() {
   return new ImageResponse(
@@ -22,10 +24,9 @@ export default function AppleIcon() {
     >
       <span
         style={{
-          color: brand.glaze,
-          fontSize: 112,
-          fontWeight: 800,
-          letterSpacing: "-0.04em",
+          color: brand.paper,
+          fontFamily: "Instrument Serif",
+          fontSize: 136,
           lineHeight: 1,
         }}
       >
@@ -38,11 +39,11 @@ export default function AppleIcon() {
           bottom: 22,
           width: 26,
           height: 26,
-          background: brand.signal,
+          background: brand.accent,
           display: "flex",
         }}
       />
     </div>,
-    { ...size },
+    { ...size, fonts: loadOgFonts() },
   );
 }

@@ -1,6 +1,7 @@
 # Phase 7: Bento redesign
 
 **Status:** COMPLETE (10-11-26). Report: `../reports/phase-7_bento-redesign_REPORT_10-11-26.md`.
+Superseded (19-11-26) by `process/features/profile-site-redesign/`, whose Phase 8 removed the bento canvas.
 **Created:** 09-11-26
 **Umbrella:** `tanstack-migration_UMBRELLA_PLAN_09-11-26.md`
 **Design source:** the approved canvas (https://claude.ai/artifact/X9f4PqkFMM4sxCw3pnDeNu).

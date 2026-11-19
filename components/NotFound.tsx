@@ -20,8 +20,7 @@ const COPY: StatusPageCopy = {
 /**
  * 404 (profile redesign Phase 7f; design spec 13 item 18). The root renders
  * it outside the `_landing` layout for every unknown path, so it brings the
- * site's nav and footer itself. The response status stays 404, and the page
- * is in the redesign's token scope (lib/design/scope.ts).
+ * site's nav and footer itself. The response status stays 404.
  */
 export default function NotFound() {
   return (

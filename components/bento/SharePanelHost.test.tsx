@@ -47,13 +47,12 @@ afterEach(() => {
 });
 
 describe("SharePanelHost", () => {
-  it("draws the panel in the chrome's scope, in English, and keeps it out of print", () => {
+  it("draws the panel in English, fixed, and keeps it out of print", () => {
     renderPage();
     openShare();
     const host = panel()!.parentElement!;
     expect(host).toHaveAttribute("data-print-hide");
     expect(host).toHaveAttribute("lang", "en");
-    expect(host).toHaveAttribute("data-design", "profile");
     expect(host.className).toMatch(/\bfixed\b/);
   });
 

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { PROFILE_ROUTES } from "./routes";
+import { ROUTES } from "./routes";
 
 /**
  * Profile redesign checks for the pages in the redesign's token scope: the
@@ -245,17 +245,13 @@ function foreignOrigins(urls: readonly string[], base: string): string[] {
   return [...new Set(origins)].filter((origin) => !allowed.has(origin));
 }
 
-for (const route of PROFILE_ROUTES) {
+for (const route of ROUTES) {
   for (const theme of THEMES) {
     test(`${route.name} (${theme}) fits this width: no sideways scroll, 12 px text, 24 px targets`, async ({
       page,
     }) => {
       await prepare(page, theme);
       await page.goto(route.path, { waitUntil: "networkidle" });
-      await expect(page.locator("html")).toHaveAttribute(
-        "data-design",
-        "profile",
-      );
       expect(await layoutProblems(page)).toEqual([]);
     });
   }

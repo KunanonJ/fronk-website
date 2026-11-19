@@ -12,27 +12,27 @@
   /* Anchors and focus (spec 4.3, native scrolling): the fixed bar covers the
      top 96 px, so anchored sections, focused elements and scrolled targets
      land below it. Smooth scrolling is set once, in globals.css. */
-  [data-design="profile"] {
+  :root {
     scroll-padding-top: 96px;
   }
-  [data-design="profile"] #work {
+  :root #work {
     scroll-margin-top: 80px;
   }
-  [data-design="profile"] #about {
+  :root #about {
     scroll-margin-top: -128px;
   }
-  [data-design="profile"] #journey {
+  :root #journey {
     scroll-margin-top: -96px;
   }
-  [data-design="profile"] #ventures,
-  [data-design="profile"] #story {
+  :root #ventures,
+  :root #story {
     scroll-margin-top: 0;
   }
-  [data-design="profile"] [id^="ch-"] {
+  :root [id^="ch-"] {
     scroll-margin-top: 16px;
   }
   @media (min-width: 50.625rem) {
-    [data-design="profile"] #about {
+    :root #about {
       scroll-margin-top: -176px;
     }
   }
@@ -857,28 +857,5 @@
   }
   .pf-nav__active {
     transition: opacity 0.16s ease-out;
-  }
-}
-
-/* The theme fade (spec 7.5), written for the scope when it replaced the live
-   site's circular reveal there. Since the Phase 6 cutover globals.css runs
-   the same fade on every page and defines its keyframes, kj-theme-fade;
-   these rules repeat it until Phase 8 removes them. They are unlayered on
-   purpose: the rules in globals.css are unlayered, and a layered rule would
-   lose to them whatever its specificity. */
-@media (prefers-reduced-motion: no-preference) {
-  html[data-design="profile"]:active-view-transition-type(
-      theme
-    )::view-transition-old(root),
-  html[data-design="profile"].kj-vt::view-transition-old(root) {
-    animation: none;
-    mix-blend-mode: normal;
-  }
-  html[data-design="profile"]:active-view-transition-type(
-      theme
-    )::view-transition-new(root),
-  html[data-design="profile"].kj-vt::view-transition-new(root) {
-    animation: kj-theme-fade 0.56s cubic-bezier(0.4, 0, 0.2, 1) both;
-    mix-blend-mode: normal;
   }
 }

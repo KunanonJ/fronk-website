@@ -1,5 +1,11 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  CONTENT_SECURITY_POLICY,
+  CSP_HEADER,
+  CSP_REPORT_PATH,
+  REPORTING_ENDPOINTS,
   SECURITY_HEADERS,
   SERVER_FN_PATH,
   isCrossSite,
@@ -42,6 +48,55 @@ describe("withSecurityHeaders", () => {
     expect(res.status).toBe(308);
     expect(res.headers.get("location")).toBe("https://kunanonj.com/about");
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+  });
+});
+
+describe("the Content Security Policy (report-only)", () => {
+  it("rides on every Worker response but Sanity Studio's", () => {
+    const page = withSecurityHeaders(new Response("ok"), "/about");
+    expect(page.headers.get(CSP_HEADER)).toBe(CONTENT_SECURITY_POLICY);
+    expect(page.headers.get("content-security-policy")).toBeNull();
+    for (const path of ["/studio", "/studio/structure"]) {
+      const studio = withSecurityHeaders(new Response("ok"), path);
+      expect(studio.headers.get(CSP_HEADER), path).toBeNull();
+      expect(studio.headers.get("x-content-type-options")).toBe("nosniff");
+    }
+  });
+
+  it("blocks plug-ins and foreign bases, forms and frames", () => {
+    for (const directive of [
+      "default-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+    ]) {
+      expect(CONTENT_SECURITY_POLICY).toContain(directive);
+    }
+  });
+
+  it("sends its reports to the Worker's report endpoint", () => {
+    // Safari drops a report-only policy that names no report destination.
+    expect(CSP_REPORT_PATH).toBe("/api/csp-report");
+    expect(CONTENT_SECURITY_POLICY).toContain(`report-uri ${CSP_REPORT_PATH}`);
+    expect(CONTENT_SECURITY_POLICY).toContain("report-to csp");
+    expect(REPORTING_ENDPOINTS).toBe(`csp="${CSP_REPORT_PATH}"`);
+    const page = withSecurityHeaders(new Response("ok"), "/about");
+    expect(page.headers.get("reporting-endpoints")).toBe(REPORTING_ENDPOINTS);
+  });
+
+  it("is the same policy in public/_headers, detached for Sanity Studio", () => {
+    const headers = readFileSync(
+      join(process.cwd(), "public/_headers"),
+      "utf8",
+    );
+    expect(headers).toContain(`  ${CSP_HEADER}: ${CONTENT_SECURITY_POLICY}\n`);
+    expect(headers).toContain(
+      `  Reporting-Endpoints: ${REPORTING_ENDPOINTS}\n`,
+    );
+    for (const path of ["/studio", "/studio/*"]) {
+      expect(headers).toContain(`\n${path}\n  ! ${CSP_HEADER}\n`);
+    }
   });
 });
 

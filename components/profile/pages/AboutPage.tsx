@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Badge, Chip } from "@/components/ds/labels";
-import { Pill } from "@/components/ds/Pill";
+import { Pill, pillClass } from "@/components/ds/Pill";
 import { TextLink } from "@/components/ds/TextLink";
 import ContributionActivity from "@/components/landing/ContributionActivity";
 import Link from "@/components/navigation/Link";
@@ -106,7 +106,7 @@ function Portrait() {
                 target="_blank"
                 rel="me noopener noreferrer"
                 aria-label={`${label} (opens in a new tab)`}
-                className="ds-pill ds-pill--ghost ds-pill--round pf-about-page__social"
+                className={`${pillClass({ variant: "ghost", round: true })} pf-about-page__social`}
               >
                 <Icon size={18} />
               </a>

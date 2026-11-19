@@ -17,9 +17,6 @@ import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
-import { profileDesign } from "@/lib/design/scope";
-import geistLatin from "../fonts/geist-latin.woff2?url";
-import geistMonoLatin from "../fonts/geist-mono-latin.woff2?url";
 import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
 import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -47,19 +44,17 @@ const preloadFont = (href: string) => ({
 
 /*
  * The Latin faces a page's first screen sets, preloaded; Thai and the rest
- * load on demand. The profile redesign's pages (design spec 2.13, 3.1) set
- * the hero in Instrument Serif over Onest, so they preload those two instead
- * of Geist, not beside it; the pages Phase 7 restyles keep Geist.
+ * load on demand. Every page sets its hero in Instrument Serif over Onest
+ * (design spec 3.1), so those two are preloaded.
  */
-const PROFILE_FONTS = [onestLatin, instrumentSerifLatin].map(preloadFont);
-const GEIST_FONTS = [geistLatin, geistMonoLatin].map(preloadFont);
+const PRELOADED_FONTS = [onestLatin, instrumentSerifLatin].map(preloadFont);
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  head: ({ matches }) => ({
+  head: () => ({
     // The default title; every page's head() replaces it (404 and error pages keep it).
     meta: [...globalMeta, { title: landingSite.title }],
     links: [
-      ...(profileDesign(matches) ? PROFILE_FONTS : GEIST_FONTS),
+      ...PRELOADED_FONTS,
       { rel: "stylesheet", href: fontsCss },
       { rel: "stylesheet", href: appCss },
       // The redesign's chrome and sections (Phases 1 to 6): every public
@@ -80,15 +75,9 @@ function RootDocument({ children }: { children: ReactNode }) {
   // Thai pages declare Thai on <html> (Next only set it on <main>).
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
-  // Profile redesign: the new tokens apply only inside this scope, taken from
-  // the routes on screen so a navigation never restyles the old page.
-  const design = useRouterState({
-    select: (s) => profileDesign(s.matches),
-  });
   return (
     <html
       lang={lang}
-      data-design={design}
       className="h-full antialiased"
       data-scroll-behavior="smooth"
       suppressHydrationWarning

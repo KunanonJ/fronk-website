@@ -1,7 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 const globalsCss = readFileSync(
   join(process.cwd(), "src/styles/globals.css"),
@@ -72,23 +71,28 @@ function withoutNoPreference(css: string): string {
 }
 
 /**
- * Foundation contract for the visual redesign (Phase 0, 09-11-26): the owner's
- * palette, light by default, Geist + Geist Mono. Phase 6 removed the legacy
- * aliases, so nothing may bring them back.
+ * Foundation contract: the profile redesign's palette and fonts, light by
+ * default. Phase 6 removed the legacy aliases and Phase 8 the earlier design's
+ * Geist faces, so nothing may bring them back.
  */
 describe("visual-redesign foundation", () => {
-  it("defines the owner's palette once", () => {
-    for (const [name, hex] of [
-      ["signal", "#2b3bff"],
-      ["glaze", "#e8ebff"],
-      ["paper", "#ffffff"],
-      ["ink", "#0b0d17"],
-      ["clay", "#ffe3d6"],
-      ["ember", "#ff5a1f"],
+  it("defines the palette (design spec 2.1) in both themes", () => {
+    const dark =
+      globalsCss.match(/^\.dark \{\n {2}--ink: #f1edfa;([\s\S]*?)^\}/m)?.[1] ??
+      "";
+    for (const [name, light, night] of [
+      ["ink", "#120e1f", "#f1edfa"],
+      ["paper", "#ffffff", "#0f0c18"],
+      ["accent", "#6e3cff", "#8d6bff"],
+      ["accent-ink", "#4b23c2", "#b9a4ff"],
+      ["coral", "#ff7a3d", "#ff8a52"],
+      ["coral-deep", "#d9541c", "#ff9e70"],
+      ["tint-2", "#f3eeff", "#1c1630"],
     ]) {
-      expect(globalsCss).toMatch(
-        new RegExp(`--palette-${name}:\\s*${hex}`, "i"),
-      );
+      expect(tokenBlock, name).toMatch(new RegExp(`\\n  --${name}: ${light};`));
+      if (name !== "ink") {
+        expect(dark, name).toMatch(new RegExp(`\\n  --${name}: ${night};`));
+      }
     }
   });
 
@@ -124,21 +128,17 @@ describe("visual-redesign foundation", () => {
     }
   });
 
-  it("uses Geist, Geist Mono, Noto Sans Thai and the profile fonts, and drops the retired fonts", () => {
+  it("uses the profile fonts and Noto Sans Thai, and drops the retired fonts", () => {
     const families = [
       ...fontsCss.matchAll(/font-family:\s*"?([^;"]+)"?;/g),
     ].map((m) => m[1]!.trim());
     expect(new Set(families)).toEqual(
       new Set([
-        "Geist",
-        "Geist Fallback",
-        "Geist Mono",
-        "Geist Mono Fallback",
         "Noto Sans Thai",
         "Noto Sans Thai Fallback",
         // Profile redesign (umbrella plan of 18-11-26, owner decisions 1 and 8
-        // and "What these reverse"): the reference's type joins Geist, which
-        // Phase 8 removes. Instrument Serif leaves the retired list below.
+        // and "What these reverse"): the reference's type replaced Geist in
+        // Phase 8. Instrument Serif left the retired list below.
         "Instrument Serif",
         "Instrument Serif Fallback",
         "Onest",
@@ -149,6 +149,8 @@ describe("visual-redesign foundation", () => {
       ]),
     );
     for (const retired of [
+      "Geist",
+      "Geist Mono",
       "Hanken Grotesk",
       "Space Mono",
       "Almarai",
@@ -204,28 +206,16 @@ describe("visual-redesign foundation", () => {
 });
 
 /**
- * Bento redesign (phase 7a) motion contract: the owner's defaults for the
- * canvas motion, pinned so a later edit cannot quietly undo them.
+ * The motion contract: the owner's defaults for the site's motion, pinned so
+ * a later edit cannot quietly undo them.
  */
-describe("bento motion contract", () => {
-  const keyframes = (name: string) =>
-    globalsCss.match(
-      new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`),
-    )?.[1] ?? "";
-
-  it("defines the new role tokens in both themes", () => {
+describe("motion contract", () => {
+  it("defines the role tokens with the new values", () => {
+    // Each follows the theme through the palette the .dark block redefines;
+    // contrast.test.ts checks both themes.
     for (const token of ["--cta", "--oncta", "--accent", "--muted"]) {
-      expect(
-        globalsCss.match(new RegExp(`\\s${token}:`, "g"))?.length,
-        token,
-      ).toBeGreaterThanOrEqual(2);
+      expect(tokenBlock, token).toMatch(new RegExp(`\\n  ${token}:`));
     }
-  });
-
-  it("never hides or blurs the LCP h1: its lines only move", () => {
-    const line = keyframes("kj-line");
-    expect(line).toContain("transform");
-    expect(line).not.toMatch(/opacity|filter/);
   });
 
   it("keeps every entrance and loop behind no-preference", () => {
@@ -248,7 +238,8 @@ describe("bento motion contract", () => {
         .filter((value) => !allowed.test(value));
       expect(loose, path).toEqual([]);
     }
-    expect(globalsCss).toMatch(/animation: kj-rise/);
+    // The scan sees the share panel's pop, so it is not vacuous.
+    expect(globalsCss).toMatch(/animation: kj-pop/);
   });
 
   it("names every keyframe kj- (or the intro's own intro-), so the guard covers it", () => {
@@ -329,59 +320,49 @@ describe("bento motion contract", () => {
 });
 
 /**
- * Profile redesign, Phase 0 (process/features/profile-site-redesign): the new
- * tokens live in one scope, `data-design="profile"` on <html>, until the
- * cutover. Contrast pairs for the scope are in contrast.test.ts.
+ * Profile redesign (process/features/profile-site-redesign): the new tokens
+ * lived in one scope, `data-design="profile"` on <html>, until Phase 8 folded
+ * it into :root and .dark. Contrast pairs are in contrast.test.ts.
  */
-describe("profile redesign scope", () => {
-  it("defines the scope in both themes", () => {
-    expect(globalsCss).toMatch(/^\[data-design="profile"\] \{/m);
-    expect(globalsCss).toMatch(
-      /^html\.dark\[data-design="profile"\],\n\.dark \[data-design="profile"\] \{/m,
-    );
+const tokenBlock =
+  globalsCss.match(
+    /^:root \{\n {2}\/\* Palette \(spec 2\.1\)\. \*\/([\s\S]*?)^\}/m,
+  )?.[1] ?? "";
+
+describe("profile redesign tokens", () => {
+  it("defines the tokens in :root and .dark, with no scope left", () => {
+    expect(tokenBlock).toContain("--ink: #120e1f;");
+    expect(globalsCss).toMatch(/^\.dark \{\n {2}--ink: #f1edfa;/m);
+    expect(layoutTsx).not.toContain("data-design");
+    for (const sheet of [globalsCss, ...profileSheets.map((p) => p.css)]) {
+      expect(sheet).not.toMatch(/\[data-design/);
+    }
   });
 
   it("never fakes bold or italic Instrument Serif", () => {
-    const scope =
-      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
-      "";
-    expect(scope).toMatch(/font-synthesis-weight: none;/);
+    expect(tokenBlock).toMatch(/font-synthesis-weight: none;/);
   });
 
-  it("sets the scope on <html> from the matched routes, for the cut-over pages", () => {
-    expect(layoutTsx).toContain("data-design={design}");
-    expect(layoutTsx).toMatch(/profileDesign\(s\.matches\)/);
-    // Phase 6 opted the core pages in (design spec 2.13); the previews are gone.
-    const scope = read("lib/design/scope.ts");
-    for (const id of [
-      '"/_landing/"',
-      '"/_landing/portfolio/"',
-      '"/_landing/portfolio/$slug"',
-      '"/_landing/ventures/$slug"',
-      '"/_landing/about"',
-      '"/_landing/contact"',
-    ]) {
-      expect(scope, id).toContain(id);
+  it("points Tailwind's preflight fonts at the new stacks", () => {
+    expect(tokenBlock).toContain("--default-font-family: var(--font-sans);");
+    expect(tokenBlock).toContain(
+      "--default-mono-font-family: var(--font-mono);",
+    );
+  });
+
+  it("gives the font utilities the tokens' own stacks", () => {
+    // `@theme inline` bakes its stacks into font-sans, font-mono and
+    // font-display, so they must be the tokens' stacks, never another face.
+    const theme = globalsCss.match(/@theme inline \{([\s\S]*?)\n\}/)![1]!;
+    for (const name of ["--font-sans", "--font-mono", "--font-display"]) {
+      const stack = (css: string) =>
+        css
+          .match(new RegExp(`\\n\\s*${name}:([^;]+);`))?.[1]
+          ?.replace(/\s+/g, " ")
+          .trim();
+      expect(stack(theme), name).toBe(stack(tokenBlock));
     }
-    expect(scope).not.toContain('"/preview"');
-  });
-
-  it("points Tailwind's preflight fonts at the scope's own stacks", () => {
-    const scope =
-      globalsCss.match(/^\[data-design="profile"\] \{([\s\S]*?)^\}/m)?.[1] ??
-      "";
-    expect(scope).toContain("--default-font-family: var(--font-sans);");
-    expect(scope).toContain("--default-mono-font-family: var(--font-mono);");
-  });
-
-  it("keeps the frozen font utilities out of the redesign's components", () => {
-    // `@theme inline` bakes the Geist stacks into font-sans, font-mono and
-    // font-display, so inside the scope they would render the old fonts.
-    const offenders = sourceFiles([
-      "components/ds",
-      "components/profile",
-    ]).filter((f) => /\bfont-(?:sans|mono|display)\b/.test(read(f)));
-    expect(offenders).toEqual([]);
+    expect(globalsCss).not.toMatch(/geist/i);
   });
 
   it("keeps the preview's reader-preference blocks", () => {
@@ -534,18 +515,14 @@ describe("profile stylesheet", () => {
     expect(shell).toMatch(/\.pf-menu\[data-open\] \{\s*display: block;/);
   });
 
-  it("keeps the scope's copy of the theme fade behind no-preference, on globals.css's keyframes", () => {
-    const shell = partials.find((sheet) =>
-      sheet.path.endsWith("/shell.css"),
-    )!.css;
-    const fade = withoutNoPreference(shell);
-    expect(fade).not.toMatch(/animation:[^;]*kj-theme-fade/);
-    // One definition, in globals.css, beside the rule every page runs.
-    expect(shell).not.toContain("@keyframes kj-theme-fade");
-    expect(shell).toMatch(
-      // Whitespace is allowed inside the pseudo-class argument: prettier wraps it.
-      /@media \(prefers-reduced-motion: no-preference\) \{\s*html\[data-design="profile"\]:active-view-transition-type\(\s*theme\s*\)::view-transition-old\(root\)/,
+  it("runs the theme fade once, in globals.css, behind no-preference", () => {
+    for (const sheet of partials) {
+      expect(sheet.css, sheet.path).not.toContain("kj-theme-fade");
+    }
+    expect(withoutNoPreference(globalsCss)).not.toMatch(
+      /animation:[^;]*kj-theme-fade/,
     );
-    expect(shell).toMatch(/animation: kj-theme-fade 0\.56s/);
+    expect(globalsCss).toMatch(/animation: kj-theme-fade 0\.56s/);
+    expect(globalsCss).toContain("@keyframes kj-theme-fade");
   });
 });

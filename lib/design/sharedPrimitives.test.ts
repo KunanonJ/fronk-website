@@ -1,3 +1,5 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { read, sourceFiles } from "@/lib/design/sourceScan";
 
@@ -34,5 +36,39 @@ describe("shared bento primitives", () => {
         /"m-0 max-w-\[620px\] text-lg leading-\[1\.55\] text-ink-2"/,
       ),
     ).toEqual([]);
+  });
+});
+
+/**
+ * The profile redesign's primitives (design spec 5) live in one place: the
+ * `ds-` and `t-` classes in src/styles/globals.css, and pillClass() in
+ * components/ds/Pill.tsx for every pill's class list. A page applies them; it
+ * never redeclares one in its partial or builds a pill's classes by hand.
+ */
+describe("the design system's primitives", () => {
+  it("draws every pill through pillClass, never a hand-written ds-pill", () => {
+    expect(
+      files.filter(
+        (f) =>
+          !f.startsWith("components/ds/") &&
+          /(?<![\w-])ds-pill(?![\w-])/.test(read(f)),
+      ),
+    ).toEqual([]);
+  });
+
+  it("declares the ds- and t- blocks in globals.css only, never in a page partial", () => {
+    const dir = join(process.cwd(), "src/styles/profile");
+    for (const name of readdirSync(dir)) {
+      const css = readFileSync(join(dir, name), "utf8").replace(
+        /\/\*[\s\S]*?\*\//g,
+        "",
+      );
+      const bare = [...css.matchAll(/([^{};]+)\{/g)]
+        .map((m) => m[1]!.trim())
+        .filter((prelude) => !prelude.startsWith("@"))
+        .flatMap((prelude) => prelude.split(",").map((s) => s.trim()))
+        .filter((selector) => /^\.(?:ds|t)-[a-z0-9-]+$/.test(selector));
+      expect(bare, name).toEqual([]);
+    }
   });
 });

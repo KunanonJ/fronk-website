@@ -3,9 +3,9 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 /**
  * Profile redesign, Phase 7 group D2 (process/features/profile-site-redesign,
  * phase 7 steps 7c, 7e to 7i): /skills and the skill pages, /resume, the 404,
- * /design, and the hidden /blog and /press, now in the redesign's token
- * scope. routes.ts lists them in PROFILE_ROUTES, so axe runs WCAG 2.2 on them
- * in both themes and profile.spec.ts checks their fit on every project. Here,
+ * /design, and the hidden /blog and /press, in the new design. axe runs
+ * WCAG 2.2 on every route in both themes (a11y.spec.ts) and profile.spec.ts
+ * checks their fit on every project. Here,
  * in desktop Chromium:
  *
  * - the device matrix (design spec 10.1): every page holds at 344, 390, 820,
@@ -289,10 +289,6 @@ test.describe("group D2's pages across the device matrix (desktop Chromium)", ()
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page);
       await open(page, path);
-      await expect(page.locator("html")).toHaveAttribute(
-        "data-design",
-        "profile",
-      );
       for (const width of MATRIX) {
         await page.setViewportSize({ width, height: 900 });
         // Chromium can resolve vw units at the old width until its next
@@ -438,15 +434,11 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     expect(top).toBe(0);
   });
 
-  test("the 404 is the new status page, in the scope, with its pixel picture", async ({
+  test("the 404 is the new status page, with its pixel picture", async ({
     page,
   }) => {
     await prepare(page);
     await open(page, PAGES.notFound);
-    await expect(page.locator("html")).toHaveAttribute(
-      "data-design",
-      "profile",
-    );
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Nothing lives here.",
     );
@@ -459,7 +451,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     expect(h1.y).toBeGreaterThan(80);
   });
 
-  test("a route that fails shows the new error page, in the scope, and Try again recovers", async ({
+  test("a route that fails shows the new error page, and Try again recovers", async ({
     page,
   }) => {
     await prepare(page);
@@ -474,10 +466,6 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
       "Something went wrong.",
     );
     await expect(page.getByRole("alert")).toBeVisible();
-    await expect(page.locator("html")).toHaveAttribute(
-      "data-design",
-      "profile",
-    );
     await expect(
       page
         .getByRole("article", { name: "Error · Didn't load" })

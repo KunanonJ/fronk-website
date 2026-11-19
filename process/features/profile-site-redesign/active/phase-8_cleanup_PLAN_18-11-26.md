@@ -1,6 +1,8 @@
 # Phase 8: Cleanup, guards and speed
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE".
+**Status:** CODE DONE (19-11-26), in review as one pull request. Report:
+`../reports/phase-8_cleanup_REPORT_19-11-26.md`. VERIFIED once merged,
+deployed and checked live.
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` sections 2, 3, 12 and 13.

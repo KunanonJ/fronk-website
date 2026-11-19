@@ -193,13 +193,6 @@ test.describe("the content contract: what the parity gate reads stays (desktop C
       expect(seen.htmlLang, "<html lang>").toBe(want.htmlLang);
       expect(seen.mainLang, "<main lang>").toBe(want.mainLang);
       expect(seen.jsonLd, "JSON-LD").toEqual(want.jsonLd);
-      // And the page is in the redesign's token scope.
-      await prepare(page);
-      await page.goto(path, { waitUntil: "domcontentloaded" });
-      await expect(page.locator("html")).toHaveAttribute(
-        "data-design",
-        "profile",
-      );
     });
   }
 });

@@ -871,15 +871,14 @@ test.describe("chrome: Say hello and the theme", () => {
     await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
   });
 
-  test("every page links the profile stylesheet once, and preloads the fonts of its own design", async ({
+  test("every page links the profile stylesheet once, and preloads the new fonts", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop", "one check is enough");
-    // Since the Phase 6 cutover the chrome is on every public page, so the
-    // root links profile.css everywhere, after globals.css. The pages in the
-    // token scope preload Onest and Instrument Serif; the others keep Geist
-    // (plan step 6b). Only stylesheets count: a profile module may also have
-    // a script chunk of its own.
+    // The chrome is on every public page, so the root links profile.css
+    // everywhere, after globals.css, and every page preloads Onest and
+    // Instrument Serif. Only stylesheets count: a profile module may also
+    // have a script chunk of its own.
     const preloads = () =>
       page
         .locator('link[rel="preload"][as="font"]')
@@ -891,13 +890,7 @@ test.describe("chrome: Say hello and the theme", () => {
             ),
           ),
         );
-    for (const [path, scoped] of [
-      ["/", true],
-      ["/portfolio/tbh-intranet", true],
-      // Phase 7 group D2 moved these two into the scope.
-      ["/skills", true],
-      ["/design", true],
-    ] as const) {
+    for (const path of ["/", "/portfolio/tbh-intranet", "/skills", "/design"]) {
       await page.goto(path, { waitUntil: "networkidle" });
       const sheets = page.locator('link[rel="stylesheet"]');
       await expect(
@@ -911,15 +904,10 @@ test.describe("chrome: Say hello and the theme", () => {
       const profile = hrefs.findIndex((href) => /\/profile-/.test(href));
       expect(globals, path).toBeGreaterThanOrEqual(0);
       expect(profile, path).toBeGreaterThan(globals);
-      // Outside the scope the attribute is absent, not empty.
-      expect(await page.locator("html").getAttribute("data-design"), path).toBe(
-        scoped ? "profile" : null,
-      );
-      expect((await preloads()).sort(), path).toEqual(
-        scoped
-          ? ["instrument-serif-latin", "onest-latin"]
-          : ["geist-latin", "geist-mono-latin"],
-      );
+      expect((await preloads()).sort(), path).toEqual([
+        "instrument-serif-latin",
+        "onest-latin",
+      ]);
     }
   });
 });
