@@ -88,7 +88,12 @@ function layoutProblems(page: Page): Promise<string[]> {
     // metrics differ between machines, and a tile's overflow: hidden keeps
     // a part that is too wide from scrolling, so this catches on a Mac what
     // only CI's wider text would push off screen. A rotated mark's box
-    // overhangs by up to 3 px, hence the 4 px allowance.
+    // overhangs by up to 3 px, hence the 4 px allowance. Some parts leave the
+    // column on purpose: the notebook bleeds to the left edge on phones
+    // (design spec 8.7), a marquee's track runs past its clipped frame, and
+    // the skill credits' links widen their hit area with a -6 px margin while
+    // their text stays on the edge.
+    const bleeds = ".pf-book, .ds-marquee__track, .pf-skill-credits__skill";
     for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
       const box = wrap.getBoundingClientRect();
       const style = getComputedStyle(wrap);
@@ -97,6 +102,7 @@ function layoutProblems(page: Page): Promise<string[]> {
       for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
         const rect = el.getBoundingClientRect();
         if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
+        if (el.closest(bleeds)) continue;
         if (rect.left < start || rect.right > end) {
           const name = el.classList[0] ? `.${el.classList[0]}` : "";
           problems.push(
