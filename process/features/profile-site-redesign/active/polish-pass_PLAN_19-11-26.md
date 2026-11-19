@@ -89,7 +89,35 @@ the ai-automation and two other case covers, the Home hero's mock frame).
 
 ## Verification Evidence
 
-(filled in at closeout)
+- typecheck, lint, format, knip, 1,560 unit tests (new: the filter getter,
+  NavProgress with the real router status, title links on skill cards and blog
+  rows, the GitHub fill-in, popover-motion guards), build
+- `perf:budget`: CSS 34.6 / 36 KB on every page (was 33.8); entry 108.1 / 120;
+  worst route 194.3 / 200 (`/skills/*`); `/about` 177.8
+- parity: 137 URLs, 0 differences
+- browser (local preview): smoke + axe 257 passed (the first run caught the new
+  skill-name links under 24 px at 320-390 px; fixed with a 24 px box and a
+  negative margin); `tests/e2e/profile` on six projects 694 passed, 0 failed
+  (baselines excluded on macOS); a new smoke test runs each filter's transition
+  to `ready` with no page error (a duplicated name aborts it, checked)
+- frames (scratchpad `polish-plan/`): a page change from /portfolio at 700 px
+  starts at `scrollY` 0 and the case page fades in in place; filters on
+  /portfolio, /skills and /blog move staying cards, fade leaving ones, and slide
+  the pressed pill; the GitHub year is 8 px cells at 390, 16.6 px at 1280, 19 px
+  capped from 1440, filling left to right
+- visual baselines (CI run 44556280680, Playwright image): 12 changed and
+  re-rendered: `preview-story-*` x6 (identical to the old ones row for row,
+  80 or 128 px shorter), `home-*` x4 (identical to row 7,600, then the smaller
+  gap; dark also the copper hue-79 card and the hero mock frame), `about-*-desktop`
+  x2 (+89 px, the GitHub card). The first attempt is kept: the retry of
+  home-desktop and about-dark caught the hero DitherField drawn, while every
+  baseline has it undrawn (a race between its idle draw and the screenshot;
+  on main a mismatch passes on CI's one retry)
+- follow-up: make the dither deterministic in screenshots (hide `.ds-dither`
+  in the visual specs, or wait for its draw), so a retry cannot mask a real diff
+- deviations: the skill name is the card's one link ("Details" became a cue);
+  the GitHub grid's styles moved to `.pf-activity*` in `cutover.css`; there is no
+  site-wide motion switch, so the filter checks reduced motion only
 
 ## Resume and Execution Handoff
 
