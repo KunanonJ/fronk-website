@@ -1,4 +1,12 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import {
+  clippedText,
+  forcedColorsProblems,
+  layoutProblems,
+  prepare,
+  tabTo,
+  zoomShortfalls,
+} from "./matrix";
 
 /**
  * Profile redesign, Phase 7 group D2 (process/features/profile-site-redesign,
@@ -42,17 +50,6 @@ function desktopOnly() {
   );
 }
 
-async function prepare(page: Page, theme: "light" | "dark" = "light") {
-  await page.addInitScript((value) => {
-    try {
-      localStorage.setItem("theme", value);
-      sessionStorage.setItem("fronk-intro-seen", "1");
-    } catch {
-      // Storage can be unavailable; the site then uses its default theme.
-    }
-  }, theme);
-}
-
 /** Opens a page and checks it answered (the 404 answers 404, on purpose). */
 async function open(page: Page, path: string) {
   const res = await page.goto(path, { waitUntil: "networkidle" });
@@ -61,96 +58,14 @@ async function open(page: Page, path: string) {
 }
 
 /**
- * Moves focus to `target` with real Tab presses from wherever focus is, as a
- * keyboard reader does (never a script focus on a control). Desktop
- * Chromium only, where Tab reaches every control.
+ * Parts that leave the column on purpose: the notebook bleeds to the left
+ * edge on phones (design spec 8.7), a marquee's track runs past its clipped
+ * frame, and the skill credits' links widen their hit area with a -6 px
+ * margin while their text stays on the edge.
  */
-async function tabTo(page: Page, target: Locator) {
-  for (let presses = 0; presses < 60; presses += 1) {
-    if (await target.evaluate((el) => el === document.activeElement)) return;
-    await page.keyboard.press("Tab");
-  }
-  await expect(target).toBeFocused();
-}
-
-/**
- * Sideways scroll, a part in the side gutter, text under 12 px and targets
- * under 24 px.
- */
-function layoutProblems(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const problems: string[] = [];
-    const width = document.documentElement.scrollWidth;
-    if (width > window.innerWidth + 1) {
-      problems.push(`${width}px of content in ${window.innerWidth}px`);
-    }
-    // A part that crosses its .ds-wrap's padding into the side gutter. Font
-    // metrics differ between machines, and a tile's overflow: hidden keeps
-    // a part that is too wide from scrolling, so this catches on a Mac what
-    // only CI's wider text would push off screen. A rotated mark's box
-    // overhangs by up to 3 px, hence the 4 px allowance. Some parts leave the
-    // column on purpose: the notebook bleeds to the left edge on phones
-    // (design spec 8.7), a marquee's track runs past its clipped frame, and
-    // the skill credits' links widen their hit area with a -6 px margin while
-    // their text stays on the edge.
-    const bleeds = ".pf-book, .ds-marquee__track, .pf-skill-credits__skill";
-    // Decoration may overhang: a part with no text whose every element is
-    // hidden from assistive tech (a pixel mark set beside a word, say).
-    const decorative = (node: Element): boolean =>
-      !node.textContent?.trim() &&
-      (node.closest("[aria-hidden='true']") !== null ||
-        (node.children.length > 0 && [...node.children].every(decorative)));
-    for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
-      const box = wrap.getBoundingClientRect();
-      const style = getComputedStyle(wrap);
-      const start = box.left + parseFloat(style.paddingLeft) - 4;
-      const end = box.right - parseFloat(style.paddingRight) + 4;
-      for (const el of wrap.querySelectorAll<HTMLElement>("*")) {
-        const rect = el.getBoundingClientRect();
-        if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
-        if (decorative(el)) continue;
-        if (el.closest(bleeds)) continue;
-        if (rect.left < start || rect.right > end) {
-          const name = el.classList[0] ? `.${el.classList[0]}` : "";
-          problems.push(
-            `${el.tagName.toLowerCase()}${name} crosses the gutter`,
-          );
-          break;
-        }
-      }
-    }
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-    );
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      const text = node.textContent?.trim();
-      const el = node.parentElement;
-      if (!text || !el) continue;
-      const rect = el.getBoundingClientRect();
-      if (rect.width <= 1 || rect.height <= 1) continue;
-      if (parseFloat(getComputedStyle(el).fontSize) < 12) {
-        problems.push(`small text: "${text.slice(0, 30)}"`);
-      }
-    }
-    for (const el of document.querySelectorAll<HTMLElement>(
-      "a[href], button, input, select, textarea, summary",
-    )) {
-      const rect = el.getBoundingClientRect();
-      if (rect.width <= 1 && rect.height <= 1) continue;
-      if (getComputedStyle(el).display === "inline" && el.closest("p, li")) {
-        continue;
-      }
-      if (rect.width < 24 || rect.height < 24) {
-        const name = el.getAttribute("aria-label") ?? el.textContent?.trim();
-        problems.push(
-          `${Math.round(rect.width)}x${Math.round(rect.height)}: ${name}`,
-        );
-      }
-    }
-    return problems;
-  });
-}
+const BLEEDS = ".pf-book, .ds-marquee__track, .pf-skill-credits__skill";
+/** Pixel art that forced colours hide. */
+const ART = ".ds-px-mark, .ds-px-dot, .ds-word-mark, .ds-dither, .pf-art";
 
 /** This lane's ringed parts, beside the shared primitives. */
 const RINGED = [
@@ -171,90 +86,6 @@ const RINGED = [
   ".pf-press-card__banner",
   ".pf-blog-banner",
 ].join(", ");
-
-/** In forced colors, ringed parts keep an edge and pixel art goes away. */
-function forcedColorsProblems(page: Page): Promise<string[]> {
-  return page.evaluate((ringed) => {
-    const out: string[] = [];
-    for (const el of document.querySelectorAll<HTMLElement>(ringed)) {
-      const s = getComputedStyle(el);
-      if (s.display === "none") continue;
-      const edge =
-        s.borderTopStyle !== "none" &&
-        parseFloat(s.borderTopWidth) >= 1 &&
-        s.borderTopColor !== "rgba(0, 0, 0, 0)" &&
-        s.borderTopColor !== "transparent";
-      if (!edge) out.push(`no edge: .${[...el.classList].join(".")}`);
-    }
-    for (const el of document.querySelectorAll<HTMLElement>(
-      ".ds-px-mark, .ds-px-dot, .ds-word-mark, .ds-dither, .pf-art",
-    )) {
-      if (getComputedStyle(el).display !== "none") {
-        out.push(`still drawn: .${[...el.classList].join(".")}`);
-      }
-    }
-    return out;
-  }, RINGED);
-}
-
-/** WCAG 1.4.12 text spacing; then any text its box clips. */
-async function clippedText(page: Page): Promise<string[]> {
-  await page.addStyleTag({
-    content:
-      "*, *::before, *::after { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }",
-  });
-  return page.evaluate(() => {
-    const out: string[] = [];
-    for (const el of document.querySelectorAll<HTMLElement>("body *")) {
-      const ownText = [...el.childNodes].some(
-        (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
-      );
-      if (!ownText || el.closest(".ds-marquee")) continue;
-      const s = getComputedStyle(el);
-      if (!/hidden|clip/.test(s.overflowX + s.overflowY)) continue;
-      if (el.clientWidth <= 1) continue;
-      if (
-        el.scrollHeight > el.clientHeight + 1 ||
-        el.scrollWidth > el.clientWidth + 1
-      ) {
-        out.push(`clipped: "${el.textContent?.trim().slice(0, 30)}"`);
-      }
-    }
-    return out;
-  });
-}
-
-/** Font sizes of every `t-*` text style on the page, by position. */
-function typeSizes(page: Page): Promise<Record<string, number>> {
-  return page.evaluate(() => {
-    const out: Record<string, number> = {};
-    document.querySelectorAll<HTMLElement>("body *").forEach((el, i) => {
-      const style = [...el.classList].find((c) => c.startsWith("t-"));
-      if (style)
-        out[`${i} .${style}`] = parseFloat(getComputedStyle(el).fontSize);
-    });
-    return out;
-  });
-}
-
-/** WCAG 1.4.4 and 1.4.10: text doubles at 500%, nothing sideways at 200%. */
-async function zoomShortfalls(page: Page): Promise<string[]> {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const base = await typeSizes(page);
-  await page.setViewportSize({ width: 640, height: 400 });
-  const out: string[] = [];
-  const reflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - window.innerWidth,
-  );
-  if (reflow > 1) out.push(`${reflow}px sideways at 200% zoom`);
-  await page.setViewportSize({ width: 256, height: 160 });
-  const zoomed = await typeSizes(page);
-  for (const [key, px] of Object.entries(base)) {
-    const at500 = (zoomed[key] ?? 0) * 5;
-    if (at500 < px * 2 - 0.5) out.push(`${key}: ${px}px, ${at500}px zoomed`);
-  }
-  return out;
-}
 
 /** With prefers-contrast: more, the small-text floor moves up to ink 80. */
 function inkFloorRaised(page: Page): Promise<boolean> {
@@ -300,7 +131,10 @@ test.describe("group D2's pages across the device matrix (desktop Chromium)", ()
             ),
         );
         await page.evaluate(() => document.fonts.ready);
-        expect(await layoutProblems(page), `${path} at ${width}px`).toEqual([]);
+        expect(
+          await layoutProblems(page, { bleeds: BLEEDS }),
+          `${path} at ${width}px`,
+        ).toEqual([]);
       }
     });
   }
@@ -325,11 +159,15 @@ test.describe("best practices on group D2's pages (desktop Chromium)", () => {
       await page.setContent(
         `<a class="ds-pill" href="#x" style="border:0;box-shadow:0 0 0 1px #000">x</a>`,
       );
-      expect(await forcedColorsProblems(page)).not.toEqual([]);
+      expect(
+        await forcedColorsProblems(page, { ringed: RINGED, art: ART }),
+      ).not.toEqual([]);
 
       await prepare(page);
       await open(page, path);
-      expect(await forcedColorsProblems(page)).toEqual([]);
+      expect(
+        await forcedColorsProblems(page, { ringed: RINGED, art: ART }),
+      ).toEqual([]);
     });
 
     test(`text spacing (WCAG 1.4.12) clips no text (${path})`, async ({
@@ -339,11 +177,11 @@ test.describe("best practices on group D2's pages (desktop Chromium)", () => {
       await page.setContent(
         `<div style="width:120px;height:20px;overflow:hidden;font-size:16px">Text that cannot fit in this box</div>`,
       );
-      expect(await clippedText(page)).not.toEqual([]);
+      expect(await clippedText(page, { skip: ".ds-marquee" })).not.toEqual([]);
 
       await prepare(page);
       await open(page, path);
-      expect(await clippedText(page)).toEqual([]);
+      expect(await clippedText(page, { skip: ".ds-marquee" })).toEqual([]);
     });
 
     test(`zoom (WCAG 1.4.4, 1.4.10): text doubles and nothing scrolls sideways (${path})`, async ({
@@ -532,7 +370,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     const tabs = page.getByRole("tablist", {
       name: "Install the whole pack with",
     });
-    await tabTo(page, tabs.getByRole("tab", { name: "Claude Code" }));
+    await tabTo(page, tabs.getByRole("tab", { name: "Claude Code" }), 60);
     await page.keyboard.press("ArrowRight");
     const codex = tabs.getByRole("tab", { name: "Codex" });
     await expect(codex).toHaveAttribute("aria-selected", "true");

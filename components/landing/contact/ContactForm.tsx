@@ -128,6 +128,8 @@ export default function ContactForm({
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const mountedAt = useRef<number | null>(null);
+  /** Set when a WebMCP agent's draft fills the form. */
+  const drafted = useRef(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const sentRef = useRef<HTMLDivElement>(null);
   const focusNameNext = useRef(false);
@@ -162,6 +164,16 @@ export default function ContactForm({
     onSubmit: async ({ value }) => {
       setStatus("sending");
       setError("");
+      // A message sent sooner than CONTACT_LIMITS.minFillMs after the form
+      // appeared reads as a bot's and is dropped with a fake success
+      // (lib/contact/sendContactMessage.ts). An agent's draft fills the form
+      // at once and moves the focus to Send, so a visitor who sends it
+      // straight away waits out the rest of that time instead of losing it.
+      if (drafted.current && mountedAt.current !== null) {
+        const left =
+          CONTACT_LIMITS.minFillMs - (performance.now() - mountedAt.current);
+        if (left > 0) await new Promise((done) => setTimeout(done, left + 50));
+      }
       const elapsedMs =
         mountedAt.current === null
           ? null
@@ -221,6 +233,7 @@ export default function ContactForm({
   useEffect(
     () =>
       onContactDraft((draft) => {
+        drafted.current = true;
         setStatus("idle");
         form.setFieldValue("name", draft.name);
         form.setFieldValue("email", draft.email);

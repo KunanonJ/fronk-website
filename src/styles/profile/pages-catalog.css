@@ -12,10 +12,7 @@
  */
 
 @layer components {
-  /* The hero's additions: a back link or breadcrumb, pills, a meta line. */
-  .pf-cat-hero__back {
-    margin-bottom: 28px;
-  }
+  /* The hero's parts on these pages: pills and a meta line. */
   .pf-cat-hero__actions {
     display: flex;
     flex-wrap: wrap;
@@ -41,13 +38,8 @@
   }
 
   /* The filters, view switches and tabs use the shared filter bar
-     (.pf-filter-bar, .pf-filter and .pf-filter__option in cutover.css). A
-     count follows its label after a space. */
-  .pf-cat-count {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-  }
+     (.pf-filter-bar, .pf-filter and .pf-filter__option in cutover.css); a
+     count (.pf-count, cutover.css) follows its label after a space. */
   .pf-cat-note {
     color: var(--ink-60);
   }

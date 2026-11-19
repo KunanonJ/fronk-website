@@ -113,9 +113,9 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
 3. **Enforcing the CSP** with nonces: the owner's decision.
 4. **The press and blog banners** load from Unsplash (hidden pages):
    self-host or drop them before the blog goes public (the owner).
-5. **Workers Builds** still fails at its start on every commit (since
-   18-11-26); production is deployed by hand. The owner's Cloudflare
-   dashboard.
+5. **Workers Builds** failed at its start on every commit from 18-11-26:
+   its API token had been deleted or rolled. **Fixed** 19-11-26 by the
+   owner in the dashboard; #129 was built and deployed by Cloudflare.
 6. **The design system artifact** (outside the repo) is re-synced from the
    repo when the owner next opens it; the repo leads.
 7. **Refactor follow-ups** (no behaviour change): `CatalogHero` folds into
@@ -123,7 +123,10 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
    the device-matrix helpers repeated in the hub and catalog specs move to one
    module; content helpers kept only for tests (`caseHeading`,
    `findProjectCase`, `findVentureCase`, `allCaseStudies`, `headlineText`)
-   are reviewed. In the follow-up cleanup pull request.
+   are reviewed. **Done** in the cleanup pull request after #129: one
+   `PageHero`, one `.pf-count`, `tests/e2e/matrix.ts`; the six helpers were
+   reviewed and kept as the tests' oracles (the routes need the raw project
+   for JSON-LD and the head, so they look it up themselves).
 8. **Cloudflare's script monitor** (Page Shield) adds its own report-only
    policy to about 1 in 12 live responses. It reports every script and
    connection, so those page views log `[Report Only] Refused to load ...`
@@ -132,16 +135,24 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
    the monitor off is the owner's choice in the Cloudflare dashboard.
 9. **Lazy images in full-page captures:** a capture never loads a lazy image
    far below the first screen, so the AI Automation baselines show a blank
-   box where the kunanonj.com cover sits in More projects. The follow-up
-   cleanup pull request makes `visual.spec.ts` load every image first.
+   box where the kunanonj.com cover sits in More projects. **Done** in the
+   cleanup pull request after #129: `visual.spec.ts` loads and decodes every
+   image first, and the baselines that change are re-rendered there.
 10. **Dependabot:** `satori` before 0.33.5 (SVG escaping; the share images;
     `@cf-wasm/satori` pins 0.32.0) and `minimatch` before 11.0.1 (a DoS in
-    dev tooling, through eslint and the Sanity CLI). The follow-up cleanup
-    pull request updates both.
+    dev tooling, through eslint and the Sanity CLI). **minimatch done** in
+    the cleanup pull request after #129 (11.0.5). **satori stays at 0.32.0:**
+    0.33.5 has the fix but cannot run in the Worker (it shapes text with
+    harfbuzzjs, whose loader finds `hb.wasm` from its script's location, so
+    every share image and icon answered 500; the parity gate caught it), and
+    `@cf-wasm/satori` pins 0.32.0. Nothing a visitor sends reaches satori (a
+    slug only picks an entry from the repo's content) and its SVG becomes a
+    PNG inside the Worker, so the alert has no path here. Revisit when
+    `@cf-wasm` updates; the owner may dismiss the alert as tolerable risk.
 11. **A WebKit flake** in `profile-shell.spec.ts`: the footer's Say hello
     test focused a link while the panel was still opening and failed about
-    once in 40 runs. The follow-up cleanup pull request waits for the
-    opening transition (80 of 80 passed).
+    once in 40 runs. **Done** in the cleanup pull request after #129: both
+    Say hello tests wait for the opening transition (80 of 80 passed).
 
 ## 8. Merge, deploy and live checks
 

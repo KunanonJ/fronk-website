@@ -1,16 +1,18 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import { DitherField } from "@/components/ds/DitherField";
 import { StatusDot } from "@/components/ds/labels";
 import type { HeadlineLines } from "@/lib/content/corePages";
 import { cn } from "@/lib/utils/cn";
 
 /*
- * The hero of a core page restyled at the Phase 6 cutover (the portfolio
- * index, About and Contact; profile redesign plan step 6d): the case pages'
- * pixel sky (design spec 9.2 and 6.8), the eyebrow after a status dot that
- * pings once, the h1 in the display serif, the lead, then the page's own
- * parts (pills, filters). The h1 never fades or moves (LCP, spec 13 item 3).
- * Styles: `.pf-page-hero*` in src/styles/profile/cutover.css.
+ * The hero of every page without its own (the portfolio index, About,
+ * Contact, skills, a skill, the résumé, the status pages, /design, the
+ * hidden blog and press): the case pages' pixel sky (design spec 9.2 and
+ * 6.8), an optional back link or breadcrumb, the eyebrow after a status dot
+ * that pings once, the h1 in the display serif, the lead, then the page's
+ * own parts (pills, filters, a meta line), with an optional picture beside
+ * the copy. The h1 never fades or moves (LCP, spec 13 item 3). Styles:
+ * `.pf-page-hero*` in src/styles/profile/cutover.css.
  */
 
 /** Peach to the two lightest lavenders, dissolving downward, as on a case. */
@@ -42,23 +44,32 @@ export function Headline({ lines }: { lines: HeadlineLines }) {
   ));
 }
 
+/** The h1's content: Headline lines, or anything else. */
+type HeroTitle =
+  { lines: HeadlineLines; title?: never } | { lines?: never; title: ReactNode };
+
 export function PageHero({
+  back,
   eyebrow,
   lines,
+  title,
+  titleClassName,
   lead,
   children,
   aside,
   className,
-}: {
-  eyebrow: string;
-  lines: HeadlineLines;
+  ...rest
+}: HeroTitle & {
+  /** A back link or a breadcrumb, above the eyebrow. */
+  back?: ReactNode;
+  eyebrow: ReactNode;
+  titleClassName?: string;
   lead?: ReactNode;
   /** The page's own parts under the lead: pills, an availability line. */
   children?: ReactNode;
   /** A picture beside the copy from 1024 px (About's portrait). */
   aside?: ReactNode;
-  className?: string;
-}) {
+} & Omit<ComponentPropsWithoutRef<"section">, "title" | "children">) {
   return (
     <section
       className={cn(
@@ -67,18 +78,23 @@ export function PageHero({
         className,
       )}
       aria-labelledby="hero-title"
+      {...rest}
     >
       <div className="pf-page-hero__sky" aria-hidden="true">
         <DitherField stops={SKY} fade="down" seed={11} />
       </div>
       <div className="ds-wrap pf-page-hero__wrap">
         <div className="pf-page-hero__copy">
+          {back ? <div className="pf-page-hero__back">{back}</div> : null}
           <p className="t-meta pf-page-hero__eyebrow">
             <StatusDot />
             <span>{eyebrow}</span>
           </p>
-          <h1 id="hero-title" className="t-display pf-page-hero__title">
-            <Headline lines={lines} />
+          <h1
+            id="hero-title"
+            className={cn("t-display pf-page-hero__title", titleClassName)}
+          >
+            {lines ? <Headline lines={lines} /> : title}
           </h1>
           {lead ? <p className="t-lead pf-page-hero__lead">{lead}</p> : null}
           {children}

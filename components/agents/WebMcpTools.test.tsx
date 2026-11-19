@@ -37,6 +37,7 @@ afterEach(() => {
     delete (target as unknown as { modelContext?: unknown }).modelContext;
   }
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("WebMcpTools", () => {
@@ -88,7 +89,6 @@ describe("WebMcpTools", () => {
     await expect(overview.tool.execute()).resolves.toMatchObject({
       isError: true,
     });
-    vi.unstubAllGlobals();
   });
 
   it("opens pages through the router", async () => {

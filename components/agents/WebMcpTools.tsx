@@ -54,27 +54,33 @@ export function WebMcpTools() {
     const undo: (() => void)[] = [];
 
     const register = (tool: SiteTool) => {
-      const registration = context.registerTool(
-        {
-          ...tool,
-          execute: async (input?: Record<string, unknown>) => {
-            try {
-              return await tool.execute(input ?? {});
-            } catch (error) {
-              return {
-                content: [
-                  {
-                    type: "text",
-                    text: `${tool.name} failed: ${error instanceof Error ? error.message : String(error)}`,
-                  },
-                ],
-                isError: true,
-              } satisfies ToolResult;
-            }
+      let registration: unknown;
+      try {
+        registration = context.registerTool(
+          {
+            ...tool,
+            execute: async (input?: Record<string, unknown>) => {
+              try {
+                return await tool.execute(input ?? {});
+              } catch (error) {
+                return {
+                  content: [
+                    {
+                      type: "text",
+                      text: `${tool.name} failed: ${error instanceof Error ? error.message : String(error)}`,
+                    },
+                  ],
+                  isError: true,
+                } satisfies ToolResult;
+              }
+            },
           },
-        },
-        { signal: controller.signal },
-      );
+          { signal: controller.signal },
+        );
+      } catch {
+        // A tool the browser refuses is left out; the others still register.
+        return;
+      }
       // Chrome's preview returned a handle with unregister().
       const handle = registration as { unregister?: () => void } | undefined;
       if (typeof handle?.unregister === "function") {
@@ -84,26 +90,30 @@ export function WebMcpTools() {
       void Promise.resolve(registration).catch(() => {});
     };
 
-    void import("@/lib/agents/webmcp").then(({ siteTools }) => {
-      if (controller.signal.aborted) return;
-      siteTools({
-        fetchText,
-        navigate: async (path) => {
-          await router.navigate({ href: path });
-        },
-        setTheme: (theme) => setThemeRef.current(theme),
-        draftContact: async (draft) => {
-          if (fillContactDraft(draft)) return true;
-          await router.navigate({ to: "/contact" });
-          // The form takes drafts once it has mounted.
-          for (let tries = 0; tries < 30; tries += 1) {
-            await wait(100);
+    void import("@/lib/agents/webmcp")
+      .then(({ siteTools }) => {
+        if (controller.signal.aborted) return;
+        siteTools({
+          fetchText,
+          navigate: async (path) => {
+            await router.navigate({ href: path });
+          },
+          setTheme: (theme) => setThemeRef.current(theme),
+          draftContact: async (draft) => {
             if (fillContactDraft(draft)) return true;
-          }
-          return false;
-        },
-      }).forEach(register);
-    });
+            await router.navigate({ to: "/contact" });
+            // The form takes drafts once it has mounted.
+            for (let tries = 0; tries < 30; tries += 1) {
+              await wait(100);
+              if (fillContactDraft(draft)) return true;
+            }
+            return false;
+          },
+        }).forEach(register);
+      })
+      // The tools are an extra: if their chunk fails to load, the page stays
+      // as it is, without an unhandled rejection.
+      .catch(() => {});
 
     return () => {
       controller.abort();

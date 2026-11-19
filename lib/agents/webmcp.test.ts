@@ -5,6 +5,7 @@ import {
   type ContactDraft,
 } from "@/lib/agents/contactDraft";
 import { siteTools, sitePath, type ToolDeps } from "@/lib/agents/webmcp";
+import { CONTACT_LIMITS } from "@/lib/content/contact";
 
 function deps(overrides: Partial<ToolDeps> = {}): ToolDeps {
   return {
@@ -142,6 +143,34 @@ describe("the WebMCP tools", () => {
     ).execute({ name: "A", email: "a@example.com", message: "Hello there." });
     expect(closed.isError).toBe(true);
     expect(textOf(closed)).toMatch(/@/);
+  });
+});
+
+describe("draft_contact_message's checks", () => {
+  it("returns the form's own complaint instead of a draft Send would refuse", async () => {
+    const d = deps();
+    const result = await tool(d, "draft_contact_message").execute({
+      name: "Ada",
+      email: "ada.example.com",
+      message: "Hello from an agent.",
+    });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toMatch(/^email: /);
+    expect(d.draftContact).not.toHaveBeenCalled();
+  });
+
+  it("cuts an overlong message without splitting a character", async () => {
+    const d = deps();
+    const emoji = "\u{1F600}"; // two UTF-16 units
+    const message = "a".repeat(CONTACT_LIMITS.messageMax - 1) + emoji + "tail";
+    await tool(d, "draft_contact_message").execute({
+      name: "Ada",
+      email: "ada@example.com",
+      message,
+    });
+    const sent = vi.mocked(d.draftContact).mock.calls[0]![0].message;
+    expect(sent).toHaveLength(CONTACT_LIMITS.messageMax - 1);
+    expect(sent.at(-1)).toBe("a");
   });
 });
 
