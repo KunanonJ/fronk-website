@@ -11,9 +11,12 @@ import {
 
 /**
  * One skill in a stage (profile redesign Phase 7c): a paper tile with the
- * name in mono, its chips, the description and three actions. Every action
- * names its skill for screen readers, so twenty "Copy install" / "ZIP" /
- * "Details" never collide.
+ * name in mono, its chips, the description, Copy and ZIP, and "Details →".
+ * The name is the card's one link to the skill's page, named by the name
+ * alone; its ::after (`.ds-stretch`) covers the card, so the whole card
+ * opens the page, and "Details →" only says so. Copy and ZIP sit above the
+ * cover and name their skill for screen readers, so twenty "Copy install"
+ * and "ZIP" never collide.
  */
 export default function SkillCard({ skill }: { skill: Skill }) {
   const { npx } = skillInstallCommands(skill);
@@ -23,7 +26,12 @@ export default function SkillCard({ skill }: { skill: Skill }) {
     <li className="pf-skill-card__item">
       <article aria-labelledby={headingId} className="pf-skill-card">
         <h3 id={headingId} className="pf-skill-card__name">
-          {skill.name}
+          <Link
+            href={`/skills/${skill.slug}`}
+            className="ds-stretch pf-skill-card__link"
+          >
+            {skill.name}
+          </Link>
         </h3>
         <p className="pf-skill-card__tags">
           <SkillTags skill={skill} variant="card" />
@@ -47,13 +55,9 @@ export default function SkillCard({ skill }: { skill: Skill }) {
             </span>
             ZIP
           </a>
-          <Link
-            href={`/skills/${skill.slug}`}
-            aria-label={`Details for ${skill.name}`}
-            className="ds-text-link pf-skill-card__details"
-          >
-            Details →
-          </Link>
+          <span aria-hidden className="ds-text-link pf-skill-card__details">
+            Details <span className="ds-text-link__arrow">→</span>
+          </span>
         </div>
       </article>
     </li>

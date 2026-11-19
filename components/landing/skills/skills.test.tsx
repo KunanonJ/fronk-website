@@ -65,6 +65,23 @@ describe("SkillsCatalog", () => {
     );
   });
 
+  it("links each card to its skill once, named by the skill's name", () => {
+    render(<SkillsCatalog show="all" onShowChange={() => {}} />);
+    const card = screen.getByRole("article", { name: "verify-loop" });
+    const toPage = within(card)
+      .getAllByRole("link")
+      .filter((a) => a.getAttribute("href") === "/skills/verify-loop");
+    expect(toPage).toHaveLength(1);
+    expect(toPage[0]).toHaveAccessibleName("verify-loop");
+    expect(toPage[0]).toHaveClass("ds-stretch");
+    // Copy stays a control of its own.
+    expect(
+      within(card).getByRole("button", {
+        name: "Copy install command for verify-loop",
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("asks the route for a new filter instead of filtering locally", () => {
     const onShowChange = vi.fn();
     render(<SkillsCatalog show="all" onShowChange={onShowChange} />);
