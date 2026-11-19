@@ -30,7 +30,7 @@ export function clampText(text: string, max: number): string {
 }
 
 /** Stable seed from the title, so each page gets its own pattern. */
-function seedFrom(text: string): number {
+export function seedFrom(text: string): number {
   let h = 2166136261;
   for (let i = 0; i < text.length; i += 1)
     h = Math.imul(h ^ text.charCodeAt(i), 16777619);
@@ -41,7 +41,7 @@ function seedFrom(text: string): number {
  * The dither band along the card's foot (design spec 6.8): the site's
  * ordered dither, dense at the bottom edge, in its peach and violet tints.
  */
-function DitherBand({ seed }: { seed: number }) {
+export function DitherBand({ seed }: { seed: number }) {
   const cells = ditherCells({ ...BAND, cell: CELL, fade: "up", seed });
   return (
     <div
