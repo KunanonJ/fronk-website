@@ -1,6 +1,6 @@
 # Phase 7 report, lane D1: topic hubs, Thai typography, reading pages
 
-**Plan:** `../active/phase-7_remaining-pages_PLAN_18-11-26.md`, steps 7a
+**Plan:** `../completed/phase-7_remaining-pages_PLAN_18-11-26.md`, steps 7a
 (`/topics/$slug` and `/th/topics/$slug`, four each), 7b (Thai typography)
 and 7d (`/learn`, `/examples`, `/stack`, `/proof`, `/build`), and this lane's
 share of 7i (tests and gates). Lane D2 runs 7c, 7e, 7f, 7g and 7h.

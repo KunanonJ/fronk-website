@@ -1,12 +1,7 @@
-import { PERSON_NAME } from "@/lib/content/identity";
-import { renderOgCard } from "@/lib/og/render";
+import { ABOUT_CARD } from "@/lib/og/profileCards";
+import { renderProfileCard } from "@/lib/og/render";
 
-/** The /about share card: who he is, in the identity's own words. */
+/** The /about share card: the About hero beside the portrait. */
 export default async function AboutOgImage() {
-  return renderOgCard({
-    eyebrow: "About",
-    title: PERSON_NAME,
-    subtitle:
-      "AI Engineering Lead and solopreneur in Bangkok. Founder of GoGoCash, builder of Manut AI.",
-  });
+  return renderProfileCard(ABOUT_CARD);
 }

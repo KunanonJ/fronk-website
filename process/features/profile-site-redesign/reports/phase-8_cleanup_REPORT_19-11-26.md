@@ -1,11 +1,12 @@
 # Phase 8 report: cleanup, guards and speed
 
-**Plan:** `../active/phase-8_cleanup_PLAN_18-11-26.md`, steps 8a to 8g.
+**Plan:** `../completed/phase-8_cleanup_PLAN_18-11-26.md`, steps 8a to 8g.
 **Date:** 19-11-26, run by the orchestrator in this session (the delegated
 lanes were rate-limited), on the branch `feat/profile-phase8-cleanup`, from
 `main` at `cb1dd6c` (Phase 7 group D2).
-**Status:** CODE DONE. The plan's Status becomes VERIFIED once the pull
-request is merged, deployed and checked live.
+**Status:** VERIFIED (19-11-26). PR #128 merged as `f50d573` and deployed
+by hand as version `fcd8f2fd` (rollback target `a9b74b54`); live checks in
+section 8.
 
 ## 1. What was done, by step
 
@@ -74,6 +75,16 @@ site, `data:`, Sanity's CDN and Unsplash; fonts and connections from the site
 - **Test:** a smoke test visits every route, scrolls it, and fails on any
   `securitypolicyviolation` event; an injected off-policy image is caught
   (`img-src https://example.org/probe.png`), and every route passes.
+- **Reports (added in review, `df49992`):** CI's WebKit run failed the case
+  pages on a console error. Safari says a report-only policy that names no
+  report destination "will have no effect". The policy now ends with
+  `report-uri /api/csp-report; report-to csp`, every response carries
+  `Reporting-Endpoints: csp="/api/csp-report"`, and the Worker answers that
+  path (`src/server/cspReport.ts`): it logs each violation as one JSON line
+  (page path, directive, the blocked URL without its query; no referrer or
+  user agent), stores nothing, and answers 204. Checked in Chromium, WebKit
+  and Firefox 157: no console message about the policy, and each engine's
+  report shape parses.
 
 ## 5. Accessibility audit (8e)
 
@@ -112,4 +123,65 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
    the device-matrix helpers repeated in the hub and catalog specs move to one
    module; content helpers kept only for tests (`caseHeading`,
    `findProjectCase`, `findVentureCase`, `allCaseStudies`, `headlineText`)
-   are reviewed.
+   are reviewed. In the follow-up cleanup pull request.
+8. **Cloudflare's script monitor** (Page Shield) adds its own report-only
+   policy to about 1 in 12 live responses. It reports every script and
+   connection, so those page views log `[Report Only] Refused to load ...`
+   errors in every browser, and a live run of the CSP smoke test or the
+   WebKit case pages fails at random. It is not the site's policy. Turning
+   the monitor off is the owner's choice in the Cloudflare dashboard.
+9. **Lazy images in full-page captures:** a capture never loads a lazy image
+   far below the first screen, so the AI Automation baselines show a blank
+   box where the kunanonj.com cover sits in More projects. The follow-up
+   cleanup pull request makes `visual.spec.ts` load every image first.
+10. **Dependabot:** `satori` before 0.33.5 (SVG escaping; the share images;
+    `@cf-wasm/satori` pins 0.32.0) and `minimatch` before 11.0.1 (a DoS in
+    dev tooling, through eslint and the Sanity CLI). The follow-up cleanup
+    pull request updates both.
+11. **A WebKit flake** in `profile-shell.spec.ts`: the footer's Say hello
+    test focused a link while the panel was still opening and failed about
+    once in 40 runs. The follow-up cleanup pull request waits for the
+    opening transition (80 of 80 passed).
+
+## 8. Merge, deploy and live checks
+
+- **Merge:** every GitHub check passed on `11c9bd5` (typecheck, lint, unit,
+  build, e2e-smoke, visual, parity, AccessLint). Workers Builds failed at its
+  start, as on every commit since 18-11-26 (open item 5), so the pull
+  request was admin-merged as `f50d573`.
+- **Deploy:** `pnpm run deploy` from a clean checkout of `main`: version
+  `fcd8f2fd-ef2c-4d6a-8acd-cd9effe19e99`. Rollback target: `a9b74b54`
+  (Phase 7 D2).
+- **Live:** `/`, `/about`, `/portfolio`, `/portfolio/tbh-intranet`, the
+  forward-deployed hub in English and the Thai AI transformation hub,
+  `/skills`, `/resume`, `/contact`, both share images, both icons and
+  `/llms.txt` answer 200. Every page sends the policy and
+  `Reporting-Endpoints: csp="/api/csp-report"`; `POST /api/csp-report`
+  answers 204 and `GET` answers 405.
+- **Smoke against production** (desktop, the recruiter path and the CSP
+  check on every route): 87 of 88 passed. The one failure, on `/stack`, was
+  Cloudflare's script monitor (open item 8); it passed when run again.
+- **WebKit case pages against production:** 21 of 21 over three repeats.
+  A run right after the deploy failed 2 of 7 on the same monitor.
+- **Speed (plan gate 4).** `pnpm probe` (390 x 844, 4x CPU, about 1.6 Mbps,
+  150 ms RTT, cold cache). Like for like, on this Mac: the Phase 7 D2 build
+  (`cb1dd6c`) against this phase's, each server warmed, four runs each,
+  interleaved. The local server sends files uncompressed, so only the
+  difference counts:
+
+  | Page | LCP median, Phase 7 | LCP median, Phase 8 | TBT median, 7 to 8 |
+  | --- | --- | --- | --- |
+  | `/` | 3,532 ms | 3,458 ms | 72 to 56 ms |
+  | `/about` | 3,312 ms | 3,206 ms | 69 to 54 ms |
+  | `/portfolio/tbh-intranet` | 2,966 ms | 2,964 ms | 46 to 43 ms |
+
+  The live site, two runs on an idle Mac after the deploy: `/` 2,036 to
+  2,168 ms, `/about` 1,916 to 1,996 ms, `/portfolio/tbh-intranet` 2,004 to
+  2,204 ms, the forward-deployed hub 1,848 to 2,196 ms and the Thai AI
+  transformation hub 1,832 to 1,968 ms; CLS 0.001 or less; no text under
+  12 px and no target under 24 px. The bytes match the cutover's (JS
+  204 KB, CSS 39 KB, fonts 122 KB on Home), whose live LCP read 1.6 to
+  1.7 s on another day: single lab runs over the real network vary by a few
+  hundred milliseconds, which is why the A/B above is the comparison. An
+  earlier, unwarmed A/B read Phase 8 slower; it did not hold up once each
+  server was warmed and the runs repeated.

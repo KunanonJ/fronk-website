@@ -1,6 +1,6 @@
 # Phase 7 report, group D2: catalog pages (skills, résumé, status, /design, blog, press)
 
-**Plan:** `../active/phase-7_remaining-pages_PLAN_18-11-26.md`, steps 7c, 7e,
+**Plan:** `../completed/phase-7_remaining-pages_PLAN_18-11-26.md`, steps 7c, 7e,
 7f, 7g, 7h and this group's share of 7i. Group D1 (7a, 7b, 7d: the topic
 hubs, Thai typography and the reading pages) runs in its own lane.
 **Date:** 18-11-26 into 19-11-26, in the worktree

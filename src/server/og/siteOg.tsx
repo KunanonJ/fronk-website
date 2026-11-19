@@ -1,10 +1,7 @@
-import { siteConfig } from "@/lib/site";
-import { renderOgCard } from "@/lib/og/render";
+import { HOME_CARD } from "@/lib/og/profileCards";
+import { renderProfileCard } from "@/lib/og/render";
 
-/** Brand share preview — black + cream KunanonJ card. */
+/** The site-wide share card: the Home hero beside the portrait. */
 export default function OpenGraphImage() {
-  return renderOgCard({
-    title: siteConfig.name,
-    subtitle: siteConfig.tagline,
-  });
+  return renderProfileCard(HOME_CARD);
 }

@@ -1,6 +1,6 @@
 # Phase 6 report: Cutover
 
-**Plan:** `../active/phase-6_cutover_PLAN_18-11-26.md` (steps 6a to 6i; 6j,
+**Plan:** `../completed/phase-6_cutover_PLAN_18-11-26.md` (steps 6a to 6i; 6j,
 the merge and the live check, is the orchestrator's).
 **Date:** 18-11-26, in the worktree `t3-0ed2720f-c910a1f09459c1a1` on the
 local branch `feat/profile-redesign-phase-6-cutover`, from `02de7bf` (Phases

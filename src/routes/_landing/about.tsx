@@ -49,9 +49,10 @@ function AboutRoute() {
 export const Route = createFileRoute("/_landing/about")({
   head: () =>
     pageHead(metadata, {
+      // profileCardAlt(ABOUT_CARD); lib/og/profileCards.test.ts checks it.
       fileOgImage: fileOg(
         "/about",
-        "Kunanon Jarat: AI Engineering Lead in Bangkok",
+        "Kunanon Jarat’s portrait beside “About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok.”",
       ),
     }),
   component: AboutRoute,

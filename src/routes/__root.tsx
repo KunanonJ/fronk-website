@@ -12,6 +12,7 @@ import NotFound from "@/components/NotFound";
 import RouteError from "@/components/RouteError";
 import appCss from "@/src/styles/globals.css?url";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
+import { WebMcpTools } from "@/components/agents/WebMcpTools";
 import { ThemeProvider } from "next-themes";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
@@ -105,6 +106,7 @@ function RootDocument({ children }: { children: ReactNode }) {
           disableTransitionOnChange
         >
           {children}
+          {pathname.startsWith("/studio") ? null : <WebMcpTools />}
         </ThemeProvider>
         <CloudflareAnalytics />
         <Suspense fallback={null}>
