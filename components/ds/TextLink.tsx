@@ -15,6 +15,7 @@ export function TextLink({
   arrow = "right",
   tone = "quiet",
   external = false,
+  context,
 }: {
   href: string;
   children: ReactNode;
@@ -22,6 +23,11 @@ export function TextLink({
   /** prose: accent-ink and underlined, for links inside paragraphs. */
   tone?: "quiet" | "prose";
   external?: boolean;
+  /**
+   * Read after the label by screen readers only (": GoGoCash"), for a label
+   * that repeats on the page with different destinations ("Case study").
+   */
+  context?: string;
 }) {
   const glyph = tone === "prose" ? null : ARROW[arrow];
   const mark = glyph ? (
@@ -43,6 +49,7 @@ export function TextLink({
       {arrow === "left" ? mark : null}
       <span>
         {children}
+        {context ? <span className="sr-only">: {context}</span> : null}
         {external ? (
           <>
             {" "}

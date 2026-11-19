@@ -51,11 +51,12 @@ describe("withSecurityHeaders", () => {
   });
 });
 
-describe("the Content Security Policy (report-only)", () => {
+describe("the Content Security Policy (enforced)", () => {
   it("rides on every Worker response but Sanity Studio's", () => {
     const page = withSecurityHeaders(new Response("ok"), "/about");
+    expect(CSP_HEADER).toBe("Content-Security-Policy");
     expect(page.headers.get(CSP_HEADER)).toBe(CONTENT_SECURITY_POLICY);
-    expect(page.headers.get("content-security-policy")).toBeNull();
+    expect(page.headers.get("content-security-policy-report-only")).toBeNull();
     for (const path of ["/studio", "/studio/structure"]) {
       const studio = withSecurityHeaders(new Response("ok"), path);
       expect(studio.headers.get(CSP_HEADER), path).toBeNull();
@@ -76,7 +77,7 @@ describe("the Content Security Policy (report-only)", () => {
   });
 
   it("sends its reports to the Worker's report endpoint", () => {
-    // Safari drops a report-only policy that names no report destination.
+    // Blocks are reported (Safari also drops a report-only policy without).
     expect(CSP_REPORT_PATH).toBe("/api/csp-report");
     expect(CONTENT_SECURITY_POLICY).toContain(`report-uri ${CSP_REPORT_PATH}`);
     expect(CONTENT_SECURITY_POLICY).toContain("report-to csp");

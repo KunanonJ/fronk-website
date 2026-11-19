@@ -299,8 +299,9 @@ export function buildArticleJsonLd(
     isPartOf: { "@id": WEBSITE_ID },
     author: { "@id": PERSON_ID },
     publisher: { "@id": PERSON_ID },
+    // A site-relative banner (public/banners) becomes an absolute URL.
     ...(input.imageUrl
-      ? { image: [input.imageUrl] }
+      ? { image: [new URL(input.imageUrl, `${BASE}/`).href] }
       : { image: [`${BASE}/profile.jpg`] }),
     ...(input.tags?.length ? { keywords: input.tags.join(", ") } : {}),
     inLanguage: "en-US",

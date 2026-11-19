@@ -1,7 +1,7 @@
 import { methodNotAllowed, readBodyText } from "./http";
 
 /*
- * POST /api/csp-report (CSP_REPORT_PATH): where browsers send the report-only
+ * POST /api/csp-report (CSP_REPORT_PATH): where browsers send the
  * Content Security Policy's violations (CONTENT_SECURITY_POLICY in ./http.ts).
  * Each violation becomes one line in the Worker's logs (wrangler.jsonc
  * `observability`), so the owner can see what enforcing the policy would

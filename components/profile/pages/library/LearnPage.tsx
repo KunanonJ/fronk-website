@@ -69,7 +69,9 @@ function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
         {hub.lede}
       </p>
       <div className="pf-read-links">
-        <ArrowLink href={hub.href}>Open hub</ArrowLink>
+        <ArrowLink href={hub.href} label={`Open hub: ${hub.title}`}>
+          Open hub
+        </ArrowLink>
         {lead ? (
           <ArrowLink
             href={hub.alt.href}

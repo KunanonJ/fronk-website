@@ -107,17 +107,39 @@ Web Vitals comparison needs 28 days of data after the cutover: carried.
 
 ## 7. Open items
 
-1. **Screen-reader passes** (VoiceOver, TalkBack, NVDA): the owner.
+1. **Screen-reader passes.** **Done** 19-11-26 as an audit of what screen
+   readers are given: the accessibility tree (Playwright `ariaSnapshot`) of
+   all 65 page routes at 1440 and 390 px. Every page has one h1, no skipped
+   heading level, one main landmark, distinct navigation names, and a name
+   on every link, button, field and image. Two pages had links that sound
+   alike in a links list while going to different places; they are named
+   now ("Open hub: <hub>" on /learn, "Case study: GoGoCash" and "Case study:
+   Manut AI" on /résumé). The nav's About (Home's About section) and the
+   footer's About (the About page) keep one name: their context tells them
+   apart, which WCAG 2.4.4 (AA, the site's target) asks; only the AAA
+   criterion 2.4.9 would want distinct names. axe (WCAG 2.2 AA) covers the
+   rest on every route in both themes.
 2. **28-day field Core Web Vitals** against the numbers from before Phase 6:
-   after 17-12-26.
-3. **Enforcing the CSP** with nonces: the owner's decision.
-4. **The press and blog banners** load from Unsplash (hidden pages):
-   self-host or drop them before the blog goes public (the owner).
+   the data completes on 17-12-26. **Scheduled**: a task runs that day at
+   10:00 Bangkok time, compares the field data (Cloudflare Web Analytics,
+   then CrUX), probes the lab numbers, and ships its report as a PR.
+3. **Enforcing the CSP.** **Done** 19-11-26: the policy is enforced
+   (`Content-Security-Policy`), after running report-only from #128 with no
+   violation of its own on any route (smoke check in Chromium, live WebKit
+   audit). Blocks are still reported to /api/csp-report. A nonce-based
+   policy would also drop 'unsafe-inline' for scripts, at the cost of
+   rendering every page on request instead of prerendering; not planned.
+4. **The press and blog banners.** **Done** 19-11-26: the five Unsplash
+   photos (Unsplash License) are self-hosted in public/banners at 1200 px
+   (352 KB in all, from 1.28 MB), and `images.unsplash.com` left the CSP.
 5. **Workers Builds** failed at its start on every commit from 18-11-26:
    its API token had been deleted or rolled. **Fixed** 19-11-26 by the
    owner in the dashboard; #129 was built and deployed by Cloudflare.
-6. **The design system artifact** (outside the repo) is re-synced from the
-   repo when the owner next opens it; the repo leads.
+6. **The design system artifact** (outside the repo) could not be opened
+   from this session's account (19-11-26), so it was not re-synced. The
+   repo leads: its living design system is the /design page, drawn from
+   the same tokens. To re-sync the artifact, share it with the account the
+   agent runs under, or have it rebuilt from /design.
 7. **Refactor follow-ups** (no behaviour change): `CatalogHero` folds into
    Phase 6's `PageHero`; `.pf-cat-count` and `.pf-read-count` are one rule;
    the device-matrix helpers repeated in the hub and catalog specs move to one

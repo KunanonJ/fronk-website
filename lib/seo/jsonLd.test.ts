@@ -138,6 +138,20 @@ describe("buildArticleJsonLd > emits BlogPosting for a post", () => {
     expect(String(article.url)).toContain("/blog/shipping-from-bangkok");
     expect((article.author as Node)["@id"]).toBe(PERSON_ID);
     expect(article.headline).toBe("Shipping from Bangkok");
+    expect(article.image).toEqual(["https://example.com/banner.jpg"]);
+  });
+
+  it("makes a self-hosted banner's address absolute", () => {
+    const article = buildArticleJsonLd({
+      title: "T",
+      description: "D",
+      slug: "t",
+      publishedAt: "2026-06-12",
+      imageUrl: "/banners/city-skyline.webp",
+      tags: [],
+    });
+    const [image] = article.image as string[];
+    expect(image).toMatch(/^https?:\/\/[^/]+\/banners\/city-skyline\.webp$/);
   });
 });
 

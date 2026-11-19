@@ -56,8 +56,12 @@ export const BLOG_VENTURE_TAGS = [
   { tag: "Manut", venture: "manut" },
 ] as const;
 
-const STOCK_BANNER =
-  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80";
+/**
+ * Banners: photos from Unsplash (Unsplash License: free to use and modify,
+ * no attribution required), self-hosted in public/banners at 1200 px so the
+ * pages load nothing from a third party.
+ */
+const STOCK_BANNER = "/banners/city-skyline.webp";
 
 /** Cornerstone + calendar posts — always mergeable into the public index by slug. */
 export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
@@ -85,8 +89,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "How tech startups in SEA pick ERP/CRM and internal systems before adding Intelligence AI.",
     publishedAt: "2026-07-08",
     tags: ["ERP", "CRM", "Startups"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/operations-dashboard.webp",
     bannerAlt: "Operations dashboard",
     bodyParagraphs: [
       "Most early teams drown in SaaS. The durable path is a clear internal system — ERP and CRM that match how the business actually runs — then Intelligence AI on top.",
@@ -101,8 +104,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "Operator notes on shipping fintech and AI products from Thailand into SEA.",
     publishedAt: "2026-07-05",
     tags: ["Founding", "Bangkok", "SEA"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/bangkok-night.webp",
     bannerAlt: "Bangkok at night",
     bodyParagraphs: [
       "Bangkok is a strong base to ship fintech and AI into Southeast Asia — if you treat operations as seriously as product.",
@@ -117,8 +119,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "How Manut folds ERP/CRM and Intelligence AI into one operator surface for automotive SMEs.",
     publishedAt: "2026-07-01",
     tags: ["Manut", "AI", "ERP"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/digital-interface.webp",
     bannerAlt: "Digital interface",
     bodyParagraphs: [
       "Manut is an ERP/CRM workspace with Intelligence AI aimed at automotive SMEs — ops, customers, and repeat decisions in one place instead of a dozen disconnected tools.",
@@ -133,8 +134,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "Why we build fintech and AI tooling from Thailand — pace, constraints, and craft.",
     publishedAt: "2026-06-12",
     tags: ["Founding", "Bangkok"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/bangkok-night.webp",
     bannerAlt: "Bangkok at night",
     bodyParagraphs: [
       "We build from Bangkok because the constraints are real and the market is adjacent — Thailand into SEA, not a slide about global from day one.",
@@ -149,8 +149,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "Lessons from GoGoCash on merchant mix, reward clarity, and habit formation.",
     publishedAt: "2026-04-28",
     tags: ["GoGoCash", "Product"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/retail-shopping.webp",
     bannerAlt: "Retail shopping",
     bodyParagraphs: [
       "Retention in cashback is habit, not novelty. Merchant mix, reward clarity, and a loop users understand beat another splash screen.",
@@ -165,8 +164,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "How Manut folds ERP/CRM and Intelligence AI into one operator surface.",
     publishedAt: "2026-02-14",
     tags: ["Manut", "AI"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/digital-interface.webp",
     bannerAlt: "Digital interface",
     bodyParagraphs: [
       "An AI workspace only helps if it sits on ERP/CRM truth. Manut’s bet is one operator surface for automotive SMEs — see /ventures/manut.",
@@ -196,8 +194,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "Operator CRM habits that stick in automotive retail — follow-up, inventory truth, and fewer tabs.",
     publishedAt: "2026-08-09",
     tags: ["CRM", "Automotive", "SME"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/operations-dashboard.webp",
     bannerAlt: "Operations dashboard",
     bodyParagraphs: [
       "Dealer CRM fails when it is a graveyard of notes. Habits that stick: one owner per lead, same-day follow-up, inventory truth tied to the customer record, and a weekly review that is shorter than a coffee.",
@@ -212,8 +209,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "A minimal ops stack for SEA founders: system of record, shipping cadence, and AI only where it compounds.",
     publishedAt: "2026-08-16",
     tags: ["Founding", "SEA", "Ops"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/bangkok-night.webp",
     bannerAlt: "Bangkok at night",
     bodyParagraphs: [
       "My 2026 ops stack for shipping from Bangkok is deliberately small: one system of record for customers and money-moving work, a weekly ship cadence, and AI only on repeat decisions.",
@@ -243,8 +239,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "When to consolidate into an internal system instead of adding another SaaS seat.",
     publishedAt: "2026-08-30",
     tags: ["ERP", "Internal systems"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/operations-dashboard.webp",
     bannerAlt: "Operations dashboard",
     bodyParagraphs: [
       "SaaS sprawl feels like progress until handoffs break. Internal tools win when the workflow is your moat and the data must stay coherent across teams.",
@@ -259,8 +254,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "How we think about retention loops at GoGoCash — clarity, merchant mix, and habit over hype.",
     publishedAt: "2026-09-01",
     tags: ["GoGoCash", "Fintech", "Product"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/retail-shopping.webp",
     bannerAlt: "Retail shopping",
     bodyParagraphs: [
       "GoGoCash retention is a loop: clear rewards, merchants people already shop, and a reason to come back without a new gimmick every week.",
@@ -275,8 +269,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "What I look for when hiring builders in Bangkok — craft, ownership, and comfort with constraints.",
     publishedAt: "2026-09-06",
     tags: ["Founding", "Bangkok", "Hiring"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/bangkok-night.webp",
     bannerAlt: "Bangkok at night",
     bodyParagraphs: [
       "Hiring builders in Bangkok, I optimize for ownership and craft under constraints — not title inflation. Ship something small that proves the bet; stay close to the work.",
@@ -291,8 +284,7 @@ export const FALLBACK_BLOG_POSTS: readonly BlogCard[] = [
       "Where Intelligence AI belongs inside ERP/CRM — repeat decisions, not generic chat overlays.",
     publishedAt: "2026-09-10",
     tags: ["AI", "ERP", "Manut"],
-    bannerSrc:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
+    bannerSrc: "/banners/digital-interface.webp",
     bannerAlt: "Digital interface",
     bodyParagraphs: [
       "Intelligence AI inside ERP should sit on decisions that already happen weekly: pricing exceptions, follow-up priority, inventory exceptions — not a blank chat box beside the grid.",
