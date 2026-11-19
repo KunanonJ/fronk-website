@@ -30,6 +30,7 @@ const PRIVACY_PATTERNS = [
   /^\.env\./,             // .env.local, .env.production, etc.
   /\.env$/,               // path/to/.env
   /\/\.env\./,            // path/to/.env.local
+  /(^|\/)\.dev\.vars(\.|$)/, // Wrangler's local secrets: .dev.vars, .dev.vars.staging
   /credentials/i,         // credentials.json, etc.
   /secrets?\.ya?ml$/i,    // secrets.yaml, secret.yml
   /\.pem$/,               // Private keys
@@ -132,29 +133,17 @@ function extractPaths(toolInput) {
 
   // Check bash commands for file paths
   if (toolInput.command) {
-    // Look for APPROVED:.env or .env patterns
+    // APPROVED:<path> approves that path only. Every other secrets file named
+    // in the command is still checked: an approval token anywhere must not
+    // switch the scan off.
     const approvedMatch = toolInput.command.match(/APPROVED:[^\s]+/g) || [];
     approvedMatch.forEach(p => paths.push({ value: p, field: 'command' }));
+    const rest = toolInput.command.replace(/APPROVED:[^\s]+/g, ' ');
 
-    // Only look for .env if no APPROVED: version found
-    if (approvedMatch.length === 0) {
-      const envMatch = toolInput.command.match(/\.env[^\s]*/g) || [];
-      envMatch.forEach(p => paths.push({ value: p, field: 'command' }));
-
-      // Also check bash variable assignments (FILE=.env, ENV_FILE=.env.local)
-      const varAssignments = toolInput.command.match(/\w+=[^\s]*\.env[^\s]*/g) || [];
-      varAssignments.forEach(a => {
-        const value = a.split('=')[1];
-        if (value) paths.push({ value, field: 'command' });
-      });
-
-      // Check command substitution containing sensitive patterns - extract .env from inside
-      const cmdSubst = toolInput.command.match(/\$\([^)]*?(\.env[^\s)]*)[^)]*\)/g) || [];
-      for (const subst of cmdSubst) {
-        const inner = subst.match(/\.env[^\s)]*/);
-        if (inner) paths.push({ value: inner[0], field: 'command' });
-      }
-    }
+    // .env and .dev.vars names anywhere in the rest of the command: plain
+    // arguments, assignments (FILE=.env) and command substitutions alike.
+    const secretFiles = rest.match(/(?:\.env|\.dev\.vars)[^\s)'";|&]*/g) || [];
+    secretFiles.forEach(p => paths.push({ value: p, field: 'command' }));
   }
 
   return paths.filter(p => p.value);
@@ -237,26 +226,29 @@ function checkPrivacy({ toolName, toolInput, options = {} }) {
   const paths = extractPaths(toolInput);
 
   // Check each path
-  for (const { value: testPath } of paths) {
-    if (!isPrivacySensitive(testPath)) continue;
+  const sensitive = paths
+    .map(({ value }) => value)
+    .filter(isPrivacySensitive);
 
-    // Check for approval prefix
-    if (hasApprovalPrefix(testPath)) {
-      const strippedPath = stripApprovalPrefix(testPath);
-      return {
-        blocked: false,
-        approved: true,
-        filePath: strippedPath,
-        suspicious: isSuspiciousPath(strippedPath)
-      };
-    }
-
-    // Block - sensitive file without approval
+  // Any sensitive path without approval blocks the call, whatever else in it
+  // was approved.
+  const unapproved = sensitive.find(testPath => !hasApprovalPrefix(testPath));
+  if (unapproved) {
     return {
       blocked: true,
-      filePath: testPath,
+      filePath: unapproved,
       reason: `Sensitive file access requires user approval`,
-      promptData: buildPromptData(testPath)
+      promptData: buildPromptData(unapproved)
+    };
+  }
+
+  if (sensitive.length > 0) {
+    const strippedPath = stripApprovalPrefix(sensitive[0]);
+    return {
+      blocked: false,
+      approved: true,
+      filePath: strippedPath,
+      suspicious: isSuspiciousPath(strippedPath)
     };
   }
 

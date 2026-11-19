@@ -16,7 +16,7 @@ updates:
       semver-major-days: 30
     ignore:
       # Must match the Playwright container image in .github/workflows/ci.yml;
-      # bump both together by hand.
+      # bump both together by hand, with the image's new digest.
       - dependency-name: "@playwright/test"
     groups:
       tanstack:
