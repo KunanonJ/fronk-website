@@ -98,6 +98,11 @@ function CurrentRoles({
   items: readonly ResolvedTimelineItem[];
   detail: ResumeDetail;
 }) {
+  // A page link whose label repeats in the list ("Case study" for each
+  // venture) is named after its entry for screen readers.
+  const labels = items.flatMap((item) => (item.more ? [item.more.label] : []));
+  const repeats = (label: string) =>
+    labels.indexOf(label) !== labels.lastIndexOf(label);
   return (
     <ol className="pf-resume__wells">
       {items.map((item) => (
@@ -120,7 +125,12 @@ function CurrentRoles({
                 <TextLink href={item.href}>{linkLabel(item.href)}</TextLink>
               ) : null}
               {item.more ? (
-                <TextLink href={item.more.href}>{item.more.label}</TextLink>
+                <TextLink
+                  href={item.more.href}
+                  context={repeats(item.more.label) ? item.title : undefined}
+                >
+                  {item.more.label}
+                </TextLink>
               ) : null}
             </div>
           ) : null}

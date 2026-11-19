@@ -102,7 +102,7 @@ describe("LearnPage", () => {
     expect(card).toHaveClass("pf-read-lead");
     expect(card).toHaveTextContent("EN · /topics/ai-transformation-thailand");
     expect(
-      within(card).getByRole("link", { name: "Open hub" }),
+      within(card).getByRole("link", { name: `Open hub: ${ai?.h1}` }),
     ).toHaveAttribute("href", "/topics/ai-transformation-thailand");
     const thai = within(card).getByRole("link", { name: "อ่านภาษาไทย" });
     expect(thai).toHaveAttribute(
@@ -120,7 +120,8 @@ describe("LearnPage", () => {
         .getAllByRole("article")
         .filter((article) => article.classList.contains("pf-read-lead")),
     ).toHaveLength(1);
-    expect(screen.getAllByRole("link", { name: "Open hub" })).toHaveLength(
+    // Each named after its hub, so a links list tells them apart.
+    expect(screen.getAllByRole("link", { name: /^Open hub: / })).toHaveLength(
       TOPIC_SLUGS.length,
     );
     expectNoHiddenLinks(container);

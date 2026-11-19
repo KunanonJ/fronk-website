@@ -147,8 +147,12 @@ describe("ResumePage (screen)", () => {
       within(projects).getByRole("link", { name: "gogocash.co" }),
     ).toHaveAttribute("href", "https://gogocash.co");
     expect(
-      within(projects).getAllByRole("link", { name: "Case study" })[0],
+      within(projects).getByRole("link", { name: "Case study: GoGoCash" }),
     ).toHaveAttribute("href", "/ventures/gogocash");
+    // Each venture's "Case study" is named after it for screen readers.
+    expect(
+      within(projects).getByRole("link", { name: "Case study: Manut AI" }),
+    ).toHaveAttribute("href", "/ventures/manut");
   });
 
   it("groups the skills under the CV's four labels, AI first", () => {
