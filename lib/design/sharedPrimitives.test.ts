@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import { read, sourceFiles } from "@/lib/design/sourceScan";
 
 /**
- * The bento card surface, the mono label and the hero shells each live in
- * one place (components/bento/classes.ts and PageHero.tsx). Copies drift:
- * before this guard there were seven card surfaces, three mono labels with
- * two line heights, and nine hand-written hero h1s.
+ * The bento card surface lives in one place (components/bento/classes.ts),
+ * and no page writes the old hero h1 or lead by hand. Copies drift: before
+ * this guard there were seven card surfaces and nine hand-written hero h1s.
+ * The mono label and the bento PageHero went once Phase 7 restyled their
+ * last pages.
  */
 const files = sourceFiles(["components", "src/routes"]);
 
@@ -24,18 +25,13 @@ describe("shared bento primitives", () => {
     ).toEqual([]);
   });
 
-  it("defines the mono label only in classes.ts", () => {
-    expect(filesContaining(/(const|let) MONO_LABEL\b/)).toEqual([]);
-  });
-
-  it("renders the standard hero h1 and lead through PageHero", () => {
+  it("writes no old hero h1 or lead by hand", () => {
     expect(
       filesContaining(/<h1 id="hero-title" className="kj-lines m-0 text-title/),
     ).toEqual([]);
     expect(
       filesContaining(
         /"m-0 max-w-\[620px\] text-lg leading-\[1\.55\] text-ink-2"/,
-        ["components/bento/PageHero.tsx"],
       ),
     ).toEqual([]);
   });

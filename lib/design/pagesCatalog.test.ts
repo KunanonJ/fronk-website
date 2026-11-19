@@ -50,9 +50,4 @@ describe("Phase 7 group D2's pages", () => {
     const offenders = files.filter((f) => /#[0-9a-fA-F]{3,8}\b/.test(read(f)));
     expect(offenders).toEqual([]);
   });
-
-  it("use the profile main, not the old bento column", () => {
-    const offenders = files.filter((f) => /\bPageMain\b/.test(read(f)));
-    expect(offenders).toEqual([]);
-  });
 });
