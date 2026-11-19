@@ -28,7 +28,7 @@ function modified(event: MouseEvent): boolean {
  * A chapter still waiting to be revealed shows at once, so it lands where it
  * rests.
  */
-export function goToChapter(id: string): boolean {
+function goToChapter(id: string): boolean {
   const target = document.getElementById(id);
   if (!target) return false;
   const pending = target.closest<HTMLElement>(".is-pending");

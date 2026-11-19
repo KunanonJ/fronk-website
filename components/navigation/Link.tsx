@@ -4,58 +4,20 @@ import { forwardRef, type AnchorHTMLAttributes } from "react";
 import { safeHref } from "@/lib/utils/safeHref";
 
 /*
- * The site's Link: TanStack Router's Link behind the `next/link` props the
- * components were written against. Off-site links, files (llms.txt,
- * resume.pdf), API routes and the Studio are plain anchors: the router would
- * try to render them as pages.
+ * The site's Link: TanStack Router's Link for the site's pages, from a plain
+ * href string. Off-site links, files (llms.txt, resume.pdf), API routes and
+ * the Studio are plain anchors: the router would try to render them as pages.
  */
 
 /** Paths a full page load must handle: a file extension, /api or /studio. */
 const DOCUMENT_PATH = /(\.[a-z0-9]+$)|(^\/(api|studio)(\/|$))/i;
 
-type UrlObject = {
-  pathname?: string;
-  query?: Record<string, string>;
-  hash?: string;
-};
+type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
-type NextLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
-  href: string | UrlObject;
-  prefetch?: boolean | null;
-  scroll?: boolean;
-  replace?: boolean;
-  shallow?: boolean;
-  legacyBehavior?: boolean;
-  passHref?: boolean;
-  locale?: string | false;
-};
-
-function toHref(href: string | UrlObject): string {
-  if (typeof href === "string") return href;
-  const query = href.query ? `?${new URLSearchParams(href.query)}` : "";
-  const hash = href.hash
-    ? href.hash.startsWith("#")
-      ? href.hash
-      : `#${href.hash}`
-    : "";
-  return `${href.pathname ?? ""}${query}${hash}`;
-}
-
-const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
-  {
-    href,
-    prefetch,
-    scroll,
-    replace,
-    shallow: _shallow,
-    legacyBehavior: _legacy,
-    passHref: _pass,
-    locale: _locale,
-    ...rest
-  },
+const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
+  { href: url, ...rest },
   ref,
 ) {
-  const url = toHref(href);
   // Off-site, protocol and fragment-only links stay plain anchors, as in Next.
   // Checked before parsing: a malformed CMS URL must not throw during render.
   // A scheme outside http(s), mailto and tel loses its href (safeHref).
@@ -81,9 +43,7 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
       to={parsed.pathname as never}
       search={search as never}
       hash={parsed.hash ? parsed.hash.slice(1) : undefined}
-      resetScroll={scroll === false ? false : undefined}
-      replace={replace}
-      preload={prefetch === false ? false : "intent"}
+      preload="intent"
       // Only the exact page counts as current (aria-current="page"); hash
       // links like /#ventures never do.
       activeOptions={{

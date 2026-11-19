@@ -5,15 +5,17 @@ import { OG_SIZE, OgCard, type OgCardProps } from "@/lib/og/card";
 import { ProfileCard, type ProfileCardProps } from "@/lib/og/profileCard";
 
 function render(element: ReactElement): ImageResponse {
-  const fonts = loadOgFonts();
-  return new ImageResponse(element, {
-    ...OG_SIZE,
-    ...(fonts.length > 0 ? { fonts } : {}),
-  });
+  return new ImageResponse(element, { ...OG_SIZE, fonts: loadOgFonts() });
 }
 
-/** Render the shared brand OG card as a route-handler ImageResponse. */
-export function renderOgCard(props: OgCardProps): ImageResponse {
+/**
+ * A page's share card at `<path>/<slug>/opengraph-image`: the card for what
+ * the slug names, or a plain 404 when it names nothing.
+ */
+export function renderSlugCard(
+  props: OgCardProps | null | undefined,
+): Response {
+  if (!props) return new Response("Not found", { status: 404 });
   return render(<OgCard {...props} />);
 }
 

@@ -4,8 +4,8 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_NAME } from "@/lib/content/identity";
 import { operatingModel } from "@/lib/content/operatingModel";
+import { SITE_ORIGIN } from "@/lib/site";
 import {
-  SITE_BASE,
   absoluteUrl,
   markdownResponse,
   paragraphToMarkdown,
@@ -24,7 +24,7 @@ export function buildAboutMd(): string {
   const push = (...lines: string[]) => out.push(...lines);
 
   push(`# About ${PERSON_NAME} (${hero.nickname})`, "");
-  push(`Source: ${SITE_BASE}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
+  push(`Source: ${SITE_ORIGIN}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
   push(`${hero.role} ${hero.location}.`, "");
   // The page shows this in its hero pill and in "Let's talk".
   push(OPEN_TO_ROLES.sentence, "");

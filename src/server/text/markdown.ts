@@ -1,8 +1,5 @@
 import type { AboutParagraph } from "@/lib/content/aboutPage";
-import { siteConfig } from "@/lib/site";
-
-/** The site origin without a trailing slash. */
-export const SITE_BASE = siteConfig.url.replace(/\/$/, "");
+import { SITE_ORIGIN, siteUrl } from "@/lib/site";
 
 /**
  * An absolute URL for a link in a Markdown twin: external links stay as they
@@ -10,8 +7,8 @@ export const SITE_BASE = siteConfig.url.replace(/\/$/, "");
  */
 export function absoluteUrl(href: string, page = "/"): string {
   if (/^https?:\/\//.test(href)) return href;
-  if (href.startsWith("#")) return `${SITE_BASE}${page}${href}`;
-  return `${SITE_BASE}${href.startsWith("/") ? href : `/${href}`}`;
+  if (href.startsWith("#")) return `${SITE_ORIGIN}${page}${href}`;
+  return siteUrl(href);
 }
 
 /** One rich paragraph (text and link spans) as a Markdown line. */
@@ -28,9 +25,18 @@ export function paragraphToMarkdown(
     .join("");
 }
 
-export function markdownResponse(body: string, status = 200): Response {
+/** A UTF-8 text body of media type `type` (the route sets the cache headers). */
+export function textResponse(
+  body: string,
+  type: string,
+  status = 200,
+): Response {
   return new Response(body, {
     status,
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+    headers: { "Content-Type": `${type}; charset=utf-8` },
   });
+}
+
+export function markdownResponse(body: string, status = 200): Response {
+  return textResponse(body, "text/markdown", status);
 }

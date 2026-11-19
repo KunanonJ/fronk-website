@@ -40,19 +40,19 @@ export interface PortfolioImage {
  * rule as the copy: steps and components restate what the project's source
  * shows; mockups hold no real data and are captioned as illustrative.
  */
-export interface PortfolioWorkflowStep {
+interface PortfolioWorkflowStep {
   label: string;
   detail?: string;
   icon?: VisualIconId;
 }
 
-export interface PortfolioWorkflow {
+interface PortfolioWorkflow {
   /** Short name for the flow, e.g. "Approval flow". */
   title: string;
   steps: readonly PortfolioWorkflowStep[];
 }
 
-export interface PortfolioArchitectureNode {
+interface PortfolioArchitectureNode {
   label: string;
   note?: string;
 }
@@ -96,7 +96,7 @@ export interface PortfolioOutcome {
  * (this site). The text endpoints list such projects apart, and the JSON-LD
  * names no organisation as their source.
  */
-export const PERSONAL_PROJECT = "Personal project";
+const PERSONAL_PROJECT = "Personal project";
 
 export function isPersonalProject(project: PortfolioProject): boolean {
   return project.organization === PERSONAL_PROJECT;

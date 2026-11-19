@@ -1,4 +1,4 @@
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN, siteConfig, siteUrl } from "@/lib/site";
 import {
   PERSON_ALTERNATE_NAMES,
   PERSON_ALUMNI_OF,
@@ -10,21 +10,16 @@ import {
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { getAllVentures } from "@/lib/content/ventures";
 
-const BASE = siteConfig.url.replace(/\/$/, "");
-
 /** Stable @id anchors so nodes cross-reference instead of duplicating. */
-export const PERSON_ID = `${BASE}/#person`;
-export const WEBSITE_ID = `${BASE}/#website`;
+export const PERSON_ID = `${SITE_ORIGIN}/#person`;
+export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
 /** Alternate site names for Google's site-name display (WebSite.alternateName). */
-export const WEBSITE_ALTERNATE_NAMES = [
+const WEBSITE_ALTERNATE_NAMES = [
   "Kunanon Jarat",
   "KunanonJ",
   "kunanonj.com",
 ] as const;
-
-/** Identity values live in lib/content/identity.ts; re-exported for existing callers. */
-export { PERSON_ALTERNATE_NAMES, PERSON_KNOWS_ABOUT };
 
 function sameAs(): readonly string[] {
   const s = siteConfig.socials;
@@ -88,9 +83,9 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         "@id": PERSON_ID,
         name: PERSON_NAME,
         alternateName: [...PERSON_ALTERNATE_NAMES],
-        url: BASE,
+        url: SITE_ORIGIN,
         email: siteConfig.email,
-        image: `${BASE}/profile.jpg`,
+        image: `${SITE_ORIGIN}/profile.jpg`,
         jobTitle: ["AI Engineering Lead", "IT Manager", "Founder"],
         worksFor: orgs.map((o) => ({ "@id": o["@id"] })),
         knowsAbout: [...PERSON_KNOWS_ABOUT],
@@ -115,7 +110,7 @@ export function buildSiteJsonLd(): Record<string, unknown> {
       {
         "@type": "WebSite",
         "@id": WEBSITE_ID,
-        url: BASE,
+        url: SITE_ORIGIN,
         name: siteConfig.name,
         // Google's site-name system reads WebSite.name + alternateName.
         alternateName: [...WEBSITE_ALTERNATE_NAMES],
@@ -133,8 +128,8 @@ export function buildProfilePageJsonLd(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    "@id": `${BASE}/about/#profilepage`,
-    url: `${BASE}/about`,
+    "@id": `${SITE_ORIGIN}/about/#profilepage`,
+    url: `${SITE_ORIGIN}/about`,
     name: `About — ${siteConfig.name}`,
     mainEntity: { "@id": PERSON_ID },
     isPartOf: { "@id": WEBSITE_ID },
@@ -192,7 +187,7 @@ export type SoftwareAppJsonLdInput = {
 export function buildSoftwareApplicationJsonLd(
   input: SoftwareAppJsonLdInput,
 ): Record<string, unknown> {
-  const pageUrl = `${BASE}${input.pagePath.startsWith("/") ? input.pagePath : `/${input.pagePath}`}`;
+  const pageUrl = siteUrl(input.pagePath);
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -234,7 +229,7 @@ export function buildBreadcrumbJsonLd(
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `${BASE}${item.path.startsWith("/") ? item.path : `/${item.path}`}`,
+      item: siteUrl(item.path),
     })),
   };
 }
@@ -259,10 +254,10 @@ export type TopicArticleJsonLdInput = {
 export function buildTopicArticleJsonLd(
   input: TopicArticleJsonLdInput,
 ): Record<string, unknown> {
-  const url = `${BASE}${input.path.startsWith("/") ? input.path : `/${input.path}`}`;
+  const url = siteUrl(input.path);
   const image = input.image.startsWith("http")
     ? input.image
-    : `${BASE}${input.image.startsWith("/") ? input.image : `/${input.image}`}`;
+    : siteUrl(input.image);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -285,7 +280,7 @@ export function buildTopicArticleJsonLd(
 export function buildArticleJsonLd(
   input: ArticleJsonLdInput,
 ): Record<string, unknown> {
-  const url = `${BASE}/blog/${input.slug}`;
+  const url = `${SITE_ORIGIN}/blog/${input.slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -301,8 +296,8 @@ export function buildArticleJsonLd(
     publisher: { "@id": PERSON_ID },
     // A site-relative banner (public/banners) becomes an absolute URL.
     ...(input.imageUrl
-      ? { image: [new URL(input.imageUrl, `${BASE}/`).href] }
-      : { image: [`${BASE}/profile.jpg`] }),
+      ? { image: [new URL(input.imageUrl, `${SITE_ORIGIN}/`).href] }
+      : { image: [`${SITE_ORIGIN}/profile.jpg`] }),
     ...(input.tags?.length ? { keywords: input.tags.join(", ") } : {}),
     inLanguage: "en-US",
   };

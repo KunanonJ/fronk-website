@@ -13,7 +13,7 @@ import { writeClipboard } from "@/lib/utils/clipboard";
 export type ShareTarget = { title: string; url: string };
 
 /** Intent and mailto URLs for the share rows (design spec 3.2). */
-export function shareLinks({ title, url }: ShareTarget) {
+function shareLinks({ title, url }: ShareTarget) {
   const enc = encodeURIComponent;
   return {
     x: `https://x.com/intent/post?text=${enc(title)}&url=${enc(url)}`,
@@ -33,7 +33,7 @@ const noSubscription = () => () => {};
  * Whether the native share sheet exists. False on the server and during
  * hydration, so server-rendered share rows match the first client render.
  */
-export function useCanShare(): boolean {
+function useCanShare(): boolean {
   return useSyncExternalStore(
     noSubscription,
     () => typeof navigator.share === "function",

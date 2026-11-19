@@ -17,7 +17,8 @@ import {
 } from "@/lib/content/skills";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
+import { textResponse } from "@/src/server/text/markdown";
 import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 
 /**
@@ -26,12 +27,11 @@ import { portfolioGroups } from "@/src/server/text/portfolioGroups";
  * can't say anything the site doesn't. The hidden blog and press are left out.
  */
 export function buildLlmsFull(): string {
-  const base = siteConfig.url.replace(/\/$/, "");
   const out: string[] = [];
   const push = (...lines: string[]) => out.push(...lines);
 
   push(`# ${PERSON_NAME} (Fronk / KunanonJ): full profile`, "");
-  push(`Site: ${base}  `, `Updated: ${SITE_UPDATED}`, "");
+  push(`Site: ${SITE_ORIGIN}  `, `Updated: ${SITE_UPDATED}`, "");
   push(PERSON_SUMMARY, "", PERSON_CUSTOMER_WORK, "", PERSON_SOLOPRENEUR, "");
   push(`Availability: ${OPEN_TO_ROLES.sentence}`, "");
 
@@ -49,16 +49,16 @@ export function buildLlmsFull(): string {
   push("## Solopreneur operating model", "", operatingModel.intro, "");
   for (const stage of operatingModel.stages) {
     push(
-      `- **${stage.label}.** ${stage.principle} ${stage.practice} Skills: ${stage.skills.join(", ")}. Seen in: ${stage.evidence.map((e) => `${e.label} (${base}${e.href})`).join(", ")}.`,
+      `- **${stage.label}.** ${stage.principle} ${stage.practice} Skills: ${stage.skills.join(", ")}. Seen in: ${stage.evidence.map((e) => `${e.label} (${SITE_ORIGIN}${e.href})`).join(", ")}.`,
     );
   }
-  push("", `Reusable version: ${base}/operating-model.md`, "");
+  push("", `Reusable version: ${SITE_ORIGIN}/operating-model.md`, "");
 
   for (const group of portfolioGroups()) {
     push(`## ${group.heading}`, "");
     for (const p of group.projects) {
       push(`### ${p.name}`, "");
-      push(`${base}/portfolio/${p.slug}  `);
+      push(`${SITE_ORIGIN}/portfolio/${p.slug}  `);
       push(`Role: ${p.role}, ${p.organization} (${p.period})  `);
       push(`Stack: ${p.stack.join(", ")}`, "");
       push(p.summary, "");
@@ -74,7 +74,7 @@ export function buildLlmsFull(): string {
   push("## Ventures", "");
   for (const v of getAllVentures()) {
     push(`### ${v.name} (${v.year})`, "");
-    push(`${base}/ventures/${v.slug} · ${v.url}  `);
+    push(`${SITE_ORIGIN}/ventures/${v.slug} · ${v.url}  `);
     push(
       `Role: ${v.role}  `,
       ...(v.offer ? [`Pricing: ${v.offer.label}  `] : []),
@@ -97,7 +97,7 @@ export function buildLlmsFull(): string {
     push(
       `### ${t.h1}`,
       "",
-      `${base}/topics/${t.slug} (Thai: ${base}/th/topics/${t.slug})`,
+      `${SITE_ORIGIN}/topics/${t.slug} (Thai: ${SITE_ORIGIN}/th/topics/${t.slug})`,
       "",
     );
     push(t.lede, "");
@@ -114,7 +114,7 @@ export function buildLlmsFull(): string {
   for (const s of skills) {
     const origin = s.source ? `adapted from ${s.source.name}` : "original";
     push(
-      `- [${s.name}](${base}/skills/${s.slug}) (${origin}): ${s.description}`,
+      `- [${s.name}](${SITE_ORIGIN}/skills/${s.slug}) (${origin}): ${s.description}`,
     );
   }
   push("");
@@ -126,7 +126,5 @@ export function buildLlmsFull(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildLlmsFull(), {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+  return textResponse(buildLlmsFull(), "text/plain");
 }

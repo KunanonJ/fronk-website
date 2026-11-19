@@ -1,15 +1,14 @@
-import { getTopicPillar, isTopicSlug } from "@/lib/content/topics/pillars";
-import { renderOgCard } from "@/lib/og/render";
+import { getTopicPillar } from "@/lib/content/topics/pillars";
+import { renderSlugCard } from "@/lib/og/render";
 
-type Props = { params: Promise<{ slug: string }> };
-
-export default async function TopicOgImage({ params }: Props) {
-  const { slug } = await params;
-  const pillar = isTopicSlug(slug) ? getTopicPillar(slug, "en") : null;
-  if (!pillar) return new Response("Not found", { status: 404 });
-  return renderOgCard({
-    eyebrow: "Topic",
-    title: pillar.h1,
-    subtitle: pillar.description?.slice(0, 120),
-  });
+/** The English hub's card; the Thai hubs share it. */
+export default function TopicOgImage(slug: string): Response {
+  const pillar = getTopicPillar(slug, "en");
+  return renderSlugCard(
+    pillar && {
+      eyebrow: "Topic",
+      title: pillar.h1,
+      subtitle: pillar.description,
+    },
+  );
 }

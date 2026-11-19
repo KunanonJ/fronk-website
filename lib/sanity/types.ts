@@ -27,7 +27,7 @@ export interface Post extends PostSummary {
   } | null;
 }
 
-export interface PageSeo {
+interface PageSeo {
   title?: string | null;
   description?: string | null;
 }

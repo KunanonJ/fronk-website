@@ -13,7 +13,7 @@ export const site = {
 } as const;
 
 /** Icon keys for nav items (kept as stable ids for the nav content tests). */
-export type NavIconId =
+type NavIconId =
   | "about"
   | "ventures"
   | "portfolio"

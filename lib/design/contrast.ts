@@ -50,7 +50,7 @@ export function parseColor(input: string): Rgba {
  * OKLCH to sRGB (Björn Ottosson's OKLab matrices), clipped to the sRGB gamut.
  * Exact for the in-gamut case materials the contrast tests measure.
  */
-export function oklchToRgb(l: number, c: number, hDeg: number): Rgb {
+function oklchToRgb(l: number, c: number, hDeg: number): Rgb {
   const h = (hDeg * Math.PI) / 180;
   const a = c * Math.cos(h);
   const b = c * Math.sin(h);
@@ -98,7 +98,7 @@ function channel(v: number): number {
   return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
-export function relativeLuminance({ r, g, b }: Rgb): number {
+function relativeLuminance({ r, g, b }: Rgb): number {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
 

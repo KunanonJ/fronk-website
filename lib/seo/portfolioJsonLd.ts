@@ -1,8 +1,7 @@
 import { outcomeLine, type PortfolioProject } from "@/lib/content/portfolio";
 import { EMPLOYER_ORGANIZATION, PERSON_ID, WEBSITE_ID } from "@/lib/seo/jsonLd";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
 
-const BASE = siteConfig.url.replace(/\/$/, "");
 const EMPLOYER_ID = `${EMPLOYER_ORGANIZATION.url}/#organization`;
 
 /** A team-built project names the Person as contributor, never as sole creator. */
@@ -18,7 +17,7 @@ export function isTeamProject(project: PortfolioProject): boolean {
 export function buildPortfolioProjectJsonLd(
   project: PortfolioProject,
 ): Record<string, unknown> {
-  const url = `${BASE}/portfolio/${project.slug}`;
+  const url = `${SITE_ORIGIN}/portfolio/${project.slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -52,8 +51,8 @@ export function buildPortfolioCollectionJsonLd(
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "@id": `${BASE}/portfolio/#collection`,
-    url: `${BASE}/portfolio`,
+    "@id": `${SITE_ORIGIN}/portfolio/#collection`,
+    url: `${SITE_ORIGIN}/portfolio`,
     name: "Selected work",
     isPartOf: { "@id": WEBSITE_ID },
     about: { "@id": PERSON_ID },
@@ -62,7 +61,7 @@ export function buildPortfolioCollectionJsonLd(
       itemListElement: projects.map((project, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${BASE}/portfolio/${project.slug}`,
+        url: `${SITE_ORIGIN}/portfolio/${project.slug}`,
         name: project.name,
       })),
     },

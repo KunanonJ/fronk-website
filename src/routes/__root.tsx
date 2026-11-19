@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
 import { lazy, Suspense, type ReactNode } from "react";
 import {
   HeadContent,
@@ -10,6 +9,7 @@ import {
 import type { RouterContext } from "../router";
 import NotFound from "@/components/NotFound";
 import RouteError from "@/components/RouteError";
+import { JsonLd } from "@/components/JsonLd";
 import appCss from "@/src/styles/globals.css?url";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { WebMcpTools } from "@/components/agents/WebMcpTools";
@@ -23,7 +23,7 @@ import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
 import profileCss from "../styles/profile.css?url";
 
-const siteJsonLd = serializeJsonLd(buildSiteJsonLd());
+const siteJsonLd = buildSiteJsonLd();
 const global = rootHead(rootViewport);
 // Router head() keeps one meta per name, so the two media-scoped theme
 // colours are rendered straight into <head> instead.
@@ -95,10 +95,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         ))}
       </head>
       <body className="flex min-h-full flex-col bg-page text-ink">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: siteJsonLd }}
-        />
+        <JsonLd data={siteJsonLd} />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

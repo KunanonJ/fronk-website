@@ -15,8 +15,8 @@ export default function manifest(): Manifest {
     theme_color: "#f7f3ff",
     icons: [
       // The K monogram: paper K in Instrument Serif on an ink tile, with one
-      // accent pixel (public/icon.svg; src/server/og/icon.tsx and
-      // appleIcon.tsx render the PNGs).
+      // accent pixel (public/icon.svg; src/server/og/icon.tsx renders the
+      // PNGs).
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml" },
       { src: "/icon", sizes: "64x64", type: "image/png" },
       { src: "/apple-icon", sizes: "180x180", type: "image/png" },

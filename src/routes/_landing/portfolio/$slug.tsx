@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import { JsonLd } from "@/components/JsonLd";
 import CasePage from "@/components/profile/case/CasePage";
 import { projectJsonLd } from "@/components/profile/case/caseJsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
@@ -7,24 +8,21 @@ import { getPortfolioProjectBySlug } from "@/lib/content/portfolio";
 import { projectCaseHead } from "@/src/lib/caseHead";
 
 /**
- * The page body for one slug (profile redesign, Phase 6 cutover; design spec
+ * One project's page (profile redesign, Phase 6 cutover; design spec
  * 9): the case-study template, under the same JSON-LD as before (the
  * breadcrumb, then the work, from the same builders). Keyed on the slug: the
  * router keeps this component when only the slug changes, and the template's
  * state (the chapter in view, an open viewer) belongs to one case.
  */
-function PortfolioProjectRouteView({ slug }: { slug: string }) {
+function PortfolioProjectRoute() {
+  const { slug } = Route.useParams();
   const project = getPortfolioProjectBySlug(slug);
   if (!project) throw notFound();
 
   return (
     <ProfileMain>
-      {projectJsonLd(project).map((json) => (
-        <script
-          key={json}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: json }}
-        />
+      {projectJsonLd(project).map((data, i) => (
+        <JsonLd key={i} data={data} />
       ))}
       <CasePage key={slug} study={projectCase(project)} />
     </ProfileMain>
@@ -42,10 +40,5 @@ export const Route = createFileRoute("/_landing/portfolio/$slug")({
     return { head: projectCaseHead(project) };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: PortfolioProjectRoute,
 });
-
-function SlugPage() {
-  const { slug } = Route.useParams();
-  return <PortfolioProjectRouteView slug={slug} />;
-}

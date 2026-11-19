@@ -1,14 +1,15 @@
+import { OG_SIZE } from "@/lib/og/card";
 import type { FileOgImage } from "@/lib/seo/metadataToHead";
 
 /**
- * The og:image Next adds for a route's opengraph-image file: same URL (the
- * parity crawl ignores Next's hash), size and alt as the file's exports.
+ * The og:image of a route that serves its own share card at
+ * `<path>/opengraph-image` (src/server/og): its URL, size, alt and type.
  */
 export function fileOg(path: string, alt: string): FileOgImage {
   return {
     url: `${path}/opengraph-image`,
-    width: 1200,
-    height: 630,
+    width: OG_SIZE.width,
+    height: OG_SIZE.height,
     alt,
     type: "image/png",
   };

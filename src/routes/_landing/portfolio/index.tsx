@@ -1,5 +1,5 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import WorkIndexPage from "@/components/profile/pages/WorkIndexPage";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import type { Metadata } from "@/lib/seo/types";
@@ -48,25 +48,16 @@ function PortfolioRoute() {
     });
   };
 
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Portfolio", path: "/portfolio" },
-    ]),
-  );
-  const collectionLd = serializeJsonLd(
-    buildPortfolioCollectionJsonLd(getAllPortfolioProjects()),
-  );
-
   return (
     <ProfileMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Portfolio", path: "/portfolio" },
+        ])}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: collectionLd }}
+      <JsonLd
+        data={buildPortfolioCollectionJsonLd(getAllPortfolioProjects())}
       />
       <WorkIndexPage category={category} onCategoryChange={setCategory} />
     </ProfileMain>

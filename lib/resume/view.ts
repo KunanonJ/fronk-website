@@ -126,7 +126,7 @@ export function linkLabel(href: string): string {
 }
 
 /** How the printed résumé sets a group: full entries, or one line each. */
-export type PrintGroupKind = "entries" | "lines";
+type PrintGroupKind = "entries" | "lines";
 
 export type PrintGroup = {
   title: string;

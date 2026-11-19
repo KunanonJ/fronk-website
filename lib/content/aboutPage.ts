@@ -8,14 +8,14 @@ import type { StackIconId } from "@/lib/content/stackIcons";
 import { OPEN_TO_ROLES, PERSON_SUMMARY } from "@/lib/content/identity";
 import { PAGE_META } from "@/lib/content/pageMeta";
 
-export type AboutInlineLink = {
+type AboutInlineLink = {
   type: "link";
   text: string;
   href: string;
   external?: boolean;
 };
 
-export type AboutInlineText = {
+type AboutInlineText = {
   type: "text";
   text: string;
 };
@@ -36,7 +36,7 @@ export type AboutPathChip = {
   detail: string;
 };
 
-export type AboutStackItem = {
+type AboutStackItem = {
   name: string;
   detail: string;
   /** Brand icon key (lib/content/stackIcons). */

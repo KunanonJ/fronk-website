@@ -36,7 +36,7 @@ export interface Venture {
   caseStudy?: VentureCaseStudy;
 }
 
-export interface VentureMetric {
+interface VentureMetric {
   value: string;
   label: string;
   /**
@@ -50,7 +50,7 @@ export interface VentureMetric {
   asOf?: string;
 }
 
-export interface VentureOffer {
+interface VentureOffer {
   /** Visible wording, e.g. "Free to start". */
   label: string;
   /** schema.org Offer price as a string ("0" for free). */
@@ -65,7 +65,7 @@ const FREE_TO_START: VentureOffer = {
   priceCurrency: "THB",
 };
 
-export interface VentureCaseStudy {
+interface VentureCaseStudy {
   /** Opening paragraph under the case-page header. */
   intro: string;
   /**

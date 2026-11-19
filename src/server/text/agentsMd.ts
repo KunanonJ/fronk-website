@@ -5,7 +5,8 @@ import {
   PERSON_NAME,
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
-import { siteConfig } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
+import { markdownResponse } from "@/src/server/text/markdown";
 
 /**
  * /agents.md: the index of agent-facing surfaces, generated from lib/content
@@ -40,13 +41,12 @@ function table(rows: readonly (readonly [string, string])[]): string[] {
 }
 
 export function buildAgentsMd(): string {
-  const base = siteConfig.url.replace(/\/$/, "");
   return [
     `# Agents: ${PERSON_NAME} (Fronk / KunanonJ)`,
     "",
     PERSON_HEADLINE,
     "",
-    `Site: ${base}  `,
+    `Site: ${SITE_ORIGIN}  `,
     `Updated: ${SITE_UPDATED}`,
     "",
     "## Who this is",
@@ -94,7 +94,5 @@ export function buildAgentsMd(): string {
 }
 
 export function GET(): Response {
-  return new Response(buildAgentsMd(), {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(buildAgentsMd());
 }

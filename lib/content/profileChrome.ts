@@ -18,16 +18,14 @@ import {
  * approval (umbrella input R3) and are not final copy until he gives it.
  */
 
-/**
- * Where the redesigned Home is served. It lived under /preview until the
- * Phase 6 cutover set it to "", the site's root; every chrome link follows it.
- */
-export const PROFILE_BASE = "";
-
 /** The Home page, or one of its sections: `homeHref("work")`. */
 export function homeHref(section?: string): string {
-  const home = PROFILE_BASE || "/";
-  return section ? `${home}#${section}` : home;
+  return section ? `/#${section}` : "/";
+}
+
+/** A case study's address: `caseHref("ventures", "gogocash")`. */
+export function caseHref(kind: "portfolio" | "ventures", slug: string): string {
+  return `/${kind}/${slug}`;
 }
 
 /** The Home sections the nav follows with its scrollspy, in page order. */
@@ -56,11 +54,7 @@ export const profileNav: readonly ChromeLink[] = [
     href: homeHref("work"),
     section: "work",
     // The portfolio index and every case page (spec 7.2).
-    current: [
-      `${PROFILE_BASE}/portfolio`,
-      `${PROFILE_BASE}/portfolio/`,
-      `${PROFILE_BASE}/ventures/`,
-    ],
+    current: ["/portfolio", "/portfolio/", "/ventures/"],
   },
   {
     label: "About",

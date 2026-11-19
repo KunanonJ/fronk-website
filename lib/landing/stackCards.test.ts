@@ -6,7 +6,6 @@ import {
   getPortfolioProjectBySlug,
   outcomeLine,
 } from "@/lib/content/portfolio";
-import { PROFILE_BASE } from "@/lib/content/profileChrome";
 import { getVentureBySlug } from "@/lib/content/ventures";
 import {
   MATERIAL_HUES,
@@ -45,12 +44,11 @@ describe("stackCards", () => {
     ).toEqual([["gogocash", "ventures"]]);
   });
 
-  it("links each case at its live address (the profile base is the root since the cutover)", () => {
+  it("links each case at its live address", () => {
     for (const card of cards) {
       const kind = card.kind === "project" ? "portfolio" : "ventures";
-      expect(card.href, card.slug).toBe(`${PROFILE_BASE}/${kind}/${card.slug}`);
+      expect(card.href, card.slug).toBe(`/${kind}/${card.slug}`);
     }
-    expect(PROFILE_BASE).toBe("");
   });
 
   it("gives each card the next material, in the spec's order, wrapping after six", () => {

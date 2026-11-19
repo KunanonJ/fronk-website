@@ -8,10 +8,10 @@
 
 type Url = string | URL;
 
-export type MetadataTitle =
+type MetadataTitle =
   string | { absolute: string } | { default: string; template?: string };
 
-export type MetadataImage =
+type MetadataImage =
   | Url
   | {
       url: Url;
@@ -21,7 +21,7 @@ export type MetadataImage =
       type?: string;
     };
 
-export type MetadataRobots =
+type MetadataRobots =
   string | { index?: boolean; follow?: boolean; nocache?: boolean };
 
 export type Metadata = {
@@ -71,7 +71,7 @@ export type Viewport = {
 type ChangeFrequency =
   "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
-export type RobotsRule = {
+type RobotsRule = {
   userAgent?: string | string[];
   /** Content Signals (contentsignals.org), e.g. `search=yes, ai-train=no`. */
   contentSignal?: string;
@@ -88,7 +88,7 @@ export type Robots = {
   host?: string;
 };
 
-export type SitemapEntry = {
+type SitemapEntry = {
   url: string;
   lastModified?: string | Date;
   changeFrequency?: ChangeFrequency;

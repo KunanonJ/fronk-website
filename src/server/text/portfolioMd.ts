@@ -5,11 +5,8 @@ import {
   getPortfolioProjectBySlug,
   type PortfolioProject,
 } from "@/lib/content/portfolio";
-import {
-  SITE_BASE,
-  absoluteUrl,
-  markdownResponse,
-} from "@/src/server/text/markdown";
+import { SITE_ORIGIN } from "@/lib/site";
+import { absoluteUrl, markdownResponse } from "@/src/server/text/markdown";
 
 /**
  * /portfolio/<slug>.md: one project as Markdown, for agents that prefer text
@@ -22,7 +19,7 @@ export function buildPortfolioProjectMd(project: PortfolioProject): string {
 
   push(`# ${project.name}`, "", project.tagline, "");
   push(
-    `Source: ${SITE_BASE}/portfolio/${project.slug}  `,
+    `Source: ${SITE_ORIGIN}/portfolio/${project.slug}  `,
     `Author: [${PERSON_NAME}](${absoluteUrl("/about")})  `,
     `Role: ${project.role}, ${project.organization} (${project.period})  `,
     `Category: ${project.category}  `,

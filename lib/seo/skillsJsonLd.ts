@@ -7,9 +7,7 @@ import {
   type Skill,
 } from "@/lib/content/skills";
 import { PERSON_ID, WEBSITE_ID } from "@/lib/seo/jsonLd";
-import { siteConfig } from "@/lib/site";
-
-const BASE = siteConfig.url.replace(/\/$/, "");
+import { SITE_ORIGIN } from "@/lib/site";
 
 /** SPDX license page, e.g. MIT -> https://spdx.org/licenses/MIT.html */
 const spdx = (license: string) => `https://spdx.org/licenses/${license}.html`;
@@ -20,7 +18,7 @@ const spdx = (license: string) => `https://spdx.org/licenses/${license}.html`;
  * line) and name the Person as maintainer, never as author.
  */
 export function buildSkillJsonLd(skill: Skill): Record<string, unknown> {
-  const url = `${BASE}/skills/${skill.slug}`;
+  const url = `${SITE_ORIGIN}/skills/${skill.slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -56,7 +54,7 @@ export function buildSkillJsonLd(skill: Skill): Record<string, unknown> {
  * Code" answers can cite the pack and its author.
  */
 export function buildSkillsPackJsonLd(): Record<string, unknown> {
-  const url = `${BASE}/skills`;
+  const url = `${SITE_ORIGIN}/skills`;
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareSourceCode",
@@ -74,7 +72,7 @@ export function buildSkillsPackJsonLd(): Record<string, unknown> {
     author: { "@id": PERSON_ID },
     isPartOf: { "@id": WEBSITE_ID },
     hasPart: getAllSkills().map((skill) => ({
-      "@id": `${BASE}/skills/${skill.slug}/#code`,
+      "@id": `${SITE_ORIGIN}/skills/${skill.slug}/#code`,
     })),
   };
 }

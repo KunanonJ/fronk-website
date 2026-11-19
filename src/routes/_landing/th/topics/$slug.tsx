@@ -1,97 +1,36 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import TopicHubPage from "@/components/profile/pages/TopicHubPage";
-import type { Metadata } from "@/lib/seo/types";
+import { createFileRoute } from "@tanstack/react-router";
 import {
-  getTopicPillar,
-  isTopicSlug,
-  TOPIC_PUBLISHED,
-  topicHreflang,
-  type TopicSlug,
-} from "@/lib/content/topics/pillars";
-import {
-  buildBreadcrumbJsonLd,
-  buildFaqJsonLd,
-  buildTopicArticleJsonLd,
-} from "@/lib/seo/jsonLd";
+  TopicHubView,
+  topicHub,
+} from "@/components/profile/pages/TopicHubPage";
+import { topicHreflang, topicPath } from "@/lib/content/topics/pillars";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  if (!isTopicSlug(slug)) return { title: "หัวข้อ" };
-  const pillar = getTopicPillar(slug, "th");
-  if (!pillar) return { title: "หัวข้อ" };
-  return routeShareMeta({
-    title: pillar.title,
-    description: pillar.description,
-    path: `/th/topics/${slug}`,
-    languages: topicHreflang(slug),
-    locale: "th_TH",
-  });
-}
-
-/** The page body for one slug; shared with the TanStack Start route. */
-function ThaiTopicPillarPageView({ slug }: { slug: string }) {
-  if (!isTopicSlug(slug)) throw notFound();
-  const pillar = getTopicPillar(slug, "th");
-  if (!pillar) throw notFound();
-
-  const articleLd = serializeJsonLd(
-    buildTopicArticleJsonLd({
-      path: `/th/topics/${slug}`,
-      headline: pillar.h1,
-      description: pillar.description,
-      inLanguage: "th",
-      datePublished: TOPIC_PUBLISHED[slug],
-      // The Thai hubs share the English hub's OG card.
-      image: `/topics/${slug}/opengraph-image`,
-    }),
-  );
-  const faqLd = serializeJsonLd(buildFaqJsonLd(pillar.faqs));
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: pillar.h1, path: `/th/topics/${slug as TopicSlug}` },
-    ]),
-  );
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: articleLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: faqLd }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
-      />
-      <TopicHubPage pillar={pillar} />
-    </>
-  );
-}
-
+/**
+ * A Thai topic hub: the English hub's view in Thai, with og:locale th_TH and
+ * the site's default share card in its head.
+ */
 export const Route = createFileRoute("/_landing/th/topics/$slug")({
-  loader: async ({ params }) => {
-    if (!(isTopicSlug(params.slug) && getTopicPillar(params.slug, "th")))
-      throw notFound();
+  loader: ({ params }) => {
+    const { slug, pillar } = topicHub(params.slug, "th");
     return {
       head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
+        routeShareMeta({
+          title: pillar.title,
+          description: pillar.description,
+          path: topicPath(slug, "th"),
+          languages: topicHreflang(slug),
+          locale: "th_TH",
+        }),
       ),
     };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: ThaiTopicRoute,
 });
 
-function SlugPage() {
+function ThaiTopicRoute() {
   const { slug } = Route.useParams();
-  return <ThaiTopicPillarPageView slug={slug} />;
+  return <TopicHubView {...topicHub(slug, "th")} />;
 }

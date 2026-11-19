@@ -39,7 +39,7 @@ export function bentoSpan(span: BentoSpan | BentoSpans): string {
  * when it names the card, or a paragraph when an h2 below does; `marker`
  * (the square's size and fill classes) puts a square before the text.
  */
-export function Kicker({
+function Kicker({
   as: Tag = "h2",
   id,
   marker,

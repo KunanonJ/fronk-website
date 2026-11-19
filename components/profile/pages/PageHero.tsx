@@ -24,7 +24,7 @@ const SKY = ["--peach", "--tint-3", "--tint-2"] as const;
  * page's (the parity gate strips the tags): muted words in `--muted`, the
  * accent in the italic serif.
  */
-export function Headline({ lines }: { lines: HeadlineLines }) {
+function Headline({ lines }: { lines: HeadlineLines }) {
   return lines.map((line, index) => (
     <Fragment key={index}>
       {index > 0 ? " " : null}

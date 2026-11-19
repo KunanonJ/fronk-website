@@ -1,5 +1,5 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
 import type { Metadata } from "@/lib/seo/types";
@@ -46,24 +46,15 @@ function SkillsRoute() {
     });
   };
 
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Skills", path: "/skills" },
-    ]),
-  );
-  const packLd = serializeJsonLd(buildSkillsPackJsonLd());
-
   return (
     <ProfileMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Skills", path: "/skills" },
+        ])}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: packLd }}
-      />
+      <JsonLd data={buildSkillsPackJsonLd()} />
       <SkillsIndexPage show={show} onShowChange={setShow} />
     </ProfileMain>
   );

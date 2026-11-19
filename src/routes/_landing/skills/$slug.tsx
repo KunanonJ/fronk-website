@@ -1,8 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
-import type { Metadata } from "@/lib/seo/types";
 import {
   getSkillBySlug,
   skillMetaDescription,
@@ -14,65 +13,43 @@ import { fileOg } from "@/src/lib/og";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const skill = getSkillBySlug(slug);
-  if (!skill) return { title: "Skills" };
-
-  return routeShareMeta({
-    title: skillTitle(skill),
-    description: skillMetaDescription(skill),
-    path: `/skills/${slug}`,
-    hasOwnOgImage: true,
-  });
-}
-
-/** The page body for one slug; shared with the TanStack Start route. */
-function SkillRouteView({ slug }: { slug: string }) {
+/** One skill's page: its breadcrumb and skill JSON-LD, then the skill. */
+function SkillRoute() {
+  const { slug } = Route.useParams();
   const skill = getSkillBySlug(slug);
   if (!skill) throw notFound();
 
-  const crumbLd = serializeJsonLd(
-    buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Skills", path: "/skills" },
-      { name: skill.name, path: `/skills/${slug}` },
-    ]),
-  );
-  const codeLd = serializeJsonLd(buildSkillJsonLd(skill));
-
   return (
     <ProfileMain>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: crumbLd }}
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Skills", path: "/skills" },
+          { name: skill.name, path: `/skills/${slug}` },
+        ])}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: codeLd }}
-      />
+      <JsonLd data={buildSkillJsonLd(skill)} />
       <SkillDetailPage skill={skill} />
     </ProfileMain>
   );
 }
 
 export const Route = createFileRoute("/_landing/skills/$slug")({
-  loader: async ({ params }) => {
-    if (!getSkillBySlug(params.slug)) throw notFound();
+  loader: ({ params }) => {
+    const skill = getSkillBySlug(params.slug);
+    if (!skill) throw notFound();
     return {
       head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
+        routeShareMeta({
+          title: skillTitle(skill),
+          description: skillMetaDescription(skill),
+          path: `/skills/${params.slug}`,
+          hasOwnOgImage: true,
+        }),
         { fileOgImage: fileOg(`/skills/${params.slug}`, "Agent skill") },
       ),
     };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: SkillRoute,
 });
-
-function SlugPage() {
-  const { slug } = Route.useParams();
-  return <SkillRouteView slug={slug} />;
-}

@@ -1,6 +1,6 @@
 import { ditherCells } from "@/components/ds/ditherCells";
 import { brand } from "@/lib/brand/tokens";
-import { siteConfig } from "@/lib/site";
+import { SITE_DOMAIN, siteConfig } from "@/lib/site";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
@@ -84,7 +84,6 @@ export function DitherBand({ seed }: { seed: number }) {
  * Callers wrap it in an ImageResponse with loadOgFonts().
  */
 export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
-  const domain = siteConfig.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
   const label = {
     display: "flex",
     fontSize: 17,
@@ -207,7 +206,7 @@ export function OgCard({ eyebrow, title, subtitle }: OgCardProps) {
           }}
         >
           <div style={{ display: "flex" }}>{siteConfig.name}</div>
-          <div style={{ display: "flex" }}>{domain}</div>
+          <div style={{ display: "flex" }}>{SITE_DOMAIN}</div>
         </div>
       </div>
     </div>

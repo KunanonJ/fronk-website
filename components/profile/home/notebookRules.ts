@@ -40,8 +40,8 @@ export function stepPage(current: number, direction: 1 | -1, total: number) {
 }
 
 /** A turn's share of the leaf (25%), or a flick faster than this, in px/ms. */
-export const TURN_SHARE = 0.25;
-export const FLICK_SPEED = 0.5;
+const TURN_SHARE = 0.25;
+const FLICK_SPEED = 0.5;
 
 /**
  * Whether a released drag turns the page: dragged past a quarter of the
