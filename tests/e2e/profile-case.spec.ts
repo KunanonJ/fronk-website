@@ -3,6 +3,7 @@ import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { extractPage } from "../../lib/parity/parity.mjs";
+import { settleDither } from "./screenshots";
 
 /**
  * Profile redesign, Phase 5: the case-study template, on the live
@@ -1221,6 +1222,7 @@ for (const theme of ["light", "dark"] as const) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page, theme);
     await visit(page);
+    await settleDither(page);
     await expect(page).toHaveScreenshot(`preview-case-${theme}.png`, {
       fullPage: true,
       animations: "disabled",

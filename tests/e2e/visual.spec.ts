@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
+import { settleDither } from "./screenshots";
 
 /**
  * Full-page visual baselines for every public route, in both themes
@@ -109,6 +110,7 @@ for (const theme of THEMES) {
         // Settle web fonts so glyph metrics are stable across runs.
         await page.evaluate(() => document.fonts.ready);
         await loadEveryImage(page);
+        await settleDither(page);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
           fullPage: true,
         });

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { settleDither } from "./screenshots";
 
 /**
  * Profile redesign, Phase 2: the Home hero, its canvas mock and the logo strip
@@ -830,6 +831,7 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page.locator("html")).toHaveClass(
         new RegExp(`(^|\\s)${theme}(\\s|$)`),
       );
+      await settleDither(page);
       await expect(page.locator(HERO)).toHaveScreenshot(
         `preview-hero-${viewport.width}-${theme}.png`,
       );
