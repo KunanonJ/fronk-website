@@ -318,3 +318,25 @@ Also found on the combined tree:
   and become one; the device-matrix helpers (`layoutProblems`, the gutter
   check and its named exemptions) are copied in two specs and move to one
   helper module.
+
+## 11. Merged, deployed and checked live (19-11-26)
+
+- **CI on PR #127.** The first run wrote the 26 baselines (the 20 pages and
+  the notebook's 6) and found one real failure: `/design` at 820 px in Linux
+  Chromium, where the pixel word mark beside "Forward" sits 0.2 em left of its
+  word by design and crossed the column. The gutter checks now let decoration
+  overhang: a part with no text whose every element is hidden from assistive
+  tech (`3d69e8d`; the hire panel, which has text, is still caught). The 26
+  renders were reviewed on contact sheets and committed (`92aa8a7`); the next
+  run passed every GitHub check.
+- **Merge.** Workers Builds still failed at its start (0 s), so PR #127 was
+  admin-merged as `cb1dd6c` and deployed by hand from a clean checkout of
+  `main`.
+- **Production:** version `a9b74b54-aab0-481f-8241-5a203e05b346`. Rollback
+  target: `3a539856-6bb6-4afb-bb7c-cfff2122df73` (group D1).
+- **Live checks** on https://kunanonj.com: `/skills`, a skill, `/resume`,
+  `/design`, `/press` and `/blog` answer 200 and an unknown URL 404, with the
+  new design and the shared filter bar in the served HTML; smoke "recruiter
+  path" 62 passed; the catalog and hub device matrices, gutter checks
+  included, 21 passed against production.
+

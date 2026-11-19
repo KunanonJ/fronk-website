@@ -1,6 +1,11 @@
 # Phase 7: Remaining pages
 
-**Status:** PLANNED (18-11-26). Needs its own "ENTER EXECUTE MODE".
+**Status:** VERIFIED (19-11-26). Run as two page-group lanes, each reviewed
+and fixed: group D1 (the topic hubs and reading pages) as PR #126, merged as
+`660af3e`; group D2 (the catalog and record pages) as PR #127, merged as
+`cb1dd6c`. Both deployed by hand while Workers Builds fails, and checked live.
+Reports: `../reports/phase-7_hubs_REPORT_18-11-26.md` and
+`../reports/phase-7_catalog_REPORT_18-11-26.md`.
 **Created:** 18-11-26, at `563b2a3`.
 **Umbrella:** `profile-site-redesign_UMBRELLA_PLAN_18-11-26.md`
 **Spec:** `../references/design-spec_18-11-26.md` sections 6, 9 (chapter,
