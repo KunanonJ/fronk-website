@@ -29,6 +29,7 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     return withSecurityHeaders(
       withServerFnNoStore(request, await route(request, env, ctx)),
+      new URL(request.url).pathname,
     );
   },
 };

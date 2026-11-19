@@ -40,6 +40,48 @@ test.describe("smoke > every route renders without JS errors", () => {
   }
 });
 
+/**
+ * The report-only Content Security Policy (best-practices audit R21,
+ * src/server/http.ts): every page sends it, and nothing on a page breaks it,
+ * lazy parts included. A violation fires securitypolicyviolation even though
+ * a report-only policy blocks nothing, so this fails before enforcing could.
+ */
+test.describe("csp > every route sends the policy and breaks none of it", () => {
+  for (const route of ROUTES) {
+    test(`${route.name} reports no Content Security Policy violation`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        const seen: string[] = [];
+        (window as unknown as { __csp: string[] }).__csp = seen;
+        document.addEventListener("securitypolicyviolation", (event) =>
+          seen.push(
+            `${event.effectiveDirective} ${event.blockedURI || "inline"}`,
+          ),
+        );
+      });
+      const response = await page.goto(route.path, {
+        waitUntil: "networkidle",
+      });
+      expect(
+        response?.headers()["content-security-policy-report-only"],
+        route.path,
+      ).toContain("default-src 'self'");
+      await page.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
+          scrollTo(0, y);
+          await new Promise((done) => setTimeout(done, 50));
+        }
+      });
+      await page.waitForLoadState("networkidle");
+      const violations = await page.evaluate(
+        () => (window as unknown as { __csp: string[] }).__csp,
+      );
+      expect(violations, route.path).toEqual([]);
+    });
+  }
+});
+
 test.describe("a11y > reduced-motion users get a static, usable page", () => {
   test("home renders its heading with reduced motion forced", async ({
     page,

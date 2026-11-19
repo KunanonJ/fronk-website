@@ -1,5 +1,9 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  CONTENT_SECURITY_POLICY,
+  CSP_HEADER,
   SECURITY_HEADERS,
   SERVER_FN_PATH,
   isCrossSite,
@@ -42,6 +46,42 @@ describe("withSecurityHeaders", () => {
     expect(res.status).toBe(308);
     expect(res.headers.get("location")).toBe("https://kunanonj.com/about");
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+  });
+});
+
+describe("the Content Security Policy (report-only)", () => {
+  it("rides on every Worker response but Sanity Studio's", () => {
+    const page = withSecurityHeaders(new Response("ok"), "/about");
+    expect(page.headers.get(CSP_HEADER)).toBe(CONTENT_SECURITY_POLICY);
+    expect(page.headers.get("content-security-policy")).toBeNull();
+    for (const path of ["/studio", "/studio/structure"]) {
+      const studio = withSecurityHeaders(new Response("ok"), path);
+      expect(studio.headers.get(CSP_HEADER), path).toBeNull();
+      expect(studio.headers.get("x-content-type-options")).toBe("nosniff");
+    }
+  });
+
+  it("blocks plug-ins and foreign bases, forms and frames", () => {
+    for (const directive of [
+      "default-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+    ]) {
+      expect(CONTENT_SECURITY_POLICY).toContain(directive);
+    }
+  });
+
+  it("is the same policy in public/_headers, detached for Sanity Studio", () => {
+    const headers = readFileSync(
+      join(process.cwd(), "public/_headers"),
+      "utf8",
+    );
+    expect(headers).toContain(`  ${CSP_HEADER}: ${CONTENT_SECURITY_POLICY}\n`);
+    for (const path of ["/studio", "/studio/*"]) {
+      expect(headers).toContain(`\n${path}\n  ! ${CSP_HEADER}\n`);
+    }
   });
 });
 

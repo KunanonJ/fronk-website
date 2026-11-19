@@ -2,6 +2,35 @@
  * Small request/response helpers shared by the Worker entry and the API routes.
  */
 
+/**
+ * The site's Content Security Policy (best-practices audit R21), sent
+ * report-only: browsers report what it would block and block nothing.
+ * Scripts keep 'unsafe-inline': TanStack Start streams per-page hydration
+ * scripts into the HTML, which no hash can cover, the prerendered pages
+ * cannot carry a per-response nonce, and any hash would switch
+ * 'unsafe-inline' off. Enforcing it (with nonces, every page rendered on
+ * request) is a later decision for the owner. Sanity Studio, a separate app,
+ * is left out.
+ */
+export const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  // Cloudflare Web Analytics, and Turnstile on /contact.
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline'",
+  // Sanity's image CDN; Unsplash for the hidden press and blog banners.
+  "img-src 'self' data: https://cdn.sanity.io https://images.unsplash.com",
+  "font-src 'self'",
+  "connect-src 'self' https://cloudflareinsights.com",
+  "frame-src https://challenges.cloudflare.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+].join("; ");
+
+/** The policy's header: report-only until the owner decides to enforce it. */
+export const CSP_HEADER = "Content-Security-Policy-Report-Only";
+
 /** Headers every Worker response carries; public/_headers sets the same on static files. */
 export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "Strict-Transport-Security": "max-age=31536000",
@@ -10,6 +39,7 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy":
     "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  [CSP_HEADER]: CONTENT_SECURITY_POLICY,
 };
 
 /**
@@ -53,12 +83,20 @@ export function withServerFnNoStore(
   });
 }
 
-/** Copy of `response` with SECURITY_HEADERS added where the response has not set them. */
-export function withSecurityHeaders(response: Response): Response {
+/**
+ * Copy of `response` with SECURITY_HEADERS added where the response has not
+ * set them. Sanity Studio (`/studio`) gets no Content Security Policy.
+ */
+export function withSecurityHeaders(
+  response: Response,
+  pathname = "/",
+): Response {
   // A WebSocket upgrade (101) cannot be rebuilt; the site has none, but be safe.
   if (response.status === 101) return response;
   const headers = new Headers(response.headers);
+  const studio = pathname === "/studio" || pathname.startsWith("/studio/");
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    if (studio && name === CSP_HEADER) continue;
     if (!headers.has(name)) headers.set(name, value);
   }
   return new Response(response.body, {
