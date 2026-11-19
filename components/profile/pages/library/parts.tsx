@@ -100,7 +100,7 @@ export function FilterBar<T extends string>({
             type="button"
             aria-pressed={option.id === value}
             onClick={() => onChange(option.id)}
-            className="pf-filter__option"
+            className="pf-filter__option ds-press"
           >
             <span lang={option.lang}>{option.label}</span>
             {option.count === undefined ? null : (

@@ -30,6 +30,9 @@ function BlogRoute() {
     void navigate({
       search: (prev) => ({ ...prev, ...next }),
       ...FILTER_NAVIGATION,
+      // Search writes on every keystroke: a transition each time would
+      // freeze the list mid-word, so only tag picks move the rows.
+      ...(next.q === undefined ? {} : { viewTransition: false }),
     });
   };
   return (

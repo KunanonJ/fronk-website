@@ -438,41 +438,39 @@ a {
   }
 }
 
-/* ─── Share and menu panels (bento redesign, phase 7a) ───────────────────────
- * The share panel (components/bento/classes.ts, PANEL) pops from the top
- * right; the rest of the bento canvas's motion went with its components.
+/* ─── Share panel (bento redesign, phase 7a; polish pass) ────────────────────
+ * The share panel (components/bento/classes.ts, PANEL) enters as the chrome's
+ * popovers do (src/styles/profile/shell.css): from 6 px above at 0.97, over
+ * 0.2 s, from the top right. React mounts it on open, so @starting-style
+ * gives the entrance; it unmounts on close, so it leaves at once.
  * ─────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: no-preference) {
   .kj-panel {
     transform-origin: top right;
-    animation: kj-pop 0.42s var(--ease) backwards;
+    transition:
+      opacity 0.2s var(--ease-expo),
+      transform 0.2s var(--ease-expo);
   }
-}
-
-@keyframes kj-pop {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
+  @starting-style {
+    .kj-panel {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+    }
   }
 }
 
 /* ─── View transitions ───────────────────────────────────────────────────────
- * Two kinds, told apart by view-transition types: the router starts page
- * navigations with type "page" (a short cross-fade, the UA default), and the
- * theme toggle starts its switch with type "theme". The toggle also sets
+ * Three kinds, told apart by view-transition types: the router starts page
+ * navigations with type "page" (a short cross-fade, the UA default), a list
+ * filter's change with type "filter" (below), and the theme toggle starts
+ * its switch with type "theme". The toggle also sets
  * html.kj-vt for the duration, which stops CSS transitions blending into the
  * snapshot and carries the theme switch in browsers that lack view-transition
  * types. Since the profile redesign's cutover (Phase 6, design spec 7.5 and
  * 13 items 6 and 23) the theme switch is the .56 s fade on every page, not
  * the circular reveal, `kj-theme-fade`, defined below. Movement-free, and
  * still only with no-preference: the toggle starts no transition under
- * reduced motion, and the block after this one turns them all off.
+ * reduced motion, and the reduced-motion block below turns them all off.
  * ─────────────────────────────────────────────────────────────────────────── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -504,6 +502,74 @@ html.kj-vt *::after {
   @keyframes kj-theme-fade {
     from {
       opacity: 0;
+    }
+  }
+}
+
+/* A list filter's change (type "filter", src/lib/filterParam.ts): the page
+   swaps at once, and only the cards move. Each listed card carries its name
+   in `--vt` (portfolio, skills and blog), applied only while a filter
+   transition runs; a card that stays slides to its new place, one that
+   leaves or arrives fades and scales. The pressed option slides to its new
+   place (one pressed route filter per page: a name used twice aborts the
+   transition). The bar keeps a layer of its own, so cards pass under it. */
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(filter)::view-transition-old(root) {
+    animation: none;
+    opacity: 0;
+  }
+  html:active-view-transition-type(filter)::view-transition-new(root) {
+    animation: none;
+  }
+  html:active-view-transition-type(filter)
+    :is(
+      .pf-work-index__item,
+      .pf-skill-card__item,
+      .pf-skill-stage__head,
+      .pf-blog-list__item
+    ) {
+    view-transition-name: var(--vt);
+    view-transition-class: pf-filter-card;
+  }
+  html:active-view-transition-type(filter)
+    .pf-filter__option[aria-pressed="true"] {
+    view-transition-name: pf-filter-pick;
+  }
+  html:active-view-transition-type(filter) .pf-nav {
+    view-transition-name: pf-nav;
+  }
+  ::view-transition-group(.pf-filter-card) {
+    animation-duration: 0.32s;
+    animation-timing-function: var(--ease-expo);
+  }
+  ::view-transition-group(pf-filter-pick) {
+    animation-duration: 0.28s;
+    animation-timing-function: var(--ease-snappy);
+  }
+  /* The two options differ in width: each keeps its own size, centred, so
+     a short label is never scaled up to a long one's box. */
+  ::view-transition-old(pf-filter-pick),
+  ::view-transition-new(pf-filter-pick) {
+    block-size: 100%;
+    object-fit: none;
+  }
+  ::view-transition-new(.pf-filter-card):only-child {
+    animation: kj-filter-in 0.24s var(--ease-expo) both;
+  }
+  ::view-transition-old(.pf-filter-card):only-child {
+    animation: kj-filter-out 0.16s ease-out both;
+  }
+
+  @keyframes kj-filter-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes kj-filter-out {
+    to {
+      opacity: 0;
+      transform: scale(0.96);
     }
   }
 }
@@ -779,8 +845,13 @@ html.kj-vt *::after {
   --tile-brand: color-mix(in srgb, #dde7f4 16%, var(--tile));
   --material-253-a: oklch(0.27 0.05 253);
   --material-253-b: oklch(0.22 0.075 253);
-  --material-79-a: oklch(0.27 0.05 79);
-  --material-79-b: oklch(0.22 0.075 79);
+  /* Hue 79 keeps its name but not its hue in dark: at this lightness hue 79
+     reads olive (#332305), and its end falls outside sRGB and clips to a
+     brown (#2c1400). Copper at the peach's hue, 50 (#392316), to ember at
+     25 (#2e0d0c) stays warm, sits in sRGB and keeps the contrast floors
+     (ink 12.79 and 15.47, ink-60 5.54 and 6.11). Spec 2.4. */
+  --material-79-a: oklch(0.28 0.04 50);
+  --material-79-b: oklch(0.215 0.055 25);
   --material-292-a: oklch(0.27 0.05 292);
   --material-292-b: oklch(0.22 0.075 292);
   --material-327-a: oklch(0.27 0.05 327);
@@ -1511,6 +1582,28 @@ html.kj-vt *::after {
   [data-reveal="scale"].is-pending {
     transform: scale(0.98);
   }
+  .ds-press {
+    transition:
+      transform 0.14s var(--ease-snappy),
+      background-color 0.1s ease-out,
+      color 0.1s ease-out;
+  }
+  .ds-press:active {
+    transform: scale(var(--press, 0.97));
+  }
+}
+
+/* Press and hover for controls that are not pills (the filters, the contact
+   topics, the blog's venture rows, the Share pill), in the Pill's language:
+   the ghost pill's paper-2 fill and ink on hover, its press, and with
+   ds-press--lift its 1 px lift. A pressed or selected option keeps its own
+   fill. Outside any layer, like the Pill's motion, so the fill beats a
+   Tailwind bg- utility on the same element. */
+@media (hover: hover) and (pointer: fine) {
+  .ds-press:not([aria-pressed="true"], [aria-selected="true"]):hover {
+    background-color: var(--paper-2);
+    color: var(--ink);
+  }
 }
 
 /* Print shows everything. The no-preference query above also matches print,
@@ -1523,7 +1616,10 @@ html.kj-vt *::after {
 }
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .ds-pill--ghost:hover {
+  /* Not while pressed: this rule comes after .ds-pill:active and would
+     replace its 0.97 press with the lift. */
+  .ds-pill--ghost:hover:not(:active),
+  .ds-press--lift:hover:not(:active) {
     transform: translateY(-1px);
   }
   .ds-text-link:hover .ds-text-link__arrow {

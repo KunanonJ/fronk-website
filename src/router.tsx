@@ -18,6 +18,11 @@ export function getRouter() {
     // On, except the restore that runs as the page hydrates once the visitor
     // has scrolled (src/lib/scrollRestoration.ts).
     scrollRestoration: restoreScrollAfterHydration(),
+    // The scroll to the top of a new page is instant. It used to inherit
+    // `html { scroll-behavior: smooth }` (globals.css, kept for in-page
+    // anchors), so the new page appeared at the old position and glided up
+    // while the 0.28 s cross-fade ran: both pages showed at once.
+    scrollRestorationBehavior: "instant",
     defaultPreload: "intent",
     // Nested routes fail inside the site layout; the root has its own errorComponent.
     defaultErrorComponent: RouteError,

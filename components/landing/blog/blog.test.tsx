@@ -67,6 +67,15 @@ describe("BlogIndexPage", () => {
     expect(screen.getByText("Showing 15 of 15 posts")).toBeInTheDocument();
   });
 
+  it("links each row by its title alone", () => {
+    renderIndex();
+    const [first] = rows();
+    const links = within(first!).getAllByRole("link");
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAccessibleName("Intelligence AI inside ERP");
+    expect(links[0]).toHaveClass("ds-stretch");
+  });
+
   it("filters by the ?tag= value whatever its case", () => {
     renderIndex({ tag: "sme" });
     expect(rows()).toHaveLength(3);

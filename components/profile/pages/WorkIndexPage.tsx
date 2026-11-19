@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Chip, PixelMark } from "@/components/ds/labels";
 import { CtaArrow, pillClass } from "@/components/ds/Pill";
 import Link from "@/components/navigation/Link";
@@ -127,7 +128,7 @@ export default function WorkIndexPage({
                 type="button"
                 aria-pressed={option.id === category}
                 onClick={() => onCategoryChange(option.id)}
-                className="pf-filter__option"
+                className="pf-filter__option ds-press"
               >
                 {option.label}
               </button>
@@ -139,7 +140,12 @@ export default function WorkIndexPage({
         </div>
         <ul className="pf-work-index__grid">
           {shown.map((project) => (
-            <li key={project.slug} className="pf-work-index__item">
+            <li
+              key={project.slug}
+              className="pf-work-index__item"
+              // Its name in a filter's view transition (globals.css).
+              style={{ "--vt": `pf-w-${project.slug}` } as CSSProperties}
+            >
               <WorkCard project={project} />
             </li>
           ))}

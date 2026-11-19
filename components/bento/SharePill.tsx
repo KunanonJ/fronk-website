@@ -26,7 +26,7 @@ export default function SharePill({
       aria-expanded={panel === "share"}
       data-panel-trigger
       onClick={(event) => toggle("share", event.currentTarget)}
-      className="inline-flex h-14 items-center justify-center gap-2.5 rounded-full border border-hairline-strong bg-surface px-[30px] text-[17px] font-semibold text-ink max-sm:w-14 max-sm:px-0"
+      className="ds-press ds-press--lift inline-flex h-14 items-center justify-center gap-2.5 rounded-full border border-hairline-strong bg-surface px-[30px] text-[17px] font-semibold text-ink max-sm:w-14 max-sm:px-0"
     >
       <ShareIcon />
       <span lang={labelLang} className="max-sm:sr-only">

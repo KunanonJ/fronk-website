@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils/cn";
  * the group is named for screen readers. A count, when given, follows the
  * label after a space, so the name reads "SME 3". Styles: the shared filter
  * bar's `.pf-filter` and `.pf-filter__option` (src/styles/profile/
- * cutover.css), and `.pf-count` (cutover.css).
+ * cutover.css), `.pf-count` (cutover.css), and the shared hover and press,
+ * `.ds-press` (globals.css).
  */
 
 export interface ToggleOption<T extends string> {
@@ -39,7 +40,7 @@ export function ToggleGroup<T extends string>({
           type="button"
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
-          className="pf-filter__option"
+          className="pf-filter__option ds-press"
         >
           {option.count === undefined ? (
             option.label

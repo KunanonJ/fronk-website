@@ -42,8 +42,10 @@ export function BannerFigure({
 }
 
 /**
- * One post as a whole-row link (Posts list, More on this tag): the date
- * column, then title, excerpt and an optional tag line with "Read →".
+ * One post as a row (Posts list, More on this tag): the date column, then
+ * title, excerpt and an optional tag line with "Read →". The title is the
+ * row's one link, named by the title alone, and its ::after (`.ds-stretch`)
+ * covers the row, so the whole row still opens the post.
  */
 export function PostRow({
   post,
@@ -57,11 +59,11 @@ export function PostRow({
 }) {
   const read = (
     <span aria-hidden className="pf-blog-row__read">
-      Read →
+      Read <span className="pf-blog-row__arrow">→</span>
     </span>
   );
   return (
-    <Link href={`/blog/${post.slug}`} className="pf-blog-row">
+    <div className="pf-blog-row">
       <div className="pf-blog-row__when">
         {index !== undefined ? (
           <span className="t-meta pf-cat-note">{pad2(index)}</span>
@@ -74,7 +76,14 @@ export function PostRow({
         </time>
       </div>
       <div className="pf-blog-row__copy">
-        <h3 className="t-lift-title pf-cat-title">{post.title}</h3>
+        <h3 className="t-lift-title pf-cat-title">
+          <Link
+            href={`/blog/${post.slug}`}
+            className="ds-stretch pf-blog-row__link"
+          >
+            {post.title}
+          </Link>
+        </h3>
         <p className="t-small pf-cat-note">{post.excerpt}</p>
         {showTags ? (
           <div className="pf-blog-row__foot">
@@ -85,6 +94,6 @@ export function PostRow({
           read
         )}
       </div>
-    </Link>
+    </div>
   );
 }

@@ -337,7 +337,10 @@
     display: flex;
     min-inline-size: 0;
   }
+  /* The name's link covers the card (`.ds-stretch`, z-index 1); Copy and
+     ZIP stay above it. */
   .pf-skill-card {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -374,6 +377,23 @@
   .pf-skill-card__details {
     min-block-size: 44px;
     margin-inline-start: auto;
+  }
+  /* The whole card is the name's target (its ::after), but a short name
+     such as "pr" still gets a 24 px box of its own (WCAG 2.5.8); the margin
+     takes the padding back, so the layout does not move. */
+  .pf-skill-card__link {
+    display: inline-block;
+    min-inline-size: 24px;
+    margin-block: -2px;
+    padding-block: 2px;
+  }
+  .pf-skill-card__actions .ds-pill {
+    z-index: 2;
+  }
+  /* Focus shows on the card (spec 6.10): the link's whole target. */
+  .pf-skill-card:has(.ds-stretch:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
   }
 
   /* Skills: the credits as a fact strip (spec 9.8). */
@@ -937,6 +957,8 @@
     font-family: var(--font-sans);
     text-align: start;
     cursor: pointer;
+    /* A row is wider than a pill: a card's press (ds-press in globals.css). */
+    --press: 0.985;
   }
   .pf-blog-venture[aria-pressed="true"] {
     border-color: var(--ink);
@@ -996,7 +1018,9 @@
   .pf-blog-list__item {
     border-top: 1px solid var(--line);
   }
+  /* The title's link covers the row (`.ds-stretch`). */
   .pf-blog-row {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 6px 24px;
@@ -1031,6 +1055,14 @@
     color: var(--link);
     font-size: 0.875rem;
     font-weight: 500;
+  }
+  .pf-blog-row__arrow {
+    display: inline-block;
+  }
+  .pf-blog-row:has(.ds-stretch:focus-visible) {
+    border-radius: var(--radius-tile);
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
   .pf-blog-hero__meta {
     display: flex;
@@ -1283,10 +1315,53 @@
     }
   }
 
-  /* Movement, only with no-preference (spec 5.1). */
+  /* Hover only where a fine pointer can hover (spec 5.3): a card's ring
+     turns accent, a row's title takes the link colour. */
+  @media (hover: hover) and (pointer: fine) {
+    .pf-skill-card:hover {
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+    .pf-skill-card:hover .pf-skill-card__details {
+      color: var(--ink);
+    }
+    .pf-blog-row:hover .pf-blog-row__link {
+      color: var(--accent-ink);
+    }
+  }
+
+  /* Movement, only with no-preference (spec 5.1). The press waits for the
+     link (`:has(.ds-stretch:active)`), so pressing Copy or ZIP never shrinks
+     the card. */
   @media (prefers-reduced-motion: no-preference) {
     .pf-skill-source__chevron {
       transition: rotate 0.15s var(--ease-snappy);
+    }
+    .pf-skill-card {
+      transition:
+        box-shadow 0.1s ease-out,
+        transform 0.14s var(--ease-snappy);
+    }
+    .pf-blog-row {
+      transition: transform 0.14s var(--ease-snappy);
+    }
+    .pf-blog-row__link {
+      transition: color 0.1s ease-out;
+    }
+    .pf-blog-row__arrow {
+      transition: transform 0.24s var(--ease-smooth);
+    }
+    .pf-skill-card:has(.ds-stretch:active),
+    .pf-blog-row:has(.ds-stretch:active) {
+      transform: scale(0.985);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-skill-card:hover:not(:has(.ds-stretch:active)) {
+      transform: translateY(-1px);
+    }
+    .pf-skill-card:hover .ds-text-link__arrow,
+    .pf-blog-row:hover .pf-blog-row__arrow {
+      transform: translateX(4px);
     }
   }
 }

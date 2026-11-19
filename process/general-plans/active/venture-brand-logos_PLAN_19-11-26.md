@@ -1,6 +1,6 @@
 # Venture brand logos, continued (19-11-26)
 
-Status: code complete, in review (owner picked all four items on 19-11-26)
+Status: done (#140 merged and live 19-11-26; owner picked all four items)
 
 Continues `7c23247` (feat(landing): use brand logos on venture cards, 19-07-26),
 which is in `main`. GoGoCash and Manut AI marks already show on the home stack

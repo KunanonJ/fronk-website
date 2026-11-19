@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { BentoCard, CardTitle } from "@/components/bento/Bento";
+import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 import {
   GITHUB_CONTRIBUTIONS_LOGIN,
   activityLevelClass,
@@ -17,15 +18,50 @@ function dayTitle(date: string, count: number): string {
 /**
  * About "Activity" card (bento canvas, design spec 4.2): the last year of
  * real GitHub contributions from /api/github/contributions, never the
- * canvas's illustrative grid. 8 px cells in the accent colour at four
- * strengths; the grid scrolls sideways in a focusable region on phones.
- * Until the data arrives (or if GitHub is down) it shows an empty year.
+ * canvas's illustrative grid. Square cells in the accent colour at four
+ * strengths fill the tile's width (8 px at least, so the grid scrolls
+ * sideways in a focusable region on phones; about 19 px at most). Until
+ * the data arrives (or if GitHub is down) it shows an empty year.
+ *
+ * With motion allowed, the year fills in week by week, left to right: when
+ * the data arrives in view, or, for a card still below the fold, once it
+ * comes into view (`data-wait` holds the cells empty until then, as Reveal
+ * holds its blocks). Under reduced motion, or without
+ * IntersectionObserver, the cells are simply there. Styles:
+ * `.pf-activity*` in src/styles/profile/cutover.css.
  */
 export default function ContributionActivity() {
   const [calendar, setCalendar] = useState<ContributionCalendar>(() =>
     emptyContributionCalendar(),
   );
   const [loaded, setLoaded] = useState(false);
+  const grid = useRef<HTMLDivElement>(null);
+
+  // The fill-in waits for the card to come into view (see above). An
+  // attribute, not state, as Reveal does: nothing renders again.
+  useEffect(() => {
+    const el = grid.current;
+    if (
+      !el ||
+      prefersReducedMotion() ||
+      typeof IntersectionObserver === "undefined" ||
+      el.getBoundingClientRect().top < window.innerHeight
+    ) {
+      return;
+    }
+    el.setAttribute("data-wait", "");
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        el.removeAttribute("data-wait");
+        observer.disconnect();
+      }
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      el.removeAttribute("data-wait");
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,17 +115,23 @@ export default function ContributionActivity() {
         {/* role="img": with no data every cell is unnamed, so the label sits
             on a role that takes a name. Days carry a native tooltip. */}
         <div
+          ref={grid}
           role="img"
           aria-label={`GitHub contribution activity for the past year, ${login}`}
-          className="mx-auto flex shrink-0 gap-0.5"
+          className="pf-activity__grid"
         >
           {calendar.weeks.map((week, wi) => (
-            <span key={wi} className="flex flex-col gap-0.5">
+            <span
+              key={wi}
+              className="pf-activity__week"
+              // The week's place in the fill-in (cutover.css).
+              style={{ "--w": wi } as CSSProperties}
+            >
               {week.days.map((day, di) => (
                 <span
                   key={`${wi}-${di}`}
                   title={day.date ? dayTitle(day.date, day.count) : undefined}
-                  className={`block size-2 rounded-[2px] ${activityLevelClass(day.level)}`}
+                  className={`pf-activity__day ${activityLevelClass(day.level)}`}
                 />
               ))}
             </span>

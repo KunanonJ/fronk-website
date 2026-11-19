@@ -411,7 +411,7 @@ export default function ContactForm({
                           )
                         }
                         className={cn(
-                          "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm font-medium",
+                          "ds-press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm font-medium",
                           active
                             ? "border-mark bg-surface-tint text-ink"
                             : "border-hairline-strong bg-surface text-ink-2",

@@ -673,6 +673,25 @@
     }
   }
 
+  /* The progress line (NavProgress.tsx): shown 150 ms into a pending
+     navigation, so a quick one never flashes it, and faded out once the page
+     is in. Opacity only here; it grows only with no-preference (below). */
+  .pf-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 90;
+    block-size: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease-out 0.1s;
+  }
+  .pf-progress[data-pending] {
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
   /* Pixel drawings (spec 7.7): one square per cell, token colours. Shown from
      1280 px; the centred call to action keeps the space under that. */
   .pf-art {
@@ -769,6 +788,12 @@
     .pf-art {
       display: none;
     }
+    /* Forced colours repaint backgrounds as Canvas: the line keeps a system
+       colour instead. */
+    .pf-progress {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
   }
 
   /* Theme changes land at once: no transition runs for two frames (spec 7.5). */
@@ -820,24 +845,60 @@
   .pf-theme__thumb {
     transition: transform 0.26s var(--ease-snappy);
   }
-  .pf-menu {
-    transition:
-      opacity 0.22s var(--ease-expo),
-      transform 0.22s var(--ease-expo);
-  }
+  /* One popover motion for Say hello and the phone menu (the share panel
+     enters the same way, globals.css): in from 6 px above at 0.97 over
+     0.2 s, out the same way over 0.14 s. The footer's panel opens upward,
+     so it moves from below. */
+  .pf-menu,
   .pf-say__panel {
+    --pop-from: translateY(-6px) scale(0.97);
     transition:
       opacity 0.2s var(--ease-expo),
       transform 0.2s var(--ease-expo);
   }
+  .pf-say__panel--footer {
+    --pop-from: translateY(6px) scale(0.97);
+  }
   @starting-style {
-    .pf-menu:popover-open {
-      opacity: 0;
-      transform: translateY(-16px) scale(0.98);
-    }
+    .pf-menu:popover-open,
     .pf-say__panel:popover-open {
       opacity: 0;
-      transform: translateY(-6px) scale(0.97);
+      transform: var(--pop-from);
+    }
+  }
+  /* The progress line grows towards 90 % while the navigation loads; when
+     it ends, the line stands full width as it fades. */
+  .pf-progress[data-pending] {
+    animation: kj-progress 8s var(--ease-expo) 0.15s both;
+  }
+  @keyframes kj-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(0.9);
+    }
+  }
+  /* The exit keeps a closing panel shown and in the top layer while it
+     fades (`display` and `overlay`, allow-discrete). Only Chromium has
+     `overlay`; other engines close the panels at once, as before. A
+     closing panel takes no clicks. */
+  @supports (overlay: auto) {
+    .pf-menu,
+    .pf-say__panel {
+      transition:
+        opacity 0.2s var(--ease-expo),
+        transform 0.2s var(--ease-expo),
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+    }
+    .pf-menu:not(:popover-open),
+    .pf-say__panel:not(:popover-open) {
+      opacity: 0;
+      transform: var(--pop-from);
+      transition-duration: 0.14s;
+      transition-timing-function: ease-in;
+      pointer-events: none;
     }
   }
 }
