@@ -6,23 +6,24 @@
 export const CSP_REPORT_PATH = "/api/csp-report";
 
 /**
- * The site's Content Security Policy (best-practices audit R21), sent
- * report-only: browsers block nothing and report what it would block to
- * CSP_REPORT_PATH, which logs each violation.
+ * The site's Content Security Policy (best-practices audit R21), enforced
+ * since 19-11-26 after it ran report-only from #128 with no violation of its
+ * own on any route: browsers block what it does not allow and report each
+ * block to CSP_REPORT_PATH, which logs it.
  * Scripts keep 'unsafe-inline': TanStack Start streams per-page hydration
  * scripts into the HTML, which no hash can cover, the prerendered pages
  * cannot carry a per-response nonce, and any hash would switch
- * 'unsafe-inline' off. Enforcing it (with nonces, every page rendered on
- * request) is a later decision for the owner. Sanity Studio, a separate app,
- * is left out.
+ * 'unsafe-inline' off. A nonce-based policy (every page rendered on request)
+ * would tighten scripts further, at the cost of prerendering. Sanity Studio,
+ * a separate app, is left out.
  */
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   // Cloudflare Web Analytics, and Turnstile on /contact.
   "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
-  // Sanity's image CDN; Unsplash for the hidden press and blog banners.
-  "img-src 'self' data: https://cdn.sanity.io https://images.unsplash.com",
+  // Sanity's image CDN (the banners are self-hosted in public/banners).
+  "img-src 'self' data: https://cdn.sanity.io",
   "font-src 'self'",
   "connect-src 'self' https://cloudflareinsights.com",
   "frame-src https://challenges.cloudflare.com",
@@ -31,8 +32,7 @@ export const CONTENT_SECURITY_POLICY = [
   "form-action 'self'",
   "frame-ancestors 'self'",
   // Where reports go: report-to (its endpoint named in Reporting-Endpoints)
-  // where the Reporting API is supported, report-uri elsewhere. Safari logs
-  // an error for a report-only policy with neither, and drops the policy.
+  // where the Reporting API is supported, report-uri elsewhere.
   `report-uri ${CSP_REPORT_PATH}`,
   "report-to csp",
 ].join("; ");
@@ -40,8 +40,8 @@ export const CONTENT_SECURITY_POLICY = [
 /** The Reporting-Endpoints header: the endpoint report-to's "csp" names. */
 export const REPORTING_ENDPOINTS = `csp="${CSP_REPORT_PATH}"`;
 
-/** The policy's header: report-only until the owner decides to enforce it. */
-export const CSP_HEADER = "Content-Security-Policy-Report-Only";
+/** The policy's header: enforced. */
+export const CSP_HEADER = "Content-Security-Policy";
 
 /** Headers every Worker response carries; public/_headers sets the same on static files. */
 export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
