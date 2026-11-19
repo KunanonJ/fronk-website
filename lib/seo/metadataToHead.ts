@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "@/lib/seo/types";
 import { IDENTITY_LINKS } from "@/lib/seo/identity";
 import { clampDescription } from "@/lib/seo/metaDescription";
+import { list } from "@/lib/seo/metadataRoutes";
 
 /*
  * Next.js Metadata -> TanStack Start head() (tanstack-migration Phase 1).
@@ -96,15 +97,47 @@ function robotsContent(robots: Metadata["robots"]): string | undefined {
   return parts.join(", ") || undefined;
 }
 
-function toList<T>(value: T | readonly T[] | undefined): T[] {
-  if (value === undefined) return [];
-  return Array.isArray(value) ? [...value] : [value as T];
-}
-
 function asImages(images: unknown): OgImage[] {
-  return toList(images as OgImage | string | URL).map((img) =>
+  return list(images as OgImage | string | URL).map((img) =>
     typeof img === "string" || img instanceof URL ? { url: img } : img,
   );
+}
+
+/** `<link rel="alternate">` for each hreflang or media type, in the map's order. */
+function alternateLinks(
+  base: URL | null | undefined,
+  map: Record<string, unknown> | undefined,
+  attr: (value: string) => { hrefLang: string } | { type: string },
+): HeadLink[] {
+  return Object.entries(map ?? {}).flatMap(([value, href]) =>
+    list(href as string | { url: string }).map((entry) => ({
+      rel: "alternate",
+      ...attr(value),
+      href: absolute(base, typeof entry === "object" ? entry.url : entry),
+    })),
+  );
+}
+
+/**
+ * An image's tags in Next's order: og:image as `<meta property>`,
+ * twitter:image as `<meta name>`, each with its size, alt and type.
+ */
+function imageMeta(
+  base: URL | null | undefined,
+  images: readonly OgImage[],
+  prefix: "og" | "twitter",
+): HeadMeta[] {
+  const tag = (field: string, content: string): HeadMeta =>
+    prefix === "og"
+      ? { property: `og:image${field}`, content }
+      : { name: `twitter:image${field}`, content };
+  return images.flatMap((img) => [
+    tag("", absolute(base, img.url)),
+    ...(img.width ? [tag(":width", String(img.width))] : []),
+    ...(img.height ? [tag(":height", String(img.height))] : []),
+    ...(img.alt ? [tag(":alt", img.alt)] : []),
+    ...(img.type ? [tag(":type", img.type)] : []),
+  ]);
 }
 
 /** Page head: title, description, canonical/alternates, OG, Twitter, robots. */
@@ -125,7 +158,7 @@ export function metadataToHead(
   if (description)
     meta.push({ name: "description", content: clampDescription(description) });
 
-  for (const author of toList(page.authors ?? root.authors)) {
+  for (const author of list(page.authors ?? root.authors)) {
     if (!author) continue;
     if (author.name) meta.push({ name: "author", content: author.name });
     if (author.url)
@@ -138,7 +171,7 @@ export function metadataToHead(
   if (robots) meta.push({ name: "robots", content: robots });
 
   const google = (page.verification ?? root.verification)?.google;
-  for (const value of toList(google))
+  for (const value of list(google))
     meta.push({ name: "google-site-verification", content: String(value) });
 
   const alternates = page.alternates ?? root.alternates;
@@ -149,22 +182,12 @@ export function metadataToHead(
         : (alternates.canonical as string | URL);
     links.push({ rel: "canonical", href: absolute(base, canonical) });
   }
-  for (const [lang, href] of Object.entries(alternates?.languages ?? {})) {
-    for (const entry of toList(href as string | { url: string })) {
-      const url = typeof entry === "object" ? entry.url : entry;
-      links.push({
-        rel: "alternate",
-        hrefLang: lang,
-        href: absolute(base, url),
-      });
-    }
-  }
-  for (const [type, href] of Object.entries(alternates?.types ?? {})) {
-    for (const entry of toList(href as string | { url: string })) {
-      const url = typeof entry === "object" ? entry.url : entry;
-      links.push({ rel: "alternate", type, href: absolute(base, url) });
-    }
-  }
+  links.push(
+    ...alternateLinks(base, alternates?.languages, (hrefLang) => ({
+      hrefLang,
+    })),
+    ...alternateLinks(base, alternates?.types, (type) => ({ type })),
+  );
 
   const og = (page.openGraph ?? root.openGraph ?? {}) as Record<
     string,
@@ -184,15 +207,7 @@ export function metadataToHead(
   ];
   for (const [property, content] of ogPairs)
     if (content) meta.push({ property, content: String(content) });
-  for (const img of ogImages) {
-    meta.push({ property: "og:image", content: absolute(base, img.url) });
-    if (img.width)
-      meta.push({ property: "og:image:width", content: String(img.width) });
-    if (img.height)
-      meta.push({ property: "og:image:height", content: String(img.height) });
-    if (img.alt) meta.push({ property: "og:image:alt", content: img.alt });
-    if (img.type) meta.push({ property: "og:image:type", content: img.type });
-  }
+  meta.push(...imageMeta(base, ogImages, "og"));
   if (og.type) meta.push({ property: "og:type", content: String(og.type) });
   if (og.type === "article" && og.publishedTime) {
     meta.push({
@@ -212,15 +227,7 @@ export function metadataToHead(
   ];
   for (const [name, content] of twPairs)
     if (content) meta.push({ name, content: String(content) });
-  for (const img of twImages) {
-    meta.push({ name: "twitter:image", content: absolute(base, img.url) });
-    if (img.width)
-      meta.push({ name: "twitter:image:width", content: String(img.width) });
-    if (img.height)
-      meta.push({ name: "twitter:image:height", content: String(img.height) });
-    if (img.alt) meta.push({ name: "twitter:image:alt", content: img.alt });
-    if (img.type) meta.push({ name: "twitter:image:type", content: img.type });
-  }
+  meta.push(...imageMeta(base, twImages, "twitter"));
 
   return { meta, links };
 }

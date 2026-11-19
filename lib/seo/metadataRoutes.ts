@@ -8,7 +8,8 @@ import { escapeXml } from "@/lib/utils/xml";
  * `comment` and `contentSignal` are this site's additions (Content Signals).
  */
 
-const list = <T>(value: T | T[] | undefined): T[] =>
+/** A value or a list of them as a list; undefined as none. */
+export const list = <T>(value: T | T[] | undefined): T[] =>
   value === undefined ? [] : Array.isArray(value) ? value : [value];
 
 export function robotsToText(robots: Robots): string {
