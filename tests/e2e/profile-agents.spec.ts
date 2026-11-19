@@ -154,4 +154,26 @@ test.describe("WebMCP tools", () => {
     await expect(page.locator("#contact-send")).toBeFocused();
     expect(posts.filter((url) => url.includes("/api/contact"))).toEqual([]);
   });
+
+  test("a draft sent at once waits out the form's fill time instead of being dropped", async ({
+    page,
+  }) => {
+    // The server drops, with a fake success, anything sent sooner than
+    // CONTACT_LIMITS.minFillMs (3 s) after the form appeared.
+    const sent: { elapsedMs: number }[] = [];
+    await page.route("**/api/contact", async (route) => {
+      sent.push(route.request().postDataJSON());
+      await route.fulfill({ json: { ok: true } });
+    });
+    await visit(page);
+    await run(page, "draft_contact_message", {
+      name: "Ada Agent",
+      email: "ada@example.com",
+      message: "Hello from an agent, on the visitor's behalf.",
+    });
+    await expect(page.locator("#contact-send")).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect.poll(() => sent.length, { timeout: 10_000 }).toBe(1);
+    expect(sent[0]!.elapsedMs).toBeGreaterThanOrEqual(3000);
+  });
 });
