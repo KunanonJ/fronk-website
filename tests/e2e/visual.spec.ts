@@ -1,6 +1,9 @@
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
-import { settleDither } from "./screenshots";
+
+/** The full pages hide the dither canvases (screenshot-no-dither.css). */
+const NO_DITHER = join(process.cwd(), "tests/e2e/screenshot-no-dither.css");
 
 /**
  * Full-page visual baselines for every public route, in both themes
@@ -110,9 +113,9 @@ for (const theme of THEMES) {
         // Settle web fonts so glyph metrics are stable across runs.
         await page.evaluate(() => document.fonts.ready);
         await loadEveryImage(page);
-        await settleDither(page);
         await expect(page).toHaveScreenshot(`${route.name}-${theme}.png`, {
           fullPage: true,
+          stylePath: NO_DITHER,
         });
       });
     }

@@ -1,0 +1,11 @@
+/*
+ * Applied while visual.spec takes its full-page screenshots: the dither
+ * canvases are hidden. A full-page capture in CI's Chromium sometimes drops
+ * a canvas's drawing (two attempts of one page differed only there, though
+ * the canvas was drawn at its size just before), so a full page cannot pin
+ * it. The element screenshots in the profile specs keep the dither, after
+ * settleDither (screenshots.ts); they are stable at zero tolerance.
+ */
+.ds-dither {
+  visibility: hidden !important;
+}

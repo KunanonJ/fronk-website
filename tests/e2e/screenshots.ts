@@ -10,6 +10,9 @@ import type { Page } from "@playwright/test";
  * ratio DitherField uses (min(devicePixelRatio, 2)) and holds ink, and the
  * sizes held still between two polls. Canvases with no box (a closed
  * popover's) are skipped.
+ *
+ * Element screenshots only: a full-page capture can still drop a canvas's
+ * drawing, so visual.spec hides the dither instead (screenshot-no-dither.css).
  */
 export async function settleDither(page: Page) {
   await page.waitForFunction(
