@@ -39,7 +39,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /Nothing lives here/i,
   },
   {
-    // Unlinked and noindex: the bento system on one page.
+    // Unlinked and noindex: the profile redesign's system on one page.
     path: "/design",
     name: "design",
     expectsHeadingPattern: /Design system/i,
@@ -171,7 +171,7 @@ const PROFILE_ROUTE_NAMES: ReadonlySet<string> = new Set([
   "portfolio-site",
   "venture-hub",
   "venture-hub-manut",
-  // Phase 7 (D1): the topic hubs in English and Thai, and the reading pages.
+  // Phase 7, group D1: the topic hubs in English and Thai, and the reading pages.
   "topic-hub",
   "topic-hub-fde",
   "topic-hub-fde-th",
@@ -182,6 +182,14 @@ const PROFILE_ROUTE_NAMES: ReadonlySet<string> = new Set([
   "stack",
   "proof",
   "build",
+  // Phase 7, group D2: skills, résumé, 404, /design, and the hidden blog and press.
+  "skills",
+  "skill-detail",
+  "resume",
+  "not-found",
+  "design",
+  "blog",
+  "press",
 ]);
 
 export const PROFILE_ROUTES: readonly RouteUnderTest[] = ROUTES.filter(

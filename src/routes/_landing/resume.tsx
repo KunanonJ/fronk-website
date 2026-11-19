@@ -1,7 +1,7 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { Metadata } from "@/lib/seo/types";
-import { PageMain } from "@/components/bento/Bento";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import ResumePage from "@/components/resume/ResumePage";
 import { ResumePrint } from "@/components/resume/ResumePrint";
 import {
@@ -57,7 +57,7 @@ function ResumeRoute() {
   };
 
   return (
-    <PageMain>
+    <ProfileMain>
       <ResumePage profile={profile} detail={view} onDetailChange={setView} />
       {/* Marked when the repo's résumé stands in for a failed Sanity read:
           `pnpm pdf` refuses to print a stand-in as the résumé. */}
@@ -67,6 +67,6 @@ function ResumeRoute() {
       >
         <ResumePrint profile={profile} />
       </div>
-    </PageMain>
+    </ProfileMain>
   );
 }

@@ -1,5 +1,5 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
-import { PageMain } from "@/components/bento/Bento";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import PressPage from "@/components/landing/PressPage";
 import type { Metadata } from "@/lib/seo/types";
 import { FILTER_NAVIGATION, usePrerenderedParam } from "@/src/lib/filterParam";
@@ -44,9 +44,9 @@ function PressRoute() {
     });
   };
   return (
-    <PageMain>
+    <ProfileMain>
       <PressPage type={type} onTypeChange={setType} />
-    </PageMain>
+    </ProfileMain>
   );
 }
 

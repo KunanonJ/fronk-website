@@ -1,6 +1,6 @@
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { serializeJsonLd } from "@/lib/seo/serializeJsonLd";
-import { PageMain } from "@/components/bento/Bento";
+import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
 import type { Metadata } from "@/lib/seo/types";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonLd";
@@ -22,9 +22,9 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /skills (bento redesign, phase 7d; design spec 4.8). The catalog filter is
- * the typed `?show=` param (Valibot): original, adapted, auto or user; the
- * default, all, never shows in the URL and an unknown value falls back to it.
+ * /skills (profile redesign Phase 7c). The catalog filter is the typed
+ * `?show=` param (Valibot): original, adapted, auto or user; the default,
+ * all, never shows in the URL and an unknown value falls back to it.
  */
 export const Route = createFileRoute("/_landing/skills/")({
   validateSearch: skillsSearchSchema,
@@ -55,7 +55,7 @@ function SkillsRoute() {
   const packLd = serializeJsonLd(buildSkillsPackJsonLd());
 
   return (
-    <PageMain>
+    <ProfileMain>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: crumbLd }}
@@ -65,6 +65,6 @@ function SkillsRoute() {
         dangerouslySetInnerHTML={{ __html: packLd }}
       />
       <SkillsIndexPage show={show} onShowChange={setShow} />
-    </PageMain>
+    </ProfileMain>
   );
 }

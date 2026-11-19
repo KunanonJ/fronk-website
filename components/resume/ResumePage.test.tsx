@@ -23,13 +23,15 @@ function renderPage(detail: ResumeDetail = "detailed") {
 }
 
 describe("ResumePage (screen)", () => {
-  it("leads with the canvas h1 built from the name and headline", () => {
+  it("leads with the h1 built from the name and headline, in the new hero", () => {
     renderPage();
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent(
       "Kunanon Jarat. AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
     );
-    expect(h1.className).toMatch(/kj-lines/);
+    // The display serif on the pixel sky (Phase 7e), one line per block.
+    expect(h1).toHaveClass("t-display");
+    expect(h1.closest("section")).toHaveClass("pf-page-hero");
     expect(h1.children).toHaveLength(3);
   });
 
@@ -84,9 +86,11 @@ describe("ResumePage (screen)", () => {
     expect(within(current).getAllByRole("heading", { level: 3 })).toHaveLength(
       1,
     );
+    // The arrow stays on screen but out of the link's name (spec 12 item 18).
     expect(
-      within(current).getByRole("link", { name: "Case studies →" }),
+      within(current).getByRole("link", { name: "Case studies" }),
     ).toHaveAttribute("href", "/portfolio");
+    expect(current).toHaveTextContent("Case studies→");
   });
 
   it("numbers Experience across two columns of about equal height", () => {
@@ -112,13 +116,17 @@ describe("ResumePage (screen)", () => {
     expect(screen.getByText(note)).toBeInTheDocument();
   });
 
-  it("spans University-era two columns from 641px and starts it at column 2 only on desktop", () => {
+  it("marks each card with its kind, which places it in the grid", () => {
+    // pages-catalog.css: University-era spans the row from 600 px and sits
+    // beside Education and Affiliations from 1024 px (profile-pages-catalog
+    // spec measures it in the browser).
     renderPage();
-    const card = screen.getByRole("article", { name: "University-era" });
-    expect(card.className).toMatch(/min-\[641px\]:col-span-2/);
-    expect(card.className).toMatch(/lg:col-\[2\/span_2\]/);
-    expect(card.className).toMatch(/lg:row-span-2/);
-    expect(card.className).not.toMatch(/(^| )col-start|min-\[641px\]:col-\[/);
+    const kind = (name: string) =>
+      screen.getByRole("article", { name }).getAttribute("data-kind");
+    expect(kind("University-era")).toBe("early");
+    expect(kind("Education")).toBe("education");
+    expect(kind("Experience")).toBe("roles");
+    expect(kind("Skills")).toBe("skills");
   });
 
   it("lists the three independent projects, the live ones marked with the Ember square", () => {
@@ -134,12 +142,12 @@ describe("ResumePage (screen)", () => {
     expect(
       within(projects).getByText("Live at gogocash.co."),
     ).toBeInTheDocument();
-    expect(container.querySelectorAll("li > .bg-ember").length).toBe(2);
+    expect(container.querySelectorAll("li > .pf-resume__live").length).toBe(2);
     expect(
-      within(projects).getByRole("link", { name: "gogocash.co →" }),
+      within(projects).getByRole("link", { name: "gogocash.co" }),
     ).toHaveAttribute("href", "https://gogocash.co");
     expect(
-      within(projects).getAllByRole("link", { name: "Case study →" })[0],
+      within(projects).getAllByRole("link", { name: "Case study" })[0],
     ).toHaveAttribute("href", "/ventures/gogocash");
   });
 
@@ -188,7 +196,8 @@ describe("ResumePage (screen)", () => {
 
   it("hides both screen parts in print", () => {
     const { container } = renderPage();
-    for (const part of container.querySelectorAll("section, .bento"))
+    expect(container.children).toHaveLength(2);
+    for (const part of container.children)
       expect(part).toHaveAttribute("data-print-hide");
   });
 });

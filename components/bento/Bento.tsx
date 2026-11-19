@@ -10,30 +10,6 @@ import { CARD_SURFACE } from "@/components/bento/classes";
  * The `bento` class hooks the card stagger and hover lift in globals.css.
  */
 
-/**
- * A redesigned page's <main> (the canvas `.kj-col` body): the 1000 px column,
- * 56 px between the hero and the bento (44 px and 16 px gutters at <=380px).
- * LandingLayout puts the header and footer on the same column.
- */
-export function PageMain({
-  className,
-  children,
-  ...rest
-}: ComponentPropsWithoutRef<"main">) {
-  return (
-    <main
-      id="main"
-      className={cn(
-        "kj mx-auto flex w-full max-w-[1000px] flex-col gap-14 px-6 pt-14 pb-14 max-[381px]:gap-11 max-[381px]:px-4",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </main>
-  );
-}
-
 export type BentoSpan = 1 | 2 | 3;
 
 /**
@@ -92,32 +68,6 @@ export function BentoPair({
         className,
       )}
       {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-
-/**
- * A full-width bento cell holding cards side by side in a wrapping flex row
- * (About FAQ + Next, Résumé Skills + Share). The cards size by their
- * `flex` basis, so the row wraps without media queries. The row itself
- * never lifts on hover; its cards do (`bento-row` in globals.css).
- */
-export function BentoRow({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "bento-row flex min-w-0 flex-wrap gap-5",
-        bentoSpan(3),
-        className,
-      )}
     >
       {children}
     </div>

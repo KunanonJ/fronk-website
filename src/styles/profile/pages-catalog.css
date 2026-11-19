@@ -1,1 +1,1300 @@
 /* Profile redesign, Phase 7 lane D2: /skills and the skill pages, /resume, the 404 and error pages, /design, and the hidden /blog and /press. Only that lane edits this partial. */
+/*
+ * Design spec 6, 8.6 (the records card), 9 (the hero, fact strip, steps and
+ * tiles), 10, 10.1 and 12; plan steps 7c, 7e, 7f, 7g and 7h. The pages reuse
+ * the core pages' hero (`.pf-page-hero*`, cutover.css), the footer's pixel
+ * art (`.pf-art`, shell.css) and the `ds-*` primitives; the pipeline's steps
+ * and the credits' strip follow the case template's (spec 9.13 and 9.8) in
+ * classes of their own. Plain CSS on the tokens in globals.css, phones
+ * first, rem breakpoints (37.5rem = 600, 40rem = 640, 64rem = 1024 px);
+ * every rule in @layer components; movement waits for no-preference at the
+ * end.
+ */
+
+@layer components {
+  /* The hero's additions: a back link or breadcrumb, pills, a meta line. */
+  .pf-cat-hero__back {
+    margin-bottom: 28px;
+  }
+  .pf-cat-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    margin-top: 32px;
+  }
+  .pf-cat-hero__meta {
+    max-inline-size: 64ch;
+    margin-top: 24px;
+    color: var(--ink-80);
+  }
+
+  /* A page section under the hero: an eyebrow row, then its tiles. */
+  .pf-cat-section {
+    padding-top: 88px;
+  }
+  .pf-cat-section > .ds-eyebrow {
+    margin-bottom: 28px;
+  }
+  .pf-cat-end {
+    padding-bottom: 128px;
+  }
+
+  /* The filters, view switches and tabs use the shared filter bar
+     (.pf-filter-bar, .pf-filter and .pf-filter__option in cutover.css). A
+     count follows its label after a space. */
+  .pf-cat-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .pf-cat-note {
+    color: var(--ink-60);
+  }
+
+  /* Code in a sentence, and a command on the page colour with its Copy. */
+  .pf-cat-code {
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
+  .pf-cat-command {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 6px 6px 6px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-snug);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .pf-cat-command__text {
+    flex: 1 1 220px;
+    min-inline-size: 0;
+    margin: 0;
+    padding-block: 6px;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .pf-cat-command .ds-pill {
+    margin-inline-start: auto;
+  }
+  /* A copy button holds every word it can say in one cell, so it never
+     changes width. */
+  .pf-cat-copy__words {
+    display: grid;
+  }
+  .pf-cat-copy__words > * {
+    grid-area: 1 / 1;
+  }
+  .pf-cat-copy__words > [data-off] {
+    visibility: hidden;
+  }
+
+  /* Shared bits of the tiles. */
+  .pf-cat-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .pf-cat-stack--start {
+    align-items: flex-start;
+  }
+  .pf-cat-measure {
+    max-inline-size: 60ch;
+  }
+  .pf-cat-kicker,
+  .pf-cat-title {
+    margin: 0;
+  }
+  .pf-cat-kicker {
+    color: var(--ink-60);
+  }
+  .pf-cat-title {
+    color: var(--ink);
+  }
+  .pf-cat-panel {
+    display: flex;
+    flex-direction: column;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-cat-download {
+    max-inline-size: 100%;
+    block-size: auto;
+    min-block-size: 48px;
+    flex-wrap: wrap;
+    padding-block: 8px;
+    white-space: normal;
+  }
+  .pf-cat-download__label {
+    overflow-wrap: anywhere;
+  }
+  .pf-cat-copy__done {
+    color: var(--accent);
+  }
+  .pf-cat-copy__failed {
+    display: block;
+    inline-size: 8px;
+    block-size: 8px;
+    margin-inline: 3px;
+    background: var(--coral);
+  }
+
+  /* Skills (7c): the hero's mono name, chips, crumbs and release pill. */
+  .pf-skill-hero__name {
+    font-family: var(--font-mono);
+    font-size: clamp(2.25rem, 4vw + 1rem, 4.5rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin: 0;
+    padding: 0;
+    color: var(--ink-60);
+    list-style: none;
+  }
+  .pf-skill-crumbs__sep {
+    display: flex;
+  }
+  .pf-skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-skill-chips__item {
+    max-inline-size: 100%;
+  }
+  .pf-skill-tag {
+    block-size: auto;
+    min-block-size: 26px;
+    color: var(--ink-60);
+    white-space: normal;
+  }
+  .pf-skill-tag--original {
+    color: var(--ink);
+  }
+  .pf-skill-tag--user {
+    border: 1px dashed var(--line-strong);
+    box-shadow: none;
+  }
+  .pf-skill-tag__mark {
+    flex: none;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--accent);
+  }
+  /* About 300 of 304 px on a 344 px phone, so a wider font or larger text
+     wraps it inside the pill rather than into the gutter. A pill that fits
+     keeps its single 44 px line. */
+  .pf-skill-release {
+    gap: 8px;
+    max-inline-size: 100%;
+    block-size: auto;
+    min-block-size: 44px;
+    padding-block: 10px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+  .pf-skill-sibling {
+    max-inline-size: 100%;
+    block-size: auto;
+    min-block-size: 36px;
+    font-family: var(--font-mono);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Skills: tiles, the pipeline as steps, the prompt. */
+  .pf-skill-install,
+  .pf-skill-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-skill-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-inline-size: 0;
+  }
+  .pf-skill-tile .pf-skill-chips {
+    margin-top: 0;
+  }
+  .pf-skill-tile__end {
+    align-self: flex-end;
+    min-block-size: 44px;
+    margin-top: auto;
+  }
+  .pf-skill-prompt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 0;
+    padding: 18px;
+    border-radius: var(--radius-well);
+    background: var(--surface-tint);
+  }
+  .pf-skill-prompt__text {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-prompt__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .pf-skill-steps {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-skill-steps__item {
+    display: flex;
+    min-inline-size: 0;
+  }
+  .pf-skill-step {
+    display: grid;
+    flex: 1;
+    align-content: start;
+    gap: 6px;
+    min-block-size: 44px;
+    padding: 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-row);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-skill-step__number {
+    color: var(--accent-ink);
+  }
+  .pf-skill-step__name {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-step__note {
+    color: var(--ink-60);
+    font-size: 0.875rem;
+  }
+
+  /* Skills: the catalog. */
+  .pf-skill-catalog {
+    display: grid;
+    gap: 56px;
+  }
+  .pf-skill-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+  .pf-skill-filter__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  .pf-skill-stage__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-skill-stage__blurb {
+    flex: 1 1 100%;
+  }
+  .pf-skill-stage__grid {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-skill-card__item {
+    display: flex;
+    min-inline-size: 0;
+  }
+  .pf-skill-card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 12px;
+    min-inline-size: 0;
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sheet);
+    background: var(--paper);
+    box-shadow: var(--elev-ring);
+  }
+  .pf-skill-card__name {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+  }
+  .pf-skill-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .pf-skill-card__details {
+    min-block-size: 44px;
+    margin-inline-start: auto;
+  }
+
+  /* Skills: the credits as a fact strip (spec 9.8). */
+  .pf-skill-credits {
+    margin: 28px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .pf-skill-credits__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 20px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-skill-credits__row > p {
+    margin: 0;
+  }
+  .pf-skill-credits__name {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .pf-skill-credits__link,
+  .pf-skill-credits__sha,
+  .pf-skill-credits__skill {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+  }
+  .pf-skill-credits__link {
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+  }
+  .pf-skill-credits__sha,
+  .pf-skill-credits__skill {
+    color: var(--link);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+  .pf-skill-credits__skills,
+  .pf-skill-credits__excerpt {
+    flex: 1 1 100%;
+  }
+  .pf-skill-credits__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Short slugs such as "pr" keep a 24 px target; the margin takes the
+     padding back, so neighbours stay 4 px apart. */
+  .pf-skill-credits__skill {
+    justify-content: center;
+    min-inline-size: 24px;
+    margin-inline: -6px;
+    padding-inline: 6px;
+  }
+
+  /* A skill's page: files, facts, the pager and SKILL.md. */
+  .pf-skill-files {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-skill-files__item + .pf-skill-files__item {
+    border-top: 1px solid var(--line);
+  }
+  .pf-skill-files__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-block-size: 48px;
+    padding-block: 4px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-skill-files__name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-inline-size: 0;
+  }
+  .pf-skill-files__name svg {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-skill-facts {
+    display: grid;
+    margin: auto 0 0;
+  }
+  .pf-skill-facts__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 0.875rem;
+  }
+  .pf-skill-facts__row > dd {
+    margin: 0;
+    text-align: end;
+  }
+  .pf-skill-facts__link {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 24px;
+    color: var(--link);
+  }
+  .pf-skill-pager {
+    display: grid;
+    gap: 16px;
+    margin-top: 56px;
+  }
+  .pf-skill-pager__link {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-block-size: 112px;
+    padding: 20px 22px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sheet);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line-soft);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-skill-pager__link--next {
+    align-items: flex-end;
+    text-align: end;
+  }
+  .pf-skill-pager__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-60);
+  }
+  .pf-skill-pager__name {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-source__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .pf-skill-source__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pf-skill-source__well {
+    min-inline-size: 0;
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-well);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .pf-skill-source__code {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .pf-skill-source__code--fade {
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+  .pf-skill-source__toggle {
+    align-self: flex-start;
+  }
+  .pf-skill-source__toggle[aria-expanded="true"] .pf-skill-source__chevron {
+    rotate: 180deg;
+  }
+
+  /* Résumé (7e): the hero's availability, pills and view switch. */
+  .pf-resume__title {
+    max-inline-size: 22ch;
+  }
+  .pf-resume__availability {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 24px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-resume__availability .ds-dot {
+    transform: translateY(-1px);
+  }
+  /* On phones the PDF takes the first row, so Contact and the Share icon
+     share the second instead of the icon wrapping alone. */
+  .pf-resume__pdf {
+    inline-size: 100%;
+  }
+  .pf-resume__detail {
+    align-self: flex-start;
+    inline-size: fit-content;
+    margin-top: 16px;
+  }
+
+  /* Résumé: the sections in the records card's style (spec 8.6). */
+  .pf-resume {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-resume__card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-inline-size: 0;
+    padding: clamp(20px, 2.4vw, 32px);
+    border: 1px solid transparent;
+    border-radius: var(--radius-mat);
+    background: var(--paper-2);
+    box-shadow: var(--elev-mat);
+  }
+  .pf-resume__heading {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-resume__wells {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__well,
+  .pf-resume__degree {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-inline-size: 0;
+  }
+  .pf-resume__well {
+    padding: 16px 16px 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-row);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-resume__degree + .pf-resume__degree {
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-resume__well-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .pf-resume__rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__row {
+    display: flex;
+    gap: 14px;
+    padding-block: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-resume__aside {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    inline-size: 40px;
+  }
+  .pf-resume__body {
+    flex: 1;
+    min-inline-size: 0;
+  }
+  .pf-resume__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 16px;
+  }
+  .pf-resume__role {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .pf-resume__role--lead {
+    font-size: 1.0625rem;
+  }
+  .pf-resume__title-link {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+  }
+  .pf-resume__org,
+  .pf-resume__note {
+    margin: 2px 0 0;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .pf-resume__period {
+    margin: 0;
+    color: var(--ink-60);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .pf-resume__line > .pf-resume__period {
+    white-space: nowrap;
+  }
+  .pf-resume__url {
+    margin-top: 2px;
+    text-transform: none;
+  }
+  .pf-resume__bullets {
+    display: grid;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__bullet {
+    display: flex;
+    gap: 10px;
+    color: var(--ink-80);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .pf-resume__mark,
+  .pf-resume__live {
+    flex: none;
+    inline-size: 5px;
+    block-size: 5px;
+    margin-top: 0.6em;
+    background: var(--ink-60);
+  }
+  .pf-resume__live {
+    inline-size: 6px;
+    block-size: 6px;
+    margin-top: 0.55em;
+    background: var(--coral);
+  }
+  .pf-resume__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin-top: auto;
+  }
+  .pf-resume__columns {
+    display: grid;
+    column-gap: 40px;
+  }
+  .pf-resume__groups {
+    display: grid;
+    gap: 18px;
+  }
+  .pf-resume__group {
+    display: grid;
+    gap: 10px;
+  }
+  .pf-resume__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__chip {
+    block-size: auto;
+    min-block-size: 32px;
+    padding-inline: 12px;
+    font-size: 0.875rem;
+    white-space: normal;
+  }
+  .pf-resume__share {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pf-resume__card-pdf {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  /* /design (7g): no site chrome, so its theme switch has a bar of its own,
+     where the nav would sit over the hero's sky. */
+  .pf-design {
+    position: relative;
+  }
+  .pf-design__bar {
+    position: absolute;
+    inset-block-start: var(--bar-top);
+    inset-inline-end: var(--pad);
+    z-index: 2;
+  }
+  .pf-design__bar .pf-theme {
+    inline-size: 13.75rem;
+  }
+  .pf-design__body {
+    padding-bottom: 128px;
+  }
+  .pf-design__section {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding-block: 48px;
+  }
+
+  /* Press and blog (7h, hidden): tiles in the canvas's spans. */
+  .pf-press__bar {
+    margin-bottom: 24px;
+  }
+  .pf-press__grid,
+  .pf-blog-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-press-card,
+  .pf-blog-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-inline-size: 0;
+  }
+  .pf-press-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .pf-press-card__body,
+  .pf-blog-feature__body {
+    display: flex;
+    flex: auto;
+    flex-wrap: wrap;
+    gap: 16px 20px;
+  }
+  .pf-press-card__banner,
+  .pf-blog-banner {
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-well);
+    background: var(--tint-2);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-press-card__banner,
+  .pf-blog-feature__banner {
+    flex: 1 1 240px;
+    min-block-size: 180px;
+    min-inline-size: 0;
+  }
+  .pf-press-card__domain {
+    position: absolute;
+    inset-block-end: 12px;
+    inset-inline-start: 12px;
+  }
+  .pf-press-card__copy,
+  .pf-blog-feature__copy {
+    display: flex;
+    flex: 1 1 240px;
+    flex-direction: column;
+    gap: 10px;
+    min-inline-size: 0;
+  }
+  .pf-press-card__title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .pf-press-card__view,
+  .pf-blog-feature__copy > .ds-text-link,
+  .pf-blog-tile__end {
+    margin-top: auto;
+  }
+  .pf-press-card__view,
+  .pf-blog-feature__copy > .ds-text-link {
+    align-self: flex-start;
+    min-block-size: 44px;
+    overflow-wrap: anywhere;
+  }
+  .pf-blog-feature__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+  }
+  .pf-blog-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: auto 0 0;
+  }
+  .pf-blog-stats__item > dd,
+  .pf-blog-dates__row > dd,
+  .pf-blog-details__row > dd {
+    margin: 0;
+  }
+  .pf-blog-dates,
+  .pf-blog-details {
+    display: grid;
+    margin: 0;
+  }
+  .pf-blog-dates__row,
+  .pf-blog-details__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding-block: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-blog-details__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pf-blog-ventures {
+    display: grid;
+    gap: 6px;
+  }
+  .pf-blog-venture {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    inline-size: 100%;
+    min-block-size: 64px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-snug);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    text-align: start;
+    cursor: pointer;
+  }
+  .pf-blog-venture[aria-pressed="true"] {
+    border-color: var(--ink);
+    background: var(--tint-2);
+  }
+  .pf-blog-venture__logo {
+    flex: none;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: var(--radius-tile);
+    object-fit: cover;
+  }
+  .pf-blog-venture__copy {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+  .pf-blog-venture__name {
+    font-weight: 500;
+  }
+  .pf-blog-search {
+    position: relative;
+  }
+  .pf-blog-search__icon {
+    position: absolute;
+    inset-block-start: 18px;
+    inset-inline-start: 18px;
+    color: var(--ink-60);
+    pointer-events: none;
+  }
+  .pf-blog-search__input {
+    inline-size: 100%;
+    block-size: 52px;
+    padding-inline: 44px 18px;
+    /* --ink-45: an input's edge on paper needs 3:1 (spec 2.2, WCAG 1.4.11). */
+    border: 1px solid var(--ink-45);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+  }
+  .pf-blog-search__input::placeholder {
+    color: var(--ink-60);
+  }
+  .pf-blog-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .pf-blog-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-blog-list__item {
+    border-top: 1px solid var(--line);
+  }
+  .pf-blog-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    padding-block: 18px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-blog-row__when {
+    display: flex;
+    flex: 0 0 104px;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pf-blog-row__date {
+    color: var(--ink);
+  }
+  .pf-blog-row__copy {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    gap: 6px;
+    min-inline-size: 0;
+  }
+  .pf-blog-row__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+  }
+  .pf-blog-row__read {
+    color: var(--link);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  .pf-blog-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .pf-blog-post {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-blog-post__top,
+  .pf-blog-post__pair {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-blog-post__side {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+  }
+  .pf-blog-note__banner {
+    aspect-ratio: 16 / 9;
+  }
+  .pf-blog-note__body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-inline-size: 64ch;
+  }
+  .pf-blog-note__text {
+    color: var(--ink);
+  }
+  .pf-blog-links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-blog-links__item + .pf-blog-links__item {
+    border-top: 1px solid var(--line);
+  }
+  .pf-blog-links__link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-block-size: 52px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-blog-links__label {
+    min-inline-size: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
+  }
+
+  /* 404 and errors (7f). */
+  .pf-status__grid {
+    display: grid;
+    gap: 16px;
+    padding-block: 8px 128px;
+  }
+  .pf-status__tile {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-inline-size: 0;
+  }
+  .pf-status__kicker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-status__square {
+    flex: none;
+    inline-size: 8px;
+    block-size: 8px;
+    background: var(--coral);
+  }
+  .pf-status__art {
+    inline-size: min(100%, 22rem);
+    margin: auto;
+  }
+  .pf-status__links {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+  }
+  .pf-status__link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-block-size: 60px;
+    color: var(--ink);
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+  .pf-status__link:not(:last-child) {
+    border-bottom: 1px solid var(--line);
+  }
+  .pf-status__number {
+    color: var(--ink-60);
+  }
+  .pf-status__arrow {
+    margin-inline-start: auto;
+    color: var(--accent-ink);
+  }
+  .pf-status__mail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+  .pf-status__address {
+    min-inline-size: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2vw + 1rem, 2.25rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 6px;
+  }
+
+  /* Breakpoints (spec 4.1 and 10.1). */
+  @media (width >= 40rem) {
+    .pf-resume__pdf {
+      inline-size: auto;
+    }
+  }
+  @media (width >= 37.5rem) {
+    .pf-status__grid,
+    .pf-skill-steps,
+    .pf-skill-stage__grid,
+    .pf-skill-grid,
+    .pf-skill-pager {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pf-status__report,
+    .pf-skill-grid > .pf-skill-tile--install,
+    .pf-skill-tile--full,
+    .pf-resume__card:is(
+      [data-kind="current"],
+      [data-kind="roles"],
+      [data-kind="early"],
+      [data-kind="credentials"]
+    ) {
+      grid-column: 1 / -1;
+    }
+    .pf-resume,
+    .pf-resume__columns,
+    .pf-press__grid,
+    .pf-blog-grid,
+    .pf-blog-post__pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    :is(.pf-press-card, .pf-blog-tile):is([data-span="2"], [data-span="3"]) {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (width >= 64rem) {
+    .pf-skill-install {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+    .pf-skill-tile--wide {
+      grid-column: 1 / -1;
+    }
+    .pf-skill-steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .pf-skill-stage__grid,
+    .pf-skill-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .pf-skill-grid > .pf-skill-tile--install {
+      grid-column: span 2;
+    }
+    /* University-era beside Education and Affiliations, which fill the
+       first column under it (dense), then Training, then Skills and Share. */
+    .pf-resume {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-flow: row dense;
+    }
+    .pf-resume__card[data-kind="early"] {
+      grid-column: 2 / span 2;
+      grid-row: span 2;
+    }
+    .pf-resume__card[data-kind="skills"] {
+      grid-column: span 2;
+    }
+    .pf-press__grid,
+    .pf-blog-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    :is(.pf-press-card, .pf-blog-tile)[data-span="2"] {
+      grid-column: span 2;
+    }
+    .pf-blog-post__top {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  /* Reader preferences (spec 12 items 26 to 28). */
+  @media (prefers-contrast: more) {
+    .pf-cat-note,
+    .pf-cat-kicker,
+    .pf-skill-tag,
+    .pf-skill-step__note,
+    .pf-skill-pager__label,
+    .pf-resume__heading,
+    .pf-resume__org,
+    .pf-resume__note,
+    .pf-resume__period,
+    .pf-status__kicker,
+    .pf-status__number {
+      color: var(--ink);
+    }
+  }
+  @media (forced-colors: active) {
+    .pf-cat-command,
+    .pf-skill-card,
+    .pf-skill-step,
+    .pf-skill-pager__link,
+    .pf-skill-source__well,
+    .pf-resume__card,
+    .pf-resume__well,
+    .pf-press-card__banner,
+    .pf-blog-banner {
+      border-color: CanvasText;
+    }
+    .pf-blog-venture[aria-pressed="true"] {
+      outline: 2px solid Highlight;
+    }
+    .pf-skill-tag__mark,
+    .pf-resume__mark,
+    .pf-status__square {
+      display: none;
+    }
+    /* A live product keeps its marker: it says something. */
+    .pf-resume__live {
+      background: CanvasText;
+    }
+  }
+
+  /* Movement, only with no-preference (spec 5.1). */
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-skill-source__chevron {
+      transition: rotate 0.15s var(--ease-snappy);
+    }
+  }
+}
