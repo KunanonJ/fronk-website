@@ -1,6 +1,7 @@
 # Security review and refactor (19-11-26)
 
-Status: EXECUTE (owner request: "review all security concerns and do code refactor")
+Status: code complete (#133 merged and live; refactor PR follows). Owner console actions pending.
+Owner request: "review all security concerns and do code refactor".
 
 Harness note: `.claude/agents`, `.claude/skills` and `process/context/all-context.md`
 are absent in this checkout, so the phases run in the main session
@@ -32,7 +33,7 @@ by slug, output is PNG).
 | S6 | `getBlogPost` validator accepts any value; arbitrary strings reach Sanity and the log label | require a slug string (`a-z0-9-`, at most 96) |
 | S7 | the webhook reads an unbounded body before checking the signature header | 401 without the header, then read at most 1 MiB (413 over) |
 | S8 | the webhook names the missing secret to unauthenticated callers | generic 500, detail to the log |
-| S9 | `/api/csp-report` logs up to 20 attacker-chosen lines per request | at most 3, repeats dropped |
+| S9 | `/api/csp-report` logs up to 20 attacker-chosen lines per request | at most 5 distinct lines, repeats dropped |
 | S10 | no `Cross-Origin-Opener-Policy` | `same-origin` on Worker and static responses |
 | S11 | `sanity schema deploy` runs in every Workers Builds build when the token is set, branches and Dependabot included | deploy only on the production branch |
 | S12 | CI actions pinned by mutable tags | pin to commit SHAs (verified with `gh api`) |
@@ -59,6 +60,13 @@ by slug, output is PNG).
   and a forgery only buys a cache purge.
 - The WebMCP draft replaces typed text: the visitor still sends from their own app.
 - automerge.yml runs the PR's own copy: only the owner can push branches.
+- satori 0.32.0 (GHSA-wx4j-mvgx-mqwp, moderate): unreachable here (static
+  cards by slug, PNG output); `@cf-wasm/satori` still pins it, so wait for
+  upstream rather than override a renderer whose output the baselines pin.
+- pnpm `minimumReleaseAge`: not set. Dependabot already waits 7 days, and the
+  setting would also hold back the security updates Dependabot exempts.
+- A Workers rate-limit binding: left to a zone rate-limiting rule (owner
+  action 5), which covers every path without per-isolate counters.
 
 ## Touchpoints
 
@@ -90,7 +98,28 @@ CI pinning. The refactor must keep output identical (parity plus a full-HTML dif
 
 ## Verification Evidence
 
-(filled in at closeout)
+Security PR #133 (squash `b5d4651`, 19-11-26):
+
+- typecheck, lint, format, knip; 1,539 unit tests (49 new); build
+- parity: 137 URLs, 0 differences (the `/studio` CSP updated in the reference)
+- local browser gate: smoke + axe 254 passed; `tests/e2e/profile` failures on
+  this machine were load flakes (all 15 non-baseline ones pass alone, 8.8 s)
+  and macOS runs of Linux baselines; CI's pinned-image `visual` job passed
+- CI on `d017cb4`: all 7 checks green, Workers Builds deployed `b5d4651`
+- live: 22/22 checks (308 on query-busting URLs, `/studio` CSP with
+  `frame-ancestors 'self'`, COOP on Worker and static responses, unsigned
+  webhook 401, bad slug 404, pages 200)
+- Playwright smoke + axe against production: 251/254; the 3 are the edge's
+  sampled `cf-csp-endpoint` added to Reporting-Endpoints (Cloudflare script
+  monitor) and `Cache-Tag`, which the edge strips; neither is from this change
+
+Refactor PR (`refactor/dedupe-helpers`, 10 commits, 102 files, -251 net lines):
+
+- every gate above; 1,539 unit tests after the rebase
+- parity: 137 URLs, 0 differences; `pnpm perf:budget` passes
+- full capture (197 requests: every ported route, text endpoint, icon and
+  share image by sha256, Markdown negotiation, HEAD and POST) diffed between
+  `main` at `b5d4651` and the rebased branch: 0 differences
 
 ## Resume and Execution Handoff
 
