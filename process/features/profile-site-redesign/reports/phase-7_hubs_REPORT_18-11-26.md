@@ -368,3 +368,37 @@ viewport`.
   device matrix passed (539), the case pages' baselines among them. The 40
   renders were reviewed on contact sheets (all ten pages, both themes,
   desktop and mobile) and committed (`8d99d1c`).
+
+## 15. Merged, deployed and checked live (19-11-26)
+
+- **Merge.** Every GitHub check passed on `2e85313` (typecheck, lint, test
+  and build; e2e-smoke; visual; parity; AccessLint). Cloudflare's Workers
+  Builds check still failed at its start (0 s, the outage since 18-11-26),
+  so PR #126 was admin-merged as `660af3e` and deployed by hand from a clean
+  checkout of `main` (`fronk-ship-pr` section 7).
+- **Production:** version `3a539856-6bb6-4afb-bb7c-cfff2122df73`. Rollback
+  target: `26188e19-0161-4b3a-b759-024bedba0ca6` (the cutover,
+  `wrangler rollback 26188e19-0161-4b3a-b759-024bedba0ca6`).
+- **Live checks** on https://kunanonj.com:
+  - The ten pages and `/`, `/about` answer 200, with `data-design="profile"`
+    on the hubs and reading pages and the closing grid's new class
+    (`pf-hub-close`) in the served HTML.
+  - Smoke "recruiter path" (desktop): 62 passed.
+  - The hubs' device matrix, gutter check included, against production:
+    13 passed.
+  - Speed probe (390 x 844, 4x CPU, about 1.6 Mbps, 150 ms RTT, cold cache),
+    taken while the D2 browser gate ran on the same Mac, so total blocking
+    time reads high on every page:
+
+    | Page | LCP | CLS | TBT |
+    |---|---|---|---|
+    | `/topics/erp-crm-internal-systems` | 1,676 ms | 0 | 286 ms |
+    | `/th/topics/ai-transformation-thailand` | 1,964 ms | 0.001 | 477 ms |
+    | `/learn` | 1,716 ms | 0 | 410 ms |
+    | `/stack` | 1,688 ms | 0 | 285 ms |
+    | `/proof` | 1,564 ms | 0 | 304 ms |
+    | `/` (for comparison, same run) | 1,820 ms | 0 | 273 ms |
+    | `/about` (same run) | 1,740 ms | 0 | 260 ms |
+
+    Under the same load a hub costs what the core pages cost. Phase 8
+    (step 8d) measures again on an idle machine.
