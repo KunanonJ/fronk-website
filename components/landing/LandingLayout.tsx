@@ -1,5 +1,6 @@
 import { ChromeProvider } from "@/components/bento/ChromeContext";
 import SharePanelHost from "@/components/bento/SharePanelHost";
+import { NavProgress } from "@/components/profile/site/NavProgress";
 import SiteFooter from "@/components/profile/site/SiteFooter";
 import SiteNav from "@/components/profile/site/SiteNav";
 
@@ -13,7 +14,8 @@ import SiteNav from "@/components/profile/site/SiteNav";
  * render their own <main id="main">. `data-site-chrome` on the header and the
  * footer lets print drop them, so the printed résumé (`pnpm pdf`) starts at
  * the top. ChromeProvider and the share panel serve the hero Share pills of
- * the pages Phase 7 restyles.
+ * the pages Phase 7 restyles. NavProgress draws the line at the top while a
+ * navigation loads.
  */
 export default function LandingLayout({
   children,
@@ -29,6 +31,7 @@ export default function LandingLayout({
           Skip to content
         </a>
         <SiteNav />
+        <NavProgress />
         {children}
         <SiteFooter />
         <SharePanelHost />

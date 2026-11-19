@@ -673,6 +673,25 @@
     }
   }
 
+  /* The progress line (NavProgress.tsx): shown 150 ms into a pending
+     navigation, so a quick one never flashes it, and faded out once the page
+     is in. Opacity only here; it grows only with no-preference (below). */
+  .pf-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 90;
+    block-size: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease-out 0.1s;
+  }
+  .pf-progress[data-pending] {
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
   /* Pixel drawings (spec 7.7): one square per cell, token colours. Shown from
      1280 px; the centred call to action keeps the space under that. */
   .pf-art {
@@ -769,6 +788,12 @@
     .pf-art {
       display: none;
     }
+    /* Forced colours repaint backgrounds as Canvas: the line keeps a system
+       colour instead. */
+    .pf-progress {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
   }
 
   /* Theme changes land at once: no transition runs for two frames (spec 7.5). */
@@ -839,6 +864,19 @@
     .pf-say__panel:popover-open {
       opacity: 0;
       transform: var(--pop-from);
+    }
+  }
+  /* The progress line grows towards 90 % while the navigation loads; when
+     it ends, the line stands full width as it fades. */
+  .pf-progress[data-pending] {
+    animation: kj-progress 8s var(--ease-expo) 0.15s both;
+  }
+  @keyframes kj-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(0.9);
     }
   }
   /* The exit keeps a closing panel shown and in the top layer while it

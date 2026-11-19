@@ -5,6 +5,7 @@ import {
   useLocation,
   useNavigate,
   useRouter,
+  useRouterState,
 } from "@tanstack/react-router";
 
 /** The current path, for components that mark the active nav item. */
@@ -15,6 +16,15 @@ export function usePathname(): string {
 /** The current location as one string (path, search and hash). It changes on every navigation. */
 export function useLocationKey(): string {
   return useLocation({ select: (location) => location.href });
+}
+
+/**
+ * True while a navigation is loading (the router's status is "pending"):
+ * its loaders, a request-rendered page's data, a lazy route's code. The
+ * site shell's progress line (components/profile/site/NavProgress.tsx).
+ */
+export function useNavigationPending(): boolean {
+  return useRouterState({ select: (state) => state.status === "pending" });
 }
 
 /** Throw a 404 from render code; the root route's notFoundComponent shows it. */
