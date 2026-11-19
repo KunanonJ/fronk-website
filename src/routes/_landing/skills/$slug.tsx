@@ -2,7 +2,6 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { JsonLd } from "@/components/JsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
-import type { Metadata } from "@/lib/seo/types";
 import {
   getSkillBySlug,
   skillMetaDescription,
@@ -13,21 +12,6 @@ import { buildSkillJsonLd } from "@/lib/seo/skillsJsonLd";
 import { fileOg } from "@/src/lib/og";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
-
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const skill = getSkillBySlug(slug);
-  if (!skill) return { title: "Skills" };
-
-  return routeShareMeta({
-    title: skillTitle(skill),
-    description: skillMetaDescription(skill),
-    path: `/skills/${slug}`,
-    hasOwnOgImage: true,
-  });
-}
 
 /** The page body for one slug; shared with the TanStack Start route. */
 function SkillRouteView({ slug }: { slug: string }) {
@@ -50,11 +34,17 @@ function SkillRouteView({ slug }: { slug: string }) {
 }
 
 export const Route = createFileRoute("/_landing/skills/$slug")({
-  loader: async ({ params }) => {
-    if (!getSkillBySlug(params.slug)) throw notFound();
+  loader: ({ params }) => {
+    const skill = getSkillBySlug(params.slug);
+    if (!skill) throw notFound();
     return {
       head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
+        routeShareMeta({
+          title: skillTitle(skill),
+          description: skillMetaDescription(skill),
+          path: `/skills/${params.slug}`,
+          hasOwnOgImage: true,
+        }),
         { fileOgImage: fileOg(`/skills/${params.slug}`, "Agent skill") },
       ),
     };

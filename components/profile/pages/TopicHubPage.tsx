@@ -10,9 +10,24 @@ import {
 } from "@/components/profile/pages/ReadingHero";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
-import type { TopicPillar } from "@/lib/content/topics/pillars";
 import { siteConfig } from "@/lib/site";
 import { pad2 } from "@/lib/utils/pad2";
+import { notFound } from "@tanstack/react-router";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  buildBreadcrumbJsonLd,
+  buildFaqJsonLd,
+  buildTopicArticleJsonLd,
+} from "@/lib/seo/jsonLd";
+import {
+  getTopicPillar,
+  isTopicSlug,
+  TOPIC_PUBLISHED,
+  topicPath,
+  type TopicLocale,
+  type TopicPillar,
+  type TopicSlug,
+} from "@/lib/content/topics/pillars";
 
 /*
  * A topic hub, in English or Thai (profile redesign, Phase 7 lane D1, plan
@@ -279,5 +294,45 @@ export default function TopicHubPage({ pillar }: { pillar: TopicPillar }) {
         </div>
       </div>
     </ProfileMain>
+  );
+}
+
+type TopicHub = { slug: TopicSlug; pillar: TopicPillar };
+
+/** The hub at `slug` in `locale`, for a route's loader and page; a 404 when there is none. */
+export function topicHub(slug: string, locale: TopicLocale): TopicHub {
+  if (!isTopicSlug(slug)) throw notFound();
+  const pillar = getTopicPillar(slug, locale);
+  if (!pillar) throw notFound();
+  return { slug, pillar };
+}
+
+/**
+ * A hub's route body, English or Thai: its Article, FAQ and breadcrumb
+ * JSON-LD, then the page. The Thai hubs share the English hub's OG card.
+ */
+export function TopicHubView({ slug, pillar }: TopicHub) {
+  const path = topicPath(slug, pillar.locale);
+  return (
+    <>
+      <JsonLd
+        data={buildTopicArticleJsonLd({
+          path,
+          headline: pillar.h1,
+          description: pillar.description,
+          inLanguage: pillar.locale,
+          datePublished: TOPIC_PUBLISHED[slug],
+          image: `/topics/${slug}/opengraph-image`,
+        })}
+      />
+      <JsonLd data={buildFaqJsonLd(pillar.faqs)} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: pillar.h1, path },
+        ])}
+      />
+      <TopicHubPage pillar={pillar} />
+    </>
   );
 }

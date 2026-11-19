@@ -525,10 +525,15 @@ export function getAllTopicPillars(
   return locale === "th" ? TH_PILLARS : EN_PILLARS;
 }
 
+/** A hub's address in one language. */
+export function topicPath(slug: TopicSlug, locale: TopicLocale): string {
+  return locale === "th" ? `/th/topics/${slug}` : `/topics/${slug}`;
+}
+
 export function topicHreflang(slug: TopicSlug): Record<string, string> {
   return {
-    en: `/topics/${slug}`,
-    th: `/th/topics/${slug}`,
-    "x-default": `/topics/${slug}`,
+    en: topicPath(slug, "en"),
+    th: topicPath(slug, "th"),
+    "x-default": topicPath(slug, "en"),
   };
 }

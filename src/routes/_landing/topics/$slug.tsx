@@ -1,85 +1,38 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { JsonLd } from "@/components/JsonLd";
-import TopicHubPage from "@/components/profile/pages/TopicHubPage";
-import type { Metadata } from "@/lib/seo/types";
+import { createFileRoute } from "@tanstack/react-router";
 import {
-  getTopicPillar,
-  isTopicSlug,
-  TOPIC_PUBLISHED,
-  topicHreflang,
-  type TopicSlug,
-} from "@/lib/content/topics/pillars";
-import {
-  buildBreadcrumbJsonLd,
-  buildFaqJsonLd,
-  buildTopicArticleJsonLd,
-} from "@/lib/seo/jsonLd";
+  TopicHubView,
+  topicHub,
+} from "@/components/profile/pages/TopicHubPage";
+import { topicHreflang, topicPath } from "@/lib/content/topics/pillars";
 import { fileOg } from "@/src/lib/og";
 import { pageHead } from "@/src/lib/head";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
 
-type Props = { params: Promise<{ slug: string }> };
-
-async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  if (!isTopicSlug(slug)) return { title: "Topic" };
-  const pillar = getTopicPillar(slug, "en");
-  if (!pillar) return { title: "Topic" };
-  return routeShareMeta({
-    title: pillar.title,
-    description: pillar.description,
-    path: `/topics/${slug}`,
-    languages: topicHreflang(slug),
-    hasOwnOgImage: true,
-  });
-}
-
-/** The page body for one slug; shared with the TanStack Start route. */
-function TopicPillarPageView({ slug }: { slug: string }) {
-  if (!isTopicSlug(slug)) throw notFound();
-  const pillar = getTopicPillar(slug, "en");
-  if (!pillar) throw notFound();
-
-  return (
-    <>
-      <JsonLd
-        data={buildTopicArticleJsonLd({
-          path: `/topics/${slug}`,
-          headline: pillar.h1,
-          description: pillar.description,
-          inLanguage: "en",
-          datePublished: TOPIC_PUBLISHED[slug],
-          image: `/topics/${slug}/opengraph-image`,
-        })}
-      />
-      <JsonLd data={buildFaqJsonLd(pillar.faqs)} />
-      <JsonLd
-        data={buildBreadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: pillar.h1, path: `/topics/${slug as TopicSlug}` },
-        ])}
-      />
-      <TopicHubPage pillar={pillar} />
-    </>
-  );
-}
-
+/**
+ * An English topic hub. The Thai route renders the same view; its head keeps
+ * the site's default share card, where this one has its own.
+ */
 export const Route = createFileRoute("/_landing/topics/$slug")({
-  loader: async ({ params }) => {
-    if (!(isTopicSlug(params.slug) && getTopicPillar(params.slug, "en")))
-      throw notFound();
+  loader: ({ params }) => {
+    const { slug, pillar } = topicHub(params.slug, "en");
     return {
       head: pageHead(
-        await generateMetadata({ params: Promise.resolve(params) }),
-        { fileOgImage: fileOg(`/topics/${params.slug}`, "Topic hub") },
+        routeShareMeta({
+          title: pillar.title,
+          description: pillar.description,
+          path: topicPath(slug, "en"),
+          languages: topicHreflang(slug),
+          hasOwnOgImage: true,
+        }),
+        { fileOgImage: fileOg(`/topics/${slug}`, "Topic hub") },
       ),
     };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},
-  component: SlugPage,
+  component: TopicRoute,
 });
 
-function SlugPage() {
+function TopicRoute() {
   const { slug } = Route.useParams();
-  return <TopicPillarPageView slug={slug} />;
+  return <TopicHubView {...topicHub(slug, "en")} />;
 }
