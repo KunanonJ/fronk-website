@@ -85,9 +85,10 @@
   }
   /* The filter bar, shared by every page that filters a list: the row
      (.pf-filter-bar, with its live count) and the segmented group
-     (.pf-filter, whose options are buttons with aria-pressed). A switch
-     whose options are pages, such as a hub's language links, styles its own
-     aria-current state. */
+     (.pf-filter, whose options are buttons with aria-pressed, or tabs with
+     aria-selected, such as a skill's install tabs). A switch whose options
+     are pages, such as a hub's language links, styles its own aria-current
+     state. */
   .pf-filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -118,7 +119,7 @@
     white-space: nowrap;
     cursor: pointer;
   }
-  .pf-filter__option[aria-pressed="true"] {
+  .pf-filter__option:is([aria-pressed="true"], [aria-selected="true"]) {
     background: var(--ink);
     color: var(--paper);
   }
@@ -520,7 +521,7 @@
     .pf-contact__action {
       border-color: CanvasText;
     }
-    .pf-filter__option[aria-pressed="true"] {
+    .pf-filter__option:is([aria-pressed="true"], [aria-selected="true"]) {
       border-color: Highlight;
       outline: 2px solid Highlight;
     }

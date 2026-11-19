@@ -122,7 +122,7 @@ const RINGED = [
   ".ds-tile",
   ".ds-motion-toggle",
   ".pf-theme",
-  ".pf-cat-filter",
+  ".pf-filter",
   ".pf-cat-command",
   ".pf-skill-card",
   ".pf-skill-step",

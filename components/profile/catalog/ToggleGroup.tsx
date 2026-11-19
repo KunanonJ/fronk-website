@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils/cn";
  * and view switches of the résumé, press and blog, as the portfolio's filter
  * draws them (ink when pressed). Each option is a button with aria-pressed;
  * the group is named for screen readers. A count, when given, follows the
- * label after a space, so the name reads "SME 3". Styles: `.pf-cat-filter`
- * and `.pf-cat-option` in src/styles/profile/pages-catalog.css.
+ * label after a space, so the name reads "SME 3". Styles: the shared filter
+ * bar's `.pf-filter` and `.pf-filter__option` (src/styles/profile/
+ * cutover.css), and `.pf-cat-count` (pages-catalog.css).
  */
 
 export interface ToggleOption<T extends string> {
@@ -31,18 +32,14 @@ export function ToggleGroup<T extends string>({
   className?: string;
 }) {
   return (
-    <div
-      role="group"
-      aria-label={label}
-      className={cn("pf-cat-filter", className)}
-    >
+    <div role="group" aria-label={label} className={cn("pf-filter", className)}>
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
-          className="pf-cat-option"
+          className="pf-filter__option"
         >
           {option.count === undefined ? (
             option.label

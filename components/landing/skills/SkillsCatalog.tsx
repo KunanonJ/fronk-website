@@ -69,7 +69,7 @@ export default function SkillsCatalog({
           <div
             role="group"
             aria-labelledby="skills-filter-label"
-            className="pf-cat-filter"
+            className="pf-filter"
           >
             {FILTERS.map((filter) => (
               <button
@@ -77,9 +77,9 @@ export default function SkillsCatalog({
                 type="button"
                 aria-pressed={filter.id === show}
                 onClick={() => onShowChange(filter.id)}
-                className="pf-cat-option"
+                className="pf-filter__option"
               >
-                <span>{filter.label}</span>
+                {filter.label}{" "}
                 <span className="pf-cat-count">{filter.count}</span>
               </button>
             ))}

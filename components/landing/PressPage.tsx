@@ -175,14 +175,14 @@ export default function PressPage({
         aria-label="Coverage"
         className="ds-wrap pf-cat-section pf-cat-end pf-press"
       >
-        <div className="pf-press__bar">
+        <div className="pf-filter-bar pf-press__bar">
           <ToggleGroup
             label="Filter coverage by type"
             options={options}
             value={type}
             onChange={onTypeChange}
           />
-          <p aria-live="polite" className="t-meta pf-cat-note">
+          <p aria-live="polite" className="t-meta pf-filter-bar__count">
             Showing {visible.length} of {pressItems.length}
           </p>
         </div>

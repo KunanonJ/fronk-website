@@ -24,8 +24,9 @@ type InstallTabsProps = {
  * move between tabs and select them, Home/End jump to the ends, Tab moves
  * into the panel. Local state, never the URL. Every panel is
  * server-rendered; inactive ones are `hidden`, so the first is already
- * correct before hydration. Styles: `.pf-cat-filter`, `.pf-cat-option` and
- * `.pf-cat-panel` in src/styles/profile/pages-catalog.css.
+ * correct before hydration. Styles: the shared filter bar's `.pf-filter`
+ * and `.pf-filter__option` (src/styles/profile/cutover.css), and
+ * `.pf-cat-panel` (pages-catalog.css).
  */
 export default function InstallTabs({
   label,
@@ -60,7 +61,7 @@ export default function InstallTabs({
 
   return (
     <>
-      <div role="tablist" aria-label={label} className="pf-cat-filter">
+      <div role="tablist" aria-label={label} className="pf-filter">
         {tabs.map((tab, index) => {
           const active = index === selected;
           return (
@@ -77,7 +78,7 @@ export default function InstallTabs({
               tabIndex={active ? 0 : -1}
               onClick={() => setSelected(index)}
               onKeyDown={(event) => onKeyDown(event, index)}
-              className="pf-cat-option"
+              className="pf-filter__option"
             >
               {tab.label}
             </button>
