@@ -122,6 +122,44 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  /* Commands (now-building-and-genz Phase 3): names as typed, and the
+     answer some of them give, like a terminal's. */
+  .pf-search__command {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+  }
+  .pf-search__answer {
+    margin: 4px 4px 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper-2);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+  .pf-search__answer-line {
+    margin: 0;
+  }
+  .pf-search__keys {
+    display: grid;
+    gap: 6px;
+    margin: 10px 0 0;
+  }
+  .pf-search__keys > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .pf-search__keys dt {
+    min-inline-size: 13ch;
+  }
+  .pf-search__keys dd {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-search__keys kbd {
+    font-family: inherit;
+  }
   .pf-search__foot {
     position: sticky;
     inset-block-end: 0;
@@ -169,7 +207,8 @@
   }
 
   @media (forced-colors: active) {
-    .pf-search {
+    .pf-search,
+    .pf-search__answer {
       border: 1px solid CanvasText;
     }
     .pf-search__option[aria-selected="true"] {
