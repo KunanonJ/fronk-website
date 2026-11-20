@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
   clippedText,
   forcedColorsProblems,
@@ -22,7 +22,7 @@ import {
  *   references/best-practices-audit_18-11-26.md (forced colors, text
  *   spacing, zoom, more contrast, request origins; plan gate 7). Each check
  *   first fails a fixture, so a check that stops catching anything fails;
- * - what jsdom cannot see: the résumé's grid, its print, the 404's scope,
+ * - what jsdom cannot see: the résumé's layout, its print, the 404's scope,
  *   /design's canonical and theme switch, and the hidden pages' robots.
  *
  * The press and blog banners still load from images.unsplash.com (their
@@ -81,8 +81,11 @@ const RINGED = [
   ".pf-skill-step",
   ".pf-skill-pager__link",
   ".pf-skill-source__well",
+  ".pf-resume-card",
+  ".pf-resume-card__venture",
   ".pf-resume__card",
-  ".pf-resume__well",
+  ".pf-resume__tile",
+  ".pf-resume__badge",
   ".pf-press-card__banner",
   ".pf-blog-banner",
 ].join(", ");
@@ -230,28 +233,86 @@ test.describe("best practices on group D2's pages (desktop Chromium)", () => {
 test.describe("what jsdom cannot see (desktop Chromium)", () => {
   test.beforeEach(() => desktopOnly());
 
-  test("the résumé: University-era beside Education from 1024 px, across the row below", async ({
+  test("the résumé: the facts card beside the copy from 1024 px, under the h1 on phones", async ({
     page,
   }) => {
     await prepare(page);
     await open(page, PAGES.resume);
-    const box = async (name: string) =>
-      (await page.getByRole("article", { name, exact: true }).boundingBox())!;
+    const box = async (locator: Locator) => (await locator.boundingBox())!;
+    const h1 = page.getByRole("heading", { level: 1 });
+    const card = page.locator("section.pf-resume-card");
+    const lead = page.locator(".pf-resume__lead");
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    let early = await box("University-era");
-    const education = await box("Education");
-    let current = await box("Currently");
-    expect(early.x).toBeGreaterThan(education.x + education.width);
-    // Two of three columns, from the second to the row's end.
-    expect(early.x + early.width).toBeCloseTo(current.x + current.width, 0);
-    expect(early.width).toBeGreaterThan(education.width * 1.9);
+    let [title, facts, summary] = await Promise.all([h1, card, lead].map(box));
+    // Beside: the card to the right of the h1 and the summary, from the top.
+    expect(facts.x).toBeGreaterThan(title.x + title.width);
+    expect(facts.x).toBeGreaterThan(summary.x + summary.width);
+    expect(facts.y).toBeLessThan(title.y + title.height);
+    expect(summary.y).toBeGreaterThan(title.y + title.height);
 
-    await page.setViewportSize({ width: 820, height: 900 });
-    early = await box("University-era");
-    current = await box("Currently");
-    expect(early.x).toBeCloseTo(current.x, 0);
-    expect(early.width).toBeCloseTo(current.width, 0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    [title, facts, summary] = await Promise.all([h1, card, lead].map(box));
+    // Under: the h1, then the card, then the summary, in one column.
+    expect(facts.y).toBeGreaterThan(title.y + title.height);
+    expect(summary.y).toBeGreaterThan(facts.y + facts.height);
+    expect(facts.x).toBeCloseTo(summary.x, 0);
+  });
+
+  test("the résumé: one timeline, the period left of the role from 768 px and above it on phones", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await open(page, PAGES.resume);
+    const experience = page.getByRole("article", {
+      name: "Experience",
+      exact: true,
+    });
+    await expect(experience.locator("ol")).toHaveCount(1);
+    const first = experience.locator(".pf-resume__entry").first();
+    const parts = async () => {
+      const [when, role] = await Promise.all([
+        first.locator(".pf-resume__when").boundingBox(),
+        first.locator("h3").boundingBox(),
+      ]);
+      return { when: when!, role: role! };
+    };
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    let { when, role } = await parts();
+    expect(when.x + when.width).toBeLessThan(role.x);
+    expect(Math.abs(when.y - role.y)).toBeLessThan(8);
+    // Periods read as text: 14 px, not uppercase.
+    const style = await first.locator(".pf-resume__when").evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { size: s.fontSize, transform: s.textTransform };
+    });
+    expect(style).toEqual({ size: "14px", transform: "none" });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    ({ when, role } = await parts());
+    expect(when.y + when.height).toBeLessThanOrEqual(role.y + 1);
+
+    // Education beside Training from 768 px, the earlier entries folded.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const education = (await page
+      .getByRole("article", { name: "Education", exact: true })
+      .boundingBox())!;
+    const training = (await page
+      .getByRole("article", { name: "Training", exact: true })
+      .boundingBox())!;
+    expect(training.x).toBeGreaterThan(education.x + education.width);
+    expect(training.y).toBeCloseTo(education.y, 0);
+    const fold = page.locator("details.pf-resume__more");
+    await expect(fold).not.toHaveAttribute("open");
+    await expect(
+      fold.getByRole("heading", { name: "University-era" }),
+    ).toBeHidden();
+    await fold.locator("summary").click();
+    await expect(fold).toHaveAttribute("open");
+    await expect(
+      fold.getByRole("heading", { name: "University-era" }),
+    ).toBeVisible();
   });
 
   test("the résumé prints its plain document, not the screen layout", async ({
@@ -265,6 +326,9 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
       page.locator('section[aria-labelledby="hero-title"]'),
     ).toBeHidden();
     await expect(page.locator(".pf-resume")).toBeHidden();
+    // The facts card, its Copy and the folded entries are screen only too.
+    await expect(page.locator("section.pf-resume-card")).toBeHidden();
+    await expect(page.locator("details.pf-resume__more")).toBeHidden();
     // The bar's offset never reaches the paper.
     const top = await page
       .locator("main#main")

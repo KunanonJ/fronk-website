@@ -1,25 +1,9 @@
-import * as v from "valibot";
-import { enumParam } from "@/lib/search/enumParam";
-
 /*
- * /resume route options that run on every navigation (so they ship in the
- * entry bundle): keep this module free of anything but Valibot.
+ * /resume route options read by the route's head(), which ships in the entry
+ * bundle: keep this module free of imports. The page has no search params
+ * since the "Snapshot" redesign (20-11-26) dropped the Detailed / Compact
+ * switch; an old `?view=compact` link still opens the page.
  */
-
-export const RESUME_DETAILS = ["detailed", "compact"] as const;
-export type ResumeDetail = (typeof RESUME_DETAILS)[number];
-
-/** The default detail level; stripped from the URL, so /resume stays clean. */
-export const RESUME_SEARCH_DEFAULTS = { view: "detailed" } as const;
-
-/**
- * /resume search params (TanStack Router `validateSearch`, Standard Schema):
- * `?view=compact` hides the bullet lists. A missing or unknown value falls
- * back to detailed without an error.
- */
-export const resumeSearchSchema = v.object({
-  view: enumParam(RESUME_DETAILS, RESUME_SEARCH_DEFAULTS.view),
-});
 
 /** /resume head() copy; the description is also the page lead when the CMS has no summary. */
 export const RESUME_META = {

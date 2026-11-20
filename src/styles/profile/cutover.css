@@ -547,6 +547,17 @@
       grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
       align-items: end;
     }
+    /* With `after`: the copy, then the parts after it, beside the aside. */
+    .pf-page-hero--after .pf-page-hero__wrap {
+      grid-template-rows: auto 1fr;
+      align-items: start;
+    }
+    .pf-page-hero--after .pf-page-hero__aside {
+      grid-area: 1 / 2 / span 2;
+    }
+    .pf-page-hero--after .pf-page-hero__after {
+      grid-column: 1;
+    }
     .pf-work-index__grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }

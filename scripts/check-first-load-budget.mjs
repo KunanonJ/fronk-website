@@ -79,7 +79,9 @@ const MARKETING_EXACT = new Set([
   "/skills",
   // Résumé (phase 7b): moved into the site layout with the header, footer
   // and Share. Rendered on request (Sanity), so this only classifies it;
-  // measured by hand at 202.1 KB on 09-11-26.
+  // measured by hand at 202.1 KB on 09-11-26, and at 164.5 KB of JS and
+  // 37.1 KB of stylesheets on 20-11-26 ("Snapshot"): its own
+  // src/styles/resume.css (2.5 KB) is linked by the page, not by profile.css.
   "/resume",
 ]);
 

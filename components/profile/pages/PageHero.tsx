@@ -11,7 +11,9 @@ import { cn } from "@/lib/utils/cn";
  * 6.8), an optional back link or breadcrumb, the eyebrow after a status dot
  * that pings once, the h1 in the display serif, the lead, then the page's
  * own parts (pills, filters, a meta line), with an optional picture beside
- * the copy. The h1 never fades or moves (LCP, spec 13 item 3). Styles:
+ * the copy, and optional parts that follow it (`after`: the résumé's lead
+ * under its facts card on phones, under the copy beside the card from
+ * 1024 px). The h1 never fades or moves (LCP, spec 13 item 3). Styles:
  * `.pf-page-hero*` in src/styles/profile/cutover.css.
  */
 
@@ -57,6 +59,7 @@ export function PageHero({
   lead,
   children,
   aside,
+  after,
   className,
   ...rest
 }: HeroTitle & {
@@ -69,12 +72,18 @@ export function PageHero({
   children?: ReactNode;
   /** A picture beside the copy from 1024 px (About's portrait). */
   aside?: ReactNode;
+  /**
+   * Parts after the aside: under it on narrow screens, and from 1024 px
+   * under the copy, with the aside beside both. Needs `aside`.
+   */
+  after?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"section">, "title" | "children">) {
   return (
     <section
       className={cn(
         "pf-page-hero",
         aside ? "pf-page-hero--aside" : null,
+        aside && after ? "pf-page-hero--after" : null,
         className,
       )}
       aria-labelledby="hero-title"
@@ -100,6 +109,9 @@ export function PageHero({
           {children}
         </div>
         {aside ? <div className="pf-page-hero__aside">{aside}</div> : null}
+        {aside && after ? (
+          <div className="pf-page-hero__after">{after}</div>
+        ) : null}
       </div>
     </section>
   );
