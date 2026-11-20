@@ -149,10 +149,11 @@ test.describe("living status > the footer", () => {
     // The real endpoint, not a mock: a mocked answer arrives whole and ends
     // its request at once, but the Worker's 503 (GitHub refusing a build
     // with no token, say) stayed open while its body went unread, and
-    // every networkidle wait on the page timed out. The 404 is short
-    // enough that its footer card is near the screen at once, so the ship
-    // log is asked for while the page loads.
-    await page.setViewportSize({ width: 882, height: 1104 });
+    // every networkidle wait on the page timed out. In a window as tall as
+    // the 404 itself, its footer card is near the screen at once, so the
+    // ship log is asked for while the page loads (the 404 grew with its
+    // pixel game, so the height is the page's, not a phone's or a laptop's).
+    await page.setViewportSize({ width: 882, height: 2600 });
     await prepare(page);
     const answered = page.waitForResponse("**/api/github/shipped");
     await page.goto("/does-not-exist", {
