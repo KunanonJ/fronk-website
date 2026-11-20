@@ -4,8 +4,8 @@ import { storyCopy, type StoryRun } from "@/lib/content/homeJourney";
 
 /*
  * The Journey's story, `#story` (profile redesign Phase 4, design spec 8.6):
- * two paragraphs with their key phrases in bold, the roles I am open to with
- * the cleared availability and its chips, and the records card beside them
+ * two paragraphs with their key phrases in bold, what I am building now
+ * with the availability and its chips, and the records card beside them
  * (under them below 1024 px). The "Read the story" pill on the stage links
  * here. /about puts the anchor on its own section instead (`anchor={false}`),
  * so "Read my story" lands with the section's heading in view.
@@ -32,8 +32,8 @@ export function Story({ anchor = true }: { anchor?: boolean }) {
             <Runs runs={runs} />
           </p>
         ))}
-        <h3 className="t-h3 pf-story__roles">{storyCopy.rolesHeading}</h3>
-        <p>{storyCopy.roles}</p>
+        <h3 className="t-h3 pf-story__now">{storyCopy.nowHeading}</h3>
+        <p>{storyCopy.now}</p>
         <ul className="pf-story__chips">
           {storyCopy.chips.map((chip) => (
             <li key={chip}>

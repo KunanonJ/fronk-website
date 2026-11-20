@@ -16,11 +16,11 @@ describe("composeContactEmail", () => {
     const email = composeContactEmail({
       name: "  Ada Lovelace ",
       message: "  We are hiring a forward deployed engineer.  ",
-      topics: ["Hiring", "Partnership"],
+      topics: ["Freelance or consulting", "Partnership"],
     });
     expect(email.to).toBe(contactPage.email);
     expect(email.subject).toBe(
-      "Hiring, Partnership: Ada Lovelace via kunanonj.com",
+      "Freelance or consulting, Partnership: Ada Lovelace via kunanonj.com",
     );
     expect(email.body).toBe(
       "We are hiring a forward deployed engineer.\n\nAda Lovelace",
@@ -89,12 +89,12 @@ describe("composeContactEmail", () => {
     const long = composeContactEmail({
       name: "Ada",
       message: "ก".repeat(400),
-      topics: ["Hiring"],
+      topics: ["Freelance or consulting"],
     });
     expect(long.complete).toBe(false);
     expect(long.body).toBe(`${"ก".repeat(400)}\n\nAda`);
     expect(long.href).toBe(
-      `mailto:${contactPage.email}?subject=${encodeURIComponent("Hiring: Ada via kunanonj.com")}`,
+      `mailto:${contactPage.email}?subject=${encodeURIComponent("Freelance or consulting: Ada via kunanonj.com")}`,
     );
   });
 });

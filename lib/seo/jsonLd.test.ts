@@ -65,35 +65,42 @@ describe("buildSiteJsonLd > emits a linked Person + WebSite + Organization graph
     }
   });
 
-  it("lists The Binary Holdings as an employer, not as a founded company", () => {
+  it("keeps The Binary Holdings as a former employer, not a founded company nor a current one", () => {
     const tbh = graph().find(
       (n) => n["@type"] === "Organization" && n.name === "The Binary Holdings",
     );
+    // The portfolio's projects still name it (portfolioJsonLd.ts).
     expect(tbh).toBeDefined();
     expect(tbh!.url).toBe("https://thebinaryholdings.com");
     expect(tbh!.founder).toBeUndefined();
+    // The role ended in November 2026 (owner direction 20-11-26).
     const worksFor = (byType("Person")!.worksFor as Node[]).map(
       (w) => w["@id"],
     );
-    expect(worksFor).toContain(tbh!["@id"]);
+    expect(worksFor).not.toContain(tbh!["@id"]);
   });
 
-  it("Person.worksFor references exactly the Organization @ids (ventures + employer)", () => {
+  it("Person.worksFor references exactly the founded Organization @ids", () => {
     const person = byType("Person")!;
-    const orgIds = graph()
-      .filter((n) => n["@type"] === "Organization")
+    const foundedIds = graph()
+      .filter(
+        (n) =>
+          n["@type"] === "Organization" &&
+          n.name !== EMPLOYER_ORGANIZATION.name,
+      )
       .map((o) => o["@id"])
       .sort();
     const worksFor = (person.worksFor as Node[]).map((w) => w["@id"]).sort();
-    expect(worksFor).toEqual(orgIds);
+    expect(worksFor).toEqual(foundedIds);
     expect(person.sameAs as string[]).toContain(siteSocialsX);
   });
 
-  it("Person leads with the AI role and supports name + category discovery", () => {
+  it("Person carries the title the ventures give him and supports name + category discovery", () => {
     const person = byType("Person")!;
     expect(person.name).toBe("Kunanon Jarat");
     expect(person.description).toBe(PERSON_SUMMARY);
-    expect((person.jobTitle as string[])[0]).toBe("AI Engineering Lead");
+    // No current title at The Binary Holdings: that role ended.
+    expect(person.jobTitle).toEqual(["Founder"]);
     const aliases = person.alternateName as string[];
     expect(aliases).toEqual(
       expect.arrayContaining(["KunanonJ", "Fronk", "Fronk Kunanon Jarat"]),

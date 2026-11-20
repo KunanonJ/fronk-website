@@ -509,11 +509,15 @@ describe("the template's labels", () => {
     expect(caseCopy.outcome).toBe("Outcome");
     expect(caseCopy.part).toBe("My part");
     expect(caseCopy.interface).toBe("Interface");
-    expect(caseCopy.hire.kicker).toBe("Hiring");
-    expect(caseCopy.hire.resume).toEqual({ label: "Résumé", href: "/resume" });
-    expect(caseCopy.hire.contact).toEqual({
-      label: "Contact",
-      href: "/contact?topic=hiring",
+    expect(caseCopy.work.kicker).toBe("Work together");
+    expect(caseCopy.work.heading).toBe("Building something? Let’s talk.");
+    expect(caseCopy.work.sentence).toBe(
+      "Currently building GoGoCash and Manut AI from Bangkok, and not looking for a full-time role right now. Open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
+    );
+    expect(caseCopy.work.resume).toEqual({ label: "Résumé", href: "/resume" });
+    expect(caseCopy.work.contact).toEqual({
+      label: "Get in touch",
+      href: "/contact?topic=project",
     });
   });
 

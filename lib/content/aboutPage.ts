@@ -5,7 +5,11 @@
 
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import type { StackIconId } from "@/lib/content/stackIcons";
-import { OPEN_TO_ROLES, PERSON_SUMMARY } from "@/lib/content/identity";
+import {
+  AVAILABILITY,
+  LATEST_ROLE,
+  PERSON_SUMMARY,
+} from "@/lib/content/identity";
 import { PAGE_META } from "@/lib/content/pageMeta";
 
 type AboutInlineLink = {
@@ -76,7 +80,8 @@ export const aboutPage = {
     },
     nickname: "Fronk",
     location: "Bangkok, Thailand",
-    role: "Founder of GoGoCash and Manut AI. IT Manager & AI Engineering Lead at The Binary Holdings.",
+    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    role: `Founder of GoGoCash and Manut AI. Previously ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
     /** 480x480 WebP crop of /profile.jpg for the round frame. */
     portraitSrc: "/profile-portrait.webp",
     portraitAlt: "Kunanon Jarat (Fronk), headshot",
@@ -89,7 +94,7 @@ export const aboutPage = {
   story: {
     id: "story",
     eyebrow: "Story",
-    heading: "AI engineering lead and founder, Bangkok.",
+    heading: "Founder and builder, Bangkok.", // DRAFT (owner direction 20-11-26)
     /** ~50-word answer block for name queries / AEO (matches FAQ + llms.txt). */
     whoIs: PERSON_SUMMARY,
     paragraphs: [
@@ -107,7 +112,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: ", the shopping-to-earn cashback platform I founded in 2023; build ",
+            text: ", the shopping-to-earn cashback platform I founded in 2023, and build ",
           },
           {
             type: "link",
@@ -117,7 +122,8 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: ", an ERP/CRM workspace with Intelligence AI for automotive SMEs; and lead IT and AI engineering at ",
+            // DRAFT (owner direction 20-11-26): the role ended.
+            text: `, an ERP/CRM workspace with Intelligence AI for automotive SMEs. Until ${LATEST_ROLE.until} I led IT and AI engineering at `,
           },
           {
             type: "link",
@@ -202,16 +208,9 @@ export const aboutPage = {
     paragraphs: [
       {
         spans: [
-          {
-            type: "text",
-            text: "Leading AI engineering at The Binary Holdings as IT Manager and AI Engineering Lead: ARIA, the intranet's assistant, and agents that keep a person in the loop. More on how I work in ",
-          },
-          {
-            type: "link",
-            text: "AI engineering",
-            href: "/topics/forward-deployed-ai-engineering",
-          },
-          { type: "text", text: ". Building " },
+          // DRAFT (owner direction 20-11-26): the ventures now, then the
+          // role that ended. The footer's Now line restates the opening.
+          { type: "text", text: "Building " },
           {
             type: "link",
             text: "GoGoCash",
@@ -227,8 +226,14 @@ export const aboutPage = {
           },
           {
             type: "text",
-            text: ` alongside it as a solopreneur. ${OPEN_TO_ROLES.sentence} Participating in `,
+            text: ` as a solopreneur, and not looking for a full-time role right now. ${AVAILABILITY.workWith} Until ${LATEST_ROLE.until} I led AI engineering at ${LATEST_ROLE.organization} as IT Manager and AI Engineering Lead: ARIA, the intranet's assistant, and agents that keep a person in the loop. More on how I work in `,
           },
+          {
+            type: "link",
+            text: "AI engineering",
+            href: "/topics/forward-deployed-ai-engineering",
+          },
+          { type: "text", text: ". Participating in " },
           {
             type: "link",
             text: "Protocol Camp",
@@ -260,7 +265,8 @@ export const aboutPage = {
         spans: [
           {
             type: "text",
-            text: "If you're a founder, builder, or operator with an interesting problem in fintech, AI, or Web3 — especially in Southeast Asia — or you're hiring for forward deployed or AI engineering roles, ",
+            // DRAFT (owner direction 20-11-26): no hiring invitation.
+            text: "If you're a founder, builder, or operator with an interesting problem in fintech, AI, or Web3 — especially in Southeast Asia — or you have a project, a partnership, a talk or a workshop in mind, ",
           },
           { type: "link", text: "say hello", href: "/contact" },
           { type: "text", text: ". I read everything." },
@@ -407,7 +413,7 @@ export const aboutPage = {
       { label: "GoGoCash", detail: "Founder · 2023—" },
       {
         label: "The Binary Holdings",
-        detail: "AI Engineering Lead · 2025—",
+        detail: "AI Engineering Lead · 2025—2026",
       },
     ] satisfies readonly AboutPathChip[],
     resumeHref: "/resume",
@@ -423,7 +429,8 @@ export const aboutPage = {
   cta: {
     eyebrow: "Next",
     heading: "Let's talk.",
-    body: "Founders and operators in Southeast Asia, and teams hiring for forward deployed or AI engineering roles in Bangkok or remote: reach out.",
+    // DRAFT (owner direction 20-11-26): partners and projects, not roles.
+    body: "Founders, operators and partners in Southeast Asia: for partnerships, freelance and consulting projects, advisory, talks or workshops, reach out.",
     links: [
       { label: "Contact", href: "/contact" },
       { label: "Portfolio", href: "/portfolio" },

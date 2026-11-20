@@ -1,4 +1,4 @@
-import { CURRENT_ROLE } from "@/lib/content/currentRole";
+import { LATEST_ROLE } from "@/lib/content/currentRole";
 
 /*
  * The résumé as data. Production renders this file: there is no
@@ -8,8 +8,11 @@ import { CURRENT_ROLE } from "@/lib/content/currentRole";
  *
  * Employers, titles, dates and bullets follow the owner's CV (PDF dated
  * 2026-10-07; recruiter-fit phase 1). The owner cleared its figures and
- * partner names for the site on 10-11-26. Never add a claim the CV, the repo
- * or an owner answer does not make.
+ * partner names for the site on 10-11-26. On 20-11-26 he directed that the
+ * Binary Holdings role ended in November 2026 and that he is building
+ * GoGoCash and Manut AI: those two lead as "Currently" and the role leads
+ * Experience. Never add a claim the CV, the repo or an owner answer does
+ * not make.
  */
 
 export interface ResolvedTimelineItem {
@@ -38,13 +41,13 @@ export interface ResumeSkillGroup {
   items: readonly string[];
 }
 
-const currentlyItems: readonly ResolvedTimelineItem[] = [
+const experienceItems: readonly ResolvedTimelineItem[] = [
   {
-    title: CURRENT_ROLE.title,
-    org: `${CURRENT_ROLE.organization} · Full-time · On-site, Bangkok`,
-    logoName: CURRENT_ROLE.organization,
+    title: LATEST_ROLE.title,
+    org: `${LATEST_ROLE.organization} · Full-time · On-site, Bangkok`,
+    logoName: LATEST_ROLE.organization,
     logoDomain: "thebinaryholdings.com",
-    period: `${CURRENT_ROLE.sinceShort} — Present`,
+    period: `${LATEST_ROLE.sinceShort} — ${LATEST_ROLE.untilShort}`,
     bullets: [
       "Owned the roadmap and requirements for an internal platform covering CRM, support, HR, project management and AI assistance; achieved adoption by 50+ employees.",
       "Led delivery of a private-data knowledge platform using Google ADK, Gemini and Retrieval-Augmented Generation (RAG) for competitive analysis and executive decision support.",
@@ -53,9 +56,6 @@ const currentlyItems: readonly ResolvedTimelineItem[] = [
     ],
     more: { label: "Case studies", href: "/portfolio" },
   },
-];
-
-const experienceItems: readonly ResolvedTimelineItem[] = [
   {
     title: "AI Project Manager",
     org: "Aiden Labs · Full-time · Hybrid",
@@ -82,8 +82,8 @@ const experienceItems: readonly ResolvedTimelineItem[] = [
   },
   {
     title: "Technical Project Manager",
-    org: `${CURRENT_ROLE.organization} · Full-time · On-site, Bangkok`,
-    logoName: CURRENT_ROLE.organization,
+    org: `${LATEST_ROLE.organization} · Full-time · On-site, Bangkok`,
+    logoName: LATEST_ROLE.organization,
     logoDomain: "thebinaryholdings.com",
     period: "Sep 2024 — Dec 2024",
     bullets: [
@@ -151,8 +151,11 @@ const experienceItems: readonly ResolvedTimelineItem[] = [
   },
 ];
 
-/** Built outside employment. The CV calls them independent projects. */
-const projectItems: readonly ResolvedTimelineItem[] = [
+/**
+ * What he is building now (owner direction 20-11-26): his own ventures,
+ * which the CV lists as independent projects.
+ */
+const currentlyItems: readonly ResolvedTimelineItem[] = [
   {
     title: "GoGoCash",
     org: "Cashback platform · Independent project",
@@ -182,6 +185,10 @@ const projectItems: readonly ResolvedTimelineItem[] = [
     ],
     more: { label: "Case study", href: "/ventures/manut" },
   },
+];
+
+/** Built outside employment. The CV calls them independent projects. */
+const projectItems: readonly ResolvedTimelineItem[] = [
   {
     title: "GoSpark",
     org: "AI workspace for business agents · Independent project",
@@ -362,11 +369,12 @@ export const RESUME_TIMELINE_FALLBACK: readonly ResolvedTimelineSection[] = [
 export const RESUME_SKILLS_FALLBACK = skills;
 
 /**
- * The résumé summary. The first sentence is the approved identity headline
- * (lib/content/identity.ts); the rest is the CV's own summary.
+ * The résumé summary. The first two sentences are the identity headline
+ * (PERSON_HEADLINE in lib/content/identity.ts; DRAFT, owner direction
+ * 20-11-26); the rest is the CV's own summary.
  */
 export const RESUME_SUMMARY_FALLBACK =
-  "AI Engineering Lead and solopreneur in Bangkok: builds AI tools inside the businesses that use them. Delivered a private-data AI knowledge platform and launched Lunar AI Agent to 10,000 users. Led cross-functional teams of up to 20 people and configured approximately 30 role-based AI agents for GoGoCash. Combines business-process automation with AI product development for nontechnical users.";
+  "Solopreneur in Bangkok building GoGoCash and Manut AI. Previously AI Engineering Lead at The Binary Holdings. Delivered a private-data AI knowledge platform and launched Lunar AI Agent to 10,000 users. Led cross-functional teams of up to 20 people and configured approximately 30 role-based AI agents for GoGoCash. Combines business-process automation with AI product development for nontechnical users.";
 
 /** Language lines for the printed header, as the CV states them. */
 export const RESUME_LANGUAGES_FALLBACK = ["English: TOEIC 725 (2026)"] as const;

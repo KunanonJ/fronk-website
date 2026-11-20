@@ -187,7 +187,7 @@ test.describe("WebMCP tools", () => {
     await run(page, "draft_contact_message", {
       name: "Ada Agent",
       message: DRAFT,
-      topics: ["Hiring"],
+      topics: ["Freelance or consulting"],
     });
     await expect(page.locator("#contact-send")).toBeFocused();
     await page.keyboard.press("Enter");
@@ -201,7 +201,7 @@ test.describe("WebMCP tools", () => {
     const email = new URL(opened[0]!);
     expect(email.pathname).toBe("fronk.kunanon@gmail.com");
     expect(email.searchParams.get("subject")).toBe(
-      "Hiring: Ada Agent via kunanonj.com",
+      "Freelance or consulting: Ada Agent via kunanonj.com",
     );
     expect(email.searchParams.get("body")).toBe(`${DRAFT}\r\n\r\nAda Agent`);
     await expect(page.locator("#contact-open")).toHaveAttribute(

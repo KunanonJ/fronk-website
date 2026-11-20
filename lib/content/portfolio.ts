@@ -166,12 +166,15 @@ export const portfolioPage = {
   ] satisfies readonly HeadlineLine[],
   /** Every project is his work: the byline on each project page. */
   author: { name: "Kunanon Jarat", href: "/about" },
-  /** The card that closes each project page: where a hiring reader goes next. */
-  hire: {
-    kicker: "Hiring",
-    heading: "Want work like this on your team?",
+  /**
+   * The card that closes each project page: where a reader who wants work
+   * like this goes next. DRAFT (owner direction 20-11-26: it was "Hiring").
+   */
+  work: {
+    kicker: "Work together",
+    heading: "Building something? Let’s talk.",
     resumeLabel: "Résumé",
-    contactLabel: "Contact",
+    contactLabel: "Get in touch",
   },
   description: PAGE_META.portfolio.description,
 } as const;
@@ -775,11 +778,12 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     urlLabel: "Source on GitHub",
     // A real screenshot, not a mockup: the site is public, and the app-shell
     // mockup (a sidebar dashboard) looks nothing like it. Home at 1440 x 900
-    // in the light theme, from a production build, saved as lossless WebP.
+    // in the light theme with reduced motion, after the intro, from a
+    // production build, saved as WebP (quality 85; captured again 20-11-26).
     // Capture it again when Home changes.
     cover: {
       src: "/portfolio/kunanonj-com/cover.webp",
-      alt: "The Home page of kunanonj.com: the headline Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok, the Open to roles and Bangkok or remote chips, the Contact me and Résumé buttons, a design canvas showing three selected projects, and the row of places he has worked",
+      alt: "The Home page of kunanonj.com: the headline Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok, the Currently building and GoGoCash and Manut AI chips, the Contact me and Résumé buttons, a design canvas showing three selected projects, and the row of places he has worked",
       width: 1440,
       height: 900,
     },

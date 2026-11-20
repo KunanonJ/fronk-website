@@ -33,7 +33,7 @@ import {
  * A topic hub, in English or Thai (profile redesign, Phase 7 lane D1, plan
  * step 7a), built from the case-study parts (design spec 9): the hero (the
  * eyebrow beside the language switch, the serif h1, the lead, the FDE hubs'
- * availability and hiring buttons, Share), then one column of chapters: each
+ * availability and work buttons, Share), then one column of chapters: each
  * section with its kicker number, the operator proof as a numbered fact
  * strip, the FAQ as native disclosures (every answer stays in the HTML, so
  * the text matches the FAQPage JSON-LD), and the related links beside the
@@ -237,14 +237,14 @@ function Explore({
 /** Contact: the hub's pitch, its call to action and the email address. */
 function Contact({ pillar }: { pillar: TopicPillar }) {
   return (
-    <article aria-labelledby="card-cta" className="pf-case-hire">
-      <div className="pf-case-hire__text">
-        <h2 id="card-cta" className="t-meta pf-case-hire__kicker">
+    <article aria-labelledby="card-cta" className="pf-case-work">
+      <div className="pf-case-work__text">
+        <h2 id="card-cta" className="t-meta pf-case-work__kicker">
           {COPY[pillar.locale].contact}
         </h2>
         <p className="t-body pf-hub-contact__text">{pillar.description}</p>
       </div>
-      <div className="pf-case-hire__actions">
+      <div className="pf-case-work__actions">
         <Pill href={pillar.ctaHref} arrow="swap">
           {pillar.ctaLabel}
         </Pill>

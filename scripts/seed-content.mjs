@@ -97,7 +97,7 @@ const resumeProfile = {
   _type: "resumeProfile",
   name: "Kunanon Jarat",
   headline:
-    "AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
+    "Solopreneur. Builds AI tools inside the businesses that use them. Based in Bangkok.",
 };
 
 const standardPages = [
@@ -109,7 +109,7 @@ const standardPages = [
     eyebrow: "About",
     heading: "Founder, builder, operator.",
     description:
-      "Kunanon Jarat (Fronk) — founder of GoGoCash, IT Manager at The Binary Holdings. Building fintech and adjacent infrastructure from Bangkok.",
+      "Kunanon Jarat (Fronk) — founder of GoGoCash, previously IT Manager at The Binary Holdings. Building fintech and adjacent infrastructure from Bangkok.",
   },
   {
     _id: "page-now",
@@ -119,7 +119,7 @@ const standardPages = [
     eyebrow: "Now",
     heading: "What I'm working on.",
     description:
-      "What Fronk Kunanon Jarat is working on right now — building GoGoCash, running IT at The Binary Holdings, and what's currently on the desk in Bangkok.",
+      "What Fronk Kunanon Jarat is working on right now — building GoGoCash and Manut AI, and what's currently on the desk in Bangkok.",
     lastUpdated: "2026-05-14",
   },
   {

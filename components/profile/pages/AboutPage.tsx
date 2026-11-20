@@ -20,7 +20,7 @@ import {
   type AboutInline,
   type AboutParagraph,
 } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { aboutRecruiterLinks, contactPage } from "@/lib/content/contact";
 import { aboutHeadline, aboutPageCopy } from "@/lib/content/corePages";
 import { FAQ_ITEMS } from "@/lib/content/faq";
@@ -133,11 +133,11 @@ function AboutHero() {
       aside={<Portrait />}
     >
       <p className="pf-about-page__availability">
-        <Badge>{OPEN_TO_ROLES.pill.label}</Badge>
+        <Badge>{AVAILABILITY.pill.label}</Badge>
         {/* The badge and the detail are one line to a screen reader. */}
         <span className="sr-only">, </span>
         <span className="t-small pf-about-page__detail">
-          {OPEN_TO_ROLES.pill.detail}
+          {AVAILABILITY.pill.detail}
         </span>
       </p>
       <div className="pf-about-page__actions">
@@ -336,7 +336,7 @@ function FaqTile() {
 
 /**
  * Next: where to go from here, Contact first, and what a recruiter asks first
- * (recruiter-fit phase 2).
+ * (recruiter-fit phase 2; since 20-11-26, that he is not looking now).
  */
 function NextTile() {
   const { cta } = aboutPage;

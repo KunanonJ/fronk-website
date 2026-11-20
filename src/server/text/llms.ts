@@ -11,7 +11,7 @@ import { getAllVentures } from "@/lib/content/ventures";
 import { SITE_ORIGIN, siteConfig } from "@/lib/site";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import {
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   PERSON_CUSTOMER_WORK,
   PERSON_SOLOPRENEUR,
   PERSON_SUMMARY,
@@ -21,10 +21,14 @@ import { fetchAllPosts } from "@/lib/sanity/fetch";
 import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 import { textResponse } from "@/src/server/text/markdown";
 
-/** Title, organisation and period for the current and past roles (no bullets). */
+/**
+ * Title, organisation and period for the employed roles (no bullets). Since
+ * 20-11-26 "Currently" holds his own ventures, which the canonical URLs
+ * below list.
+ */
 function roleLines(): string[] {
-  const sections = RESUME_TIMELINE_FALLBACK.filter((s) =>
-    ["Currently", "Experience"].includes(s.title),
+  const sections = RESUME_TIMELINE_FALLBACK.filter(
+    (s) => s.title === "Experience",
   );
   return sections.flatMap((section) =>
     section.items.map(
@@ -51,7 +55,7 @@ export async function GET() {
   push(`# ${siteConfig.name}`, `> ${siteConfig.tagline}`, "");
   push(PERSON_SUMMARY, "", PERSON_CUSTOMER_WORK, "", PERSON_SOLOPRENEUR, "");
   push(
-    `- **Availability:** ${OPEN_TO_ROLES.sentence}`,
+    `- **Availability:** ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
     `- **Location:** Bangkok, Thailand`,
     `- **Email:** ${siteConfig.email}`,
     `- **Website:** ${SITE_ORIGIN}`,

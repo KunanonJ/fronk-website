@@ -769,6 +769,10 @@
     gap: 4px 20px;
     margin-top: auto;
   }
+  /* A role row's page link sits under its bullets. */
+  .pf-resume__body > .pf-resume__links {
+    margin-top: 10px;
+  }
   .pf-resume__columns {
     display: grid;
     column-gap: 40px;

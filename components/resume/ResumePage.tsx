@@ -13,10 +13,10 @@ import {
   SkillsCard,
 } from "@/components/resume/ResumeCards";
 import {
-  HIRING_CONTACT_HREF,
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   RESUME_PDF_HREF,
   RESUME_PDF_NAME,
+  WORK_CONTACT_HREF,
 } from "@/lib/content/availability";
 import type { HeadlinePart } from "@/lib/content/corePages";
 import {
@@ -84,8 +84,8 @@ export default function ResumePage({
         <p className="pf-resume__availability">
           <StatusDot plain />
           <span>
-            {OPEN_TO_ROLES.pill.label}{" "}
-            <span className="pf-cat-note">· {OPEN_TO_ROLES.pill.detail}</span>
+            {AVAILABILITY.pill.label}{" "}
+            <span className="pf-cat-note">· {AVAILABILITY.pill.detail}</span>
           </span>
         </p>
         <div className="pf-cat-hero__actions pf-resume__actions">
@@ -101,7 +101,7 @@ export default function ResumePage({
             <span>Download PDF</span>
           </a>
           <Link
-            href={HIRING_CONTACT_HREF}
+            href={WORK_CONTACT_HREF}
             className={pillClass({ variant: "ghost", size: "lg" })}
           >
             Contact

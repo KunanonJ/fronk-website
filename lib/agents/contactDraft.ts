@@ -1,4 +1,4 @@
-import type { ContactTopic } from "@/lib/content/contact";
+import type { ContactTopic } from "@/lib/content/contactTopics";
 
 /**
  * A bridge from the WebMCP draft_contact_message tool to the contact form:

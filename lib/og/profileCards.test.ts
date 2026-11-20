@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://kunanonj.com";
 });
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { ProfileCard } from "@/lib/og/profileCard";
 import { ABOUT_CARD, HOME_CARD, profileCardAlt } from "@/lib/og/profileCards";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/routeMeta";
@@ -47,7 +47,7 @@ describe("the profile share cards", () => {
       "Kunanon Jarat’s portrait beside “About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok.”",
     );
     for (const card of [HOME_CARD, ABOUT_CARD]) {
-      expect(card.pill).toBe(OPEN_TO_ROLES.pill.label);
+      expect(card.pill).toBe(AVAILABILITY.pill.label);
     }
   });
 
@@ -70,7 +70,7 @@ describe("the profile share cards", () => {
       "and",
       ABOUT_CARD.accent,
       ABOUT_CARD.lead,
-      OPEN_TO_ROLES.pill.label,
+      AVAILABILITY.pill.label,
       "kunanonj.com",
     ]) {
       expect(all, part).toContain(part);

@@ -9,14 +9,19 @@ import {
 import ContactPage from "./ContactPage";
 import { composeHref } from "@/lib/content/profileChrome";
 import { contactMessages, contactPage } from "@/lib/content/contact";
+import { CONTACT_TOPICS, TOPIC_PROMPTS } from "@/lib/content/contactTopics";
 import { MAILTO_MAX } from "@/lib/contact/compose";
 
 const MESSAGE = "I'd like to talk about Manut AI for our dealership.";
 
+/** The message label while each intent's topic is chosen. */
+const PROJECT_PROMPT = TOPIC_PROMPTS["Freelance or consulting"];
+const ROLE_PROMPT = TOPIC_PROMPTS["A future role"];
+
 function fill({
   name = "Ada Lovelace",
   message = MESSAGE,
-  // The message field's label depends on whether Hiring is chosen.
+  // The message field's label depends on the topics chosen.
   messageLabel = contactPage.messagePlaceholder as string,
 } = {}) {
   fireEvent.change(screen.getByLabelText(contactPage.namePlaceholder), {
@@ -147,25 +152,43 @@ describe("ContactPage", () => {
     expect(writeText).toHaveBeenCalledWith(contactPage.email);
   });
 
-  it("exposes topic chips as toggle buttons, Hiring first", () => {
+  it("exposes topic chips as toggle buttons, in the owner's order", () => {
     render(<ContactPage />);
-    const chip = screen.getByRole("button", { name: "Hiring" });
+    const chip = screen.getByRole("button", {
+      name: "Freelance or consulting",
+    });
     expect(chip).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(chip);
     expect(chip).toHaveAttribute("aria-pressed", "true");
     const chips = chip.parentElement!.querySelectorAll("button");
+    // Owner direction 20-11-26: the work he is open to first, a future role
+    // near the end, and no "Hiring" topic.
+    expect([...chips].map((button) => button.textContent)).toEqual([
+      ...CONTACT_TOPICS,
+    ]);
     expect(chips[0]).toBe(chip);
-    expect(chips).toHaveLength(8);
+    expect(screen.queryByRole("button", { name: "Hiring" })).toBeNull();
   });
 
-  it("readies the form for a recruiter who arrives through a hiring button", async () => {
+  it("readies the form for a project when a work button brings the visitor", async () => {
+    render(<ContactPage intent="project" />);
+    const chip = screen.getByRole("button", {
+      name: "Freelance or consulting",
+    });
+    await waitFor(() => expect(chip).toHaveAttribute("aria-pressed", "true"));
+    expect(screen.getByLabelText(PROJECT_PROMPT)).toBeInTheDocument();
+    expect(screen.queryByLabelText(contactPage.messagePlaceholder)).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "A future role" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("readies the form for a recruiter who arrives through an old hiring link", async () => {
     render(<ContactPage intent="hiring" />);
-    const chip = screen.getByRole("button", { name: "Hiring" });
+    const chip = screen.getByRole("button", { name: "A future role" });
     await waitFor(() => expect(chip).toHaveAttribute("aria-pressed", "true"));
     // The question changes with the visitor; the general one is gone.
-    expect(
-      screen.getByLabelText(contactPage.hiringPlaceholder),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(ROLE_PROMPT)).toBeInTheDocument();
     expect(screen.queryByLabelText(contactPage.messagePlaceholder)).toBeNull();
     // Chosen for them, not locked: they can still take it off, and the
     // question follows the chip back to the general one.
@@ -174,69 +197,59 @@ describe("ContactPage", () => {
     expect(
       screen.getByLabelText(contactPage.messagePlaceholder),
     ).toBeInTheDocument();
-    expect(screen.queryByLabelText(contactPage.hiringPlaceholder)).toBeNull();
+    expect(screen.queryByLabelText(ROLE_PROMPT)).toBeNull();
   });
 
-  it("asks about the role whenever Hiring is chosen, also by hand", () => {
+  it("asks about the role whenever A future role is chosen, also by hand", () => {
     render(<ContactPage />);
-    fireEvent.click(screen.getByRole("button", { name: "Hiring" }));
-    expect(
-      screen.getByLabelText(contactPage.hiringPlaceholder),
-    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "A future role" }));
+    expect(screen.getByLabelText(ROLE_PROMPT)).toBeInTheDocument();
     expect(screen.queryByLabelText(contactPage.messagePlaceholder)).toBeNull();
   });
 
-  it("only ever adds Hiring: a later general visit leaves the chip alone", async () => {
+  it("only ever adds the intent's topic: a later general visit leaves the chip alone", async () => {
     const { rerender } = render(<ContactPage intent="hiring" />);
-    const chip = screen.getByRole("button", { name: "Hiring" });
+    const chip = screen.getByRole("button", { name: "A future role" });
     await waitFor(() => expect(chip).toHaveAttribute("aria-pressed", "true"));
     // The same form, now under /contact: what the visitor sees pressed stays
     // pressed, and the question still matches it.
     rerender(<ContactPage />);
-    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
     expect(
-      screen.getByLabelText(contactPage.hiringPlaceholder),
-    ).toBeInTheDocument();
+      screen.getByRole("button", { name: "A future role" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText(ROLE_PROMPT)).toBeInTheDocument();
   });
 
-  it("keeps the form ready for a recruiter who writes another message", async () => {
+  it("keeps the form ready for a visitor who writes another message", async () => {
     const opened = recordOpenedLinks();
-    render(<ContactPage intent="hiring" />);
+    render(<ContactPage intent="project" />);
+    const chosen = () =>
+      screen.getByRole("button", { name: "Freelance or consulting" });
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-        "aria-pressed",
-        "true",
-      ),
+      expect(chosen()).toHaveAttribute("aria-pressed", "true"),
     );
-    fill({ messageLabel: contactPage.hiringPlaceholder });
+    fill({ messageLabel: PROJECT_PROMPT });
     fireEvent.click(submitButton());
     await screen.findByRole("status");
     expect(mailtoParts(opened[0]!).subject).toBe(
-      "Hiring: Ada Lovelace via kunanonj.com",
+      "Freelance or consulting: Ada Lovelace via kunanonj.com",
     );
 
     fireEvent.click(
       screen.getByRole("button", { name: contactPage.writeAnother }),
     );
-    // An empty form again, still a hiring one.
-    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    expect(screen.getByLabelText(contactPage.hiringPlaceholder)).toHaveValue(
-      "",
-    );
+    // An empty form again, still a project one.
+    expect(chosen()).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText(PROJECT_PROMPT)).toHaveValue("");
   });
 
-  it("leaves the general form alone without the hiring intent", () => {
+  it("leaves the general form alone without an intent", () => {
     render(<ContactPage />);
-    expect(screen.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
+    for (const name of ["Freelance or consulting", "A future role"])
+      expect(screen.getByRole("button", { name })).toHaveAttribute(
+        "aria-pressed",
+        "false",
+      );
     expect(
       screen.getByLabelText(contactPage.messagePlaceholder),
     ).toBeInTheDocument();
@@ -248,7 +261,7 @@ describe("ContactPage", () => {
       name: contactPage.recruiterTitle,
     });
     expect(card).toHaveTextContent(
-      "Open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
+      "Currently building GoGoCash and Manut AI from Bangkok, and not looking for a full-time role right now.",
     );
     expect(card).toHaveTextContent("Bangkok time, GMT+7.");
     // The arrows are hidden from the link names since the cutover (design

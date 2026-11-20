@@ -87,7 +87,7 @@ const TYPE: readonly [string, string, ReactNode][] = [
   [
     "t-lead",
     "Lead",
-    "IT Manager & AI Engineering Lead at The Binary Holdings. Also building GoGoCash and Manut AI.",
+    "Building GoGoCash and Manut AI. Previously IT Manager & AI Engineering Lead at The Binary Holdings.",
   ],
   [
     "t-body",
@@ -331,9 +331,9 @@ export default function DesignSystemPage() {
           </Specimen>
 
           <Specimen title="Badge and chips">
-            <Badge>Open to roles</Badge>
-            <Chip>Bangkok or remote</Chip>
-            <Chip>Forward Deployed Engineer</Chip>
+            <Badge>Currently building</Badge>
+            <Chip>GoGoCash and Manut AI</Chip>
+            <Chip>Bangkok</Chip>
             <span
               className="relative block h-24 w-40 rounded-[16px]"
               style={{
@@ -362,7 +362,7 @@ export default function DesignSystemPage() {
             </p>
             <p className="t-small flex items-center gap-2 text-ink-2">
               <StatusDot plain />
-              Open to roles
+              Currently building
             </p>
             <p className="t-statement relative">
               <span className="relative inline-block">

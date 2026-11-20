@@ -41,10 +41,11 @@ const wellFormed = (value: string) =>
   );
 
 /**
- * The subject names the topics and the sender ("Hiring: Ada Lovelace via
- * kunanonj.com"), so the owner can sort the inbox; the body is the message,
- * then the name as a sign-off. Line breaks become CRLF, as mailto bodies
- * expect (RFC 6068), and the name keeps to one line, as a subject must.
+ * The subject names the topics and the sender ("Freelance or consulting:
+ * Ada Lovelace via kunanonj.com"), so the owner can sort the inbox; the
+ * body is the message, then the name as a sign-off. Line breaks become
+ * CRLF, as mailto bodies expect (RFC 6068), and the name keeps to one line,
+ * as a subject must.
  */
 export function composeContactEmail({
   name,

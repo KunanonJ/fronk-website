@@ -124,7 +124,7 @@ export const ROUTES: readonly RouteUnderTest[] = [
   },
   {
     // The Thai FDE hub: two sections, with the availability pill and the
-    // hiring buttons in Thai (recruiter-fit phase 2).
+    // work buttons in Thai (recruiter-fit phase 2; owner direction 20-11-26).
     path: "/th/topics/forward-deployed-ai-engineering",
     name: "topic-hub-fde-th",
     expectsHeadingPattern: /\S/,

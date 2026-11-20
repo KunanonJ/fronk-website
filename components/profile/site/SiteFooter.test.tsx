@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import SiteFooter from "@/components/profile/site/SiteFooter";
-import { footerCopy } from "@/lib/content/profileChrome";
+import { footerCopy, nowLine } from "@/lib/content/profileChrome";
 
 /*
  * The footer (design spec 7.7): every page the old menu linked is in the server
@@ -56,7 +56,9 @@ describe("SiteFooter", () => {
   });
 
   it("carries the availability, the place and the draft copy", () => {
-    expect(html).toContain("Open to roles");
+    expect(html).toContain("Currently building");
+    expect(html).toContain(nowLine.doing);
+    expect(html).not.toMatch(/open to roles/i);
     expect(html).toContain("Bangkok, GMT+7");
     expect(html).toContain(footerCopy.headline);
     for (const paragraph of footerCopy.paragraphs) {

@@ -1056,7 +1056,7 @@ test.describe("best practices on the case pages (desktop Chromium)", () => {
       const problems = await page.evaluate(() => {
         const out: string[] = [];
         const ringed = document.querySelectorAll<HTMLElement>(
-          ".ds-pill, .ds-chip, .pf-case-cover__frame, .pf-sc__tile, .pf-case-steps__item, .pf-case-layers__layer, .pf-case-hire, .pf-lift__mat, .pf-flow",
+          ".ds-pill, .ds-chip, .pf-case-cover__frame, .pf-sc__tile, .pf-case-steps__item, .pf-case-layers__layer, .pf-case-work, .pf-lift__mat, .pf-flow",
         );
         for (const el of ringed) {
           const s = getComputedStyle(el);

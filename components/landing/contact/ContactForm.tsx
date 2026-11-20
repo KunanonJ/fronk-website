@@ -9,12 +9,12 @@ import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { CheckIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
 import type { ContactIntent } from "@/lib/contact/search";
+import { CONTACT_LIMITS, contactPage } from "@/lib/content/contact";
 import {
-  CONTACT_LIMITS,
   CONTACT_TOPICS,
-  HIRING_TOPIC,
-  contactPage,
-} from "@/lib/content/contact";
+  INTENT_TOPICS,
+  messagePrompt,
+} from "@/lib/content/contactTopics";
 import {
   contactFormSchema,
   firstContactIssue,
@@ -112,11 +112,13 @@ function invalidProps(id: string, error?: string) {
  * - Ready: after the button, a status panel says the email is in the
  *   visitor's app, offers to open it again or copy it (a browser with no
  *   email app opens nothing), and focus moves to it.
- * - Intent: `hiring` (from `/contact?topic=hiring`) chooses the Hiring topic
+ * - Intent: `project` (from `/contact?topic=project`) chooses "Freelance or
+ *   consulting" and `hiring` (from `/contact?topic=hiring`) "A future role"
  *   on arrival and again after "Write another message". It only ever adds
  *   the topic: the chips stay the visitor's to change.
- * - Prompt: the message label follows the Hiring chip, not the URL, so it
- *   asks about the role exactly while Hiring is chosen.
+ * - Prompt: the message label follows the chips, not the URL: it asks what
+ *   the first chosen topic with a prompt needs (messagePrompt), and the
+ *   general question otherwise.
  */
 export default function ContactForm({
   intent = "general",
@@ -169,20 +171,21 @@ export default function ContactForm({
   });
 
   // The page is prerendered with the general form, so the intent arrives
-  // after hydration: choose Hiring then, without touching other choices.
-  const hiring = intent === "hiring";
-  const chooseHiring = useCallback(() => {
+  // after hydration: choose its topic then, without touching other choices.
+  const intentTopic = intent === "general" ? null : INTENT_TOPICS[intent];
+  const chooseIntentTopic = useCallback(() => {
+    if (!intentTopic) return;
     form.setFieldValue("topics", (topics) =>
-      topics.includes(HIRING_TOPIC) ? topics : [HIRING_TOPIC, ...topics],
+      topics.includes(intentTopic) ? topics : [intentTopic, ...topics],
     );
-  }, [form]);
+  }, [form, intentTopic]);
   useEffect(() => {
-    if (hiring) chooseHiring();
-  }, [hiring, chooseHiring]);
+    chooseIntentTopic();
+  }, [chooseIntentTopic]);
 
-  // What the message field asks follows the chip the visitor sees pressed.
-  const hiringChosen = useStore(form.store, (state) =>
-    state.values.topics.includes(HIRING_TOPIC),
+  // What the message field asks follows the chips the visitor sees pressed.
+  const prompt = useStore(form.store, (state) =>
+    messagePrompt(state.values.topics),
   );
 
   // A WebMCP agent's draft (draft_contact_message, lib/agents/webmcp.ts)
@@ -285,8 +288,8 @@ export default function ContactForm({
               type="button"
               onClick={() => {
                 form.reset();
-                // A recruiter who writes again is still a recruiter.
-                if (hiring) chooseHiring();
+                // A visitor who writes again came for the same reason.
+                chooseIntentTopic();
                 focusNameNext.current = true;
                 setReady(null);
               }}
@@ -358,15 +361,7 @@ export default function ContactForm({
             {(field) => {
               const fieldError = errorText(field.state.meta.errors);
               return (
-                <Field
-                  id="contact-message"
-                  label={
-                    hiringChosen
-                      ? contactPage.hiringPlaceholder
-                      : contactPage.messagePlaceholder
-                  }
-                  error={fieldError}
-                >
+                <Field id="contact-message" label={prompt} error={fieldError}>
                   <textarea
                     id="contact-message"
                     name="message"

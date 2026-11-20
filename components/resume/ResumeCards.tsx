@@ -140,7 +140,11 @@ function CurrentRoles({
   );
 }
 
-/** A role row: logo and running number, title and period, org, bullets. */
+/**
+ * A role row: logo and running number, title and period, org, bullets, and
+ * the entry's page on this site when it has one (the latest role's "Case
+ * studies", since it left Currently on 20-11-26).
+ */
 function RoleList({
   items,
   start,
@@ -171,6 +175,11 @@ function RoleList({
             <p className="pf-resume__org">{item.org}</p>
             <Note item={item} />
             <Bullets bullets={visibleBullets(item, detail)} />
+            {item.more ? (
+              <div className="pf-resume__links">
+                <TextLink href={item.more.href}>{item.more.label}</TextLink>
+              </div>
+            ) : null}
           </div>
         </li>
       ))}

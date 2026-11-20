@@ -45,7 +45,7 @@ describe("resumeHeadline", () => {
       resumeHeadline("Kunanon Jarat", DEFAULT_RESUME_PROFILE.headline),
     ).toEqual({
       name: "Kunanon Jarat.",
-      muted: "AI Engineering Lead.",
+      muted: "Solopreneur.",
       middle: ["Builds AI tools inside the businesses that use them."],
       accent: "Based in Bangkok.",
     });
@@ -134,7 +134,7 @@ describe("printGroups", () => {
     ]);
   });
 
-  it("leads Experience with the current role, then the past roles", () => {
+  it("leads Experience with what he is building now (Currently), then the roles", () => {
     const [currently, experience] = RESUME_TIMELINE_FALLBACK;
     expect(groups[0]!.items).toEqual([
       ...currently!.items,

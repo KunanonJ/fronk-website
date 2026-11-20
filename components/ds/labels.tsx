@@ -27,7 +27,7 @@ export function Chip({
   );
 }
 
-/** The one solid accent label on a page, such as "Open to roles". */
+/** The one solid accent label on a page, such as "Currently building". */
 export function Badge({ children }: { children: ReactNode }) {
   return <span className="ds-badge">{children}</span>;
 }

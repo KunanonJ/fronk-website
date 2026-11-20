@@ -874,11 +874,11 @@
     inset-block-end: 16px;
   }
 
-  /* Hiring panel (spec 9.11). */
-  .pf-case-step--hire .pf-case-hire {
+  /* Work together panel (spec 9.11; the Hiring panel until 20-11-26). */
+  .pf-case-step--work .pf-case-work {
     margin-top: 0;
   }
-  .pf-case-hire {
+  .pf-case-work {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -890,23 +890,23 @@
     background: var(--paper);
     box-shadow: 0 0 0 1px var(--line-soft);
   }
-  .pf-case-hire__text {
+  .pf-case-work__text {
     display: grid;
     gap: 10px;
     flex: 1 1 22rem;
     min-inline-size: 0;
   }
-  .pf-case-hire__kicker {
+  .pf-case-work__kicker {
     color: var(--ink-60);
   }
-  .pf-case-hire__heading {
+  .pf-case-work__heading {
     color: var(--ink);
   }
-  .pf-case-hire__sentence {
+  .pf-case-work__sentence {
     max-inline-size: 560px;
     color: var(--ink-60);
   }
-  .pf-case-hire__actions {
+  .pf-case-work__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -914,7 +914,7 @@
   /* A call to action longer than the panel is wide (a hub's, on a 344 px
      phone) wraps inside its pill instead of pushing the panel into the
      gutter. A pill that fits keeps its single 44 px line. */
-  .pf-case-hire__actions .ds-pill {
+  .pf-case-work__actions .ds-pill {
     block-size: auto;
     min-block-size: 44px;
     max-inline-size: 100%;
@@ -1158,7 +1158,7 @@
     .pf-flow,
     .pf-flow__dot,
     .pf-layers-art__band,
-    .pf-case-hire,
+    .pf-case-work,
     .pf-lift__mat {
       border-color: CanvasText;
     }

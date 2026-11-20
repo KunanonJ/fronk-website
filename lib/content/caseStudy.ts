@@ -1,7 +1,7 @@
 import {
-  HIRING_CONTACT_HREF,
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   RESUME_HREF,
+  WORK_CONTACT_HREF,
 } from "@/lib/content/availability";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 import {
@@ -295,14 +295,14 @@ export const caseCopy = {
   pause: aboutCopy.motion.pause,
   play: aboutCopy.motion.play,
   /** The end of the page (spec 9.11, 9.12). */
-  hire: {
-    kicker: portfolioPage.hire.kicker,
-    heading: portfolioPage.hire.heading,
-    sentence: OPEN_TO_ROLES.sentence,
-    resume: { label: portfolioPage.hire.resumeLabel, href: RESUME_HREF },
+  work: {
+    kicker: portfolioPage.work.kicker,
+    heading: portfolioPage.work.heading,
+    sentence: `${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
+    resume: { label: portfolioPage.work.resumeLabel, href: RESUME_HREF },
     contact: {
-      label: portfolioPage.hire.contactLabel,
-      href: HIRING_CONTACT_HREF,
+      label: portfolioPage.work.contactLabel,
+      href: WORK_CONTACT_HREF,
     },
   },
   more: "More projects",

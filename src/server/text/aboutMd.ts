@@ -1,5 +1,5 @@
 import { aboutPage } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_NAME } from "@/lib/content/identity";
@@ -27,7 +27,7 @@ export function buildAboutMd(): string {
   push(`Source: ${SITE_ORIGIN}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
   push(`${hero.role} ${hero.location}.`, "");
   // The page shows this in its hero pill and in "Let's talk".
-  push(OPEN_TO_ROLES.sentence, "");
+  push(AVAILABILITY.sentence, "");
 
   push(`## ${story.heading}`, "", story.whoIs, "");
   for (const p of story.paragraphs) push(paragraphToMarkdown(p, PAGE), "");

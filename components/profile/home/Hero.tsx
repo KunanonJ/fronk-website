@@ -25,8 +25,9 @@ import { homeHero } from "@/lib/content/home";
  * page until its last line is in view, so nothing in it is ever out of
  * reach, and keyboard focus inside it unsticks it (home-hero.css), so the
  * browser scrolls a focused control into view where it really is (WCAG
- * 2.4.11). The recruiter facts (the h1, "Open to roles", Contact me, Résumé)
- * are at the top of the copy, above the fold at 375 x 812 and 1440 x 900.
+ * 2.4.11). The first facts (the h1, "Currently building", Contact me,
+ * Résumé) are at the top of the copy, above the fold at 375 x 812 and
+ * 1440 x 900.
  */
 
 /** The stage's height, for the sticky offset in home-hero.css. */
@@ -91,7 +92,7 @@ export default function Hero() {
           <p className="pf-hero__chips">
             <Badge>{homeHero.badge}</Badge>
             <span className="sr-only">, </span>
-            <Chip>{homeHero.location}</Chip>
+            <Chip>{homeHero.chip}</Chip>
           </p>
           <Headline ready={ready} paused={!playing || focusInside} />
           <p className="t-lead pf-hero__lead">{homeHero.lead}</p>

@@ -1,7 +1,7 @@
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import {
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   PERSON_CUSTOMER_WORK,
   PERSON_NAME,
   PERSON_SOLOPRENEUR,
@@ -33,7 +33,7 @@ export function buildLlmsFull(): string {
   push(`# ${PERSON_NAME} (Fronk / KunanonJ): full profile`, "");
   push(`Site: ${SITE_ORIGIN}  `, `Updated: ${SITE_UPDATED}`, "");
   push(PERSON_SUMMARY, "", PERSON_CUSTOMER_WORK, "", PERSON_SOLOPRENEUR, "");
-  push(`Availability: ${OPEN_TO_ROLES.sentence}`, "");
+  push(`Availability: ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`, "");
 
   push("## Career", "");
   for (const section of RESUME_TIMELINE_FALLBACK) {

@@ -78,12 +78,13 @@ afterEach(() => {
 });
 
 describe("Hero", () => {
-  it("is a region named by its one h1, with the recruiter facts", () => {
+  it("is a region named by its one h1, with the first facts", () => {
     render(withRouter(<Hero />));
     const region = screen.getByRole("region", { name: homeHero.title });
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(region).toHaveTextContent("Open to roles");
-    expect(region).toHaveTextContent("Bangkok or remote");
+    expect(region).toHaveTextContent("Currently building");
+    expect(region).toHaveTextContent("GoGoCash and Manut AI");
+    expect(region).not.toHaveTextContent(/open to roles/i);
     expect(screen.getByRole("link", { name: "Contact me" })).toHaveAttribute(
       "href",
       "/contact",

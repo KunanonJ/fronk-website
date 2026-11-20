@@ -18,9 +18,10 @@ const metadata: Metadata = routeShareMeta({
 });
 
 /**
- * /contact. `?topic=hiring` (typed, Valibot) is where every recruiter button
- * leads: it opens the form with the Hiring topic chosen. The default,
- * general, never shows in the URL and an unknown value falls back to it.
+ * /contact. `?topic=` (typed, Valibot) is where the work and recruiter
+ * buttons lead: `project` opens the form with "Freelance or consulting"
+ * chosen, `hiring` with "A future role". The default, general, never shows
+ * in the URL and an unknown value falls back to it.
  */
 export const Route = createFileRoute("/_landing/contact")({
   validateSearch: contactSearchSchema,

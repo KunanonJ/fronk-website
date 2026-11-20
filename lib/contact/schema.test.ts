@@ -11,7 +11,9 @@ const valid = {
 describe("contactFormSchema", () => {
   it("accepts a valid message", () => {
     expect(firstContactIssue(valid)).toBeNull();
-    expect(firstContactIssue({ ...valid, topics: ["Hiring"] })).toBeNull();
+    expect(
+      firstContactIssue({ ...valid, topics: ["Freelance or consulting"] }),
+    ).toBeNull();
   });
 
   it.each([

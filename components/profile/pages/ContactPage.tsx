@@ -28,8 +28,9 @@ import { writeClipboard } from "@/lib/utils/clipboard";
  * The Bangkok card is retired (umbrella input R14): the footer carries
  * "Bangkok, GMT+7". The form keeps its labels, autocomplete, aria-invalid and
  * aria-describedby, 16 px inputs, focus on the first invalid field, and
- * aria-busy while sending. `intent` comes from `?topic=`: `hiring` readies
- * the form for a recruiter. Styles: `.pf-contact*` in
+ * aria-busy while sending. `intent` comes from `?topic=`: `project` readies
+ * the form for a freelance or consulting project, `hiring` for a recruiter
+ * writing about a future role. Styles: `.pf-contact*` in
  * src/styles/profile/cutover.css.
  */
 

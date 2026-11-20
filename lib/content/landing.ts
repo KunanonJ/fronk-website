@@ -1,12 +1,13 @@
-import { RESUME_HREF } from "@/lib/content/availability";
+import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
-import { CURRENT_ROLE } from "@/lib/content/currentRole";
+import { LATEST_ROLE } from "@/lib/content/currentRole";
 import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 
 export const site = {
   wordmark: "KunanonJ",
   contextLabel: "Bangkok 🇹🇭 · Founder",
-  title: "Kunanon Jarat: AI Engineering Lead and Solopreneur, Bangkok",
+  // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+  title: "Kunanon Jarat: Founder of GoGoCash and Manut AI, Bangkok",
   description: PERSON_META_DESCRIPTION,
   email: "fronk.kunanon@gmail.com",
   tagline: "Building fintech and digital workspaces from Bangkok.",
@@ -136,8 +137,11 @@ export const hero = {
   name: "Kunanon Jarat.",
   headline: ["Forward deployed", "AI engineering"],
   headlineAccent: "from Bangkok.",
-  /** Beside the buttons: the employed role first, then the ventures. */
-  homeLead: `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization}. Also building GoGoCash and Manut AI.`,
+  /**
+   * Beside the buttons: the ventures he is building, then the role that
+   * ended (owner direction 20-11-26).
+   */
+  homeLead: `Building ${AVAILABILITY.ventures.join(" and ")}. Previously ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
   primaryCta: { label: "Contact me", href: "/contact" },
   resumeCta: { label: "Résumé", href: RESUME_HREF },
   portraitSrc: "/profile-portrait.webp",

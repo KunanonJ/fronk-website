@@ -79,7 +79,7 @@ const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
 const HUB_LAYOUT = { moreTargets: "[role='button']" };
 const HUB_FORCED = {
   ringed:
-    "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-filter, .pf-case-hire, .pf-read-stat, .pf-read-ticket)",
+    "main :is(.ds-pill, .ds-chip, .ds-badge, .ds-tile, .pf-filter, .pf-case-work, .pf-read-stat, .pf-read-ticket)",
   art: "main :is(.ds-px-mark, .ds-px-dot, .ds-dither, .pf-page-hero__sky)",
 };
 
@@ -369,8 +369,8 @@ test.describe("the hubs by keyboard", () => {
   });
 });
 
-test.describe("the FDE hub's hiring path and printing", () => {
-  test("the hiring buttons and the contact panel lead to the hiring form", async ({
+test.describe("the FDE hub's work path and printing", () => {
+  test("the work buttons and the contact panel lead to the project form", async ({
     page,
   }) => {
     only(BEHAVIOUR, "desktop Chromium and the WebKit phone");
@@ -381,11 +381,13 @@ test.describe("the FDE hub's hiring path and printing", () => {
       "href",
       "/resume",
     );
+    await expect(
+      hero.getByRole("link", { name: "Work with me" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
     const panel = page.getByRole("article", { name: "Contact", exact: true });
-    await expect(panel.getByRole("link", { name: "Contact" })).toHaveAttribute(
-      "href",
-      "/contact?topic=hiring",
-    );
+    await expect(
+      panel.getByRole("link", { name: "Work with me" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
     await expect(
       panel.getByRole("link", { name: "fronk.kunanon@gmail.com" }),
     ).toHaveAttribute("href", "mailto:fronk.kunanon@gmail.com");

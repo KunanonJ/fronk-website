@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import type {
   ResolvedTimelineItem,
   resolveResumeProfile,
@@ -71,7 +71,7 @@ export function ResumePrint({ profile }: { profile: ResumeProfileView }) {
         {profile.languages.length > 0 ? (
           <p className="m-0 text-ink-2">{profile.languages.join(" | ")}</p>
         ) : null}
-        <p className="mt-1 mb-0 font-medium">{OPEN_TO_ROLES.sentence}</p>
+        <p className="mt-1 mb-0 font-medium">{AVAILABILITY.sentence}</p>
       </header>
 
       <PrintSection title="Summary">

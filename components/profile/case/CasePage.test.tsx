@@ -453,21 +453,24 @@ describe("CasePage, the contents (spec 9.6)", () => {
 });
 
 describe("CasePage, the end of the page (spec 9.11, 9.12)", () => {
-  it("ends the column with the Hiring panel and its two links", () => {
+  it("ends the column with the Work together panel and its two links", () => {
     render(<CasePage study={findProjectCase("tbh-intranet")!} />);
-    const hire = screen.getByRole("article", { name: "Hiring" });
-    expect(hire).toHaveTextContent("Want work like this on your team?");
-    expect(hire).toHaveTextContent(
-      "Open to Forward Deployed Engineer and AI engineering roles",
+    expect(screen.queryByRole("article", { name: "Hiring" })).toBeNull();
+    const work = screen.getByRole("article", { name: "Work together" });
+    expect(work).toHaveTextContent("Building something? Let’s talk.");
+    expect(work).toHaveTextContent(
+      "Currently building GoGoCash and Manut AI from Bangkok, and not looking for a full-time role right now.",
     );
-    expect(within(hire).getByRole("link", { name: "Résumé" })).toHaveAttribute(
+    expect(work).toHaveTextContent(
+      "Open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
+    );
+    expect(within(work).getByRole("link", { name: "Résumé" })).toHaveAttribute(
       "href",
       "/resume",
     );
-    expect(within(hire).getByRole("link", { name: "Contact" })).toHaveAttribute(
-      "href",
-      "/contact?topic=hiring",
-    );
+    expect(
+      within(work).getByRole("link", { name: "Get in touch" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
   });
 
   it("offers two more cases as cards whose one link names the case", () => {

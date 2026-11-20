@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import {
-  CURRENT_ROLE,
-  OPEN_TO_ROLES,
+  LATEST_ROLE,
+  AVAILABILITY,
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
 import {
@@ -19,7 +19,7 @@ describe("agent docs", () => {
   it("agents.md carries the identity, availability and date", () => {
     const md = buildAgentsMd();
     expect(md).toContain(PERSON_SUMMARY);
-    expect(md).toContain(OPEN_TO_ROLES.sentence);
+    expect(md).toContain(AVAILABILITY.sentence);
     expect(md).toContain(`Updated: ${SITE_UPDATED}`);
     expect(md).not.toMatch(/Next\.js|OpenNext/);
   });
@@ -40,13 +40,18 @@ describe("agent docs", () => {
     const text = await (await llmsTxt()).text();
     const firstParagraph = text.split("\n\n")[1];
     expect(firstParagraph).toBe(PERSON_SUMMARY);
-    expect(text).toContain(OPEN_TO_ROLES.sentence);
-    expect(text).toContain("## Roles");
     expect(text).toContain(
-      `- ${CURRENT_ROLE.title}, ${CURRENT_ROLE.organization} (${CURRENT_ROLE.sinceShort} to Present)`,
+      `- **Availability:** ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
     );
-    // Employment only: the independent projects are not roles.
+    expect(text).toContain("## Roles");
+    // The latest role, ended (owner direction 20-11-26).
+    expect(text).toContain(
+      `- ${LATEST_ROLE.title}, ${LATEST_ROLE.organization} (${LATEST_ROLE.sinceShort} to ${LATEST_ROLE.untilShort})`,
+    );
+    // Employment only: the independent projects (Currently) are not roles.
     expect(text).not.toMatch(/^- Founder,/m);
+    expect(text).not.toMatch(/^- (GoGoCash|Manut AI),/m);
+    expect(text).not.toContain("to Present)");
     expect(text).toContain(`**Updated:** ${SITE_UPDATED}`);
   });
 });
@@ -141,14 +146,16 @@ describe("llms-full.txt", () => {
     const { buildLlmsFull } = await import("./llmsFull");
     const { RESUME_TIMELINE_FALLBACK } =
       await import("@/lib/content/resumeTimeline.fallback");
-    const { OPEN_TO_ROLES } = await import("@/lib/content/availability");
+    const { AVAILABILITY } = await import("@/lib/content/availability");
     const text = buildLlmsFull();
     const notes = RESUME_TIMELINE_FALLBACK.flatMap((s) => s.items)
       .map((item) => item.note)
       .filter((note): note is string => Boolean(note));
     expect(notes.length).toBeGreaterThan(0);
     for (const note of notes) expect(text).toContain(`  - ${note}`);
-    expect(text).toContain(`Availability: ${OPEN_TO_ROLES.sentence}`);
+    expect(text).toContain(
+      `Availability: ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
+    );
   });
 });
 

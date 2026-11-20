@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { canvasMock, homeHero, logoStrip } from "@/lib/content/home";
 import { caseHref } from "@/lib/content/profileChrome";
 import { hero } from "@/lib/content/landing";
@@ -36,9 +36,13 @@ describe("homeHero", () => {
   });
 
   it("reads the chips, the lead and the buttons from the site's content (R4)", () => {
-    expect(homeHero.badge).toBe(OPEN_TO_ROLES.pill.label);
-    expect(homeHero.location).toBe(OPEN_TO_ROLES.location);
+    expect(homeHero.badge).toBe(AVAILABILITY.pill.label);
+    expect(homeHero.chip).toBe("GoGoCash and Manut AI");
     expect(homeHero.lead).toBe(hero.homeLead);
+    // The ventures now, then the role that ended (owner direction 20-11-26).
+    expect(homeHero.lead).toBe(
+      "Building GoGoCash and Manut AI. Previously IT Manager & AI Engineering Lead at The Binary Holdings.",
+    );
     expect(homeHero.primaryCta).toEqual({
       label: "Contact me",
       href: "/contact",
@@ -48,8 +52,9 @@ describe("homeHero", () => {
 });
 
 describe("logoStrip", () => {
-  const employers = RESUME_TIMELINE_FALLBACK.filter((section) =>
-    ["Currently", "Experience"].includes(section.title),
+  // "Currently" holds his own ventures since 20-11-26: the strip adds them last.
+  const employers = RESUME_TIMELINE_FALLBACK.filter(
+    (section) => section.title === "Experience",
   ).flatMap((section) => section.items.map((item) => item.logoName));
 
   it("lists every employer in the résumé, then the two ventures, once each (R6)", () => {
@@ -176,7 +181,7 @@ describe("canvasMock", () => {
       canvasMock.comment.who,
       logoStrip.label,
       homeHero.badge,
-      homeHero.location,
+      homeHero.chip,
     ].join(" ");
     expect(copy).not.toMatch(/\d/);
   });
