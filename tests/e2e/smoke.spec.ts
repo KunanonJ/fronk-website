@@ -2487,6 +2487,45 @@ test.describe("share pill > a round icon on phones, the labelled pill from 640 p
  * the skip link, the nav and whatever the page scrolls to under the bar
  * (WCAG 2.4.11).
  */
+test.describe("share panel > the copy row shows the address (UX sweep 21-11-26)", () => {
+  for (const width of [1440, 390]) {
+    test(`at ${width} px a short address shows whole, a long one ends in an ellipsis inside the row`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      for (const [path, label] of [
+        ["/skills", "kunanonj.com/skills"],
+        [
+          "/skills/verification-before-completion",
+          "kunanonj.com/skills/verification-before-completion",
+        ],
+      ] as const) {
+        await page.goto(path, { waitUntil: "networkidle" });
+        await page
+          .getByRole("main")
+          .getByRole("button", { name: "Share", exact: true })
+          .click();
+        const panel = page.getByRole("region", { name: "Share this page" });
+        const address = panel.getByText(label, { exact: true });
+        await expect(address).toBeVisible();
+        const fit = await address.evaluate((el) => {
+          const row = el.closest("button")!.getBoundingClientRect();
+          const box = el.getBoundingClientRect();
+          return {
+            whole: el.scrollWidth <= el.clientWidth,
+            inside: box.right <= row.right && box.left >= row.left,
+            ellipsis: getComputedStyle(el).textOverflow,
+          };
+        });
+        expect(fit.inside, path).toBe(true);
+        expect(fit.ellipsis).toBe("ellipsis");
+        // The 19-character address was cut by 7 px in a 130 px slot.
+        if (path === "/skills") expect(fit.whole, path).toBe(true);
+      }
+    });
+  }
+});
+
 test.describe("share panel > focus that leaves it closes it", () => {
   test("Tab past the last row on /skills at 390 px closes the panel", async ({
     page,
