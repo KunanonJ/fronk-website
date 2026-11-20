@@ -67,9 +67,14 @@ export default function ShareRows({
         }}
       >
         {copied ? <CheckIcon className="text-mark" /> : <LinkIcon />}
-        <span aria-live="polite">{copied ? "Link copied" : "Copy link"}</span>
+        <span aria-live="polite" className="shrink-0">
+          {copied ? "Link copied" : "Copy link"}
+        </span>
+        {/* The rest of the row, cut with an ellipsis only when the address
+            is longer than that (a fixed 130 px cut kunanonj.com/skills by
+            7 px; UX sweep 21-11-26). */}
         {showUrl ? (
-          <span className="ml-auto max-w-[130px] truncate font-mono text-xs text-ink-2">
+          <span className="ml-auto min-w-0 truncate font-mono text-xs text-ink-2">
             {shareUrlLabel(target.url)}
           </span>
         ) : null}

@@ -43,6 +43,89 @@ test.describe("smoke > every route renders without JS errors", () => {
 });
 
 /**
+ * The asset retry (src/lib/assetRetry.ts; UX sweep 21-11-26): a page whose
+ * own script or stylesheet fails to load (one load in 600 got a 502 on the
+ * main bundle and never ran) reloads once and runs; a file that keeps
+ * failing reloads it once and no more.
+ */
+test.describe("assets > a site file that fails to load reloads the page once", () => {
+  /** The page's own document loads, counted as they start. */
+  const documents = (page: Page) => {
+    const seen = { count: 0 };
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        seen.count += 1;
+    });
+    return seen;
+  };
+  const ENTRY = /\/assets\/index-[\w-]+\.js$/;
+
+  test("a 502 on the main bundle: one reload, then the page runs and the flag is gone", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    // Throughout the first load (its preload and its module script may each
+    // ask), then the bundle answers.
+    await page.route(ENTRY, (route) =>
+      loads.count <= 1
+        ? route.fulfill({ status: 502, body: "Bad gateway" })
+        : route.fallback(),
+    );
+    await page.goto("/contact", { waitUntil: "commit" });
+    // The footer's clock is client-only: the page has hydrated.
+    await expect(page.locator("time[data-clock]")).toBeAttached({
+      timeout: 15_000,
+    });
+    expect(loads.count).toBe(2);
+    await page.waitForLoadState("load");
+    await expect
+      .poll(() => page.evaluate(() => sessionStorage.getItem("pf-asset-retry")))
+      .toBeNull();
+    // The address is the page's own: nothing was added to it.
+    expect(new URL(page.url()).pathname + new URL(page.url()).search).toBe(
+      "/contact",
+    );
+  });
+
+  test("a stylesheet that fails: one reload, and the page is styled", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    await page.route(/\/assets\/profile-[\w-]+\.css$/, (route) =>
+      loads.count <= 1
+        ? route.fulfill({ status: 502, body: "Bad gateway" })
+        : route.fallback(),
+    );
+    await page.goto("/about", { waitUntil: "commit" });
+    await expect(page.locator("time[data-clock]")).toBeAttached({
+      timeout: 15_000,
+    });
+    expect(loads.count).toBe(2);
+    // profile.css places the bar.
+    await expect(page.locator(".pf-nav")).toHaveCSS("position", "fixed");
+  });
+
+  test("a bundle that keeps failing: one reload and no more", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    await page.route(ENTRY, (route) =>
+      route.fulfill({ status: 502, body: "Bad gateway" }),
+    );
+    await page.goto("/contact", { waitUntil: "commit" });
+    await expect.poll(() => loads.count).toBe(2);
+    await page.waitForLoadState("load");
+    // Long enough for a second reload, were there one.
+    await page.waitForTimeout(2_000);
+    expect(loads.count).toBe(2);
+    await expect(page.locator("time[data-clock]")).toHaveCount(0);
+    expect(
+      await page.evaluate(() => sessionStorage.getItem("pf-asset-retry")),
+    ).toBe("1");
+  });
+});
+
+/**
  * The Content Security Policy (best-practices audit R21, src/server/http.ts),
  * enforced: every page sends it, and nothing on a page breaks it, lazy parts
  * included. Each block fires securitypolicyviolation. Only the site's own
@@ -271,6 +354,39 @@ test.describe("resume > the first screen answers a recruiter", () => {
     // The confirmation clears itself after two seconds.
     await expect(status).toHaveText("", { timeout: 5_000 });
   });
+
+  for (const [width, height] of [
+    [1920, 1080],
+    [1440, 900],
+    [390, 844],
+  ] as const) {
+    test(`at ${width} x ${height} no logo in the first screen is lazy, and the ones below it are (UX sweep 21-11-26)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("/resume", { waitUntil: "networkidle" });
+      const logos = await page
+        .locator('[data-logo="image"] img')
+        .evaluateAll((imgs) =>
+          imgs.map((img) => {
+            const box = img.getBoundingClientRect();
+            return {
+              src: img.getAttribute("src"),
+              loading: img.getAttribute("loading"),
+              // In the first screen, as the page opens at its top.
+              first: box.top < window.innerHeight && box.bottom > 0,
+            };
+          }),
+        );
+      const first = logos.filter((logo) => logo.first);
+      expect(first.length).toBeGreaterThan(0);
+      expect(first.filter((logo) => logo.loading === "lazy")).toEqual([]);
+      // Far below the first screen: still lazy.
+      expect(
+        logos.filter((logo) => logo.loading === "lazy").length,
+      ).toBeGreaterThan(0);
+    });
+  }
 
   test("an old ?view=compact link still opens the whole résumé", async ({
     page,
@@ -1100,6 +1216,34 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(page.locator(dialog)).toBeVisible();
     await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
   });
+
+  for (const [width, most] of [
+    [390, 2],
+    [1440, 1],
+  ] as const) {
+    test(`at ${width} px a result's summary takes up to ${most} line${most > 1 ? "s" : ""} (UX sweep 21-11-26)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await visit(page, "/contact");
+      await page.keyboard.press("ControlOrMeta+k");
+      await page.getByRole("combobox", { name: "Search the site" }).fill("ai");
+      const summary = page.locator(".pf-search__summary").first();
+      await expect(summary).toBeVisible();
+      const lines = await summary.evaluate((el) => {
+        // One line of it: the same element holding two letters.
+        const probe = el.cloneNode() as HTMLElement;
+        probe.textContent = "Ag";
+        el.after(probe);
+        const line = probe.getBoundingClientRect().height;
+        probe.remove();
+        return Math.round(el.getBoundingClientRect().height / line);
+      });
+      // On a phone one line kept under half of most summaries: two lines,
+      // clamped there; on a wide screen, one.
+      expect(lines).toBe(most);
+    });
+  }
 
   test("the footer's Now line, then the time in Bangkok", async ({ page }) => {
     await page.goto("/contact", { waitUntil: "load" });
@@ -2343,6 +2487,45 @@ test.describe("share pill > a round icon on phones, the labelled pill from 640 p
  * the skip link, the nav and whatever the page scrolls to under the bar
  * (WCAG 2.4.11).
  */
+test.describe("share panel > the copy row shows the address (UX sweep 21-11-26)", () => {
+  for (const width of [1440, 390]) {
+    test(`at ${width} px a short address shows whole, a long one ends in an ellipsis inside the row`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      for (const [path, label] of [
+        ["/skills", "kunanonj.com/skills"],
+        [
+          "/skills/verification-before-completion",
+          "kunanonj.com/skills/verification-before-completion",
+        ],
+      ] as const) {
+        await page.goto(path, { waitUntil: "networkidle" });
+        await page
+          .getByRole("main")
+          .getByRole("button", { name: "Share", exact: true })
+          .click();
+        const panel = page.getByRole("region", { name: "Share this page" });
+        const address = panel.getByText(label, { exact: true });
+        await expect(address).toBeVisible();
+        const fit = await address.evaluate((el) => {
+          const row = el.closest("button")!.getBoundingClientRect();
+          const box = el.getBoundingClientRect();
+          return {
+            whole: el.scrollWidth <= el.clientWidth,
+            inside: box.right <= row.right && box.left >= row.left,
+            ellipsis: getComputedStyle(el).textOverflow,
+          };
+        });
+        expect(fit.inside, path).toBe(true);
+        expect(fit.ellipsis).toBe("ellipsis");
+        // The 19-character address was cut by 7 px in a 130 px slot.
+        if (path === "/skills") expect(fit.whole, path).toBe(true);
+      }
+    });
+  }
+});
+
 test.describe("share panel > focus that leaves it closes it", () => {
   test("Tab past the last row on /skills at 390 px closes the panel", async ({
     page,

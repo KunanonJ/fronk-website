@@ -115,6 +115,76 @@ describe("TraitToast", () => {
     expect(second.onClose).toHaveBeenCalledTimes(1);
   });
 
+  describe("where it stands (UX sweep 21-11-26)", () => {
+    /** The page's rects: the toast's by its place, a link's as given. */
+    function layout(link: HTMLElement, linkBox: [number, number]) {
+      const style = document.createElement("style");
+      // What secrets.css gives it, so it is placed.
+      style.textContent = ".pf-toast { position: fixed; }";
+      document.head.append(style);
+      const rect = (top: number, height: number) =>
+        ({
+          x: 16,
+          y: top,
+          left: 16,
+          top,
+          right: 360,
+          bottom: top + height,
+          width: 344,
+          height,
+        }) as DOMRect;
+      vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
+        function (this: Element) {
+          if (this === link) return rect(...linkBox);
+          if (this.matches(".pf-toast"))
+            return (this as HTMLElement).dataset.place === "low"
+              ? rect(760, 66)
+              : rect(92, 66);
+          return rect(0, 0);
+        },
+      );
+      return () => style.remove();
+    }
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("stands under the bar when nothing to press lies there", () => {
+      const link = Object.assign(document.createElement("a"), {
+        href: "/stack",
+        textContent: "Stack",
+      });
+      document.body.append(link);
+      // The link is at the foot of the screen, under the toast's other place.
+      const undo = layout(link, [780, 28]);
+      show();
+      expect(screen.getByTestId("trait-toast")).not.toHaveAttribute(
+        "data-place",
+      );
+      undo();
+    });
+
+    it("goes to the foot when the top lies over a link and the foot does not", () => {
+      const link = Object.assign(document.createElement("a"), {
+        href: "/stack",
+        textContent: "Stack",
+      });
+      document.body.append(link);
+      const undo = layout(link, [110, 28]);
+      show();
+      expect(screen.getByTestId("trait-toast")).toHaveAttribute(
+        "data-place",
+        "low",
+      );
+      // Its own link and button never count.
+      expect(
+        screen.getByRole("link", { name: "See your portrait" }),
+      ).toBeVisible();
+      undo();
+    });
+  });
+
   it("waits for an open dialog to close, and leaves Esc to it", () => {
     const dialog = document.createElement("dialog");
     dialog.setAttribute("open", "");

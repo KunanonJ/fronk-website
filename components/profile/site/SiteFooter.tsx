@@ -30,7 +30,9 @@ import {
  *
  * The living status (now-building-and-genz Phase 5) is a lazy chunk, loaded
  * once the page runs: a guess at what he is doing beside the clock, and the
- * ship log (the latest commit on main) under the Now line. The server and
+ * ship log (the latest commit on main), which arrives late and so stands
+ * where it pushes nothing: under the place's line from 810 px, and under
+ * the card, out of the flow, below that (Living.tsx). The server and
  * hydration draw neither, so a page's HTML and first load are as they were.
  */
 
@@ -79,11 +81,6 @@ export default function SiteFooter() {
               <p className="pf-footer__status">
                 {nowLine.label} {nowLine.doing}
               </p>
-              {hydrated && (
-                <Suspense>
-                  <Living />
-                </Suspense>
-              )}
               <p className="pf-footer__status">
                 {availability.location}
                 <LocalTime
@@ -97,6 +94,11 @@ export default function SiteFooter() {
                   )}
                 </LocalTime>
               </p>
+              {hydrated && (
+                <Suspense>
+                  <Living at="name" />
+                </Suspense>
+              )}
             </div>
             <nav
               aria-label={footerLinks.pages}
@@ -155,6 +157,11 @@ export default function SiteFooter() {
                 </ul>
               </nav>
             </div>
+            {hydrated && (
+              <Suspense>
+                <Living at="end" />
+              </Suspense>
+            )}
           </div>
         </Reveal>
         <p className="t-meta pf-footer__copyright" suppressHydrationWarning>

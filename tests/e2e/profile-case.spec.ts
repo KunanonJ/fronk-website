@@ -1183,6 +1183,146 @@ test.describe("best practices on the case pages (desktop Chromium)", () => {
   });
 });
 
+/** The lift cards (/portfolio and More projects) had no ring on their pill. */
+test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  for (const path of ["/portfolio", INTRANET]) {
+    test(`on ${path}, a card's pill takes the site's ring when focused, as its picture does (WCAG 2.4.7)`, async ({
+      page,
+      browserName,
+    }) => {
+      await prepare(page);
+      await visit(page, path);
+      const link = page.locator("a.pf-lift__link").first();
+      // From the control before it, as a keyboard reader arrives (Safari
+      // moves to links with Option+Tab).
+      await link.evaluate((el) => {
+        const all = [
+          ...document.querySelectorAll<HTMLElement>("a[href], button"),
+        ].filter((n) => n.getClientRects().length > 0 && n.tabIndex >= 0);
+        all[all.indexOf(el as HTMLElement) - 1]!.focus();
+      });
+      await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+      await expect(link).toBeFocused();
+      await settle(page);
+      const pill = link.locator(".ds-pill");
+      await expect(pill).toHaveCSS("outline-style", "solid");
+      await expect(pill).toHaveCSS("outline-width", "2px");
+      await expect(
+        link.locator("xpath=ancestor::article[1]").locator(".pf-lift__mat"),
+      ).toHaveCSS("outline-style", "solid");
+      // The ring is where the focus is: the pill is on screen, uncovered.
+      // WebKit may still be scrolling it in (CI once read it 44 px below
+      // the fold), so both are polled.
+      await expect(pill).toBeInViewport({ ratio: 1 });
+      await expect
+        .poll(() =>
+          pill.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            const hit = document.elementFromPoint(
+              r.left + r.width / 2,
+              r.top + r.height / 2,
+            );
+            return !!hit && el.closest("a")!.contains(hit);
+          }),
+        )
+        .toBe(true);
+    });
+  }
+});
+
+/** A drawing's tile clipped its last rows where its labels wrapped. */
+test.describe("the showcase's drawings at narrow widths (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  test("AI Automation's layers grow their tile where the labels wrap, and keep its square where they fit", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/portfolio/ai-automation");
+    const tile = page.locator('.pf-sc__tile[data-sc-tile="layers"]');
+    // 320 to 360 px in one column, 600 px in two: the widths it clipped at.
+    for (const width of [320, 344, 360, 600, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const fit = await tile.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        const drawing = el.querySelector(".pf-layers-art")!;
+        const bands = [...drawing.children].map((band) =>
+          band.getBoundingClientRect(),
+        );
+        return {
+          width: box.width,
+          height: box.height,
+          // The last band ends inside the tile, above its padding.
+          lastBand: bands.at(-1)!.bottom,
+          tileBottom: box.bottom - el.clientTop,
+        };
+      });
+      expect(fit.lastBand, `last band at ${width} px`).toBeLessThanOrEqual(
+        fit.tileBottom,
+      );
+      // Never shorter than its square; square where the drawing fits.
+      expect(fit.height, `${width} px`).toBeGreaterThanOrEqual(fit.width - 1);
+      if (width >= 768) expect(fit.height).toBeCloseTo(fit.width, 0);
+    }
+  });
+});
+
+/** The found-trait toast stood over the footer's links at a case's end. */
+test.describe("the toast at the end of a case (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  test("the toast for the end of a case stands under the bar and lies over no link or control as it shows", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page, INTRANET);
+    await page
+      .getByRole("article", { name: "Work together", exact: true })
+      .scrollIntoViewIfNeeded();
+    const toast = page.getByTestId("trait-toast");
+    await expect(toast.getByRole("status")).toHaveText(
+      "You found Gold glasses · 1/6",
+    );
+    // Its entrance over.
+    await expect
+      .poll(() =>
+        toast.evaluate((el) =>
+          el.getAnimations().every((a) => a.playState !== "running"),
+        ),
+      )
+      .toBe(true);
+    const under = await toast.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      const targets = [
+        ...document.querySelectorAll<HTMLElement>(
+          "a[href], button, input, select, textarea, summary",
+        ),
+      ].filter((t) => {
+        if (el.contains(t)) return false;
+        const r = t.getBoundingClientRect();
+        return (
+          r.width > 0 &&
+          r.left < box.right &&
+          r.right > box.left &&
+          r.top < box.bottom &&
+          r.bottom > box.top
+        );
+      });
+      return {
+        top: box.top,
+        low: el.dataset.place === "low",
+        under: targets.map((t) => t.textContent?.trim()),
+      };
+    });
+    expect(under.under).toEqual([]);
+    // Under the bar, unless the top held a target.
+    if (!under.low) expect(under.top).toBeGreaterThanOrEqual(BAR_BOTTOM);
+  });
+});
+
 test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
   test.use({ reducedMotion: "reduce" });
 

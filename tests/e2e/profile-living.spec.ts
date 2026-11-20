@@ -3,8 +3,9 @@ import { prepare, tabTo } from "./matrix";
 
 /**
  * The living status (now-building-and-genz Phase 5): the guess beside the
- * footer's Bangkok clock, the ship log under its Now line (the latest commit
- * on main, from /api/github/shipped, mocked here) and the nav avatar's wink.
+ * footer's Bangkok clock, the ship log where it pushes nothing (the latest
+ * commit on main, from /api/github/shipped, mocked here) and the nav
+ * avatar's wink.
  * All of it client-only and lazy: the server HTML and a page at rest are as
  * they were. Behaviour runs in desktop Chromium and the WebKit phone; the
  * hover wink needs a mouse, so it runs on desktop only.
@@ -104,14 +105,25 @@ test.describe("living status > the footer", () => {
     await page.locator(".pf-footer__card").scrollIntoViewIfNeeded();
     const log = page.locator(".pf-footer__shipped");
     await expect(log).toBeVisible();
+    await expect(log).toHaveCount(1);
     expect(requests.count).toBe(1);
-    // Directly under the Now line.
-    await expect(
-      page.locator(".pf-footer__name-block > :nth-child(3)"),
-    ).toContainText("Now: building GoGoCash and Manut AI");
-    await expect(
-      page.locator(".pf-footer__name-block > :nth-child(4)"),
-    ).toHaveClass("pf-footer__shipped");
+    // Where it pushes nothing (UX sweep 21-11-26): under the place's line
+    // where the card has columns (desktop), at the end of the card where it
+    // is one column (the phone).
+    if (
+      await page.evaluate(() => matchMedia("(min-width: 50.625rem)").matches)
+    ) {
+      await expect(
+        page.locator(".pf-footer__name-block > :last-child"),
+      ).toHaveClass("pf-footer__shipped");
+      await expect(
+        page.locator(".pf-footer__name-block > :nth-last-child(2)"),
+      ).toContainText("Bangkok, GMT+7");
+    } else {
+      await expect(page.locator(".pf-footer__card > :last-child")).toHaveClass(
+        "pf-footer__shipped",
+      );
+    }
     await expect(log).toContainText(
       /^Shipped 3\s?h\S* ago: the Layers panel selects its frame \(#157\)/,
     );
@@ -121,6 +133,59 @@ test.describe("living status > the footer", () => {
     });
     await expect(link).toHaveAttribute("href", SHIPPED.url);
     await expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  test("a ship log that arrives with the card in view pushes nothing in it (UX sweep 21-11-26)", async ({
+    page,
+  }) => {
+    // Still: the card's rise into view would move it while it is measured.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    // The answer is held until the reader is at the card, as on a slow
+    // network (under the Now line it pushed the page list and the
+    // copyright down by up to 67 px, a layout shift of 0.04 to 0.06).
+    let answer = () => {};
+    const held = new Promise<void>((done) => (answer = done));
+    await page.route(SHIPPED_ROUTE, async (route) => {
+      await held;
+      await route.fulfill({ json: SHIPPED });
+    });
+    await page.clock.setFixedTime(MORNING);
+    await visit(page, "/does-not-exist");
+    const asked = page.waitForRequest("**/api/github/shipped");
+    await page.evaluate(() =>
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "instant",
+      }),
+    );
+    await asked;
+    /** Where the card's lines and lists stand, and the copyright under it. */
+    const places = () =>
+      page.evaluate(() =>
+        [
+          ...document.querySelectorAll(
+            ".pf-footer__name-block > :not(.pf-footer__shipped), .pf-footer__block, .pf-footer__copyright",
+          ),
+        ].map((el) => ({
+          part: el.className,
+          top: Math.round(el.getBoundingClientRect().top),
+        })),
+      );
+    const before = await places();
+    answer();
+    await expect(page.locator(".pf-footer__shipped")).toBeVisible();
+    const after = await places();
+    // Nothing in the card moves, nor does the page scroll to follow the
+    // dither (the footer's sheet is never the scroll anchor). Under 810 px
+    // the log ends the card, so the copyright line under it may move down;
+    // from 810 px nothing does.
+    const columns = await page.evaluate(
+      () => matchMedia("(min-width: 50.625rem)").matches,
+    );
+    const inCard = (list: typeof before) =>
+      list.filter((p) => columns || !p.part.includes("copyright"));
+    expect(inCard(after)).toEqual(inCard(before));
   });
 
   test("when the endpoint fails, the footer shows no ship log and nothing breaks", async ({

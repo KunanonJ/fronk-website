@@ -541,10 +541,14 @@
     overflow: hidden;
     padding-block-start: 40px;
   }
+  /* Never the scroll anchor: its dither is pinned to the footer's foot, so
+     a line added to the card (the ship log, Living.tsx) moves it, and a
+     browser anchored on it would scroll the whole footer by that much. */
   .pf-footer__sheet {
     position: absolute;
     inset: 0;
     background: var(--footer-sheet);
+    overflow-anchor: none;
   }
   .pf-footer__dither {
     position: absolute;

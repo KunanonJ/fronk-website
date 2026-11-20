@@ -1,8 +1,8 @@
 /*
  * Copy of the footer's living status (now-building-and-genz Phase 5): the
- * guess beside the Bangkok clock and the ship log under the Now line. Only
- * the footer's lazy chunk (components/profile/site/living/Living.tsx)
- * imports it, so no page's first load carries it.
+ * guess beside the Bangkok clock and the ship log. Only the footer's lazy
+ * chunk (components/profile/site/living/Living.tsx, which also says where
+ * the log stands) imports it, so no page's first load carries it.
  *
  * DRAFT, all of it, awaiting the owner's approval. Each hour's words are a
  * guess and say so ("probably"); none says when he answers or whether he is

@@ -622,9 +622,15 @@
     min-inline-size: 0;
     margin: 0;
   }
+  /* Clipped, not hidden: a box that clips without scrolling keeps its
+     ratio only as a least height, so a drawing whose labels wrap (the AI
+     Automation layers at 320 to 360 px, and at 600 px in two columns) grows
+     the tile instead of losing its last rows (UX sweep 21-11-26). Elsewhere
+     its contents fit, and the tile is drawn as it was. */
   .pf-sc__tile {
     position: relative;
     overflow: hidden;
+    overflow: clip;
     container-type: inline-size;
     display: grid;
     place-items: center;
@@ -632,6 +638,13 @@
     border: 1px solid transparent;
     border-radius: var(--radius-tile);
     background: var(--tile);
+  }
+  /* A drawing's tile does not clip at all: WebKit holds any clipping box
+     at its ratio, `clip` too, while a drawing is inset (6cqi) and fits once
+     its tile grows, so only a screenshot needs the rounded clip. In every
+     engine (a WebKit-only check missed Linux WebKit, CI's). */
+  .pf-sc__tile:has(> .pf-sc__art) {
+    overflow: visible;
   }
   .pf-sc__tile[data-tone="deep"] {
     background: var(--tile-deep);
@@ -1014,13 +1027,13 @@
     margin-top: auto;
     padding-top: 12px;
   }
-  /* Focus shows on the picture (spec 6.10): the card's whole target. */
+  /* Focus shows on the picture (spec 6.10), the card's whole target, and on
+     the pill itself with the site's ring (.ds-stretch in globals.css): the
+     picture can sit far above it, out of view on a phone, while the browser
+     always scrolls the focused pill into view (WCAG 2.4.7). */
   .pf-lift:has(.ds-stretch:focus-visible) .pf-lift__mat {
     outline: 2px solid var(--focus);
     outline-offset: 3px;
-  }
-  .pf-lift .ds-stretch:focus-visible .ds-pill {
-    outline: none;
   }
 
   /* Breakpoints (spec 4.1 and 10.1). */
