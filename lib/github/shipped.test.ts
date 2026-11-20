@@ -51,15 +51,29 @@ describe("commitSubject", () => {
       commitSubject(
         "  feat(hero):  the canvas   drifts \n\nBody\nCo-Authored-By: x",
       ),
-    ).toBe("feat(hero): the canvas drifts");
-    expect(commitSubject("fix: one\r\nTwo")).toBe("fix: one");
+    ).toBe("the canvas drifts");
+    expect(commitSubject("fix: one\r\nTwo")).toBe("one");
+  });
+
+  it("leaves out a conventional commit's type and scope, and nothing else", () => {
+    expect(commitSubject("feat(hero): the canvas drifts (#157)")).toBe(
+      "the canvas drifts (#157)",
+    );
+    expect(commitSubject("chore(deps)!: bump vite")).toBe("bump vite");
+    expect(commitSubject("docs: a note")).toBe("a note");
+    // Not a type: kept as written.
+    expect(commitSubject('Revert "feat(hero): drift"')).toBe(
+      'Revert "feat(hero): drift"',
+    );
+    expect(commitSubject("Fix: capitalised")).toBe("Fix: capitalised");
+    expect(commitSubject("feat:")).toBe("feat:");
   });
 
   it("cuts a long subject on a whole word with an ellipsis, within the limit", () => {
     const cut = commitSubject(`feat: ${"wording ".repeat(20)}`);
     expect(Array.from(cut).length).toBeLessThanOrEqual(SUBJECT_MAX);
     expect(Array.from(cut).length).toBeGreaterThan(SUBJECT_MAX - 16);
-    expect(cut).toMatch(/^feat: (wording )+wording…$/);
+    expect(cut).toMatch(/^(wording )+wording…$/);
     // At the limit exactly, nothing is cut.
     const exact = "x".repeat(SUBJECT_MAX);
     expect(commitSubject(exact)).toBe(exact);
@@ -68,24 +82,24 @@ describe("commitSubject", () => {
   });
 
   it("keeps a squash merge's pull request number when it cuts", () => {
-    // The real subject of #160: 81 characters.
+    // 87 characters once the type is left out.
     expect(
       commitSubject(
-        "feat(secrets): ⌘K commands, a pixel party and a trait hunt across the site (#160)",
+        "feat(secrets): ⌘K commands, a pixel party, a trait hunt across the site and a toast that says so (#160)",
       ),
     ).toBe(
-      "feat(secrets): ⌘K commands, a pixel party and a trait hunt across the… (#160)",
+      "⌘K commands, a pixel party, a trait hunt across the site and a toast… (#160)",
     );
   });
 
   it("drops the punctuation a cut leaves before the ellipsis", () => {
-    // The real subject of #161: 86 characters.
+    // 86 characters once the type is left out; the cut ends on "stickers,".
     expect(
       commitSubject(
-        "feat(hero): the canvas toolbar works: pen doodles, pixel stickers, ink, clear (#161)",
+        "feat(hero): the canvas toolbar works with a mouse: pen doodles, pixel stickers, ink, clear (#161)",
       ),
     ).toBe(
-      "feat(hero): the canvas toolbar works: pen doodles, pixel stickers, ink… (#161)",
+      "the canvas toolbar works with a mouse: pen doodles, pixel stickers… (#161)",
     );
   });
 
@@ -104,8 +118,7 @@ describe("parseLatestCommit", () => {
         ),
       ),
     ).toEqual({
-      subject:
-        "feat(resume): Snapshot, a recruiter-first résumé with a facts card (#159)",
+      subject: "Snapshot, a recruiter-first résumé with a facts card (#159)",
       date: "2026-11-20T08:12:33.000Z",
       url: URL,
     });

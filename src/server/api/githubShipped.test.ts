@@ -43,8 +43,7 @@ describe("GET /api/github/shipped", () => {
     const res = await GET();
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
-      subject:
-        "feat(resume): Snapshot, a recruiter-first résumé with a facts card (#159)",
+      subject: "Snapshot, a recruiter-first résumé with a facts card (#159)",
       date: "2026-11-20T08:12:33.000Z",
       url: `https://github.com/KunanonJ/fronk-website/commit/${SHA}`,
     });

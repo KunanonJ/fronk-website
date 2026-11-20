@@ -43,13 +43,24 @@ const PULL_REQUEST = / \(#\d+\)$/;
 const WORD_BACKTRACK = 16;
 
 /**
- * A commit message's subject: its first line, spaces collapsed, at most
- * `max` characters. A longer one is cut with an ellipsis, on a word where
- * one ends near the cut and without the punctuation before it, and keeps
- * its pull request number. Characters are whole (never half a UTF-16 pair).
+ * A conventional commit's type and scope at the start of its subject:
+ * "feat(hero): ", "fix: ", "chore(deps)!: ". Developer shorthand, so the
+ * footer leaves it out and starts with what shipped.
+ */
+const COMMIT_TYPE = /^[a-z]+(?:\([^)]*\))?!?: (?=\S)/;
+
+/**
+ * A commit message's subject: its first line, spaces collapsed, without a
+ * conventional commit's type and scope, at most `max` characters. A longer
+ * one is cut with an ellipsis, on a word where one ends near the cut and
+ * without the punctuation before it, and keeps its pull request number.
+ * Characters are whole (never half a UTF-16 pair).
  */
 export function commitSubject(message: string, max = SUBJECT_MAX): string {
-  const line = (message.split(/\r?\n/, 1)[0] ?? "").replace(/\s+/g, " ").trim();
+  const line = (message.split(/\r?\n/, 1)[0] ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(COMMIT_TYPE, "");
   if (Array.from(line).length <= max) return line;
   const pr = PULL_REQUEST.exec(line)?.[0] ?? "";
   const room = max - 1 - pr.length;

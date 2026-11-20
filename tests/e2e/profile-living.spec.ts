@@ -16,7 +16,7 @@ const SHA = "0123456789abcdef0123456789abcdef01234567";
 /** 03:30 UTC is 10:30 in Bangkok (GMT+7). */
 const MORNING = new Date("2026-11-20T03:30:00Z");
 const SHIPPED = {
-  subject: "feat(hero): the Layers panel selects its frame (#157)",
+  subject: "the Layers panel selects its frame (#157)",
   // Three hours before MORNING.
   date: "2026-11-20T00:30:00.000Z",
   url: `https://github.com/KunanonJ/fronk-website/commit/${SHA}`,
@@ -113,11 +113,11 @@ test.describe("living status > the footer", () => {
       page.locator(".pf-footer__name-block > :nth-child(4)"),
     ).toHaveClass("pf-footer__shipped");
     await expect(log).toContainText(
-      /^Shipped 3\s?h\S* ago: feat\(hero\): the Layers panel selects its frame \(#157\)/,
+      /^Shipped 3\s?h\S* ago: the Layers panel selects its frame \(#157\)/,
     );
     await expect(log.locator("time")).toHaveAttribute("datetime", SHIPPED.date);
     const link = log.getByRole("link", {
-      name: /^feat\(hero\): the Layers panel selects its frame \(#157\)/,
+      name: /^the Layers panel selects its frame \(#157\)/,
     });
     await expect(link).toHaveAttribute("href", SHIPPED.url);
     await expect(link).toHaveAttribute("target", "_blank");

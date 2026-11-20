@@ -10,7 +10,7 @@ import Living from "@/components/profile/site/living/Living";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
 const SHIPPED = {
-  subject: "feat(hero): the Layers panel selects its frame (#157)",
+  subject: "the Layers panel selects its frame (#157)",
   date: "2026-11-20T09:00:00.000Z",
   url: `https://github.com/KunanonJ/fronk-website/commit/${SHA}`,
 };
@@ -103,11 +103,11 @@ describe("Living, the ship log", () => {
       selector: ".pf-footer__shipped > span",
     });
     expect(log.textContent).toMatch(
-      /^Shipped 3\s?h.* ago: feat\(hero\): the Layers panel selects its frame \(#157\)/,
+      /^Shipped 3\s?h.* ago: the Layers panel selects its frame \(#157\)/,
     );
     expect(log.querySelector("time")).toHaveAttribute("datetime", SHIPPED.date);
     const link = screen.getByRole("link", {
-      name: /^feat\(hero\): the Layers panel .*opens in a new tab/,
+      name: /^the Layers panel .*opens in a new tab/,
     });
     expect(link).toHaveAttribute("href", SHIPPED.url);
     expect(link).toHaveAttribute("target", "_blank");
