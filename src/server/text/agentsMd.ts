@@ -1,6 +1,6 @@
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import {
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   PERSON_HEADLINE,
   PERSON_NAME,
   PERSON_SUMMARY,
@@ -53,7 +53,7 @@ export function buildAgentsMd(): string {
     "",
     PERSON_SUMMARY,
     "",
-    OPEN_TO_ROLES.sentence,
+    `${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
     "",
     "## Site resources for crawlers and LLM tools",
     "",

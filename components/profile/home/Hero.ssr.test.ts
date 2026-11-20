@@ -70,8 +70,9 @@ describe("Hero, server HTML", () => {
     expect(html).not.toContain("Pause motion");
   });
 
-  it("carries the recruiter facts and every frame link and wordmark", () => {
+  it("carries the first facts and every frame link and wordmark", () => {
     expect(html).toContain(homeHero.badge);
+    expect(html).toContain(homeHero.chip);
     expect(html).toContain('href="/contact"');
     expect(html).toContain('href="/resume"');
     for (const frame of canvasMock.frames) {

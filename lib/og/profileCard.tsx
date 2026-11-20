@@ -7,7 +7,7 @@ import portrait from "./portrait.jpg?inline";
 type HeadlineSegment = string | { muted: string };
 
 export interface ProfileCardProps {
-  /** The accent pill's label, for example "Open to roles". */
+  /** The accent pill's label, for example "Currently building". */
   pill: string;
   /** Headline lines above the accent line, as the page's hero sets them. */
   lines: readonly (readonly HeadlineSegment[])[];

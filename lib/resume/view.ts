@@ -148,9 +148,10 @@ const PRINT_HEADINGS = new Map<string, { title: string; kind: PrintGroupKind }>(
 );
 
 /**
- * The résumé sections as the PDF prints them: the current role leads
- * Experience, Education and Training share a heading and print one line per
- * entry, and the screen-only sections are dropped. A section this file does
+ * The résumé sections as the PDF prints them: Currently (since 20-11-26 the
+ * ventures he is building) leads Experience, Education and Training share a
+ * heading and print one line per entry, and the screen-only sections are
+ * dropped. A section this file does
  * not know (a new CMS section) prints in full under its own title.
  */
 export function printGroups(

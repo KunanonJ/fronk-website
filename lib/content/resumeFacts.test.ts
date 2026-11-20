@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { FAQ_ITEMS } from "@/lib/content/faq";
-import { CURRENT_ROLE, PERSON_SUMMARY } from "@/lib/content/identity";
+import { LATEST_ROLE, PERSON_SUMMARY } from "@/lib/content/identity";
 import {
   RESUME_SKILLS_FALLBACK,
   RESUME_TIMELINE_FALLBACK,
@@ -24,31 +24,53 @@ const section = (title: string) =>
   RESUME_TIMELINE_FALLBACK.find((s) => s.title === title)!.items;
 const employer = (org: string) => org.split(" · ")[0]!;
 
-describe("the current role", () => {
-  const current = section("Currently");
-
-  it("is the only entry under Currently", () => {
-    expect(current).toHaveLength(1);
+describe("what he does now", () => {
+  it("is his two ventures under Currently, not an employed role (owner direction 20-11-26)", () => {
+    const current = section("Currently");
+    expect(current.map((item) => item.title)).toEqual(["GoGoCash", "Manut AI"]);
+    for (const item of current) {
+      expect(item.org).toMatch(/· Independent project$/);
+      expect(item.period).toMatch(/ — Present$/);
+    }
   });
+});
 
-  it("reads its title, employer and start month from one constant", () => {
-    expect(current[0]!.title).toBe(CURRENT_ROLE.title);
-    expect(employer(current[0]!.org)).toBe(CURRENT_ROLE.organization);
-    expect(current[0]!.period).toBe(`${CURRENT_ROLE.sinceShort} — Present`);
-  });
+describe("the latest role", () => {
+  const latest = section("Experience")[0]!;
 
-  it("starts in the same month in the summary and on the FDE hub, in both languages", () => {
-    const since = `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}`;
-    expect(PERSON_SUMMARY).toContain(since);
-    const hub = getTopicPillar("forward-deployed-ai-engineering", "en")!;
-    expect(hub.proof).toContain(since);
-    const thaiHub = getTopicPillar("forward-deployed-ai-engineering", "th")!;
-    expect(thaiHub.proof).toContain(
-      `${CURRENT_ROLE.title} ที่ ${CURRENT_ROLE.organization} ตั้งแต่${CURRENT_ROLE.sinceThai}`,
+  it("leads Experience, with its title, employer and both months from one constant", () => {
+    expect(latest.title).toBe(LATEST_ROLE.title);
+    expect(employer(latest.org)).toBe(LATEST_ROLE.organization);
+    expect(latest.period).toBe(
+      `${LATEST_ROLE.sinceShort} — ${LATEST_ROLE.untilShort}`,
     );
   });
 
-  it("uses the same month in its long, short and Thai forms", () => {
+  it("is in the past tense, with the same months, in the summary and on the FDE hub, in both languages", () => {
+    const held = `${LATEST_ROLE.title} at ${LATEST_ROLE.organization} from ${LATEST_ROLE.since} to ${LATEST_ROLE.until}`;
+    expect(PERSON_SUMMARY).toContain(`He was ${held}`);
+    const hub = getTopicPillar("forward-deployed-ai-engineering", "en")!;
+    expect(hub.proof).toContain(held);
+    const thaiHub = getTopicPillar("forward-deployed-ai-engineering", "th")!;
+    expect(thaiHub.proof).toContain(
+      `${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization} ตั้งแต่${LATEST_ROLE.sinceThai} ถึง${LATEST_ROLE.untilThai}`,
+    );
+  });
+
+  it("is never presented as current", () => {
+    const spoken = JSON.stringify([
+      PERSON_SUMMARY,
+      aboutPage,
+      FAQ_ITEMS,
+      getAllTopicPillars("en"),
+      getAllTopicPillars("th"),
+    ]);
+    expect(spoken).not.toMatch(
+      /\b(leads|lead|leading) (IT|AI|internal)|since September 2025|where he leads|AI engineering lead and solopreneur|AI Engineering Lead at The Binary Holdings, founder/i,
+    );
+  });
+
+  it("uses the same months in their long, short and Thai forms", () => {
     const THAI_MONTHS: Record<string, string> = {
       January: "มกราคม",
       February: "กุมภาพันธ์",
@@ -63,13 +85,18 @@ describe("the current role", () => {
       November: "พฤศจิกายน",
       December: "ธันวาคม",
     };
-    const [month, year] = CURRENT_ROLE.since.split(" ");
-    expect(CURRENT_ROLE.sinceShort).toBe(`${month!.slice(0, 3)} ${year}`);
-    expect(CURRENT_ROLE.sinceThai).toBe(`${THAI_MONTHS[month!]} ${year}`);
+    for (const [long, short, thai] of [
+      [LATEST_ROLE.since, LATEST_ROLE.sinceShort, LATEST_ROLE.sinceThai],
+      [LATEST_ROLE.until, LATEST_ROLE.untilShort, LATEST_ROLE.untilThai],
+    ]) {
+      const [month, year] = long.split(" ");
+      expect(short).toBe(`${month!.slice(0, 3)} ${year}`);
+      expect(thai).toBe(`${THAI_MONTHS[month!]} ${year}`);
+    }
   });
 
   it("is dated nowhere else in the topic hubs, in either language", () => {
-    // A start date typed by hand in a hub is how the two languages drifted.
+    // A date typed by hand in a hub is how the two languages drifted.
     const months =
       /(January|February|March|April|May|June|July|August|September|October|November|December) 20\d\d|(มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม) 20\d\d/g;
     for (const locale of ["en", "th"] as const)
@@ -77,7 +104,12 @@ describe("the current role", () => {
         const dated = JSON.stringify(pillar).match(months) ?? [];
         for (const date of dated)
           expect(
-            [CURRENT_ROLE.since, CURRENT_ROLE.sinceThai],
+            [
+              LATEST_ROLE.since,
+              LATEST_ROLE.sinceThai,
+              LATEST_ROLE.until,
+              LATEST_ROLE.untilThai,
+            ],
             `${locale} ${pillar.slug}`,
           ).toContain(date);
       }
@@ -85,7 +117,7 @@ describe("the current role", () => {
 });
 
 describe("employers", () => {
-  const roles = [...section("Currently"), ...section("Experience")];
+  const roles = section("Experience");
 
   it("are the CV's, newest first, with no second job beside Playbux", () => {
     expect(roles.map((item) => [employer(item.org), item.title])).toEqual([
@@ -104,11 +136,12 @@ describe("employers", () => {
 
   it("carry the CV's start and end months", () => {
     // The periods were checked against the CV on 10-11-26; the titles are
-    // the site's wording (the CV writes the current one with a slash). These
+    // the site's wording (the CV writes the latest one with a slash). The
+    // latest role's end month is the owner's direction of 20-11-26. These
     // periods reach the résumé, Home, /llms-full.txt and the PDF, so a
     // changed month has to be a decision made here, not a slip in the data.
     expect(roles.map((item) => [item.title, item.period])).toEqual([
-      ["IT Manager & AI Engineering Lead", "Sep 2025 — Present"],
+      ["IT Manager & AI Engineering Lead", "Sep 2025 — Nov 2026"],
       ["AI Project Manager", "Jan 2025 — Oct 2025"],
       ["Advisor", "Nov 2024 — Dec 2024"],
       ["Technical Project Manager", "Sep 2024 — Dec 2024"],
@@ -136,7 +169,7 @@ describe("employers", () => {
     return date.getFullYear() * 12 + date.getMonth();
   };
 
-  it("dates every role as Mon YYYY to Mon YYYY, or to Present", () => {
+  it("dates every role as Mon YYYY to Mon YYYY, none of them to Present", () => {
     // The overlap rule below reads these, so a new format must fail here
     // rather than pass there unnoticed.
     for (const item of roles) {
@@ -145,9 +178,8 @@ describe("employers", () => {
       month(start);
       if (end !== "Present") month(end);
     }
-    expect(roles.filter((item) => item.period.endsWith("Present"))).toEqual([
-      roles[0],
-    ]);
+    // No employed role is current since 20-11-26.
+    expect(roles.filter((item) => item.period.endsWith("Present"))).toEqual([]);
   });
 
   it("explains every role that overlaps the one listed above it", () => {
@@ -217,7 +249,7 @@ describe("the wording rule", () => {
     );
     expect(said).toHaveLength(1);
     expect(said[0]).toMatch(/knowledge platform/);
-    expect(section("Currently")[0]!.bullets).toContain(said[0]);
+    expect(section("Experience")[0]!.bullets).toContain(said[0]);
     expect(
       RESUME_SKILLS_FALLBACK.filter((group) =>
         group.items.some((item) => /\bRAG\b/.test(item)),
@@ -236,8 +268,11 @@ describe("the wording rule", () => {
 });
 
 describe("independent projects", () => {
-  it("lists the three, live ones first, none of them as an employed role", () => {
-    const projects = section("Independent projects");
+  it("lists the three once each, the live two under Currently, none of them as an employed role", () => {
+    const projects = [
+      ...section("Currently"),
+      ...section("Independent projects"),
+    ];
     expect(projects.map((item) => item.title)).toEqual([
       "GoGoCash",
       "Manut AI",

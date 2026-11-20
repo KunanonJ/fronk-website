@@ -1,6 +1,6 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
 import {
-  OPEN_TO_ROLES,
+  AVAILABILITY,
   PERSON_CUSTOMER_WORK,
   PERSON_SOLOPRENEUR,
   PERSON_SUMMARY,
@@ -19,8 +19,9 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     answer: PERSON_SUMMARY,
   },
   {
-    question: "Is Kunanon Jarat open to new roles?",
-    answer: `Yes. ${OPEN_TO_ROLES.sentence} ${PERSON_CUSTOMER_WORK} Email ${siteConfig.email} or use the contact page.`,
+    // DRAFT (owner direction 20-11-26): not looking for a full-time role.
+    question: "Is Kunanon Jarat open to new roles or projects?",
+    answer: `Not to full-time roles right now: he is building ${AVAILABILITY.ventures.join(" and ")}. He is open to partnerships, freelance and consulting projects, advisory, talks and workshops, and recruiters are welcome to get in touch for later. ${PERSON_CUSTOMER_WORK} Email ${siteConfig.email} or use the contact page.`,
   },
   {
     question: "How does Kunanon Jarat build products?",

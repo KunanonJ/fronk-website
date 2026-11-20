@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ChromeProvider } from "@/components/bento/ChromeContext";
 import ResumePage from "@/components/resume/ResumePage";
-import { OPEN_TO_ROLES } from "@/lib/content/identity";
+import { AVAILABILITY } from "@/lib/content/identity";
 import { resolveResumeProfile } from "@/lib/content/resumeProfile";
 import type { ResumeDetail } from "@/lib/resume/search";
 
@@ -27,7 +27,7 @@ describe("ResumePage (screen)", () => {
     renderPage();
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent(
-      "Kunanon Jarat. AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
+      "Kunanon Jarat. Solopreneur. Builds AI tools inside the businesses that use them. Based in Bangkok.",
     );
     // The display serif on the pixel sky (Phase 7e), one line per block.
     expect(h1).toHaveClass("t-display");
@@ -39,9 +39,9 @@ describe("ResumePage (screen)", () => {
     renderPage();
     expect(screen.getByText(profile.summary)).toBeInTheDocument();
     expect(
-      screen.getByText(OPEN_TO_ROLES.pill.label, { exact: false }).closest("p"),
+      screen.getByText(AVAILABILITY.pill.label, { exact: false }).closest("p"),
     ).toHaveTextContent(
-      `${OPEN_TO_ROLES.pill.label} · ${OPEN_TO_ROLES.pill.detail}`,
+      `${AVAILABILITY.pill.label} · ${AVAILABILITY.pill.detail}`,
     );
   });
 
@@ -51,10 +51,10 @@ describe("ResumePage (screen)", () => {
       expect(link).toHaveAttribute("href", "/resume.pdf");
       expect(link).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
     }
-    // A recruiter's Contact opens the form with Hiring already chosen.
+    // Contact opens the form with Freelance or consulting already chosen.
     expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
       "href",
-      "/contact?topic=hiring",
+      "/contact?topic=project",
     );
     expect(screen.getByRole("button", { name: "Share" })).toHaveAttribute(
       "data-panel-trigger",
@@ -77,20 +77,36 @@ describe("ResumePage (screen)", () => {
     expect(screen.getByRole("article", { name: "Share" })).toBeInTheDocument();
   });
 
-  it("keeps Currently to the one employed role and links its case studies", () => {
+  it("keeps Currently to the two ventures he is building, each with its case study", () => {
     renderPage();
     const current = screen.getByRole("article", { name: "Currently" });
     expect(
-      within(current).getAllByRole("listitem", { hidden: false })[0],
-    ).toHaveTextContent("IT Manager & AI Engineering Lead");
-    expect(within(current).getAllByRole("heading", { level: 3 })).toHaveLength(
-      1,
-    );
+      within(current)
+        .getAllByRole("heading", { level: 3 })
+        .map((h) => h.textContent),
+    ).toEqual(["GoGoCash", "Manut AI"]);
+    expect(current).not.toHaveTextContent("IT Manager & AI Engineering Lead");
+    // Each venture's "Case study" is named after it for screen readers.
+    expect(
+      within(current).getByRole("link", { name: "Case study: GoGoCash" }),
+    ).toHaveAttribute("href", "/ventures/gogocash");
+    expect(
+      within(current).getByRole("link", { name: "Case study: Manut AI" }),
+    ).toHaveAttribute("href", "/ventures/manut");
+  });
+
+  it("leads Experience with the latest role, ended, and links its case studies", () => {
+    renderPage();
+    const card = screen.getByRole("article", { name: "Experience" });
+    const first = card.querySelector("li")!;
+    expect(first).toHaveTextContent("IT Manager & AI Engineering Lead");
+    expect(first).toHaveTextContent("Sep 2025 — Nov 2026");
+    expect(card).not.toHaveTextContent("Present");
     // The arrow stays on screen but out of the link's name (spec 12 item 18).
     expect(
-      within(current).getByRole("link", { name: "Case studies" }),
+      within(first).getByRole("link", { name: "Case studies" }),
     ).toHaveAttribute("href", "/portfolio");
-    expect(current).toHaveTextContent("Case studies→");
+    expect(first).toHaveTextContent("Case studies→");
   });
 
   it("numbers Experience across two columns of about equal height", () => {
@@ -98,12 +114,12 @@ describe("ResumePage (screen)", () => {
     const card = screen.getByRole("article", { name: "Experience" });
     const columns = card.querySelectorAll("ol");
     expect(columns).toHaveLength(2);
-    // Four long roles balance five short ones: the split follows height, not count.
+    // Four long roles balance six short ones: the split follows height, not count.
     expect(columns[0]!.children).toHaveLength(4);
-    expect(columns[1]!.children).toHaveLength(5);
+    expect(columns[1]!.children).toHaveLength(6);
     expect(columns[1]).toHaveAttribute("start", "5");
     expect(card.textContent).toContain("01");
-    expect(card.textContent).toContain("09");
+    expect(card.textContent).toContain("10");
   });
 
   it("explains a role that overlapped another, in both detail levels", () => {
@@ -129,8 +145,9 @@ describe("ResumePage (screen)", () => {
     expect(kind("Skills")).toBe("skills");
   });
 
-  it("lists the three independent projects, the live ones marked with the Ember square", () => {
+  it("lists the live ventures under Currently with the Ember square, and GoSpark under Independent projects", () => {
     const { container } = renderPage();
+    const current = screen.getByRole("article", { name: "Currently" });
     const projects = screen.getByRole("article", {
       name: "Independent projects",
     });
@@ -138,21 +155,14 @@ describe("ResumePage (screen)", () => {
       within(projects)
         .getAllByRole("heading", { level: 3 })
         .map((h) => h.textContent),
-    ).toEqual(["GoGoCash", "Manut AI", "GoSpark"]);
+    ).toEqual(["GoSpark"]);
     expect(
-      within(projects).getByText("Live at gogocash.co."),
+      within(current).getByText("Live at gogocash.co."),
     ).toBeInTheDocument();
     expect(container.querySelectorAll("li > .pf-resume__live").length).toBe(2);
     expect(
-      within(projects).getByRole("link", { name: "gogocash.co" }),
+      within(current).getByRole("link", { name: "gogocash.co" }),
     ).toHaveAttribute("href", "https://gogocash.co");
-    expect(
-      within(projects).getByRole("link", { name: "Case study: GoGoCash" }),
-    ).toHaveAttribute("href", "/ventures/gogocash");
-    // Each venture's "Case study" is named after it for screen readers.
-    expect(
-      within(projects).getByRole("link", { name: "Case study: Manut AI" }),
-    ).toHaveAttribute("href", "/ventures/manut");
   });
 
   it("groups the skills under the CV's four labels, AI first", () => {

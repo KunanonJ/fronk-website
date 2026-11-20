@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OPEN_TO_ROLES, RESUME_HREF } from "@/lib/content/availability";
+import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
 import {
   journeyCopy,
   orbitCopy,
@@ -14,7 +14,7 @@ import { stackItems, STACK_GROUPS } from "@/lib/content/stack";
 /*
  * The Journey's copy (profile redesign Phase 4, design spec 15.5; plan gate
  * 5): the story states no figure and names only organisations the résumé
- * lists; the roles are the cleared availability; the tools are /stack's; no
+ * lists; the "now" line is the availability; the tools are /stack's; no
  * line carries an em dash.
  */
 
@@ -55,7 +55,7 @@ describe("the Journey's story", () => {
     const allowed = new Set([
       "I",
       "From",
-      "Today",
+      "Most",
       "IT",
       "AI",
       "Kasetsart",
@@ -72,12 +72,20 @@ describe("the Journey's story", () => {
       expect(runs.some((run) => typeof run !== "string")).toBe(true);
   });
 
-  it("states the cleared availability, with its roles and place as chips", () => {
-    expect(storyCopy.roles).toBe(OPEN_TO_ROLES.sentence);
+  it("states the availability, with its ventures and place as chips", () => {
+    expect(storyCopy.now).toBe(AVAILABILITY.sentence);
     expect(storyCopy.chips).toEqual([
-      ...OPEN_TO_ROLES.roles,
-      OPEN_TO_ROLES.location,
+      ...AVAILABILITY.ventures,
+      AVAILABILITY.location,
     ]);
+  });
+
+  it("tells the Binary Holdings role in the past tense (owner direction 20-11-26)", () => {
+    const last = story.at(-1)!;
+    expect(last).toContain(
+      "I led IT and AI engineering at The Binary Holdings",
+    );
+    expect(last).not.toMatch(/Today|I lead\b/);
   });
 });
 
@@ -106,7 +114,7 @@ describe("the Journey's stage, orbit and records labels", () => {
     const lines = [
       ...Object.values(journeyCopy),
       ...story,
-      storyCopy.rolesHeading,
+      storyCopy.nowHeading,
       ...Object.values(orbitCopy).flat(),
       recordsCopy.label,
       recordsCopy.employment,

@@ -46,7 +46,12 @@ function foundedOrganizations(): Record<string, unknown>[] {
     }));
 }
 
-/** Employer the person works for but did not found, so no `founder` link. */
+/**
+ * The employer the portfolio's projects were built for (portfolioJsonLd.ts
+ * links them to it). He did not found it, so no `founder` link, and his role
+ * there ended in November 2026 (owner direction 20-11-26), so Person.worksFor
+ * no longer lists it.
+ */
 export const EMPLOYER_ORGANIZATION = {
   name: "The Binary Holdings",
   url: "https://thebinaryholdings.com",
@@ -69,13 +74,15 @@ function organizations(): Record<string, unknown>[] {
 
 /**
  * The site-wide schema.org @graph: a Person (the knowledge-panel entity), a
- * WebSite, the founded Organizations and the employer Organization,
- * cross-linked by @id. Person.worksFor references all of them. All values are
+ * WebSite, the founded Organizations and the former employer Organization,
+ * cross-linked by @id. Person.worksFor references the founded ones only: the
+ * role at the employer ended in November 2026. All values are
  * developer-controlled constants / real venture data — no XSS surface, no
  * fabricated claims.
  */
 export function buildSiteJsonLd(): Record<string, unknown> {
   const orgs = organizations();
+  const founded = foundedOrganizations();
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -87,8 +94,10 @@ export function buildSiteJsonLd(): Record<string, unknown> {
         url: SITE_ORIGIN,
         email: siteConfig.email,
         image: `${SITE_ORIGIN}/profile.jpg`,
-        jobTitle: ["AI Engineering Lead", "IT Manager", "Founder"],
-        worksFor: orgs.map((o) => ({ "@id": o["@id"] })),
+        // The title ventures.ts gives him for both ventures; the role at The
+        // Binary Holdings ended in November 2026 (owner direction 20-11-26).
+        jobTitle: ["Founder"],
+        worksFor: founded.map((o) => ({ "@id": o["@id"] })),
         knowsAbout: [...PERSON_KNOWS_ABOUT],
         alumniOf: {
           "@type": "CollegeOrUniversity",

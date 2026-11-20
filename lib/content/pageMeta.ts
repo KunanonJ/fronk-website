@@ -12,8 +12,9 @@ export const PAGE_META = {
   about: {
     // The About h1 restates this title (aboutPage.test.ts), so it changes with the hero copy.
     title: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok",
+    // DRAFT (owner direction 20-11-26): no longer open to roles.
     description:
-      "Kunanon Jarat (Fronk): AI Engineering Lead at The Binary Holdings, founder of GoGoCash, builder of Manut AI. Open to FDE and AI roles, Bangkok or remote.",
+      "Kunanon Jarat (Fronk): founder of GoGoCash, builder of Manut AI, previously AI Engineering Lead at The Binary Holdings. Open to partnerships and consulting.",
   },
   build: {
     title: "Build",

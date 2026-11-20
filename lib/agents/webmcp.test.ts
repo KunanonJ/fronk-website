@@ -127,14 +127,14 @@ describe("the WebMCP tools", () => {
     const ok = await draft.execute({
       name: "Ada",
       message: "Hello from an agent.",
-      topics: ["Hiring"],
+      topics: ["Freelance or consulting"],
     });
     expect(ok.isError).toBeUndefined();
     expect(textOf(ok)).toMatch(/email app/);
     expect(d.draftContact).toHaveBeenCalledWith({
       name: "Ada",
       message: "Hello from an agent.",
-      topics: ["Hiring"],
+      topics: ["Freelance or consulting"],
     });
     // Without topics, the form keeps the chips it has.
     await draft.execute({ name: "Ada", message: "Hello from an agent." });
@@ -146,12 +146,12 @@ describe("the WebMCP tools", () => {
     await draft.execute({
       name: "Ada\nLovelace",
       message: "Hello from an agent.",
-      topics: ["Hiring", "Hiring"],
+      topics: ["Freelance or consulting", "Freelance or consulting"],
     });
     expect(d.draftContact).toHaveBeenLastCalledWith({
       name: "Ada Lovelace",
       message: "Hello from an agent.",
-      topics: ["Hiring"],
+      topics: ["Freelance or consulting"],
     });
     expect((await draft.execute({ name: "Ada" })).isError).toBe(true);
     const closed = await tool(
@@ -181,14 +181,14 @@ describe("draft_contact_message's checks", () => {
     const unknown = await draft.execute({
       name: "Ada",
       message: "Hello from an agent.",
-      topics: ["Hiring", "Not a topic"],
+      topics: ["Freelance or consulting", "Not a topic"],
     });
     expect(unknown.isError).toBe(true);
     expect(textOf(unknown)).toMatch(/^topics\.1: .*"Manut AI"/);
     const notAList = await draft.execute({
       name: "Ada",
       message: "Hello from an agent.",
-      topics: "Hiring",
+      topics: "Freelance or consulting",
     });
     expect(notAList.isError).toBe(true);
     expect(textOf(notAList)).toMatch(/^topics: /);

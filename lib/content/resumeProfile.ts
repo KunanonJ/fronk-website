@@ -18,13 +18,14 @@ export type { ResolvedTimelineItem, ResolvedTimelineSection, ResumeSkillGroup };
 
 /**
  * The header when Sanity holds no résumé document (the state on 11-11-26;
- * `pnpm seed` or Studio can create one). The headline is approved identity
- * wording and leads with the AI role.
+ * `pnpm seed` or Studio can create one). The headline keeps the approved
+ * identity wording but no longer leads with the role at The Binary
+ * Holdings, which ended in November 2026: DRAFT (owner direction 20-11-26).
  */
 export const DEFAULT_RESUME_PROFILE = {
   name: "Kunanon Jarat",
   headline:
-    "AI Engineering Lead. Builds AI tools inside the businesses that use them. Based in Bangkok.",
+    "Solopreneur. Builds AI tools inside the businesses that use them. Based in Bangkok.",
   summary: RESUME_SUMMARY_FALLBACK,
 } as const;
 

@@ -224,31 +224,31 @@ describe("TopicHubPage (every hub)", () => {
 describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
   const SLUG = "forward-deployed-ai-engineering";
 
-  it("says who he is open to hearing from, under the lede", () => {
+  it("says what he is building now, under the lede", () => {
     renderTopic(SLUG, "en");
-    const pill = screen.getByText("Open to roles").closest("p")!;
+    const pill = screen.getByText("Currently building").closest("p")!;
     expect(pill).toHaveTextContent(
-      "Open to roles · Forward Deployed Engineer and AI engineering · Bangkok or remote",
+      "Currently building · GoGoCash and Manut AI · Bangkok",
     );
-    expect(screen.getByText("Open to roles")).toHaveClass("ds-badge");
+    expect(screen.getByText("Currently building")).toHaveClass("ds-badge");
     expect(hero()).toContainElement(pill);
+    expect(screen.queryByText(/open to roles/i)).toBeNull();
   });
 
-  it("offers the hiring contact and the résumé side by side", () => {
+  it("offers the work contact and the résumé side by side", () => {
     renderTopic(SLUG, "en");
     expect(
-      within(hero()).getByRole("link", { name: "Contact" }),
-    ).toHaveAttribute("href", "/contact?topic=hiring");
+      within(hero()).getByRole("link", { name: "Work with me" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
     const resume = within(hero()).getByRole("link", { name: "Résumé" });
     expect(resume).toHaveAttribute("href", "/resume");
     // The second button is the ghost pill: one dark action per group.
     expect(resume).toHaveClass("ds-pill--ghost");
     // The contact block at the foot of the page leads to the same form.
     const card = screen.getByRole("article", { name: "Contact" });
-    expect(within(card).getByRole("link", { name: "Contact" })).toHaveAttribute(
-      "href",
-      "/contact?topic=hiring",
-    );
+    expect(
+      within(card).getByRole("link", { name: "Work with me" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
   });
 
   it("lists the résumé among the pages to explore", () => {
@@ -285,14 +285,12 @@ describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
   it("does the same in Thai, in Thai", () => {
     renderTopic(SLUG, "th");
     // The same words are in the proof list and the FAQ; this is the hero's pill.
-    expect(
-      within(hero()).getByText("เปิดรับตำแหน่ง").closest("p"),
-    ).toHaveTextContent(
-      "เปิดรับตำแหน่ง · Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+    expect(within(hero()).getByText("กำลังสร้าง").closest("p")).toHaveTextContent(
+      "กำลังสร้าง · GoGoCash และ Manut AI ที่กรุงเทพฯ",
     );
     expect(within(hero()).getByRole("link", { name: "ติดต่อ" })).toHaveAttribute(
       "href",
-      "/contact?topic=hiring",
+      "/contact?topic=project",
     );
     expect(within(hero()).getByRole("link", { name: "เรซูเม่" })).toHaveAttribute(
       "href",
@@ -308,7 +306,9 @@ describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
 
   it("keeps the pill and the second button off the other hubs", () => {
     renderTopic("ai-transformation-thailand", "en");
-    expect(screen.queryByText("Open to roles", { exact: false })).toBeNull();
+    expect(
+      screen.queryByText("Currently building", { exact: false }),
+    ).toBeNull();
     expect(screen.queryByRole("link", { name: "Résumé" })).toBeNull();
   });
 });

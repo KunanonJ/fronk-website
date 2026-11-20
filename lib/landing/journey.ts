@@ -93,8 +93,11 @@ export interface RecordRow {
   readonly period: string;
 }
 
-/** The résumé sections that list employment, in the résumé's order. */
-const EMPLOYMENT = new Set(["Currently", "Experience"]);
+/**
+ * The résumé sections that list employment, in the résumé's order. Since
+ * 20-11-26 "Currently" holds his own ventures, not an employer.
+ */
+const EMPLOYMENT = new Set(["Experience"]);
 
 function rows(
   sections: readonly ResolvedTimelineSection[],

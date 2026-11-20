@@ -27,7 +27,7 @@ export const operatingModel = {
   eyebrow: "Solopreneur",
   heading: "How I ship.",
   intro:
-    "One person can take a product from idea to production when every stage has a principle, a repeatable skill and a check. I run this loop solo on GoGoCash and Manut AI, and inside teams at The Binary Holdings. These are the stages, the agent skills that run them, and work where each one shows.",
+    "One person can take a product from idea to production when every stage has a principle, a repeatable skill and a check. I run this loop solo on GoGoCash and Manut AI, and ran it inside teams at The Binary Holdings. These are the stages, the agent skills that run them, and work where each one shows.",
   markdownHref: "/operating-model.md",
   stages: [
     {

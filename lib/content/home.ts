@@ -1,5 +1,5 @@
 import { aboutPage } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { PERSON_NAME } from "@/lib/content/identity";
 import { hero } from "@/lib/content/landing";
 import {
@@ -43,9 +43,13 @@ export const homeHero = {
   phrases: [canonicalPhrase, ...ALTERNATE_PHRASES] as readonly string[],
   /** The h1's accessible name, whatever phrase shows. */
   title: `${greetingLine} ${canonicalPhrase}`,
-  /** Umbrella input R4: the accent badge and one plain chip. */
-  badge: OPEN_TO_ROLES.pill.label,
-  location: OPEN_TO_ROLES.location,
+  /**
+   * Umbrella input R4: the accent badge and one plain chip. Since the owner's
+   * direction of 20-11-26 the chip names the ventures, so the two read as
+   * one phrase: "Currently building, GoGoCash and Manut AI".
+   */
+  badge: AVAILABILITY.pill.label,
+  chip: AVAILABILITY.ventures.join(" and "),
   lead: hero.homeLead,
   primaryCta: hero.primaryCta,
   resumeCta: hero.resumeCta,
@@ -53,11 +57,11 @@ export const homeHero = {
   rotateMs: 4200,
 } as const;
 
-/** The résumé sections that list employers (umbrella input R6). */
-const EMPLOYER_SECTIONS: ReadonlySet<string> = new Set([
-  "Currently",
-  "Experience",
-]);
+/**
+ * The résumé sections that list employers (umbrella input R6). "Currently"
+ * holds his own ventures since 20-11-26, which the strip adds at its end.
+ */
+const EMPLOYER_SECTIONS: ReadonlySet<string> = new Set(["Experience"]);
 
 /**
  * The ventures R6 names for the strip, by slug: GoGoCash and Manut AI. A

@@ -1,8 +1,8 @@
 import type { FaqItem } from "@/lib/seo/jsonLd";
-import { HIRING_CONTACT_HREF, RESUME_HREF } from "@/lib/content/availability";
+import { RESUME_HREF, WORK_CONTACT_HREF } from "@/lib/content/availability";
 import {
-  CURRENT_ROLE,
-  OPEN_TO_ROLES,
+  AVAILABILITY,
+  LATEST_ROLE,
   PERSON_CUSTOMER_WORK,
 } from "@/lib/content/identity";
 
@@ -37,7 +37,7 @@ export type TopicPillar = {
   relatedLinks: readonly { label: string; href: string }[];
   ctaLabel: string;
   ctaHref: string;
-  /** A pill in the hero saying who he is open to hearing from (the FDE hub). */
+  /** A pill in the hero saying what he is building now (the FDE hub). */
   availability?: { readonly label: string; readonly detail: string };
   /** A second button beside the CTA: the résumé, on the FDE hub. */
   secondaryCta?: { readonly label: string; readonly href: string };
@@ -85,7 +85,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is Kunanon Jarat in this space?",
         answer:
-          "Kunanon Jarat (Fronk) is a Bangkok-based AI engineering lead and solopreneur: AI Engineering Lead at The Binary Holdings, founder of GoGoCash (fintech cashback) and builder of Manut AI (ERP/CRM with Intelligence AI for automotive SMEs).",
+          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          "Kunanon Jarat (Fronk) is a Bangkok-based solopreneur: founder of GoGoCash (fintech cashback) and builder of Manut AI (ERP/CRM with Intelligence AI for automotive SMEs), and previously AI Engineering Lead at The Binary Holdings.",
       },
       {
         question: "Where should a startup begin?",
@@ -214,7 +215,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is the founder behind KunanonJ?",
         answer:
-          "Kunanon Jarat (Fronk) — Bangkok-based AI Engineering Lead at The Binary Holdings, founder of GoGoCash and builder of Manut AI.",
+          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          "Kunanon Jarat (Fronk) — Bangkok-based founder of GoGoCash and builder of Manut AI, previously AI Engineering Lead at The Binary Holdings.",
       },
       {
         question: "What markets do you focus on?",
@@ -254,7 +256,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
       ["AI engineering ", { muted: "from" }, " "],
       ["Bangkok"],
     ],
-    lede: `A forward deployed engineer builds inside the business that will use the software: next to the people doing the work, against the systems they already run, until the tool is part of the daily routine. Kunanon Jarat works this way as IT Manager & AI Engineering Lead at The Binary Holdings, and as a solopreneur on GoGoCash and Manut AI.`,
+    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    lede: `A forward deployed engineer builds inside the business that will use the software: next to the people doing the work, against the systems they already run, until the tool is part of the daily routine. Kunanon Jarat works this way as a solopreneur on GoGoCash and Manut AI, and worked this way as ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
     sections: [
       {
         heading: "Built inside the business",
@@ -274,14 +277,14 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      `${CURRENT_ROLE.title} at ${CURRENT_ROLE.organization} since ${CURRENT_ROLE.since}`,
+      `${LATEST_ROLE.title} at ${LATEST_ROLE.organization} from ${LATEST_ROLE.since} to ${LATEST_ROLE.until}`,
       // The case studies' outcomes, in the résumé's own words. Typed here so
       // the hubs do not load the portfolio module; portfolioOutcomes.test.ts
       // checks every clause against the outcome and the bullet it restates.
       "TBH Intranet: adoption by 50+ employees; build cycles from 4 months to 1 week",
       "AI Automation: recurring workflow staffing from 10 people to 1 operator; 30-minute turnaround",
       `Superstacks: ${SUPERSTACKS_SKILL_COUNT} MIT-licensed agent skills for Claude Code, Codex and Cursor`,
-      OPEN_TO_ROLES.sentence,
+      AVAILABILITY.sentence,
     ],
     faqs: [
       {
@@ -291,7 +294,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
       {
         question: "Does Kunanon Jarat work as a forward deployed engineer?",
-        answer: `He works this way as IT Manager & AI Engineering Lead at The Binary Holdings, where he leads internal AI agents, automations and the intranet's AI assistant. ${OPEN_TO_ROLES.sentence}`,
+        // DRAFT (owner direction 20-11-26): past tense for the role.
+        answer: `He worked this way as ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}, where he led internal AI agents, automations and the intranet's AI assistant. ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
       },
       {
         question: "Which AI tools has he shipped?",
@@ -306,10 +310,11 @@ const EN_PILLARS: readonly TopicPillar[] = [
       { label: "Agent skills", href: "/skills" },
       { label: "About", href: "/about" },
     ],
-    ctaLabel: "Contact",
-    // The page a recruiter lands on: its buttons open the hiring path.
-    ctaHref: HIRING_CONTACT_HREF,
-    availability: OPEN_TO_ROLES.pill,
+    // DRAFT label (owner direction 20-11-26): the button opens the contact
+    // form with "Freelance or consulting" chosen.
+    ctaLabel: "Work with me",
+    ctaHref: WORK_CONTACT_HREF,
+    availability: AVAILABILITY.pill,
     secondaryCta: { label: "Résumé", href: RESUME_HREF },
   },
 ];
@@ -352,7 +357,8 @@ const TH_PILLARS: readonly TopicPillar[] = [
       {
         question: "Kunanon Jarat คือใคร?",
         answer:
-          "IT Manager & AI Engineering Lead ที่ The Binary Holdings ผู้ก่อตั้ง GoGoCash และผู้สร้าง Manut AI จากกรุงเทพฯ (KunanonJ / Fronk)",
+          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          "ผู้ก่อตั้ง GoGoCash และผู้สร้าง Manut AI จากกรุงเทพฯ อดีต IT Manager & AI Engineering Lead ที่ The Binary Holdings (KunanonJ / Fronk)",
       },
     ],
     relatedLinks: [
@@ -445,7 +451,8 @@ const TH_PILLARS: readonly TopicPillar[] = [
       [{ muted: "แบบ" }, " Forward Deployed "],
       [{ muted: "จาก" }, "กรุงเทพฯ"],
     ],
-    lede: "Forward deployed engineer คือวิศวกรที่ลงไปสร้างระบบในธุรกิจที่จะใช้งานจริง ทำงานใกล้ชิดกับคนหน้างาน เชื่อมกับระบบที่ใช้อยู่ และอยู่จนเครื่องมือกลายเป็นส่วนหนึ่งของงานประจำวัน Kunanon Jarat ทำงานแบบนี้ในตำแหน่ง IT Manager & AI Engineering Lead ที่ The Binary Holdings และในฐานะ solopreneur ของ GoGoCash และ Manut AI",
+    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    lede: `Forward deployed engineer คือวิศวกรที่ลงไปสร้างระบบในธุรกิจที่จะใช้งานจริง ทำงานใกล้ชิดกับคนหน้างาน เชื่อมกับระบบที่ใช้อยู่ และอยู่จนเครื่องมือกลายเป็นส่วนหนึ่งของงานประจำวัน Kunanon Jarat ทำงานแบบนี้ในฐานะ solopreneur ของ GoGoCash และ Manut AI และเคยทำงานแบบนี้ในตำแหน่ง ${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization}`,
     sections: [
       {
         heading: "สร้างจากภายในธุรกิจ",
@@ -457,17 +464,17 @@ const TH_PILLARS: readonly TopicPillar[] = [
       },
     ],
     proof: [
-      `${CURRENT_ROLE.title} ที่ ${CURRENT_ROLE.organization} ตั้งแต่${CURRENT_ROLE.sinceThai}`,
+      `${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization} ตั้งแต่${LATEST_ROLE.sinceThai} ถึง${LATEST_ROLE.untilThai}`,
       // The same outcomes as the English hub, figure for figure (tested).
       "TBH Intranet: มีพนักงานใช้งาน 50+ คน และรอบการพัฒนาลดลงจาก 4 เดือนเหลือ 1 สัปดาห์",
       "AI Automation: ลดจำนวนคนในเวิร์กโฟลว์ที่ทำเป็นประจำจาก 10 คนเหลือผู้ปฏิบัติงาน 1 คน ด้วยระยะเวลาดำเนินการ 30 นาที",
-      OPEN_TO_ROLES.th.sentence,
+      AVAILABILITY.th.sentence,
     ],
     faqs: [
       {
         question: "Kunanon Jarat ทำงานแบบ forward deployed engineer หรือไม่?",
-        answer:
-          "ทำงานแบบนี้ในตำแหน่ง IT Manager & AI Engineering Lead ที่ The Binary Holdings ดูแล AI agents ภายใน งานอัตโนมัติ และผู้ช่วย AI ของ intranet และเปิดรับตำแหน่ง Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
+        // DRAFT (owner direction 20-11-26): past tense for the role.
+        answer: `เคยทำงานแบบนี้ในตำแหน่ง ${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization} ดูแล AI agents ภายใน งานอัตโนมัติ และผู้ช่วย AI ของ intranet ปัจจุบัน${AVAILABILITY.th.sentence}`,
       },
     ],
     relatedLinks: [
@@ -479,8 +486,8 @@ const TH_PILLARS: readonly TopicPillar[] = [
       { label: "เกี่ยวกับ", href: "/about" },
     ],
     ctaLabel: "ติดต่อ",
-    ctaHref: HIRING_CONTACT_HREF,
-    availability: OPEN_TO_ROLES.th.pill,
+    ctaHref: WORK_CONTACT_HREF,
+    availability: AVAILABILITY.th.pill,
     secondaryCta: { label: "เรซูเม่", href: RESUME_HREF },
   },
 ];

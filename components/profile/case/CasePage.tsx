@@ -2,7 +2,7 @@ import { Reveal } from "@/components/ds/Reveal";
 import { CaseChapter } from "@/components/profile/case/CaseChapter";
 import { CaseHero } from "@/components/profile/case/CaseHero";
 import { CaseContents, CaseRail } from "@/components/profile/case/CaseRail";
-import { HiringPanel } from "@/components/profile/case/HiringPanel";
+import { WorkTogetherPanel } from "@/components/profile/case/WorkTogetherPanel";
 import { MoreProjects } from "@/components/profile/case/MoreProjects";
 import { useChapterNav } from "@/components/profile/case/useChapterNav";
 import type { CaseStudy } from "@/lib/content/caseStudy";
@@ -10,7 +10,7 @@ import type { CaseStudy } from "@/lib/content/caseStudy";
 /*
  * The case-study template (profile redesign Phase 5, design spec 9): the
  * hero with the evidence rows, the cover and the meta row; then the phone
- * contents, the chapters beside the sticky rail, the Hiring panel at the end
+ * contents, the chapters beside the sticky rail, the Work together panel at the end
  * of the column; then More projects. The footer comes from the layout.
  * Every case renders from lib/content/caseStudy.ts, which reads today's
  * content modules. Styles: src/styles/profile/case.css.
@@ -30,8 +30,8 @@ export default function CasePage({ study }: { study: CaseStudy }) {
                 <CaseChapter chapter={chapter} />
               </Reveal>
             ))}
-            <Reveal className="pf-case-step pf-case-step--hire">
-              <HiringPanel />
+            <Reveal className="pf-case-step pf-case-step--work">
+              <WorkTogetherPanel />
             </Reveal>
           </div>
         </div>

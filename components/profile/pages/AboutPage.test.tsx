@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AboutPage from "@/components/profile/pages/AboutPage";
 import { aboutPage } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { aboutRecruiterLinks } from "@/lib/content/contact";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
@@ -48,8 +48,8 @@ describe("AboutPage: the hero", () => {
 
   it("says who he is open to hearing from, between the role and the buttons", () => {
     render(<AboutPage />);
-    const line = screen.getByText(OPEN_TO_ROLES.pill.label).closest("p")!;
-    expect(line).toHaveTextContent(OPEN_TO_ROLES.pill.detail);
+    const line = screen.getByText(AVAILABILITY.pill.label).closest("p")!;
+    expect(line).toHaveTextContent(AVAILABILITY.pill.detail);
     const role = screen.getByText(aboutPage.hero.role);
     const contact = screen.getByRole("link", { name: "Contact me" });
     expect(
@@ -203,7 +203,7 @@ describe("AboutPage: the Next card", () => {
       ...aboutPage.cta.links.map((l) => l.href),
     ]);
     // The dark pill serves every reader, so it opens the general form.
-    // A string name matches the whole name: not "Contact about a role".
+    // A string name matches the whole name: not "Get in touch for later".
     const contact = within(next).getByRole("link", { name: "Contact" });
     expect(contact).toHaveAttribute("href", "/contact");
     expect(contact.className).toMatch(/\bds-pill\b/);
@@ -215,12 +215,16 @@ describe("AboutPage: the Next card", () => {
     expect(
       within(next).getByRole("heading", { name: "For recruiters" }),
     ).toBeInTheDocument();
-    expect(next).toHaveTextContent(OPEN_TO_ROLES.sentence);
+    expect(next).toHaveTextContent(AVAILABILITY.sentence);
     expect(next).toHaveTextContent("Bangkok time, GMT+7.");
-    // A recruiter's own link opens the form with Hiring chosen. The arrows
+    // He is not looking now (owner direction 20-11-26), so the recruiter's
+    // link is for later: the form with "A future role" chosen. The arrows
     // are hidden from the names since the cutover (spec 12 item 18).
     expect(
-      within(next).getByRole("link", { name: "Contact about a role" }),
+      within(next).queryByRole("link", { name: "Contact about a role" }),
+    ).toBeNull();
+    expect(
+      within(next).getByRole("link", { name: "Get in touch for later" }),
     ).toHaveAttribute("href", "/contact?topic=hiring");
     const pdf = within(next).getByRole("link", { name: "Download PDF" });
     expect(pdf).toHaveAttribute("href", "/resume.pdf");

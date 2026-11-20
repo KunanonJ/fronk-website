@@ -15,9 +15,10 @@ describe("resolveResumeProfile", () => {
     });
   });
 
-  it("leads the default headline with the AI role, not a founder title", () => {
-    expect(DEFAULT_RESUME_PROFILE.headline).toMatch(/^AI Engineering Lead\./);
-    expect(DEFAULT_RESUME_PROFILE.headline).not.toMatch(/Founder/);
+  it("leads the default headline with how he works now, not a title he no longer holds", () => {
+    // The Binary Holdings role ended in November 2026 (owner direction 20-11-26).
+    expect(DEFAULT_RESUME_PROFILE.headline).toMatch(/^Solopreneur\./);
+    expect(DEFAULT_RESUME_PROFILE.headline).not.toMatch(/Founder|Lead\b/);
   });
 
   it("prefers a CMS summary and keeps the repo's skill groups", () => {

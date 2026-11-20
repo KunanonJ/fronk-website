@@ -105,16 +105,16 @@ describe("labels", () => {
   it("renders chips, the illustration chip and the badge as text", () => {
     render(
       <>
-        <Chip>Bangkok or remote</Chip>
+        <Chip>GoGoCash and Manut AI</Chip>
         <Chip kind="illustration">Illustration</Chip>
-        <Badge>Open to roles</Badge>
+        <Badge>Currently building</Badge>
       </>,
     );
-    expect(screen.getByText("Bangkok or remote")).toHaveClass("ds-chip");
+    expect(screen.getByText("GoGoCash and Manut AI")).toHaveClass("ds-chip");
     expect(screen.getByText("Illustration")).toHaveClass(
       "ds-chip--illustration",
     );
-    expect(screen.getByText("Open to roles")).toHaveClass("ds-badge");
+    expect(screen.getByText("Currently building")).toHaveClass("ds-badge");
   });
 
   it("sets eyebrows as mono labels, as a heading when asked", () => {

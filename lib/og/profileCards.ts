@@ -1,5 +1,5 @@
 import { aboutPage } from "@/lib/content/aboutPage";
-import { OPEN_TO_ROLES } from "@/lib/content/availability";
+import { AVAILABILITY } from "@/lib/content/availability";
 import { PERSON_NAME } from "@/lib/content/identity";
 import { hero } from "@/lib/content/landing";
 import type { ProfileCardProps } from "@/lib/og/profileCard";
@@ -12,7 +12,7 @@ import type { ProfileCardProps } from "@/lib/og/profileCard";
 
 /** The site-wide card (/opengraph-image), which Home and most pages share. */
 export const HOME_CARD: ProfileCardProps = {
-  pill: OPEN_TO_ROLES.pill.label,
+  pill: AVAILABILITY.pill.label,
   lines: [[`${hero.greeting} ${hero.name}`], ...hero.headline.map((l) => [l])],
   accent: hero.headlineAccent,
   lead: hero.homeLead,
@@ -22,7 +22,7 @@ const about = aboutPage.hero.headline;
 
 /** /about/opengraph-image: the About hero, muted words included. */
 export const ABOUT_CARD: ProfileCardProps = {
-  pill: OPEN_TO_ROLES.pill.label,
+  pill: AVAILABILITY.pill.label,
   lines: [
     [{ muted: about.muted }, about.name],
     [about.focus, { muted: about.joiner }],

@@ -1,5 +1,5 @@
 import {
-  HIRING_CONTACT_HREF,
+  FUTURE_ROLE_CONTACT_HREF,
   RESUME_HREF,
   RESUME_PDF_HREF,
 } from "@/lib/content/availability";
@@ -10,25 +10,10 @@ import { PAGE_META } from "@/lib/content/pageMeta";
 /**
  * Copy and limits for `/contact`. The form prepares an email that the
  * visitor's own email app sends (lib/contact/compose.ts): the site has no
- * mail server and keeps nothing.
+ * mail server and keeps nothing. The topics, which only the form and the
+ * agents' tools need, are in ./contactTopics, out of the chunk every page's
+ * footer loads.
  */
-
-/** Hiring leads: it is the topic a recruiter looks for (recruiter-fit phase 2). */
-export const CONTACT_TOPICS = [
-  "Hiring",
-  "GoGoCash",
-  "Manut AI",
-  "Partnership",
-  "Investment",
-  "AI / ERP advice",
-  "Speaking or press",
-  "Something else",
-] as const;
-
-/** The topic `/contact?topic=hiring` chooses for the visitor. */
-export const HIRING_TOPIC = "Hiring" satisfies (typeof CONTACT_TOPICS)[number];
-
-export type ContactTopic = (typeof CONTACT_TOPICS)[number];
 
 export const CONTACT_LIMITS = {
   nameMax: 100,
@@ -67,9 +52,6 @@ export const contactPage = {
     "It opens in your email app, addressed to me. Nothing is sent until you press Send there.",
   namePlaceholder: "Full name",
   messagePlaceholder: "What are you working on, and how can I help?",
-  /** The message label when the visitor arrives through a hiring button. */
-  hiringPlaceholder:
-    "Tell me about the role: the team, the scope and the location",
   topicsLabel: "What’s it about?",
   submit: "Open in your email app",
   readyTitle: "Your email is ready.",
@@ -127,10 +109,12 @@ export const contactRecruiterLinks: readonly RecruiterLink[] = [
 
 /**
  * The same block in About's "Let's talk" card. The résumé already has a
- * button there, so the hiring form leads instead.
+ * button there, so the form leads instead, with "A future role" chosen: he
+ * is not looking now, but a recruiter may write for later (owner direction
+ * 20-11-26).
  */
 export const aboutRecruiterLinks: readonly RecruiterLink[] = [
-  { label: "Contact about a role", href: HIRING_CONTACT_HREF },
+  { label: "Get in touch for later", href: FUTURE_ROLE_CONTACT_HREF }, // DRAFT
   RESUME_FILE,
   LINKEDIN,
 ];
@@ -156,10 +140,3 @@ export const contactMessages = {
   messageTooShort: `Write a little more (at least ${CONTACT_LIMITS.messageMin} characters).`,
   messageTooLong: `Keep it under ${CONTACT_LIMITS.messageMax.toLocaleString("en-US")} characters.`,
 } as const;
-
-export function isContactTopic(value: unknown): value is ContactTopic {
-  return (
-    typeof value === "string" &&
-    (CONTACT_TOPICS as readonly string[]).includes(value)
-  );
-}

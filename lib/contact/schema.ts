@@ -1,9 +1,6 @@
 import * as v from "valibot";
-import {
-  CONTACT_LIMITS,
-  CONTACT_TOPICS,
-  contactMessages,
-} from "@/lib/content/contact";
+import { CONTACT_LIMITS, contactMessages } from "@/lib/content/contact";
+import { CONTACT_TOPICS } from "@/lib/content/contactTopics";
 
 /**
  * The contact form's rules as a Valibot schema (Standard Schema), shared by

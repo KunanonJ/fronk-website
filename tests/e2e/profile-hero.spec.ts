@@ -190,7 +190,7 @@ test.describe("hero: the recruiter facts (plan gate 2)", () => {
     { width: 1440, height: 900 },
     { width: 375, height: 812 },
   ]) {
-    test(`at ${viewport.width} px the h1, Open to roles, Contact me and Résumé are fully in view`, async ({
+    test(`at ${viewport.width} px the h1, Currently building, Contact me and Résumé are fully in view`, async ({
       page,
     }) => {
       only(["desktop", "webkit-phone"]);
@@ -204,7 +204,7 @@ test.describe("hero: the recruiter facts (plan gate 2)", () => {
         "Forward deployed AI engineering from Bangkok.",
       );
       await expect(h1).toBeInViewport({ ratio: 1 });
-      await expect(hero.getByText("Open to roles")).toBeInViewport({
+      await expect(hero.getByText("Currently building")).toBeInViewport({
         ratio: 1,
       });
       await expect(

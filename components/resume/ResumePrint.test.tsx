@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { PRINT_FONT, ResumePrint } from "@/components/resume/ResumePrint";
-import { OPEN_TO_ROLES } from "@/lib/content/identity";
+import { AVAILABILITY } from "@/lib/content/identity";
 import { resolveResumeProfile } from "@/lib/content/resumeProfile";
 import { isLiveBullet, printGroups } from "@/lib/resume/view";
 import { siteConfig } from "@/lib/site";
@@ -23,7 +23,7 @@ describe("ResumePrint", () => {
       /^Kunanon Jarat$/,
     );
     expect(screen.getByText(profile.headline)).toBeInTheDocument();
-    expect(screen.getByText(OPEN_TO_ROLES.sentence)).toBeInTheDocument();
+    expect(screen.getByText(AVAILABILITY.sentence)).toBeInTheDocument();
     expect(screen.getByText(profile.summary)).toBeInTheDocument();
     // The languages line is the CV's (the owner cleared its figures).
     expect(profile.languages.length).toBeGreaterThan(0);
@@ -88,11 +88,15 @@ describe("ResumePrint", () => {
       for (const bullet of (item.bullets ?? []).filter((b) => !isLiveBullet(b)))
         expect(article).toHaveTextContent(bullet);
     });
-    // Not derived from printGroups: the current role leads, the internship ends Experience.
-    expect(articles[0]).toHaveTextContent(
-      "IT Manager & AI Engineering LeadSep 2025 - Present",
+    // Not derived from printGroups: what he is building now leads (owner
+    // direction 20-11-26), then the latest role, ended; the internship ends
+    // Experience.
+    expect(articles[0]).toHaveTextContent("GoGoCashMay 2023 - Present");
+    expect(articles[1]).toHaveTextContent("Manut AI2025 - Present");
+    expect(articles[2]).toHaveTextContent(
+      "IT Manager & AI Engineering LeadSep 2025 - Nov 2026",
     );
-    expect(articles[9]).toHaveTextContent(
+    expect(articles[11]).toHaveTextContent(
       "Smart Contract InternNov 2021 - Jan 2022",
     );
     expect(articles.at(-1)).toHaveTextContent("GoSparkIn development");
@@ -100,7 +104,8 @@ describe("ResumePrint", () => {
 
   it("writes periods with a plain hyphen and prints each project's site once", () => {
     const { container } = render(<ResumePrint profile={profile} />);
-    expect(container.textContent).toContain("Sep 2025 - Present");
+    expect(container.textContent).toContain("Sep 2025 - Nov 2026");
+    expect(container.textContent).toContain("May 2023 - Present");
     expect(container.textContent).not.toMatch(
       /[—–] (Present|[A-Z][a-z]{2} \d{4})/,
     );

@@ -192,8 +192,10 @@ test.describe("resume > the detail view is a typed search param", () => {
     await expect(
       group.getByRole("button", { name: "Compact" }),
     ).toHaveAttribute("aria-pressed", "true");
+    // The live ventures lead the résumé under Currently (20-11-26).
     const projects = page.getByRole("article", {
-      name: "Independent projects",
+      name: "Currently",
+      exact: true,
     });
     await expect(projects.getByText(/^Live at /)).toHaveCount(0);
 
@@ -1036,9 +1038,7 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
   test("the footer's Now line, then the time in Bangkok", async ({ page }) => {
     await page.goto("/contact", { waitUntil: "load" });
     const footer = page.locator(".pf-footer__name-block");
-    await expect(footer).toContainText(
-      "Now: leading AI engineering at The Binary Holdings",
-    );
+    await expect(footer).toContainText("Now: building GoGoCash and Manut AI");
     await expect(footer.locator("time[data-clock]")).toHaveText(
       /^\d{2}:\d{2}$/,
     );
@@ -1166,8 +1166,11 @@ test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
 });
 
 /**
- * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
- * deployed or AI engineer needs is one glance or one click away.
+ * The recruiter path (recruiter-fit phase 2): what a visitor weighing his
+ * work needs is one glance or one click away. Since the owner's direction of
+ * 20-11-26 the availability says he is building GoGoCash and Manut AI, and
+ * the buttons lead to a project ("Get in touch", "Work with me"); the old
+ * hiring address still opens the form, for a future role.
  */
 test.describe("recruiter path > the role, the availability and the résumé are one glance away", () => {
   test.beforeEach(async ({ page }) => {
@@ -1185,7 +1188,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     { width: 1440, height: 900 },
     { width: 375, height: 812 },
   ]) {
-    test(`home shows the role, who he is open to and both buttons without scrolling at ${viewport.width} px`, async ({
+    test(`home shows the role, what he is building and both buttons without scrolling at ${viewport.width} px`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport);
@@ -1196,9 +1199,10 @@ test.describe("recruiter path > the role, the availability and the résumé are 
         "Forward deployed AI engineering from Bangkok.",
       );
       await expect(h1).toBeInViewport({ ratio: 1 });
-      await expect(hero.getByText("Open to roles")).toBeInViewport({
+      await expect(hero.getByText("Currently building")).toBeInViewport({
         ratio: 1,
       });
+      await expect(hero.getByText(/open to roles/i)).toHaveCount(0);
       await expect(
         hero.getByRole("link", { name: "Contact me" }),
       ).toBeInViewport({ ratio: 1 });
@@ -1329,7 +1333,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     expect(mark.background).not.toBe("rgba(0, 0, 0, 0)");
   });
 
-  test("a hiring button opens the contact form ready for a recruiter", async ({
+  test("a work button opens the contact form ready for a project", async ({
     page,
   }) => {
     await page.goto("/topics/forward-deployed-ai-engineering", {
@@ -1337,35 +1341,33 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     });
     await page
       .locator('section[aria-labelledby="hero-title"]')
-      .getByRole("link", { name: "Contact" })
+      .getByRole("link", { name: "Work with me" })
       .click();
-    await expect(page).toHaveURL(/\/contact\?topic=hiring$/);
-    await expect(page.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    await expect(page).toHaveURL(/\/contact\?topic=project$/);
     await expect(
-      page.getByLabel(
-        "Tell me about the role: the team, the scope and the location",
-      ),
+      page.getByRole("button", { name: "Freelance or consulting" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      page.getByLabel("What are you building, and where could I help?"),
     ).toBeVisible();
     await expect(
       page.getByRole("article", { name: "For recruiters", exact: true }),
     ).toBeVisible();
   });
 
-  test("the hiring link also works as a direct visit, and the chip stays the visitor's", async ({
+  test("the old hiring link still works as a direct visit, for a future role, and the chip stays the visitor's", async ({
     page,
   }) => {
     // The page is prerendered as the general form; the intent arrives after
     // hydration.
     await page.goto("/contact?topic=hiring", { waitUntil: "networkidle" });
     await expect(page).toHaveURL(/\/contact\?topic=hiring$/);
-    const chip = page.getByRole("button", { name: "Hiring" });
+    await expect(page.getByRole("button", { name: "Hiring" })).toHaveCount(0);
+    const chip = page.getByRole("button", { name: "A future role" });
     await expect(chip).toHaveAttribute("aria-pressed", "true");
     await expect(
       page.getByLabel(
-        "Tell me about the role: the team, the scope and the location",
+        "Not looking right now, but tell me about the role for later: the team and the scope",
       ),
     ).toBeVisible();
     // Taking the chip off brings the general question back.
@@ -1382,8 +1384,9 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     await expect(
       card.getByRole("heading", { name: "For recruiters" }),
     ).toBeVisible();
+    // Not looking now: the recruiter's link is for later (20-11-26).
     await expect(
-      card.getByRole("link", { name: "Contact about a role" }),
+      card.getByRole("link", { name: "Get in touch for later" }),
     ).toHaveAttribute("href", "/contact?topic=hiring");
     // The ink button serves every reader: it opens the general form.
     await expect(
@@ -1459,10 +1462,11 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     // The default is never written into the URL either.
     await page.goto("/contact?topic=general", { waitUntil: "networkidle" });
     await expect(page).toHaveURL(/\/contact$/);
-    await expect(page.getByRole("button", { name: "Hiring" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
+    for (const name of ["Freelance or consulting", "A future role"])
+      await expect(page.getByRole("button", { name })).toHaveAttribute(
+        "aria-pressed",
+        "false",
+      );
   });
 
   test("the FDE hub sets its four sections as chapters, each body beside its heading at desktop width", async ({
@@ -1507,7 +1511,7 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     // The pill is one paragraph: the label, a middle dot, then the detail.
     await expect(
       hero.locator("p", {
-        hasText: "เปิดรับตำแหน่ง · Forward Deployed Engineer",
+        hasText: "กำลังสร้าง · GoGoCash และ Manut AI ที่กรุงเทพฯ",
       }),
     ).toBeVisible();
     await expect(hero.getByRole("link", { name: "เรซูเม่" })).toHaveAttribute(
@@ -1516,23 +1520,28 @@ test.describe("recruiter path > the role, the availability and the résumé are 
     );
     await expect(hero.getByRole("link", { name: "ติดต่อ" })).toHaveAttribute(
       "href",
-      "/contact?topic=hiring",
+      "/contact?topic=project",
     );
   });
 
-  test("a case study ends with the résumé and the hiring contact", async ({
+  test("a case study ends with the résumé and the work contact", async ({
     page,
   }) => {
     await page.goto("/portfolio/tbh-intranet", { waitUntil: "networkidle" });
-    const card = page.getByRole("article", { name: "Hiring", exact: true });
+    await expect(
+      page.getByRole("article", { name: "Hiring", exact: true }),
+    ).toHaveCount(0);
+    const card = page.getByRole("article", {
+      name: "Work together",
+      exact: true,
+    });
     await expect(card.getByRole("link", { name: "Résumé" })).toHaveAttribute(
       "href",
       "/resume",
     );
-    await expect(card.getByRole("link", { name: "Contact" })).toHaveAttribute(
-      "href",
-      "/contact?topic=hiring",
-    );
+    await expect(
+      card.getByRole("link", { name: "Get in touch" }),
+    ).toHaveAttribute("href", "/contact?topic=project");
   });
 });
 

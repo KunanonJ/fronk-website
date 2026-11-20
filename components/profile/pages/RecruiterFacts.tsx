@@ -1,5 +1,5 @@
 import { TextLink } from "@/components/ds/TextLink";
-import { OPEN_TO_ROLES, RESUME_PDF_NAME } from "@/lib/content/availability";
+import { AVAILABILITY, RESUME_PDF_NAME } from "@/lib/content/availability";
 import type { RecruiterLink } from "@/lib/content/contact";
 import { place } from "@/lib/content/landing";
 
@@ -7,14 +7,15 @@ import { place } from "@/lib/content/landing";
  * What a recruiter asks first, answered before they write (recruiter-fit
  * phase 2), in the profile redesign's style since the Phase 6 cutover: About
  * shows it in its "Next" card, Contact in "For recruiters". Only what the
- * owner approved appears: the availability line and where he is.
+ * owner directed appears: the availability line (20-11-26: not looking for
+ * a full-time role now) and where he is.
  */
 
-/** Who he is open to hearing from, then his time zone. */
+/** What he is doing and whether he is looking, then his time zone. */
 export function RecruiterLines() {
   return (
     <>
-      <p className="t-body pf-recruit__line">{OPEN_TO_ROLES.sentence}</p>
+      <p className="t-body pf-recruit__line">{AVAILABILITY.sentence}</p>
       <p className="t-small pf-recruit__time">
         {place.city} time, {place.utcLabel}.
       </p>

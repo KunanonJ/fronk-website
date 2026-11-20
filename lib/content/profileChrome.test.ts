@@ -89,7 +89,7 @@ describe("profile chrome links", () => {
 
 describe("profile chrome copy", () => {
   it("takes the availability line and place from the content modules", () => {
-    expect(availability.label).toBe("Open to roles");
+    expect(availability.label).toBe("Currently building");
     expect(availability.location).toBe("Bangkok, GMT+7");
     expect(copyright(2026)).toBe("© 2026 Kunanon Jarat · Bangkok");
   });
@@ -106,7 +106,10 @@ describe("profile chrome copy", () => {
       expect(line, line).not.toMatch(/\p{Extended_Pictographic}/u);
     }
     expect(footerCopy.paragraphs[0]).toMatch(/^I build /);
-    expect(footerCopy.paragraphs[1]).toMatch(/^I’m open to /);
+    // The availability in the first person (owner direction 20-11-26).
+    expect(footerCopy.paragraphs[1]).toMatch(
+      /^I’m building GoGoCash and Manut AI and not looking for a full-time role right now\. I’m open to /,
+    );
     expect(footerCopy.paragraphs).toHaveLength(2);
   });
 });
@@ -170,10 +173,13 @@ describe("the topic hubs in the chrome (Phase 6 review, finding 3)", () => {
 
 describe("the footer's Now line", () => {
   it("says what he is doing in the words that open /about's Now section", () => {
-    const first = aboutPage.now.paragraphs[0]!.spans[0]!;
-    expect(first.type).toBe("text");
-    expect(first.text.toLowerCase()).toMatch(
+    // The paragraph's text as read, links included (they name the ventures).
+    const opening = aboutPage.now.paragraphs[0]!.spans.map(
+      (span) => span.text,
+    ).join("");
+    expect(opening.toLowerCase()).toMatch(
       new RegExp(`^${nowLine.doing.toLowerCase()}\\b`),
     );
+    expect(nowLine.doing).toBe("building GoGoCash and Manut AI");
   });
 });

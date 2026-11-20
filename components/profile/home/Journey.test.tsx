@@ -171,17 +171,17 @@ describe("Journey", () => {
     expect(offset(container)).not.toBe("");
   });
 
-  it("tells the story at #story, with the roles I am open to and their chips", () => {
+  it("tells the story at #story, with what I am building now and its chips", () => {
     const { container } = render(<Journey />);
     const story = container.querySelector("#story")!;
     expect(story.querySelectorAll("p strong").length).toBeGreaterThanOrEqual(2);
     expect(
       within(story as HTMLElement).getByRole("heading", {
         level: 3,
-        name: storyCopy.rolesHeading,
+        name: storyCopy.nowHeading,
       }),
     ).toBeInTheDocument();
-    expect(story).toHaveTextContent(storyCopy.roles);
+    expect(story).toHaveTextContent(storyCopy.now);
     for (const chip of storyCopy.chips)
       expect(within(story as HTMLElement).getByText(chip)).toHaveClass(
         "ds-chip",

@@ -1,4 +1,4 @@
-import { OPEN_TO_ROLES, RESUME_HREF } from "@/lib/content/availability";
+import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
 import { contactPage } from "@/lib/content/contact";
 import { PERSON_NAME } from "@/lib/content/identity";
 import {
@@ -143,7 +143,7 @@ export const brand = {
 
 /** The availability line and the place, as the footer card shows them. */
 export const availability = {
-  label: OPEN_TO_ROLES.pill.label,
+  label: AVAILABILITY.pill.label,
   location: `${place.city}, ${place.utcLabel}`,
   /** The place's clock, which the footer shows once the page runs. */
   timeZone: place.timeZone,
@@ -156,7 +156,7 @@ export const availability = {
  */
 export const nowLine = {
   label: "Now:", // DRAFT
-  doing: "leading AI engineering at The Binary Holdings",
+  doing: "building GoGoCash and Manut AI", // DRAFT (owner direction 20-11-26)
 };
 
 /** The copyright line, with the year passed in (spec 7.7). */
@@ -166,8 +166,9 @@ export function copyright(year: number): string {
 
 /*
  * DRAFT, awaiting the owner's approval (umbrella R3). Drafted from cleared
- * copy: place.body and OPEN_TO_ROLES.sentence in lib/content. First person,
- * with no figure or claim that the content does not already carry.
+ * copy: place.body, and AVAILABILITY.sentence and workWith in lib/content
+ * (owner direction 20-11-26). First person, with no figure or claim that
+ * the content does not already carry.
  */
 export const footerCopy = {
   eyebrow: "Get in touch", // DRAFT
@@ -175,8 +176,8 @@ export const footerCopy = {
   paragraphs: [
     // DRAFT
     "I build fintech and AI operator systems from Bangkok, for Thailand and SEA: AI transformation, ERP/CRM, internal systems and tech startups.",
-    // DRAFT, the emphasised last line
-    "I’m open to Forward Deployed Engineer and AI engineering roles, based in Bangkok or remote.",
+    // DRAFT (owner direction 20-11-26), the emphasised last line
+    "I’m building GoGoCash and Manut AI and not looking for a full-time role right now. I’m open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
   ],
 } as const;
 

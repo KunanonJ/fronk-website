@@ -16,5 +16,9 @@
  * 2026-11-11: case-study evidence (recruiter-fit phase 3): outcomes and "my
  * part" on the case studies, delivery on /proof, GoGoCash's totals as of
  * October 2026, and this site as a portfolio project.
+ *
+ * 2026-11-20: availability and career facts (owner direction 20-11-26): the
+ * Binary Holdings role ended in November 2026; he is building GoGoCash and
+ * Manut AI and is not looking for a full-time role.
  */
-export const SITE_UPDATED = "2026-11-11";
+export const SITE_UPDATED = "2026-11-20";

@@ -2,11 +2,8 @@ import { markdownPathFor } from "@/lib/agents/markdownPaths";
 import type { ContactDraft } from "@/lib/agents/contactDraft";
 import { oneLine } from "@/lib/contact/compose";
 import { firstContactIssue } from "@/lib/contact/schema";
-import {
-  CONTACT_LIMITS,
-  CONTACT_TOPICS,
-  isContactTopic,
-} from "@/lib/content/contact";
+import { CONTACT_LIMITS } from "@/lib/content/contact";
+import { CONTACT_TOPICS, isContactTopic } from "@/lib/content/contactTopics";
 import { siteConfig } from "@/lib/site";
 
 /*

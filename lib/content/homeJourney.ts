@@ -1,4 +1,4 @@
-import { OPEN_TO_ROLES, RESUME_HREF } from "@/lib/content/availability";
+import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
 import { STACK_GROUPS, stackItems } from "@/lib/content/stack";
 
 /*
@@ -9,8 +9,8 @@ import { STACK_GROUPS, stackItems } from "@/lib/content/stack";
  * Lines marked DRAFT wait for the owner's approval, line by line (umbrella
  * input R9). The story is drafted from the résumé
  * (lib/content/resumeTimeline.fallback.ts): every organisation it names is an
- * employer or the university there, and it states no figure. The roles
- * paragraph and chips are the cleared availability (availability.ts), the
+ * employer or the university there, and it states no figure. The "now"
+ * paragraph and chips are the availability (availability.ts), the
  * tools are /stack's (stack.ts), and the records card reads the résumé
  * through lib/landing/journey.ts. Nothing here repeats the About story, which
  * the About bento already shows.
@@ -72,15 +72,15 @@ export const storyCopy = {
     [
       "From there I moved into delivery: ", // DRAFT
       { strong: "business systems" }, // DRAFT
-      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Today I lead ", // DRAFT
+      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Most recently I led ", // DRAFT (owner direction 20-11-26)
       { strong: "IT and AI engineering at The Binary Holdings" }, // DRAFT
       ".",
     ],
   ] as const satisfies readonly (readonly StoryRun[])[],
-  rolesHeading: "Roles I’m open to", // DRAFT (plan step 4c)
-  /** Cleared on 10-11-26 (availability.ts). */
-  roles: OPEN_TO_ROLES.sentence,
-  chips: [...OPEN_TO_ROLES.roles, OPEN_TO_ROLES.location],
+  nowHeading: "What I’m building now", // DRAFT (owner direction 20-11-26)
+  /** The availability the owner directed on 20-11-26 (availability.ts). */
+  now: AVAILABILITY.sentence,
+  chips: [...AVAILABILITY.ventures, AVAILABILITY.location],
 } as const;
 
 export const recordsCopy = {

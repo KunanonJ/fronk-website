@@ -63,7 +63,8 @@ describe("careerRecords", () => {
     RESUME_TIMELINE_FALLBACK.find((section) => section.title === title)!.items;
 
   it("lists the four newest roles, as the résumé has them", () => {
-    const roles = [...resume("Currently"), ...resume("Experience")].slice(0, 4);
+    // Employment only: "Currently" holds his own ventures since 20-11-26.
+    const roles = resume("Experience").slice(0, 4);
     expect(employment).toHaveLength(4);
     employment.forEach((row, index) => {
       const item = roles[index]!;
@@ -73,8 +74,9 @@ describe("careerRecords", () => {
     });
     expect(employment[0]).toMatchObject({
       organisation: "The Binary Holdings",
-      period: "Sep 2025 to now",
+      period: "Sep 2025 to Nov 2026",
     });
+    for (const row of employment) expect(row.period).not.toMatch(/now/);
   });
 
   it("lists the education, and nothing from the projects or early roles", () => {
@@ -89,6 +91,7 @@ describe("careerRecords", () => {
       [...employment, ...education].map((row) => row.title),
     );
     for (const item of [
+      ...resume("Currently"),
       ...resume("Independent projects"),
       ...resume("University-era"),
     ])
