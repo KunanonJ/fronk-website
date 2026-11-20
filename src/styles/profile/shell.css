@@ -648,7 +648,13 @@
     color: var(--ink-80);
     font-size: 0.9375rem;
     line-height: 1.25rem;
-    text-decoration: none;
+    /* The underline is there, unpainted, so it fades in on hover. */
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+  }
+  .pf-footer__link:focus-visible {
+    text-decoration-color: currentColor;
   }
   .pf-footer__side {
     display: grid;
@@ -800,8 +806,7 @@
     }
     .pf-footer__link:hover {
       color: var(--ink);
-      text-decoration: underline;
-      text-underline-offset: 3px;
+      text-decoration-color: currentColor;
     }
   }
 
@@ -856,6 +861,11 @@
 /* Motion (spec 5.1 and 5.7): movement only with no-preference. Opacity-only
    rules are the reduced-motion versions. */
 @media (prefers-reduced-motion: no-preference) {
+  .pf-footer__link {
+    transition:
+      color 0.2s ease-out,
+      text-decoration-color 0.2s ease-out;
+  }
   .pf-nav__row {
     transition:
       opacity 0.2s var(--ease-snappy),

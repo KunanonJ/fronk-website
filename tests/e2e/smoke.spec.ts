@@ -886,6 +886,48 @@ test.describe("reading aids > the reading line follows the main content", () => 
 });
 
 /**
+ * Link underlines (research item 5): a prose link's underline draws in, the
+ * full accent at 2 px, under the pointer or keyboard focus; a footer link's
+ * underline is there unpainted and fades in. At rest both look as before.
+ */
+test.describe("links > underlines draw in under the pointer and the keyboard", () => {
+  const decoration = (locator: Locator) =>
+    locator.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        color: style.textDecorationColor,
+        thickness: style.textDecorationThickness,
+      };
+    });
+
+  test("/about: a prose link and a footer link", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about", { waitUntil: "load" });
+    const prose = page.locator("main .ds-prose-link").first();
+    await prose.scrollIntoViewIfNeeded();
+    expect((await decoration(prose)).thickness).toBe("auto");
+    await prose.hover();
+    expect(await decoration(prose)).toEqual({
+      color: "rgb(110, 60, 255)",
+      thickness: "2px",
+    });
+    await page.mouse.move(0, 0);
+    expect((await decoration(prose)).thickness).toBe("auto");
+    // Reached with the keyboard: Tab back to it from the control before.
+    await prose.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    expect((await decoration(prose)).thickness).toBe("2px");
+
+    const footer = page.locator(".pf-footer__link").first();
+    await footer.scrollIntoViewIfNeeded();
+    expect((await decoration(footer)).color).toBe("rgba(0, 0, 0, 0)");
+    await footer.hover();
+    expect((await decoration(footer)).color).not.toBe("rgba(0, 0, 0, 0)");
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */
