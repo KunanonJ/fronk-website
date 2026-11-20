@@ -779,7 +779,7 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     // A real screenshot, not a mockup: the site is public, and the app-shell
     // mockup (a sidebar dashboard) looks nothing like it. Home at 1440 x 900
     // in the light theme with reduced motion, after the intro, from a
-    // production build, saved as WebP (quality 85; captured again 20-11-26).
+    // production build, saved as WebP (quality 85; captured again 21-11-26).
     // Capture it again when Home changes.
     cover: {
       src: "/portfolio/kunanonj-com/cover.webp",
