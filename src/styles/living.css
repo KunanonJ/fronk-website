@@ -1,0 +1,47 @@
+/*
+ * The footer's living status (now-building-and-genz Phase 5;
+ * components/profile/site/living/Living.tsx): the hour's guess beside the
+ * Bangkok clock and the ship log under the Now line. Linked by them when
+ * they first show, so no page's first load carries it. Tokens from
+ * globals.css only; the layer order is profile.css's.
+ */
+@layer components {
+  /* The place's line wraps the guess under the time on a narrow card. */
+  .pf-footer__status:has(> .pf-footer__guess) {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .pf-footer__guess {
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  /* As the status lines above it, with a pixel at the first line's middle. */
+  .pf-footer__shipped {
+    display: flex;
+    gap: 8px;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+  .pf-footer__shipped .ds-px-dot {
+    margin-block-start: calc((1.4em - 6px) / 2);
+  }
+  .pf-footer__shipped a {
+    color: var(--ink-80);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset: 3px;
+  }
+  .pf-footer__shipped a:hover,
+  .pf-footer__shipped a:focus-visible {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+  }
+}

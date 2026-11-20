@@ -16,7 +16,7 @@ import {
 } from "@/components/profile/site/SayHello";
 import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
-import { PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
+import { PORTRAIT_COLOURS, PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
 import { useWornAvatar } from "@/components/profile/site/useWornAvatar";
 import { SearchTrigger } from "@/components/profile/site/search/SearchTrigger";
 import {
@@ -190,7 +190,21 @@ export default function SiteNav() {
             onClick={onBrand}
           >
             {/* The pixel portrait's 16 x 16 cut, whole pixels at 32 px. */}
-            <PixelPortrait rows={avatar} className="pf-nav__avatar" />
+            <PixelPortrait rows={avatar} className="pf-nav__avatar">
+              {/* The wink (now-building-and-genz Phase 5), a patch on the
+                  cut: row 7, columns 9 and 10 (one eye's white and pupil)
+                  shut in the pupils' colour, over the worn trait. Hidden at
+                  rest; shell.css shows it for 250 ms as the link is hovered
+                  or focused. None where shades cover the eye. */}
+              {avatar[7]?.[10] === "e" && (
+                <path
+                  className="pf-nav__wink"
+                  d="M9 7h2v1H9z"
+                  fill={PORTRAIT_COLOURS.e}
+                  visibility="hidden"
+                />
+              )}
+            </PixelPortrait>
             <span className="pf-nav__word">
               {brand.firstName}
               <span className="pf-nav__surname"> {brand.surname}</span>

@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import SiteFooter from "@/components/profile/site/SiteFooter";
 import { footerCopy, nowLine } from "@/lib/content/profileChrome";
 
@@ -70,6 +70,43 @@ describe("SiteFooter", () => {
   it("opens Say hello above its trigger, from the footer", () => {
     expect(html).toMatch(/popovertarget="say-hello-footer"/i);
     expect(html).toContain('id="say-hello-footer"');
+  });
+
+  it("draws none of the living status: no guess, no ship log, no time", () => {
+    expect(html).not.toContain("pf-footer__guess");
+    expect(html).not.toContain("pf-footer__shipped");
+    expect(html).not.toContain("data-clock");
+    expect(html).not.toMatch(/probably|Shipped/);
+  });
+});
+
+/*
+ * The living status (now-building-and-genz Phase 5): once the page runs,
+ * the lazy chunk puts the hour's guess beside the clock.
+ */
+describe("SiteFooter, the living status", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("guesses beside the Bangkok clock once the page runs", async () => {
+    // The ship log's request never answers here.
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    vi.useFakeTimers({ toFake: ["Date"] });
+    // 05:30 UTC is 12:30 in Bangkok.
+    vi.setSystemTime(new Date("2026-11-20T05:30:00Z"));
+    render(<SiteFooter />);
+    const guess = await screen.findByText("probably at lunch");
+    expect(guess).toHaveClass("pf-footer__guess");
+    const place = guess.closest("p")!;
+    expect(place).toHaveTextContent(/^Bangkok, GMT\+7/);
+    // After the clock, in the same line.
+    const clock = place.querySelector("time[data-clock]")!;
+    expect(clock).toHaveTextContent("12:30");
+    expect(
+      clock.compareDocumentPosition(guess) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
 

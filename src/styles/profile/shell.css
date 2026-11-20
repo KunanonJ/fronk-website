@@ -960,6 +960,18 @@
       transform: scaleX(0.9);
     }
   }
+  /* The nav avatar winks (now-building-and-genz Phase 5): its wink patch
+     (SiteNav), hidden at rest, shows for 250 ms as the home link is hovered
+     or focused, once each time, never looping. */
+  .pf-nav__name:is(:hover, :focus-visible) .pf-nav__wink {
+    animation: kj-wink 0.25s;
+  }
+  @keyframes kj-wink {
+    from,
+    to {
+      visibility: visible;
+    }
+  }
   /* The exit keeps a closing panel shown and in the top layer while it
      fades (`display` and `overlay`, allow-discrete). Only Chromium has
      `overlay`; other engines close the panels at once, as before. A

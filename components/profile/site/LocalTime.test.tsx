@@ -32,4 +32,54 @@ describe("LocalTime", () => {
     });
     expect(container.querySelector("time")).toHaveTextContent("10:08");
   });
+
+  it("hands its children the hour there, at each minute, and draws them after it", () => {
+    vi.useFakeTimers();
+    // 15:59:30 UTC is 22:59 in Bangkok; the next minute is 23:00.
+    vi.setSystemTime(new Date("2026-11-20T15:59:30Z"));
+    const hours: number[] = [];
+    const { container } = render(
+      <p>
+        <LocalTime timeZone="Asia/Bangkok">
+          {(hour) => {
+            hours.push(hour);
+            return <span data-testid="after">{hour}</span>;
+          }}
+        </LocalTime>
+      </p>,
+    );
+    const after = container.querySelector('[data-testid="after"]');
+    expect(after).toHaveTextContent("22");
+    expect(after?.previousElementSibling?.tagName).toBe("TIME");
+
+    act(() => {
+      vi.advanceTimersByTime(30_100);
+    });
+    expect(container.querySelector('[data-testid="after"]')).toHaveTextContent(
+      "23",
+    );
+    expect(hours.every((hour) => hour === 22 || hour === 23)).toBe(true);
+  });
+
+  it("hands midnight there as hour 0", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-20T17:00:30Z"));
+    const { container } = render(
+      <LocalTime timeZone="Asia/Bangkok">
+        {(hour) => <span data-testid="after">{hour}</span>}
+      </LocalTime>,
+    );
+    expect(container.querySelector("time")).toHaveTextContent("00:00");
+    expect(container.querySelector('[data-testid="after"]')).toHaveTextContent(
+      /^0$/,
+    );
+  });
+
+  it("draws no children on the server", () => {
+    expect(
+      renderToString(
+        <LocalTime timeZone="Asia/Bangkok">{() => <b>after</b>}</LocalTime>,
+      ),
+    ).toBe("");
+  });
 });

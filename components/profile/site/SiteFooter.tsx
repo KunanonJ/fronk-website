@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import Link from "@/components/navigation/Link";
 import { DitherField } from "@/components/ds/DitherField";
 import { EyebrowRow, StatusDot } from "@/components/ds/labels";
@@ -6,7 +7,7 @@ import { LocalTime } from "@/components/profile/site/LocalTime";
 import { PixelArt } from "@/components/profile/site/PixelArt";
 import { BROWSER_ART, PHONE_ART } from "@/components/profile/site/footerArt";
 import { SayHello } from "@/components/profile/site/SayHello";
-import { POPOVER_IDS } from "@/components/profile/site/popover";
+import { POPOVER_IDS, useHydrated } from "@/components/profile/site/popover";
 import {
   availability,
   brand,
@@ -26,9 +27,17 @@ import {
  * Identical on every page. The two pixel drawings are code-drawn and shown from
  * 1280 px only; each plays once as it comes into view (PixelArt `play`), and
  * the dither field prints in (DitherField).
+ *
+ * The living status (now-building-and-genz Phase 5) is a lazy chunk, loaded
+ * once the page runs: a guess at what he is doing beside the clock, and the
+ * ship log (the latest commit on main) under the Now line. The server and
+ * hydration draw neither, so a page's HTML and first load are as they were.
  */
 
+const Living = lazy(() => import("@/components/profile/site/living/Living"));
+
 export default function SiteFooter() {
+  const hydrated = useHydrated();
   return (
     <footer data-site-chrome lang="en" className="pf-footer">
       <div className="pf-footer__sheet" aria-hidden="true">
@@ -70,12 +79,23 @@ export default function SiteFooter() {
               <p className="pf-footer__status">
                 {nowLine.label} {nowLine.doing}
               </p>
+              {hydrated && (
+                <Suspense>
+                  <Living />
+                </Suspense>
+              )}
               <p className="pf-footer__status">
                 {availability.location}
                 <LocalTime
                   timeZone={availability.timeZone}
                   className="pf-footer__time"
-                />
+                >
+                  {(hour) => (
+                    <Suspense>
+                      <Living hour={hour} />
+                    </Suspense>
+                  )}
+                </LocalTime>
               </p>
             </div>
             <nav

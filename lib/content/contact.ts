@@ -6,6 +6,7 @@ import {
 import { site } from "@/lib/content/landing";
 import { siteConfig } from "@/lib/site";
 import { PAGE_META } from "@/lib/content/pageMeta";
+import { CONTACT_WORDS } from "@/lib/content/contactWords";
 
 /**
  * Copy and limits for `/contact`. The form prepares an email that the
@@ -44,8 +45,8 @@ export const contactPage = {
   cardTitle: "Say hello",
   directLabel: "Email me directly",
   email: site.email,
-  copyEmail: "Copy email",
-  emailCopied: "Copied",
+  copyEmail: CONTACT_WORDS.copyEmail,
+  emailCopied: CONTACT_WORDS.emailCopied,
   formLabel: "Or write it here",
   /** Under the button: what pressing it does, and that nothing is sent yet. */
   formNote:
@@ -72,7 +73,7 @@ export const contactPage = {
     "Your browser blocked the copy. The email is selected below, ready to copy.",
   writeAnother: "Write another message",
   mailtoSubject: "Hello from kunanonj.com",
-  elsewhereTitle: "Elsewhere",
+  elsewhereTitle: CONTACT_WORDS.elsewhereTitle,
   whoTitle: "Who should write",
   recruiterTitle: "For recruiters",
 } as const;

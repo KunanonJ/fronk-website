@@ -1,5 +1,5 @@
 import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
-import { contactPage } from "@/lib/content/contact";
+import { CONTACT_WORDS } from "@/lib/content/contactWords";
 import { PERSON_NAME } from "@/lib/content/identity";
 import {
   footerAgents,
@@ -184,7 +184,7 @@ export const footerCopy = {
 /** The footer's social links and its agent files, as lib/content gives them. */
 export const footerLinks = {
   pages: "Pages",
-  elsewhere: contactPage.elsewhereTitle,
+  elsewhere: CONTACT_WORDS.elsewhereTitle,
   elsewhereLinks: socials,
   agents: footerAgents,
 };
@@ -196,8 +196,8 @@ export const sayHello = {
   eyebrow: "Email",
   address: site.email,
   name: `Email ${PERSON_NAME}`,
-  copy: contactPage.copyEmail,
-  copied: contactPage.emailCopied,
+  copy: CONTACT_WORDS.copyEmail,
+  copied: CONTACT_WORDS.emailCopied,
   compose: "Compose in Gmail",
   mailApp: "Open your mail app",
   contactForm: "Use the contact form",
