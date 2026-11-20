@@ -1417,6 +1417,12 @@ html.kj-vt *::after {
     text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
     text-underline-offset: 3px;
   }
+  /* Its underline draws in under the pointer or keyboard focus: the full
+     accent, twice as thick (serif micro-type, research item 5). */
+  .ds-prose-link:focus-visible {
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+  }
 
   /* Skip link: hidden until focused, then above everything (z-skip, spec 4.4). */
   .ds-skip {
@@ -1505,6 +1511,10 @@ html.kj-vt *::after {
     .ds-text-link:hover,
     .ds-back:hover {
       color: var(--ink);
+    }
+    .ds-prose-link:hover {
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
     }
     .ds-stretch-card:hover .ds-cta-arrow {
       inline-size: 16px;
@@ -1641,6 +1651,11 @@ html.kj-vt *::after {
       transform 0.14s var(--ease-snappy),
       background-color 0.1s ease-out,
       color 0.1s ease-out;
+  }
+  .ds-prose-link {
+    transition:
+      text-decoration-color 0.2s ease-out,
+      text-decoration-thickness 0.2s var(--ease-smooth);
   }
   .ds-press:active {
     transform: scale(var(--press, 0.97));
