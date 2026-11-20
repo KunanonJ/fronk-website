@@ -15,6 +15,7 @@ import {
   SayHelloTrigger,
 } from "@/components/profile/site/SayHello";
 import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
+import { SearchTrigger } from "@/components/profile/site/search/SearchTrigger";
 import {
   POPOVER_IDS,
   closePopover,
@@ -213,6 +214,7 @@ export default function SiteNav() {
           <PhoneMenuButton />
         </div>
         <div className="pf-nav__right">
+          <SearchTrigger />
           <ThemeToggle />
           <SayHelloTrigger id={POPOVER_IDS.nav} placement="nav" />
         </div>

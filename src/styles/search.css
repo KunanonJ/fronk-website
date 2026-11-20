@@ -1,0 +1,174 @@
+/*
+ * The search dialog (premium interactions, item 8;
+ * components/profile/site/search/SearchDialog.tsx). Its own sheet, linked by
+ * the dialog when it first opens, so no page's first load carries it. Tokens
+ * from globals.css only; the layer order is profile.css's.
+ */
+@layer components {
+  .pf-search {
+    inline-size: min(640px, calc(100vw - 32px));
+    max-block-size: min(560px, calc(100dvh - 32px));
+    margin: max(16px, 12vh) auto auto;
+    padding: 0;
+    border: 0;
+    border-radius: 24px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow:
+      var(--elev-ring),
+      0 24px 64px -24px color-mix(in srgb, var(--ink) 45%, transparent);
+    /* The dialog scrolls, the field and the hints stay: so the scrolling
+       region holds the focusable field (axe scrollable-region-focusable),
+       and a result moved into view clears both. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: 68px 48px;
+  }
+  .pf-search::backdrop {
+    background: color-mix(in srgb, var(--ink) 30%, transparent);
+    backdrop-filter: blur(4px);
+  }
+  .pf-search__field {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    block-size: 60px;
+    padding-inline: 20px;
+    border-block-end: 1px solid var(--line-soft);
+    background: var(--paper);
+  }
+  .pf-search__field:focus-within {
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .pf-search__icon {
+    flex: none;
+    color: var(--ink-60);
+  }
+  .pf-search__input {
+    flex: 1;
+    min-inline-size: 0;
+    block-size: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.0625rem;
+  }
+  /* The field's 2 px accent underline (above) is the focus indicator; the
+     site's ring would draw a second box around the input. */
+  .pf-search .pf-search__input:focus-visible {
+    outline: none;
+  }
+  .pf-search__input::placeholder {
+    color: var(--ink-60);
+  }
+  /* Close: the Esc key's name for a keyboard, a word for touch. */
+  .pf-search__close {
+    flex: none;
+    min-block-size: 28px;
+    padding: 2px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--paper-2);
+    color: var(--ink-60);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .pf-search__key {
+    font: inherit;
+  }
+  .pf-search__touch {
+    display: none;
+  }
+  .pf-search__body {
+    padding: 8px;
+  }
+  .pf-search__note {
+    padding: 20px 12px;
+    color: var(--ink-60);
+  }
+  .pf-search__group {
+    padding: 12px 12px 6px;
+    color: var(--ink-60);
+  }
+  .pf-search__option {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .pf-search__option[aria-selected="true"] {
+    background: var(--paper-2);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .pf-search__title {
+    font-weight: 500;
+  }
+  .pf-search__summary {
+    overflow: hidden;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .pf-search__foot {
+    position: sticky;
+    inset-block-end: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    padding: 10px 20px;
+    border-block-start: 1px solid var(--line-soft);
+    background: var(--paper);
+    color: var(--ink-60);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  /* Touch: no keys to name. Last, so it beats the rules above. */
+  @media (pointer: coarse) {
+    .pf-search__key,
+    .pf-search__foot {
+      display: none;
+    }
+    .pf-search__touch {
+      display: inline;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-search[open] {
+      animation: kj-search-in 0.22s var(--ease-expo);
+    }
+    .pf-search[open]::backdrop {
+      animation: kj-search-fade 0.22s ease-out;
+    }
+    @keyframes kj-search-in {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+      }
+    }
+    @keyframes kj-search-fade {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    .pf-search {
+      border: 1px solid CanvasText;
+    }
+    .pf-search__option[aria-selected="true"] {
+      outline: 2px solid Highlight;
+    }
+  }
+}

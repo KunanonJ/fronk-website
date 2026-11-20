@@ -1,0 +1,8 @@
+/*
+ * Applied while a full page is captured (visual.spec and profile-case's
+ * preview-case): the footer's clock (LocalTime, `[data-clock]`) moves on
+ * every minute, so it is hidden. It keeps its box, so nothing shifts.
+ */
+[data-clock] {
+  visibility: hidden !important;
+}

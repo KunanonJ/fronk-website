@@ -2,6 +2,7 @@ import Link from "@/components/navigation/Link";
 import { DitherField } from "@/components/ds/DitherField";
 import { EyebrowRow, StatusDot } from "@/components/ds/labels";
 import { Reveal } from "@/components/ds/Reveal";
+import { LocalTime } from "@/components/profile/site/LocalTime";
 import { PixelArt } from "@/components/profile/site/PixelArt";
 import { BROWSER_ART, PHONE_ART } from "@/components/profile/site/footerArt";
 import { SayHello } from "@/components/profile/site/SayHello";
@@ -13,12 +14,15 @@ import {
   footerCopy,
   footerLinks,
   footerPages,
+  nowLine,
 } from "@/lib/content/profileChrome";
 
 /*
  * The footer (profile redesign, design spec 7.7): the sheet and its dither
  * field, a centred call to action with Say hello, and the card with the name,
  * the Pages list (every page the old menu linked), Elsewhere and For agents.
+ * The name block ends with the "Now" line: what he is doing, then the place
+ * with its time once the page runs (LocalTime).
  * Identical on every page. The two pixel drawings are code-drawn and shown from
  * 1280 px only; each plays once as it comes into view (PixelArt `play`), and
  * the dither field prints in (DitherField).
@@ -63,7 +67,16 @@ export default function SiteFooter() {
                 <StatusDot plain />
                 {availability.label}
               </p>
-              <p className="pf-footer__status">{availability.location}</p>
+              <p className="pf-footer__status">
+                {nowLine.label} {nowLine.doing}
+              </p>
+              <p className="pf-footer__status">
+                {availability.location}
+                <LocalTime
+                  timeZone={availability.timeZone}
+                  className="pf-footer__time"
+                />
+              </p>
             </div>
             <nav
               aria-label={footerLinks.pages}

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { aboutPage } from "@/lib/content/aboutPage";
 import {
   availability,
   brand,
@@ -9,6 +10,7 @@ import {
   footerPages,
   homeHref,
   isCurrentLink,
+  nowLine,
   profileMenu,
   profileNav,
 } from "@/lib/content/profileChrome";
@@ -163,5 +165,15 @@ describe("the topic hubs in the chrome (Phase 6 review, finding 3)", () => {
     expect(marked("/th/resume")).toEqual([]);
     expect(marked("/th/portfolio/tbh-intranet")).toEqual([]);
     expect(marked("/thumbnails/topics/x")).toEqual([]);
+  });
+});
+
+describe("the footer's Now line", () => {
+  it("says what he is doing in the words that open /about's Now section", () => {
+    const first = aboutPage.now.paragraphs[0]!.spans[0]!;
+    expect(first.type).toBe("text");
+    expect(first.text.toLowerCase()).toMatch(
+      new RegExp(`^${nowLine.doing.toLowerCase()}\\b`),
+    );
   });
 });

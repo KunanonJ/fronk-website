@@ -261,7 +261,8 @@
   }
 
   /* The theme toggle (spec 7.5): from 810 px, a 48 px round button. */
-  .pf-theme-toggle {
+  .pf-theme-toggle,
+  .pf-search-toggle {
     display: none;
     place-items: center;
     inline-size: 48px;
@@ -275,7 +276,8 @@
     cursor: pointer;
   }
   @media (min-width: 50.625rem) {
-    .pf-theme-toggle {
+    .pf-theme-toggle,
+    .pf-search-toggle {
       display: grid;
     }
   }
@@ -520,6 +522,14 @@
     padding: 12px 4px 4px;
     border-block-start: 1px solid var(--line-soft);
   }
+  .pf-menu__search {
+    gap: 12px;
+    inline-size: 100%;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
 
   /* The footer (spec 7.7). */
   .pf-footer {
@@ -626,6 +636,11 @@
     color: var(--ink-60);
     font-size: 0.875rem;
     line-height: 1.4;
+  }
+  /* The place's time (LocalTime): a dot before it, not read aloud. */
+  .pf-footer__time::before {
+    content: "·" / "";
+    margin-inline-end: 8px;
   }
   .pf-footer__block {
     min-inline-size: 0;
@@ -797,7 +812,8 @@
     .pf-nav__link:not([aria-current]):hover {
       color: var(--ink);
     }
-    .pf-theme-toggle:hover {
+    .pf-theme-toggle:hover,
+    .pf-search-toggle:hover {
       background: var(--paper-2);
     }
     .pf-menu__link:hover,
@@ -823,6 +839,7 @@
   @media (forced-colors: active) {
     .pf-nav__pill,
     .pf-theme-toggle,
+    .pf-search-toggle,
     .pf-theme,
     .pf-say__panel,
     .pf-menu,
@@ -884,12 +901,14 @@
       width 0.28s var(--ease-snappy),
       opacity 0.16s ease-out;
   }
-  .pf-theme-toggle {
+  .pf-theme-toggle,
+  .pf-search-toggle {
     transition:
       background-color 0.1s ease-out,
       transform 0.14s var(--ease-snappy);
   }
-  .pf-theme-toggle:active {
+  .pf-theme-toggle:active,
+  .pf-search-toggle:active {
     transform: scale(0.94);
   }
   .pf-theme-toggle__glyph {
