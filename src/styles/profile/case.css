@@ -469,6 +469,14 @@
     padding-block: 18px;
     border-block: 1px solid var(--line);
   }
+  /* Chapter 01 ends on its fact strip and the next chapter opens with its
+     own rule, so the strip leaves out its closing one: two lines a chapter
+     gap apart framed an empty row (UX sweep 21-11-26). */
+  .pf-case-step:has(+ .pf-case-step)
+    > .pf-case-chapter
+    > .pf-case-facts:last-child {
+    border-block-end: 0;
+  }
   .pf-case-facts__item {
     display: flex;
     align-items: baseline;
@@ -1050,6 +1058,19 @@
     }
     .pf-sc--full {
       grid-column: 1 / -1;
+    }
+  }
+  /* Stacked on phones, the facts share one label column, so their values
+     start on one line ("Zoho" under "One login-only web app"). */
+  @media (max-width: 39.9375rem) {
+    .pf-case-facts {
+      grid-template-columns: max-content minmax(0, 1fr);
+      column-gap: 12px;
+    }
+    .pf-case-facts__item {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
     }
   }
   @media (min-width: 40rem) {
