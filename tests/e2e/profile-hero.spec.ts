@@ -449,6 +449,47 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
     await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 
+  test("a layer outlines its frame on hover and selects it on a press, the named cursor following; the dots drift with a mouse", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await prepare(page);
+    await visit(page);
+    const frame = (index: number) =>
+      page.getByRole("link", {
+        name: `${FRAMES[index]}: open the case study`,
+      });
+    const layer = page.locator(".pf-mock__layer").nth(2);
+    // The rows sit inside the hidden decoration: a pointer's shortcut only.
+    await expect(layer).not.toHaveAttribute("tabindex");
+    await layer.hover();
+    await expect(frame(2)).toHaveAttribute("data-hovered", "");
+    await expect(frame(2)).not.toHaveAttribute("data-selected");
+    await layer.click();
+    await expect(frame(2)).toHaveAttribute("data-selected", "");
+    await expect(page.locator(".pf-mock__inspector")).toContainText(FRAMES[2]);
+    await expect(page.locator(".pf-mock__cursor")).toHaveAttribute(
+      "data-frame",
+      "2",
+    );
+
+    const canvas = page.locator(".pf-mock__canvas");
+    const position = () =>
+      canvas.evaluate((el) => getComputedStyle(el).backgroundPosition);
+    const box = (await canvas.boundingBox())!;
+    // Over the comment, bottom left, clear of the frames and panels.
+    await page.mouse.move(box.x + 24, box.y + box.height - 24, { steps: 4 });
+    await expect.poll(position).not.toBe("0px 0px");
+    await page.mouse.move(2, 2);
+    await expect.poll(position).toBe("0px 0px");
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.mouse.move(box.x + 24, box.y + box.height - 24, { steps: 4 });
+    await page.waitForTimeout(300);
+    expect(await position()).toBe("0px 0px");
+  });
+
   test("the named cursor tours once in under 5 s and rests on the first frame", async ({
     page,
   }) => {

@@ -12,8 +12,11 @@ import { canvasMock, type MockFrame } from "@/lib/content/home";
 
 const FRAMES = canvasMock.frames;
 
-/** Motion allowed or not, and whether the viewport is wide (810 px and up). */
-function stubMedia({ reduce = false, wide = true } = {}) {
+/**
+ * Motion allowed or not, whether the viewport is wide (810 px and up), and
+ * whether the pointer can hover (a mouse).
+ */
+function stubMedia({ reduce = false, wide = true, fine = false } = {}) {
   vi.spyOn(window, "matchMedia").mockImplementation(
     (query: string) =>
       ({
@@ -21,7 +24,9 @@ function stubMedia({ reduce = false, wide = true } = {}) {
           ? reduce
           : query.includes("min-width")
             ? wide
-            : false,
+            : query.includes("pointer: fine")
+              ? fine
+              : false,
         media: query,
         addEventListener: () => {},
         removeEventListener: () => {},
@@ -133,6 +138,87 @@ describe("CanvasMock", () => {
     expect(
       container.querySelector(".pf-mock__layer[data-selected]"),
     ).toHaveTextContent(FRAMES[2]!.name);
+  });
+
+  it("selects a frame from its layer, as hovering the frame does, and sends the named cursor there", () => {
+    const { container } = render(<CanvasMock ready />);
+    const links = screen.getAllByRole("link");
+    const layers = container.querySelectorAll<HTMLElement>(".pf-mock__layer");
+    const cursor = container.querySelector(".pf-mock__cursor")!;
+
+    // Over a layer, its frame is outlined but the selection stays.
+    fireEvent.pointerEnter(layers[1]!);
+    expect(links[1]).toHaveAttribute("data-hovered");
+    expect(links[1]).not.toHaveAttribute("data-selected");
+    expect(links[0]).toHaveAttribute("data-selected");
+    fireEvent.pointerLeave(container.querySelector(".pf-mock__layer-list")!);
+    expect(links[1]).not.toHaveAttribute("data-hovered");
+
+    // Pressed, it selects the frame, drives the inspector and the cursor,
+    // and ends the tour like any pick.
+    fireEvent.click(layers[1]!);
+    expect(links[1]).toHaveAttribute("data-selected");
+    expect(links[0]).not.toHaveAttribute("data-selected");
+    expect(layers[1]).toHaveAttribute("data-selected");
+    expect(inspector(container)).toHaveTextContent(FRAMES[1]!.name);
+    expect(cursor).toHaveAttribute("data-frame", "1");
+    advance(5000);
+    expect(cursor).toHaveAttribute("data-frame", "1");
+    expect(links[1]).toHaveAttribute("data-selected");
+
+    // The selected frame is not outlined twice.
+    fireEvent.pointerEnter(layers[1]!);
+    expect(links[1]).not.toHaveAttribute("data-hovered");
+  });
+
+  it("drifts the dotted canvas against a fine pointer, and eases it back when it leaves", () => {
+    // Frames run at once; the id 0 says none is still pending, as it is
+    // once a real frame has run.
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((step) => {
+      step(0);
+      return 0;
+    });
+    const pan = (canvas: HTMLElement) => [
+      canvas.style.getPropertyValue("--pan-x"),
+      canvas.style.getPropertyValue("--pan-y"),
+    ];
+    const hover = (canvas: HTMLElement, clientX: number, clientY: number) => {
+      vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue({
+        left: 100,
+        top: 50,
+        width: 400,
+        height: 200,
+      } as DOMRect);
+      fireEvent.pointerMove(canvas, { clientX, clientY });
+    };
+
+    stubMedia({ fine: true });
+    const view = render(<CanvasMock ready={false} />);
+    const canvas =
+      view.container.querySelector<HTMLElement>(".pf-mock__canvas")!;
+    // The pointer at the canvas's right edge, a quarter of the way down.
+    hover(canvas, 500, 100);
+    expect(pan(canvas)).toEqual(["-12px", "6px"]);
+    fireEvent.pointerLeave(canvas);
+    expect(pan(canvas)).toEqual(["0px", "0px"]);
+    // Paused by the hero's motion toggle, it rests where it started.
+    hover(canvas, 500, 100);
+    view.rerender(<CanvasMock ready={false} paused />);
+    expect(pan(canvas)).toEqual(["", ""]);
+    hover(canvas, 100, 50);
+    expect(pan(canvas)).toEqual(["", ""]);
+    view.unmount();
+
+    // Never under reduced motion, nor for a touch screen.
+    for (const media of [{ fine: true, reduce: true }, { fine: false }]) {
+      stubMedia(media);
+      const still = render(<CanvasMock ready={false} />);
+      const el =
+        still.container.querySelector<HTMLElement>(".pf-mock__canvas")!;
+      hover(el, 500, 100);
+      expect(pan(el)).toEqual(["", ""]);
+      still.unmount();
+    }
   });
 
   it("tours the frames once with the named cursor, ends on the first, and rests", () => {
