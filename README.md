@@ -201,6 +201,19 @@ pnpm run deploy:staging  # build + deploy fronk-website-start (wrangler.start.js
 | Deploy default branch | `main` | `pnpm run build:cloudflare` | `npx wrangler deploy` |
 | Deploy non-production branches | all except `main` | `pnpm run build:cloudflare` | `npx wrangler versions upload` |
 
+**Merging** (`.github/workflows/automerge.yml`): a pull request merges itself,
+squashed, once every required check passes, and so deploys. That covers a
+person's pull request by default, and Dependabot's minor and patch npm updates
+and its GitHub Actions updates. A draft or the `hold` label stops it; the
+`automerge` label merges a pull request that does not qualify (a major update,
+ImgBot). After each merge, the pull requests waiting to merge are brought up to
+date with `main` (Dependabot is asked to rebase its own). That step needs the
+`AUTOMERGE_TOKEN` secret (in both the Actions and the Dependabot secrets): a
+fine-grained token for this repository with Contents, Pull requests and
+Workflows set to read and write. Without it, pull requests still merge
+themselves, but one that falls behind `main` waits for someone to press Update
+branch, and a merge starts no CI run on `main` (Cloudflare still deploys).
+
 A PR that adds a Durable Object migration fails the non-production build by
 design: Cloudflare will not upload a version that carries an unapplied
 migration. The check is not required; `wrangler deploy` on `main` applies the
