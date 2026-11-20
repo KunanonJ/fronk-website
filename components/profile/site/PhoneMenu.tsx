@@ -1,17 +1,24 @@
 import { ProfileLink } from "@/components/profile/site/ProfileLink";
+import { Search } from "lucide-react";
 import { ThemeSwitch } from "@/components/profile/site/ThemeSwitch";
+import { openSearch } from "@/components/profile/site/search/SearchTrigger";
 import {
   POPOVER_IDS,
   closePopover,
   usePopover,
 } from "@/components/profile/site/popover";
-import { currentOf, menuCopy, profileMenu } from "@/lib/content/profileChrome";
+import {
+  currentOf,
+  menuCopy,
+  profileMenu,
+  searchCopy,
+} from "@/lib/content/profileChrome";
 import { usePathname } from "@/lib/router/navigation";
 
 /*
  * The phone menu (profile redesign, design spec 7.6): under 810 px, a text
- * button "Menu" in the nav opens a card with the six links and the theme
- * switch. Native popover like Say hello, so it works before hydration. Script
+ * button "Menu" in the nav opens a card with the six links, Search (which
+ * closes the card and opens the search dialog) and the theme switch. Native popover like Say hello, so it works before hydration. Script
  * moves focus, sets the button's names and closes the card after a link; the
  * "Close" label shows without script through the popover's :popover-open state.
  */
@@ -62,6 +69,20 @@ export function PhoneMenu() {
           </li>
         ))}
       </ul>
+      <div className="pf-menu__sep">
+        <button
+          type="button"
+          className="pf-menu__link pf-menu__search"
+          aria-haspopup="dialog"
+          onClick={() => {
+            close();
+            openSearch();
+          }}
+        >
+          <Search size={18} strokeWidth={1.8} aria-hidden="true" />
+          {searchCopy.menu}
+        </button>
+      </div>
       <div className="pf-menu__sep">
         <ThemeSwitch />
       </div>

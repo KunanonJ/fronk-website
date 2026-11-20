@@ -23,6 +23,7 @@ import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
 import { Route as OperatingModelDotmdRouteImport } from './routes/operating-model[.]md'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SearchDotjsonRouteImport } from './routes/search[.]json'
 import { Route as SitemapDotmdRouteImport } from './routes/sitemap[.]md'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SkillsDotjsonRouteImport } from './routes/skills[.]json'
@@ -123,6 +124,11 @@ const OperatingModelDotmdRoute = OperatingModelDotmdRouteImport.update({
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchDotjsonRoute = SearchDotjsonRouteImport.update({
+  id: '/search.json',
+  path: '/search.json',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotmdRoute = SitemapDotmdRouteImport.update({
@@ -312,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/search.json': typeof SearchDotjsonRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/search.json': typeof SearchDotjsonRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
@@ -408,6 +416,7 @@ export interface FileRoutesById {
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/search.json': typeof SearchDotjsonRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/skills.json': typeof SkillsDotjsonRoute
@@ -458,6 +467,7 @@ export interface FileRouteTypes {
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
+    | '/search.json'
     | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
@@ -505,6 +515,7 @@ export interface FileRouteTypes {
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
+    | '/search.json'
     | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
@@ -553,6 +564,7 @@ export interface FileRouteTypes {
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
+    | '/search.json'
     | '/sitemap.md'
     | '/sitemap.xml'
     | '/skills.json'
@@ -603,6 +615,7 @@ export interface RootRouteChildren {
   OpengraphImageRoute: typeof OpengraphImageRoute
   OperatingModelDotmdRoute: typeof OperatingModelDotmdRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SearchDotjsonRoute: typeof SearchDotjsonRoute
   SitemapDotmdRoute: typeof SitemapDotmdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SkillsDotjsonRoute: typeof SkillsDotjsonRoute
@@ -716,6 +729,13 @@ declare module '@tanstack/react-router' {
       path: '/robots.txt'
       fullPath: '/robots.txt'
       preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search.json': {
+      id: '/search.json'
+      path: '/search.json'
+      fullPath: '/search.json'
+      preLoaderRoute: typeof SearchDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.md': {
@@ -1025,6 +1045,7 @@ const rootRouteChildren: RootRouteChildren = {
   OpengraphImageRoute: OpengraphImageRoute,
   OperatingModelDotmdRoute: OperatingModelDotmdRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SearchDotjsonRoute: SearchDotjsonRoute,
   SitemapDotmdRoute: SitemapDotmdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SkillsDotjsonRoute: SkillsDotjsonRoute,

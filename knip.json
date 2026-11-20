@@ -1,6 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["src/routes/**/*.{ts,tsx}!", "scripts/*.mjs"],
-  "ignore": [".codex/**", "tests/e2e/screenshot-no-dither.css"],
+  "ignore": [
+    ".codex/**",
+    "tests/e2e/screenshot-no-dither.css",
+    "tests/e2e/screenshot-no-clock.css"
+  ],
   "ignoreExportsUsedInFile": false
 }

@@ -609,7 +609,8 @@ test.describe("chrome: the phone menu", () => {
       page.getByRole("link", { name: "Work", exact: true }),
     ).toBeFocused();
 
-    const links = menu.locator(".pf-menu__link");
+    // Links only: the menu's Search button shares their look.
+    const links = menu.locator("a.pf-menu__link");
     await expect(links).toHaveCount(6);
     for (let i = 0; i < 6; i += 1) {
       const box = await links.nth(i).boundingBox();

@@ -145,6 +145,18 @@ export const brand = {
 export const availability = {
   label: OPEN_TO_ROLES.pill.label,
   location: `${place.city}, ${place.utcLabel}`,
+  /** The place's clock, which the footer shows once the page runs. */
+  timeZone: place.timeZone,
+};
+
+/**
+ * The footer's "Now" line (premium interactions, item 7): what he is doing,
+ * in the words that open /about's "What I'm doing now." (a test keeps the
+ * two together), then the time in Bangkok.
+ */
+export const nowLine = {
+  label: "Now:", // DRAFT
+  doing: "leading AI engineering at The Binary Holdings",
 };
 
 /** The copyright line, with the year passed in (spec 7.7). */
@@ -206,6 +218,27 @@ export const themeCopy = {
 };
 
 /** The phone menu's trigger and its names (spec 7.1, 7.6). */
+/** The search dialog and its buttons (premium interactions, item 8). */
+export const searchCopy = {
+  open: "Search the site", // DRAFT
+  shortcut: "⌘K", // DRAFT
+  menu: "Search", // DRAFT
+  placeholder: "Pages, cases, skills", // DRAFT
+  close: "Close search", // DRAFT
+  closeKey: "esc", // DRAFT
+  groups: {
+    page: "Pages",
+    case: "Case studies",
+    topic: "Topics",
+    skill: "Agent skills",
+  }, // DRAFT
+  loading: "Loading the index…", // DRAFT
+  failed: "Search could not load. Try again in a moment.", // DRAFT
+  empty: (query: string) => `Nothing matches “${query}”.`, // DRAFT
+  hints: ["↑ ↓ to move", "↵ to open", "esc to close"], // DRAFT
+  count: (n: number) => `${n} ${n === 1 ? "result" : "results"}`, // DRAFT
+} as const;
+
 export const menuCopy = {
   open: "Menu",
   close: "Close",

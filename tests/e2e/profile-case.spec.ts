@@ -1229,6 +1229,8 @@ for (const theme of ["light", "dark"] as const) {
     await expect(page).toHaveScreenshot(`preview-case-${theme}.png`, {
       fullPage: true,
       animations: "disabled",
+      // The footer's clock moves on every minute.
+      stylePath: join(process.cwd(), "tests/e2e/screenshot-no-clock.css"),
     });
   });
 }

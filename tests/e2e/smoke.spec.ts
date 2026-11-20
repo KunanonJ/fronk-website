@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
 
@@ -903,14 +904,20 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
   test("/about: a prose link and a footer link", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/about", { waitUntil: "load" });
+    await expect(page.locator("time[data-clock]")).toBeAttached();
+    // /about settles late (its activity card fills in, the footer moves
+    // 12 px after hydration), which can slide a link from under the
+    // pointer: each hover is retried until its state holds.
     const prose = page.locator("main .ds-prose-link").first();
     await prose.scrollIntoViewIfNeeded();
     expect((await decoration(prose)).thickness).toBe("auto");
-    await prose.hover();
-    expect(await decoration(prose)).toEqual({
-      color: "rgb(110, 60, 255)",
-      thickness: "2px",
-    });
+    await expect(async () => {
+      await prose.hover();
+      expect(await decoration(prose)).toEqual({
+        color: "rgb(110, 60, 255)",
+        thickness: "2px",
+      });
+    }).toPass();
     await page.mouse.move(0, 0);
     expect((await decoration(prose)).thickness).toBe("auto");
     // Reached with the keyboard: Tab back to it from the control before.
@@ -922,8 +929,113 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
     const footer = page.locator(".pf-footer__link").first();
     await footer.scrollIntoViewIfNeeded();
     expect((await decoration(footer)).color).toBe("rgba(0, 0, 0, 0)");
-    await footer.hover();
-    expect((await decoration(footer)).color).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(async () => {
+      await footer.hover();
+      expect((await decoration(footer)).color).not.toBe("rgba(0, 0, 0, 0)");
+    }).toPass();
+  });
+});
+
+/**
+ * Search (premium interactions, item 8): ⌘K or the nav's button opens a
+ * modal dialog whose stylesheet loads only then; the field is a combobox,
+ * the arrows move, Enter opens a result, Esc closes and gives focus back.
+ * Phones open it from the menu. The footer's "Now" line ends with the time
+ * in Bangkok once the page runs.
+ */
+test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
+  const dialog = "dialog.pf-search[open]";
+  /** Opens a page and waits for hydration: the footer's clock is client-only. */
+  const visit = async (page: Page, path: string) => {
+    await page.goto(path, { waitUntil: "load" });
+    await expect(page.locator("time[data-clock]")).toBeAttached();
+  };
+  const searchSheet = (page: Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('link[rel="stylesheet"]')].some((link) =>
+        /search/.test((link as HTMLLinkElement).href),
+      ),
+    );
+
+  test("⌘K, type, arrows and Enter open a case; its sheet loads only then", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    await visit(page, "/about");
+    await expect(page.locator(".pf-search-toggle")).toBeVisible();
+    expect(await searchSheet(page)).toBe(false);
+
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    expect(await searchSheet(page)).toBe(true);
+    const field = page.getByRole("combobox", { name: "Search the site" });
+    await expect(field).toBeFocused();
+    await expect(page.getByRole("option").first()).toBeVisible();
+
+    await field.fill("intranet");
+    await expect(page.getByRole("option")).toHaveCount(1);
+    await expect(page.getByRole("option")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/portfolio\/tbh-intranet$/);
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+
+    await page.keyboard.press("ControlOrMeta+k");
+    await field.fill("a");
+    const second = page.getByRole("option").nth(1);
+    await page.keyboard.press("ArrowDown");
+    await expect(second).toHaveAttribute("aria-selected", "true");
+    await expect(field).toHaveAttribute(
+      "aria-activedescendant",
+      (await second.getAttribute("id"))!,
+    );
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("the button opens it; Esc closes it and gives focus back; no serious axe violations", async ({
+    page,
+  }) => {
+    await visit(page, "/contact");
+    const button = page.getByRole("button", { name: "Search the site" });
+    await button.click();
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(page.getByRole("option").first()).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include("dialog.pf-search")
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(
+      results.violations
+        .filter((v) => ["serious", "critical"].includes(v.impact ?? ""))
+        .map((v) => v.id),
+    ).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await expect(button).toBeFocused();
+  });
+
+  test("on a phone, the menu's Search opens it", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await visit(page, "/");
+    await expect(page.locator(".pf-search-toggle")).toBeHidden();
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await page.getByRole("button", { name: "Search", exact: true }).click();
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
+  });
+
+  test("the footer's Now line, then the time in Bangkok", async ({ page }) => {
+    await page.goto("/contact", { waitUntil: "load" });
+    const footer = page.locator(".pf-footer__name-block");
+    await expect(footer).toContainText(
+      "Now: leading AI engineering at The Binary Holdings",
+    );
+    await expect(footer.locator("time[data-clock]")).toHaveText(
+      /^\d{2}:\d{2}$/,
+    );
   });
 });
 
