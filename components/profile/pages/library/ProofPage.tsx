@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CountUp } from "@/components/ds/CountUp";
 import { Chip } from "@/components/ds/labels";
 import { Reveal } from "@/components/ds/Reveal";
 import Link from "@/components/navigation/Link";
@@ -81,6 +82,7 @@ function Delivery({ outcomes }: { outcomes: readonly ProofOutcome[] }) {
  * Venture metrics: a tile per published figure; picking one shows the
  * sentence it comes from. The pick is local state (owner default: metric
  * tiles are not URL state). A running total prints the month it was true.
+ * Each figure counts up once as it comes into view (CountUp).
  */
 function Metrics({ metrics }: { metrics: readonly ProofMetric[] }) {
   const [picked, setPicked] = useState(0);
@@ -111,7 +113,7 @@ function Metrics({ metrics }: { metrics: readonly ProofMetric[] }) {
               metric.asOf && "pf-read-pick--wide",
             )}
           >
-            <span className="t-h3 pf-read-figure">{metric.value}</span>
+            <CountUp className="t-h3 pf-read-figure" value={metric.value} />
             <span className="t-meta text-ink-2">
               {metric.label} · {metric.source}
               {metric.asOf ? (

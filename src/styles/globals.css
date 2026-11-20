@@ -461,7 +461,8 @@ a {
 
 /* ─── View transitions ───────────────────────────────────────────────────────
  * Three kinds, told apart by view-transition types: the router starts page
- * navigations with type "page" (a short cross-fade, the UA default), a list
+ * navigations with type "page" (a short cross-fade, the UA default, with a
+ * morph when a case card opens its case, below), a list
  * filter's change with type "filter" (below), and the theme toggle starts
  * its switch with type "theme". The toggle also sets
  * html.kj-vt for the duration, which stops CSS transitions blending into the
@@ -570,6 +571,59 @@ html.kj-vt *::after {
     to {
       opacity: 0;
       transform: scale(0.96);
+    }
+  }
+}
+
+/* A case opening from its card (type "page", components/profile/case/
+   caseMorph.ts): the pressed card's title moves into the h1's name and a
+   venture's logo into the hero's logo, while the rest cross-fades. Only
+   marked parts take the names, and only while the transition runs. The card
+   title shrinks to its text, so both boxes hold just the words. The card is
+   Onest and the h1 Instrument Serif, so the title fades through: the old
+   words leave early and the new ones arrive late. */
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(page)
+    [data-morph-card][data-morph]
+    :is(.pf-lift__title, .pf-card__title),
+  html:active-view-transition-type(page)
+    .pf-case-hero__title[data-morph]
+    .pf-case-hero__name {
+    view-transition-name: pf-morph-title;
+  }
+  html:active-view-transition-type(page)
+    [data-morph-card][data-morph]
+    :is(.pf-lift__title, .pf-card__title) {
+    inline-size: fit-content;
+  }
+  html:active-view-transition-type(page)
+    [data-morph-card][data-morph]
+    :is(.pf-venture-art__logo, .pf-case-venture__logo),
+  html:active-view-transition-type(page)
+    .pf-case-hero__title[data-morph]
+    .pf-case-hero__logo {
+    view-transition-name: pf-morph-logo;
+  }
+  ::view-transition-group(pf-morph-title),
+  ::view-transition-group(pf-morph-logo) {
+    animation-duration: 0.42s;
+    animation-timing-function: var(--ease-expo);
+  }
+  ::view-transition-old(pf-morph-title) {
+    animation: kj-morph-out 0.16s ease-out both;
+  }
+  ::view-transition-new(pf-morph-title) {
+    animation: kj-morph-in 0.3s var(--ease) 0.08s both;
+  }
+
+  @keyframes kj-morph-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes kj-morph-in {
+    from {
+      opacity: 0;
     }
   }
 }
@@ -1612,6 +1666,26 @@ html.kj-vt *::after {
   [data-reveal].is-pending {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Count-ups (components/ds/CountUp.tsx): while `data-shown` holds a frame,
+   the real figure keeps its place unpainted and the frame is drawn over it
+   with empty alt text, so only the real figure is ever read. Only where alt
+   text for `content` works, on screens, with motion allowed and no forced
+   colours; anywhere else the real figure shows. */
+@supports (content: "a" / "") {
+  @media screen and (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+    .ds-count[data-shown] {
+      position: relative;
+      -webkit-text-fill-color: transparent;
+    }
+    .ds-count[data-shown]::after {
+      content: attr(data-shown) / "";
+      position: absolute;
+      inset: 0;
+      -webkit-text-fill-color: currentcolor;
+    }
   }
 }
 

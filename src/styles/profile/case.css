@@ -90,6 +90,12 @@
     object-fit: cover;
     vertical-align: -0.06em;
   }
+  /* One box even on two lines: a page transition captures only an element
+     in one piece, and the name morphs from a case card (caseMorph.ts). It
+     already has its own line(s), so it looks the same. */
+  .pf-case-hero__name {
+    display: inline-block;
+  }
   /* The tagline: a smaller italic line inside the h1 (R12). */
   .pf-case-hero__tagline {
     display: block;

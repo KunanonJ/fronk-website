@@ -1,3 +1,4 @@
+import { CountUp } from "@/components/ds/CountUp";
 import Link from "@/components/navigation/Link";
 import type { CaseEvidence as Evidence } from "@/lib/content/caseStudy";
 
@@ -8,7 +9,8 @@ import type { CaseEvidence as Evidence } from "@/lib/content/caseStudy";
  * smoke tests read both, and the link's exact name). A venture's figures take
  * the Outcome position, each with its month when it is a running total, and
  * its "My role" section takes the My part position. A case without the data
- * shows no row. Styles: `.pf-case-row*` in src/styles/profile/case.css.
+ * shows no row. A figure counts up once as it comes into view (CountUp).
+ * Styles: `.pf-case-row*` in src/styles/profile/case.css.
  */
 export function CaseEvidence({ evidence }: { evidence: Evidence }) {
   const { figures, part } = evidence;
@@ -25,7 +27,11 @@ export function CaseEvidence({ evidence }: { evidence: Evidence }) {
               {figures.items.map((item) => (
                 <div key={item.label} className="pf-case-figure">
                   <dt className="pf-case-figure__label">{item.label}</dt>
-                  <dd className="pf-case-figure__value">{item.value}</dd>
+                  <CountUp
+                    as="dd"
+                    className="pf-case-figure__value"
+                    value={item.value}
+                  />
                   {item.note ? (
                     <dd className="t-meta pf-case-figure__note">{item.note}</dd>
                   ) : null}
