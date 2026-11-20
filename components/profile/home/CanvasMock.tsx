@@ -20,6 +20,13 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * 810 px the panels go and the frames become a swipeable row with a pager.
  * Frames show a real screenshot where one is registered, else a textless
  * drawing labelled "Illustration".
+ *
+ * As in a design tool (owner, 20-11-26): hovering a row of the Layers panel
+ * outlines its frame, and pressing it selects the frame as hovering the frame
+ * does, the named cursor gliding over to it. The rows are a pointer's
+ * shortcut inside the hidden decoration; the keyboard selects by focusing the
+ * frames themselves. Under a fine pointer the dotted canvas drifts against
+ * it, a little, as if it lay deeper than the frames.
  */
 
 /**
@@ -33,6 +40,11 @@ const TOUR_STEP_MS = 1200;
 
 /** Wide enough for the panels; under it the frames swipe (spec 10). */
 const PANELS_QUERY = "(min-width: 50.625rem)";
+
+/** A pointer that can hover: the canvas drifts under it. */
+const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
+/** How far the dots drift, at the canvas's edge, in px. */
+const PAN_PX = 12;
 
 /** The frame whose centre is nearest the row's, on the swipeable row. */
 function centredFrame(row: HTMLElement): number {
@@ -100,13 +112,59 @@ export function CanvasMock({
 }) {
   const reduced = useReducedMotion();
   const row = useRef<HTMLUListElement>(null);
+  const canvas = useRef<HTMLDivElement>(null);
   /** Set once the hero's toggle pauses: like a pick, it ends the tour. */
   const halted = useRef(false);
   const [selected, setSelected] = useState(0);
+  /** The frame whose layer the pointer is over: outlined, not selected. */
+  const [hovered, setHovered] = useState<number | null>(null);
   const [cursorAt, setCursorAt] = useState(0);
   const [touched, setTouched] = useState(false);
   const [shown, setShown] = useState("");
   const current = frames[selected] ?? frames[0];
+
+  // The dotted canvas drifts against a fine pointer and eases back when it
+  // leaves; still under reduced motion and while the hero's motion is paused.
+  useEffect(() => {
+    const el = canvas.current;
+    if (!el || reduced || paused) return;
+    if (!window.matchMedia(FINE_POINTER_QUERY).matches) return;
+    let frame = 0;
+    let x = 0;
+    let y = 0;
+    const apply = () => {
+      frame = 0;
+      el.style.setProperty("--pan-x", `${x}px`);
+      el.style.setProperty("--pan-y", `${y}px`);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+    const move = (event: PointerEvent) => {
+      const box = el.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      // From -1 to 1 across the canvas; the dots go the other way.
+      const across = ((event.clientX - box.left) / box.width) * 2 - 1;
+      const down = ((event.clientY - box.top) / box.height) * 2 - 1;
+      x = Math.round(-across * PAN_PX * 10) / 10;
+      y = Math.round(-down * PAN_PX * 10) / 10;
+      schedule();
+    };
+    const leave = () => {
+      x = 0;
+      y = 0;
+      schedule();
+    };
+    el.addEventListener("pointermove", move, { passive: true });
+    el.addEventListener("pointerleave", leave);
+    return () => {
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerleave", leave);
+      cancelAnimationFrame(frame);
+      el.style.removeProperty("--pan-x");
+      el.style.removeProperty("--pan-y");
+    };
+  }, [reduced, paused]);
 
   // The cursor's one tour, on the full canvas only; a reader's own choice
   // ends it: a pick, or a pause on the hero's motion toggle.
@@ -150,6 +208,12 @@ export function CanvasMock({
     setSelected(index);
   };
 
+  /** A layer pressed: its frame is selected and the named cursor goes to it. */
+  const pickLayer = (index: number) => {
+    pick(index);
+    setCursorAt(index);
+  };
+
   /** The inspector's button: the selected frame's own link does the work. */
   const openSelected = () => {
     row.current?.children[selected]
@@ -189,19 +253,27 @@ export function CanvasMock({
           </span>
           <span className="pf-mock__share">{canvasMock.share}</span>
         </div>
-        <div className="pf-mock__canvas">
+        <div ref={canvas} className="pf-mock__canvas">
           <div className="pf-mock__panel pf-mock__layers" aria-hidden="true">
             <p className="pf-mock__tabs">
               <b>{canvasMock.layersTabs[0]}</b>
               <span>{canvasMock.layersTabs[1]}</span>
             </p>
             <p className="pf-mock__group">{canvasMock.layersGroup}</p>
-            <ul className="pf-mock__layer-list">
+            {/* For a pointer only, like the inspector's button: inside
+                aria-hidden nothing may take focus, and the frames are the
+                same choice for the keyboard and for screen readers. */}
+            <ul
+              className="pf-mock__layer-list"
+              onPointerLeave={() => setHovered(null)}
+            >
               {frames.map((frame, index) => (
                 <li
                   key={frame.slug}
                   className="pf-mock__layer"
                   data-selected={index === selected ? "" : undefined}
+                  onPointerEnter={() => setHovered(index)}
+                  onClick={() => pickLayer(index)}
                 >
                   <span className="pf-mock__hash">#</span>
                   <span>{frame.name}</span>
@@ -216,6 +288,9 @@ export function CanvasMock({
                   href={frame.href}
                   className="pf-mock__frame"
                   data-selected={index === selected ? "" : undefined}
+                  data-hovered={
+                    index === hovered && index !== selected ? "" : undefined
+                  }
                   aria-label={canvasMock.frameName(frame.name)}
                   onPointerEnter={() => pick(index)}
                   onFocus={() => pick(index)}

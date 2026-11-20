@@ -205,6 +205,8 @@
       transparent 1.5px
     );
     background-size: 16px 16px;
+    /* Set by a fine pointer over the canvas (CanvasMock): the dots drift. */
+    background-position: var(--pan-x, 0px) var(--pan-y, 0px);
   }
   .pf-mock__panel,
   .pf-mock__comment,
@@ -378,6 +380,11 @@
   /* The selection box and its four handles. */
   .pf-mock__frame[data-selected] :is(.pf-thumb, .pf-mock__cover) {
     outline: 1.5px solid var(--accent);
+    outline-offset: 3px;
+  }
+  /* Its layer is under the pointer: outlined, as a design tool does. */
+  .pf-mock__frame[data-hovered] :is(.pf-thumb, .pf-mock__cover) {
+    outline: 1px solid var(--accent);
     outline-offset: 3px;
   }
   .pf-mock__handles {
@@ -608,6 +615,12 @@
       gap: 6px;
       padding: 4px 10px;
       color: var(--ink-80);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .pf-mock__layer:hover {
+      background: var(--paper-2);
+      color: var(--ink);
     }
     .pf-mock__layer[data-selected] {
       background: var(--accent);
@@ -917,6 +930,14 @@
       transition:
         inset-inline-start 0.9s var(--ease-expo),
         inset-block-start 0.9s var(--ease-expo);
+    }
+    .pf-mock__canvas {
+      transition: background-position 0.8s var(--ease-expo);
+    }
+    .pf-mock__layer {
+      transition:
+        background-color 0.15s var(--ease-smooth),
+        color 0.15s var(--ease-smooth);
     }
   }
 }
