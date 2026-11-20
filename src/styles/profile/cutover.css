@@ -173,6 +173,37 @@
     block-size: 100%;
     object-fit: cover;
   }
+  /* The pixel portrait over the photo (PortraitPlay): a press tries a trait;
+     the bar's pill dissolves it to the photo and back. */
+  .pf-about-page__pixels {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .pf-about-page__pixels[hidden] {
+    display: none;
+  }
+  .pf-about-page__pixels svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .pf-about-page__pixels:focus-visible {
+    outline-offset: -6px;
+  }
+  .pf-about-page__portrait-bar {
+    position: absolute;
+    inset-block-start: 16px;
+    inset-inline: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
   .pf-about-page__socials {
     position: absolute;
     inset-block-end: 16px;
@@ -570,6 +601,15 @@
 @media (prefers-reduced-motion: no-preference) {
   .pf-faq__mark {
     transition: rotate 0.2s var(--ease-snappy);
+  }
+  /* A newly found trait: the portrait bumps once. */
+  .pf-about-page__pixels.is-new {
+    animation: kj-portrait-pop 0.32s var(--ease-back);
+  }
+  @keyframes kj-portrait-pop {
+    50% {
+      transform: scale(1.04);
+    }
   }
   /* The GitHub year fills in week by week, left to right. Outside the
      layer, so the wait beats the cells' Tailwind colours; screen only, so

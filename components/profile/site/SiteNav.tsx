@@ -15,6 +15,8 @@ import {
   SayHelloTrigger,
 } from "@/components/profile/site/SayHello";
 import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
+import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
+import { PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
 import { SearchTrigger } from "@/components/profile/site/search/SearchTrigger";
 import {
   POPOVER_IDS,
@@ -184,13 +186,8 @@ export default function SiteNav() {
             className="pf-nav__name"
             onClick={onBrand}
           >
-            <img
-              src={brand.avatar}
-              alt=""
-              width={32}
-              height={32}
-              className="pf-nav__avatar"
-            />
+            {/* The pixel portrait's 16 x 16 cut, whole pixels at 32 px. */}
+            <PixelPortrait rows={PORTRAIT_SMALL} className="pf-nav__avatar" />
             <span className="pf-nav__word">
               {brand.firstName}
               <span className="pf-nav__surname"> {brand.surname}</span>
