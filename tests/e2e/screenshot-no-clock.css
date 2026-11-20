@@ -6,3 +6,14 @@
 [data-clock] {
   visibility: hidden !important;
 }
+
+/*
+ * The footer's living status (components/profile/site/living/Living.tsx):
+ * the guess moves with the clock's hour and the ship log with every merge,
+ * and either may still be loading. Both are taken out of the flow, so the
+ * footer is drawn as the server draws it.
+ */
+.pf-footer__guess,
+.pf-footer__shipped {
+  display: none !important;
+}
