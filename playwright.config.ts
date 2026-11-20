@@ -25,7 +25,7 @@ export default defineConfig({
   expect: {
     // Allow a tiny per-pixel tolerance so font anti-aliasing / grain noise
     // doesn't cause false visual-regression failures.
-    toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: "disabled" },
+    toHaveScreenshot: { maxDiffPixelRatio: 0, animations: "disabled" },
   },
   use: {
     baseURL: BASE_URL,
