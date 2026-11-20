@@ -123,3 +123,10 @@ the ai-automation and two other case covers, the Home hero's mock frame).
 
 Branch `feat/polish-pass` off `main` at `0add090`. One PR, gates as for #133,
 baselines from CI's visual job artifacts, squash-merge, live checks, cleanup.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #141, squash 949c637 (19-11-26); the dither follow-up in PR #142, 0abce7d (20-11-26).
+- **Verified:** F1 to F8 live; 12 baselines refreshed; CSS 34.6 / 36 KB. #142 made the screenshots deterministic: element captures settle the dither, full pages hide it; all 96 full pages and 676 profile screenshots identical on the first attempt and the retry.
+- **Deviations and notes:** The dither race found while baselining #141 was fixed in its own PR (#142).
+- **Status:** complete; archived to `completed/`.

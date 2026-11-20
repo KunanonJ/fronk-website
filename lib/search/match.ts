@@ -20,14 +20,6 @@ export interface SearchEntry {
   readonly lang?: "th";
 }
 
-/** The groups, in the order the dialog shows them. */
-export const SEARCH_GROUPS: readonly SearchKind[] = [
-  "page",
-  "case",
-  "topic",
-  "skill",
-];
-
 /** Lower case, Latin accents removed (U+0300 to U+036F only, not Thai). */
 function fold(text: string): string {
   return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -65,16 +57,18 @@ export function searchEntries(
 }
 
 /**
- * Results in the dialog's groups: each group in SEARCH_GROUPS order, its
- * entries best first; empty groups left out.
+ * Results in the dialog's groups, each group where its best result ranks:
+ * "gogocash" leads with the case whose title it is, not with the pages that
+ * mention it. Within a group, best first; empty groups left out.
  */
 export function groupResults(
   results: readonly SearchEntry[],
 ): { kind: SearchKind; entries: SearchEntry[] }[] {
-  return SEARCH_GROUPS.map((kind) => ({
+  const kinds = [...new Set(results.map((entry) => entry.kind))];
+  return kinds.map((kind) => ({
     kind,
     entries: results.filter((entry) => entry.kind === kind),
-  })).filter((group) => group.entries.length > 0);
+  }));
 }
 
 let index: Promise<SearchEntry[]> | null = null;

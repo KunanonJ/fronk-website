@@ -126,3 +126,10 @@ Refactor PR (`refactor/dedupe-helpers`, 10 commits, 102 files, -251 net lines):
 Branch `fix/security-hardening` (security) and the refactor worktree branch. Gates:
 typecheck, lint, format, knip, unit tests, build, parity, browser gate; then PR, CI,
 squash-merge, live checks, cleanup.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #133, squash b5d4651 (19-11-26); the refactors in PR #139, 0119650.
+- **Verified:** Live: 22 checks on kunanonj.com passed (headers, CSP, COOP, query-free redirects, webhook limits). The refactor was output-identical: a capture of every route, text endpoint and OG image (197 requests) matched main.
+- **Deviations and notes:** No high or critical finding. The owner console actions (unused Worker secrets, the Sanity deploy token, preview URLs, Sanity CORS, branch protection for admins) stay with the owner; they need account access.
+- **Status:** complete; archived to `completed/`.

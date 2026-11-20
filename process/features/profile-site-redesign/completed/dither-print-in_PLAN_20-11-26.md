@@ -49,3 +49,10 @@ texture). One PR. SIMPLE plan.
 - The dither lens (research item 3, "if it earns its place").
 - Fields on screen at load (the hero and case skies) stay still: Reveal's
   rule, and the LCP area never moves.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #145, squash 151ef5a (20-11-26).
+- **Verified:** Live 13/13: footer field and drawings wait, play once and end still; eight Home fields wait; nothing under reduced motion.
+- **Deviations and notes:** The drawings hide on `visibility`, not opacity: opacity left hairline seams between squares.
+- **Status:** complete; archived to `completed/`.

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  SEARCH_GROUPS,
   groupResults,
   searchEntries,
   type SearchEntry,
@@ -75,9 +74,22 @@ describe("searchEntries", () => {
 });
 
 describe("groupResults", () => {
-  it("keeps the dialog's group order and leaves empty groups out", () => {
-    const groups = groupResults(searchEntries(ENTRIES, "ai"));
-    expect(groups.map((group) => group.kind)).toEqual(["page", "topic"]);
-    expect(SEARCH_GROUPS).toEqual(["page", "case", "topic", "skill"]);
+  it("puts each group where its best result ranks", () => {
+    // "ai": the topic's title matches, Home only mentions it.
+    expect(
+      groupResults(searchEntries(ENTRIES, "ai")).map((group) => group.kind),
+    ).toEqual(["topic", "page"]);
+    // A case's own name leads, ahead of a page that mentions it.
+    expect(
+      groupResults(searchEntries(ENTRIES, "intranet")).map(
+        (group) => group.kind,
+      ),
+    ).toEqual(["case"]);
+  });
+
+  it("keeps the index order for an empty query: pages, then cases", () => {
+    expect(
+      groupResults(searchEntries(ENTRIES, "")).map((group) => group.kind),
+    ).toEqual(["page", "case"]);
   });
 });

@@ -54,3 +54,10 @@ previews follow in their own PR. SIMPLE plan.
 7. **Tests:** unit (matching, the index, the Now line against /about, the
    clock); smoke (⌘K, typing, arrows, Enter, Esc and focus return, the
    lazy stylesheet, axe on the open dialog, the phone menu, the footer).
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #148, squash a8cf4bc (20-11-26).
+- **Verified:** Live 12/12: /search.json (46 entries, deploy-cached), the footer Now line and Bangkok clock, the lazy dialog stylesheet, open and close by ⌘K, button, phone menu and touch close; 100 baselines re-rendered at zero tolerance.
+- **Deviations and notes:** Two axe fixes (the dialog scrolls itself; the Esc hint is not a button, touch gets an icon button); fixed group order put pages first, so a case's name could rank below a page that mentions it: fixed in PR #149.
+- **Status:** complete; archived to `completed/`.

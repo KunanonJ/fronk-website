@@ -63,3 +63,10 @@ Signature texture). One PR, two commits. SIMPLE plan.
 - The way back (case to list) morph: browser back restores the list's scroll
   as the page renders, so the target could be off screen; revisit if wanted.
 - Outcomes on /proof's Delivery and /stack's figures (mixed text, not counts).
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #144, squash 77258e6 (20-11-26).
+- **Verified:** Live 13/13: the title morph from /portfolio, title and logo from a Home venture card, count-ups on /proof and the stats tile, nothing under reduced motion. Case heroes pixel-identical at six widths after the name became inline-block.
+- **Deviations and notes:** As planned; the way back (case to list) stays out of scope.
+- **Status:** complete; archived to `completed/`.
