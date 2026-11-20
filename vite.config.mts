@@ -40,6 +40,16 @@ const REQUIRED_PUBLIC_ENV = [
 
 const wranglerConfig = process.env.START_WRANGLER_CONFIG ?? "wrangler.jsonc";
 
+/**
+ * One id per build, on every page's <html data-build> and in the Worker, which
+ * keeps a page at the edge only when the two match (src/lib/buildId.ts). A
+ * build evaluates this file once per environment, so the id is kept in the
+ * process's environment: the client, the Worker and the prerendered pages
+ * share it.
+ */
+process.env.KJ_BUILD_ID ??= Date.now().toString(36);
+const BUILD_ID = process.env.KJ_BUILD_ID;
+
 export default defineConfig(({ command, mode }) => {
   // Precedence: the shell (CI overrides), then local .env files, then the
   // Worker's own `vars`, so Workers Builds needs no build variables.
@@ -64,12 +74,15 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: [{ find: /^@\//, replacement: `${root}/` }],
     },
-    define: Object.fromEntries(
-      PUBLIC_ENV.map((key) => [
-        `process.env.${key}`,
-        env[key] === undefined ? "undefined" : JSON.stringify(env[key]),
-      ]),
-    ),
+    define: {
+      ...Object.fromEntries(
+        PUBLIC_ENV.map((key) => [
+          `process.env.${key}`,
+          env[key] === undefined ? "undefined" : JSON.stringify(env[key]),
+        ]),
+      ),
+      __BUILD_ID__: JSON.stringify(BUILD_ID),
+    },
     plugins: [
       // Production config by default; `pnpm deploy:staging` builds against the staging Worker.
       cloudflare({

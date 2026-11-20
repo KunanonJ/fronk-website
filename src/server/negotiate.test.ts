@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { BUILD_MARK } from "@/src/lib/buildId";
 import {
   HOME_LINKS,
   markdownPathFor,
@@ -70,6 +71,8 @@ const html = (body: string) =>
       "Cache-Control": "public, max-age=0, must-revalidate",
     },
   });
+/** A page of this build: its <html> carries this build's id. */
+const page = (inner: string) => `<html ${BUILD_MARK}>${inner}</html>`;
 const get = (path: string, accept: string | null, method = "GET") =>
   new Request(`https://kunanonj.com${path}`, {
     method,
@@ -81,7 +84,7 @@ describe("negotiate", () => {
     const start = vi.fn(async (req: Request) =>
       new URL(req.url).pathname === "/about.md" ? md("# About") : html("x"),
     );
-    const assets = vi.fn(async () => html("<h1>About</h1>"));
+    const assets = vi.fn(async () => html(page("<h1>About</h1>")));
     const res = await negotiate(
       get("/about", "text/markdown"),
       "/about.md",
@@ -99,14 +102,14 @@ describe("negotiate", () => {
 
   it("answers a browser with the static page, marked as varying by Accept", async () => {
     const start = vi.fn(async () => md("# About"));
-    const assets = vi.fn(async () => html("<h1>About</h1>"));
+    const assets = vi.fn(async () => html(page("<h1>About</h1>")));
     const res = await negotiate(
       get("/about", BROWSER),
       "/about.md",
       start,
       assets,
     );
-    expect(await res.text()).toBe("<h1>About</h1>");
+    expect(await res.text()).toBe(page("<h1>About</h1>"));
     expect(res.headers.get("vary")).toBe("Accept");
     expect(res.headers.get("content-location")).toBeNull();
     expect(res.headers.get("cdn-cache-control")).toBe("public, max-age=86400");
@@ -118,7 +121,7 @@ describe("negotiate", () => {
 
   it("gives both versions of the home page its links and one tag", async () => {
     const start = vi.fn(async () => md("# Kunanon Jarat"));
-    const assets = vi.fn(async () => html("<h1>Home</h1>"));
+    const assets = vi.fn(async () => html(page("<h1>Home</h1>")));
     // The Markdown is the /llms.txt brief, so it keeps that file's hour; the
     // static HTML changes only on a deploy, so it keeps a day like /about.
     for (const [accept, lifetime] of [
@@ -146,9 +149,9 @@ describe("negotiate", () => {
           get("/about", "text/markdown"),
           "/about.md",
           start,
-          vi.fn(async () => html("<h1>About</h1>")),
+          vi.fn(async () => html(page("<h1>About</h1>"))),
         );
-        expect(await res.text()).toBe("<h1>About</h1>");
+        expect(await res.text()).toBe(page("<h1>About</h1>"));
         expect(res.headers.get("content-location")).toBeNull();
         // Otherwise the cache would answer this Accept with HTML for a day.
         expect(res.headers.get("cache-control")).toBe("no-store");
@@ -162,6 +165,49 @@ describe("negotiate", () => {
     } finally {
       logged.mockRestore();
     }
+  });
+
+  it("answers another build's page but keeps it nowhere: a deploy rolling out", async () => {
+    // For a few seconds of a deploy the static files can still be the
+    // previous build's; kept a day, that page would point at deleted scripts.
+    const warned = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      for (const stale of [
+        '<html data-build="older"><h1>About</h1></html>',
+        // The pages built before the mark existed carry none.
+        "<html><h1>About</h1></html>",
+      ]) {
+        const res = await negotiate(
+          get("/about", BROWSER),
+          "/about.md",
+          vi.fn(async () => md("# About")),
+          vi.fn(async () => html(stale)),
+        );
+        expect(res.status).toBe(200);
+        expect(await res.text()).toBe(stale);
+        expect(res.headers.get("cdn-cache-control")).toBeNull();
+        expect(res.headers.get("cache-control")).toBe("no-store");
+        expect(res.headers.get("vary")).toBe("Accept");
+      }
+      expect(warned).toHaveBeenCalledTimes(2);
+      expect(String(warned.mock.calls[0]?.[0])).toContain(
+        "/about is another build's HTML",
+      );
+    } finally {
+      warned.mockRestore();
+    }
+  });
+
+  it("keeps this build's page a day, the home page with its tag", async () => {
+    const res = await negotiate(
+      get("/", BROWSER),
+      "/index.md",
+      vi.fn(async () => md("# Kunanon Jarat")),
+      vi.fn(async () => html(page("<h1>Home</h1>"))),
+    );
+    expect(await res.text()).toBe(page("<h1>Home</h1>"));
+    expect(res.headers.get("cdn-cache-control")).toBe("public, max-age=86400");
+    expect(res.headers.get("cache-tag")).toBe("posts");
   });
 
   it("falls back to the app when there is no static file, and leaves a 404 alone", async () => {
