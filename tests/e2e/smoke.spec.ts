@@ -819,6 +819,73 @@ test.describe("footer > the dither prints in and the drawings play once in view"
 });
 
 /**
+ * Reading aids (plan reading-aids_PLAN_20-11-26): on the long reads, a line at
+ * the top of the screen is empty at the top of the page and full once the
+ * main content has been read, CSS only; a case's eyebrow ends with its
+ * reading time. Other pages draw no line, and under reduced motion it hides.
+ */
+test.describe("reading aids > the reading line follows the main content", () => {
+  /** The line's horizontal scale at a share of the main content's scroll. */
+  const scaleAt = (page: Page, share: number) =>
+    page.evaluate(async (share) => {
+      const main = document.querySelector("main")!;
+      const end = main.getBoundingClientRect().bottom + window.scrollY;
+      window.scrollTo({
+        top: Math.round((end - window.innerHeight) * share),
+        behavior: "instant",
+      });
+      await new Promise((done) =>
+        requestAnimationFrame(() => requestAnimationFrame(done)),
+      );
+      const line = document.querySelector(".pf-reading")!;
+      const transform = getComputedStyle(line).transform;
+      return transform === "none"
+        ? 1
+        : Number(/matrix\(([^,]+)/.exec(transform)?.[1]);
+    }, share);
+
+  for (const path of [
+    "/portfolio/tbh-intranet",
+    "/ventures/gogocash",
+    "/topics/ai-transformation-thailand",
+    "/about",
+  ]) {
+    test(`${path}: empty at the top, half way at half, full at the end`, async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(
+        browserName !== "chromium",
+        "scroll-driven animations are checked in Chromium",
+      );
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto(path, { waitUntil: "load" });
+      await expect(page.locator(".pf-reading")).toHaveCSS("display", "block");
+      expect(await scaleAt(page, 0)).toBeCloseTo(0, 2);
+      expect(await scaleAt(page, 0.5)).toBeCloseTo(0.5, 1);
+      expect(await scaleAt(page, 1)).toBeCloseTo(1, 2);
+    });
+  }
+
+  test("a case's eyebrow ends with its reading time", async ({ page }) => {
+    await page.goto("/portfolio/tbh-intranet", { waitUntil: "load" });
+    await expect(page.locator(".pf-case-hero__eyebrow")).toHaveText(
+      /·\s\d+\smin\sread$/,
+    );
+  });
+
+  test("no line on a page that is not a long read, none under reduced motion", async ({
+    page,
+  }) => {
+    await page.goto("/proof", { waitUntil: "load" });
+    await expect(page.locator(".pf-reading")).toHaveCount(0);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/portfolio/tbh-intranet", { waitUntil: "load" });
+    await expect(page.locator(".pf-reading")).toHaveCSS("display", "none");
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

@@ -11,6 +11,7 @@ import {
   findVentureCase,
 } from "@/lib/content/caseStudy";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
+import { caseWords, readingMinutes } from "@/lib/content/readingTime";
 import { extractPage } from "@/lib/parity/parity.mjs";
 import { VENTURE_RELATED_TOPICS, getAllVentures } from "@/lib/content/ventures";
 import parity from "@/tests/fixtures/site-parity.json";
@@ -50,6 +51,19 @@ describe("CasePage, the h1 (R12)", () => {
     expect(h1.querySelector(".pf-case-hero__tagline")).toHaveTextContent(
       "Shopping-to-earn cashback.",
     );
+  });
+});
+
+describe("CasePage, the reading time (reading aids)", () => {
+  it("ends the eyebrow with the minutes counted from the case's words", () => {
+    for (const study of allCaseStudies()) {
+      const { container, unmount } = render(<CasePage study={study} />);
+      const eyebrow = container.querySelector(".pf-case-hero__eyebrow");
+      expect(eyebrow, study.path).toHaveTextContent(
+        `${study.eyebrow} · ${readingMinutes(caseWords(study))} min read`,
+      );
+      unmount();
+    }
   });
 });
 

@@ -692,6 +692,46 @@
     transition-delay: 0.15s;
   }
 
+  /* Reading progress (reading aids; ProfileMain `reading`): a 2 px line at
+     the top of the screen on the long reads, under the loading line. It is
+     empty while the main content's top is at the screen's top and full as
+     its end reaches the screen's bottom, so the footer does not count. CSS
+     only: a view timeline on <main>. On screens, with motion allowed, where
+     scroll-driven animations exist; anywhere else there is no line. */
+  .pf-reading {
+    display: none;
+  }
+  @supports (animation-timeline: view()) {
+    @media screen and (prefers-reduced-motion: no-preference) {
+      /* Inset 0: the default takes the page's 96 px scroll padding, and the
+         line would start part-filled. */
+      .pf-main--reading {
+        view-timeline: --reading block;
+        view-timeline-inset: 0;
+      }
+      .pf-reading {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 89;
+        display: block;
+        block-size: 2px;
+        background: var(--accent);
+        transform-origin: left;
+        pointer-events: none;
+        animation-name: kj-reading;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --reading;
+        animation-range: contain 0% contain 100%;
+      }
+      @keyframes kj-reading {
+        from {
+          transform: scaleX(0);
+        }
+      }
+    }
+  }
+
   /* Pixel drawings (spec 7.7): one square per cell, token colours. Shown from
      1280 px; the centred call to action keeps the space under that. */
   .pf-art {
@@ -795,9 +835,10 @@
     .pf-art {
       display: none;
     }
-    /* Forced colours repaint backgrounds as Canvas: the line keeps a system
+    /* Forced colours repaint backgrounds as Canvas: the lines keep a system
        colour instead. */
-    .pf-progress {
+    .pf-progress,
+    .pf-reading {
       forced-color-adjust: none;
       background: Highlight;
     }

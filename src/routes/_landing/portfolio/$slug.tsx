@@ -20,7 +20,7 @@ function PortfolioProjectRoute() {
   if (!project) throw notFound();
 
   return (
-    <ProfileMain>
+    <ProfileMain reading>
       {projectJsonLd(project).map((data, i) => (
         <JsonLd key={i} data={data} />
       ))}

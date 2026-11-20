@@ -29,7 +29,7 @@ const metadata: Metadata = {
  */
 function AboutRoute() {
   return (
-    <ProfileMain>
+    <ProfileMain reading>
       <JsonLd data={buildProfilePageJsonLd()} />
       <JsonLd data={buildFaqJsonLd(FAQ_ITEMS)} />
       <AboutPage />

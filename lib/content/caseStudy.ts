@@ -258,6 +258,12 @@ export const caseCopy = {
   } satisfies Record<Venture["status"], string>,
   /** The rail and the phone contents (spec 9.6). */
   contents: "On this page", // DRAFT (spec 9.6)
+  /**
+   * The eyebrow's last part (reading aids, lib/content/readingTime.ts), with
+   * its separator: no-break spaces, so on a narrow screen it moves to the
+   * next line whole instead of leaving "2" behind.
+   */
+  readingTime: (minutes: number) => `·\u00a0${minutes}\u00a0min\u00a0read`,
   chapter: {
     does: "What it does",
     flow: "How it works",

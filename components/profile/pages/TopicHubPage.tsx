@@ -268,7 +268,7 @@ export default function TopicHubPage({ pillar }: { pillar: TopicPillar }) {
   );
 
   return (
-    <ProfileMain lang={th ? "th" : undefined} className="pf-hub">
+    <ProfileMain lang={th ? "th" : undefined} className="pf-hub" reading>
       <HubHero pillar={pillar} />
       <div className="ds-wrap pf-hub-body">
         <div className="pf-hub-column">
