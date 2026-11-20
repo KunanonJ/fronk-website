@@ -1,3 +1,4 @@
+import { BUILD_MARK } from "@/src/lib/buildId";
 import { DEPLOY_LIFETIME, EDGE_LIFETIME } from "@/src/lib/cache";
 import { withHeaders } from "@/src/lib/response";
 
@@ -170,5 +171,36 @@ export async function negotiate(
   }
   const page = await assets(request);
   const html = page.status === 404 ? await start(request) : page;
-  return withVersionHeaders(html, pathname, null, false, !markdownFailed);
+  const own = await ofThisBuild(html, pathname, request.method === "HEAD");
+  return withVersionHeaders(
+    own.response,
+    pathname,
+    null,
+    false,
+    !markdownFailed && own.current,
+  );
+}
+
+/**
+ * Whether a page's HTML is this build's (src/lib/buildId.ts). While a deploy
+ * rolls out, the static files can still be the previous build's for a few
+ * seconds: such a page is answered, but kept nowhere, or the edge would keep
+ * it a day under this version's key, pointing at scripts the deploy deleted.
+ * A HEAD has no body to read and is answered as before.
+ */
+async function ofThisBuild(
+  response: Response,
+  pathname: string,
+  head: boolean,
+): Promise<{ response: Response; current: boolean }> {
+  if (head || !response.ok) return { response, current: true };
+  if (!(response.headers.get("Content-Type") ?? "").includes("text/html"))
+    return { response, current: true };
+  const text = await response.text();
+  const current = text.includes(BUILD_MARK);
+  if (!current)
+    console.warn(
+      `[negotiate] ${pathname} is another build's HTML (a deploy rolling out); answered, kept nowhere`,
+    );
+  return { response: new Response(text, response), current };
 }

@@ -18,6 +18,7 @@ import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
+import { BUILD_ID } from "@/src/lib/buildId";
 import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
 import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -81,6 +82,7 @@ function RootDocument({ children }: { children: ReactNode }) {
       lang={lang}
       className="h-full antialiased"
       data-scroll-behavior="smooth"
+      data-build={BUILD_ID}
       suppressHydrationWarning
     >
       <head>
