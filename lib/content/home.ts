@@ -1,6 +1,7 @@
 import { aboutPage } from "@/lib/content/aboutPage";
 import { AVAILABILITY } from "@/lib/content/availability";
 import { PERSON_NAME } from "@/lib/content/identity";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { hero } from "@/lib/content/landing";
 import {
   getFeaturedPortfolioProjects,
@@ -50,7 +51,8 @@ export const homeHero = {
    */
   badge: AVAILABILITY.pill.label,
   chip: AVAILABILITY.ventures.join(" and "),
-  lead: hero.homeLead,
+  /** The lede, its names unbroken ("Manut / AI" on phones; keepWhole.ts). */
+  lead: keepNamesWhole(hero.homeLead),
   primaryCta: hero.primaryCta,
   resumeCta: hero.resumeCta,
   /** How long a phrase stays (spec 5.5: measured 4,202 ms). */

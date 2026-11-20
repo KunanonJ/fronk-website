@@ -73,6 +73,17 @@ export function layoutProblems(
         !node.textContent?.trim() &&
         (node.closest("[aria-hidden='true']") !== null ||
           (node.children.length > 0 && [...node.children].every(decorative)));
+      // A part inside a sideways scroller (a filter row on phones) is one
+      // swipe or Tab away, not lost in the gutter; the scroller itself is
+      // still checked.
+      const scrolled = (node: Element, wrap: Element): boolean => {
+        let up = node.parentElement;
+        while (up && up !== wrap) {
+          if (/auto|scroll/.test(getComputedStyle(up).overflowX)) return true;
+          up = up.parentElement;
+        }
+        return false;
+      };
       for (const wrap of document.querySelectorAll<HTMLElement>(".ds-wrap")) {
         const box = wrap.getBoundingClientRect();
         const style = getComputedStyle(wrap);
@@ -83,6 +94,7 @@ export function layoutProblems(
           if (rect.width <= 1 || rect.height <= 1) continue; // visually hidden
           if (decorative(el)) continue;
           if (bleeds && el.closest(bleeds)) continue;
+          if (scrolled(el, wrap)) continue;
           if (rect.left < start || rect.right > end) {
             const name = el.classList[0] ? `.${el.classList[0]}` : "";
             problems.push(

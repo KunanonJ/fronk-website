@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Hero, { holdsHeadline } from "@/components/profile/home/Hero";
 import { homeHero } from "@/lib/content/home";
+import { hero } from "@/lib/content/landing";
 import { withRouter } from "@/tests/routerContext";
 
 /*
@@ -93,7 +94,8 @@ describe("Hero", () => {
       "href",
       "/resume",
     );
-    expect(region).toHaveTextContent(homeHero.lead);
+    // toHaveTextContent reads the no-break spaces as spaces.
+    expect(region).toHaveTextContent(hero.homeLead);
   });
 
   it("has one motion toggle, and it holds the headline as well as the strip, with focus left on it", () => {

@@ -27,7 +27,9 @@ export type TopicPillar = {
    * The h1 as the bento canvas draws it: one entry per line, connector words
    * muted, the last line in the accent colour. Spaces are written out (Thai
    * runs words together), so the segments joined are exactly `h1` (tested):
-   * the visible heading and the breadcrumb JSON-LD never drift apart.
+   * the visible heading and the breadcrumb JSON-LD never drift apart. The
+   * last line holds two words or more, so it never sets one word alone
+   * ("and SEA", as the Thai hubs group it; UX sweep 21-11-26).
    */
   h1Lines: readonly HeadlineLine[];
   lede: string;
@@ -53,8 +55,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
     h1: "AI transformation for Thailand and SEA",
     h1Lines: [
       ["AI transformation "],
-      [{ muted: "for" }, " Thailand ", { muted: "and" }, " "],
-      ["SEA"],
+      [{ muted: "for" }, " Thailand "],
+      [{ muted: "and" }, " SEA"],
     ],
     lede: "AI transformation is not a slide deck. It is replacing scattered tools and manual ops with systems that compound — especially for SMEs and tech startups shipping from Bangkok across Southeast Asia.",
     sections: [
@@ -188,8 +190,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
     h1: "Tech startups in Thailand and SEA",
     h1Lines: [
       ["Tech startups "],
-      [{ muted: "in" }, " Thailand ", { muted: "and" }, " "],
-      ["SEA"],
+      [{ muted: "in" }, " Thailand "],
+      [{ muted: "and" }, " SEA"],
     ],
     lede: "Bangkok is a strong base to ship fintech and AI products into Southeast Asia — if you treat operations as seriously as product.",
     sections: [
@@ -253,8 +255,8 @@ const EN_PILLARS: readonly TopicPillar[] = [
     h1: "Forward deployed AI engineering from Bangkok",
     h1Lines: [
       ["Forward deployed "],
-      ["AI engineering ", { muted: "from" }, " "],
-      ["Bangkok"],
+      ["AI engineering "],
+      [{ muted: "from" }, " Bangkok"],
     ],
     // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
     lede: `A forward deployed engineer builds inside the business that will use the software: next to the people doing the work, against the systems they already run, until the tool is part of the daily routine. Kunanon Jarat works this way as a solopreneur on GoGoCash and Manut AI, and worked this way as ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,

@@ -107,8 +107,9 @@ describe("profile chrome copy", () => {
     }
     expect(footerCopy.paragraphs[0]).toMatch(/^I build /);
     // The availability in the first person (owner direction 20-11-26).
+    // "Manut AI" holds a no-break space, so a line never ends inside it.
     expect(footerCopy.paragraphs[1]).toMatch(
-      /^I’m building GoGoCash and Manut AI and not looking for a full-time role right now\. I’m open to /,
+      /^I’m building GoGoCash and Manut\u00a0AI and not looking for a full-time role right now\. I’m open to /,
     );
     expect(footerCopy.paragraphs).toHaveLength(2);
   });

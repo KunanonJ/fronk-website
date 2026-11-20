@@ -190,7 +190,7 @@
     color: var(--ink-60);
   }
   .pf-case-row__text {
-    max-inline-size: 72ch;
+    max-inline-size: var(--measure);
     font-size: 1.0625rem;
     line-height: 1.6;
     color: var(--ink-80);
@@ -204,13 +204,15 @@
   .pf-case-cover__figure {
     margin: 0;
   }
+  /* No transparent border: a screenshot fills the frame to its ring, so it
+     spans the column (UX sweep 21-11-26). Forced colours draw the border
+     instead (at the end). */
   .pf-case-cover__frame {
     position: relative;
     overflow: hidden;
     display: grid;
     place-items: center;
     aspect-ratio: 16 / 10;
-    border: 1px solid transparent;
     border-radius: var(--radius-bento);
     background: var(--paper-2);
     box-shadow: 0 0 0 1px var(--line-soft);
@@ -488,7 +490,7 @@
   .pf-case-points {
     display: grid;
     gap: 10px;
-    max-inline-size: 64ch;
+    max-inline-size: var(--measure);
     margin: 28px 0 0;
     padding: 0;
     list-style: none;
@@ -1161,6 +1163,9 @@
     }
   }
   @media (forced-colors: active) {
+    .pf-case-cover__frame {
+      border: 1px solid;
+    }
     .pf-case-cover__frame,
     .pf-case-venture__logo,
     .pf-case-venture__name,

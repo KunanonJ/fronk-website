@@ -8,6 +8,7 @@ import { CaseEvidence } from "@/components/profile/case/CaseEvidence";
 import { CaseMeta } from "@/components/profile/case/CaseMeta";
 import { useMorphTarget } from "@/components/profile/case/caseMorph";
 import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { caseWords, readingMinutes } from "@/lib/content/readingTime";
 
 /*
@@ -67,7 +68,9 @@ export function CaseHero({ study }: { study: CaseStudy }) {
           <span className="pf-case-hero__name">{study.titleName}</span>{" "}
           <span className="pf-case-hero__tagline">{study.tagline}</span>
         </h1>
-        <p className="t-lead pf-case-hero__lead">{study.lead}</p>
+        <p className="t-lead pf-case-hero__lead">
+          {keepNamesWhole(study.lead)}
+        </p>
         {study.byline ? (
           <p className="t-small pf-case-hero__byline">
             {caseCopy.byline}{" "}

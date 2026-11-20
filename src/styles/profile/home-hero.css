@@ -132,6 +132,31 @@
     gap: 10px;
     margin-block-start: 32px;
   }
+  /* Small phones (UX sweep 21-11-26). At 360 px the badge and its chip fit
+     one row with 2 px less around the chip. Under 360 px (a 320 x 568
+     screen) the h1 takes 36 px, its first line then one line, and the
+     spacing tightens, so Contact me and Résumé are on the first screen. */
+  @media (width <= 22.5rem) {
+    .pf-hero__chips {
+      gap: 6px;
+    }
+    .pf-hero__chips .ds-chip {
+      padding-inline: 9px;
+    }
+  }
+  @media (width < 22.5rem) {
+    .pf-hero__grid {
+      padding-block-start: calc(var(--nav-h) + 12px);
+    }
+    .pf-hero__title {
+      margin-block-start: 16px;
+      font-size: 2.25rem;
+    }
+    .pf-hero__lead,
+    .pf-hero__actions {
+      margin-block-start: 24px;
+    }
+  }
 
   /* The canvas mock (spec 8.2): phones first, a swipeable row of frames. */
   .pf-mock-wrap {

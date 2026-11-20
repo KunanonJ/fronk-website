@@ -78,6 +78,7 @@
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .ds-chip > .pf-count {
     color: var(--accent-ink);
@@ -132,6 +133,23 @@
   .pf-filter-bar__count {
     color: var(--ink-60);
   }
+  /* Phones: a filter group that does not fit keeps one row and scrolls
+     sideways, rather than wrapping into rows inside its outline (UX sweep
+     21-11-26). Its options stay in the tab order and a focused one scrolls
+     into view; the pressed one is brought into view (usePressedInView.ts);
+     the scrollbar stays. Tabs keep wrapping, so every install method shows. */
+  @media (width < 37.5rem) {
+    .pf-filter[role="group"] {
+      flex-wrap: nowrap;
+      max-inline-size: 100%;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: thin;
+    }
+    .pf-filter[role="group"] > .pf-filter__option {
+      flex: none;
+    }
+  }
   .pf-work-index__grid {
     display: grid;
     gap: 56px 24px;
@@ -157,12 +175,14 @@
   }
 
   /* About. */
+  /* No transparent border: the photo fills the card to its ring, so it
+     spans the column the hero shares (UX sweep 21-11-26). Forced colours
+     draw the border instead (below). */
   .pf-about-page__portrait {
     position: relative;
     overflow: hidden;
     aspect-ratio: 1;
     max-inline-size: 420px;
-    border: 1px solid transparent;
     border-radius: 28px;
     background: var(--tint-2);
     box-shadow: var(--elev-ring);
@@ -251,7 +271,7 @@
     padding-top: 112px;
   }
   .pf-about-page__prose {
-    max-inline-size: 64ch;
+    max-inline-size: var(--measure);
     margin-top: 32px;
     color: var(--ink-80);
   }
@@ -377,7 +397,7 @@
     rotate: 45deg;
   }
   .pf-faq__answer {
-    max-inline-size: 64ch;
+    max-inline-size: calc(var(--measure) + 40px);
     padding: 0 40px 20px 0;
     overflow-wrap: anywhere;
     color: var(--ink-80);
@@ -586,10 +606,12 @@
   }
   @media (forced-colors: active) {
     .pf-filter,
-    .pf-about-page__portrait,
     .pf-about-page__socials,
     .pf-contact__action {
       border-color: CanvasText;
+    }
+    .pf-about-page__portrait {
+      border: 1px solid CanvasText;
     }
     .pf-filter__option:is([aria-pressed="true"], [aria-selected="true"]) {
       border-color: Highlight;

@@ -32,7 +32,7 @@
     transform: translateY(-1px);
   }
   .pf-page-hero__lead.pf-resume__lead {
-    max-inline-size: 62ch;
+    max-inline-size: var(--measure);
     margin-top: 0;
     font-size: 1.125rem;
     line-height: 1.55;
@@ -410,6 +410,7 @@
   .pf-resume__bullet {
     display: flex;
     gap: 10px;
+    max-inline-size: var(--measure);
     color: var(--ink-80);
     font-size: 0.9375rem;
     line-height: 1.5;

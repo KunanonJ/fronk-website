@@ -1,5 +1,6 @@
 import { aboutPage } from "@/lib/content/aboutPage";
 import { contactPage } from "@/lib/content/contact";
+import { keepLastWordsTogether } from "@/lib/content/keepWhole";
 import { portfolioPage } from "@/lib/content/portfolio";
 
 /*
@@ -33,11 +34,15 @@ export const portfolioHeadline: HeadlineLines = portfolioPage.headline.map(
 );
 
 const about = aboutPage.hero.headline;
-/** /about: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok." */
+/**
+ * /about: "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok." The
+ * accent's last two words are joined, so a 320 px phone sets "startups / in
+ * Bangkok." rather than leaving "Bangkok." alone (keepWhole.ts).
+ */
 export const aboutHeadline: HeadlineLines = [
   [{ text: about.muted, tone: "muted" }, { text: about.name }],
   [{ text: about.focus }, { text: about.joiner, tone: "muted" }],
-  [{ text: about.accent, tone: "accent" }],
+  [{ text: keepLastWordsTogether(about.accent), tone: "accent" }],
 ];
 
 const contact = contactPage.headline;
@@ -52,9 +57,15 @@ export const contactHeadline: HeadlineLines = [
   [{ text: contact.lead }, { text: contact.accent, tone: "accent" }],
 ];
 
-/** The h1's text as the parity gate reads it: the parts joined by spaces. */
+/**
+ * The h1's text as the parity gate reads it: the parts joined by spaces, a
+ * no-break space read as a space (it collapses all white space).
+ */
 export function headlineText(lines: HeadlineLines): string {
-  return lines.map((line) => line.map((part) => part.text).join(" ")).join(" ");
+  return lines
+    .map((line) => line.map((part) => part.text).join(" "))
+    .join(" ")
+    .replace(/\s+/g, " ");
 }
 
 /** The portfolio index's labels, as the live page printed them. */

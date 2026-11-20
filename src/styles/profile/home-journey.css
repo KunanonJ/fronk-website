@@ -74,7 +74,9 @@
     display: grid;
     justify-items: center;
     gap: 32px;
-    max-inline-size: 40rem;
+    /* Room for "From smart contracts" on one line at the title's largest
+       size (84 px), inside the 40 px padding. */
+    max-inline-size: 42rem;
     padding: 40px;
     border-radius: 50%;
     background: radial-gradient(
@@ -413,6 +415,15 @@
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;
+    }
+  }
+  /* Under 600 px the ring's side tiles pass within the two-line title's
+     ends, so it sets in three balanced lines; never narrower than its
+     longest word, so wider text spacing cannot push a word out. */
+  @media (width < 37.5rem) {
+    .pf-journey__copy .pf-section-head__title {
+      inline-size: 5.25em;
+      min-inline-size: min-content;
     }
   }
 

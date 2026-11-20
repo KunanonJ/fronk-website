@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { PixelMark } from "@/components/ds/labels";
 import Link from "@/components/navigation/Link";
+import { usePressedInView } from "@/components/profile/catalog/usePressedInView";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
 
@@ -91,9 +92,12 @@ export function FilterBar<T extends string>({
   onChange: (next: T) => void;
   result: string;
 }) {
+  // One sideways-scrolling row on phones: a shared link's choice stays in view.
+  const row = useRef<HTMLDivElement>(null);
+  usePressedInView(row, value);
   return (
     <div className="pf-filter-bar">
-      <div role="group" aria-label={label} className="pf-filter">
+      <div ref={row} role="group" aria-label={label} className="pf-filter">
         {options.map((option) => (
           <button
             key={option.id}

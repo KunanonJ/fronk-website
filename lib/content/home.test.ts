@@ -38,9 +38,13 @@ describe("homeHero", () => {
   it("reads the chips, the lead and the buttons from the site's content (R4)", () => {
     expect(homeHero.badge).toBe(AVAILABILITY.pill.label);
     expect(homeHero.chip).toBe("GoGoCash and Manut AI");
-    expect(homeHero.lead).toBe(hero.homeLead);
+    // Word for word the site's lead; only the spaces inside the names are
+    // no-break, so a phone never ends a line on "Manut" (keepWhole.ts).
+    expect(homeHero.lead.replaceAll("\u00a0", " ")).toBe(hero.homeLead);
+    expect(homeHero.lead).toContain("Manut\u00a0AI");
+    expect(homeHero.lead).toContain("The\u00a0Binary\u00a0Holdings");
     // The ventures now, then the role that ended (owner direction 20-11-26).
-    expect(homeHero.lead).toBe(
+    expect(hero.homeLead).toBe(
       "Building GoGoCash and Manut AI. Previously IT Manager & AI Engineering Lead at The Binary Holdings.",
     );
     expect(homeHero.primaryCta).toEqual({

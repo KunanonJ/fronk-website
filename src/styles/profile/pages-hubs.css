@@ -150,8 +150,23 @@
     gap: clamp(80px, 9vw, 112px);
     padding-block: 24px 128px;
   }
+  /* A block may be narrower than its widest row: a filter that scrolls
+     sideways on phones (cutover.css) must not widen the page. */
+  .pf-read-body > * {
+    min-inline-size: 0;
+  }
   .pf-read-head .pf-case-kicker {
     margin: 0;
+  }
+  /* A head's words start where the tiles' words under it do on phones (a
+     1 px border and 20 px): the 8 px mark, its 4 px and a 9 px gap. In a
+     board column, where the tickets' words do (1 px and 16 px): the 7 px
+     marker and a 10 px gap. */
+  .pf-read-head .pf-case-kicker:has(> .ds-px-mark) {
+    gap: 9px;
+  }
+  .pf-read-board .pf-read-head .pf-case-kicker {
+    gap: 10px;
   }
   .pf-read-head + .pf-filter-bar {
     margin-top: 16px;
@@ -221,6 +236,7 @@
     overflow-wrap: anywhere;
   }
   .pf-read-text {
+    max-inline-size: var(--measure);
     color: var(--ink-80);
   }
   .pf-read-links {

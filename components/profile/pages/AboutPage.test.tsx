@@ -162,7 +162,13 @@ describe("AboutPage: the sections", () => {
     const sections = [...container.querySelectorAll("section")];
     expect(sections).toHaveLength(named.length);
     sections.forEach((section, at) => {
-      expect(section).toBe(screen.getByRole("region", { name: named[at] }));
+      // A no-break space (the h1 keeps its last two words together) reads
+      // as a space.
+      expect(section).toBe(
+        screen.getByRole("region", {
+          name: (name) => name.replace(/\s/g, " ") === named[at],
+        }),
+      );
       // The name comes from the section's own header, not from elsewhere.
       const label = document.getElementById(
         section.getAttribute("aria-labelledby") ?? "",

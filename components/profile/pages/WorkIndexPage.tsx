@@ -1,9 +1,10 @@
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import { Chip, PixelMark } from "@/components/ds/labels";
 import { CtaArrow, pillClass } from "@/components/ds/Pill";
 import Link from "@/components/navigation/Link";
 import { CaseMediaView } from "@/components/profile/case/CaseMedia";
 import { morphFromCard } from "@/components/profile/case/caseMorph";
+import { usePressedInView } from "@/components/profile/catalog/usePressedInView";
 import { PageHero } from "@/components/profile/pages/PageHero";
 import { caseAccess, caseCopy, projectCase } from "@/lib/content/caseStudy";
 import { portfolioHeadline, workIndexCopy } from "@/lib/content/corePages";
@@ -108,6 +109,9 @@ export default function WorkIndexPage({
   const shown = projects.filter((project) =>
     matchesPortfolioFilter(project.category, category),
   );
+  // One sideways-scrolling row on phones: a shared ?category= stays in view.
+  const filter = useRef<HTMLDivElement>(null);
+  usePressedInView(filter, category);
 
   return (
     <>
@@ -122,6 +126,7 @@ export default function WorkIndexPage({
       >
         <div className="pf-filter-bar">
           <div
+            ref={filter}
             role="group"
             aria-label={workIndexCopy.filter}
             className="pf-filter"

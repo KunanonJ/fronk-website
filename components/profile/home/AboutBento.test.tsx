@@ -10,6 +10,7 @@ import {
 } from "@/components/profile/home/PrincipleTile";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
 
 /*
@@ -70,8 +71,11 @@ describe("AboutBento", () => {
       );
       expect(links[index]).toHaveAttribute("target", "_blank");
       expect(links[index]).toHaveAttribute("rel", "noopener");
-      // No visible space between the link and the punctuation after it.
-      expect(links[index]!.firstChild?.textContent).toBe(span.text);
+      // No visible space between the link and the punctuation after it; a
+      // name keeps its no-break spaces (keepWhole.ts).
+      expect(links[index]!.firstChild?.textContent).toBe(
+        keepNamesWhole(span.text),
+      );
     });
   });
 

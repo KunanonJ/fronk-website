@@ -187,6 +187,17 @@ body {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
+  /* Headings balance their lines; running text avoids a lone word on its
+     last line. The longhand sets only the style, so text inside a nowrap
+     parent still never wraps. Progressive: balance from Chrome 130, Safari
+     17.5 and Firefox 124; pretty from Chrome 130 and Safari 26 (Firefox
+     wraps as before). A class in @layer components can choose its own. */
+  :where(h1, h2, h3, h4) {
+    text-wrap-style: balance;
+  }
+  :where(p, li, dd, figcaption, blockquote) {
+    text-wrap-style: pretty;
+  }
 }
 
 .landing-root {
@@ -749,6 +760,10 @@ html.kj-vt *::after {
   --bar-row: 48px;
   --nav-h: 92px;
   --screen: max(640px, 100svh);
+  /* A reading measure of about 70 characters, in the text's own em: an
+     average Onest character is 0.475em wide, but its zero (the ch unit) is
+     0.665em, so a 64ch measure held about 90. */
+  --measure: 34em;
 
   /* Type (spec 3.3): rem bounds, the largest at most 2.5x the smallest, so
    * 200% zoom always doubles text; the hero keeps a 42 px floor. */
@@ -948,7 +963,7 @@ html.kj-vt *::after {
     text-wrap: pretty;
   }
   .t-prose {
-    max-width: 64ch;
+    max-inline-size: var(--measure);
     line-height: 1.7;
   }
   .t-prose > * + * {
@@ -970,6 +985,7 @@ html.kj-vt *::after {
   }
   .t-kicker {
     line-height: 1.55;
+    text-wrap-style: balance;
   }
   .t-nav {
     font-size: 0.9375rem;
@@ -990,6 +1006,12 @@ html.kj-vt *::after {
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.015em;
+  }
+  /* Short titles on any element balance their lines, as headings do. */
+  .t-item,
+  .t-meta-value,
+  .t-lift-title {
+    text-wrap-style: balance;
   }
   .t-quote {
     font-family: var(--font-hand);
@@ -1344,6 +1366,11 @@ html.kj-vt *::after {
   }
   .ds-back {
     min-block-size: 40px;
+  }
+  /* The back arrow takes 12 px, so with the gap its words start 18 px in,
+     on the line of the eyebrow's words under it (an 8 px dot and 10 px). */
+  .ds-back > .ds-text-link__arrow {
+    min-inline-size: 12px;
   }
   .ds-text-link__arrow {
     display: inline-block;

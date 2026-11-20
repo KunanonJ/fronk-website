@@ -24,6 +24,7 @@ import { AVAILABILITY } from "@/lib/content/availability";
 import { aboutRecruiterLinks, contactPage } from "@/lib/content/contact";
 import { aboutHeadline, aboutPageCopy } from "@/lib/content/corePages";
 import { FAQ_ITEMS } from "@/lib/content/faq";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { socials } from "@/lib/content/landing";
 import { operatingModel } from "@/lib/content/operatingModel";
 import { pad2 } from "@/lib/utils/pad2";
@@ -47,8 +48,10 @@ const SOCIAL_ICONS = {
   GitHub: GithubIcon,
 } as const satisfies Record<(typeof socials)[number]["label"], unknown>;
 
+/** A run of the story, its names unbroken on phones (keepWhole.ts). */
 function InlineSpan({ span }: { span: AboutInline }) {
-  if (span.type === "text") return span.text;
+  const text = keepNamesWhole(span.text);
+  if (span.type === "text") return text;
   if (span.external) {
     return (
       <a
@@ -57,14 +60,14 @@ function InlineSpan({ span }: { span: AboutInline }) {
         rel="noopener"
         className="ds-prose-link"
       >
-        {span.text}
+        {text}
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
     );
   }
   return (
     <Link href={span.href} className="ds-prose-link">
-      {span.text}
+      {text}
     </Link>
   );
 }
