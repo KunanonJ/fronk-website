@@ -1014,13 +1014,13 @@
     margin-top: auto;
     padding-top: 12px;
   }
-  /* Focus shows on the picture (spec 6.10): the card's whole target. */
+  /* Focus shows on the picture (spec 6.10), the card's whole target, and on
+     the pill itself with the site's ring (.ds-stretch in globals.css): the
+     picture can sit far above it, out of view on a phone, while the browser
+     always scrolls the focused pill into view (WCAG 2.4.7). */
   .pf-lift:has(.ds-stretch:focus-visible) .pf-lift__mat {
     outline: 2px solid var(--focus);
     outline-offset: 3px;
-  }
-  .pf-lift .ds-stretch:focus-visible .ds-pill {
-    outline: none;
   }
 
   /* Breakpoints (spec 4.1 and 10.1). */

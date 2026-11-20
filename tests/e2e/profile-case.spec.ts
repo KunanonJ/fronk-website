@@ -1183,6 +1183,56 @@ test.describe("best practices on the case pages (desktop Chromium)", () => {
   });
 });
 
+/** The lift cards (/portfolio and More projects) had no ring on their pill. */
+test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  for (const path of ["/portfolio", INTRANET]) {
+    test(`on ${path}, a card's pill takes the site's ring when focused, as its picture does (WCAG 2.4.7)`, async ({
+      page,
+      browserName,
+    }) => {
+      await prepare(page);
+      await visit(page, path);
+      const link = page.locator("a.pf-lift__link").first();
+      // From the control before it, as a keyboard reader arrives (Safari
+      // moves to links with Option+Tab).
+      await link.evaluate((el) => {
+        const all = [
+          ...document.querySelectorAll<HTMLElement>("a[href], button"),
+        ].filter((n) => n.getClientRects().length > 0 && n.tabIndex >= 0);
+        all[all.indexOf(el as HTMLElement) - 1]!.focus();
+      });
+      await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+      await expect(link).toBeFocused();
+      await settle(page);
+      const pill = link.locator(".ds-pill");
+      await expect(pill).toHaveCSS("outline-style", "solid");
+      await expect(pill).toHaveCSS("outline-width", "2px");
+      await expect(
+        link.locator("xpath=ancestor::article[1]").locator(".pf-lift__mat"),
+      ).toHaveCSS("outline-style", "solid");
+      // The ring is where the focus is: the pill is on screen, uncovered.
+      const view = await pill.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(
+          r.left + r.width / 2,
+          r.top + r.height / 2,
+        );
+        return {
+          top: r.top,
+          bottom: r.bottom,
+          height: window.innerHeight,
+          mine: !!hit && el.closest("a")!.contains(hit),
+        };
+      });
+      expect(view.top).toBeGreaterThanOrEqual(0);
+      expect(view.bottom).toBeLessThanOrEqual(view.height);
+      expect(view.mine).toBe(true);
+    });
+  }
+});
+
 test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
   test.use({ reducedMotion: "reduce" });
 
