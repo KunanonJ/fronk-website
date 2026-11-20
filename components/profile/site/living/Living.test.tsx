@@ -157,3 +157,90 @@ describe("Living, the ship log", () => {
     expect(Observer.all[0]!.disconnected).toBe(true);
   });
 });
+
+/*
+ * Where the log stands (UX sweep 21-11-26): it arrives late, so it goes
+ * where it pushes nothing: under the place's line from 810 px, where the
+ * name block's column has room, and at the end of the card below that.
+ * SiteFooter offers both places; only the one for the width asks and draws.
+ */
+describe("Living, the ship log's place", () => {
+  /** A screen as wide as `columns` says, whose width can change. */
+  function screenWidth(columns: boolean) {
+    const listeners = new Set<() => void>();
+    const state = { columns };
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      get matches() {
+        return query === "(min-width: 50.625rem)" && state.columns;
+      },
+      media: query,
+      addEventListener: (_: string, listener: () => void) =>
+        listeners.add(listener),
+      removeEventListener: (_: string, listener: () => void) =>
+        listeners.delete(listener),
+    }));
+    return {
+      /** Crosses 810 px. */
+      set(next: boolean) {
+        state.columns = next;
+        for (const listener of listeners) listener();
+      },
+    };
+  }
+
+  it("from 810 px, only the name block's place asks and draws", async () => {
+    screenWidth(true);
+    const fetchMock = vi.fn().mockResolvedValue(Response.json(SHIPPED));
+    vi.stubGlobal("fetch", fetchMock);
+    card();
+    const name = render(<Living at="name" />);
+    const end = render(<Living at="end" />);
+    // Only one place watches the card.
+    expect(Observer.all).toHaveLength(1);
+    await act(async () => Observer.all[0]!.fire(true));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await screen.findByRole("link", { name: /^the Layers panel/ });
+    expect(name.container.querySelector(".pf-footer__shipped")).not.toBeNull();
+    expect(end.container).toBeEmptyDOMElement();
+  });
+
+  it("under 810 px, only the end of the card asks and draws", async () => {
+    screenWidth(false);
+    const fetchMock = vi.fn().mockResolvedValue(Response.json(SHIPPED));
+    vi.stubGlobal("fetch", fetchMock);
+    card();
+    const name = render(<Living at="name" />);
+    const end = render(<Living at="end" />);
+    expect(Observer.all).toHaveLength(1);
+    await act(async () => Observer.all[0]!.fire(true));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await screen.findByRole("link", { name: /^the Layers panel/ });
+    expect(end.container.querySelector(".pf-footer__shipped")).not.toBeNull();
+    expect(name.container).toBeEmptyDOMElement();
+  });
+
+  it("moves to the other place when the width crosses 810 px", async () => {
+    const width = screenWidth(true);
+    // A fresh answer each time: a body can be read once.
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve(Response.json(SHIPPED)));
+    vi.stubGlobal("fetch", fetchMock);
+    card();
+    const name = render(<Living at="name" />);
+    const end = render(<Living at="end" />);
+    await act(async () => Observer.all[0]!.fire(true));
+    await screen.findByRole("link", { name: /^the Layers panel/ });
+
+    act(() => width.set(false));
+    expect(name.container).toBeEmptyDOMElement();
+    // The end of the card watches now, and draws once the card is near.
+    await act(async () => Observer.all.at(-1)!.fire(true));
+    await screen.findByRole("link", { name: /^the Layers panel/ });
+    expect(end.container.querySelector(".pf-footer__shipped")).not.toBeNull();
+    expect(
+      screen.getAllByRole("link", { name: /^the Layers panel/ }),
+    ).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});
