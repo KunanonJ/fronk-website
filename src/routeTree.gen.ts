@@ -52,6 +52,7 @@ import { Route as LandingSkillsSlugRouteImport } from './routes/_landing/skills/
 import { Route as LandingTopicsSlugRouteImport } from './routes/_landing/topics/$slug'
 import { Route as LandingVenturesSlugRouteImport } from './routes/_landing/ventures/$slug'
 import { Route as ApiGithubContributionsRouteImport } from './routes/api/github/contributions'
+import { Route as ApiGithubShippedRouteImport } from './routes/api/github/shipped'
 import { Route as PortfolioSlugOpengraphImageRouteImport } from './routes/portfolio.$slug.opengraph-image'
 import { Route as SkillsSlugOpengraphImageRouteImport } from './routes/skills.$slug.opengraph-image'
 import { Route as TopicsSlugOpengraphImageRouteImport } from './routes/topics.$slug.opengraph-image'
@@ -274,6 +275,11 @@ const ApiGithubContributionsRoute = ApiGithubContributionsRouteImport.update({
   path: '/api/github/contributions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiGithubShippedRoute = ApiGithubShippedRouteImport.update({
+  id: '/api/github/shipped',
+  path: '/api/github/shipped',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortfolioSlugOpengraphImageRoute =
   PortfolioSlugOpengraphImageRouteImport.update({
     id: '/portfolio/$slug/opengraph-image',
@@ -343,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/topics/$slug': typeof LandingTopicsSlugRoute
   '/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/api/github/shipped': typeof ApiGithubShippedRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
@@ -391,6 +398,7 @@ export interface FileRoutesByTo {
   '/topics/$slug': typeof LandingTopicsSlugRoute
   '/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/api/github/shipped': typeof ApiGithubShippedRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
@@ -442,6 +450,7 @@ export interface FileRoutesById {
   '/_landing/topics/$slug': typeof LandingTopicsSlugRoute
   '/_landing/ventures/$slug': typeof LandingVenturesSlugRoute
   '/api/github/contributions': typeof ApiGithubContributionsRoute
+  '/api/github/shipped': typeof ApiGithubShippedRoute
   '/portfolio/$slug/opengraph-image': typeof PortfolioSlugOpengraphImageRoute
   '/skills/$slug/opengraph-image': typeof SkillsSlugOpengraphImageRoute
   '/topics/$slug/opengraph-image': typeof TopicsSlugOpengraphImageRoute
@@ -492,6 +501,7 @@ export interface FileRouteTypes {
     | '/topics/$slug'
     | '/ventures/$slug'
     | '/api/github/contributions'
+    | '/api/github/shipped'
     | '/portfolio/$slug/opengraph-image'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
@@ -540,6 +550,7 @@ export interface FileRouteTypes {
     | '/topics/$slug'
     | '/ventures/$slug'
     | '/api/github/contributions'
+    | '/api/github/shipped'
     | '/portfolio/$slug/opengraph-image'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
@@ -590,6 +601,7 @@ export interface FileRouteTypes {
     | '/_landing/topics/$slug'
     | '/_landing/ventures/$slug'
     | '/api/github/contributions'
+    | '/api/github/shipped'
     | '/portfolio/$slug/opengraph-image'
     | '/skills/$slug/opengraph-image'
     | '/topics/$slug/opengraph-image'
@@ -625,6 +637,7 @@ export interface RootRouteChildren {
   PortfolioChar123slugChar125DotmdRoute: typeof PortfolioChar123slugChar125DotmdRoute
   DotwellKnownAgentSkillsIndexDotjsonRoute: typeof DotwellKnownAgentSkillsIndexDotjsonRoute
   ApiGithubContributionsRoute: typeof ApiGithubContributionsRoute
+  ApiGithubShippedRoute: typeof ApiGithubShippedRoute
   PortfolioSlugOpengraphImageRoute: typeof PortfolioSlugOpengraphImageRoute
   SkillsSlugOpengraphImageRoute: typeof SkillsSlugOpengraphImageRoute
   TopicsSlugOpengraphImageRoute: typeof TopicsSlugOpengraphImageRoute
@@ -934,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGithubContributionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/github/shipped': {
+      id: '/api/github/shipped'
+      path: '/api/github/shipped'
+      fullPath: '/api/github/shipped'
+      preLoaderRoute: typeof ApiGithubShippedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portfolio/$slug/opengraph-image': {
       id: '/portfolio/$slug/opengraph-image'
       path: '/portfolio/$slug/opengraph-image'
@@ -1056,6 +1076,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotwellKnownAgentSkillsIndexDotjsonRoute:
     DotwellKnownAgentSkillsIndexDotjsonRoute,
   ApiGithubContributionsRoute: ApiGithubContributionsRoute,
+  ApiGithubShippedRoute: ApiGithubShippedRoute,
   PortfolioSlugOpengraphImageRoute: PortfolioSlugOpengraphImageRoute,
   SkillsSlugOpengraphImageRoute: SkillsSlugOpengraphImageRoute,
   TopicsSlugOpengraphImageRoute: TopicsSlugOpengraphImageRoute,

@@ -55,6 +55,7 @@ describe("queryFreeRedirect (endpoints whose output ignores the query)", () => {
       "/.well-known/agent-skills/index.json",
     ],
     ["/api/github/contributions?x=1", "/api/github/contributions"],
+    ["/api/github/shipped?x=1", "/api/github/shipped"],
   ])("%s -> %s", (from, to) => {
     expect(queryFreeRedirect(at(from), "GET")).toBe(to);
     expect(queryFreeRedirect(at(from), "HEAD")).toBe(to);
