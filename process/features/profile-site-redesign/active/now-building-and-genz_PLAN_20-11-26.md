@@ -85,6 +85,14 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
 - A Bangkok-hour chip, worded as a guess. Its copy is for the owner to approve.
 - A ship log from the latest commit on main, through a Worker endpoint with an edge cache.
 - The nav avatar winks on hover or focus.
+- **Built (branch `feat/living-status`):**
+  - **The guess:** beside the footer's clock, from the hour LocalTime hands it at each minute (no timer of its own). DRAFT copy in `lib/content/livingCopy.ts`: "probably asleep" (23 to 6), "probably having coffee" (6 to 9), "probably shipping" (9 to 12, 13 to 18), "probably at lunch" (12), "probably still shipping" (18 to 23). The owner's "asleep, replies by morning" became "probably asleep": a reply time is a claim about availability.
+  - **The ship log:** `/api/github/shipped` answers `{ subject, date, url }` for main's latest commit (GitHub's REST API, `GITHUB_TOKEN` when set). Ten minutes in browsers and at the edge, a day of the last copy on error (`stale-if-error`), a 503 with `no-store` when GitHub fails. The subject is the first line, at most 80 characters, cut on a word and keeping the pull request number. The footer asks for it once its card is within half a screen, and shows "Shipped 3h ago: <subject>" under the Now line (Intl.RelativeTimeFormat, narrow), or nothing.
+  - **Loading:** both are one lazy chunk (`Living`, 1.2 KB gzip) with its own sheet (`living.css`, 0.4 KB), loaded after hydration; the server draws neither. Full-page captures take both out of the flow (`screenshot-no-clock.css`).
+  - **The wink:** a hidden 16 x 16 patch (row 7, columns 9 and 10) drawn over the dressed avatar, shown for 250 ms by CSS when the home link is hovered or focused; never under reduced motion, and none where shades cover the eye.
+  - **Budgets:** the shell grew 146 B gzip (on #161's main); the topic hubs are at 168,918 B (164.96 of 165 KB, 42 B left), so the next shell change needs a deliberate raise or a saving.
+  - **At rest:** Home's nav and footer, captured as the full-page baselines are (both themes, 1440 and 375 px), are byte-identical to main's.
+  - **Parity:** the endpoint is not in the parity crawl: without a token in CI, GitHub's limit of 60 requests an hour could turn its 200 into a 503 and fail the gate at random.
 
 ## Phase 6: the 404 game, Save my edition, the holo card
 
