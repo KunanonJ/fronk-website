@@ -114,7 +114,7 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
 
 - **Ask:** a bug hunt on every platform from desktop to phone, collecting every detail to be pixel perfect, with ways to improve.
 - **The sweep:** 48 routes on 12 devices, light and dark (Chromium, WebKit and Firefox, 320 px to 1920 px; 600 loads): axe, sideways scroll, clipping, tap areas, focus rings, widows, measure, alignment and breaks. No axe violations and no sideways scroll. The findings went into two batches.
-- **Batch B, typography and pixel polish (#166):**
+- **Batch B, typography and pixel polish: shipped as #166, squash c683967 (20-11-26 UTC).**
   - Headings balance their lines and paragraphs avoid a lone last word (`text-wrap-style`, progressive). The topic hub headlines end "and SEA" and "from Bangkok", as the Thai hubs do.
   - One reading measure, `--measure: 34em` (about 70 characters; Onest's `ch` is 0.665em, so 64ch held about 90), on case prose, FAQ answers, /about, /learn, /proof, skills notes and the résumé.
   - "Manut AI", "The Binary Holdings" and "IT Manager" never split (`lib/content/keepWhole.ts`, display copy only, so meta tags, JSON-LD, Markdown and llms.txt keep plain spaces).
@@ -130,7 +130,25 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - The ship log no longer shifts the footer (under the place's line from 810 px, under the card below that); the résumé's first-screen logos load eagerly; ⌘K summaries take two lines on phones; the share row shows whole addresses.
   - CI's first run caught a WebKit-only check through an Apple font keyword, which Linux WebKit lacks: a drawing's tile now never clips, in every engine.
   - Live in real Chrome: the retry script ships and leaves no flag, the ring is 2 px solid, the 320 px drawing fits its tile, the pause is pressable at every step of the slide, the ship log sits where intended at 390 and 1440, and the résumé card's logos are eager.
-- **For the owner (not changed):** /about states its principles twice and the availability line about five times; /contact puts "Or write it here" before the email option and ends with a second call to action; at 1024 x 768 Home's hero is one column with about 40% empty.
+  - Baselines: 126 refreshed from CI at zero tolerance over three passes (all 96 in visual.spec, 30 in the profile specs), attempt equal to retry by md5. The pass after rebasing onto #167 failed on the same 14 as the pass before, so #167 moved no baseline.
+  - Live (build `mwpizcfa`) in real Chrome, WebKit and Firefox: no missing assets and hydrated on every page checked; at 320 x 568 Contact me and Résumé end at 526 px; the lede keeps "Manut AI" and "The Binary Holdings" whole; the hub headline's last line is "and SEA"; the /portfolio filter is one scrolling row at 360 px with no page overflow; case prose is 578 px (34em) at 1440; chapter 01's facts have no closing rule and their values start at the same x on phones; the résumé email is one line at 320 (stacked) and 390 (side by side). Batch A's checks pass again on the same build.
+- **Contrast:** axe leaves text over the gradients and dither as "incomplete", so it was measured from pixels: every visible first-screen text run on 11 routes and the 404, both themes, 1440 and 390 px, is at or above AA (closest 4.55:1, the résumé's category note). The logo row's fade-in dips below for a moment while it animates.
+- **Seen after both deploys:** the first phone check of the footer found no ship log, and every later load had it. The footer shows nothing when `/api/github/shipped` cannot reach GitHub, and each deploy starts the endpoint's edge copy afresh. If the Worker has no `GITHUB_TOKEN`, unauthenticated calls share GitHub's 60-an-hour limit; adding the token would make it steadier. Not confirmed (no Worker logs read).
+
+## For the owner (decisions, not changed)
+
+- **/about repeats itself:** the four principles appear twice (bento tiles and "How I ship"), and the availability line about five times; the page is 14,023 px tall at 390. Suggest one of each.
+- **/contact on phones:** "Or write it here" comes before the email option it refers to, and the page ends with the global "Get in touch" block, a second call to action. Suggest email first and no footer call to action on /contact.
+- **Home at 1024 x 768:** one column, about 40% empty beside the headline, the canvas below the fold. Suggest the two-column hero from 1024 px (a 5:6 split, h1 about 52 to 72 px), then recheck 1024 x 768 and 1180 x 820.
+- **/resume's first-load CSS** was measured at 37.1 KB (20-11-26), over the 36 KB the prerendered pages are held to. CI cannot measure it (rendered on request). Suggest measuring it in CI against the preview and trimming.
+- **DRAFT copy to confirm:** the Home title ("Founder of GoGoCash and Manut AI"), the résumé headline ("Solopreneur in Bangkok building ..."), the hour guesses, the secrets and toast copy, the canvas tool labels, the 404 game's lines, and the story lines marked DRAFT.
+- **Thai:** the Thai hubs have the availability sentence but no "open to partnerships, freelance ..." line.
+- **/about:** "Participating in Protocol Camp cohort 2025" reads as current in November 2026.
+
+## Closeout (21-11-26)
+
+- Phases 1 to 7 shipped: #158, #159, #160, #161 and #162, #164, #163, the cache fix #165, and the bug hunt #167 and #166. All live and checked in real browsers.
+- Archive-readiness: implementation complete and verified; kept in `active/` until the owner rules on the decisions above (each becomes its own change, or the list moves to a follow-up plan), then archive to `completed/`.
 
 ## Constraints in every phase
 
