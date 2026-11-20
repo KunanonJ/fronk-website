@@ -329,7 +329,7 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
     stubMedia({ fine: true });
   });
 
-  it("is a toolbar of five buttons, drawn as the decorative one until it is reached for", () => {
+  it("is a toolbar of five buttons showing their tools, and nothing loads until it is reached for", () => {
     const { container } = render(<CanvasMock ready={false} />);
     const bar = toolbar();
     expect(bar.closest("[aria-hidden='true']")).toBeNull();
@@ -437,6 +437,31 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
       expect(within(group).queryAllByRole("button")).toHaveLength(0);
       unmount();
     }
+  });
+
+  it("keeps a click made before the drawing layer has loaded, and stamps it where it landed", async () => {
+    vi.useRealTimers();
+    const { container } = render(<CanvasMock ready={false} />);
+    const canvas = container.querySelector<HTMLElement>(".pf-mock__canvas")!;
+    vi.spyOn(canvas, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 400,
+      height: 200,
+    } as DOMRect);
+    fireEvent.click(button("Stickers"));
+    // At once, before the lazy layer can have arrived: a quarter of the way
+    // across and down.
+    expect(container.querySelector(".pf-ink")).toBeNull();
+    fireEvent.click(canvas, { clientX: 100, clientY: 50 });
+    await vi.waitFor(() =>
+      expect(container.querySelectorAll(".pf-sticker")).toHaveLength(1),
+    );
+    const sticker = container.querySelector<HTMLElement>(".pf-sticker")!;
+    expect(sticker.style.left).toBe("25%");
+    expect(sticker.style.top).toBe("25%");
+    // A press on the toolbar is never a stamp.
+    expect(container.querySelectorAll(".pf-sticker")).toHaveLength(1);
   });
 
   it("stamps a sticker from the keyboard, says so, finds the trait, and Clear empties the canvas", async () => {
