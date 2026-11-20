@@ -452,7 +452,11 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
     );
     const layer = container.querySelector(".pf-mock__canvas > .pf-ink")!;
     expect(layer).toHaveAttribute("data-tool", "stickers");
-    expect(live).toHaveTextContent("Sticker placed: ship it");
+    // The announcement can follow the sticker by a render (the layer is a
+    // lazy chunk), so it is awaited rather than read at once.
+    await vi.waitFor(() =>
+      expect(live).toHaveTextContent("Sticker placed: ship it"),
+    );
     await vi.waitFor(() =>
       expect(store.award).toHaveBeenCalledWith("headphones", "canvas"),
     );
@@ -460,8 +464,10 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
     expect(button("Stickers").title).toBe("Stickers: press again to stamp one");
 
     fireEvent.click(button("Clear the canvas"));
-    expect(container.querySelectorAll(".pf-sticker")).toHaveLength(0);
-    expect(live).toHaveTextContent("Canvas cleared");
+    await vi.waitFor(() =>
+      expect(container.querySelectorAll(".pf-sticker")).toHaveLength(0),
+    );
+    await vi.waitFor(() => expect(live).toHaveTextContent("Canvas cleared"));
     expect(button("Clear the canvas")).toHaveAttribute("aria-disabled", "true");
     // Disabled, it does nothing.
     fireEvent.click(button("Clear the canvas"));
