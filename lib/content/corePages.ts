@@ -69,4 +69,17 @@ export const workIndexCopy = {
 /** About's labels that lived in its components. */
 export const aboutPageCopy = {
   socials: "Social profiles",
+  /** The pixel portrait over the photo (PortraitPlay). */
+  portrait: {
+    tryTrait: (found: number, total: number) =>
+      `Try a trait · ${found}/${total}`, // DRAFT
+    showPhoto: "Photo", // DRAFT
+    showPixels: "Pixels", // DRAFT
+    toPhoto: "Show the photo", // DRAFT
+    toPixels: "Show the pixels", // DRAFT
+    gold: (total: number) => `Gold edition · ${total}/${total}`, // DRAFT
+    found: (label: string, found: number, total: number) =>
+      `${label}. ${found} of ${total} traits found.`, // DRAFT
+    goldFound: "All six traits found: the gold edition.", // DRAFT
+  },
 } as const;

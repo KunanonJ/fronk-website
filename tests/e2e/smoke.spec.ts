@@ -1127,6 +1127,45 @@ test.describe("link previews > a case's text link shows its card", () => {
 });
 
 /**
+ * The pixel portrait (owner, 20-11-26): the nav's avatar is the portrait's
+ * 16 x 16 cut; on /about the portrait lies over the photo, a press tries a
+ * trait (remembered), and the pill dissolves it to the photo and back.
+ */
+test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
+  test("the nav avatar is the pixel portrait", async ({ page }) => {
+    await page.goto("/", { waitUntil: "load" });
+    const avatar = page.locator(".pf-nav__name svg.pf-portrait");
+    await expect(avatar).toBeVisible();
+    await expect(avatar).toHaveAttribute("viewBox", "0 0 16 16");
+  });
+
+  test("/about: a press tries a trait; the pill shows the photo and back", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about", { waitUntil: "load" });
+    await expect(page.locator("time[data-clock]")).toBeAttached();
+    const pixels = page.locator(".pf-about-page__pixels");
+    const tryTrait = page.getByRole("button", { name: /^Try a trait/ });
+    await expect(pixels).toBeVisible();
+    await expect(tryTrait).toHaveText("Try a trait · 0/6");
+    await tryTrait.click();
+    await expect(tryTrait).toHaveText("Try a trait · 1/6");
+    // A press on the portrait does the same, for a pointer.
+    await pixels.click({ position: { x: 120, y: 200 } });
+    await expect(tryTrait).toHaveText("Try a trait · 2/6");
+    await page.reload({ waitUntil: "load" });
+    await expect(tryTrait).toHaveText("Try a trait · 2/6");
+
+    await page.getByRole("button", { name: "Show the photo" }).click();
+    await expect(pixels).toBeHidden();
+    await expect(page.locator(".pf-about-page__photo")).toBeVisible();
+    await page.getByRole("button", { name: "Show the pixels" }).click();
+    await expect(pixels).toBeVisible();
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

@@ -9,6 +9,7 @@ import { SectionHeader } from "@/components/profile/home/SectionHeader";
 import { Story } from "@/components/profile/home/Story";
 import { FaqList } from "@/components/profile/pages/FaqList";
 import { PageHero } from "@/components/profile/pages/PageHero";
+import { PortraitPlay } from "@/components/profile/pages/PortraitPlay";
 import {
   RecruiterLines,
   RecruiterLinks,
@@ -82,7 +83,10 @@ function RichParagraphs({
   ));
 }
 
-/** The portrait, loaded first as a likely LCP, with the social links on it. */
+/**
+ * The portrait, loaded first as a likely LCP, with the social links on it,
+ * and the pixel portrait over it (PortraitPlay).
+ */
 function Portrait() {
   const { hero } = aboutPage;
   return (
@@ -96,6 +100,7 @@ function Portrait() {
         decoding="async"
         className="pf-about-page__photo"
       />
+      <PortraitPlay />
       <ul aria-label={aboutPageCopy.socials} className="pf-about-page__socials">
         {socials.map(({ label, href }) => {
           const Icon = SOCIAL_ICONS[label];

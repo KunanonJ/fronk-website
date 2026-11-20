@@ -95,13 +95,17 @@
     white-space: nowrap;
     text-decoration: none;
   }
+  /* The pixel portrait (PixelPortrait): a rounded tile, as pixels sit
+     best in a square. Its background is the portrait's colour. */
   .pf-nav__avatar {
     display: block;
     flex: none;
     inline-size: 32px;
     block-size: 32px;
-    border-radius: 50%;
-    object-fit: cover;
+    border-radius: 9px;
+  }
+  .pf-portrait__bg {
+    fill: var(--portrait-bg, var(--accent));
   }
   .pf-nav__dot {
     color: var(--accent);
