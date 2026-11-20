@@ -43,6 +43,89 @@ test.describe("smoke > every route renders without JS errors", () => {
 });
 
 /**
+ * The asset retry (src/lib/assetRetry.ts; UX sweep 21-11-26): a page whose
+ * own script or stylesheet fails to load (one load in 600 got a 502 on the
+ * main bundle and never ran) reloads once and runs; a file that keeps
+ * failing reloads it once and no more.
+ */
+test.describe("assets > a site file that fails to load reloads the page once", () => {
+  /** The page's own document loads, counted as they start. */
+  const documents = (page: Page) => {
+    const seen = { count: 0 };
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        seen.count += 1;
+    });
+    return seen;
+  };
+  const ENTRY = /\/assets\/index-[\w-]+\.js$/;
+
+  test("a 502 on the main bundle: one reload, then the page runs and the flag is gone", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    // Throughout the first load (its preload and its module script may each
+    // ask), then the bundle answers.
+    await page.route(ENTRY, (route) =>
+      loads.count <= 1
+        ? route.fulfill({ status: 502, body: "Bad gateway" })
+        : route.fallback(),
+    );
+    await page.goto("/contact", { waitUntil: "commit" });
+    // The footer's clock is client-only: the page has hydrated.
+    await expect(page.locator("time[data-clock]")).toBeAttached({
+      timeout: 15_000,
+    });
+    expect(loads.count).toBe(2);
+    await page.waitForLoadState("load");
+    await expect
+      .poll(() => page.evaluate(() => sessionStorage.getItem("pf-asset-retry")))
+      .toBeNull();
+    // The address is the page's own: nothing was added to it.
+    expect(new URL(page.url()).pathname + new URL(page.url()).search).toBe(
+      "/contact",
+    );
+  });
+
+  test("a stylesheet that fails: one reload, and the page is styled", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    await page.route(/\/assets\/profile-[\w-]+\.css$/, (route) =>
+      loads.count <= 1
+        ? route.fulfill({ status: 502, body: "Bad gateway" })
+        : route.fallback(),
+    );
+    await page.goto("/about", { waitUntil: "commit" });
+    await expect(page.locator("time[data-clock]")).toBeAttached({
+      timeout: 15_000,
+    });
+    expect(loads.count).toBe(2);
+    // profile.css places the bar.
+    await expect(page.locator(".pf-nav")).toHaveCSS("position", "fixed");
+  });
+
+  test("a bundle that keeps failing: one reload and no more", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    await page.route(ENTRY, (route) =>
+      route.fulfill({ status: 502, body: "Bad gateway" }),
+    );
+    await page.goto("/contact", { waitUntil: "commit" });
+    await expect.poll(() => loads.count).toBe(2);
+    await page.waitForLoadState("load");
+    // Long enough for a second reload, were there one.
+    await page.waitForTimeout(2_000);
+    expect(loads.count).toBe(2);
+    await expect(page.locator("time[data-clock]")).toHaveCount(0);
+    expect(
+      await page.evaluate(() => sessionStorage.getItem("pf-asset-retry")),
+    ).toBe("1");
+  });
+});
+
+/**
  * The Content Security Policy (best-practices audit R21, src/server/http.ts),
  * enforced: every page sends it, and nothing on a page breaks it, lazy parts
  * included. Each block fires securitypolicyviolation. Only the site's own

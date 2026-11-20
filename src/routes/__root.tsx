@@ -3,6 +3,7 @@ import { lazy, Suspense, type ReactNode } from "react";
 import {
   HeadContent,
   Scripts,
+  ScriptOnce,
   createRootRouteWithContext,
   useRouterState,
 } from "@tanstack/react-router";
@@ -18,6 +19,7 @@ import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
+import { ASSET_RETRY_SCRIPT } from "@/src/lib/assetRetry";
 import { BUILD_ID } from "@/src/lib/buildId";
 import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
 import onestLatin from "../fonts/onest-latin.woff2?url";
@@ -86,6 +88,13 @@ function RootDocument({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
+        {/* One reload when the page's own files fail to load
+            (src/lib/assetRetry.ts): in <head>, so it listens before the
+            module script in <body> runs. The server writes it once; the
+            client bundle leaves the string out. */}
+        {import.meta.env.SSR ? (
+          <ScriptOnce>{ASSET_RETRY_SCRIPT}</ScriptOnce>
+        ) : null}
         <HeadContent />
         {themeColors.map((m) => (
           <meta
