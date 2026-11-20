@@ -1,13 +1,13 @@
 import { useEffect, type RefObject } from "react";
 import { COUNT_MS, countFrame, parseFigure } from "@/lib/motion/countUp";
-import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
+import { waitForFirstView } from "@/lib/motion/firstView";
 
 /*
- * Runs a figure's count-up (lib/motion/countUp.ts) the way Reveal waits:
- * after hydration, only a figure still below the fold waits at zero until it
- * is in view, then counts once. On screen already, hidden, under reduced
- * motion, without IntersectionObserver, or for a value that is not one
- * number, the figure stays as it is. Printing shows the figure.
+ * Runs a figure's count-up (lib/motion/countUp.ts) once, the way Reveal waits
+ * (lib/motion/firstView.ts): only a figure still below the fold after
+ * hydration waits at zero until it is in view. On screen already, hidden,
+ * under reduced motion, without IntersectionObserver, or for a value that is
+ * not one number, the figure stays as it is. Printing shows the figure.
  *
  * `draw` shows a frame over the real figure, or with null takes the frame
  * away. It never changes the real figure, which React owns and which stays
@@ -28,21 +28,10 @@ export function useCountUp<T extends Element>(
   useEffect(() => {
     const el = ref.current;
     const figure = parseFigure(value);
-    if (
-      !el ||
-      !figure ||
-      prefersReducedMotion() ||
-      typeof IntersectionObserver === "undefined"
-    ) {
-      return;
-    }
-    const box = el.getBoundingClientRect();
-    if (box.height === 0 || box.top < window.innerHeight) return;
+    if (!el || !figure) return;
 
     let frame = 0;
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
+    const count = () => {
       const start = performance.now();
       const step = (now: number) => {
         const progress = (now - start) / COUNT_MS;
@@ -54,16 +43,17 @@ export function useCountUp<T extends Element>(
         frame = requestAnimationFrame(step);
       };
       frame = requestAnimationFrame(step);
-    }, COUNT_OBSERVER);
+    };
+    const stop = waitForFirstView(el, count, COUNT_OBSERVER);
+    if (!stop) return;
     const finish = () => {
-      observer.disconnect();
+      stop();
       cancelAnimationFrame(frame);
       window.removeEventListener("beforeprint", finish);
       draw(el, null);
     };
 
     draw(el, countFrame(figure, 0));
-    observer.observe(el);
     window.addEventListener("beforeprint", finish);
     return finish;
   }, [ref, value, draw]);
