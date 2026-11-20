@@ -130,7 +130,9 @@ async function revealAll(page: Page) {
 /**
  * Waits for a moment when nothing finite is moving: the rises, and the bar
  * fading back in at the top. The workflow's steps change colour every 1.2 s,
- * so such a moment comes quickly.
+ * so such a moment comes quickly. An animation on a scroll or view timeline
+ * (the reading line) runs for as long as its timeline is active and moves
+ * only with scrolling, so it does not count.
  */
 function stillFrame(page: Page) {
   return page.waitForFunction(() =>
@@ -139,7 +141,8 @@ function stillFrame(page: Page) {
       .every(
         (animation) =>
           animation.playState !== "running" ||
-          animation.effect?.getTiming().iterations === Infinity,
+          animation.effect?.getTiming().iterations === Infinity ||
+          animation.timeline !== document.timeline,
       ),
   );
 }

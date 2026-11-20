@@ -45,7 +45,7 @@ export function CaseHero({ study }: { study: CaseStudy }) {
         <p className="t-meta pf-case-hero__eyebrow">
           <StatusDot />
           <span>
-            {study.eyebrow} ·{" "}
+            {study.eyebrow}{" "}
             {caseCopy.readingTime(readingMinutes(caseWords(study)))}
           </span>
         </p>

@@ -870,7 +870,7 @@ test.describe("reading aids > the reading line follows the main content", () => 
   test("a case's eyebrow ends with its reading time", async ({ page }) => {
     await page.goto("/portfolio/tbh-intranet", { waitUntil: "load" });
     await expect(page.locator(".pf-case-hero__eyebrow")).toHaveText(
-      /· \d+ min read$/,
+      /·\s\d+\smin\sread$/,
     );
   });
 
