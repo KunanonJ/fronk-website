@@ -49,7 +49,7 @@ under reduced motion, no flashing (WCAG 2.3.1). The champagne CSS goes.
 
 ## Closeout (20-11-26)
 
-- **Shipped:** PR 1, the portrait: #152, squash f57d8d9 (20-11-26). PR 2, the minting intro: INTRO_PR.
+- **Shipped:** PR 1, the portrait: #152, squash f57d8d9 (20-11-26). PR 2, the minting intro: #153 (20-11-26).
 - **Verified:** #152 live: `/icon.svg` and `/favicon.ico` byte-equal to the repo, `/icon` (64 px) and `/apple-icon` (180 px) drawn from the art, the nav's 16 x 16 avatar, and the portrait smoke test 10/10 against production (Chromium, WebKit, Firefox). The intro: unit tests (print-in, counter, burst, timings), and an e2e check that the hand-over names the portrait before and the avatar after (`pf-avatar`), never both.
 - **Deviations and notes:**
   - A full-portrait button overlapped the pills and socials at phone widths (WCAG 2.5.8). The portrait became a pointer-only shortcut, and "Try a trait · n/6" is the labelled button.
