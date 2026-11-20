@@ -1213,22 +1213,21 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
         link.locator("xpath=ancestor::article[1]").locator(".pf-lift__mat"),
       ).toHaveCSS("outline-style", "solid");
       // The ring is where the focus is: the pill is on screen, uncovered.
-      const view = await pill.evaluate((el) => {
-        const r = el.getBoundingClientRect();
-        const hit = document.elementFromPoint(
-          r.left + r.width / 2,
-          r.top + r.height / 2,
-        );
-        return {
-          top: r.top,
-          bottom: r.bottom,
-          height: window.innerHeight,
-          mine: !!hit && el.closest("a")!.contains(hit),
-        };
-      });
-      expect(view.top).toBeGreaterThanOrEqual(0);
-      expect(view.bottom).toBeLessThanOrEqual(view.height);
-      expect(view.mine).toBe(true);
+      // WebKit may still be scrolling it in (CI once read it 44 px below
+      // the fold), so both are polled.
+      await expect(pill).toBeInViewport({ ratio: 1 });
+      await expect
+        .poll(() =>
+          pill.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            const hit = document.elementFromPoint(
+              r.left + r.width / 2,
+              r.top + r.height / 2,
+            );
+            return !!hit && el.closest("a")!.contains(hit);
+          }),
+        )
+        .toBe(true);
     });
   }
 });

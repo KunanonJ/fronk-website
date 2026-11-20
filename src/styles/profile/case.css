@@ -639,14 +639,12 @@
     border-radius: var(--radius-tile);
     background: var(--tile);
   }
-  /* WebKit holds any clipping box at its ratio, `clip` too, so there a
-     drawing's tile does not clip: a drawing fits once its tile grows, and
-     only a screenshot needs the rounded clip (WebKit only, by its system
-     font keyword). */
-  @supports (font: -apple-system-body) {
-    .pf-sc__tile:has(> .pf-sc__art) {
-      overflow: visible;
-    }
+  /* A drawing's tile does not clip at all: WebKit holds any clipping box
+     at its ratio, `clip` too, while a drawing is inset (6cqi) and fits once
+     its tile grows, so only a screenshot needs the rounded clip. In every
+     engine (a WebKit-only check missed Linux WebKit, CI's). */
+  .pf-sc__tile:has(> .pf-sc__art) {
+    overflow: visible;
   }
   .pf-sc__tile[data-tone="deep"] {
     background: var(--tile-deep);
