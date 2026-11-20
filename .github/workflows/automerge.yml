@@ -1,49 +1,169 @@
-# Auto-merge: a pull request labelled `automerge` is squash-merged by GitHub
-# as soon as every required check on `main` passes (typecheck-lint-test-build,
-# e2e-smoke, visual, parity). Every merge to `main` deploys production through
-# Cloudflare Workers Builds, so the label is an explicit opt-in per pull
-# request; removing it switches auto-merge off again.
+# Auto-merge (owner, 20-11-26): pull requests merge themselves, squashed, as
+# soon as every required check on `main` passes (typecheck-lint-test-build,
+# e2e-smoke, visual, parity, Workers Builds). Every merge to `main` deploys
+# production through Cloudflare Workers Builds.
 #
-# Only pull requests from this repository qualify: a fork's pull_request run
-# gets a read-only token and no secrets, and the job's condition skips it.
+# Who qualifies:
+# - A pull request from this repository by a person, by default. A draft or
+#   the `hold` label stops it; marking it ready or removing the label starts
+#   it again. Keep work in progress as a draft.
+# - Dependabot's minor and patch npm updates, and all its GitHub Actions
+#   updates (CI runs the pull request's own workflows, so a broken action
+#   fails its own checks). Major npm updates and other bots (ImgBot) stay
+#   manual; the `automerge` label merges one anyway.
+# - Never a fork: the jobs' conditions skip it.
 #
-# GitHub starts no workflow from an event made with GITHUB_TOKEN, so a merge
-# enabled with it does not start the push run of ci.yml on `main` (Cloudflare
-# still deploys: its build listens to the push webhook). Add a fine-grained
-# token as the AUTOMERGE_TOKEN secret (contents and pull requests: write) to
-# keep that post-merge run; the job uses it when present.
+# `main` requires a branch to be up to date, so after every push to `main`
+# the keep-current job brings the pull requests waiting to merge up to date:
+# it merges `main` into a person's branch, and asks Dependabot to rebase its
+# own (a merge into Dependabot's branch would hide its update metadata and
+# stop Dependabot managing the branch).
+#
+# This runs on pull_request_target: `main`'s copy of this file, never the
+# pull request's, and it checks out no code. It needs the AUTOMERGE_TOKEN
+# secret, a fine-grained token for this repository only (Contents, Pull
+# requests and Workflows: read and write). GitHub starts no workflow from an
+# event made with GITHUB_TOKEN: without the token a merge would start no CI
+# run or keep-current on `main`, and an updated branch would get no checks.
 name: Auto-merge
 
 on:
-  pull_request:
-    types: [opened, reopened, ready_for_review, synchronize, labeled, unlabeled]
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - converted_to_draft
+      - synchronize
+      - labeled
+      - unlabeled
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
 
 concurrency:
-  group: automerge-${{ github.event.pull_request.number }}
+  group: automerge-${{ github.event.pull_request.number || 'keep-current' }}
   cancel-in-progress: false
 
 jobs:
   automerge:
     name: auto-merge
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
       PR_URL: ${{ github.event.pull_request.html_url }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
     steps:
-      - name: Enable auto-merge (squash)
-        if: >-
-          contains(github.event.pull_request.labels.*.name, 'automerge') &&
-          !github.event.pull_request.draft
-        run: gh pr merge --auto --squash "$PR_URL"
+      # Reads the update from Dependabot's commit; it leaves the outputs empty
+      # (and the pull request manual) once anyone else has pushed to it.
+      - name: Dependabot metadata
+        id: dependabot
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
+        continue-on-error: true
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
 
-      - name: Disable auto-merge when the label is removed
-        if: >-
-          github.event.action == 'unlabeled' &&
-          github.event.label.name == 'automerge'
-        run: gh pr merge --disable-auto "$PR_URL"
+      - name: Decide
+        id: decide
+        env:
+          ACTION: ${{ github.event.action }}
+          ACTOR: ${{ github.actor }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          ECOSYSTEM: ${{ steps.dependabot.outputs.package-ecosystem }}
+          UPDATE_TYPE: ${{ steps.dependabot.outputs.update-type }}
+        run: |
+          has_label() { [[ ",$LABELS," == *",$1,"* ]]; }
+          safe_update() {
+            [ "$ECOSYSTEM" = github_actions ] ||
+              [ "$UPDATE_TYPE" = version-update:semver-minor ] ||
+              [ "$UPDATE_TYPE" = version-update:semver-patch ]
+          }
+          if [ "$AUTHOR" = "dependabot[bot]" ] && [ "$ACTION" = synchronize ] &&
+            [ "$ACTOR" != "dependabot[bot]" ]; then
+            want=keep # someone else's push: leave the setting as it was
+          elif [ "$DRAFT" = true ] || has_label hold; then
+            want=off
+          elif has_label automerge || [ "$AUTHOR_TYPE" = User ]; then
+            want=on
+          elif [ "$AUTHOR" = "dependabot[bot]" ] && safe_update; then
+            want=on
+          else
+            want=off
+          fi
+          echo "want=$want" >> "$GITHUB_OUTPUT"
+          echo "$AUTHOR ($AUTHOR_TYPE) ${UPDATE_TYPE:-}, $ACTION by $ACTOR: auto-merge $want" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enable auto-merge (squash)
+        if: steps.decide.outputs.want == 'on'
+        run: |
+          if gh pr merge --auto --squash "$PR_URL"; then
+            exit 0
+          fi
+          # Auto-merge cannot be enabled on a pull request that is already
+          # clean (every requirement met, e.g. "hold" removed after CI): merge it.
+          state=$(gh pr view "$PR_URL" --json mergeStateStatus --jq .mergeStateStatus)
+          if [ "$state" = CLEAN ]; then
+            gh pr merge --squash --match-head-commit "$HEAD_SHA" "$PR_URL"
+          else
+            echo "::error::Could not enable auto-merge (merge state $state)"
+            exit 1
+          fi
+
+      - name: Disable auto-merge
+        if: steps.decide.outputs.want == 'off'
+        run: |
+          enabled=$(gh pr view "$PR_URL" --json autoMergeRequest --jq '.autoMergeRequest != null')
+          if [ "$enabled" = true ]; then gh pr merge --disable-auto "$PR_URL"; fi
+
+  keep-current:
+    name: keep current
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Bring the pull requests waiting to merge up to date with main
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::No AUTOMERGE_TOKEN secret: an update would start no checks, so none is made."
+            exit 0
+          fi
+          # GitHub works out each pull request's merge state after a push to
+          # main; read it until it is known (UNKNOWN), for up to a minute.
+          state_of() {
+            local state
+            for _ in 1 2 3 4 5 6; do
+              state=$(gh pr view "$1" --json mergeStateStatus --jq .mergeStateStatus)
+              [ "$state" != UNKNOWN ] && break
+              sleep 10
+            done
+            echo "$state"
+          }
+          mapfile -t waiting < <(
+            gh pr list --base main --state open --limit 100 \
+              --json number,author,isDraft,autoMergeRequest \
+              --jq '.[] | select(.autoMergeRequest != null and (.isDraft | not)) | "\(.number) \(.author.login)"'
+          )
+          for line in "${waiting[@]}"; do
+            read -r number author <<< "$line"
+            state=$(state_of "$number")
+            echo "#$number ($author): $state"
+            [ "$state" = BEHIND ] || continue
+            if [ "$author" = app/dependabot ]; then
+              gh pr comment "$number" --body "@dependabot rebase"
+            elif ! gh pr update-branch "$number"; then
+              echo "::warning::#$number could not be brought up to date (a conflict?); it waits for a person."
+            fi
+          done
