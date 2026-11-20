@@ -1,0 +1,66 @@
+/*
+ * A link preview's card (premium interactions, item 6;
+ * components/profile/site/preview/PreviewCard.tsx). Its own sheet, linked by
+ * the card when it first shows, so no page's first load carries it. Tokens
+ * from globals.css only; the layer order is profile.css's.
+ */
+@layer components {
+  .pf-preview {
+    position: fixed;
+    inset: auto;
+    inline-size: min(320px, calc(100vw - 32px));
+    margin: 0;
+    padding: 16px 18px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow:
+      var(--elev-ring),
+      0 16px 40px -16px color-mix(in srgb, var(--ink) 40%, transparent);
+    overflow: visible;
+  }
+  .pf-preview__meta {
+    color: var(--ink-60);
+  }
+  .pf-preview__title {
+    margin-block-start: 6px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .pf-preview__summary {
+    margin-block-start: 6px;
+    color: var(--ink-80);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-preview {
+      animation: kj-preview-in 0.18s var(--ease-expo);
+    }
+    .pf-preview[data-side="above"] {
+      animation-name: kj-preview-in-above;
+    }
+    @keyframes kj-preview-in {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+    }
+    @keyframes kj-preview-in-above {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    .pf-preview {
+      border: 1px solid CanvasText;
+    }
+  }
+}

@@ -1040,6 +1040,87 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
 });
 
 /**
+ * Link previews (premium interactions, item 6): a case's text link shows the
+ * case's card after a pause under the pointer, or at once on keyboard
+ * focus; the pointer can move onto it; Esc dismisses it; its stylesheet
+ * loads only then. Cards that open a case have none, and touch has none.
+ */
+test.describe("link previews > a case's text link shows its card", () => {
+  const card = ".pf-preview";
+  const visit = async (page: Page, path: string) => {
+    await page.goto(path, { waitUntil: "load" });
+    await expect(page.locator("time[data-clock]")).toBeAttached();
+  };
+
+  test("/about: under the pointer after a pause, onto the card, Esc", async ({
+    page,
+  }) => {
+    await visit(page, "/about");
+    const link = page
+      .locator('main a.ds-prose-link[href="/portfolio/tbh-intranet"]')
+      .first();
+    await link.scrollIntoViewIfNeeded();
+    const previewSheet = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('link[rel="stylesheet"]')].some((l) =>
+          /preview/.test((l as HTMLLinkElement).href),
+        ),
+      );
+    expect(await previewSheet()).toBe(false);
+
+    await expect(async () => {
+      await link.hover();
+      await expect(page.locator(card)).toBeVisible({ timeout: 1500 });
+    }).toPass();
+    expect(await previewSheet()).toBe(true);
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toContainText("TBH Intranet");
+    await expect(tooltip).toContainText("One back office");
+    await expect(link).toHaveAttribute(
+      "aria-describedby",
+      (await tooltip.getAttribute("id"))!,
+    );
+
+    // Hoverable: the pointer crosses to the card and it stays.
+    const box = (await page.locator(card).boundingBox())!;
+    await page.mouse.move(box.x + 24, box.y + 24, { steps: 5 });
+    await page.waitForTimeout(400);
+    await expect(page.locator(card)).toBeVisible();
+
+    // Dismissible without moving the pointer.
+    await page.keyboard.press("Escape");
+    await expect(page.locator(card)).toHaveCount(0);
+    await expect(link).not.toHaveAttribute("aria-describedby", /./);
+  });
+
+  test("/about: on keyboard focus, gone when focus leaves", async ({
+    page,
+  }) => {
+    await visit(page, "/about");
+    const link = page
+      .locator('main a.ds-prose-link[href="/ventures/manut"]')
+      .first();
+    await link.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("tooltip")).toContainText("Manut");
+    await page.locator("body").press("Escape");
+    await expect(page.locator(card)).toHaveCount(0);
+  });
+
+  test("/portfolio: the cards that open a case have no preview", async ({
+    page,
+  }) => {
+    await visit(page, "/portfolio");
+    const cardLink = page.locator(".pf-work-card a.ds-stretch").first();
+    await cardLink.scrollIntoViewIfNeeded();
+    await cardLink.hover();
+    await page.waitForTimeout(900);
+    await expect(page.locator(card)).toHaveCount(0);
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */
