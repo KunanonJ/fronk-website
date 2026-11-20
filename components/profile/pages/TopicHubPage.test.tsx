@@ -290,12 +290,14 @@ describe("TopicHubPage (the FDE hub, where a recruiter lands)", () => {
     ).toHaveTextContent(
       "เปิดรับตำแหน่ง · Forward Deployed Engineer และงานวิศวกรรม AI ในกรุงเทพฯ หรือทำงานทางไกล",
     );
-    expect(
-      within(hero()).getByRole("link", { name: "ติดต่อ" }),
-    ).toHaveAttribute("href", "/contact?topic=hiring");
-    expect(
-      within(hero()).getByRole("link", { name: "เรซูเม่" }),
-    ).toHaveAttribute("href", "/resume");
+    expect(within(hero()).getByRole("link", { name: "ติดต่อ" })).toHaveAttribute(
+      "href",
+      "/contact?topic=hiring",
+    );
+    expect(within(hero()).getByRole("link", { name: "เรซูเม่" })).toHaveAttribute(
+      "href",
+      "/resume",
+    );
     const explore = screen.getByRole("article", { name: "อ่านต่อ" });
     expect(
       within(explore)

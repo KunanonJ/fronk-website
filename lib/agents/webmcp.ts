@@ -46,8 +46,8 @@ export interface ToolDeps {
   draftContact: (draft: ContactDraft) => Promise<boolean>;
 }
 
-export const COLOR_THEMES = ["light", "dark", "system"] as const;
-export type ColorTheme = (typeof COLOR_THEMES)[number];
+const COLOR_THEMES = ["light", "dark", "system"] as const;
+type ColorTheme = (typeof COLOR_THEMES)[number];
 
 const text = (value: string): ToolResult => ({
   content: [{ type: "text", text: value }],
