@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { PORTRAIT_COLOURS, portraitCells } from "@/lib/brand/pixelPortrait";
 import { cn } from "@/lib/utils/cn";
 
@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils/cn";
  * prints in (the intro, the /about dissolve to the photo). The background is
  * cells too, so a hidden group shows what is behind the portrait. Its colour
  * is `--portrait-bg` (the accent by default). Decorative unless `label` is
- * set; crisp edges at any size.
+ * set; crisp edges at any size. `children` are drawn over it, in its cells
+ * (the nav avatar's wink).
  */
 
 const RANKS = 16;
@@ -19,6 +20,7 @@ export function PixelPortrait({
   shown = RANKS,
   label,
   className,
+  children,
 }: {
   rows: readonly string[];
   /** Ranks drawn, 0 to 16: all of them by default. */
@@ -26,6 +28,8 @@ export function PixelPortrait({
   /** The portrait's name for assistive technology; none hides it. */
   label?: string;
   className?: string;
+  /** SVG drawn over the portrait, in its cells. */
+  children?: ReactNode;
 }) {
   const groups = useMemo(() => {
     const byRank = Array.from(
@@ -68,6 +72,7 @@ export function PixelPortrait({
           ))}
         </g>
       ))}
+      {children}
     </svg>
   );
 }

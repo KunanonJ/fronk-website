@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import SiteNav from "@/components/profile/site/SiteNav";
+import { PORTRAIT_COLOURS, PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
 
 /*
  * The pill nav (design spec 7.1 to 7.3): the server HTML carries the bar, the
@@ -64,6 +65,52 @@ describe("SiteNav, server HTML", () => {
     const dom = new DOMParser().parseFromString(html, "text/html");
     expect(dom.querySelector(".pf-nav__row #say-hello-nav")).toBeNull();
     expect(dom.querySelector("header.pf-nav > #say-hello-nav")).not.toBeNull();
+  });
+
+  it("draws the avatar's wink hidden, as the last layer, over one eye", () => {
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    const avatar = dom.querySelector(".pf-nav__name svg.pf-nav__avatar")!;
+    const wink = avatar.querySelector("path.pf-nav__wink")!;
+    expect(wink).not.toBeNull();
+    expect(avatar.lastElementChild).toBe(wink);
+    // Hidden at rest, without the stylesheet as well: the page at rest is
+    // drawn as before.
+    expect(wink.getAttribute("visibility")).toBe("hidden");
+    expect(wink.getAttribute("fill")).toBe(PORTRAIT_COLOURS.e);
+    // Row 7, columns 9 and 10 of the 16 x 16 cut: an eye, white then pupil.
+    expect(wink.getAttribute("d")).toBe("M9 7h2v1H9z");
+    expect(PORTRAIT_SMALL[7]!.slice(9, 11)).toBe("we");
+  });
+});
+
+/*
+ * The wink (now-building-and-genz Phase 5) keeps the visitor's trait: it is
+ * drawn over the dressed avatar, and not at all where shades cover the eye.
+ */
+describe("SiteNav, the avatar's wink with a trait", () => {
+  afterEach(() => localStorage.clear());
+
+  const wear = (id: string) => {
+    localStorage.setItem("pf-portrait-found", JSON.stringify([id]));
+    localStorage.setItem("pf-portrait-worn", id);
+  };
+  const fills = (container: HTMLElement) =>
+    [...container.querySelectorAll(".pf-nav__avatar path[fill]")].map((path) =>
+      path.getAttribute("fill"),
+    );
+
+  it("winks through gold glasses, which leave the eyes showing", async () => {
+    wear("glasses");
+    const { container } = render(<SiteNav />);
+    await waitFor(() => expect(fills(container)).toContain("#e3b341"));
+    expect(container.querySelector(".pf-nav__wink")).not.toBeNull();
+  });
+
+  it("does not wink behind shades, and keeps them on", async () => {
+    wear("shades");
+    const { container } = render(<SiteNav />);
+    await waitFor(() => expect(fills(container)).toContain("#2a2440"));
+    expect(container.querySelector(".pf-nav__wink")).toBeNull();
   });
 });
 

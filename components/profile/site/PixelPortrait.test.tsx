@@ -26,6 +26,17 @@ describe("PixelPortrait", () => {
     );
   });
 
+  it("draws its children over the portrait, in its cells", () => {
+    const { container } = render(
+      <PixelPortrait rows={PORTRAIT_SMALL}>
+        <path className="over" d="M9 7h2v1H9z" />
+      </PixelPortrait>,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.lastElementChild).toHaveClass("over");
+    expect(svg.querySelectorAll("g")).toHaveLength(16);
+  });
+
   it("is an image with a name when it has a label", () => {
     const { getByRole } = render(
       <PixelPortrait rows={PORTRAIT} label="Pixel portrait" />,
