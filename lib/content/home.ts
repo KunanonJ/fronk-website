@@ -153,4 +153,20 @@ export const canvasMock = {
   /** What the pager says once a reader turns to a frame. */
   shown: (name: string, index: number, count: number) =>
     `${name}, ${index + 1} of ${count}`, // DRAFT
+  /**
+   * The canvas toolbar's buttons, from 810 px with a mouse
+   * (now-building-and-genz Phase 4). The tools' own words, which load with
+   * them, are in ./canvasTools.
+   */
+  tools: {
+    label: "Canvas tools", // DRAFT
+    move: "Move", // DRAFT
+    stickers: "Stickers", // DRAFT
+    /** The Stickers button's tooltip and description once it is on. */
+    stamp: "press again to stamp one", // DRAFT
+    pen: "Pen", // DRAFT
+    ink: (colour: string) => `Ink: ${colour}`, // DRAFT
+    inks: { violet: "violet", coral: "coral" }, // DRAFT
+    clear: "Clear the canvas", // DRAFT
+  },
 } as const;

@@ -1,0 +1,178 @@
+/*
+ * The hero canvas's tools (now-building-and-genz Phase 4;
+ * components/profile/home/CanvasInk.tsx): the drawing layer, the Pen's
+ * strokes and the stickers. Linked by the layer the first time a tool is
+ * picked, so no page's first load carries it; the toolbar's own few rules
+ * are in profile/home-hero.css. Tokens from globals.css only; the layer
+ * order is profile.css's.
+ */
+@layer components {
+  /* Over the frames, under the panels (it comes first in the canvas), and
+     only from 810 px, where the toolbar is real. */
+  .pf-ink {
+    display: none;
+  }
+  @media (min-width: 50.625rem) {
+    .pf-ink {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: block;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .pf-ink[data-tool="pen"] {
+      pointer-events: auto;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .pf-ink[data-tool="stickers"] {
+      pointer-events: auto;
+      cursor: copy;
+    }
+  }
+
+  .pf-ink__svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+  .pf-ink__stroke {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .pf-ink__stroke[data-ink="coral"] {
+    stroke: var(--coral);
+  }
+
+  /* Die-cut stickers: a paper edge drawn by four hard shadows, and a soft
+     one under it. Their words are in the ink with its own text colour. */
+  .pf-sticker {
+    --sticker: var(--accent);
+    --sticker-on: var(--on-accent);
+    position: absolute;
+    display: grid;
+    place-items: center;
+    color: var(--sticker-on);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    translate: -50% -50%;
+    rotate: var(--tilt);
+    filter: drop-shadow(2px 0 0 var(--paper)) drop-shadow(-2px 0 0 var(--paper))
+      drop-shadow(0 2px 0 var(--paper)) drop-shadow(0 -2px 0 var(--paper))
+      drop-shadow(0 6px 6px color-mix(in srgb, var(--ink) 22%, transparent));
+  }
+  .pf-sticker[data-ink="coral"] {
+    --sticker: var(--coral);
+    --sticker-on: var(--ink);
+  }
+  .dark .pf-sticker[data-ink="coral"] {
+    --sticker-on: var(--paper);
+  }
+  .pf-sticker:is([data-kind="ship"], [data-kind="gm"], [data-kind="w"]) {
+    background: var(--sticker);
+  }
+  .pf-sticker[data-kind="ship"] {
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pf-sticker[data-kind="gm"] {
+    padding: 3px 14px 8px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-style: italic;
+    font-weight: 400;
+  }
+  .pf-sticker[data-kind="w"] {
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 12px;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+  }
+  .pf-sticker__art {
+    inline-size: 44px;
+    block-size: auto;
+  }
+  .pf-sticker__art [data-cell="k"] {
+    fill: var(--ink);
+  }
+  .pf-sticker__art [data-cell="a"] {
+    fill: var(--sticker);
+  }
+  .pf-sticker__art [data-cell="w"] {
+    fill: #fff;
+  }
+
+  /* The fade and the pop, only while things may move; CanvasInk holds the
+     strokes (no data-fade) while the hero's motion is paused. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-ink__stroke[data-fade] {
+      animation: pf-ink-fade 4s linear forwards;
+    }
+    .pf-sticker[data-pop] {
+      animation: pf-sticker-pop 0.42s var(--ease-expo) both;
+    }
+    .pf-ink[data-still] :is(.pf-sticker, .intro-pixel) {
+      animation: none;
+    }
+    @keyframes pf-ink-fade {
+      0%,
+      70% {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    @keyframes pf-sticker-pop {
+      from {
+        opacity: 0;
+        scale: 1.8;
+      }
+      60% {
+        opacity: 1;
+        scale: 0.92;
+      }
+    }
+  }
+
+  /* Forced colours: system colours of their own, so nothing drawn vanishes. */
+  @media (forced-colors: active) {
+    .pf-ink {
+      forced-color-adjust: none;
+    }
+    .pf-ink__stroke,
+    .pf-ink__stroke[data-ink="coral"] {
+      stroke: CanvasText;
+    }
+    .pf-ink .pf-sticker[data-ink] {
+      --sticker: Highlight;
+      --sticker-on: HighlightText;
+      filter: none;
+    }
+    .pf-sticker:is([data-kind="ship"], [data-kind="gm"], [data-kind="w"]) {
+      border: 2px solid CanvasText;
+    }
+    .pf-sticker__art [data-cell="k"] {
+      fill: CanvasText;
+    }
+    .pf-sticker__art [data-cell="w"] {
+      fill: Canvas;
+    }
+  }
+}

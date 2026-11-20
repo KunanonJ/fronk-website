@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   Frame,
   MessageCircle,
@@ -8,6 +16,12 @@ import {
 } from "lucide-react";
 import Link from "@/components/navigation/Link";
 import { Chip } from "@/components/ds/labels";
+import type { CanvasInkApi } from "@/components/profile/home/CanvasInk";
+import {
+  CanvasToolbar,
+  type CanvasInkColour,
+  type CanvasTool,
+} from "@/components/profile/home/CanvasToolbar";
 import { canvasMock, type MockFrame } from "@/lib/content/home";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -27,6 +41,13 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * shortcut inside the hidden decoration; the keyboard selects by focusing the
  * frames themselves. Under a fine pointer the dotted canvas drifts against
  * it, a little, as if it lay deeper than the frames.
+ *
+ * From 810 px with a mouse the toolbar is real (now-building-and-genz
+ * Phase 4; CanvasToolbar): Move, the default, under which the canvas is as
+ * above; the Pen, whose doodles fade; Stickers; the ink; and Clear. The
+ * drawing layer and its stylesheet load the first time the toolbar is
+ * reached for (CanvasInk). On touch screens and narrow ones the toolbar
+ * stays decoration.
  */
 
 /**
@@ -43,6 +64,33 @@ const PANELS_QUERY = "(min-width: 50.625rem)";
 
 /** A pointer that can hover: the canvas drifts under it. */
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
+
+/** The drawing layer, loaded when the toolbar is first reached for. */
+const CanvasInk = lazy(() => import("@/components/profile/home/CanvasInk"));
+
+function subscribeTools(onChange: () => void): () => void {
+  const lists = [PANELS_QUERY, FINE_POINTER_QUERY].map((query) =>
+    window.matchMedia(query),
+  );
+  lists.forEach((list) => list.addEventListener("change", onChange));
+  return () =>
+    lists.forEach((list) => list.removeEventListener("change", onChange));
+}
+
+/**
+ * The tools work here: wide enough for the panels, and a mouse. Never on
+ * the server or at hydration, which draw the decorative toolbar.
+ */
+function useToolsAllowed(): boolean {
+  return useSyncExternalStore(
+    subscribeTools,
+    () =>
+      window.matchMedia(PANELS_QUERY).matches &&
+      window.matchMedia(FINE_POINTER_QUERY).matches,
+    () => false,
+  );
+}
+
 /** How far the dots drift, at the canvas's edge, in px. */
 const PAN_PX = 12;
 
@@ -122,6 +170,22 @@ export function CanvasMock({
   const [touched, setTouched] = useState(false);
   const [shown, setShown] = useState("");
   const current = frames[selected] ?? frames[0];
+
+  const toolsAllowed = useToolsAllowed();
+  const [chosen, setChosen] = useState<CanvasTool>("move");
+  /** Off where the tools do not work: a window narrowed, a mouse gone. */
+  const tool = toolsAllowed ? chosen : "move";
+  const [ink, setInk] = useState<CanvasInkColour>("violet");
+  const [awake, setAwake] = useState(false);
+  /**
+   * The toolbar has been reached for: the drawing layer (empty, and letting
+   * the pointer through under Move) is in the page, so a tool works at once.
+   */
+  const [inking, setInking] = useState(false);
+  const [marks, setMarks] = useState(0);
+  const inkApi = useRef<CanvasInkApi | null>(null);
+  /** Stamps asked for before the layer arrived. */
+  const queued = useRef(0);
 
   // The dotted canvas drifts against a fine pointer and eases back when it
   // leaves; still under reduced motion and while the hero's motion is paused.
@@ -208,6 +272,47 @@ export function CanvasMock({
     setSelected(index);
   };
 
+  // Esc puts any tool down (unless a dialog's Esc, or another's, came first).
+  useEffect(() => {
+    if (tool === "move") return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      if (document.querySelector("dialog[open]")) return;
+      event.preventDefault();
+      setChosen("move");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [tool]);
+
+  /** The live line; the same words again are still read. */
+  const say = useCallback((text: string) => {
+    setShown((said) => (said === text ? `${text}\u00a0` : text));
+  }, []);
+
+  const onInkReady = useCallback((api: CanvasInkApi | null) => {
+    inkApi.current = api;
+    for (; api && queued.current > 0; queued.current -= 1) api.stamp();
+  }, []);
+
+  const wake = () => {
+    if (awake) return;
+    setAwake(true);
+    setInking(true);
+  };
+
+  /** A tool picked ends the tour, as a pick does; Stickers again stamps. */
+  const pickTool = (next: CanvasTool) => {
+    setTouched(true);
+    if (next === "stickers" && tool === "stickers") {
+      if (inkApi.current) inkApi.current.stamp();
+      else queued.current += 1;
+      return;
+    }
+    setChosen(next);
+    if (next !== "move") setInking(true);
+  };
+
   /** A layer pressed: its frame is selected and the named cursor goes to it. */
   const pickLayer = (index: number) => {
     pick(index);
@@ -239,7 +344,12 @@ export function CanvasMock({
 
   return (
     <div className="pf-mock-wrap">
-      <div className="pf-mock" role="group" aria-label={canvasMock.label}>
+      <div
+        className="pf-mock"
+        role="group"
+        aria-label={canvasMock.label}
+        data-tool={tool === "move" ? undefined : tool}
+      >
         <div className="pf-mock__bar" aria-hidden="true">
           <span className="pf-mock__lights">
             <i />
@@ -254,6 +364,19 @@ export function CanvasMock({
           <span className="pf-mock__share">{canvasMock.share}</span>
         </div>
         <div ref={canvas} className="pf-mock__canvas">
+          {/* First, so the panels after it (at its z-index) lie over it. */}
+          {inking && toolsAllowed ? (
+            <Suspense fallback={null}>
+              <CanvasInk
+                tool={tool}
+                ink={ink}
+                still={reduced || paused}
+                onCount={setMarks}
+                onReady={onInkReady}
+                say={say}
+              />
+            </Suspense>
+          ) : null}
           <div className="pf-mock__panel pf-mock__layers" aria-hidden="true">
             <p className="pf-mock__tabs">
               <b>{canvasMock.layersTabs[0]}</b>
@@ -359,23 +482,42 @@ export function CanvasMock({
             <MousePointer2 size={18} strokeWidth={1.6} />
             <span className="pf-mock__cursor-name">{canvasMock.cursor}</span>
           </div>
-          <div className="pf-mock__tools" aria-hidden="true">
-            <span data-on="">
-              <MousePointer2 size={15} strokeWidth={1.8} />
-            </span>
-            <span>
-              <Frame size={15} strokeWidth={1.8} />
-            </span>
-            <span>
-              <PenTool size={15} strokeWidth={1.8} />
-            </span>
-            <span>
-              <Type size={15} strokeWidth={1.8} />
-            </span>
-            <span>
-              <MessageCircle size={15} strokeWidth={1.8} />
-            </span>
-          </div>
+          {toolsAllowed ? (
+            <CanvasToolbar
+              tool={tool}
+              ink={ink}
+              canClear={marks > 0}
+              awake={awake}
+              onWake={wake}
+              onTool={pickTool}
+              onInk={() => {
+                setTouched(true);
+                setInk((was) => (was === "violet" ? "coral" : "violet"));
+              }}
+              onClear={() => {
+                setTouched(true);
+                inkApi.current?.clear();
+              }}
+            />
+          ) : (
+            <div className="pf-mock__tools" aria-hidden="true">
+              <span data-on="">
+                <MousePointer2 size={15} strokeWidth={1.8} />
+              </span>
+              <span>
+                <Frame size={15} strokeWidth={1.8} />
+              </span>
+              <span>
+                <PenTool size={15} strokeWidth={1.8} />
+              </span>
+              <span>
+                <Type size={15} strokeWidth={1.8} />
+              </span>
+              <span>
+                <MessageCircle size={15} strokeWidth={1.8} />
+              </span>
+            </div>
+          )}
         </div>
       </div>
       <div className="pf-mock__pager">

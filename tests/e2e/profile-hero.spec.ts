@@ -393,7 +393,7 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
 });
 
 test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
-  test("exposes only its three frame links, named, and selects on hover and focus", async ({
+  test("exposes only its three frame links, named, and the toolbar's five buttons, and selects on hover and focus", async ({
     page,
   }) => {
     only(["desktop"]);
@@ -402,7 +402,16 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
     await visit(page);
     const group = page.getByRole("group", { name: "Featured projects" });
     await expect(group.getByRole("link")).toHaveCount(3);
-    await expect(group.getByRole("button")).toHaveCount(0);
+    // From 810 px with a mouse the toolbar is real (now-building-and-genz
+    // Phase 4): its buttons are the group's only ones. On a phone there are
+    // none (the phone row's test below).
+    const tools = group.getByRole("toolbar", { name: "Canvas tools" });
+    expect(
+      await group
+        .getByRole("button")
+        .evaluateAll((all) => all.map((el) => el.getAttribute("aria-label"))),
+    ).toEqual(["Move", "Stickers", "Pen", "Ink: violet", "Clear the canvas"]);
+    await expect(tools.getByRole("button")).toHaveCount(5);
     for (const [index, name] of FRAMES.entries()) {
       const link = group.getByRole("link", {
         name: `${name}: open the case study`,
@@ -547,6 +556,13 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
     await prepare(page);
     await visit(page);
     await expect(page.locator(".pf-mock__inspector")).toBeHidden();
+    // No tools on a phone: the group holds links only.
+    await expect(
+      page
+        .getByRole("group", { name: "Featured projects" })
+        .getByRole("button"),
+    ).toHaveCount(0);
+    await expect(page.getByRole("toolbar")).toHaveCount(0);
     const pager = page.locator(".pf-mock__pager");
     await expect(pager.getByRole("button")).toHaveCount(3);
     const last = pager.getByRole("button", { name: `Show ${FRAMES[2]}` });
