@@ -14,6 +14,7 @@ const DOM_TS_TESTS = [
   "lib/brand/traitStore.test.ts",
   "lib/secrets/konami.test.ts",
   "components/profile/site/secrets/pixelParty.test.ts",
+  "components/profile/pages/portraitEdition.test.ts",
 ];
 
 export default defineConfig({

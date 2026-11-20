@@ -1,0 +1,66 @@
+/*
+ * The holo card (now-building-and-genz Phase 6;
+ * components/profile/pages/PortraitHolo.tsx): /about's portrait tilts toward
+ * a mouse and a foil sheen follows it. Linked by that lazy chunk the first
+ * time a mouse comes over the portrait, so no page's first load carries it.
+ * The card is flat and the sheen gone under reduced motion, in forced colours
+ * and with a coarse pointer, whatever the script sees. Tokens from
+ * globals.css only; the layer order is profile.css's.
+ */
+@layer components {
+  .pf-about-page__portrait[data-holo] {
+    transform: perspective(900px) rotateX(var(--holo-rx, 0deg))
+      rotateY(var(--holo-ry, 0deg));
+    transition: transform 0.6s var(--ease-smooth);
+  }
+  /* Following the pointer: quick, so it keeps up without jumping. */
+  .pf-about-page__portrait[data-holo="on"] {
+    transition-duration: 0.12s;
+  }
+  /* Over the pixels, under the controls (they come after it): no text
+     under the sheen, and it takes no pointer. */
+  .pf-holo {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(
+        circle at var(--holo-x, 50%) var(--holo-y, 50%),
+        rgb(255 255 255 / 0.55),
+        transparent 55%
+      ),
+      linear-gradient(
+        115deg,
+        transparent 20%,
+        color-mix(in srgb, var(--coral) 60%, transparent) 36%,
+        rgb(227 179 65 / 0.55) 50%,
+        color-mix(in srgb, var(--accent) 60%, transparent) 64%,
+        transparent 80%
+      );
+    background-position:
+      center,
+      var(--holo-x, 50%) var(--holo-y, 50%);
+    background-size:
+      100% 100%,
+      240% 240%;
+    mix-blend-mode: soft-light;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+  }
+  .pf-about-page__portrait[data-holo="on"] .pf-holo {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce),
+    (forced-colors: active),
+    (hover: none),
+    (pointer: coarse) {
+    .pf-about-page__portrait[data-holo] {
+      transform: none;
+    }
+    .pf-holo {
+      display: none;
+    }
+  }
+}

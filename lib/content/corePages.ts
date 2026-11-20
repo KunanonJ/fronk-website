@@ -81,5 +81,15 @@ export const aboutPageCopy = {
     found: (label: string, found: number, total: number) =>
       `${label}. ${found} of ${total} traits found.`, // DRAFT
     goldFound: "All six traits found: the gold edition.", // DRAFT
+    /** Save my edition: the button, by what it does on this device. */
+    save: "Save my edition", // DRAFT
+    share: "Share my edition", // DRAFT
+    /** The PNG's stamp. */
+    stamp: (found: number, total: number) =>
+      `KunanonJ · edition ${found}/${total}`, // DRAFT
+    saved: (found: number, total: number) =>
+      `Saved your edition, ${found} of ${total}, as a PNG.`, // DRAFT
+    shared: "Shared your edition.", // DRAFT
+    saveFailed: "Could not save the edition on this device.", // DRAFT
   },
 } as const;
