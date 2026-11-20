@@ -7,8 +7,13 @@ import { canvasMock, type MockFrame } from "@/lib/content/home";
  * The hero's canvas mock (design spec 8.2 and 12, item 16; plan gate 6): it
  * exposes only its frame links (and, on phones, the pager); a frame chosen
  * by pointer or focus drives the inspector; the named cursor tours once and
- * rests; drawings carry the "Illustration" label.
+ * rests; drawings carry the "Illustration" label. From 810 px with a mouse
+ * its toolbar is real (now-building-and-genz Phase 4); CanvasInk.test.tsx
+ * covers the drawing layer itself.
  */
+
+const store = vi.hoisted(() => ({ award: vi.fn(() => true) }));
+vi.mock("@/lib/brand/traitStore", () => store);
 
 const FRAMES = canvasMock.frames;
 
@@ -298,5 +303,173 @@ describe("CanvasMock", () => {
       "aria-live",
       "polite",
     );
+  });
+});
+
+describe("CanvasMock's tools, from 810 px with a mouse", () => {
+  const toolbar = () => screen.getByRole("toolbar", { name: "Canvas tools" });
+  const button = (name: string) =>
+    within(toolbar()).getByRole("button", { name });
+  /** The icon in each slot, by lucide's class, or "dot" for the ink. */
+  const icons = (bar: Element) =>
+    [...bar.querySelectorAll(":scope > * > svg")].map(
+      (svg) =>
+        [...svg.classList].find((name) => name.startsWith("lucide-")) ?? "dot",
+    );
+  const AT_REST = [
+    "lucide-mouse-pointer-2",
+    "lucide-frame",
+    "lucide-pen-tool",
+    "lucide-type",
+    "lucide-message-circle",
+  ];
+
+  beforeEach(() => {
+    stubMedia({ fine: true });
+  });
+
+  it("is a toolbar of five buttons, drawn as the decorative one until it is reached for", () => {
+    const { container } = render(<CanvasMock ready={false} />);
+    const bar = toolbar();
+    expect(bar.closest("[aria-hidden='true']")).toBeNull();
+    expect(bar).toHaveClass("pf-mock__tools");
+    const group = screen.getByRole("group", { name: "Featured projects" });
+    expect(
+      within(group)
+        .getAllByRole("button")
+        .map((el) => el.getAttribute("aria-label")),
+    ).toEqual(["Move", "Stickers", "Pen", "Ink: violet", "Clear the canvas"]);
+    expect(button("Move")).toHaveAttribute("aria-pressed", "true");
+    expect(button("Move")).toHaveAttribute("data-on");
+    expect(button("Stickers")).toHaveAttribute("aria-pressed", "false");
+    expect(button("Pen")).toHaveAttribute("aria-pressed", "false");
+    expect(button("Ink: violet")).not.toHaveAttribute("aria-pressed");
+    expect(button("Clear the canvas")).toHaveAttribute("aria-disabled", "true");
+    // At rest, the five icons of the decorative toolbar, Move pressed.
+    expect(icons(bar)).toEqual(AT_REST);
+    // Nothing of the tools loads until the toolbar is reached for.
+    expect(container.querySelector(".pf-ink")).toBeNull();
+
+    // Reached for, it wakes: the slots show their tools, for good.
+    fireEvent.pointerEnter(bar);
+    expect(icons(bar)).toEqual([
+      "lucide-mouse-pointer-2",
+      "lucide-sticker",
+      "lucide-pen-tool",
+      "dot",
+      "lucide-eraser",
+    ]);
+    fireEvent.pointerLeave(bar);
+    expect(bar).toHaveAttribute("data-awake");
+  });
+
+  it("wakes on keyboard focus too, and moves along one tab stop with the arrows, Home and End", () => {
+    render(<CanvasMock ready={false} />);
+    const bar = toolbar();
+    const buttons = within(bar).getAllByRole("button");
+    expect(buttons.map((el) => el.tabIndex)).toEqual([0, -1, -1, -1, -1]);
+    act(() => buttons[0]!.focus());
+    expect(bar).toHaveAttribute("data-awake");
+    fireEvent.keyDown(buttons[0]!, { key: "ArrowRight" });
+    expect(buttons[1]).toHaveFocus();
+    expect(buttons.map((el) => el.tabIndex)).toEqual([-1, 0, -1, -1, -1]);
+    fireEvent.keyDown(buttons[1]!, { key: "End" });
+    expect(buttons[4]).toHaveFocus();
+    fireEvent.keyDown(buttons[4]!, { key: "ArrowRight" });
+    expect(buttons[0]).toHaveFocus();
+    fireEvent.keyDown(buttons[0]!, { key: "ArrowLeft" });
+    expect(buttons[4]).toHaveFocus();
+    fireEvent.keyDown(buttons[4]!, { key: "Home" });
+    expect(buttons[0]).toHaveFocus();
+  });
+
+  it("switches tools, ends the named cursor's tour, and Esc puts any tool down", () => {
+    const { container } = render(<CanvasMock ready />);
+    const mock = container.querySelector(".pf-mock")!;
+    const cursor = container.querySelector(".pf-mock__cursor")!;
+
+    fireEvent.click(button("Pen"));
+    expect(button("Pen")).toHaveAttribute("aria-pressed", "true");
+    expect(button("Move")).toHaveAttribute("aria-pressed", "false");
+    expect(mock).toHaveAttribute("data-tool", "pen");
+    advance(5000);
+    expect(cursor).toHaveAttribute("data-frame", "0");
+
+    fireEvent.click(button("Stickers"));
+    expect(button("Stickers")).toHaveAttribute("aria-pressed", "true");
+    expect(button("Pen")).toHaveAttribute("aria-pressed", "false");
+    expect(mock).toHaveAttribute("data-tool", "stickers");
+
+    // Esc is a dialog's first, and another handler's.
+    const dialog = document.createElement("dialog");
+    dialog.setAttribute("open", "");
+    document.body.append(dialog);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(mock).toHaveAttribute("data-tool", "stickers");
+    dialog.remove();
+    const taken = new KeyboardEvent("keydown", {
+      key: "Escape",
+      cancelable: true,
+    });
+    taken.preventDefault();
+    act(() => {
+      window.dispatchEvent(taken);
+    });
+    expect(mock).toHaveAttribute("data-tool", "stickers");
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(button("Move")).toHaveAttribute("aria-pressed", "true");
+    expect(mock).not.toHaveAttribute("data-tool");
+
+    // The ink turns between violet and coral.
+    fireEvent.click(button("Ink: violet"));
+    expect(button("Ink: coral")).toBeInTheDocument();
+  });
+
+  it("is decoration on a touch screen and on a narrow one, as before", () => {
+    for (const media of [
+      { wide: true, fine: false },
+      { wide: false, fine: true },
+    ]) {
+      stubMedia(media);
+      const { container, unmount } = render(<CanvasMock ready={false} />);
+      expect(screen.queryByRole("toolbar")).toBeNull();
+      expect(container.querySelector(".pf-mock__tools")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
+      const group = screen.getByRole("group", { name: "Featured projects" });
+      expect(within(group).queryAllByRole("button")).toHaveLength(0);
+      unmount();
+    }
+  });
+
+  it("stamps a sticker from the keyboard, says so, finds the trait, and Clear empties the canvas", async () => {
+    vi.useRealTimers();
+    store.award.mockClear();
+    const { container } = render(<CanvasMock ready={false} />);
+    const live = container.querySelector("[aria-live='polite']")!;
+    // Stickers on, then pressed again: a sticker at a free spot.
+    fireEvent.click(button("Stickers"));
+    fireEvent.click(button("Stickers"));
+    await vi.waitFor(() =>
+      expect(container.querySelectorAll(".pf-sticker")).toHaveLength(1),
+    );
+    const layer = container.querySelector(".pf-mock__canvas > .pf-ink")!;
+    expect(layer).toHaveAttribute("data-tool", "stickers");
+    expect(live).toHaveTextContent("Sticker placed: ship it");
+    await vi.waitFor(() =>
+      expect(store.award).toHaveBeenCalledWith("headphones", "canvas"),
+    );
+    expect(button("Clear the canvas")).not.toHaveAttribute("aria-disabled");
+    expect(button("Stickers").title).toBe("Stickers: press again to stamp one");
+
+    fireEvent.click(button("Clear the canvas"));
+    expect(container.querySelectorAll(".pf-sticker")).toHaveLength(0);
+    expect(live).toHaveTextContent("Canvas cleared");
+    expect(button("Clear the canvas")).toHaveAttribute("aria-disabled", "true");
+    // Disabled, it does nothing.
+    fireEvent.click(button("Clear the canvas"));
+    expect(live.textContent).toBe("Canvas cleared");
   });
 });

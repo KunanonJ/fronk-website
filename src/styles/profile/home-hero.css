@@ -736,7 +736,7 @@
       pointer-events: none;
       transform: translateX(-50%);
     }
-    .pf-mock__tools span {
+    .pf-mock__tools > * {
       display: grid;
       place-items: center;
       inline-size: 26px;
@@ -747,6 +747,43 @@
     .pf-mock__tools [data-on] {
       background: var(--accent);
       color: var(--on-accent);
+    }
+    /* Real with a mouse (CanvasToolbar), and drawn as at rest until used;
+       the transparent edge shows in forced colours. The drawing layer's
+       rules load with it (canvas-tools.css). */
+    .pf-mock__tools[role="toolbar"] {
+      pointer-events: auto;
+    }
+    .pf-mock__tools button {
+      padding: 0;
+      border: 1px solid transparent;
+      background: none;
+      font: inherit;
+    }
+    /* The press lands on the button, not on an icon the toolbar's waking
+       swaps out under it (a click would be lost). */
+    .pf-mock__tools button > svg {
+      pointer-events: none;
+    }
+    .pf-mock__tools button:focus-visible {
+      outline-offset: 1px;
+    }
+    .pf-mock__tools button:not([data-on], [aria-disabled]):hover {
+      background: var(--paper-2);
+      color: var(--ink);
+    }
+    .pf-mock__tools[data-awake] [aria-disabled] {
+      color: var(--ink-45);
+      cursor: inherit;
+    }
+    /* A tool on: the frames and the panels' shortcuts let the pointer
+       through to the drawing layer, even before it has loaded, so a stroke
+       never opens a case or selects text. */
+    .pf-mock[data-tool] {
+      user-select: none;
+    }
+    .pf-mock[data-tool] :is(.pf-mock__frames, .pf-mock__layer, .pf-mock__open) {
+      pointer-events: none;
     }
   }
 
@@ -806,6 +843,19 @@
     }
     .pf-mock__dot[aria-current="true"] span {
       background: Highlight;
+    }
+    .pf-mock__tools button {
+      border-color: ButtonText;
+    }
+    .pf-mock__tools [aria-pressed="true"] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .pf-mock__tools[data-awake] [aria-disabled] {
+      border-color: GrayText;
+      color: GrayText;
     }
   }
 }
@@ -888,6 +938,13 @@
   }
 }
 
+@keyframes kj-tool-wake {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
 @keyframes kj-word-drift {
   from {
     translate: calc(var(--dir) * 0.08em) 0;
@@ -938,6 +995,10 @@
       transition:
         background-color 0.15s var(--ease-smooth),
         color 0.15s var(--ease-smooth);
+    }
+    /* A slot turning into its tool as the toolbar wakes. */
+    .pf-mock__tools [data-face] > svg {
+      animation: kj-tool-wake 0.32s var(--ease-expo);
     }
   }
 }

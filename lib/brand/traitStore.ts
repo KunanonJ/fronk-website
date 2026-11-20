@@ -11,9 +11,9 @@ import { PORTRAIT_TRAITS, wornPortrait } from "@/lib/brand/portraitTraits";
  * which of the portrait's six traits they have found, and the one they wear.
  * /about's "Try a trait" finds them in turn; around the site the visitor
  * finds them (the pixel party, the end of a case, a contact draft, a ⌘K
- * secret). Kept on this device only, under the keys /about has used since the
- * portrait shipped, so nothing found before is lost. Where storage is blocked
- * they last as long as the page.
+ * secret, a first sticker on Home's canvas). Kept on this device only, under
+ * the keys /about has used since the portrait shipped, so nothing found
+ * before is lost. Where storage is blocked they last as long as the page.
  *
  * A store for useSyncExternalStore(subscribeTraits, readTraits,
  * serverTraits): the server's snapshot is nothing found, so the server and
@@ -29,7 +29,8 @@ export interface Traits {
 }
 
 /** Where a trait was found. /about's own button says so itself: no toast. */
-export type TraitSource = "about" | "party" | "case" | "contact" | "search";
+export type TraitSource =
+  "about" | "party" | "case" | "contact" | "search" | "canvas";
 
 const NOTHING: Traits = { found: [], worn: null };
 const listeners = new Set<() => void>();
