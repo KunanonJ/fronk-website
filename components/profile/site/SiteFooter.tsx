@@ -80,7 +80,7 @@ export default function SiteFooter() {
                 {nowLine.label} {nowLine.doing}
               </p>
               {hydrated && (
-                <Suspense fallback={null}>
+                <Suspense>
                   <Living />
                 </Suspense>
               )}
@@ -91,7 +91,7 @@ export default function SiteFooter() {
                   className="pf-footer__time"
                 >
                   {(hour) => (
-                    <Suspense fallback={null}>
+                    <Suspense>
                       <Living hour={hour} />
                     </Suspense>
                   )}

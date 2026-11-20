@@ -142,6 +142,29 @@ test.describe("living status > the footer", () => {
     );
     expect(errors).toEqual([]);
   });
+
+  test("whatever the Worker answers, the request ends: a short page goes network-idle", async ({
+    page,
+  }) => {
+    // The real endpoint, not a mock: a mocked answer arrives whole and ends
+    // its request at once, but the Worker's 503 (GitHub refusing a build
+    // with no token, say) stayed open while its body went unread, and
+    // every networkidle wait on the page timed out. The 404 is short
+    // enough that its footer card is near the screen at once, so the ship
+    // log is asked for while the page loads.
+    await page.setViewportSize({ width: 882, height: 1104 });
+    await prepare(page);
+    const answered = page.waitForResponse("**/api/github/shipped");
+    await page.goto("/does-not-exist", {
+      waitUntil: "networkidle",
+      timeout: 15_000,
+    });
+    const status = (await answered).status();
+    expect([200, 503]).toContain(status);
+    await expect(page.locator(".pf-footer__shipped")).toHaveCount(
+      status === 200 ? 1 : 0,
+    );
+  });
 });
 
 /** Records each start of the wink's animation, from the first paint. */

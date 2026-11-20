@@ -117,6 +117,12 @@ describe("Living, the ship log", () => {
   it("shows nothing when the endpoint fails or answers something else", async () => {
     for (const respond of [
       () => Promise.resolve(Response.json(null, { status: 503 })),
+      // A 503 that carries the commit still shows nothing.
+      () => Promise.resolve(Response.json(SHIPPED, { status: 503 })),
+      () =>
+        Promise.resolve(
+          new Response("<html>Bad gateway</html>", { status: 502 }),
+        ),
       () =>
         Promise.resolve(
           Response.json({ ...SHIPPED, url: "https://evil.test" }),
@@ -133,6 +139,15 @@ describe("Living, the ship log", () => {
       expect(container).toBeEmptyDOMElement();
       unmount();
     }
+  });
+
+  it("reads a failed answer's body, so the request ends and the page can go idle", async () => {
+    const failed = Response.json(null, { status: 503 });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(failed));
+    card();
+    render(<Living />);
+    await act(async () => Observer.all[0]!.fire(true));
+    expect(failed.bodyUsed).toBe(true);
   });
 
   it("stops watching when it goes", () => {

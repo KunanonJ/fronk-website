@@ -55,8 +55,13 @@ function useShipped(): ShipLogEntry | null {
     let live = true;
     const load = () => {
       fetch(SHIPPED_PATH)
-        .then((res) => (res.ok ? res.json() : null))
-        .then((json: unknown) => {
+        // The body is read whatever the status: an unread one keeps the
+        // request open, and the page never goes network-idle.
+        .then(async (res) => {
+          const json: unknown = await res.json();
+          return res.ok ? json : null;
+        })
+        .then((json) => {
           if (live && isShipped(json))
             setEntry({ shipped: json, ago: shippedAgo(json.date, Date.now()) });
         })
