@@ -58,6 +58,13 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - "Try a trait" on /about stays the open path
 - **Contact:** a pixel burst when the contact draft is ready.
 - **Rules:** device storage only. Under reduced motion, the effects become a trait swap and a polite message.
+- **Phase 2 shipped:** #159, squash 6db14ae (20-11-26). Live at 1440 x 900 and 390 x 844: the h1, Download PDF and Contact are in view, `resume.css` loads with the page, and University-era is folded.
+- **Built (#160):**
+  - The traits moved to `lib/brand/portraitTraits.ts`, and the store (`lib/brand/traitStore.ts`) loads only once a trait exists. The shell carries only `traitEvents.ts`.
+  - The commands are `/theme light|dark`; there is no system theme, because the provider has `enableSystem={false}`.
+  - Gold glasses are awarded only after the page has scrolled, so full-page captures never trigger them.
+  - The topic hubs sit at 164.9 of 165 KB, so any future shell code needs a deliberate budget raise.
+  - A zero-tolerance run showed no baseline moving.
 
 ## Phase 4: hero canvas tools
 
