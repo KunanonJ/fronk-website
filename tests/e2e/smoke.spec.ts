@@ -992,6 +992,12 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
       "aria-activedescendant",
       (await second.getAttribute("id"))!,
     );
+
+    // A case's own name leads, ahead of the pages that mention it.
+    await field.fill("gogocash");
+    const first = page.getByRole("option").first();
+    await expect(first).toHaveAttribute("aria-selected", "true");
+    await expect(first.locator(".pf-search__title")).toHaveText("GoGoCash");
     expect(errors, errors.join("\n")).toEqual([]);
   });
 
