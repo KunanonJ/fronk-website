@@ -105,6 +105,8 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - **The 404:** seven seeded gaps. They are buttons named "Patch pixel n of 7", and "Patch it all" is the path that needs no game. The art plays when it is fixed and awards the Coral cap. "I'm feeling lucky" chooses a case on the client from `lib/content/casePaths.ts`, which a test holds equal to the site's cases.
   - **/about:** Save my edition is a 480 px PNG, made in the browser; touch devices get the share sheet. The button shows only once a trait is found, so /about is unchanged at rest. The holo tilt and sheen are for a mouse only, and lazy.
   - **Sizes:** the 404 is 97 px taller, so 4 baselines were refreshed. The topic hubs are at 168,876 of 168,960 B.
+- **Phase 6 shipped:** #163, squash 2337239 (20-11-26).
+- **Phase 5's budget:** with phase 6 merged, the topic hubs were 51 B over 165 KB. The fix was not a raise: the footer read three words from the contact page's copy, which pulled the whole contact chunk (1.2 KB gzip) into every page. Those words now live in `lib/content/contactWords.ts`, which takes the hubs to 168,107 B, with 853 B of headroom.
 
 ## Constraints in every phase
 
