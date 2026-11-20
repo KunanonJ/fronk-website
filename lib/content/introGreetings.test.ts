@@ -8,14 +8,14 @@ import {
 } from "@/lib/content/introGreetings";
 
 describe("intro timing", () => {
-  it("finishes within the 5.5 s ceiling, exit included", () => {
-    expect(INTRO_MAX_MS).toBe(5500);
+  it("finishes within the 3.2 s ceiling, the hand-over included", () => {
+    expect(INTRO_MAX_MS).toBe(3200);
     expect(introTotalMs()).toBeLessThanOrEqual(INTRO_MAX_MS);
   });
 
-  it("keeps the owner's chosen length: five greetings, 5.2 s", () => {
+  it("keeps the owner's chosen length (20-11-26): five greetings, 2.9 s", () => {
     expect(INTRO_GREETINGS).toHaveLength(5);
-    expect(introTotalMs()).toBe(5200);
+    expect(introTotalMs()).toBe(2900);
   });
 
   it("starts the exit after every greeting has been shown", () => {
@@ -31,9 +31,7 @@ describe("intro timing", () => {
     expect(INTRO_GREETINGS.at(-1)).toBe("Welcome to KunanonJ");
   });
 
-  it("fits the arrival burst inside the last hold and the exit fade", () => {
-    expect(INTRO_TIMING.burstMs).toBeLessThanOrEqual(
-      INTRO_TIMING.lastHoldMs + INTRO_TIMING.exitMs,
-    );
+  it("fits the welcome's burst inside the last hold", () => {
+    expect(INTRO_TIMING.burstMs).toBeLessThanOrEqual(INTRO_TIMING.lastHoldMs);
   });
 });

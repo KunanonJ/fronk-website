@@ -227,11 +227,28 @@ body {
   }
 }
 
-/* The arrival burst (owner, 09-11-26): a champagne pop (ring + flash), a fan
- * of confetti that shoots up and falls, and sparkles around the welcome. CSS
- * only, in palette tokens; each piece reads its path from custom properties
- * set inline by IntroBurst. */
-.intro-burst {
+/* The minting (owner, 20-11-26; IntroLoader): the pixel portrait prints in
+ * by the dither's ranks under its counter, and the welcome's burst of pixels
+ * (IntroPixels) flies out of it. The hand-over names the portrait, then the
+ * nav's avatar (`data-intro-morph`), so the one flies into the other. */
+.intro-mint {
+  position: relative;
+}
+
+.intro-portrait {
+  display: block;
+  inline-size: 192px;
+  block-size: 192px;
+  border-radius: 24px;
+  box-shadow: var(--elev-ring);
+}
+
+.intro-counter {
+  color: var(--ink-60);
+  font-variant-numeric: tabular-nums;
+}
+
+.intro-pixels {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -240,123 +257,43 @@ body {
   pointer-events: none;
 }
 
-.intro-burst > * {
+.intro-pixel {
   position: absolute;
   left: 0;
   top: 0;
+  width: var(--s);
+  height: var(--s);
+  background: var(--c);
   opacity: 0;
 }
 
+html[data-intro-morph="from"] .intro-portrait,
+html[data-intro-morph="to"] .pf-nav__avatar {
+  view-transition-name: pf-avatar;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .intro-pop {
-    width: 9rem;
-    height: 9rem;
-    border: 2px solid var(--scene-gold-2);
-    border-radius: 999px;
-    animation: intro-pop 520ms var(--ease) both;
+  .intro-pixel {
+    animation: intro-pixel var(--d) var(--ease-expo) var(--delay) both;
   }
 
-  .intro-flash {
-    width: 16rem;
-    height: 16rem;
-    border-radius: 999px;
-    background: radial-gradient(
-      circle,
-      color-mix(in srgb, var(--scene-gold-3) 70%, transparent) 0%,
-      transparent 65%
-    );
-    animation: intro-flash 420ms var(--ease) both;
-  }
-
-  .intro-confetti {
-    width: var(--w);
-    height: var(--h);
-    border-radius: 2px;
-    background: var(--c);
-    animation: intro-confetti var(--d) var(--ease) var(--delay) both;
-  }
-
-  .intro-sparkle {
-    width: var(--s);
-    height: var(--s);
-    background: var(--c);
-    clip-path: polygon(
-      50% 0,
-      61% 39%,
-      100% 50%,
-      61% 61%,
-      50% 100%,
-      39% 61%,
-      0 50%,
-      39% 39%
-    );
-    animation: intro-sparkle 560ms var(--ease) var(--delay) both;
+  ::view-transition-group(pf-avatar) {
+    animation-duration: 0.5s;
+    animation-timing-function: var(--ease-expo);
   }
 }
 
-@keyframes intro-pop {
+@keyframes intro-pixel {
   0% {
-    opacity: 0.9;
-    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 1;
+    transform: translate(-50%, -50%);
   }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.6);
-  }
-}
-
-@keyframes intro-flash {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.4);
-  }
-  30% {
+  70% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-}
-
-@keyframes intro-confetti {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(0deg) scale(0.4);
-  }
-  10% {
-    opacity: 1;
-  }
-  55% {
-    opacity: 1;
-    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
-      rotate(var(--r)) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(
-        calc(-50% + var(--x) * 1.2),
-        calc(-50% + var(--y) + var(--fall))
-      )
-      rotate(calc(var(--r) * 2)) scale(0.9);
-  }
-}
-
-@keyframes intro-sparkle {
-  0% {
-    opacity: 0;
-    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0)
-      rotate(0deg);
-  }
-  45% {
-    opacity: 1;
-    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1)
-      rotate(45deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
-      scale(0.2) rotate(90deg);
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y)));
   }
 }
 
