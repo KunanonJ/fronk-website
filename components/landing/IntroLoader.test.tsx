@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { INTRO_BURST_MS } from "@/components/landing/IntroBurst";
 import IntroLoader from "@/components/landing/IntroLoader";
+import { INTRO_PIXELS_MS } from "@/components/landing/IntroPixels";
 import {
+  INTRO_CELLS,
   INTRO_GREETINGS,
   INTRO_MAX_MS,
+  INTRO_RANKS,
   INTRO_SESSION_KEY,
   INTRO_TIMING,
   introExitStartMs,
@@ -50,7 +52,7 @@ describe("IntroLoader", () => {
     sessionStorage.clear();
   });
 
-  it("cycles the greetings and is gone within 5.5 s on a first visit", () => {
+  it("cycles the greetings and is gone within 3.2 s on a first visit", () => {
     render(<IntroLoader />);
     advance(20);
     expect(overlay()).not.toBeNull();
@@ -133,19 +135,41 @@ describe("IntroLoader", () => {
     expect(overlay()).toHaveClass("is-exiting");
   });
 
-  it("celebrates the last greeting with a decorative burst that fits the timing", () => {
+  it("mints the portrait: it prints in rank by rank under a counter of its cells", () => {
     render(<IntroLoader />);
     advance(20);
-    expect(screen.queryByTestId("intro-burst")).toBeNull();
+    const hidden = () =>
+      overlay()!.querySelectorAll(".intro-portrait g[visibility='hidden']")
+        .length;
+    expect(hidden()).toBe(INTRO_RANKS);
+    expect(overlay()).toHaveTextContent(`Minting 000 / ${INTRO_CELLS}`);
+
+    advance(INTRO_TIMING.printStepMs * 8);
+    expect(hidden()).toBe(INTRO_RANKS - 8);
+    expect(overlay()).toHaveTextContent(`Minting 288 / ${INTRO_CELLS}`);
+
+    advance(INTRO_TIMING.printStepMs * 8);
+    expect(hidden()).toBe(0);
+    expect(overlay()).toHaveTextContent(
+      `Minted ${INTRO_CELLS} / ${INTRO_CELLS}`,
+    );
+    // The portrait is whole as the welcome lands.
+    expect(INTRO_TIMING.printStepMs * INTRO_RANKS).toBe(
+      (INTRO_GREETINGS.length - 1) * INTRO_TIMING.wordMs,
+    );
+  });
+
+  it("welcomes with a decorative burst of pixels that fits the timing", () => {
+    render(<IntroLoader />);
+    advance(20);
+    expect(screen.queryByTestId("intro-pixels")).toBeNull();
 
     advance(introExitStartMs() - INTRO_TIMING.lastHoldMs);
     expect(screen.getByText(INTRO_GREETINGS.at(-1)!)).toBeInTheDocument();
-    const burst = screen.getByTestId("intro-burst");
+    const burst = screen.getByTestId("intro-pixels");
     expect(burst).toHaveAttribute("aria-hidden", "true");
-    expect(burst.querySelectorAll(".intro-confetti").length).toBeGreaterThan(
-      20,
-    );
-    expect(burst.querySelectorAll(".intro-sparkle").length).toBeGreaterThan(4);
-    expect(INTRO_BURST_MS).toBeLessThanOrEqual(INTRO_TIMING.burstMs);
+    expect(burst.querySelectorAll(".intro-pixel").length).toBeGreaterThan(20);
+    expect(INTRO_PIXELS_MS).toBeLessThanOrEqual(INTRO_TIMING.burstMs);
+    expect(INTRO_TIMING.burstMs).toBeLessThanOrEqual(INTRO_TIMING.lastHoldMs);
   });
 });
