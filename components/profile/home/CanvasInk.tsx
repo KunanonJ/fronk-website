@@ -109,7 +109,7 @@ const ART_PATHS = {
   star: artPaths(ART.star),
 };
 
-type Point = readonly [x: number, y: number];
+export type Point = readonly [x: number, y: number];
 
 const fixed = ([x, y]: Point) => `${x.toFixed(1)} ${y.toFixed(1)}`;
 
@@ -250,8 +250,11 @@ function marksReducer(marks: Marks, action: Action): Marks {
 
 /** What CanvasMock can ask of the layer. */
 export interface CanvasInkApi {
-  /** A sticker at a free spot (the keyboard's way). */
-  stamp: () => void;
+  /**
+   * A sticker: at a free spot (the keyboard's way), or where a click landed
+   * before the layer had loaded (in % of the canvas).
+   */
+  stamp: (at?: Point | null) => void;
   clear: () => void;
 }
 
@@ -376,7 +379,7 @@ export default function CanvasInk({
   // CanvasMock's handle: a sticker from the keyboard, and Clear.
   useEffect(() => {
     onReady({
-      stamp: () => stamp(null),
+      stamp: (at) => stamp(at ?? null),
       clear: () => dispatch({ type: "clear" }),
     });
     return () => onReady(null);

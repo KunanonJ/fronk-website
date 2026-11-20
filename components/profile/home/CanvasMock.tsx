@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type MouseEvent as ReactMouseEvent,
 } from "react";
 import {
   Frame,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "@/components/navigation/Link";
 import { Chip } from "@/components/ds/labels";
-import type { CanvasInkApi } from "@/components/profile/home/CanvasInk";
+import type { CanvasInkApi, Point } from "@/components/profile/home/CanvasInk";
 import {
   CanvasToolbar,
   type CanvasInkColour,
@@ -184,8 +185,11 @@ export function CanvasMock({
   const [inking, setInking] = useState(false);
   const [marks, setMarks] = useState(0);
   const inkApi = useRef<CanvasInkApi | null>(null);
-  /** Stamps asked for before the layer arrived. */
-  const queued = useRef(0);
+  /**
+   * Stamps asked for before the layer arrived: a free spot (the keyboard)
+   * or where a click landed. Played, in order, once it has.
+   */
+  const queued = useRef<(Point | null)[]>([]);
 
   // The dotted canvas drifts against a fine pointer and eases back when it
   // leaves; still under reduced motion and while the hero's motion is paused.
@@ -292,8 +296,27 @@ export function CanvasMock({
 
   const onInkReady = useCallback((api: CanvasInkApi | null) => {
     inkApi.current = api;
-    for (; api && queued.current > 0; queued.current -= 1) api.stamp();
+    if (!api) return;
+    for (const at of queued.current.splice(0)) api.stamp(at);
   }, []);
+
+  /**
+   * A click with Stickers on that lands before the layer has loaded (the
+   * chunk is still on its way on a slow network): kept, with its place, and
+   * stamped once the layer arrives. Once it is there, it handles clicks.
+   */
+  const onCanvasClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (tool !== "stickers" || inkApi.current) return;
+    if ((event.target as Element).closest(".pf-mock__tools")) return;
+    const box = event.currentTarget.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const percent = (px: number, of: number) =>
+      Math.round((px / of) * 1e4) / 100;
+    queued.current.push([
+      percent(event.clientX - box.left, box.width),
+      percent(event.clientY - box.top, box.height),
+    ]);
+  };
 
   const wake = () => {
     if (awake) return;
@@ -306,7 +329,7 @@ export function CanvasMock({
     setTouched(true);
     if (next === "stickers" && tool === "stickers") {
       if (inkApi.current) inkApi.current.stamp();
-      else queued.current += 1;
+      else queued.current.push(null);
       return;
     }
     setChosen(next);
@@ -363,7 +386,9 @@ export function CanvasMock({
           </span>
           <span className="pf-mock__share">{canvasMock.share}</span>
         </div>
-        <div ref={canvas} className="pf-mock__canvas">
+        {/* The click only keeps a stamp asked for before the layer loads;
+            the keyboard's way is the Stickers button (CanvasToolbar). */}
+        <div ref={canvas} className="pf-mock__canvas" onClick={onCanvasClick}>
           {/* First, so the panels after it (at its z-index) lie over it. */}
           {inking && toolsAllowed ? (
             <Suspense fallback={null}>

@@ -234,6 +234,30 @@ test.describe("hero canvas tools (now-building-and-genz Phase 4)", () => {
     await expect(toast).toHaveCount(0);
   });
 
+  test("on a slow network, a sticker clicked before the drawing layer arrives still lands where it was clicked", async ({
+    page,
+  }) => {
+    await visit(page);
+    await onlyWithTools(page);
+    // Hold the drawing layer's chunk back, as a slow connection would.
+    await page.route(/\/assets\/CanvasInk-[^/]+\.js$/, async (route) => {
+      await new Promise((done) => setTimeout(done, 1500));
+      await route.continue();
+    });
+    await tool(page, "Stickers").click();
+    await expect(page.locator(".pf-ink")).toHaveCount(0);
+    await page.mouse.click(...(await canvasPoint(page, 0.84, 0.76)));
+    await expect(page.locator(".pf-ink")).toBeAttached({ timeout: 10_000 });
+    const stickers = page.locator(".pf-sticker");
+    await expect(stickers).toHaveCount(1);
+    const left = await stickers
+      .first()
+      .evaluate((el) => parseFloat((el as HTMLElement).style.left));
+    expect(left).toBeGreaterThan(80);
+    expect(left).toBeLessThan(88);
+    await expect(page).toHaveURL(/\/$/);
+  });
+
   test("one tab stop with a visible ring, the arrows move along, Esc puts a tool down", async ({
     page,
   }) => {
