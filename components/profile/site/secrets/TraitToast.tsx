@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { PixelPortrait } from "@/components/profile/site/PixelPortrait";
 import type { ProfileLink } from "@/components/profile/site/ProfileLink";
 import type { TraitNews } from "@/lib/brand/traitEvents";
@@ -11,10 +11,12 @@ import secretsCss from "@/src/styles/secrets.css?url";
  * The found-trait toast (now-building-and-genz Phase 3), loaded by Secrets
  * when a trait is first found anywhere but /about's own button: the nav's
  * cut wearing it, "You found Shades · 2/6", and a link to /about's portrait.
- * Near the bottom of the screen. It goes by itself after 5 s, waits while
- * the pointer or focus is on it, and closes with its button or Esc. Its line
- * is a polite status, filled a frame after the region is in the page so it
- * is read. While a modal dialog is open (⌘K found the trait) it waits for the
+ * Under the nav bar, clear of what the reader meets next where a trait is
+ * found (the footer's links, the contact card's actions; secrets.css says
+ * why). It goes by itself after 5 s, waits while the pointer or focus is on
+ * it, and closes with its button or Esc. Its line is a polite status,
+ * filled a frame after the region is in the page so it is read. While a
+ * modal dialog is open (⌘K found the trait) it waits for the
  * dialog to close: everything else is inert until then. It slides in only
  * with motion allowed and never flashes. Its stylesheet comes with it
  * (src/styles/secrets.css). The shell hands it the nav's drawing, the
@@ -23,6 +25,46 @@ import secretsCss from "@/src/styles/secrets.css?url";
 
 /** How long the toast stays while nobody points at it or focuses it. */
 export const TOAST_MS = 5000;
+
+/** Links and controls: what the toast must not lie over. */
+const TARGETS =
+  "a[href], button, input, select, textarea, summary, [role='button']";
+
+/** How many of the page's drawn links and controls `toast` lies over. */
+function covered(toast: HTMLElement): number {
+  const box = toast.getBoundingClientRect();
+  let count = 0;
+  for (const el of document.querySelectorAll(TARGETS)) {
+    if (toast.contains(el)) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) continue;
+    if (
+      r.left < box.right &&
+      r.right > box.left &&
+      r.top < box.bottom &&
+      r.bottom > box.top
+    ) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * Where it stands, chosen once as it shows: under the bar, or at the foot of
+ * the screen when the top would lie over a link or a control and the foot
+ * over fewer (secrets.css).
+ */
+function place(toast: HTMLElement) {
+  // Measured where it rests, not where its entrance starts.
+  toast.style.animation = "none";
+  const top = covered(toast);
+  if (top > 0) {
+    toast.dataset.place = "low";
+    if (covered(toast) >= top) delete toast.dataset.place;
+  }
+  toast.style.removeProperty("animation");
+}
 
 export default function TraitToast({
   news,
@@ -77,6 +119,21 @@ export default function TraitToast({
     }
     dialog.addEventListener("close", show, { once: true });
     return () => dialog.removeEventListener("close", show);
+  }, [shown]);
+
+  // Its place, before it paints: once its stylesheet has placed it (a few
+  // frames at most; without the sheet it stays where it is).
+  useLayoutEffect(() => {
+    const toast = box.current;
+    if (!shown || !toast) return;
+    let frame = 0;
+    let tries = 10;
+    const settle = () => {
+      if (getComputedStyle(toast).position === "fixed") place(toast);
+      else if ((tries -= 1) > 0) frame = requestAnimationFrame(settle);
+    };
+    settle();
+    return () => cancelAnimationFrame(frame);
   }, [shown]);
 
   // The region is in the page first, its words a frame later, so they are read.

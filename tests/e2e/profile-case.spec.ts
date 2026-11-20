@@ -1271,6 +1271,59 @@ test.describe("the showcase's drawings at narrow widths (UX sweep 21-11-26)", ()
   });
 });
 
+/** The found-trait toast stood over the footer's links at a case's end. */
+test.describe("the toast at the end of a case (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  test("the toast for the end of a case stands under the bar and lies over no link or control as it shows", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page, INTRANET);
+    await page
+      .getByRole("article", { name: "Work together", exact: true })
+      .scrollIntoViewIfNeeded();
+    const toast = page.getByTestId("trait-toast");
+    await expect(toast.getByRole("status")).toHaveText(
+      "You found Gold glasses · 1/6",
+    );
+    // Its entrance over.
+    await expect
+      .poll(() =>
+        toast.evaluate((el) =>
+          el.getAnimations().every((a) => a.playState !== "running"),
+        ),
+      )
+      .toBe(true);
+    const under = await toast.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      const targets = [
+        ...document.querySelectorAll<HTMLElement>(
+          "a[href], button, input, select, textarea, summary",
+        ),
+      ].filter((t) => {
+        if (el.contains(t)) return false;
+        const r = t.getBoundingClientRect();
+        return (
+          r.width > 0 &&
+          r.left < box.right &&
+          r.right > box.left &&
+          r.top < box.bottom &&
+          r.bottom > box.top
+        );
+      });
+      return {
+        top: box.top,
+        low: el.dataset.place === "low",
+        under: targets.map((t) => t.textContent?.trim()),
+      };
+    });
+    expect(under.under).toEqual([]);
+    // Under the bar, unless the top held a target.
+    if (!under.low) expect(under.top).toBeGreaterThanOrEqual(BAR_BOTTOM);
+  });
+});
+
 test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
   test.use({ reducedMotion: "reduce" });
 

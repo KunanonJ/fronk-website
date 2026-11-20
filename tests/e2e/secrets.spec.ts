@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Secrets and collectibles (now-building-and-genz Phase 3): ⌘K commands with
@@ -71,6 +71,55 @@ const bursts = (page: Page) =>
   page.evaluate(
     () => (window as unknown as { __bursts: { party: number } }).__bursts.party,
   );
+
+/** Waits until the toast's entrance has ended. */
+async function settleToast(page: Page) {
+  await expect
+    .poll(() =>
+      page
+        .getByTestId("trait-toast")
+        .evaluate((el) =>
+          el.getAnimations().every((a) => a.playState !== "running"),
+        ),
+    )
+    .toBe(true);
+}
+
+/** The links and controls the toast lies over, by name. */
+function coveredByToast(page: Page) {
+  return page.getByTestId("trait-toast").evaluate((toast) => {
+    const box = toast.getBoundingClientRect();
+    return [
+      ...document.querySelectorAll<HTMLElement>(
+        "a[href], button, input, select, textarea, summary",
+      ),
+    ]
+      .filter((el) => {
+        if (toast.contains(el)) return false;
+        const r = el.getBoundingClientRect();
+        return (
+          r.width > 0 &&
+          r.left < box.right &&
+          r.right > box.left &&
+          r.top < box.bottom &&
+          r.bottom > box.top
+        );
+      })
+      .map((el) => el.textContent?.trim() ?? "");
+  });
+}
+
+/** True when what is drawn at the element's centre is the element. */
+function hitsItself(target: Locator) {
+  return target.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    const hit = document.elementFromPoint(
+      box.left + box.width / 2,
+      box.top + box.height / 2,
+    );
+    return !!hit && el.contains(hit);
+  });
+}
 
 async function command(page: Page, text: string) {
   await page.keyboard.press("ControlOrMeta+k");
@@ -234,6 +283,59 @@ test.describe("secrets > the trait hunt", () => {
     ).toHaveText("You found Gold glasses · 1/6");
     expect(await found(page)).toEqual(["glasses"]);
   });
+
+  test("on a phone the toast stands under the bar, clear of the contact card's actions (UX sweep 21-11-26)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => {
+      const click = HTMLAnchorElement.prototype.click;
+      HTMLAnchorElement.prototype.click = function (this: HTMLAnchorElement) {
+        if (this.protocol !== "mailto:") click.call(this);
+      };
+    });
+    await visit(page, "/contact");
+    await page.locator("#contact-name").fill("Ada Lovelace");
+    await page
+      .locator("#contact-message")
+      .fill("Hello! I would like to talk about a project with your team.");
+    await page.locator("#contact-send").click();
+    const card = page.getByRole("article", { name: "Say hello", exact: true });
+    await expect(card.getByRole("status")).toContainText(
+      "Your email is ready.",
+    );
+    const toast = page.getByTestId("trait-toast");
+    await expect(toast.getByRole("status")).toHaveText(
+      "You found Lapel pin · 1/6",
+    );
+    await settleToast(page);
+    expect(await coveredByToast(page)).toEqual([]);
+    // "Write another message", which the foot of the screen covered.
+    const again = card.getByRole("button", { name: "Write another message" });
+    expect(await hitsItself(again)).toBe(true);
+    const box = (await toast.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(80);
+  });
+
+  for (const [width, height] of [
+    [1280, 800],
+    [1024, 768],
+  ] as const) {
+    test(`at ${width} x ${height}, the toast for the end of a case lies over none of the links in view (UX sweep 21-11-26)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await visit(page, "/portfolio/tbh-intranet");
+      await page
+        .getByRole("article", { name: "Work together", exact: true })
+        .scrollIntoViewIfNeeded();
+      await expect(
+        page.getByTestId("trait-toast").getByRole("status"),
+      ).toHaveText("You found Gold glasses · 1/6");
+      await settleToast(page);
+      expect(await coveredByToast(page)).toEqual([]);
+    });
+  }
 
   test("a contact draft ready stamps it and finds the Lapel pin", async ({
     page,
