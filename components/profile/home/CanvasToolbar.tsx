@@ -4,15 +4,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
-import {
-  Eraser,
-  Frame,
-  MessageCircle,
-  MousePointer2,
-  PenTool,
-  Sticker,
-  Type,
-} from "lucide-react";
+import { Eraser, MousePointer2, PenTool, Sticker } from "lucide-react";
 import { canvasMock } from "@/lib/content/home";
 
 /*
@@ -21,12 +13,9 @@ import { canvasMock } from "@/lib/content/home";
  * buttons with one tab stop (the arrow keys, Home and End move along it).
  * CanvasMock owns the state; the drawing layer is a lazy chunk.
  *
- * At rest it is drawn exactly as the decorative toolbar it stands in for:
- * the same five slots and the same five icons, Move pressed, so Home looks
- * as it did until a visitor reaches for it. Under the pointer, or with
- * keyboard focus, it wakes for good: the three slots that had no tool behind
- * them (Frame, Type, Comment) show the ones that now do (Stickers, the ink,
- * Clear). Their names are right from the start.
+ * Each slot shows its own tool from the first paint, so what a button
+ * shows is what it does. Under the pointer, or with keyboard focus, the
+ * toolbar wakes for good: that is when the drawing layer starts to load.
  */
 
 export type CanvasTool = "move" | "pen" | "stickers";
@@ -60,10 +49,8 @@ interface Slot {
   readonly disabled?: boolean;
   /** Said after the name, and shown as the tooltip. */
   readonly hint?: string;
-  /** The decorative toolbar's icon, shown until the toolbar wakes. */
-  readonly rest: ReactNode;
-  /** The tool's own icon once awake, where it differs. */
-  readonly face?: ReactNode;
+  /** The tool's icon. */
+  readonly icon: ReactNode;
   readonly press: () => void;
 }
 
@@ -108,7 +95,7 @@ export function CanvasToolbar({
       key: "move",
       label: tools.move,
       pressed: tool === "move",
-      rest: <MousePointer2 {...ICON} />,
+      icon: <MousePointer2 {...ICON} />,
       press: () => onTool("move"),
     },
     {
@@ -116,30 +103,27 @@ export function CanvasToolbar({
       label: tools.stickers,
       pressed: tool === "stickers",
       hint: tool === "stickers" ? tools.stamp : undefined,
-      rest: <Frame {...ICON} />,
-      face: <Sticker {...ICON} />,
+      icon: <Sticker {...ICON} />,
       press: () => onTool("stickers"),
     },
     {
       key: "pen",
       label: tools.pen,
       pressed: tool === "pen",
-      rest: <PenTool {...ICON} />,
+      icon: <PenTool {...ICON} />,
       press: () => onTool("pen"),
     },
     {
       key: "ink",
       label: tools.ink(tools.inks[ink]),
-      rest: <Type {...ICON} />,
-      face: <InkDot ink={ink} />,
+      icon: <InkDot ink={ink} />,
       press: onInk,
     },
     {
       key: "clear",
       label: tools.clear,
       disabled: !canClear,
-      rest: <MessageCircle {...ICON} />,
-      face: <Eraser {...ICON} />,
+      icon: <Eraser {...ICON} />,
       press: onClear,
     },
   ];
@@ -170,27 +154,23 @@ export function CanvasToolbar({
       onFocus={onFocus}
       onKeyDown={onKeyDown}
     >
-      {slots.map((slot, at) => {
-        const turned = awake && slot.face !== undefined;
-        return (
-          <button
-            key={slot.key}
-            type="button"
-            tabIndex={at === stop ? 0 : -1}
-            aria-label={slot.label}
-            title={slot.hint ? `${slot.label}: ${slot.hint}` : slot.label}
-            aria-pressed={slot.pressed}
-            aria-disabled={slot.disabled || undefined}
-            data-on={slot.pressed ? "" : undefined}
-            data-face={turned ? "" : undefined}
-            onClick={() => {
-              if (!slot.disabled) slot.press();
-            }}
-          >
-            {turned ? slot.face : slot.rest}
-          </button>
-        );
-      })}
+      {slots.map((slot, at) => (
+        <button
+          key={slot.key}
+          type="button"
+          tabIndex={at === stop ? 0 : -1}
+          aria-label={slot.label}
+          title={slot.hint ? `${slot.label}: ${slot.hint}` : slot.label}
+          aria-pressed={slot.pressed}
+          aria-disabled={slot.disabled || undefined}
+          data-on={slot.pressed ? "" : undefined}
+          onClick={() => {
+            if (!slot.disabled) slot.press();
+          }}
+        >
+          {slot.icon}
+        </button>
+      ))}
     </div>
   );
 }

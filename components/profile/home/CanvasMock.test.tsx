@@ -316,12 +316,13 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
       (svg) =>
         [...svg.classList].find((name) => name.startsWith("lucide-")) ?? "dot",
     );
-  const AT_REST = [
+  /** The toolbar shows its own tools from the first paint. */
+  const TOOLS = [
     "lucide-mouse-pointer-2",
-    "lucide-frame",
+    "lucide-sticker",
     "lucide-pen-tool",
-    "lucide-type",
-    "lucide-message-circle",
+    "dot",
+    "lucide-eraser",
   ];
 
   beforeEach(() => {
@@ -345,20 +346,14 @@ describe("CanvasMock's tools, from 810 px with a mouse", () => {
     expect(button("Pen")).toHaveAttribute("aria-pressed", "false");
     expect(button("Ink: violet")).not.toHaveAttribute("aria-pressed");
     expect(button("Clear the canvas")).toHaveAttribute("aria-disabled", "true");
-    // At rest, the five icons of the decorative toolbar, Move pressed.
-    expect(icons(bar)).toEqual(AT_REST);
+    // At rest, each slot shows its own tool, Move pressed.
+    expect(icons(bar)).toEqual(TOOLS);
     // Nothing of the tools loads until the toolbar is reached for.
     expect(container.querySelector(".pf-ink")).toBeNull();
 
-    // Reached for, it wakes: the slots show their tools, for good.
+    // Reached for, it wakes for good, and the same tools stay.
     fireEvent.pointerEnter(bar);
-    expect(icons(bar)).toEqual([
-      "lucide-mouse-pointer-2",
-      "lucide-sticker",
-      "lucide-pen-tool",
-      "dot",
-      "lucide-eraser",
-    ]);
+    expect(icons(bar)).toEqual(TOOLS);
     fireEvent.pointerLeave(bar);
     expect(bar).toHaveAttribute("data-awake");
   });

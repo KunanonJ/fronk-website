@@ -772,7 +772,7 @@
       background: var(--paper-2);
       color: var(--ink);
     }
-    .pf-mock__tools[data-awake] [aria-disabled] {
+    .pf-mock__tools [aria-disabled] {
       color: var(--ink-45);
       cursor: inherit;
     }
@@ -853,7 +853,7 @@
       background: Highlight;
       color: HighlightText;
     }
-    .pf-mock__tools[data-awake] [aria-disabled] {
+    .pf-mock__tools [aria-disabled] {
       border-color: GrayText;
       color: GrayText;
     }
@@ -938,13 +938,6 @@
   }
 }
 
-@keyframes kj-tool-wake {
-  from {
-    opacity: 0;
-    scale: 0.4;
-  }
-}
-
 @keyframes kj-word-drift {
   from {
     translate: calc(var(--dir) * 0.08em) 0;
@@ -995,10 +988,6 @@
       transition:
         background-color 0.15s var(--ease-smooth),
         color 0.15s var(--ease-smooth);
-    }
-    /* A slot turning into its tool as the toolbar wakes. */
-    .pf-mock__tools [data-face] > svg {
-      animation: kj-tool-wake 0.32s var(--ease-expo);
     }
   }
 }
