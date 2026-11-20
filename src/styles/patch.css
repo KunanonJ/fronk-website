@@ -1,0 +1,88 @@
+/*
+ * The 404 you fix (now-building-and-genz Phase 6;
+ * components/landing/PatchArt.tsx). Its own sheet, linked by the 404's lazy
+ * chunk, so no other page's first load carries it. The drawing keeps the
+ * status tile's size (.pf-status__art); each missing pixel is a button over
+ * its cell, 24 px at least (WCAG 2.5.8), drawn as a dashed cell. Tokens from
+ * globals.css only; the layer order is profile.css's.
+ */
+@layer components {
+  .pf-patch {
+    position: relative;
+    container-type: inline-size;
+    inline-size: min(100%, 22rem);
+    margin: auto;
+  }
+  .pf-patch__art {
+    inline-size: 100%;
+  }
+  /* Centred on its cell; the cell's share of the drawing's width, or 24 px. */
+  .pf-patch__gap {
+    position: absolute;
+    inset-inline-start: calc((var(--x) + 0.5) / var(--w) * 100%);
+    inset-block-start: calc((var(--y) + 0.5) / var(--h) * 100%);
+    display: grid;
+    place-items: center;
+    inline-size: max(24px, 100cqi / var(--w));
+    block-size: max(24px, 100cqi / var(--w));
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    translate: -50% -50%;
+  }
+  .pf-patch__gap::before {
+    content: "";
+    box-sizing: border-box;
+    inline-size: calc(100cqi / var(--w));
+    block-size: calc(100cqi / var(--w));
+    border: 1.5px dashed var(--ink);
+    background: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+  .pf-patch__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .pf-patch__news {
+    margin: 0;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pf-patch__gap:hover::before {
+      border-style: solid;
+      background: color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+  }
+  @media (prefers-contrast: more) {
+    .pf-patch__news {
+      color: var(--ink);
+    }
+  }
+  /* Forced colours take the pixel art away (shell.css), so the gaps go too;
+     Patch it all still fixes the page. */
+  @media (forced-colors: active) {
+    .pf-patch {
+      display: none;
+    }
+  }
+}
+
+/* A patched pixel pops in, over its neighbours, and settles. */
+@media (prefers-reduced-motion: no-preference) {
+  .pf-patch__fill {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: kj-patch-pop 0.32s var(--ease-back);
+  }
+  @keyframes kj-patch-pop {
+    from {
+      transform: scale(0.2);
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { ROUTES } from "./routes";
@@ -2263,6 +2264,30 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
       });
     }
 
+    // Save my edition (now-building-and-genz Phase 6) shows only once a
+    // trait is found, so the /about test above never measures it.
+    test(`/about with a trait found (Save my edition) at ${width} px`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => {
+        localStorage.setItem("pf-portrait-found", '["cap","pin"]');
+        localStorage.setItem("pf-portrait-worn", "cap");
+      });
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/about", { waitUntil: "networkidle" });
+      await expect(
+        page.getByRole("button", { name: "Save my edition" }),
+      ).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const { small, overlaps, covered } = await page.evaluate(tapAreas, {
+        min: MIN,
+        root: ".pf-about-page__portrait",
+      });
+      expect(small, `tap areas under ${MIN} px`).toEqual([]);
+      expect(overlaps, "overlapping tap areas").toEqual([]);
+      expect(covered, "covered tap areas").toEqual([]);
+    });
+
     // Hidden while closed, so the page tests above never measure it.
     test(`the open menu at ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 });
@@ -2377,5 +2402,248 @@ test.describe("share panel > focus that leaves it closes it", () => {
     await page.keyboard.press("Escape");
     await expect(panel).toHaveCount(0);
     await expect(share).toBeFocused();
+  });
+});
+
+/*
+ * The 404 you fix, Save my edition and the holo card (now-building-and-genz
+ * Phase 6). The 404 arrives with seven pixels missing, each a button; patched
+ * by keyboard or pointer (or Patch it all) it plays its print-in and finds
+ * the Coral cap, which the toast announces. The status stays 404. On /about,
+ * once a trait is found, Save my edition downloads the portrait as a
+ * 480 x 480 PNG; a mouse tilts the portrait card, and nothing moves under
+ * reduced motion.
+ */
+const CORAL_CAP = "#ff7a3d";
+
+/** A visit without the first-visit intro, waiting for hydration. */
+async function visitPlay(page: Page, path: string) {
+  await page.addInitScript(() => {
+    try {
+      sessionStorage.setItem("fronk-intro-seen", "1");
+    } catch {
+      // Storage can be unavailable; the intro then plays first.
+    }
+  });
+  const response = await page.goto(path, { waitUntil: "load" });
+  // The footer's clock is client-only: the page has hydrated.
+  await expect(page.locator("time[data-clock]")).toBeAttached();
+  return response;
+}
+
+/**
+ * The 404, once its game has hydrated too: it is a lazy chunk, so it can
+ * hydrate after the page. Its lucky link leaves /portfolio for a case study
+ * only then.
+ */
+async function visitNotFound(page: Page) {
+  const response = await visitPlay(page, "/does-not-exist");
+  await expect(
+    page.getByRole("link", { name: "I'm feeling lucky" }),
+  ).toHaveAttribute("href", /^\/(portfolio|ventures)\/[a-z-]+$/);
+  return response;
+}
+
+const patchGaps = (page: Page) =>
+  page.getByRole("button", { name: /^Patch pixel \d of 7$/ });
+const foundTraits = (page: Page) =>
+  page.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("pf-portrait-found") ?? "[]") as string[],
+  );
+
+/** The cap was found: the toast says so and the nav's avatar wears it. */
+async function expectCapFound(page: Page) {
+  const toast = page.getByTestId("trait-toast");
+  await expect(toast).toBeVisible();
+  await expect(toast.getByRole("status")).toHaveText(
+    "You found Coral cap · 1/6",
+  );
+  expect(await foundTraits(page)).toEqual(["cap"]);
+  await expect
+    .poll(() =>
+      page
+        .locator(".pf-nav__avatar path[fill]")
+        .evaluateAll((paths) => paths.map((p) => p.getAttribute("fill"))),
+    )
+    .toContain(CORAL_CAP);
+}
+
+/** How many of the drawing's squares are animating. */
+const animatedSquares = (page: Page) =>
+  page
+    .locator("svg.pf-patch__art")
+    .evaluate(
+      (svg) =>
+        [...svg.querySelectorAll("rect")].filter(
+          (rect) => rect.getAnimations().length > 0,
+        ).length,
+    );
+
+test.describe("404 > the page you fix (Phase 6)", () => {
+  test("answers 404 with its words and links, and seven gaps to patch", async ({
+    page,
+  }) => {
+    const response = await visitNotFound(page);
+    expect(response?.status()).toBe(404);
+    await expect(page.locator("h1")).toHaveText("Nothing lives here.");
+    await expect(
+      page
+        .getByRole("navigation", { name: "Recovery links" })
+        .getByRole("link"),
+    ).toHaveCount(4);
+    await expect(patchGaps(page)).toHaveCount(7);
+    const sizes = await patchGaps(page).evaluateAll((els) =>
+      els.map((el) => {
+        const box = el.getBoundingClientRect();
+        return Math.min(box.width, box.height);
+      }),
+    );
+    for (const size of sizes) expect(size).toBeGreaterThanOrEqual(24);
+    // At rest nothing is found, and the lucky link is a case study.
+    expect(await foundTraits(page)).toEqual([]);
+    await expect(
+      page.getByRole("link", { name: "I'm feeling lucky" }),
+    ).toHaveAttribute("href", /^\/(portfolio|ventures)\/[a-z-]+$/);
+  });
+
+  test("fixed by keyboard: each gap in turn, then the cap", async ({
+    page,
+  }) => {
+    await visitNotFound(page);
+    const first = page.getByRole("button", { name: "Patch pixel 1 of 7" });
+    // Tab in from the top, as a keyboard reader does.
+    for (let presses = 0; presses < 60; presses += 1) {
+      if (await first.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press("Tab");
+    }
+    await expect(first).toBeFocused();
+    for (let left = 7; left > 0; left -= 1) {
+      // Focus moves on by itself after each patch.
+      await page.keyboard.press(left % 2 ? "Enter" : "Space");
+      await expect(patchGaps(page)).toHaveCount(left - 1);
+    }
+    await expect(
+      page.getByRole("link", { name: "I'm feeling lucky" }),
+    ).toBeFocused();
+    await expect(page.locator(".pf-patch__news")).toHaveText(
+      "Fixed. Every pixel is back.",
+    );
+    await expectCapFound(page);
+  });
+
+  test("fixed by pointer, gap by gap, then the print-in plays", async ({
+    page,
+  }) => {
+    await visitNotFound(page);
+    const squares = page.locator("svg.pf-patch__art rect");
+    const before = await squares.count();
+    for (let left = 7; left > 0; left -= 1) {
+      await patchGaps(page).first().click();
+      await expect(squares).toHaveCount(before + 8 - left);
+    }
+    // Whole again: the drawing's beats run on its squares.
+    expect(await animatedSquares(page)).toBeGreaterThan(100);
+    await expectCapFound(page);
+  });
+
+  test("Patch it all, under reduced motion: filled at once, nothing moves", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await visitNotFound(page);
+    await page.getByRole("button", { name: "Patch it all" }).click();
+    await expect(patchGaps(page)).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Patch it all" }),
+    ).toHaveCount(0);
+    expect(await animatedSquares(page)).toBe(0);
+    await expectCapFound(page);
+    // The lucky link opens a real case study.
+    const href = await page
+      .getByRole("link", { name: "I'm feeling lucky" })
+      .getAttribute("href");
+    expect((await page.request.get(href!)).status(), href!).toBe(200);
+  });
+});
+
+test.describe("about > Save my edition and the holo card (Phase 6)", () => {
+  const portraitCard = (page: Page) => page.locator(".pf-about-page__portrait");
+  const transformOf = (page: Page) =>
+    portraitCard(page).evaluate((el) => getComputedStyle(el).transform);
+
+  test("at rest: no Save button, no sheen, a flat card", async ({ page }) => {
+    await visitPlay(page, "/about");
+    await expect(
+      page.getByRole("button", { name: "Save my edition" }),
+    ).toHaveCount(0);
+    await expect(page.locator(".pf-holo")).toHaveCount(0);
+    expect(await transformOf(page)).toBe("none");
+  });
+
+  test("Save my edition downloads the portrait as a 480 x 480 PNG", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("pf-portrait-found", '["cap","pin","shades"]');
+      localStorage.setItem("pf-portrait-worn", "cap");
+    });
+    await visitPlay(page, "/about");
+    const save = page.getByRole("button", { name: "Save my edition" });
+    await expect(save).toBeVisible();
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      save.click(),
+    ]);
+    expect(download.suggestedFilename()).toBe("kunanonj-edition.png");
+    const png = readFileSync((await download.path())!);
+    // The PNG signature, then IHDR's width and height.
+    expect([...png.subarray(0, 8)]).toEqual([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+    ]);
+    expect(png.subarray(12, 16).toString("ascii")).toBe("IHDR");
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([480, 480]);
+    await expect(
+      page.locator(".pf-about-page__portrait [aria-live]"),
+    ).toHaveText("Saved your edition, 3 of 6, as a PNG.");
+  });
+
+  test("a mouse tilts the card toward it, and the controls still work", async ({
+    page,
+  }) => {
+    await visitPlay(page, "/about");
+    const card = portraitCard(page);
+    await card.scrollIntoViewIfNeeded();
+    const box = (await card.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page.locator(".pf-holo")).toBeAttached();
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.3, {
+      steps: 8,
+    });
+    await expect.poll(() => transformOf(page)).toMatch(/^matrix3d\(/);
+    await expect(card).toHaveAttribute("data-holo", "on");
+    // The trait button still answers under the pointer.
+    await page.getByRole("button", { name: "Try a trait · 0/6" }).click();
+    await expect(
+      page.getByRole("button", { name: "Try a trait · 1/6" }),
+    ).toBeVisible();
+    // Leaving eases it back flat.
+    await page.mouse.move(box.x - 60, box.y + box.height / 2);
+    await expect(card).toHaveAttribute("data-holo", "off");
+  });
+
+  test("stays flat under reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await visitPlay(page, "/about");
+    const card = portraitCard(page);
+    await card.scrollIntoViewIfNeeded();
+    const box = (await card.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.3, {
+      steps: 8,
+    });
+    await page.waitForTimeout(400);
+    await expect(page.locator(".pf-holo")).toHaveCount(0);
+    expect(await transformOf(page)).toBe("none");
   });
 });
