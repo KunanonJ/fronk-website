@@ -9,7 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { searchCopy } from "@/lib/content/profileChrome";
 import {
   groupResults,
@@ -151,18 +151,17 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
             onKeyDown={onKeyDown}
             autoFocus
           />
+          {/* A keyboard closes with Esc, named here; touch gets a button. */}
+          <kbd className="pf-search__key" aria-hidden="true">
+            {searchCopy.closeKey}
+          </kbd>
           <button
             type="button"
             className="pf-search__close"
             aria-label={searchCopy.close}
             onClick={() => dialog.current?.close()}
           >
-            <kbd className="pf-search__key" aria-hidden="true">
-              {searchCopy.closeKey}
-            </kbd>
-            <span className="pf-search__touch" aria-hidden="true">
-              {searchCopy.closeTouch}
-            </span>
+            <X size={18} strokeWidth={1.8} aria-hidden="true" />
           </button>
         </div>
         <div className="pf-search__body">

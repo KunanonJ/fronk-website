@@ -224,10 +224,8 @@ export const searchCopy = {
   shortcut: "⌘K", // DRAFT
   menu: "Search", // DRAFT
   placeholder: "Pages, cases, skills", // DRAFT
-  /** Holds the visible words, "esc" and "Close" (WCAG 2.5.3). */
-  close: "Close search (esc)", // DRAFT
+  close: "Close search", // DRAFT
   closeKey: "esc", // DRAFT
-  closeTouch: "Close", // DRAFT
   groups: {
     page: "Pages",
     case: "Case studies",

@@ -66,24 +66,29 @@
   .pf-search__input::placeholder {
     color: var(--ink-60);
   }
-  /* Close: the Esc key's name for a keyboard, a word for touch. */
-  .pf-search__close {
+  /* Esc, named for a keyboard; a close button for touch (below). */
+  .pf-search__key {
     flex: none;
-    min-block-size: 28px;
-    padding: 2px 10px;
-    border: 0;
+    padding: 2px 8px;
     border-radius: 8px;
     background: var(--paper-2);
     color: var(--ink-60);
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    cursor: pointer;
   }
-  .pf-search__key {
-    font: inherit;
-  }
-  .pf-search__touch {
+  .pf-search__close {
     display: none;
+    flex: none;
+    place-items: center;
+    inline-size: 44px;
+    block-size: 44px;
+    margin-inline-end: -12px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink-60);
+    cursor: pointer;
   }
   .pf-search__body {
     padding: 8px;
@@ -138,8 +143,8 @@
     .pf-search__foot {
       display: none;
     }
-    .pf-search__touch {
-      display: inline;
+    .pf-search__close {
+      display: grid;
     }
   }
 
