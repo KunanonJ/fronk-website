@@ -622,9 +622,15 @@
     min-inline-size: 0;
     margin: 0;
   }
+  /* Clipped, not hidden: a box that clips without scrolling keeps its
+     ratio only as a least height, so a drawing whose labels wrap (the AI
+     Automation layers at 320 to 360 px, and at 600 px in two columns) grows
+     the tile instead of losing its last rows (UX sweep 21-11-26). Elsewhere
+     its contents fit, and the tile is drawn as it was. */
   .pf-sc__tile {
     position: relative;
     overflow: hidden;
+    overflow: clip;
     container-type: inline-size;
     display: grid;
     place-items: center;
@@ -632,6 +638,15 @@
     border: 1px solid transparent;
     border-radius: var(--radius-tile);
     background: var(--tile);
+  }
+  /* WebKit holds any clipping box at its ratio, `clip` too, so there a
+     drawing's tile does not clip: a drawing fits once its tile grows, and
+     only a screenshot needs the rounded clip (WebKit only, by its system
+     font keyword). */
+  @supports (font: -apple-system-body) {
+    .pf-sc__tile:has(> .pf-sc__art) {
+      overflow: visible;
+    }
   }
   .pf-sc__tile[data-tone="deep"] {
     background: var(--tile-deep);

@@ -1233,6 +1233,44 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
   }
 });
 
+/** A drawing's tile clipped its last rows where its labels wrapped. */
+test.describe("the showcase's drawings at narrow widths (UX sweep 21-11-26)", () => {
+  test.beforeEach(() => only(BEHAVIOUR, "desktop and the WebKit phone"));
+
+  test("AI Automation's layers grow their tile where the labels wrap, and keep its square where they fit", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/portfolio/ai-automation");
+    const tile = page.locator('.pf-sc__tile[data-sc-tile="layers"]');
+    // 320 to 360 px in one column, 600 px in two: the widths it clipped at.
+    for (const width of [320, 344, 360, 600, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const fit = await tile.evaluate((el) => {
+        const box = el.getBoundingClientRect();
+        const drawing = el.querySelector(".pf-layers-art")!;
+        const bands = [...drawing.children].map((band) =>
+          band.getBoundingClientRect(),
+        );
+        return {
+          width: box.width,
+          height: box.height,
+          // The last band ends inside the tile, above its padding.
+          lastBand: bands.at(-1)!.bottom,
+          tileBottom: box.bottom - el.clientTop,
+        };
+      });
+      expect(fit.lastBand, `last band at ${width} px`).toBeLessThanOrEqual(
+        fit.tileBottom,
+      );
+      // Never shorter than its square; square where the drawing fits.
+      expect(fit.height, `${width} px`).toBeGreaterThanOrEqual(fit.width - 1);
+      if (width >= 768) expect(fit.height).toBeCloseTo(fit.width, 0);
+    }
+  });
+});
+
 test.describe("axe on the cases routes.ts does not list (WCAG 2.2 AA)", () => {
   test.use({ reducedMotion: "reduce" });
 
