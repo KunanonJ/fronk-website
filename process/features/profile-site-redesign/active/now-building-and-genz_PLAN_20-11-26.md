@@ -124,7 +124,12 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - 320 x 568: Contact me and Résumé are on the first screen in all three engines.
   - Case pages: chapter 01's fact strip drops its closing rule (it drew an empty row above chapter 02's), and on phones the facts share a label column. The résumé's facts card stacks below 375 px, so the email is one line.
   - Sweep, before and after: heading widows 169 to 59 (Tier 5: 108 to 5), long measure 160 to 0, alignment near-misses 140 to 44. Brand names split at phone widths: 64 to 2.
-- **Batch A, correctness and accessibility:** in progress.
+- **Batch A, correctness and accessibility: shipped as #167, squash fd05d87 (20-11-26 UTC).**
+  - The lift cards' pill shows the focus ring; a drawing's showcase tile grows instead of clipping; the found-trait toast stands under the bar unless the bottom covers fewer controls; Home's logo-strip pause stays pressable while Work slides over it (210 px of scroll at 1024 x 768, was 50).
+  - An inline script reloads once when the page's own `/assets/` script or stylesheet fails before the load event (`src/lib/assetRetry.ts`; a session flag stops loops).
+  - The ship log no longer shifts the footer (under the place's line from 810 px, under the card below that); the résumé's first-screen logos load eagerly; ⌘K summaries take two lines on phones; the share row shows whole addresses.
+  - CI's first run caught a WebKit-only check through an Apple font keyword, which Linux WebKit lacks: a drawing's tile now never clips, in every engine.
+  - Live in real Chrome: the retry script ships and leaves no flag, the ring is 2 px solid, the 320 px drawing fits its tile, the pause is pressable at every step of the slide, the ship log sits where intended at 390 and 1440, and the résumé card's logos are eager.
 - **For the owner (not changed):** /about states its principles twice and the availability line about five times; /contact puts "Or write it here" before the email option and ends with a second call to action; at 1024 x 768 Home's hero is one column with about 40% empty.
 
 ## Constraints in every phase
