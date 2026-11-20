@@ -103,6 +103,18 @@
     font-size: 0.9375rem;
     line-height: 1.45;
   }
+  /* Too narrow for a term beside its value (below 375 px phones), each
+     term sits over its value: beside the 84 px term, the email had 142 to
+     182 px of its 187 and broke as "fronk.kunanon@gmail.co / m". */
+  .pf-resume-card__facts {
+    container-type: inline-size;
+  }
+  @container (width < 18rem) {
+    .pf-resume-card__fact {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+  }
   .pf-resume-card__ventures,
   .pf-resume-card__profiles {
     display: flex;
