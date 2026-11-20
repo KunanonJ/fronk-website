@@ -38,10 +38,17 @@ const offset = (container: HTMLElement) =>
     .querySelector<HTMLElement>(".pf-orbit")!
     .style.getPropertyValue("--orbit-offset");
 
+/**
+ * The h2's words: its last two are joined by a no-break space (WebKit's
+ * balance would leave "engineering." alone on a phone), read as a space.
+ */
+const headingName = (name: string) =>
+  name.replace(/\s/g, " ") === journeyCopy.heading;
+
 describe("Journey", () => {
   it("is section#journey, named by its h2, with the eyebrow, lead and a link to the story", () => {
     render(<Journey />);
-    const section = screen.getByRole("region", { name: journeyCopy.heading });
+    const section = screen.getByRole("region", { name: headingName });
     expect(section).toHaveAttribute("id", "journey");
     expect(within(section).getByRole("heading", { level: 2 })).toHaveAttribute(
       "id",
@@ -147,7 +154,7 @@ describe("Journey", () => {
     render(<Journey />);
     const heading = screen.getByRole("heading", {
       level: 2,
-      name: journeyCopy.heading,
+      name: headingName,
     });
     const list = screen.getByRole("list", { name: orbitCopy.label });
     expect(
