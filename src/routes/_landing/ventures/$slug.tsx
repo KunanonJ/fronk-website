@@ -20,7 +20,7 @@ function VentureCaseRoute() {
   if (!venture?.caseStudy) throw notFound();
 
   return (
-    <ProfileMain>
+    <ProfileMain reading>
       {ventureJsonLd(venture).map((data, i) => (
         <JsonLd key={i} data={data} />
       ))}

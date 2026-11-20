@@ -8,6 +8,7 @@ import { CaseEvidence } from "@/components/profile/case/CaseEvidence";
 import { CaseMeta } from "@/components/profile/case/CaseMeta";
 import { useMorphTarget } from "@/components/profile/case/caseMorph";
 import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
+import { caseWords, readingMinutes } from "@/lib/content/readingTime";
 
 /*
  * The case hero (profile redesign Phase 5, design spec 9.1 to 9.5): the pixel
@@ -17,7 +18,8 @@ import { caseCopy, type CaseStudy } from "@/lib/content/caseStudy";
  * with a literal space between, so it reads "{name}. {tagline}" for a project
  * and "{name} {tagline}" for a venture. It never fades or moves (LCP),
  * except inside a page transition from a case card: the card's title and logo
- * then morph into the name and the logo (caseMorph.ts).
+ * then morph into the name and the logo (caseMorph.ts). The eyebrow ends with
+ * the reading time, counted from the case's own words (readingTime.ts).
  * Styles: `.pf-case-hero*` in src/styles/profile/case.css.
  */
 
@@ -42,7 +44,10 @@ export function CaseHero({ study }: { study: CaseStudy }) {
         </div>
         <p className="t-meta pf-case-hero__eyebrow">
           <StatusDot />
-          <span>{study.eyebrow}</span>
+          <span>
+            {study.eyebrow} ·{" "}
+            {caseCopy.readingTime(readingMinutes(caseWords(study)))}
+          </span>
         </p>
         <h1
           id="hero-title"
