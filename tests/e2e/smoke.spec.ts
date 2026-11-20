@@ -1217,6 +1217,34 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
   });
 
+  for (const [width, most] of [
+    [390, 2],
+    [1440, 1],
+  ] as const) {
+    test(`at ${width} px a result's summary takes up to ${most} line${most > 1 ? "s" : ""} (UX sweep 21-11-26)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await visit(page, "/contact");
+      await page.keyboard.press("ControlOrMeta+k");
+      await page.getByRole("combobox", { name: "Search the site" }).fill("ai");
+      const summary = page.locator(".pf-search__summary").first();
+      await expect(summary).toBeVisible();
+      const lines = await summary.evaluate((el) => {
+        // One line of it: the same element holding two letters.
+        const probe = el.cloneNode() as HTMLElement;
+        probe.textContent = "Ag";
+        el.after(probe);
+        const line = probe.getBoundingClientRect().height;
+        probe.remove();
+        return Math.round(el.getBoundingClientRect().height / line);
+      });
+      // On a phone one line kept under half of most summaries: two lines,
+      // clamped there; on a wide screen, one.
+      expect(lines).toBe(most);
+    });
+  }
+
   test("the footer's Now line, then the time in Bangkok", async ({ page }) => {
     await page.goto("/contact", { waitUntil: "load" });
     const footer = page.locator(".pf-footer__name-block");

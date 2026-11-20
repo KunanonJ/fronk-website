@@ -122,6 +122,17 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  /* On a phone one line kept under half of most summaries (UX sweep
+     21-11-26): two lines say what each result is. */
+  @media (width < 40rem) {
+    .pf-search__summary {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      white-space: normal;
+    }
+  }
   /* Commands (now-building-and-genz Phase 3): names as typed, and the
      answer some of them give, like a terminal's. */
   .pf-search__command {
