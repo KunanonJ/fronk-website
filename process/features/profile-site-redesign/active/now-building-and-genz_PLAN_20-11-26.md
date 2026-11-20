@@ -71,6 +71,14 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
 - **The tools:** the canvas toolbar works at 810 px and up with a mouse. The pen draws violet or coral doodles that fade, stamps drop pixel stickers, and Clear empties the canvas.
 - **Move stays the default**, so the frame links keep working.
 - **Loading:** a lazy chunk and stylesheet.
+- **Phase 3 shipped:** #160, squash a5ea607 (20-11-26). Checked live with no page errors:
+  - Typing `/` in ⌘K lists 9 commands.
+  - `sudo hire kunanon` answers, and the toast says "You found Gold earring · 1/6".
+  - The Konami code throws the party, and the nav avatar puts on Shades.
+- **Built (#161):**
+  - The toolbar is Move, Stickers, Pen, Ink (violet or coral) and Clear. Each slot shows its own tool from the first paint. The build first showed the old decorative icons until hover and then swapped them, so the icons changed under the pointer; that was dropped in favour of a one-time baseline refresh of 4 captures.
+  - The first sticker awards the headphones.
+  - The tools' chunk (3.1 KB) and stylesheet (1.0 KB) load on the first hover or focus of the toolbar.
 
 ## Phase 5: living status
 
