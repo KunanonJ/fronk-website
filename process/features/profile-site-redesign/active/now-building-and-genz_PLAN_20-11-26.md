@@ -91,6 +91,12 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
 - **The 404:** it arrives with pixels missing. Patching them plays the art and awards the cap, and there is a random-case link.
 - **Save my edition:** a PNG of the traited portrait, made in the browser.
 - **The holo card:** the /about portrait tilts with a sheen, for a mouse only, with lazy CSS.
+- **Phase 4 shipped:** #161, squash e080c8b (20-11-26). Live: the toolbar, a sticker and the Headphones toast, the pen, and Esc back to Move all work.
+  - The live check found a first click lost while the layer's chunk was still loading; #162 (8031712) keeps it and stamps it once the layer arrives.
+- **Built (#163):**
+  - **The 404:** seven seeded gaps. They are buttons named "Patch pixel n of 7", and "Patch it all" is the path that needs no game. The art plays when it is fixed and awards the Coral cap. "I'm feeling lucky" chooses a case on the client from `lib/content/casePaths.ts`, which a test holds equal to the site's cases.
+  - **/about:** Save my edition is a 480 px PNG, made in the browser; touch devices get the share sheet. The button shows only once a trait is found, so /about is unchanged at rest. The holo tilt and sheen are for a mouse only, and lazy.
+  - **Sizes:** the 404 is 97 px taller, so 4 baselines were refreshed. The topic hubs are at 168,876 of 168,960 B.
 
 ## Constraints in every phase
 
