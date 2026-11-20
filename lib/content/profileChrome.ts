@@ -1,6 +1,7 @@
 import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
 import { CONTACT_WORDS } from "@/lib/content/contactWords";
 import { PERSON_NAME } from "@/lib/content/identity";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import {
   footerAgents,
   hero,
@@ -176,8 +177,11 @@ export const footerCopy = {
   paragraphs: [
     // DRAFT
     "I build fintech and AI operator systems from Bangkok, for Thailand and SEA: AI transformation, ERP/CRM, internal systems and tech startups.",
-    // DRAFT (owner direction 20-11-26), the emphasised last line
-    "I’m building GoGoCash and Manut AI and not looking for a full-time role right now. I’m open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
+    // DRAFT (owner direction 20-11-26), the emphasised last line; the name
+    // unbroken on phones (keepWhole.ts).
+    keepNamesWhole(
+      "I’m building GoGoCash and Manut AI and not looking for a full-time role right now. I’m open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
+    ),
   ],
 } as const;
 

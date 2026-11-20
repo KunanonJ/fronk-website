@@ -9,6 +9,7 @@ import { CompanyLogo } from "@/components/CompanyLogo";
 import { pillClass } from "@/components/ds/Pill";
 import { TextLink } from "@/components/ds/TextLink";
 import { RESUME_PDF_HREF, RESUME_PDF_NAME } from "@/lib/content/availability";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import type {
   ResolvedTimelineItem,
   ResolvedTimelineSection,
@@ -75,7 +76,7 @@ function Bullets({ bullets }: { bullets: readonly string[] }) {
               isLiveBullet(bullet) ? "pf-resume__live" : "pf-resume__mark"
             }
           />
-          <span>{bullet}</span>
+          <span>{keepNamesWhole(bullet)}</span>
         </li>
       ))}
     </ul>
@@ -180,7 +181,9 @@ function Entry({ item }: { item: ResolvedTimelineItem }) {
       {item.period ? <p className="pf-resume__when">{item.period}</p> : null}
       {item.note || item.bullets?.length || item.more ? (
         <div className="pf-resume__entry-body">
-          {item.note ? <p className="pf-resume__note">{item.note}</p> : null}
+          {item.note ? (
+            <p className="pf-resume__note">{keepNamesWhole(item.note)}</p>
+          ) : null}
           <Bullets bullets={item.bullets ?? []} />
           {item.more ? (
             <div className="pf-resume__links">

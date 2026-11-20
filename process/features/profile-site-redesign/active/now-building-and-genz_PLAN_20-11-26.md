@@ -107,6 +107,30 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - **Sizes:** the 404 is 97 px taller, so 4 baselines were refreshed. The topic hubs are at 168,876 of 168,960 B.
 - **Phase 6 shipped:** #163, squash 2337239 (20-11-26).
 - **Phase 5's budget:** with phase 6 merged, the topic hubs were 51 B over 165 KB. The fix was not a raise: the footer read three words from the contact page's copy, which pulled the whole contact chunk (1.2 KB gzip) into every page. Those words now live in `lib/content/contactWords.ts`, which takes the hubs to 168,107 B, with 853 B of headroom.
+- **Phase 5 shipped:** #164, squash 20e7c20 (20-11-26). The ship log drops a commit's type prefix ("feat(footer): ..." reads "a living status ...").
+- **The deploy incident (20-11-26, fixed by #165, 748202a):** five seconds into #164's rollout, the Worker cache kept the previous build's home page under the new version's key, for a day. Real Chrome's variant pointed at 19 deleted scripts: an unstyled page that never ran. WebKit and Firefox were fine, and curl with default headers saw nothing. Every build now has an id on `<html data-build>`, and `src/server/negotiate.ts` keeps a page at the edge only when the id is its own; otherwise it answers with `no-store` and logs. After a deploy, check home in real Chrome (Playwright `channel: "chrome"`).
+
+## Phase 7: the UX/UI bug hunt (21-11-26)
+
+- **Ask:** a bug hunt on every platform from desktop to phone, collecting every detail to be pixel perfect, with ways to improve.
+- **The sweep:** 48 routes on 12 devices, light and dark (Chromium, WebKit and Firefox, 320 px to 1920 px; 600 loads): axe, sideways scroll, clipping, tap areas, focus rings, widows, measure, alignment and breaks. No axe violations and no sideways scroll. The findings went into two batches.
+- **Batch B, typography and pixel polish (#166):**
+  - Headings balance their lines and paragraphs avoid a lone last word (`text-wrap-style`, progressive). The topic hub headlines end "and SEA" and "from Bangkok", as the Thai hubs do.
+  - One reading measure, `--measure: 34em` (about 70 characters; Onest's `ch` is 0.665em, so 64ch held about 90), on case prose, FAQ answers, /about, /learn, /proof, skills notes and the résumé.
+  - "Manut AI", "The Binary Holdings" and "IT Manager" never split (`lib/content/keepWhole.ts`, display copy only, so meta tags, JSON-LD, Markdown and llms.txt keep plain spaces).
+  - Skills pages: the agent prompt breaks only after a slash, commands only between words, sizes never.
+  - Filter groups below 600 px are one row that scrolls sideways, and the pressed option scrolls into view.
+  - Alignment: the skill pager, code insets, library kickers, the back link and the framed images.
+  - 320 x 568: Contact me and Résumé are on the first screen in all three engines.
+  - Case pages: chapter 01's fact strip drops its closing rule (it drew an empty row above chapter 02's), and on phones the facts share a label column. The résumé's facts card stacks below 375 px, so the email is one line.
+  - Sweep, before and after: heading widows 169 to 59 (Tier 5: 108 to 5), long measure 160 to 0, alignment near-misses 140 to 44. Brand names split at phone widths: 64 to 2.
+- **Batch A, correctness and accessibility: shipped as #167, squash fd05d87 (20-11-26 UTC).**
+  - The lift cards' pill shows the focus ring; a drawing's showcase tile grows instead of clipping; the found-trait toast stands under the bar unless the bottom covers fewer controls; Home's logo-strip pause stays pressable while Work slides over it (210 px of scroll at 1024 x 768, was 50).
+  - An inline script reloads once when the page's own `/assets/` script or stylesheet fails before the load event (`src/lib/assetRetry.ts`; a session flag stops loops).
+  - The ship log no longer shifts the footer (under the place's line from 810 px, under the card below that); the résumé's first-screen logos load eagerly; ⌘K summaries take two lines on phones; the share row shows whole addresses.
+  - CI's first run caught a WebKit-only check through an Apple font keyword, which Linux WebKit lacks: a drawing's tile now never clips, in every engine.
+  - Live in real Chrome: the retry script ships and leaves no flag, the ring is 2 px solid, the 320 px drawing fits its tile, the pause is pressable at every step of the slide, the ship log sits where intended at 390 and 1440, and the résumé card's logos are eager.
+- **For the owner (not changed):** /about states its principles twice and the availability line about five times; /contact puts "Or write it here" before the email option and ends with a second call to action; at 1024 x 768 Home's hero is one column with about 40% empty.
 
 ## Constraints in every phase
 

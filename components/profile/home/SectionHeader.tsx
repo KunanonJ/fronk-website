@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { EyebrowRow } from "@/components/ds/labels";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { cn } from "@/lib/utils/cn";
 
 /*
@@ -24,11 +25,15 @@ export interface SectionHeaderProps {
   title: ReactNode;
   /** An id for the h2. */
   titleId?: string;
-  /** One short line beside or under the h2, in ink 60. Optional. */
+  /**
+   * One short line beside or under the h2, in ink 60. Optional. A string
+   * keeps its names unbroken (keepWhole.ts).
+   */
   lead?: ReactNode;
   /**
    * The h2's measure in `ch`, so a long title breaks into lines on purpose:
-   * 13 by default; the spec sets 10 for About and 9 for Journey.
+   * 13 by default; the spec sets 10 for About. Journey takes 16, so its
+   * title sets in two lines rather than four.
    */
   titleMaxWidth?: number;
   /** "split" (default): lead on the right. "centred": all centred. */
@@ -102,7 +107,7 @@ export function SectionHeader({
                 : "t-body pf-section-head__lead"
             }
           >
-            {lead}
+            {typeof lead === "string" ? keepNamesWhole(lead) : lead}
           </p>
         ) : null}
       </div>

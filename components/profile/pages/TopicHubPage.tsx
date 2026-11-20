@@ -10,6 +10,7 @@ import {
 } from "@/components/profile/pages/ReadingHero";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { siteConfig } from "@/lib/site";
 import { pad2 } from "@/lib/utils/pad2";
 import { notFound } from "@tanstack/react-router";
@@ -174,7 +175,7 @@ function Proof({ pillar }: { pillar: TopicPillar }) {
       <ul className="pf-hub-facts">
         {pillar.proof.map((item) => (
           <li key={item} className="pf-hub-facts__item">
-            {item}
+            {keepNamesWhole(item)}
           </li>
         ))}
       </ul>

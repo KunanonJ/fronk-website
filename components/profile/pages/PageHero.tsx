@@ -2,6 +2,7 @@ import { Fragment, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import { DitherField } from "@/components/ds/DitherField";
 import { StatusDot } from "@/components/ds/labels";
 import type { HeadlineLines } from "@/lib/content/corePages";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { cn } from "@/lib/utils/cn";
 
 /*
@@ -67,6 +68,7 @@ export function PageHero({
   back?: ReactNode;
   eyebrow: ReactNode;
   titleClassName?: string;
+  /** A string keeps its names unbroken (keepWhole.ts). */
   lead?: ReactNode;
   /** The page's own parts under the lead: pills, an availability line. */
   children?: ReactNode;
@@ -105,7 +107,11 @@ export function PageHero({
           >
             {lines ? <Headline lines={lines} /> : title}
           </h1>
-          {lead ? <p className="t-lead pf-page-hero__lead">{lead}</p> : null}
+          {lead ? (
+            <p className="t-lead pf-page-hero__lead">
+              {typeof lead === "string" ? keepNamesWhole(lead) : lead}
+            </p>
+          ) : null}
           {children}
         </div>
         {aside ? <div className="pf-page-hero__aside">{aside}</div> : null}

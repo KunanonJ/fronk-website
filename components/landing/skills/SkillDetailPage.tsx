@@ -15,6 +15,7 @@ import {
   INLINE_LINK,
   NOTE,
   SkillTags,
+  SlashBreaks,
 } from "@/components/landing/skills/SkillParts";
 import {
   PACK_INSTALL,
@@ -298,16 +299,7 @@ function FilesCard({ skill }: { skill: Skill }) {
               <span className="pf-skill-files__name">
                 <FileText aria-hidden size={15} strokeWidth={1.8} />
                 <span className="pf-cat-code">
-                  {file.path.split("/").map((part, i, parts) => (
-                    <span key={`${i}-${part}`}>
-                      {part}
-                      {i < parts.length - 1 ? (
-                        <>
-                          /<wbr />
-                        </>
-                      ) : null}
-                    </span>
-                  ))}
+                  <SlashBreaks text={file.path} />
                 </span>
               </span>
               {/* Read as "SKILL.md, 2.1 KB, opens on GitHub". */}

@@ -11,6 +11,7 @@ import {
   SegmentHeadline,
 } from "@/components/profile/pages/ReadingHero";
 import type { BlogCard } from "@/lib/content/blog";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import {
   getLearnHubs,
   getLearnWritingLinks,
@@ -66,7 +67,7 @@ function HubCard({ hub, index }: { hub: LearnHub; index: number }) {
         {hub.title}
       </h3>
       <p lang={hub.lang} className="t-body pf-read-text">
-        {hub.lede}
+        {keepNamesWhole(hub.lede)}
       </p>
       <div className="pf-read-links">
         {/* Named "Open hub" plus the hub's title, read from the h3 so a
@@ -118,7 +119,9 @@ function LinkList({
           <li key={item.href} className="ds-tile pf-read-tile">
             <p className="t-meta text-ink-2">{pad2(i + 1)}</p>
             <h3 className="t-lift-title pf-read-title">{item.title}</h3>
-            <p className="t-small pf-read-text">{item.description}</p>
+            <p className="t-small pf-read-text">
+              {keepNamesWhole(item.description)}
+            </p>
             <div className="pf-read-links">
               <ArrowLink href={item.href} label={`${cta}: ${item.title}`}>
                 {cta}

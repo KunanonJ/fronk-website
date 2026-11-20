@@ -1,6 +1,7 @@
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import SkillCard from "@/components/landing/skills/SkillCard";
 import { NOTE } from "@/components/landing/skills/SkillParts";
+import { usePressedInView } from "@/components/profile/catalog/usePressedInView";
 import {
   ADAPTED_COUNT,
   MODEL_INVOKED_COUNT,
@@ -45,6 +46,9 @@ export default function SkillsCatalog({
       skills: skills.filter((s) => matchesSkillFilter(s, show)),
     }))
     .filter(({ skills }) => skills.length > 0);
+  // One sideways-scrolling row on phones: a shared ?show= stays in view.
+  const row = useRef<HTMLDivElement>(null);
+  usePressedInView(row, show);
 
   return (
     <div className="pf-skill-catalog">
@@ -68,6 +72,7 @@ export default function SkillsCatalog({
             Show
           </span>
           <div
+            ref={row}
             role="group"
             aria-labelledby="skills-filter-label"
             className="pf-filter"

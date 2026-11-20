@@ -6,6 +6,7 @@ import { StatsTile } from "@/components/profile/home/StatsTile";
 import Link from "@/components/navigation/Link";
 import type { AboutInline } from "@/lib/content/aboutPage";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { aboutStats, statsFootnote } from "@/lib/landing/aboutStats";
 
 /*
@@ -26,6 +27,7 @@ const STATS_FOOTNOTE = statsFootnote(STATS);
  * the punctuation that follows the link (spec 6.10, 12 item 17).
  */
 function StoryLink({ span }: { span: Extract<AboutInline, { type: "link" }> }) {
+  const text = keepNamesWhole(span.text);
   if (span.external) {
     return (
       <a
@@ -34,19 +36,22 @@ function StoryLink({ span }: { span: Extract<AboutInline, { type: "link" }> }) {
         rel="noopener"
         className="ds-prose-link"
       >
-        {span.text}
+        {text}
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
     );
   }
   return (
     <Link href={span.href} className="ds-prose-link">
-      {span.text}
+      {text}
     </Link>
   );
 }
 
-/** The "In short" tile: today's About story, its links included. */
+/**
+ * The "In short" tile: today's About story, its links included, its names
+ * unbroken on phones (keepWhole.ts).
+ */
 function BriefTile() {
   return (
     <div className="ds-tile pf-bento__tile pf-bento__brief">
@@ -56,7 +61,7 @@ function BriefTile() {
           <p key={index}>
             {paragraph.spans.map((span, at) =>
               span.type === "text" ? (
-                span.text
+                keepNamesWhole(span.text)
               ) : (
                 <StoryLink key={at} span={span} />
               ),

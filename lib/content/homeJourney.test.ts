@@ -18,8 +18,12 @@ import { stackItems, STACK_GROUPS } from "@/lib/content/stack";
  * line carries an em dash.
  */
 
+/** A paragraph's words, its no-break spaces (names kept whole) read as spaces. */
 const text = (runs: readonly StoryRun[]) =>
-  runs.map((run) => (typeof run === "string" ? run : run.strong)).join("");
+  runs
+    .map((run) => (typeof run === "string" ? run : run.strong))
+    .join("")
+    .replaceAll("\u00a0", " ");
 
 const story = storyCopy.paragraphs.map(text);
 
@@ -73,7 +77,9 @@ describe("the Journey's story", () => {
   });
 
   it("states the availability, with its ventures and place as chips", () => {
-    expect(storyCopy.now).toBe(AVAILABILITY.sentence);
+    // Word for word; only the spaces inside "Manut AI" are no-break.
+    expect(storyCopy.now.replaceAll("\u00a0", " ")).toBe(AVAILABILITY.sentence);
+    expect(storyCopy.now).toContain("Manut\u00a0AI");
     expect(storyCopy.chips).toEqual([
       ...AVAILABILITY.ventures,
       AVAILABILITY.location,

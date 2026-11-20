@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { DownloadIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
 import CopyButton from "@/components/landing/skills/CopyButton";
@@ -35,9 +35,45 @@ export const EXTERNAL = {
 } as const;
 
 /**
+ * Text that breaks only after a slash where a path or address runs long:
+ * a <wbr> after each "/", so "github.com/KunanonJ/superstacks" never splits
+ * inside a word. The text itself (and what Copy copies) is unchanged.
+ */
+export function SlashBreaks({ text }: { text: string }) {
+  return text.split("/").map((part, i, parts) => (
+    <Fragment key={i}>
+      {part}
+      {i < parts.length - 1 ? (
+        <>
+          /<wbr />
+        </>
+      ) : null}
+    </Fragment>
+  ));
+}
+
+/**
+ * A command's words, each kept whole: a line breaks only at a space, never
+ * inside a flag ("--copy") or a name ("verify-loop"). A word longer than
+ * the row still wraps inside its own box (`.pf-cat-command__word`).
+ */
+function CommandWords({ command }: { command: string }) {
+  return command.split(/(\s+)/).map((part, i) =>
+    /^\s*$/.test(part) ? (
+      part
+    ) : (
+      <span key={i} className="pf-cat-command__word">
+        {part}
+      </span>
+    ),
+  );
+}
+
+/**
  * A command (or path) on the page colour with its Copy pill. The command
- * wraps instead of scrolling, so the row never scrolls sideways on phones;
- * the pill drops under it when the row is narrow.
+ * wraps instead of scrolling, so the row never scrolls sideways on phones,
+ * and breaks only between its words; the pill drops under it when the row
+ * is narrow.
  */
 export function CommandRow({
   command,
@@ -56,7 +92,9 @@ export function CommandRow({
     <div className="pf-cat-stack">
       {label ? <p className="t-small pf-cat-note">{label}</p> : null}
       <div className="pf-cat-command">
-        <code className="pf-cat-command__text">{command}</code>
+        <code className="pf-cat-command__text">
+          <CommandWords command={command} />
+        </code>
         <CopyButton
           text={command}
           accessibleLabel={accessibleLabel}

@@ -38,18 +38,26 @@ const offset = (container: HTMLElement) =>
     .querySelector<HTMLElement>(".pf-orbit")!
     .style.getPropertyValue("--orbit-offset");
 
+/**
+ * The h2's words: its last two are joined by a no-break space (WebKit's
+ * balance would leave "engineering." alone on a phone), read as a space.
+ */
+const headingName = (name: string) =>
+  name.replace(/\s/g, " ") === journeyCopy.heading;
+
 describe("Journey", () => {
   it("is section#journey, named by its h2, with the eyebrow, lead and a link to the story", () => {
     render(<Journey />);
-    const section = screen.getByRole("region", { name: journeyCopy.heading });
+    const section = screen.getByRole("region", { name: headingName });
     expect(section).toHaveAttribute("id", "journey");
     expect(within(section).getByRole("heading", { level: 2 })).toHaveAttribute(
       "id",
       "journey-title",
     );
-    // The spec's 9ch measure (jsdom drops logical properties, so read the HTML).
+    // 16ch, so the title sets in two lines (the spec's 9ch stacked four);
+    // jsdom drops logical properties, so read the HTML.
     expect(renderToString(<Journey />)).toMatch(
-      /<h2 id="journey-title"[^>]*style="max-inline-size:9ch"/,
+      /<h2 id="journey-title"[^>]*style="max-inline-size:16ch"/,
     );
     expect(screen.getByText(journeyCopy.eyebrow)).toHaveClass("t-meta");
     expect(screen.getByText(journeyCopy.lead)).toHaveClass("t-lead");
@@ -146,7 +154,7 @@ describe("Journey", () => {
     render(<Journey />);
     const heading = screen.getByRole("heading", {
       level: 2,
-      name: journeyCopy.heading,
+      name: headingName,
     });
     const list = screen.getByRole("list", { name: orbitCopy.label });
     expect(
@@ -181,7 +189,8 @@ describe("Journey", () => {
         name: storyCopy.nowHeading,
       }),
     ).toBeInTheDocument();
-    expect(story).toHaveTextContent(storyCopy.now);
+    // toHaveTextContent reads the page's no-break spaces as spaces.
+    expect(story).toHaveTextContent(storyCopy.now.replaceAll("\u00a0", " "));
     for (const chip of storyCopy.chips)
       expect(within(story as HTMLElement).getByText(chip)).toHaveClass(
         "ds-chip",

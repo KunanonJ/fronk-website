@@ -15,6 +15,7 @@ import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import { ResumeSnapshot } from "@/components/resume/ResumeSnapshot";
 import { AVAILABILITY } from "@/lib/content/availability";
 import type { HeadlinePart } from "@/lib/content/corePages";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { RESUME_META } from "@/lib/resume/search";
 import { resumeHeadline, resumeLayout } from "@/lib/resume/view";
 import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
@@ -75,7 +76,7 @@ export default function ResumePage({
         aside={<ResumeSnapshot name={profile.name} now={layout.now} />}
         after={
           <p className="t-lead pf-page-hero__lead pf-resume__lead">
-            {profile.summary}
+            {keepNamesWhole(profile.summary)}
           </p>
         }
       >

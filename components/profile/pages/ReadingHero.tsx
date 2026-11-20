@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import { DitherField } from "@/components/ds/DitherField";
 import { StatusDot } from "@/components/ds/labels";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import type { HeadlineLine } from "@/lib/content/topics/pillars";
 import { cn } from "@/lib/utils/cn";
 
@@ -65,6 +66,7 @@ export function ReadingHero({
   eyebrow: string;
   /** The h1's content, usually a SegmentHeadline. */
   title: ReactNode;
+  /** A string keeps its names unbroken (keepWhole.ts). */
   lead?: ReactNode;
   /** A control beside the eyebrow: the hubs' language switch. */
   aside?: ReactNode;
@@ -95,7 +97,11 @@ export function ReadingHero({
           <h1 id="hero-title" className="t-display pf-page-hero__title">
             {title}
           </h1>
-          {lead ? <p className="t-lead pf-page-hero__lead">{lead}</p> : null}
+          {lead ? (
+            <p className="t-lead pf-page-hero__lead">
+              {typeof lead === "string" ? keepNamesWhole(lead) : lead}
+            </p>
+          ) : null}
           {children}
         </div>
       </div>

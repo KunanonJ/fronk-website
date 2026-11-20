@@ -1,4 +1,5 @@
 import { AVAILABILITY, RESUME_HREF } from "@/lib/content/availability";
+import { keepNamesWhole } from "@/lib/content/keepWhole";
 import { STACK_GROUPS, stackItems } from "@/lib/content/stack";
 
 /*
@@ -73,13 +74,19 @@ export const storyCopy = {
       "From there I moved into delivery: ", // DRAFT
       { strong: "business systems" }, // DRAFT
       " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Most recently I led ", // DRAFT (owner direction 20-11-26)
-      { strong: "IT and AI engineering at The Binary Holdings" }, // DRAFT
+      // DRAFT; the name unbroken on phones (keepWhole.ts).
+      {
+        strong: keepNamesWhole("IT and AI engineering at The Binary Holdings"),
+      },
       ".",
     ],
   ] as const satisfies readonly (readonly StoryRun[])[],
   nowHeading: "What I’m building now", // DRAFT (owner direction 20-11-26)
-  /** The availability the owner directed on 20-11-26 (availability.ts). */
-  now: AVAILABILITY.sentence,
+  /**
+   * The availability the owner directed on 20-11-26 (availability.ts), its
+   * names unbroken.
+   */
+  now: keepNamesWhole(AVAILABILITY.sentence),
   chips: [...AVAILABILITY.ventures, AVAILABILITY.location],
 } as const;
 

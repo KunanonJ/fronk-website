@@ -1,4 +1,5 @@
-import { Fragment } from "react";
+import { Fragment, useRef } from "react";
+import { usePressedInView } from "@/components/profile/catalog/usePressedInView";
 import { cn } from "@/lib/utils/cn";
 
 /*
@@ -32,8 +33,16 @@ export function ToggleGroup<T extends string>({
   onChange: (value: T) => void;
   className?: string;
 }) {
+  // One sideways-scrolling row on phones: the pressed option stays in view.
+  const row = useRef<HTMLDivElement>(null);
+  usePressedInView(row, value);
   return (
-    <div role="group" aria-label={label} className={cn("pf-filter", className)}>
+    <div
+      ref={row}
+      role="group"
+      aria-label={label}
+      className={cn("pf-filter", className)}
+    >
       {options.map((option) => (
         <button
           key={option.value}

@@ -13,6 +13,7 @@ import {
   EXTERNAL,
   INLINE_LINK,
   NOTE,
+  SlashBreaks,
 } from "@/components/landing/skills/SkillParts";
 import {
   ADAPTED_COUNT,
@@ -275,7 +276,9 @@ function InstallRow() {
           README.
         </p>
         <figure className="pf-skill-prompt">
-          <p className="pf-skill-prompt__text">{skillsPage.askAgentPrompt}</p>
+          <p className="pf-skill-prompt__text">
+            <SlashBreaks text={skillsPage.askAgentPrompt} />
+          </p>
           <figcaption className="pf-skill-prompt__actions">
             <CopyButton
               text={skillsPage.askAgentPrompt}

@@ -24,7 +24,7 @@
     margin-top: 32px;
   }
   .pf-cat-hero__meta {
-    max-inline-size: 64ch;
+    max-inline-size: var(--measure);
     margin-top: 24px;
     color: var(--ink-80);
   }
@@ -77,6 +77,13 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
+  /* Each word of a command is one box (SkillParts' CommandWords), so a line
+     breaks only at a space, never after the hyphen in "--copy"; a word
+     longer than the row still wraps inside its box. */
+  .pf-cat-command__word {
+    display: inline-block;
+    max-inline-size: 100%;
+  }
   .pf-cat-command .ds-pill {
     margin-inline-start: auto;
   }
@@ -102,7 +109,7 @@
     align-items: flex-start;
   }
   .pf-cat-measure {
-    max-inline-size: 60ch;
+    max-inline-size: var(--measure);
   }
   .pf-cat-kicker,
   .pf-cat-title {
@@ -236,6 +243,7 @@
     min-block-size: 44px;
     margin-top: auto;
   }
+  /* Its words start 17 px in, as a command row's do (a 1 px ring and 16 px). */
   .pf-skill-prompt {
     display: flex;
     flex: 1;
@@ -243,7 +251,7 @@
     justify-content: space-between;
     gap: 18px;
     margin: 0;
-    padding: 18px;
+    padding: 18px 17px;
     border-radius: var(--radius-well);
     background: var(--surface-tint);
   }
@@ -303,6 +311,12 @@
   .pf-skill-catalog {
     display: grid;
     gap: 56px;
+  }
+  /* The filter scrolls sideways on phones (cutover.css), so neither the
+     tile nor its controls may grow to the filter's full row. */
+  .pf-skill-catalog > *,
+  .pf-skill-filter__controls {
+    min-inline-size: 0;
   }
   .pf-skill-filter {
     display: flex;
@@ -520,12 +534,14 @@
     gap: 16px;
     margin-top: 56px;
   }
+  /* The tiles' inset (.ds-tile), so the pager's words sit on the line of
+     the cards' words above it. */
   .pf-skill-pager__link {
     display: flex;
     flex-direction: column;
     gap: 8px;
     min-block-size: 112px;
-    padding: 20px 22px;
+    padding: 20px clamp(20px, 2.4vw, 36px);
     border: 1px solid transparent;
     border-radius: var(--radius-sheet);
     background: var(--paper-2);
@@ -562,9 +578,11 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+  /* Its code starts 17 px in, on the line of the install command above it
+     on phones (a 1 px ring and 16 px). */
   .pf-skill-source__well {
     min-inline-size: 0;
-    padding: 20px;
+    padding: 20px 16px;
     border: 1px solid transparent;
     border-radius: var(--radius-well);
     background: var(--paper);
