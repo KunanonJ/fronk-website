@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Chip } from "@/components/ds/labels";
 import { pillClass } from "@/components/ds/Pill";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
 import {
@@ -15,9 +14,11 @@ import { cn } from "@/lib/utils/cn";
 /*
  * The /about portrait's pixel side (owner, 20-11-26): the pixel portrait lies
  * over the photo. "Photo" dissolves it away through the dither's 16 ranks, the
- * print-in in reverse, and "Pixels" brings it back. Pressing the portrait puts
- * on the next of six traits; each one found is remembered on this device, and
- * finding all six turns the outline gold. A polite line says what was found.
+ * print-in in reverse, and "Pixels" brings it back. "Try a trait" puts on the
+ * next of six traits (a press on the portrait does too, for a pointer: like a
+ * showcase tile, the portrait is not a control itself, so it overlaps no other
+ * target); each one found is remembered on this device, and finding all six
+ * turns the outline gold. A polite line says what was found.
  * The server draws the plain portrait; traits come from storage once the page
  * runs. Under reduced motion the dissolve is a cut.
  */
@@ -132,16 +133,15 @@ export function PortraitPlay() {
   const { portrait } = aboutPageCopy;
   return (
     <>
-      <button
-        type="button"
+      {/* A pointer's shortcut to "Try a trait"; the button is the way in. */}
+      <div
         className={cn("pf-about-page__pixels", pop && "is-new")}
-        aria-label={portrait.tryTrait(saved.found.length, TOTAL)}
         hidden={photo && shown === 0}
         onClick={nextTrait}
         onAnimationEnd={() => setPop(false)}
       >
         <PixelPortrait rows={rows} shown={shown} />
-      </button>
+      </div>
       <div className="pf-about-page__portrait-bar">
         <button
           type="button"
@@ -151,9 +151,15 @@ export function PortraitPlay() {
         >
           {photo ? portrait.showPixels : portrait.showPhoto}
         </button>
-        <Chip>
-          {gold ? portrait.gold : portrait.count(saved.found.length, TOTAL)}
-        </Chip>
+        <button
+          type="button"
+          className={pillClass({ variant: "ghost", size: "sm" })}
+          onClick={nextTrait}
+        >
+          {gold
+            ? portrait.gold(TOTAL)
+            : portrait.tryTrait(saved.found.length, TOTAL)}
+        </button>
       </div>
       <p className="sr-only" aria-live="polite">
         {news}

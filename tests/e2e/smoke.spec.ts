@@ -1145,21 +1145,17 @@ test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/about", { waitUntil: "load" });
     await expect(page.locator("time[data-clock]")).toBeAttached();
-    const pixels = page.getByRole("button", {
-      name: /^Pixel portrait: try a trait/,
-    });
+    const pixels = page.locator(".pf-about-page__pixels");
+    const tryTrait = page.getByRole("button", { name: /^Try a trait/ });
     await expect(pixels).toBeVisible();
-    await expect(page.locator(".pf-about-page__portrait-bar")).toContainText(
-      "0/6 traits",
-    );
-    await pixels.click();
-    await expect(page.locator(".pf-about-page__portrait-bar")).toContainText(
-      "1/6 traits",
-    );
+    await expect(tryTrait).toHaveText("Try a trait · 0/6");
+    await tryTrait.click();
+    await expect(tryTrait).toHaveText("Try a trait · 1/6");
+    // A press on the portrait does the same, for a pointer.
+    await pixels.click({ position: { x: 120, y: 200 } });
+    await expect(tryTrait).toHaveText("Try a trait · 2/6");
     await page.reload({ waitUntil: "load" });
-    await expect(page.locator(".pf-about-page__portrait-bar")).toContainText(
-      "1/6 traits",
-    );
+    await expect(tryTrait).toHaveText("Try a trait · 2/6");
 
     await page.getByRole("button", { name: "Show the photo" }).click();
     await expect(pixels).toBeHidden();

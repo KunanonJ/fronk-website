@@ -3,9 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PortraitPlay } from "@/components/profile/pages/PortraitPlay";
 
 /*
- * The /about pixel portrait (owner, 20-11-26): a press tries the next trait
- * and remembers it; all six found turn the outline gold; the pill dissolves to
- * the photo and back (a cut under reduced motion, as here).
+ * The /about pixel portrait (owner, 20-11-26): "Try a trait" (or a press on
+ * the portrait) puts on the next trait and remembers it; all six found turn
+ * the outline gold; the pill dissolves to the photo and back (a cut under
+ * reduced motion, as here).
  */
 beforeEach(() => {
   localStorage.clear();
@@ -24,41 +25,41 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const portrait = () =>
-  screen.getByRole("button", { name: /^Pixel portrait: try a trait/ });
+const tryTrait = () =>
+  screen.getByRole("button", { name: /^(Try a trait|Gold edition)/ });
+const portrait = () => document.querySelector(".pf-about-page__pixels")!;
 const gold = (svg: Element) =>
   svg.querySelectorAll('path[fill="#e3b341"]').length;
 
 describe("PortraitPlay", () => {
   it("starts with no trait found", () => {
     render(<PortraitPlay />);
-    expect(portrait()).toHaveAccessibleName(
-      "Pixel portrait: try a trait (0 of 6 found)",
-    );
-    expect(screen.getByText("0/6 traits")).toBeInTheDocument();
+    expect(tryTrait()).toHaveAccessibleName("Try a trait · 0/6");
   });
 
   it("puts on the next trait, says so, and remembers it", () => {
     const { unmount } = render(<PortraitPlay />);
-    act(() => fireEvent.click(portrait()));
+    act(() => fireEvent.click(tryTrait()));
     expect(
       screen.getByText("Shades. 1 of 6 traits found."),
     ).toBeInTheDocument();
-    expect(screen.getByText("1/6 traits")).toBeInTheDocument();
+    expect(tryTrait()).toHaveAccessibleName("Try a trait · 1/6");
     expect(JSON.parse(localStorage.getItem("pf-portrait-found")!)).toEqual([
       "shades",
     ]);
     unmount();
     render(<PortraitPlay />);
-    expect(screen.getByText("1/6 traits")).toBeInTheDocument();
+    expect(tryTrait()).toHaveAccessibleName("Try a trait · 1/6");
+    // A press on the portrait does the same, for a pointer.
+    act(() => fireEvent.click(portrait()));
+    expect(tryTrait()).toHaveAccessibleName("Try a trait · 2/6");
   });
 
   it("turns gold once all six are found", () => {
     const { container } = render(<PortraitPlay />);
-    const svg = container.querySelector("svg")!;
-    const before = gold(svg);
-    for (let i = 0; i < 6; i += 1) act(() => fireEvent.click(portrait()));
-    expect(screen.getByText("Gold edition")).toBeInTheDocument();
+    const before = gold(container.querySelector("svg")!);
+    for (let i = 0; i < 6; i += 1) act(() => fireEvent.click(tryTrait()));
+    expect(tryTrait()).toHaveAccessibleName("Gold edition · 6/6");
     expect(
       screen.getByText("All six traits found: the gold edition."),
     ).toBeInTheDocument();
@@ -70,12 +71,10 @@ describe("PortraitPlay", () => {
     act(() =>
       fireEvent.click(screen.getByRole("button", { name: "Show the photo" })),
     );
-    expect(document.querySelector(".pf-about-page__pixels")).toHaveAttribute(
-      "hidden",
-    );
+    expect(portrait()).toHaveAttribute("hidden");
     act(() =>
       fireEvent.click(screen.getByRole("button", { name: "Show the pixels" })),
     );
-    expect(portrait()).toBeVisible();
+    expect(portrait()).not.toHaveAttribute("hidden");
   });
 });
