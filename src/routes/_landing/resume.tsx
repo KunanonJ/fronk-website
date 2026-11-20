@@ -1,17 +1,11 @@
-import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { Metadata } from "@/lib/seo/types";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import ResumePage from "@/components/resume/ResumePage";
 import { ResumePrint } from "@/components/resume/ResumePrint";
-import {
-  RESUME_META,
-  RESUME_SEARCH_DEFAULTS,
-  resumeSearchSchema,
-  type ResumeDetail,
-} from "@/lib/resume/search";
+import { RESUME_META } from "@/lib/resume/search";
 import { routeCacheHeaders } from "@/src/lib/cache";
-import { FILTER_NAVIGATION } from "@/src/lib/filterParam";
 import { pageHead } from "@/src/lib/head";
 import { loadResume, resumeQuery } from "@/src/queries/content";
 import { routeShareMeta } from "@/lib/seo/routeMeta";
@@ -28,14 +22,11 @@ const metadata: Metadata = {
 };
 
 /**
- * /resume (bento redesign, phase 7b): in the site layout since 7b, with the
- * header, footer and Share. `?view=compact` (typed, Valibot) hides the
- * bullet lists on screen; the default, detailed, never shows in the URL.
- * The printed résumé (`pnpm pdf`) is ResumePrint, unchanged by either.
+ * /resume ("Snapshot", now-building program phase 2): in the site layout,
+ * with the header and footer. ResumePage is the screen; the printed résumé
+ * (`pnpm pdf`) is ResumePrint, plain and unchanged by it.
  */
 export const Route = createFileRoute("/_landing/resume")({
-  validateSearch: resumeSearchSchema,
-  search: { middlewares: [stripSearchParams(RESUME_SEARCH_DEFAULTS)] },
   loader: ({ context }) => loadResume(context.queryClient),
   head: () => pageHead(metadata),
   // A résumé drawn from the repo because Sanity could not be read is not
@@ -47,18 +38,10 @@ export const Route = createFileRoute("/_landing/resume")({
 
 function ResumeRoute() {
   const profile = useSuspenseQuery(resumeQuery).data;
-  const { view } = Route.useSearch();
-  const navigate = Route.useNavigate();
-  const setView = (next: ResumeDetail) => {
-    void navigate({
-      search: (prev) => ({ ...prev, view: next }),
-      ...FILTER_NAVIGATION,
-    });
-  };
 
   return (
     <ProfileMain>
-      <ResumePage profile={profile} detail={view} onDetailChange={setView} />
+      <ResumePage profile={profile} />
       {/* Marked when the repo's résumé stands in for a failed Sanity read:
           `pnpm pdf` refuses to print a stand-in as the résumé. */}
       <div

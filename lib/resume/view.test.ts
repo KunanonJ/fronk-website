@@ -1,46 +1,19 @@
 import { describe, expect, it } from "vitest";
-import * as v from "valibot";
 import { DEFAULT_RESUME_PROFILE } from "@/lib/content/resumeProfile";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
-import { resumeSearchSchema } from "./search";
 import {
+  isLive,
   isLiveBullet,
   linkLabel,
   printGroups,
   resumeHeadline,
+  resumeLayout,
   resumeSectionKind,
-  rowWeight,
-  splitColumns,
-  visibleBullets,
+  tileLine,
 } from "./view";
 
-describe("resume search params", () => {
-  const parse = (input: unknown) => v.parse(resumeSearchSchema, input);
-
-  it("defaults to detailed", () => {
-    expect(parse({})).toEqual({ view: "detailed" });
-  });
-
-  it("reads ?view=compact", () => {
-    expect(parse({ view: "compact" })).toEqual({ view: "compact" });
-  });
-
-  it.each([["full"], [""], [1], [null], [["compact"]]])(
-    "falls back to detailed for %j without throwing",
-    (view) => {
-      expect(parse({ view })).toEqual({ view: "detailed" });
-    },
-  );
-
-  it("drops unrelated params", () => {
-    expect(parse({ view: "compact", other: "x" })).toEqual({
-      view: "compact",
-    });
-  });
-});
-
 describe("resumeHeadline", () => {
-  it("splits the default headline into the canvas lines", () => {
+  it("splits the default headline into the h1's lines", () => {
     expect(
       resumeHeadline("Kunanon Jarat", DEFAULT_RESUME_PROFILE.headline),
     ).toEqual({
@@ -68,58 +41,59 @@ describe("resumeHeadline", () => {
 });
 
 describe("resume section layout", () => {
-  it("maps every fallback section to its canvas card", () => {
+  it("places every fallback section by its title", () => {
     expect(
       RESUME_TIMELINE_FALLBACK.map((s) => resumeSectionKind(s.title)),
     ).toEqual([
-      "current",
+      "now",
       "roles",
-      "current",
-      "early",
-      "education",
-      "list",
-      "credentials",
+      "projects",
+      "earlier",
+      "learning",
+      "earlier",
+      "learning",
     ]);
   });
 
-  it("draws an unknown section as roles", () => {
+  it("reads an unknown section as roles", () => {
     expect(resumeSectionKind("Volunteering")).toBe("roles");
     // A title that names an Object.prototype key is still just a title.
     expect(resumeSectionKind("Constructor")).toBe("roles");
     expect(resumeSectionKind("toString")).toBe("roles");
+    expect(resumeSectionKind("Certifications")).toBe("learning");
   });
 
-  it("splits a list into two columns, the first taking the odd item", () => {
-    expect(splitColumns([1, 2, 3, 4, 5])).toEqual([
-      [1, 2, 3],
-      [4, 5],
+  it("orders the page: building now, the roles, projects, learning, then the earlier entries", () => {
+    const layout = resumeLayout(RESUME_TIMELINE_FALLBACK);
+    expect(layout.now?.title).toBe("Currently");
+    expect(layout.roles.map((s) => s.title)).toEqual(["Experience"]);
+    expect(layout.projects.map((s) => s.title)).toEqual([
+      "Independent projects",
     ]);
-    expect(splitColumns([])).toEqual([[], []]);
-  });
-
-  it("splits by weight where the two columns are closest in height", () => {
-    const heights = [9, 1, 1, 1, 1, 1];
-    expect(splitColumns(heights, (height) => height)).toEqual([
-      [9],
-      [1, 1, 1, 1, 1],
+    expect(layout.learning.map((s) => s.title)).toEqual([
+      "Education",
+      "Training",
     ]);
-    // One item cannot be split: it stays in the first column.
-    expect(splitColumns([4], (height) => height)).toEqual([[4], []]);
+    expect(layout.earlier.map((s) => s.title)).toEqual([
+      "University-era",
+      "Affiliations",
+    ]);
   });
 
-  it("weighs a role by its note and its visible bullets", () => {
-    const role = {
-      title: "Role",
-      org: "Org",
-      period: "2026",
-      note: "x".repeat(60),
-      bullets: ["x".repeat(48), "x".repeat(49)],
-    };
-    expect(rowWeight(role, "detailed")).toBe(2 + 2 + 1 + 2);
-    expect(rowWeight(role, "compact")).toBe(2 + 2);
-    expect(
-      rowWeight({ title: "Role", org: "Org", period: "2026" }, "detailed"),
-    ).toBe(2);
+  it("keeps a CMS résumé's unknown sections with the roles, and copes with a missing Currently", () => {
+    const item = { title: "Mentor", org: "Example", period: "2026" };
+    const layout = resumeLayout([
+      { title: "Experience", items: [item] },
+      { title: "Volunteering", items: [item] },
+    ]);
+    expect(layout.now).toBeUndefined();
+    expect(layout.roles.map((s) => s.title)).toEqual([
+      "Experience",
+      "Volunteering",
+    ]);
+    expect(layout.projects).toEqual([]);
+    expect(layout.learning).toEqual([]);
+    expect(layout.earlier).toEqual([]);
   });
 });
 
@@ -160,19 +134,32 @@ describe("printGroups", () => {
 });
 
 describe("resume item helpers", () => {
-  it("spots the live bullets", () => {
+  const [gogocash, manut] = RESUME_TIMELINE_FALLBACK[0]!.items;
+
+  it("spots the live bullets and the live entries", () => {
     expect(isLiveBullet("Live at gogocash.co.")).toBe(true);
     expect(isLiveBullet("Delivered live dashboards.")).toBe(false);
+    expect(isLive(gogocash!)).toBe(true);
+    expect(isLive({ title: "x", org: "y", period: "z" })).toBe(false);
+  });
+
+  it("gives a tile its note, else its first bullet that is not the live line", () => {
+    expect(tileLine(gogocash!)).toBe(gogocash!.note);
+    expect(tileLine(manut!)).toBe(
+      "Building an ERP/CRM workspace with Intelligence AI for automotive SMEs.",
+    );
+    expect(
+      tileLine({
+        title: "x",
+        org: "y",
+        period: "z",
+        bullets: ["Live at x.co."],
+      }),
+    ).toBeUndefined();
   });
 
   it("labels links without the scheme", () => {
     expect(linkLabel("https://gogocash.co")).toBe("gogocash.co");
     expect(linkLabel("https://www.manut.xyz/")).toBe("manut.xyz");
-  });
-
-  it("hides bullets in the compact view", () => {
-    const item = RESUME_TIMELINE_FALLBACK[0]!.items[0]!;
-    expect(visibleBullets(item, "detailed").length).toBeGreaterThan(0);
-    expect(visibleBullets(item, "compact")).toEqual([]);
   });
 });

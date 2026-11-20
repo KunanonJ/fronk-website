@@ -1,0 +1,662 @@
+/*
+ * /resume, "Snapshot" (now-building program phase 2, 20-11-26;
+ * components/resume). Its own sheet, linked by the résumé page itself
+ * (ResumePage, `precedence`), so it is in the server-rendered HTML of
+ * /resume and in no other page's first load. Moved here from
+ * src/styles/profile/pages-catalog.css. Tokens from globals.css only; the
+ * layer order is profile.css's. Phones first, rem breakpoints (48rem = 768,
+ * 64rem = 1024 px). Selectors that change a shared part (the hero's title,
+ * lead and grid) carry two classes, so they win in any load order. Print
+ * never shows any of this: the screen parts are `data-print-hide`.
+ */
+@layer components {
+  /* The hero: a smaller h1, the availability line, the summary after the
+     facts card on phones and beside it from 1024 px (PageHero `after`). */
+  .pf-resume-hero.pf-page-hero--aside .pf-page-hero__wrap {
+    row-gap: 28px;
+  }
+  .pf-page-hero__title.pf-resume__title {
+    max-inline-size: 24ch;
+    font-size: clamp(2rem, 2.4vw + 1.1rem, 3.5rem);
+    line-height: 1;
+  }
+  .pf-resume__availability {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 18px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .pf-resume__availability .ds-dot {
+    transform: translateY(-1px);
+  }
+  .pf-page-hero__lead.pf-resume__lead {
+    max-inline-size: 62ch;
+    margin-top: 0;
+    font-size: 1.125rem;
+    line-height: 1.55;
+  }
+
+  /* The facts card. */
+  .pf-resume-card {
+    display: grid;
+    gap: 18px;
+    min-inline-size: 0;
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-bento);
+    background: var(--paper);
+    box-shadow: var(--elev-soft);
+  }
+  .pf-resume-card__top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .pf-resume-card__portrait {
+    display: block;
+    flex: none;
+    inline-size: 56px;
+    block-size: 56px;
+    border-radius: 14px;
+  }
+  .pf-resume-card__label {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-resume-card__name {
+    margin: 4px 0 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    line-height: 1;
+  }
+  .pf-resume-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pf-resume-card__facts {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .pf-resume-card__fact {
+    display: grid;
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 12px;
+  }
+  .pf-resume-card__term {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-60);
+  }
+  .pf-resume-card__fact dd {
+    min-inline-size: 0;
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+  .pf-resume-card__ventures,
+  .pf-resume-card__profiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume-card__profiles {
+    gap: 4px 20px;
+  }
+  .pf-resume-card__venture {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-block-size: 32px;
+    padding: 3px 12px 3px 3px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--line);
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+  .pf-resume-card__venture:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* The time in Bangkok, once the page runs: a dot before it, not read. */
+  .pf-resume-card__time {
+    font-variant-numeric: tabular-nums;
+  }
+  .pf-resume-card__time::before {
+    content: "·" / "";
+    margin-inline: 0.3em;
+  }
+  .pf-resume-card__contact {
+    display: grid;
+    gap: 8px;
+  }
+  .pf-resume-card__email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+  /* Wide enough for "Copied", so the pill keeps its width. */
+  .pf-resume-card__copy {
+    min-inline-size: 6.5rem;
+  }
+  .pf-resume-card__copy[data-status="copied"] .ds-pill__icon {
+    color: var(--accent-ink);
+  }
+  .pf-resume-card__address {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 28px;
+    color: var(--ink);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+  }
+
+  /* The sections under the hero, in the records card's style (spec 8.6). */
+  .pf-cat-section.pf-resume-body {
+    padding-top: 48px;
+  }
+  .pf-resume {
+    display: grid;
+    gap: 16px;
+  }
+  .pf-resume__card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-inline-size: 0;
+    padding: clamp(20px, 3vw, 40px);
+    border: 1px solid transparent;
+    border-radius: var(--radius-mat);
+    background: var(--paper-2);
+    box-shadow: var(--elev-mat);
+  }
+  .pf-resume__heading,
+  .pf-resume__subheading,
+  .pf-resume__more-title {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+  .pf-resume__heading {
+    font-size: clamp(1.75rem, 1.2vw + 1.25rem, 2.25rem);
+  }
+  .pf-resume__subheading,
+  .pf-resume__more-title {
+    font-size: clamp(1.5rem, 0.8vw + 1.1rem, 1.875rem);
+  }
+  .pf-resume__subheading {
+    margin-bottom: 20px;
+  }
+  .pf-resume__org,
+  .pf-resume__note {
+    margin: 2px 0 0;
+    color: var(--ink-60);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .pf-resume__note {
+    margin: 0 0 8px;
+  }
+  /* Periods read as text: 14 px, ink 80, even figures. */
+  .pf-resume__when {
+    margin: 0;
+    color: var(--ink-80);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tiles: what he is building, and the independent projects. */
+  .pf-resume__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__tile {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-inline-size: 0;
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-well);
+    background: var(--paper);
+    box-shadow: 0 0 0 1px var(--line-soft);
+  }
+  .pf-resume__tile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .pf-resume__tile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px 10px;
+    min-block-size: 24px;
+  }
+  .pf-resume__tile-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .pf-resume__tile-line {
+    margin: 0;
+    color: var(--ink-80);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .pf-resume__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    block-size: 24px;
+    padding-inline: 10px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--tint-coral);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .pf-resume__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin-top: auto;
+  }
+
+  /* Entries: a role, a degree, a course. The period has an area of its
+     own: above the role here, beside it in the timeline from 768 px. */
+  .pf-resume__timeline,
+  .pf-resume__entries {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__entries {
+    gap: 24px;
+  }
+  .pf-resume__entry {
+    display: grid;
+    grid-template-areas: "when" "head" "body";
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+    min-inline-size: 0;
+  }
+  .pf-resume__entry > .pf-resume__when {
+    grid-area: when;
+  }
+  .pf-resume__entry-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    grid-area: head;
+    min-inline-size: 0;
+  }
+  .pf-resume__entry-name {
+    min-inline-size: 0;
+  }
+  .pf-resume__entry-body {
+    grid-area: body;
+    min-inline-size: 0;
+    max-inline-size: 78ch;
+  }
+  .pf-resume__entry-body > .pf-resume__links {
+    margin-top: 10px;
+  }
+  .pf-resume__role {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .pf-resume__title-link {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 4px;
+  }
+
+  /* The timeline's rail, and a pixel node level with each period (the
+     first, the latest role, filled). Drawn with borders, so forced
+     colours keep them. */
+  .pf-resume__timeline {
+    --node-y: 10px;
+    --rail-x: 4px;
+  }
+  .pf-resume__timeline > .pf-resume__entry {
+    position: relative;
+    padding-inline-start: 28px;
+    padding-block-end: 32px;
+  }
+  .pf-resume__timeline > .pf-resume__entry:last-child {
+    padding-block-end: 0;
+  }
+  .pf-resume__timeline > .pf-resume__entry::before,
+  .pf-resume__timeline > .pf-resume__entry::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  .pf-resume__timeline > .pf-resume__entry::before {
+    inset-block: 0;
+    inset-inline-start: var(--rail-x);
+    border-inline-start: 1px solid var(--line-strong);
+  }
+  .pf-resume__timeline > .pf-resume__entry:first-child::before {
+    inset-block-start: var(--node-y);
+  }
+  .pf-resume__timeline > .pf-resume__entry:last-child::before {
+    inset-block-end: auto;
+    block-size: var(--node-y);
+  }
+  .pf-resume__timeline > .pf-resume__entry:only-child::before {
+    display: none;
+  }
+  .pf-resume__timeline > .pf-resume__entry::after {
+    inset-block-start: calc(var(--node-y) - 4.5px);
+    inset-inline-start: calc(var(--rail-x) - 4px);
+    inline-size: 9px;
+    block-size: 9px;
+    border: 2px solid var(--accent);
+    background: var(--paper-2);
+  }
+  .pf-resume__timeline > .pf-resume__entry:first-child::after {
+    background: var(--accent);
+  }
+
+  /* Bullets: a plain square, or the coral one for a live product. */
+  .pf-resume__bullets {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__bullet {
+    display: flex;
+    gap: 10px;
+    color: var(--ink-80);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .pf-resume__mark,
+  .pf-resume__live {
+    flex: none;
+    inline-size: 5px;
+    block-size: 5px;
+    margin-top: 0.62em;
+    background: var(--ink-60);
+  }
+  .pf-resume__live {
+    inline-size: 6px;
+    block-size: 6px;
+    margin-top: 0.58em;
+    background: var(--coral);
+  }
+  .pf-resume__badge > .pf-resume__live {
+    margin-top: 0;
+  }
+
+  /* Education beside Training from 768 px; one alone takes the row. */
+  .pf-resume__pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 16px;
+  }
+
+  /* Skills. */
+  .pf-resume__groups {
+    display: grid;
+    gap: 22px;
+  }
+  .pf-resume__group {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+  }
+  .pf-resume__group-label {
+    margin: 0;
+    color: var(--ink-60);
+  }
+  .pf-resume__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-resume__chip {
+    block-size: auto;
+    min-block-size: 32px;
+    padding-inline: 12px;
+    font-size: 0.875rem;
+    white-space: normal;
+  }
+
+  /* The earlier entries, folded: the summary is the card's one row. */
+  .pf-resume__card.pf-resume__more {
+    display: block;
+    padding: 0;
+  }
+  .pf-resume__more-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+    min-block-size: 72px;
+    padding: 18px clamp(20px, 3vw, 40px);
+    border-radius: inherit;
+    list-style: none;
+    cursor: pointer;
+  }
+  .pf-resume__more-summary::-webkit-details-marker {
+    display: none;
+  }
+  .pf-resume__more-summary:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .pf-resume__more-count {
+    color: var(--ink-60);
+    font-size: 0.875rem;
+  }
+  /* A plus that turns into a minus, drawn with borders. */
+  .pf-resume__more-mark {
+    position: relative;
+    flex: none;
+    inline-size: 32px;
+    block-size: 32px;
+    margin-inline-start: auto;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+  }
+  .pf-resume__more-mark::before,
+  .pf-resume__more-mark::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: 12px;
+    block-size: 0;
+    border-top: 2px solid var(--ink);
+    translate: -50% -50%;
+  }
+  .pf-resume__more-mark::after {
+    rotate: 90deg;
+  }
+  .pf-resume__more[open] .pf-resume__more-mark::after {
+    rotate: 0deg;
+  }
+  .pf-resume__more-body {
+    display: grid;
+    gap: 40px;
+    padding: 8px clamp(20px, 3vw, 40px) clamp(20px, 3vw, 40px);
+  }
+
+  /* Share. */
+  .pf-resume__share {
+    display: grid;
+    gap: 20px;
+  }
+  .pf-resume__url {
+    margin: 4px 0 0;
+    color: var(--ink-60);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+  .pf-resume__share-rows {
+    display: grid;
+    gap: 2px;
+  }
+  .pf-resume__card-pdf {
+    justify-self: start;
+  }
+
+  /* Breakpoints. */
+  @media (width >= 48rem) {
+    /* Two tiles a row, so a lone project keeps a tile's width. */
+    .pf-resume__tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* The period on the left of the rail, the role on its right. */
+    .pf-resume__timeline {
+      --node-y: 11px;
+      --rail-x: calc(10rem + 24px);
+    }
+    .pf-resume__timeline > .pf-resume__entry {
+      grid-template-areas: "when head" ". body";
+      grid-template-columns: 10rem minmax(0, 1fr);
+      column-gap: 48px;
+      padding-inline-start: 0;
+    }
+    .pf-resume__timeline .pf-resume__entry-body {
+      padding-inline-start: 54px;
+    }
+    .pf-resume__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 40px;
+    }
+    .pf-resume__share-rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 16px;
+    }
+  }
+  @media (width >= 64rem) {
+    .pf-resume-hero.pf-page-hero--aside .pf-page-hero__wrap {
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+      column-gap: clamp(48px, 6vw, 96px);
+      row-gap: 24px;
+    }
+    .pf-resume__availability {
+      margin-top: 20px;
+    }
+    .pf-resume__share {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr) auto;
+      align-items: center;
+      column-gap: 32px;
+    }
+    .pf-resume__card-pdf {
+      justify-self: end;
+    }
+  }
+
+  /* Reader preferences (spec 12 items 26 to 28). */
+  @media (prefers-contrast: more) {
+    .pf-resume-card__label,
+    .pf-resume-card__term,
+    .pf-resume__group-label,
+    .pf-resume__org,
+    .pf-resume__note,
+    .pf-resume__when,
+    .pf-resume__more-count,
+    .pf-resume__url {
+      color: var(--ink);
+    }
+  }
+  @media (forced-colors: active) {
+    .pf-resume-card,
+    .pf-resume-card__venture,
+    .pf-resume__card,
+    .pf-resume__tile,
+    .pf-resume__badge {
+      border-color: CanvasText;
+    }
+    .pf-resume__mark {
+      display: none;
+    }
+    /* A live product keeps its marker: it says something. */
+    .pf-resume__live {
+      background: CanvasText;
+    }
+  }
+
+  /* Hover only where a fine pointer can hover (spec 5.3): a tile's ring and
+     a venture chip's ring turn accent. */
+  @media (hover: hover) and (pointer: fine) {
+    .pf-resume__tile:hover,
+    .pf-resume-card__venture:hover {
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
+    }
+    .pf-resume__more-summary:hover .pf-resume__more-mark {
+      border-color: var(--accent);
+    }
+  }
+
+  /* Movement, only with no-preference (spec 5.1): sections rise in as they
+     come into view (Reveal, globals.css), the fold's plus turns, a tile
+     lifts by a pixel under the pointer. */
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-resume__more-mark::after {
+      transition: rotate 0.2s var(--ease-snappy);
+    }
+    .pf-resume__tile,
+    .pf-resume-card__venture {
+      transition:
+        box-shadow 0.12s ease-out,
+        transform 0.16s var(--ease-snappy);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .pf-resume__tile:hover,
+    .pf-resume-card__venture:hover {
+      transform: translateY(-1px);
+    }
+  }
+}

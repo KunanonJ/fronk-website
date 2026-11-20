@@ -15,34 +15,42 @@ import type {
   ResumeSkillGroup,
 } from "@/lib/content/resumeProfile";
 import {
+  isLive,
   isLiveBullet,
   linkLabel,
-  resumeSectionKind,
-  rowWeight,
   sectionSlug,
-  splitColumns,
-  visibleBullets,
+  tileLine,
 } from "@/lib/resume/view";
-import type { ResumeDetail } from "@/lib/resume/search";
 import { cn } from "@/lib/utils/cn";
-import { pad2 } from "@/lib/utils/pad2";
 
 /*
- * Résumé sections in the records card's style (profile redesign Phase 7e;
- * design spec 8.6): paper 2, a mono heading, and rows of the title, the
- * organisation and the period. Every section comes from the résumé data in
- * the repo (or from Sanity, if a résumé document is ever created) and is
- * drawn by its title: Currently, Experience, Independent projects,
- * University-era, Education, Affiliations and Training (or Certifications)
- * have their layouts; any other section reads as roles. `detail` "compact"
- * hides the bullet lists. Screen only: print uses ResumePrint. Styles:
- * `.pf-resume*` in src/styles/profile/pages-catalog.css.
+ * The résumé's sections below the hero ("Snapshot", now-building program
+ * phase 2, 20-11-26), each a card with a serif h2: what he is building as
+ * tiles, the roles as one timeline (the period on the left from 768 px,
+ * above the role on phones), the skills, education and training, and the
+ * University-era roles and affiliations folded into one closed <details>.
+ * Every section comes from the résumé data (the repo's, or a Sanity
+ * `resumeProfile`); lib/resume/view.ts places them by title. Screen only:
+ * print uses ResumePrint. Styles: `.pf-resume*` in src/styles/resume.css.
  */
 
-/** One line under the organisation: a project's description, or an overlap. */
-function Note({ item }: { item: ResolvedTimelineItem }) {
-  if (!item.note) return null;
-  return <p className="pf-resume__note">{item.note}</p>;
+/** New wording on these cards, for the owner's review. */
+const COPY = {
+  now: "Building now", // DRAFT
+  live: "Live", // DRAFT
+  entries: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`, // DRAFT
+} as const;
+
+function Logo({ item, size }: { item: ResolvedTimelineItem; size: number }) {
+  return (
+    <CompanyLogo
+      name={item.logoName ?? item.org}
+      domain={item.logoDomain}
+      src={item.logoSrc}
+      size={size}
+      tile
+    />
+  );
 }
 
 function Bullets({ bullets }: { bullets: readonly string[] }) {
@@ -65,18 +73,6 @@ function Bullets({ bullets }: { bullets: readonly string[] }) {
   );
 }
 
-function Logo({ item, size }: { item: ResolvedTimelineItem; size: number }) {
-  return (
-    <CompanyLogo
-      name={item.logoName ?? item.org}
-      domain={item.logoDomain}
-      src={item.logoSrc}
-      size={size}
-      tile
-    />
-  );
-}
-
 /** The item title, linked when the résumé gives it a URL. */
 function ItemTitle({ item }: { item: ResolvedTimelineItem }) {
   if (!item.href) return <>{item.title}</>;
@@ -87,214 +83,124 @@ function ItemTitle({ item }: { item: ResolvedTimelineItem }) {
   );
 }
 
+const itemKey = (item: ResolvedTimelineItem) =>
+  `${item.title}-${item.org}-${item.period}`;
+
 /**
- * Currently and Independent projects: paper rows with a logo, the period,
- * bullets and links (the entry's own site, and its page on this site).
+ * Ventures and projects as tiles: the logo, the period (and "Live" when a
+ * bullet says so), the name, the kind, one line, and the links (the
+ * entry's own site, and its page on this site).
  */
-function CurrentRoles({
-  items,
-  detail,
-}: {
-  items: readonly ResolvedTimelineItem[];
-  detail: ResumeDetail;
-}) {
+function Tiles({ items }: { items: readonly ResolvedTimelineItem[] }) {
   // A page link whose label repeats in the list ("Case study" for each
   // venture) is named after its entry for screen readers.
   const labels = items.flatMap((item) => (item.more ? [item.more.label] : []));
   const repeats = (label: string) =>
     labels.indexOf(label) !== labels.lastIndexOf(label);
   return (
-    <ol className="pf-resume__wells">
-      {items.map((item) => (
-        <li key={`${item.title}-${item.org}`} className="pf-resume__well">
-          <div className="pf-resume__well-head">
-            <Logo item={item} size={44} />
-            <span className="pf-resume__period">{item.period}</span>
-          </div>
-          <div>
-            <h3 className="pf-resume__role pf-resume__role--lead">
-              {item.title}
-            </h3>
-            <p className="pf-resume__org">{item.org}</p>
-            <Note item={item} />
-          </div>
-          <Bullets bullets={visibleBullets(item, detail)} />
-          {item.href || item.more ? (
-            <div className="pf-resume__links">
-              {item.href ? (
-                <TextLink href={item.href}>{linkLabel(item.href)}</TextLink>
-              ) : null}
-              {item.more ? (
-                <TextLink
-                  href={item.more.href}
-                  context={repeats(item.more.label) ? item.title : undefined}
-                >
-                  {item.more.label}
-                </TextLink>
-              ) : null}
+    <ul className="pf-resume__tiles">
+      {items.map((item) => {
+        const line = tileLine(item);
+        return (
+          <li key={itemKey(item)} className="pf-resume__tile">
+            <div className="pf-resume__tile-top">
+              <Logo item={item} size={48} />
+              <div className="pf-resume__tile-meta">
+                {isLive(item) ? (
+                  <span className="pf-resume__badge">
+                    <span aria-hidden className="pf-resume__live" />
+                    {COPY.live}
+                  </span>
+                ) : null}
+                <span className="pf-resume__when">{item.period}</span>
+              </div>
             </div>
-          ) : null}
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-/**
- * A role row: logo and running number, title and period, org, bullets, and
- * the entry's page on this site when it has one (the latest role's "Case
- * studies", since it left Currently on 20-11-26).
- */
-function RoleList({
-  items,
-  start,
-  detail,
-}: {
-  items: readonly ResolvedTimelineItem[];
-  start: number;
-  detail: ResumeDetail;
-}) {
-  return (
-    <ol start={start + 1} className="pf-resume__rows">
-      {items.map((item, i) => (
-        <li
-          key={`${item.title}-${item.org}-${item.period}`}
-          className="pf-resume__row"
-        >
-          <span aria-hidden className="pf-resume__aside">
-            <Logo item={item} size={40} />
-            <span className="pf-resume__period">{pad2(start + i + 1)}</span>
-          </span>
-          <div className="pf-resume__body">
-            <div className="pf-resume__line">
-              <h3 className="pf-resume__role">
-                <ItemTitle item={item} />
-              </h3>
-              <span className="pf-resume__period">{item.period}</span>
+            <div>
+              <h3 className="pf-resume__tile-title">{item.title}</h3>
+              {item.org ? <p className="pf-resume__org">{item.org}</p> : null}
             </div>
-            <p className="pf-resume__org">{item.org}</p>
-            <Note item={item} />
-            <Bullets bullets={visibleBullets(item, detail)} />
-            {item.more ? (
+            {line ? <p className="pf-resume__tile-line">{line}</p> : null}
+            {item.href || item.more ? (
               <div className="pf-resume__links">
-                <TextLink href={item.more.href}>{item.more.label}</TextLink>
+                {item.href ? (
+                  <TextLink href={item.href} external arrow="up-right">
+                    {linkLabel(item.href)}
+                  </TextLink>
+                ) : null}
+                {item.more ? (
+                  <TextLink
+                    href={item.more.href}
+                    context={repeats(item.more.label) ? item.title : undefined}
+                  >
+                    {item.more.label}
+                  </TextLink>
+                ) : null}
               </div>
             ) : null}
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-/** A credential row (affiliations, certifications): no period column. */
-function CredentialList({
-  items,
-  start,
-  detail,
-}: {
-  items: readonly ResolvedTimelineItem[];
-  start: number;
-  detail: ResumeDetail;
-}) {
-  return (
-    <ol start={start + 1} className="pf-resume__rows">
-      {items.map((item, i) => (
-        <li
-          key={`${item.title}-${item.org}-${item.period}`}
-          className="pf-resume__row"
-        >
-          <span aria-hidden className="pf-resume__aside">
-            <Logo item={item} size={40} />
-            <span className="pf-resume__period">{pad2(start + i + 1)}</span>
-          </span>
-          <div className="pf-resume__body">
-            <h3 className="pf-resume__role">
-              <ItemTitle item={item} />
-            </h3>
-            <p className="pf-resume__org">{item.org}</p>
-            <p className="pf-resume__period">{item.period}</p>
-            <Bullets bullets={visibleBullets(item, detail)} />
-          </div>
-        </li>
-      ))}
-    </ol>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
 /**
- * Two list columns side by side from 600 px, split where their heights are
- * closest.
+ * One entry: the logo, title and organisation, the period (a grid area of
+ * its own, so CSS can set it beside or above), then the note, bullets and
+ * the entry's page on this site.
  */
-function TwoColumns({
-  items,
-  detail,
-  List,
-}: {
-  items: readonly ResolvedTimelineItem[];
-  detail: ResumeDetail;
-  List: typeof RoleList;
-}) {
-  const [left, right] = splitColumns(items, (item) => rowWeight(item, detail));
+function Entry({ item }: { item: ResolvedTimelineItem }) {
   return (
-    <div className="pf-resume__columns">
-      <List items={left} start={0} detail={detail} />
-      <List items={right} start={left.length} detail={detail} />
-    </div>
+    <li className="pf-resume__entry">
+      <div className="pf-resume__entry-head">
+        <Logo item={item} size={40} />
+        <div className="pf-resume__entry-name">
+          <h3 className="pf-resume__role">
+            <ItemTitle item={item} />
+          </h3>
+          {item.org ? <p className="pf-resume__org">{item.org}</p> : null}
+        </div>
+      </div>
+      {item.period ? <p className="pf-resume__when">{item.period}</p> : null}
+      {item.note || item.bullets?.length || item.more ? (
+        <div className="pf-resume__entry-body">
+          {item.note ? <p className="pf-resume__note">{item.note}</p> : null}
+          <Bullets bullets={item.bullets ?? []} />
+          {item.more ? (
+            <div className="pf-resume__links">
+              <TextLink href={item.more.href}>{item.more.label}</TextLink>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </li>
   );
 }
 
-/** Education: the degree with a larger logo, period and highlights. */
-function EducationItems({
-  items,
-  detail,
-}: {
-  items: readonly ResolvedTimelineItem[];
-  detail: ResumeDetail;
-}) {
-  return items.map((item) => (
-    <div key={`${item.title}-${item.org}`} className="pf-resume__degree">
-      <div className="pf-resume__well-head">
-        <Logo item={item} size={52} />
-        <span className="pf-resume__period">{item.period}</span>
-      </div>
-      <div>
-        <h3 className="pf-resume__role pf-resume__role--lead">
-          <ItemTitle item={item} />
-        </h3>
-        <p className="pf-resume__org">{item.org}</p>
-      </div>
-      <Bullets bullets={visibleBullets(item, detail)} />
-    </div>
-  ));
+/** Roles as a timeline: a rail with a pixel node per role, latest first. */
+function Timeline({ items }: { items: readonly ResolvedTimelineItem[] }) {
+  return (
+    <ol className="pf-resume__timeline">
+      {items.map((item) => (
+        <Entry key={itemKey(item)} item={item} />
+      ))}
+    </ol>
+  );
 }
 
-type Body = (
-  items: readonly ResolvedTimelineItem[],
-  detail: ResumeDetail,
-) => ReactNode;
+/** Degrees and courses: the same entries, without the rail. */
+function Entries({ items }: { items: readonly ResolvedTimelineItem[] }) {
+  return (
+    <ul className="pf-resume__entries">
+      {items.map((item) => (
+        <Entry key={itemKey(item)} item={item} />
+      ))}
+    </ul>
+  );
+}
 
-const BODIES: Record<ReturnType<typeof resumeSectionKind>, Body> = {
-  current: (items, detail) => <CurrentRoles items={items} detail={detail} />,
-  roles: (items, detail) => (
-    <TwoColumns items={items} detail={detail} List={RoleList} />
-  ),
-  early: (items, detail) => (
-    <RoleList items={items} start={0} detail={detail} />
-  ),
-  education: (items, detail) => (
-    <EducationItems items={items} detail={detail} />
-  ),
-  list: (items, detail) => (
-    <CredentialList items={items} start={0} detail={detail} />
-  ),
-  credentials: (items, detail) => (
-    <TwoColumns items={items} detail={detail} List={CredentialList} />
-  ),
-};
-
-/** A section's card: its kind places it in the grid (`data-kind`). */
-function RecordsCard({
+/** A section's card, named by its h2 (`data-kind` sets its layout). */
+function Card({
   id,
   title,
   kind,
@@ -313,7 +219,7 @@ function RecordsCard({
       data-kind={kind}
       className={cn("pf-resume__card", className)}
     >
-      <h2 id={id} className="t-meta pf-resume__heading">
+      <h2 id={id} className="pf-resume__heading">
         {title}
       </h2>
       {children}
@@ -321,23 +227,90 @@ function RecordsCard({
   );
 }
 
-/** One résumé section as its records card. */
-export function ResumeSectionCard({
+const cardId = (title: string) => `card-${sectionSlug(title)}`;
+
+/** What he is building now: the "Currently" section, as tiles. */
+export function NowCard({ section }: { section: ResolvedTimelineSection }) {
+  return (
+    <Card id="card-building-now" title={COPY.now} kind="now">
+      <Tiles items={section.items} />
+    </Card>
+  );
+}
+
+/** Independent projects, as tiles too. */
+export function ProjectsCard({
   section,
-  detail,
 }: {
   section: ResolvedTimelineSection;
-  detail: ResumeDetail;
 }) {
-  const kind = resumeSectionKind(section.title);
   return (
-    <RecordsCard
-      id={`card-${sectionSlug(section.title)}`}
-      title={section.title}
-      kind={kind}
-    >
-      {BODIES[kind](section.items, detail)}
-    </RecordsCard>
+    <Card id={cardId(section.title)} title={section.title} kind="projects">
+      <Tiles items={section.items} />
+    </Card>
+  );
+}
+
+/** Experience (and a section the page does not know): the timeline. */
+export function TimelineCard({
+  section,
+}: {
+  section: ResolvedTimelineSection;
+}) {
+  return (
+    <Card id={cardId(section.title)} title={section.title} kind="roles">
+      <Timeline items={section.items} />
+    </Card>
+  );
+}
+
+/** Education, Training or Certifications: entries without the rail. */
+export function LearningCard({
+  section,
+}: {
+  section: ResolvedTimelineSection;
+}) {
+  return (
+    <Card id={cardId(section.title)} title={section.title} kind="learning">
+      <Entries items={section.items} />
+    </Card>
+  );
+}
+
+/**
+ * University-era and Affiliations, folded into one closed <details>: its
+ * summary names them and counts their entries; inside, each is a timeline.
+ */
+export function EarlierCard({
+  sections,
+}: {
+  sections: readonly ResolvedTimelineSection[];
+}) {
+  const count = sections.reduce((sum, s) => sum + s.items.length, 0);
+  return (
+    <details className="pf-resume__card pf-resume__more" data-kind="earlier">
+      <summary className="pf-resume__more-summary">
+        <span className="pf-resume__more-title">
+          {sections.map((section) => section.title).join(" and ")}
+        </span>
+        <span className="pf-resume__more-count">{COPY.entries(count)}</span>
+        <span aria-hidden className="pf-resume__more-mark" />
+      </summary>
+      <div className="pf-resume__more-body">
+        {sections.map((section) => (
+          <article
+            key={section.title}
+            aria-labelledby={cardId(section.title)}
+            className="pf-resume__more-part"
+          >
+            <h2 id={cardId(section.title)} className="pf-resume__subheading">
+              {section.title}
+            </h2>
+            <Timeline items={section.items} />
+          </article>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -348,11 +321,11 @@ export function SkillsCard({
   skills: readonly ResumeSkillGroup[];
 }) {
   return (
-    <RecordsCard id="card-skills" title="Skills" kind="skills">
+    <Card id="card-skills" title="Skills" kind="skills">
       <div className="pf-resume__groups">
         {skills.map((group) => (
           <div key={group.label} className="pf-resume__group">
-            <h3 className="t-meta pf-resume__heading">{group.label}</h3>
+            <h3 className="t-meta pf-resume__group-label">{group.label}</h3>
             <ul className="pf-resume__chips">
               {group.items.map((skill) => (
                 <li key={skill} className="ds-chip pf-resume__chip">
@@ -363,33 +336,33 @@ export function SkillsCard({
           </div>
         ))}
       </div>
-    </RecordsCard>
+    </Card>
   );
 }
 
-/** Share: the share panel's actions inline, then the PDF download. */
+/** Share: the page's title and address, the share actions, the PDF. */
 export function ShareCard({ target }: { target: ShareTarget }) {
   return (
-    <RecordsCard id="card-share" title="Share" kind="share">
-      <div>
-        <p className="pf-resume__role">{target.title}</p>
-        <p className="pf-resume__period pf-resume__url">
-          {shareUrlLabel(target.url)}
-        </p>
-      </div>
+    <Card id="card-share" title="Share" kind="share">
       <div className="pf-resume__share">
-        <ShareRows target={target} />
+        <div>
+          <p className="pf-resume__role">{target.title}</p>
+          <p className="pf-resume__url">{shareUrlLabel(target.url)}</p>
+        </div>
+        <div className="pf-resume__share-rows">
+          <ShareRows target={target} />
+        </div>
+        <a
+          href={RESUME_PDF_HREF}
+          download={RESUME_PDF_NAME}
+          className={`${pillClass({ size: "lg" })} pf-resume__card-pdf`}
+        >
+          <span className="ds-pill__icon" aria-hidden="true">
+            <DownloadIcon />
+          </span>
+          <span>Download PDF</span>
+        </a>
       </div>
-      <a
-        href={RESUME_PDF_HREF}
-        download={RESUME_PDF_NAME}
-        className={`${pillClass({ size: "lg" })} pf-resume__card-pdf`}
-      >
-        <span className="ds-pill__icon" aria-hidden="true">
-          <DownloadIcon />
-        </span>
-        <span>Download PDF</span>
-      </a>
-    </RecordsCard>
+    </Card>
   );
 }

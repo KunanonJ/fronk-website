@@ -162,6 +162,8 @@ test.describe("resume > company logos are self-hosted (ux-audit finding 12)", ()
     });
 
     await page.goto("/resume", { waitUntil: "networkidle" });
+    // The earlier entries are folded: open them, so their logos count too.
+    await page.locator("details.pf-resume__more > summary").click();
     // The logos are lazy; load every one so the whole page is checked.
     await page.evaluate(() => {
       for (const img of Array.from(document.images)) img.loading = "eager";
@@ -173,6 +175,9 @@ test.describe("resume > company logos are self-hosted (ux-audit finding 12)", ()
 
     const logos = page.locator('[data-logo="image"] img');
     expect(await logos.count()).toBeGreaterThan(0);
+    // The ventures' marks in the facts card and the Building now tiles.
+    const snapshot = page.locator("section.pf-resume-card");
+    await expect(snapshot.locator('[data-logo="image"] img')).toHaveCount(2);
     const broken = await logos.evaluateAll((imgs) =>
       (imgs as HTMLImageElement[])
         .filter((img) => img.naturalWidth === 0)
@@ -183,43 +188,103 @@ test.describe("resume > company logos are self-hosted (ux-audit finding 12)", ()
   });
 });
 
-test.describe("resume > the detail view is a typed search param", () => {
-  test("?view=compact hides the bullets, Detailed brings them back on a clean URL", async ({
-    page,
-  }) => {
-    await page.goto("/resume?view=compact", { waitUntil: "networkidle" });
-    const group = page.getByRole("group", { name: "Résumé detail" });
-    await expect(
-      group.getByRole("button", { name: "Compact" }),
-    ).toHaveAttribute("aria-pressed", "true");
-    // The live ventures lead the résumé under Currently (20-11-26).
-    const projects = page.getByRole("article", {
-      name: "Currently",
-      exact: true,
+/**
+ * The résumé's first screen ("Snapshot", now-building program phase 2): a
+ * recruiter sees who he is, that he is building, and the PDF without
+ * scrolling. At desktop width Contact is there too; on a phone the facts
+ * card comes before the summary, so Download PDF is.
+ */
+test.describe("resume > the first screen answers a recruiter", () => {
+  test.beforeEach(async ({ page }) => {
+    // The first-visit intro would cover the page for its second and a half.
+    await page.addInitScript(() => {
+      try {
+        sessionStorage.setItem("fronk-intro-seen", "1");
+      } catch {
+        // Storage can be unavailable; the intro then plays and the test waits.
+      }
     });
-    await expect(projects.getByText(/^Live at /)).toHaveCount(0);
-
-    await group.getByRole("button", { name: "Detailed" }).click();
-    await expect(page).toHaveURL(/\/resume$/);
-    await expect(
-      group.getByRole("button", { name: "Detailed" }),
-    ).toHaveAttribute("aria-pressed", "true");
-    await expect(projects.getByText(/^Live at /).first()).toBeVisible();
   });
 
-  test("an unknown view falls back to detailed without an error", async ({
+  const parts = (page: Page) => {
+    const hero = page.locator('section[aria-labelledby="hero-title"]');
+    const card = hero.locator("section.pf-resume-card");
+    return {
+      h1: hero.getByRole("heading", { level: 1 }),
+      availability: hero.locator(".pf-resume__availability"),
+      pdf: card.getByRole("link", { name: "Download PDF" }),
+      contact: card.getByRole("link", { name: "Contact", exact: true }),
+      email: card.getByRole("link", { name: "fronk.kunanon@gmail.com" }),
+    };
+  };
+
+  test("at 1440 x 900: the h1, the availability line, Download PDF and Contact", async ({
     page,
   }) => {
-    const response = await page.goto("/resume?view=everything", {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/resume", { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    const { h1, availability, pdf, contact, email } = parts(page);
+    await expect(h1).toContainText("Kunanon Jarat.");
+    await expect(availability).toContainText("Currently building");
+    for (const part of [h1, availability, pdf, contact, email])
+      await expect(part).toBeInViewport({ ratio: 1 });
+    await expect(pdf).toHaveAttribute("download", "Kunanon-Jarat-Resume.pdf");
+  });
+
+  test("at 390 x 844: the h1, the availability line and Download PDF", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/resume", { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    const { h1, availability, pdf } = parts(page);
+    for (const part of [h1, availability, pdf])
+      await expect(part).toBeInViewport({ ratio: 1 });
+  });
+
+  test("Copy puts the address on the clipboard and says so politely", async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    // Only Chromium takes the clipboard permissions; the others copy on the
+    // click alone.
+    if (browserName === "chromium")
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/resume", { waitUntil: "networkidle" });
+    const card = page.locator("section.pf-resume-card");
+    // The clock is client only: once it shows, the page has hydrated.
+    await expect(card.locator("time[data-clock]")).toBeVisible();
+    const copy = card.getByRole("button", { name: "Copy email" });
+    const status = card.getByRole("status");
+    await expect(status).toHaveText("");
+    await copy.click();
+    await expect(status).toHaveText("Email copied");
+    await expect(status).toHaveAttribute("aria-live", "polite");
+    await expect(copy).toContainText("Copied");
+    if (browserName === "chromium")
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        "fronk.kunanon@gmail.com",
+      );
+    // The confirmation clears itself after two seconds.
+    await expect(status).toHaveText("", { timeout: 5_000 });
+  });
+
+  test("an old ?view=compact link still opens the whole résumé", async ({
+    page,
+  }) => {
+    const response = await page.goto("/resume?view=compact", {
       waitUntil: "networkidle",
     });
     expect(response?.ok()).toBe(true);
-    await expect(page).toHaveURL(/\/resume$/);
+    const experience = page.getByRole("article", {
+      name: "Experience",
+      exact: true,
+    });
     await expect(
-      page
-        .getByRole("group", { name: "Résumé detail" })
-        .getByRole("button", { name: "Detailed" }),
-    ).toHaveAttribute("aria-pressed", "true");
+      experience.getByText(/^Owned the roadmap and requirements/),
+    ).toBeVisible();
   });
 });
 

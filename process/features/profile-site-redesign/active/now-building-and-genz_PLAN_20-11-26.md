@@ -26,6 +26,7 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - `?topic=project` is new, and `?topic=hiring` still works and chooses "A future role"
 - **Facts:** the FAQ, JSON-LD (no current employer), both FDE hubs, share cards, the text endpoints and the résumé data (PDF regenerated).
 - **Baselines:** the footer label is on every page, so they are refreshed at zero tolerance (the two-pass method in memory).
+- **Shipped:** #158, squash 053af6b (20-11-26). Live: "Open to roles" gone, "Currently building" on every page, cases end with "Work together", `?topic=project` chooses Freelance or consulting, and the live PDF equals main's. 126 baselines were re-rendered in one zero-tolerance pass (both visual steps finished in time), attempt equal to retry.
 
 ## Phase 2: the résumé, "Snapshot"
 
@@ -41,6 +42,11 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - Degraded mode renders the same.
   - Print stays plain and at most two pages.
 - **Styles:** `.pf-resume*` moves to a lazily loaded `src/styles/resume.css`, which frees first-load CSS for every page.
+- **Built (#159):**
+  - Every other page's first-load CSS goes from 35.2 to 34.6 KB, and a zero-tolerance run showed no other baseline moving.
+  - /resume itself loads 37.1 KB of stylesheets, over the 36 KB first-load budget, which the script does not measure on this request-rendered page. Trimming it is a follow-up.
+  - The Detailed/Compact toggle is gone; an old `?view=compact` link still opens the page.
+  - GoGoCash's figures left the screen's tiles but stay in the PDF and the case studies.
 
 ## Phase 3: secrets and collectibles
 

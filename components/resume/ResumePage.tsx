@@ -1,37 +1,25 @@
-import Link from "@/components/navigation/Link";
-import { DownloadIcon } from "@/components/bento/icons";
-import SharePill from "@/components/bento/SharePill";
 import type { ShareTarget } from "@/components/bento/ShareRows";
 import { StatusDot } from "@/components/ds/labels";
-import { pillClass } from "@/components/ds/Pill";
-import { ToggleGroup } from "@/components/profile/catalog/ToggleGroup";
+import { Reveal } from "@/components/ds/Reveal";
 import { PageHero } from "@/components/profile/pages/PageHero";
-import type { ResumeProfileView } from "@/components/resume/ResumePrint";
 import {
-  ResumeSectionCard,
+  EarlierCard,
+  LearningCard,
+  NowCard,
+  ProjectsCard,
   ShareCard,
   SkillsCard,
+  TimelineCard,
 } from "@/components/resume/ResumeCards";
-import {
-  AVAILABILITY,
-  RESUME_PDF_HREF,
-  RESUME_PDF_NAME,
-  WORK_CONTACT_HREF,
-} from "@/lib/content/availability";
+import type { ResumeProfileView } from "@/components/resume/ResumePrint";
+import { ResumeSnapshot } from "@/components/resume/ResumeSnapshot";
+import { AVAILABILITY } from "@/lib/content/availability";
 import type { HeadlinePart } from "@/lib/content/corePages";
-import {
-  RESUME_DETAILS,
-  RESUME_META,
-  type ResumeDetail,
-} from "@/lib/resume/search";
-import { resumeHeadline } from "@/lib/resume/view";
+import { RESUME_META } from "@/lib/resume/search";
+import { resumeHeadline, resumeLayout } from "@/lib/resume/view";
 import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
 import { siteConfig } from "@/lib/site";
-
-const DETAIL_LABELS: Record<ResumeDetail, string> = {
-  detailed: "Detailed",
-  compact: "Compact",
-};
+import resumeCss from "@/src/styles/resume.css?url";
 
 /** What the Share card shares: the page's head() title and canonical URL. */
 const SHARE_TARGET: ShareTarget = {
@@ -56,30 +44,40 @@ function headlineLines(name: string, headline: string) {
 }
 
 /**
- * Résumé on screen (profile redesign Phase 7e; plan step 7e): the hero on the
- * pixel sky with the summary, the availability line, Download PDF, Contact,
- * Share and the Detailed / Compact switch, then the sections in the records
- * card's style (spec 8.6), Skills and Share. Both parts are hidden in print;
- * ResumePrint, unchanged and plain, is what `pnpm pdf` renders. Styles:
- * `.pf-resume*` in src/styles/profile/pages-catalog.css.
+ * Résumé on screen ("Snapshot", now-building program phase 2, 20-11-26):
+ * recruiter first. The first screen holds the h1, the availability line and
+ * the facts card (Download PDF, Contact, what he is building, where he is,
+ * how to reach him) beside the summary from 1024 px; on phones the card
+ * comes before the summary, so Download PDF is on the first screen. Then
+ * Building now, the roles as one timeline, independent projects, skills,
+ * education and training, the earlier entries folded, and Share. Sections
+ * rise in under no-preference only (Reveal). Both parts are hidden in print;
+ * ResumePrint, unchanged and plain, is what `pnpm pdf` renders. Its
+ * stylesheet (src/styles/resume.css) is linked here, so no other page loads
+ * it.
  */
 export default function ResumePage({
   profile,
-  detail,
-  onDetailChange,
 }: {
   profile: ResumeProfileView;
-  detail: ResumeDetail;
-  onDetailChange: (detail: ResumeDetail) => void;
 }) {
+  const layout = resumeLayout(profile.sections);
+
   return (
     <>
+      <link rel="stylesheet" href={resumeCss} precedence="pf-resume" />
       <PageHero
         data-print-hide
+        className="pf-resume-hero"
         eyebrow="Résumé"
         lines={headlineLines(profile.name, profile.headline)}
         titleClassName="pf-resume__title"
-        lead={profile.summary}
+        aside={<ResumeSnapshot name={profile.name} now={layout.now} />}
+        after={
+          <p className="t-lead pf-page-hero__lead pf-resume__lead">
+            {profile.summary}
+          </p>
+        }
       >
         <p className="pf-resume__availability">
           <StatusDot plain />
@@ -88,49 +86,48 @@ export default function ResumePage({
             <span className="pf-cat-note">· {AVAILABILITY.pill.detail}</span>
           </span>
         </p>
-        <div className="pf-cat-hero__actions pf-resume__actions">
-          {/* Full width on phones (pages-catalog.css). */}
-          <a
-            href={RESUME_PDF_HREF}
-            download={RESUME_PDF_NAME}
-            className={`${pillClass({ size: "lg" })} pf-resume__pdf`}
-          >
-            <span className="ds-pill__icon" aria-hidden="true">
-              <DownloadIcon />
-            </span>
-            <span>Download PDF</span>
-          </a>
-          <Link
-            href={WORK_CONTACT_HREF}
-            className={pillClass({ variant: "ghost", size: "lg" })}
-          >
-            Contact
-          </Link>
-          <SharePill />
-        </div>
-        <ToggleGroup
-          label="Résumé detail"
-          value={detail}
-          onChange={onDetailChange}
-          options={RESUME_DETAILS.map((value) => ({
-            value,
-            label: DETAIL_LABELS[value],
-          }))}
-          className="pf-resume__detail"
-        />
       </PageHero>
 
-      <div data-print-hide className="ds-wrap pf-cat-section pf-cat-end">
+      <div
+        data-print-hide
+        className="ds-wrap pf-cat-section pf-cat-end pf-resume-body"
+      >
         <div className="pf-resume">
-          {profile.sections.map((section) => (
-            <ResumeSectionCard
-              key={section.title}
-              section={section}
-              detail={detail}
-            />
+          {layout.now ? (
+            <Reveal>
+              <NowCard section={layout.now} />
+            </Reveal>
+          ) : null}
+          {layout.roles.map((section) => (
+            <Reveal key={section.title}>
+              <TimelineCard section={section} />
+            </Reveal>
           ))}
-          <SkillsCard skills={profile.skills} />
-          <ShareCard target={SHARE_TARGET} />
+          {layout.projects.map((section) => (
+            <Reveal key={section.title}>
+              <ProjectsCard section={section} />
+            </Reveal>
+          ))}
+          <Reveal>
+            <SkillsCard skills={profile.skills} />
+          </Reveal>
+          {layout.learning.length > 0 ? (
+            <Reveal>
+              <div className="pf-resume__pair">
+                {layout.learning.map((section) => (
+                  <LearningCard key={section.title} section={section} />
+                ))}
+              </div>
+            </Reveal>
+          ) : null}
+          {layout.earlier.length > 0 ? (
+            <Reveal>
+              <EarlierCard sections={layout.earlier} />
+            </Reveal>
+          ) : null}
+          <Reveal>
+            <ShareCard target={SHARE_TARGET} />
+          </Reveal>
         </div>
       </div>
     </>
