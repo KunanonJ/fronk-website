@@ -17,6 +17,7 @@ import {
 import { ThemeToggle } from "@/components/profile/site/ThemeToggle";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
 import { PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
+import { useWornAvatar } from "@/components/profile/site/useWornAvatar";
 import { SearchTrigger } from "@/components/profile/site/search/SearchTrigger";
 import {
   POPOVER_IDS,
@@ -144,6 +145,8 @@ export default function SiteNav() {
   // The scrollspy's answer only means something on Home.
   const section = home ? spied : undefined;
   const replaceNavigate = useReplaceNavigate();
+  // The visitor's trait (and the gold edition): the plain cut until then.
+  const avatar = useWornAvatar(PORTRAIT_SMALL);
 
   useHideOnScroll(bar);
   useScrollspy(home, HOME_SECTIONS, setSpied);
@@ -187,7 +190,7 @@ export default function SiteNav() {
             onClick={onBrand}
           >
             {/* The pixel portrait's 16 x 16 cut, whole pixels at 32 px. */}
-            <PixelPortrait rows={PORTRAIT_SMALL} className="pf-nav__avatar" />
+            <PixelPortrait rows={avatar} className="pf-nav__avatar" />
             <span className="pf-nav__word">
               {brand.firstName}
               <span className="pf-nav__surname"> {brand.surname}</span>

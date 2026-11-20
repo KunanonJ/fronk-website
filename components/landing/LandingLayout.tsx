@@ -2,6 +2,7 @@ import { ChromeProvider } from "@/components/bento/ChromeContext";
 import SharePanelHost from "@/components/bento/SharePanelHost";
 import { NavProgress } from "@/components/profile/site/NavProgress";
 import { LinkPreviews } from "@/components/profile/site/preview/LinkPreviews";
+import { Secrets } from "@/components/profile/site/secrets/Secrets";
 import SiteFooter from "@/components/profile/site/SiteFooter";
 import SiteNav from "@/components/profile/site/SiteNav";
 
@@ -17,6 +18,8 @@ import SiteNav from "@/components/profile/site/SiteNav";
  * the top. ChromeProvider and the share panel serve the hero Share pills of
  * the pages Phase 7 restyles. NavProgress draws the line at the top while a
  * navigation loads; LinkPreviews shows a case's card on its text links.
+ * Secrets listens for the Konami code and for found traits, and renders
+ * nothing until one comes.
  */
 export default function LandingLayout({
   children,
@@ -37,6 +40,7 @@ export default function LandingLayout({
         <SiteFooter />
         <SharePanelHost />
         <LinkPreviews />
+        <Secrets />
       </div>
     </ChromeProvider>
   );

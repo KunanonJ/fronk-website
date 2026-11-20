@@ -5,18 +5,22 @@ import {
   PORTRAIT,
   PORTRAIT_COLOURS,
   PORTRAIT_SMALL,
-  PORTRAIT_TRAITS,
-  goldEdition,
   portraitCells,
   portraitIco,
   portraitSvg,
-  withTrait,
 } from "@/lib/brand/pixelPortrait";
+import {
+  PORTRAIT_TRAITS,
+  goldEdition,
+  withTrait,
+  wornPortrait,
+} from "@/lib/brand/portraitTraits";
 
 /*
  * The pixel portrait: square grids in known colours, traits that stay inside
- * the drawing, and the committed icons drawn from it. Run with UPDATE_ICONS=1
- * to rewrite public/icon.svg and public/favicon.ico after changing the art.
+ * both drawings, and the committed icons drawn from it. Run with
+ * UPDATE_ICONS=1 to rewrite public/icon.svg and public/favicon.ico after
+ * changing the art.
  */
 
 /** The favicon: the nav's 16 x 16 cut on a rounded tile, as /icon draws it. */
@@ -62,6 +66,41 @@ describe("the pixel portrait", () => {
       expect(worn, trait.id).not.toEqual(PORTRAIT);
     }
     expect(withTrait(PORTRAIT, undefined)).toEqual(PORTRAIT);
+  });
+
+  it("paints each trait inside the nav's 16 x 16 cut too, in its colours", () => {
+    for (const trait of PORTRAIT_TRAITS) {
+      expect(trait.smallPatches.length, trait.id).toBeGreaterThan(0);
+      for (const [row, col, cells] of trait.smallPatches) {
+        expect(row, trait.id).toBeGreaterThanOrEqual(0);
+        expect(row, trait.id).toBeLessThan(16);
+        expect(col, trait.id).toBeGreaterThanOrEqual(0);
+        expect(col + cells.length, trait.id).toBeLessThanOrEqual(16);
+        for (const key of cells.replaceAll(" ", "")) {
+          expect(key in PORTRAIT_COLOURS, `${trait.id}: ${key}`).toBe(true);
+        }
+      }
+      const worn = withTrait(PORTRAIT_SMALL, trait);
+      expect(worn).toHaveLength(16);
+      expect(
+        worn.every((row) => row.length === 16),
+        trait.id,
+      ).toBe(true);
+      expect(worn, trait.id).not.toEqual(PORTRAIT_SMALL);
+    }
+    expect(withTrait(PORTRAIT_SMALL, undefined)).toEqual(PORTRAIT_SMALL);
+  });
+
+  it("dresses a drawing as the visitor has it: their trait, then gold", () => {
+    expect(wornPortrait(PORTRAIT_SMALL, null, 0)).toEqual(PORTRAIT_SMALL);
+    expect(wornPortrait(PORTRAIT_SMALL, "unknown", 2)).toEqual(PORTRAIT_SMALL);
+    const shades = PORTRAIT_TRAITS[0]!;
+    expect(wornPortrait(PORTRAIT_SMALL, "shades", 1)).toEqual(
+      withTrait(PORTRAIT_SMALL, shades),
+    );
+    expect(wornPortrait(PORTRAIT, "shades", 6)).toEqual(
+      goldEdition(withTrait(PORTRAIT, shades)),
+    );
   });
 
   it("turns the outline gold for the gold edition, and nothing else", () => {

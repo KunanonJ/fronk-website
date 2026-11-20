@@ -90,7 +90,7 @@ function RichParagraphs({
 function Portrait() {
   const { hero } = aboutPage;
   return (
-    <div className="pf-about-page__portrait">
+    <div id="portrait" className="pf-about-page__portrait">
       <img
         src={hero.portraitSrc}
         alt={hero.portraitAlt}

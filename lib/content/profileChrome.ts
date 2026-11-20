@@ -236,7 +236,7 @@ export const searchCopy = {
   loading: "Loading the index…", // DRAFT
   failed: "Search could not load. Try again in a moment.", // DRAFT
   empty: (query: string) => `Nothing matches “${query}”.`, // DRAFT
-  hints: ["↑ ↓ to move", "↵ to open", "esc to close"], // DRAFT
+  hints: ["↑ ↓ to move", "↵ to open", "esc to close", "Type / for commands"], // DRAFT
   count: (n: number) => `${n} ${n === 1 ? "result" : "results"}`, // DRAFT
 } as const;
 

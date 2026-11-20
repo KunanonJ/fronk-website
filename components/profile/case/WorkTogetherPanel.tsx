@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Pill } from "@/components/ds/Pill";
 import { caseCopy } from "@/lib/content/caseStudy";
 
@@ -8,11 +9,37 @@ import { caseCopy } from "@/lib/content/caseStudy";
  * what he is open to, the résumé and the contact form with "Freelance or
  * consulting" chosen. The smoke tests pin its name and both links' names and
  * targets. Styles: `.pf-case-work*` in case.css.
+ *
+ * A reader who scrolls down to it finds the Gold glasses trait
+ * (now-building-and-genz Phase 3; the toast says so). Only after a scroll:
+ * a page that opens with it in view, or a full-page capture, finds nothing.
+ * The trait store loads then, not with the page.
  */
 export function WorkTogetherPanel() {
   const { work } = caseCopy;
+  const panel = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = panel.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (window.scrollY <= 0 || !entries.some((e) => e.isIntersecting)) {
+          return;
+        }
+        observer.disconnect();
+        void import("@/lib/brand/traitStore").then((store) =>
+          store.award("glasses", "case"),
+        );
+      },
+      { threshold: 0.5 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <article className="pf-case-work" aria-labelledby="case-work">
+    <article ref={panel} className="pf-case-work" aria-labelledby="case-work">
       <div className="pf-case-work__text">
         <h2 id="case-work" className="t-meta pf-case-work__kicker">
           {work.kicker}

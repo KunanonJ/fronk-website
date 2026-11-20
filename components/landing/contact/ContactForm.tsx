@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -32,6 +34,11 @@ export const contactMailto = `mailto:${contactPage.email}?subject=${encodeURICom
 const EMPTY: ContactFormValues = { name: "", message: "", topics: [] };
 
 const COPY_RESET_MS = 2000;
+
+/** The Ready moment's burst and stamp, loaded when the email is ready. */
+const DraftReady = lazy(
+  () => import("@/components/landing/contact/DraftReady"),
+);
 
 /** Opens a mailto: link the way a click on it would: the email app takes it. */
 function openEmail(href: string) {
@@ -111,7 +118,9 @@ function invalidProps(id: string, error?: string) {
  *   the first invalid field takes focus.
  * - Ready: after the button, a status panel says the email is in the
  *   visitor's app, offers to open it again or copy it (a browser with no
- *   email app opens nothing), and focus moves to it.
+ *   email app opens nothing), and focus moves to it. Its check mark bursts
+ *   into pixels beside a "Draft ready" stamp, and the Lapel pin trait is
+ *   found (DraftReady, loaded then; no burst under reduced motion).
  * - Intent: `project` (from `/contact?topic=project`) chooses "Freelance or
  *   consulting" and `hiring` (from `/contact?topic=hiring`) "A future role"
  *   on arrival and again after "Write another message". It only ever adds
@@ -239,9 +248,12 @@ export default function ContactForm({
           >
             <span
               aria-hidden
-              className="mb-2 inline-flex size-14 items-center justify-center rounded-full bg-surface-tint text-mark"
+              className="pf-ready-mark mb-2 inline-flex size-14 items-center justify-center rounded-full bg-surface-tint text-mark"
             >
               <CheckIcon size={24} />
+              <Suspense fallback={null}>
+                <DraftReady />
+              </Suspense>
             </span>
             <p className="m-0 text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">
               {ready.complete ? contactPage.readyTitle : contactPage.longTitle}
