@@ -29,6 +29,51 @@
       padding-block-start: 176px;
     }
   }
+  /* Work slides over the sticky hero (home-hero.css), whose last line, the
+     logo strip with the only pause for its moving row (WCAG 2.2.2), is the
+     first part it covers: at 1024 x 768 the pause could be pressed for
+     50 px of scrolling only (UX sweep 21-11-26). Work's empty top (the
+     112 px of padding above) is drawn by ::before and the rest of its paper
+     by ::after. While Work's top is in the first 150 px of its way up the
+     screen, that empty top is over the strip: it draws nothing and takes no
+     press, so the strip shows and its pause can be pressed until Work's
+     content reaches it. Over the next 50 px it fades back in, so Work rises
+     over the rest of the hero as before, its eyebrow under 112 px of paper,
+     and lands from the nav as before. The page at rest, Work's box, its
+     anchor and the scrollspy are as they were. Where the motion runs
+     (reduced motion stills the strip and drops its pause) and the browser
+     ties animations to scrolling. */
+  @media (min-width: 50.625rem) and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .pf-hero ~ .pf-work {
+        view-timeline: --pf-work block;
+        background: none;
+        pointer-events: none;
+      }
+      .pf-hero ~ .pf-work > * {
+        pointer-events: auto;
+      }
+      .pf-hero ~ .pf-work::before,
+      .pf-hero ~ .pf-work::after {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        z-index: -1;
+        background: var(--paper);
+        pointer-events: auto;
+      }
+      .pf-hero ~ .pf-work::before {
+        inset-block: 0 auto;
+        block-size: 112px;
+        animation: kj-work-top linear both;
+        animation-timeline: --pf-work;
+        animation-range: entry 150px entry 200px;
+      }
+      .pf-hero ~ .pf-work::after {
+        inset-block: 112px 0;
+      }
+    }
+  }
 
   /* The section header (SectionHeader.tsx). */
   .pf-section-head {
@@ -830,5 +875,17 @@
   }
   50% {
     transform: translateY(-4px) rotate(-4deg);
+  }
+}
+
+/* Work's empty top over the hero's logo strip: not there, then back. */
+@keyframes kj-work-top {
+  from {
+    opacity: 0;
+    pointer-events: none;
+  }
+  to {
+    opacity: 1;
+    pointer-events: auto;
   }
 }

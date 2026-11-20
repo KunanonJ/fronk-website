@@ -784,6 +784,86 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
     expect(work).toBeLessThan(1000);
   });
 
+  for (const [width, height] of [
+    [1024, 768],
+    [1440, 900],
+  ] as const) {
+    test(`at ${width} x ${height} the logo strip's pause stays in view and pressable while #work's empty top passes over it (WCAG 2.2.2)`, async ({
+      page,
+    }) => {
+      only(["desktop"]);
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.setViewportSize({ width, height });
+      await prepare(page);
+      await visit(page);
+      const stage = (await page.locator(HERO).boundingBox())!.height;
+      const pause = page
+        .locator(HERO)
+        .getByRole("button", { name: "Pause motion" });
+      // The stage holds once its last line shows; from there #work slides
+      // over it. While its empty first 112 px pass over the strip they
+      // draw nothing and take no press (the pause was pressable for 50 px
+      // at 1024 x 768; UX sweep 21-11-26).
+      const hold = Math.max(0, stage - height);
+      const workTop = () =>
+        page.evaluate(() => {
+          const work = document.getElementById("work")!;
+          const box = work.getBoundingClientRect();
+          const hit = document.elementFromPoint(
+            box.left + box.width / 2,
+            box.top + 20,
+          );
+          return {
+            opacity: getComputedStyle(work, "::before").opacity,
+            drawn: !!hit && work.contains(hit),
+          };
+        });
+      for (const past of [0, 40, 80, 120]) {
+        await page.evaluate(
+          (y) => window.scrollTo({ top: y, behavior: "instant" }),
+          hold + past,
+        );
+        // In view, and what is drawn at its centre is the pause itself.
+        await expect
+          .poll(
+            () =>
+              pause.evaluate((el) => {
+                const box = el.getBoundingClientRect();
+                const hit = document.elementFromPoint(
+                  box.left + box.width / 2,
+                  box.top + box.height / 2,
+                );
+                return box.bottom <= window.innerHeight && el.contains(hit);
+              }),
+            { message: `${past} px past the hold` },
+          )
+          .toBe(true);
+      }
+      // Once Work's content has covered the strip, its empty top is drawn
+      // again and takes presses: Work rises over the rest of the hero, and
+      // lands from the nav, as before.
+      await page.evaluate(
+        (y) => window.scrollTo({ top: y, behavior: "instant" }),
+        hold + 300,
+      );
+      // (A scroll timeline moves on with the next frame.)
+      await expect.poll(workTop).toEqual({ opacity: "1", drawn: true });
+      // A press on the pause, back where it shows, pauses the row.
+      await page.evaluate(
+        (y) => window.scrollTo({ top: y, behavior: "instant" }),
+        hold + 60,
+      );
+      await pause.click();
+      await expect(
+        page.locator(HERO).getByRole("button", { name: "Play motion" }),
+      ).toBeVisible();
+      await expect(page.locator(".pf-logos .ds-marquee__track")).toHaveCSS(
+        "animation-play-state",
+        "paused",
+      );
+    });
+  }
+
   test("at 1024 x 768, Shift+Tab from the stack back onto a frame link leaves each stop in view and uncovered (WCAG 2.4.11)", async ({
     page,
   }) => {
