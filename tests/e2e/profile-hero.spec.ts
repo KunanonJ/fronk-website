@@ -312,10 +312,10 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     await expect(page.locator("html")).toHaveAttribute("data-intro", "pending");
     expect(await animationOf(page, ".pf-hero__chips")).toBe("none");
     expect(await animationOf(page, ".pf-mock-wrap")).toBe("none");
-    // The cursor waits too. By the third greeting (1.44 s in) a tour that
+    // The cursor waits too. By the fourth greeting (1.2 s in) a tour that
     // had started at once would have made its first stop (0.9 s).
     // Read once, not polled: the tour itself ends on frame 0.
-    await expect(overlay).toContainText("Bonjour");
+    await expect(overlay).toContainText("こんにちは");
     expect(
       await page.locator(".pf-mock__cursor").getAttribute("data-frame"),
     ).toBe("0");
@@ -323,6 +323,56 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     await page.getByRole("button", { name: "Skip intro" }).click();
     await expect(page.locator("html")).toHaveAttribute("data-intro", "done");
     expect(await animationOf(page, ".pf-hero__chips")).toBe("kj-fade-up");
+  });
+
+  test("the portrait mints, then flies into the nav's avatar", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await prepare(page, { intro: true });
+    // What the hand-over names: the intro's portrait in the old state, the
+    // nav's avatar in the new one.
+    await page.addInitScript(() => {
+      const log: string[] = [];
+      (window as unknown as { __morph: string[] }).__morph = log;
+      const doc = document as unknown as {
+        startViewTransition?: (update: () => void) => unknown;
+      };
+      const start = doc.startViewTransition?.bind(document);
+      if (!start) return;
+      const name = (selector: string) => {
+        const el = document.querySelector(selector);
+        return el ? getComputedStyle(el).viewTransitionName : "missing";
+      };
+      doc.startViewTransition = (update) =>
+        start(() => {
+          if (document.documentElement.dataset.introMorph) {
+            log.push(`from ${name(".intro-portrait")}`);
+          }
+          update();
+          if (document.documentElement.dataset.introMorph) {
+            log.push(`to ${name(".pf-nav__avatar")}`);
+            log.push(`portrait ${name(".intro-portrait")}`);
+          }
+        });
+    });
+    await page.goto(HOME);
+    const overlay = page.getByTestId("intro-overlay");
+    await expect(overlay).toContainText("Minting");
+    await expect(overlay).toContainText("Minted 576 / 576");
+    await expect(page.getByTestId("intro-pixels")).toBeAttached();
+    await expect(overlay).toBeHidden();
+    await expect(page.locator("html")).toHaveAttribute("data-intro", "done");
+    await expect(page.locator("html")).not.toHaveAttribute(
+      "data-intro-morph",
+      /.*/,
+    );
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __morph: string[] }).__morph,
+      ),
+    ).toEqual(["from pf-avatar", "to pf-avatar", "portrait missing"]);
   });
 
   test("on a later visit the entrance plays at once, and reduced motion has none", async ({
