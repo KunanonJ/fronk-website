@@ -59,3 +59,10 @@ Every page carrying the site graph (the founded organizations), two share images
 
 Branch `feat/venture-brand-logos` off `main` at `0119650`. Gates as for #133;
 PR, CI, squash-merge, live checks, cleanup.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #140, squash 0add090 (19-11-26).
+- **Verified:** Live: the logos in the ventures' JSON-LD and on their share cards; parity fixture updated (66 entries); dark mode checked.
+- **Deviations and notes:** The Airplusauto files were removed in the same PR, as asked.
+- **Status:** complete; archived to `completed/`.

@@ -41,3 +41,10 @@ just navigates, an off switch. WCAG 1.4.13." The second PR after
 5. **Tests:** unit (which links preview); smoke (pointer pause, hover onto
    the card, Esc, `aria-describedby`, the lazy stylesheet, keyboard focus,
    no preview on cards). No baseline changes: nothing shows at rest.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #149 (20-11-26), with the search ranking fix and this archive.
+- **Verified:** Smoke: pointer pause, hover onto the card, Esc, aria-describedby, the lazy stylesheet, keyboard focus (nine runs out of nine), no preview on cards.
+- **Deviations and notes:** The card follows its link while the page scrolls: keyboard focus scrolls smoothly to the link, and closing on scroll had hidden the card at once.
+- **Status:** complete; archived to `completed/`.

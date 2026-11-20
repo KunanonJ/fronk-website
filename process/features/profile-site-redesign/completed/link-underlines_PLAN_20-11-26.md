@@ -31,3 +31,10 @@ with `text-decoration-thickness`." SIMPLE plan.
 4. **Tests:** a smoke test of both states, pointer and keyboard.
 5. **Gates:** typecheck, lint, format, knip, unit (the CSS guards),
    budgets, smoke, a11y and profile e2e against the build.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #147, squash 25baca7 (20-11-26).
+- **Verified:** Live 6/6: prose link 2 px accent on hover and keyboard focus, footer underline painted on hover, unchanged at rest.
+- **Deviations and notes:** The italic swap was dropped, as the plan records (the nav name is 9 px wider in Italic).
+- **Status:** complete; archived to `completed/`.

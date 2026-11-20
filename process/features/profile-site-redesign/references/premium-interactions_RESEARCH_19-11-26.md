@@ -7,6 +7,13 @@ recorded route and filter frames), and outside research on current platform
 features and calm editorial portfolios. This is a menu with a recommended
 order, not a plan: the owner picks, then a plan file follows.
 
+**Status (20-11-26):** the polish pass (F1 to F8) and items 1 to 8 shipped,
+each with its plan in `../completed/`: the morph and count-ups (#144), the
+dither print-in and footer drawings (#145), reading aids (#146; post contents
+wait for the blog), link underlines (#147; the italic swap dropped), the Now
+line and ⌘K search (#148), link previews (#149). Left on the menu: the dither
+lens (3), the intro (9), the theme dissolve (10) and the illustration upgrade.
+
 The design source is `references/design-spec_18-11-26.md`;
 `docs/redesign/01-05` describe the older black HUD design (03 is superseded).
 

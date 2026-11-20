@@ -51,3 +51,10 @@ reading time at build. SIMPLE plan.
 - Post contents and reading time: with the blog.
 - Contents for /about or the hubs: short sections, and the layouts are
   designed without a rail.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR #146, squash 6e283d7 (20-11-26).
+- **Verified:** Live 10/10: the line 0 / 0.5 / 1 on five pages, reading time on cases, none on /proof, hidden under reduced motion.
+- **Deviations and notes:** No-break spaces keep "· 2 min read" whole on phones; the case spec's stillFrame ignores scroll-driven animations; 26 baselines re-rendered at zero tolerance. Post contents wait for the blog.
+- **Status:** complete; archived to `completed/`.
