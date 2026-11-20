@@ -8,6 +8,11 @@
 /** The 4 x 4 Bayer matrix, values 0 to 15. */
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5] as const;
 
+/** A cell's place in the matrix, 0 to 15, for column `x` and row `y`. */
+export function bayerRank(x: number, y: number): number {
+  return BAYER[(y % 4) * 4 + (x % 4)]!;
+}
+
 export interface DitherOptions {
   /** Field size in CSS px. */
   readonly width: number;
@@ -28,6 +33,11 @@ export interface DitherCell {
   readonly y: number;
   /** The ramp at this cell, 1 at the dense edge and 0 at the far one. */
   readonly level: number;
+  /**
+   * The cell's place in the matrix, 0 to 15: the order it prints in when a
+   * field prints in (DitherField), the lowest first.
+   */
+  readonly rank: number;
 }
 
 export function ditherCells({
@@ -55,9 +65,9 @@ export function ditherCells({
             : fade === "left"
               ? 1 - x / cols
               : (x + 1) / cols;
-      const threshold =
-        (BAYER[((y + dy) % 4) * 4 + ((x + dx) % 4)]! + 0.5) / 16;
-      if (level ** falloff > threshold) cells.push({ x, y, level });
+      const rank = bayerRank(x + dx, y + dy);
+      const threshold = (rank + 0.5) / 16;
+      if (level ** falloff > threshold) cells.push({ x, y, level, rank });
     }
   }
   return cells;

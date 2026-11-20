@@ -747,6 +747,78 @@ test.describe("figures > count up once in view, the text always the real figure"
 });
 
 /**
+ * The footer on reveal (plan dither-print-in_PLAN_20-11-26): below the fold,
+ * its dither field waits blank and its two drawings wait hidden; in view the
+ * field prints in and the drawings play once, then all is still and drawn.
+ * Under reduced motion nothing waits.
+ */
+test.describe("footer > the dither prints in and the drawings play once in view", () => {
+  const field = ".pf-footer__dither";
+  const art = ".pf-footer__art";
+
+  test("/about at 1440 px: wait, play once, end still", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/about", { waitUntil: "networkidle" });
+    await expect(page.locator(field)).toHaveAttribute("data-print", "wait");
+    await expect(page.locator(`${art}[data-wait]`)).toHaveCount(2);
+
+    // Samples the field and the drawings from the moment they scroll in.
+    const seen = await page.evaluate(
+      async ({ field, art }) => {
+        const canvas = document.querySelector<HTMLCanvasElement>(field)!;
+        document
+          .querySelector(".pf-footer")!
+          .scrollIntoView({ block: "start", behavior: "instant" });
+        const states = new Set<string>();
+        let playing = 0;
+        const end = performance.now() + 2500;
+        while (performance.now() < end) {
+          states.add(String(canvas.getAttribute("data-print")));
+          playing = Math.max(
+            playing,
+            document
+              .getAnimations()
+              .filter((a) =>
+                (a.effect as KeyframeEffect | null)?.target?.closest(art),
+              ).length,
+          );
+          await new Promise(requestAnimationFrame);
+        }
+        const data = canvas
+          .getContext("2d")!
+          .getImageData(0, 0, canvas.width, canvas.height).data;
+        let ink = 0;
+        for (let i = 3; i < data.length; i += 4) if (data[i]) ink++;
+        return {
+          states: [...states],
+          playing,
+          still: document
+            .getAnimations()
+            .filter((a) =>
+              (a.effect as KeyframeEffect | null)?.target?.closest(art),
+            ).length,
+          ink,
+        };
+      },
+      { field, art },
+    );
+    expect(seen.states).toContain("run");
+    expect(seen.states.at(-1)).toBe("null");
+    expect(seen.playing).toBeGreaterThan(100);
+    expect(seen.still).toBe(0);
+    expect(seen.ink).toBeGreaterThan(0);
+    await expect(page.locator(`${art}[data-wait]`)).toHaveCount(0);
+  });
+
+  test("/about under reduced motion: nothing waits", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about", { waitUntil: "networkidle" });
+    await expect(page.locator("canvas.ds-dither[data-print]")).toHaveCount(0);
+    await expect(page.locator(`${art}[data-wait]`)).toHaveCount(0);
+  });
+});
+
+/**
  * The recruiter path (recruiter-fit phase 2): what someone hiring a forward
  * deployed or AI engineer needs is one glance or one click away.
  */

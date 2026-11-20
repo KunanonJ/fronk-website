@@ -9,7 +9,9 @@ import type { Page } from "@playwright/test";
  * mismatch. A canvas is settled when its bitmap is its box at the device
  * ratio DitherField uses (min(devicePixelRatio, 2)) and holds ink, and the
  * sizes held still between two polls. Canvases with no box (a closed
- * popover's) are skipped.
+ * popover's) are skipped, as is a field still waiting below the fold to
+ * print in (`data-print="wait"`, motion allowed only); one printing in
+ * (`data-print="run"`) is waited for.
  *
  * Element screenshots only: a full-page capture can still drop a canvas's
  * drawing, so visual.spec hides the dither instead (screenshot-no-dither.css).
@@ -20,8 +22,13 @@ export async function settleDither(page: Page) {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       const canvases = [
         ...document.querySelectorAll<HTMLCanvasElement>("canvas.ds-dither"),
-      ].filter((canvas) => canvas.getBoundingClientRect().width > 0);
+      ].filter(
+        (canvas) =>
+          canvas.getBoundingClientRect().width > 0 &&
+          canvas.getAttribute("data-print") !== "wait",
+      );
       const drawn = canvases.every((canvas) => {
+        if (canvas.hasAttribute("data-print")) return false;
         const box = canvas.getBoundingClientRect();
         if (
           canvas.width !== Math.round(box.width * ratio) ||

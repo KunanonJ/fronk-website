@@ -41,7 +41,17 @@ describe("ditherCells", () => {
       expect(c.y).toBeLessThan(field.height / field.cell);
       expect(c.level).toBeGreaterThan(0);
       expect(c.level).toBeLessThanOrEqual(1);
+      expect(c.rank).toBeGreaterThanOrEqual(0);
+      expect(c.rank).toBeLessThan(16);
     }
+  });
+
+  it("ranks the cells of every 4 x 4 block 0 to 15, once each", () => {
+    // A full field: every cell is drawn at a level of 1 with falloff 0.
+    const block = ditherCells({ width: 40, height: 40, cell: 10, falloff: 0 });
+    expect(block.map((c) => c.rank).sort((a, b) => a - b)).toEqual(
+      Array.from({ length: 16 }, (_, i) => i),
+    );
   });
 
   it("draws nothing for an empty field", () => {

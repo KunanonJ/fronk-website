@@ -20,7 +20,8 @@ import {
  * field, a centred call to action with Say hello, and the card with the name,
  * the Pages list (every page the old menu linked), Elsewhere and For agents.
  * Identical on every page. The two pixel drawings are code-drawn and shown from
- * 1280 px only.
+ * 1280 px only; each plays once as it comes into view (PixelArt `play`), and
+ * the dither field prints in (DitherField).
  */
 
 export default function SiteFooter() {
@@ -129,10 +130,12 @@ export default function SiteFooter() {
         <PixelArt
           className="pf-footer__art pf-footer__art--browser"
           rows={BROWSER_ART}
+          play
         />
         <PixelArt
           className="pf-footer__art pf-footer__art--phone"
           rows={PHONE_ART}
+          play
         />
       </div>
     </footer>
