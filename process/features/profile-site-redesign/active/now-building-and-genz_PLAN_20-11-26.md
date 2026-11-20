@@ -122,9 +122,10 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
   - Filter groups below 600 px are one row that scrolls sideways, and the pressed option scrolls into view.
   - Alignment: the skill pager, code insets, library kickers, the back link and the framed images.
   - 320 x 568: Contact me and Résumé are on the first screen in all three engines.
+  - Case pages: chapter 01's fact strip drops its closing rule (it drew an empty row above chapter 02's), and on phones the facts share a label column. The résumé's facts card stacks below 375 px, so the email is one line.
   - Sweep, before and after: heading widows 169 to 59 (Tier 5: 108 to 5), long measure 160 to 0, alignment near-misses 140 to 44. Brand names split at phone widths: 64 to 2.
 - **Batch A, correctness and accessibility:** in progress.
-- **For the owner (not changed):** /about states its principles twice and the availability line about five times; /contact puts "Or write it here" before the email option and ends with a second call to action; at 1024 x 768 Home's hero is one column with about 40% empty; the résumé email breaks mid-word at 320 to 360 px.
+- **For the owner (not changed):** /about states its principles twice and the availability line about five times; /contact puts "Or write it here" before the email option and ends with a second call to action; at 1024 x 768 Home's hero is one column with about 40% empty.
 
 ## Constraints in every phase
 
