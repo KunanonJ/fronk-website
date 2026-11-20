@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { pillClass } from "@/components/ds/Pill";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
+import { PORTRAIT } from "@/lib/brand/pixelPortrait";
+import { PORTRAIT_TRAITS, wornPortrait } from "@/lib/brand/portraitTraits";
 import {
-  PORTRAIT,
-  PORTRAIT_TRAITS,
-  goldEdition,
-  withTrait,
-} from "@/lib/brand/pixelPortrait";
+  award,
+  readTraits,
+  serverTraits,
+  subscribeTraits,
+  wear,
+} from "@/lib/brand/traitStore";
 import { aboutPageCopy } from "@/lib/content/corePages";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 import { cn } from "@/lib/utils/cn";
@@ -18,78 +21,27 @@ import { cn } from "@/lib/utils/cn";
  * next of six traits (a press on the portrait does too, for a pointer: like a
  * showcase tile, the portrait is not a control itself, so it overlaps no other
  * target); each one found is remembered on this device, and finding all six
- * turns the outline gold. A polite line says what was found.
+ * turns the outline gold. A polite line says what was found. The traits are
+ * the visitor's across the site (lib/brand/traitStore.ts): the nav's avatar
+ * wears the same one, and some are found elsewhere.
  * The server draws the plain portrait; traits come from storage once the page
  * runs. Under reduced motion the dissolve is a cut.
  */
 
 const TOTAL = PORTRAIT_TRAITS.length;
-const FOUND_KEY = "pf-portrait-found";
-const WORN_KEY = "pf-portrait-worn";
 /** The dissolve: 8 frames of 45 ms, two ranks a frame. */
 const FRAME_MS = 45;
 
-interface Saved {
-  readonly found: readonly string[];
-  readonly worn: string | null;
-}
-
-const NOTHING: Saved = { found: [], worn: null };
-const listeners = new Set<() => void>();
-let cached: { raw: string; saved: Saved } | null = null;
-
-function readSaved(): Saved {
-  try {
-    const raw = `${localStorage.getItem(FOUND_KEY)}|${localStorage.getItem(WORN_KEY)}`;
-    if (cached?.raw === raw) return cached.saved;
-    const found = JSON.parse(localStorage.getItem(FOUND_KEY) ?? "[]");
-    const saved: Saved = {
-      found: Array.isArray(found)
-        ? found.filter((id) => PORTRAIT_TRAITS.some((t) => t.id === id))
-        : [],
-      worn: localStorage.getItem(WORN_KEY),
-    };
-    cached = { raw, saved };
-    return saved;
-  } catch {
-    return NOTHING;
-  }
-}
-
-function writeSaved(saved: Saved): void {
-  try {
-    localStorage.setItem(FOUND_KEY, JSON.stringify(saved.found));
-    if (saved.worn) localStorage.setItem(WORN_KEY, saved.worn);
-    else localStorage.removeItem(WORN_KEY);
-  } catch {
-    // Storage blocked: the traits last as long as the page.
-    cached = { raw: "", saved };
-  }
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-
 export function PortraitPlay() {
-  const saved = useSyncExternalStore(subscribe, readSaved, () => NOTHING);
+  const saved = useSyncExternalStore(subscribeTraits, readTraits, serverTraits);
   const [photo, setPhoto] = useState(false);
   const [shown, setShown] = useState(16);
   const [news, setNews] = useState("");
   const [pop, setPop] = useState(false);
   const timer = useRef(0);
 
-  const worn = PORTRAIT_TRAITS.find((trait) => trait.id === saved.worn);
   const gold = saved.found.length === TOTAL;
-  const rows = gold
-    ? goldEdition(withTrait(PORTRAIT, worn))
-    : withTrait(PORTRAIT, worn);
+  const rows = wornPortrait(PORTRAIT, saved.worn, saved.found.length);
 
   useEffect(() => () => window.clearInterval(timer.current), []);
 
@@ -115,14 +67,15 @@ export function PortraitPlay() {
   const nextTrait = () => {
     const at = PORTRAIT_TRAITS.findIndex((trait) => trait.id === saved.worn);
     const trait = PORTRAIT_TRAITS[(at + 1) % TOTAL]!;
-    const isNew = !saved.found.includes(trait.id);
-    const found = isNew ? [...saved.found, trait.id] : [...saved.found];
-    writeSaved({ found, worn: trait.id });
+    // Found here, the line below says so (no toast); one found before goes on.
+    const isNew = award(trait.id, "about");
+    if (!isNew) wear(trait.id);
+    const found = readTraits().found.length;
     const { portrait } = aboutPageCopy;
     setNews(
-      isNew && found.length === TOTAL
+      isNew && found === TOTAL
         ? portrait.goldFound
-        : portrait.found(trait.label, found.length, TOTAL),
+        : portrait.found(trait.label, found, TOTAL),
     );
     if (isNew) {
       setPop(false);

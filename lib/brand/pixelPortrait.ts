@@ -12,7 +12,8 @@ import { bayerRank } from "@/components/ds/ditherCells";
  * takes the site's colour where it is drawn; every other character has a fixed
  * colour, so he looks the same in both themes. The 16 x 16 cut serves the
  * nav's 32 px avatar at a whole 2x (a 24 grid would smear at 32 px). Traits
- * are patches on the 24 x 24 drawing, found on /about.
+ * are patches on both drawings (lib/brand/portraitTraits.ts), found on /about
+ * and around the site (lib/brand/traitStore.ts).
  */
 
 /** The drawing's colours (the background is not here: it follows the site). */
@@ -82,116 +83,6 @@ export const PORTRAIT_SMALL: readonly string[] = [
   "..knnnbwwbnnnk..",
   ".knnnnnbbnnnnnk.",
 ];
-
-/** A trait: cells painted over the 24 x 24 drawing (spaces keep the cell). */
-export interface PortraitTrait {
-  readonly id: string;
-  readonly label: string;
-  readonly patches: readonly (readonly [
-    row: number,
-    col: number,
-    cells: string,
-  ])[];
-}
-
-/** Our own traits, in the order a press finds them. */
-export const PORTRAIT_TRAITS: readonly PortraitTrait[] = [
-  {
-    id: "shades",
-    label: "Shades",
-    patches: [
-      [10, 6, "kqqqqkkqqqqk"],
-      [11, 7, "kqqk  kqqk"],
-      [10, 8, "w"],
-      [10, 14, "w"],
-    ],
-  },
-  {
-    id: "glasses",
-    label: "Gold glasses",
-    patches: [
-      [9, 7, " yy    yy"],
-      [10, 7, "y  y"],
-      [10, 11, "yy"],
-      [10, 13, "y  y"],
-      [11, 7, " yy    yy"],
-    ],
-  },
-  {
-    id: "headphones",
-    label: "Headphones",
-    patches: [
-      [3, 6, "aaaaaaaaaaaa"],
-      [4, 5, "a"],
-      [4, 18, "a"],
-      [5, 4, "a"],
-      [5, 19, "a"],
-      [6, 4, "a"],
-      [6, 19, "a"],
-      [7, 4, "a"],
-      [7, 19, "a"],
-      [8, 3, "kaak"],
-      [8, 17, "kaak"],
-      [9, 3, "kaak"],
-      [9, 17, "kaak"],
-      [10, 3, "kaak"],
-      [10, 17, "kaak"],
-      [11, 3, "kkkk"],
-      [11, 17, "kkkk"],
-    ],
-  },
-  {
-    id: "cap",
-    label: "Coral cap",
-    patches: [
-      [1, 7, "kkkkkkkkkk"],
-      [2, 6, "kcccccccccck"],
-      [3, 5, "kcccccccccccck"],
-      [4, 5, "kcccccwccccck"],
-      [5, 5, "kcccccccccccck"],
-      [6, 5, "kkkkkkkkkkkkkkkk"],
-      [6, 14, "kkkkkkkk"],
-      [7, 14, "ccccccc"],
-      [7, 21, "k"],
-      [8, 14, "kkkkkkkk"],
-    ],
-  },
-  {
-    id: "earring",
-    label: "Gold earring",
-    patches: [
-      [12, 3, "ky"],
-      [13, 3, "ky"],
-    ],
-  },
-  {
-    id: "pin",
-    label: "Lapel pin",
-    patches: [
-      [20, 7, "ya"],
-      [21, 7, "aa"],
-    ],
-  },
-];
-
-/** The drawing with a trait painted on. */
-export function withTrait(
-  rows: readonly string[],
-  trait: PortraitTrait | undefined,
-): string[] {
-  const grid = rows.map((row) => [...row]);
-  for (const [row, col, cells] of trait?.patches ?? []) {
-    [...cells].forEach((cell, at) => {
-      if (cell !== " ") grid[row]![col + at] = cell;
-    });
-  }
-  return grid.map((cells) => cells.join(""));
-}
-
-/** The gold edition, for finding every trait: the outline turns gold. */
-export function goldEdition(rows: readonly string[]): string[] {
-  return rows.map((row) => row.replaceAll("k", "y"));
-}
 
 /** One square of the drawing: its place, its colour key and its print rank. */
 export interface PortraitCell {
