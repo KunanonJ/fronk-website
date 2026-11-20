@@ -87,8 +87,14 @@ export function pixelBeats(rows: readonly string[]): PixelBeat[] {
  */
 const HIDDEN: Keyframe[] = [{ visibility: "hidden" }, { visibility: "hidden" }];
 
-/** Plays a drawing's beats on its squares (the svg's rects, in cell order). */
-function playBeats(svg: SVGSVGElement, beats: readonly PixelBeat[]): void {
+/**
+ * Plays a drawing's beats on its squares (the svg's rects, in cell order).
+ * The 404's drawing plays it once its last pixel is patched (PatchArt).
+ */
+export function playBeats(
+  svg: SVGSVGElement,
+  beats: readonly PixelBeat[],
+): void {
   svg.querySelectorAll("rect").forEach((rect, i) => {
     const beat = beats[i];
     if (!beat) return;

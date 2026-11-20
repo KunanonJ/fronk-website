@@ -100,16 +100,18 @@ function ReportTile({ title, subject }: StatusPageCopy["report"]) {
 /**
  * The status page body. `actions` sits under the lead (RouteError's "Try
  * again"); `alert` makes the hero a live alert for an error that appears in
- * place of a page.
+ * place of a page; `art` takes the drawing's place (the 404 you fix).
  */
 export default function StatusPage({
   copy,
   actions,
   alert = false,
+  art,
 }: {
   copy: StatusPageCopy;
   actions?: ReactNode;
   alert?: boolean;
+  art?: ReactNode;
 }) {
   const { headline } = copy;
   return (
@@ -137,7 +139,7 @@ export default function StatusPage({
             <span aria-hidden className="pf-status__square" />
             {copy.status}
           </h2>
-          <PixelArt rows={copy.art} className="pf-status__art" />
+          {art ?? <PixelArt rows={copy.art} className="pf-status__art" />}
         </article>
         <RecoveryTile />
         <ReportTile {...copy.report} />
