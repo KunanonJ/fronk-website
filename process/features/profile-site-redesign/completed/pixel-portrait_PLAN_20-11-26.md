@@ -46,3 +46,13 @@ the dither ranks beside a 0 to 576 counter, faster greetings (about 400 ms),
 "Welcome to KunanonJ" with a burst of pixels, and a hand-over that morphs the
 portrait into the nav avatar; about 3 s, skippable, once a session, nothing
 under reduced motion, no flashing (WCAG 2.3.1). The champagne CSS goes.
+
+## Closeout (20-11-26)
+
+- **Shipped:** PR 1, the portrait: #152, squash f57d8d9 (20-11-26). PR 2, the minting intro: INTRO_PR.
+- **Verified:** #152 live: `/icon.svg` and `/favicon.ico` byte-equal to the repo, `/icon` (64 px) and `/apple-icon` (180 px) drawn from the art, the nav's 16 x 16 avatar, and the portrait smoke test 10/10 against production (Chromium, WebKit, Firefox). The intro: unit tests (print-in, counter, burst, timings), and an e2e check that the hand-over names the portrait before and the avatar after (`pf-avatar`), never both.
+- **Deviations and notes:**
+  - A full-portrait button overlapped the pills and socials at phone widths (WCAG 2.5.8). The portrait became a pointer-only shortcut, and "Try a trait · n/6" is the labelled button.
+  - #152's zero-tolerance run overran the visual job's 20 minutes, leaving the profile step half done. A second zero-tolerance run, with the first harvest committed, finished it: profile-journey and profile-work-about had not changed.
+  - The intro runs 2.9 s, down from 5.2 s. Its greetings now pass at 400 ms, so the in-app intro test waits for the fourth greeting (1.2 s) to prove the tour held past its first stop (0.9 s).
+- **Status:** complete; archived to `completed/`.
