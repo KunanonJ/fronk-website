@@ -224,7 +224,8 @@ export const searchCopy = {
   shortcut: "⌘K", // DRAFT
   menu: "Search", // DRAFT
   placeholder: "Pages, cases, skills", // DRAFT
-  close: "Close search", // DRAFT
+  /** Holds the visible words, "esc" and "Close" (WCAG 2.5.3). */
+  close: "Close search (esc)", // DRAFT
   closeKey: "esc", // DRAFT
   closeTouch: "Close", // DRAFT
   groups: {

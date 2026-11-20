@@ -904,14 +904,20 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
   test("/about: a prose link and a footer link", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/about", { waitUntil: "load" });
+    await expect(page.locator("time[data-clock]")).toBeAttached();
+    // /about settles late (its activity card fills in, the footer moves
+    // 12 px after hydration), which can slide a link from under the
+    // pointer: each hover is retried until its state holds.
     const prose = page.locator("main .ds-prose-link").first();
     await prose.scrollIntoViewIfNeeded();
     expect((await decoration(prose)).thickness).toBe("auto");
-    await prose.hover();
-    expect(await decoration(prose)).toEqual({
-      color: "rgb(110, 60, 255)",
-      thickness: "2px",
-    });
+    await expect(async () => {
+      await prose.hover();
+      expect(await decoration(prose)).toEqual({
+        color: "rgb(110, 60, 255)",
+        thickness: "2px",
+      });
+    }).toPass();
     await page.mouse.move(0, 0);
     expect((await decoration(prose)).thickness).toBe("auto");
     // Reached with the keyboard: Tab back to it from the control before.
@@ -923,8 +929,10 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
     const footer = page.locator(".pf-footer__link").first();
     await footer.scrollIntoViewIfNeeded();
     expect((await decoration(footer)).color).toBe("rgba(0, 0, 0, 0)");
-    await footer.hover();
-    expect((await decoration(footer)).color).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(async () => {
+      await footer.hover();
+      expect((await decoration(footer)).color).not.toBe("rgba(0, 0, 0, 0)");
+    }).toPass();
   });
 });
 
