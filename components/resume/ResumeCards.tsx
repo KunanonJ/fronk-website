@@ -41,13 +41,22 @@ const COPY = {
   entries: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`, // DRAFT
 } as const;
 
-function Logo({ item, size }: { item: ResolvedTimelineItem; size: number }) {
+function Logo({
+  item,
+  size,
+  loading,
+}: {
+  item: ResolvedTimelineItem;
+  size: number;
+  loading?: "eager" | "lazy";
+}) {
   return (
     <CompanyLogo
       name={item.logoName ?? item.org}
       domain={item.logoDomain}
       src={item.logoSrc}
       size={size}
+      loading={loading}
       tile
     />
   );
@@ -89,9 +98,16 @@ const itemKey = (item: ResolvedTimelineItem) =>
 /**
  * Ventures and projects as tiles: the logo, the period (and "Live" when a
  * bullet says so), the name, the kind, one line, and the links (the
- * entry's own site, and its page on this site).
+ * entry's own site, and its page on this site). `eager` for the first
+ * section, whose logos are in the first screen on a wide one.
  */
-function Tiles({ items }: { items: readonly ResolvedTimelineItem[] }) {
+function Tiles({
+  items,
+  eager = false,
+}: {
+  items: readonly ResolvedTimelineItem[];
+  eager?: boolean;
+}) {
   // A page link whose label repeats in the list ("Case study" for each
   // venture) is named after its entry for screen readers.
   const labels = items.flatMap((item) => (item.more ? [item.more.label] : []));
@@ -104,7 +120,7 @@ function Tiles({ items }: { items: readonly ResolvedTimelineItem[] }) {
         return (
           <li key={itemKey(item)} className="pf-resume__tile">
             <div className="pf-resume__tile-top">
-              <Logo item={item} size={48} />
+              <Logo item={item} size={48} loading={eager ? "eager" : "lazy"} />
               <div className="pf-resume__tile-meta">
                 {isLive(item) ? (
                   <span className="pf-resume__badge">
@@ -233,7 +249,7 @@ const cardId = (title: string) => `card-${sectionSlug(title)}`;
 export function NowCard({ section }: { section: ResolvedTimelineSection }) {
   return (
     <Card id="card-building-now" title={COPY.now} kind="now">
-      <Tiles items={section.items} />
+      <Tiles items={section.items} eager />
     </Card>
   );
 }

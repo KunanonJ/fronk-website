@@ -11,6 +11,12 @@ interface CompanyLogoProps {
   size?: number;
   /** The bento résumé's 12 px tile; the printed résumé keeps the 8 px chip. */
   tile?: boolean;
+  /**
+   * "eager" for a logo in the page's first screen at some width (the
+   * résumé's Snapshot card and its first section, UX sweep 21-11-26), where
+   * lazy only delays it; the default is lazy.
+   */
+  loading?: "eager" | "lazy";
   className?: string;
 }
 
@@ -29,6 +35,7 @@ export function CompanyLogo({
   src,
   size = 40,
   tile = false,
+  loading = "lazy",
   className,
 }: CompanyLogoProps) {
   const url = src ?? companyLogoSrc(domain);
@@ -66,7 +73,7 @@ export function CompanyLogo({
         alt=""
         width={size - 8}
         height={size - 8}
-        loading="lazy"
+        loading={loading}
         decoding="async"
         className="h-full w-full object-contain"
       />

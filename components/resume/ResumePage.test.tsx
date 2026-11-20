@@ -209,6 +209,24 @@ describe("ResumePage (screen)", () => {
     ).toHaveAttribute("href", "https://gogocash.co");
   });
 
+  it("loads the first screen's logos at once and the rest lazily (UX sweep 21-11-26)", () => {
+    renderPage();
+    const loading = (scope: HTMLElement) =>
+      [...scope.querySelectorAll<HTMLImageElement>("[data-logo] img")].map(
+        (img) => img.getAttribute("loading"),
+      );
+    // The facts card's ventures and the first section's tiles: in the
+    // first screen at some width, so never lazy.
+    expect(loading(snapshot())).toEqual(["eager", "eager"]);
+    expect(
+      loading(screen.getByRole("article", { name: "Building now" })),
+    ).toEqual(["eager", "eager"]);
+    // Below the fold everywhere: lazy.
+    const roles = loading(screen.getByRole("article", { name: "Experience" }));
+    expect(roles.length).toBeGreaterThan(0);
+    expect(new Set(roles)).toEqual(new Set(["lazy"]));
+  });
+
   it("draws Experience as one timeline, latest first, with readable periods", () => {
     renderPage();
     const card = screen.getByRole("article", { name: "Experience" });

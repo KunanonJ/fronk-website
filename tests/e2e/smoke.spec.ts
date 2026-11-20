@@ -355,6 +355,39 @@ test.describe("resume > the first screen answers a recruiter", () => {
     await expect(status).toHaveText("", { timeout: 5_000 });
   });
 
+  for (const [width, height] of [
+    [1920, 1080],
+    [1440, 900],
+    [390, 844],
+  ] as const) {
+    test(`at ${width} x ${height} no logo in the first screen is lazy, and the ones below it are (UX sweep 21-11-26)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("/resume", { waitUntil: "networkidle" });
+      const logos = await page
+        .locator('[data-logo="image"] img')
+        .evaluateAll((imgs) =>
+          imgs.map((img) => {
+            const box = img.getBoundingClientRect();
+            return {
+              src: img.getAttribute("src"),
+              loading: img.getAttribute("loading"),
+              // In the first screen, as the page opens at its top.
+              first: box.top < window.innerHeight && box.bottom > 0,
+            };
+          }),
+        );
+      const first = logos.filter((logo) => logo.first);
+      expect(first.length).toBeGreaterThan(0);
+      expect(first.filter((logo) => logo.loading === "lazy")).toEqual([]);
+      // Far below the first screen: still lazy.
+      expect(
+        logos.filter((logo) => logo.loading === "lazy").length,
+      ).toBeGreaterThan(0);
+    });
+  }
+
   test("an old ?view=compact link still opens the whole résumé", async ({
     page,
   }) => {

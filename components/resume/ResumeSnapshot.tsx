@@ -95,11 +95,13 @@ function CopyEmail() {
 function Venture({ item }: { item: ResolvedTimelineSection["items"][number] }) {
   const body = (
     <>
+      {/* In the first screen at every width but the smallest: not lazy. */}
       <CompanyLogo
         name={item.logoName ?? item.title}
         domain={item.logoDomain}
         src={item.logoSrc}
         size={24}
+        loading="eager"
       />
       <span>{item.title}</span>
     </>
