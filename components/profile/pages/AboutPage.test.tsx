@@ -10,6 +10,7 @@ import { aboutCopy } from "@/lib/content/homeWorkAbout";
 import { socials } from "@/lib/content/landing";
 import { learnOperatorNotes } from "@/lib/content/learn";
 import { operatingModel } from "@/lib/content/operatingModel";
+import { nowLine } from "@/lib/content/profileChrome";
 
 /*
  * /about after the Phase 6 cutover (plan step 6d), the same intents as the
@@ -152,8 +153,9 @@ describe("AboutPage: the sections", () => {
       // Home's About bento, reused without its principles, keeps Home's
       // name: its eyebrow, the nav's label (AboutBento.test.tsx pins it).
       aboutCopy.eyebrow,
+      // Now is part of the story since 21-11-26 (owner decision), not a
+      // region of its own.
       aboutPage.story.heading,
-      aboutPage.now.heading,
       aboutPage.stack.heading,
       operatingModel.heading,
       aboutPage.faq.heading,
@@ -226,11 +228,84 @@ describe("AboutPage: each thing once (UX sweep 21-11-26)", () => {
         /not looking for a full-time role/.test(p.textContent ?? ""),
     );
     expect(lines).toHaveLength(1);
-    expect(lines[0]!.closest(`#${aboutPage.now.id}`)).not.toBeNull();
+    // Now's opening paragraph, right under its heading.
+    expect(document.getElementById(aboutPage.now.id)!.nextElementSibling).toBe(
+      lines[0],
+    );
     // The story's own now block is Home's.
     expect(
       screen.queryByRole("heading", { name: storyCopy.nowHeading }),
     ).toBeNull();
+  });
+});
+
+describe("AboutPage: Now in the story's column (owner decision 21-11-26)", () => {
+  /** A paragraph's text as read, links included. */
+  const read = (spans: readonly { text: string }[]) =>
+    spans.map((span) => span.text).join("");
+  /**
+   * An element's text as drawn: without the screen-reader-only "(opens in a
+   * new tab)", the no-break spaces read as spaces.
+   */
+  const drawn = (el: Element) => {
+    const copy = el.cloneNode(true) as Element;
+    for (const hidden of copy.querySelectorAll(".sr-only")) hidden.remove();
+    return copy.textContent!.replaceAll(" ", " ");
+  };
+
+  it("makes #now Now's heading, an h3 in the story's column before the records card", () => {
+    const { container } = render(<AboutPage />);
+    const heading = container.querySelector(`#${aboutPage.now.id}`)!;
+    expect(heading.tagName).toBe("H3");
+    expect(heading).toHaveTextContent(aboutPage.now.heading);
+    expect(heading.parentElement).toHaveClass("pf-story__text");
+    expect(heading.closest("section")!.id).toBe(
+      aboutPage.hero.storyHref.slice(1),
+    );
+    expect(
+      heading.compareDocumentPosition(container.querySelector(".pf-records")!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // No section of its own: a region named Now would say it twice.
+    expect(
+      screen.queryByRole("region", { name: aboutPage.now.heading }),
+    ).toBeNull();
+  });
+
+  it("follows the heading with Now's paragraphs, the first in the footer's words", () => {
+    const { container } = render(<AboutPage />);
+    const heading = container.querySelector(`#${aboutPage.now.id}`)!;
+    let next = heading.nextElementSibling;
+    for (const paragraph of aboutPage.now.paragraphs) {
+      expect(next!.tagName).toBe("P");
+      expect(drawn(next!)).toBe(read(paragraph.spans));
+      next = next!.nextElementSibling;
+    }
+    // The column ends with Now.
+    expect(next).toBeNull();
+    expect(drawn(heading.nextElementSibling!).toLowerCase()).toMatch(
+      new RegExp(`^${nowLine.doing.toLowerCase()}\\b`),
+    );
+  });
+
+  it("leaves out the story's closing sentence, which Now tells in full", () => {
+    const { container } = render(<AboutPage />);
+    const column = container.querySelector<HTMLElement>(".pf-story__text")!;
+    const latest = storyCopy.latest
+      .map((run) => (typeof run === "string" ? run : run.strong))
+      .join("")
+      .replaceAll(" ", " ")
+      .trim();
+    expect(column).not.toHaveTextContent(latest);
+    // The story still ends a paragraph, on its last employer before.
+    const paragraphs = column.querySelectorAll("p");
+    expect(paragraphs[storyCopy.paragraphs.length - 1]).toHaveTextContent(
+      /Aiden Labs\.$/,
+    );
+    // The Binary Holdings role, once in the column: Now's sentence.
+    expect(
+      column.textContent!.replaceAll(" ", " ").match(/Binary Holdings/g),
+    ).toHaveLength(1);
   });
 });
 

@@ -26,6 +26,8 @@
  * January 2026). Same day: the skills hub moved to Superstacks v6.7.0 (22
  * skills, with `ama` and `owner-decisions` new). Same day: /open-source and
  * a strip on Home list the owner's three MIT projects from a GitHub snapshot
- * (lib/content/openSource.generated.json).
+ * (lib/content/openSource.generated.json). Same day: /about sets its Now in
+ * the story's column, and there the story leaves out its closing sentence on
+ * the latest role, which Now tells in full (owner decision).
  */
 export const SITE_UPDATED = "2026-11-21";

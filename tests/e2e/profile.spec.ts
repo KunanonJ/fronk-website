@@ -318,6 +318,49 @@ test.describe("About's Read my story (review finding 9)", () => {
   });
 });
 
+/**
+ * /about#now, which Learn links, is Now's heading since Now moved into the
+ * story's column (owner decision 21-11-26): an h3 that must land in view,
+ * under the bar, from Learn's card and on a direct load.
+ */
+test.describe("About's #now (owner decision 21-11-26)", () => {
+  const BAR_BOTTOM = 80;
+  const landsInView = async (page: Page) => {
+    await expect(page).toHaveURL(/\/about#now$/);
+    const heading = page.locator("#story h3#now");
+    await expect(heading).toHaveCount(1);
+    await expect
+      .poll(async () => (await heading.boundingBox())?.y ?? -1)
+      .toBeGreaterThanOrEqual(BAR_BOTTOM);
+    const box = (await heading.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  };
+
+  test.beforeEach(async ({ page }) => {
+    test.skip(
+      !["desktop", "webkit-phone"].includes(test.info().project.name),
+      "desktop Chromium and the WebKit phone",
+    );
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page, "light");
+  });
+
+  test("Learn's What I'm doing now lands on the heading, below the bar", async ({
+    page,
+  }) => {
+    await page.goto("/learn", { waitUntil: "networkidle" });
+    await page.locator('a[href="/about#now"]').click();
+    await landsInView(page);
+  });
+
+  test("a direct load of /about#now lands on the heading, below the bar", async ({
+    page,
+  }) => {
+    await page.goto("/about#now", { waitUntil: "networkidle" });
+    await landsInView(page);
+  });
+});
+
 test("the 12 px floor reads SVG text at the size it is drawn", async ({
   page,
 }) => {

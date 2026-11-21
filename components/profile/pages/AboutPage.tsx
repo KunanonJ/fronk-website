@@ -32,19 +32,21 @@ import { pad2 } from "@/lib/utils/pad2";
 /*
  * /about (profile redesign, Phase 6 cutover; plan step 6d), built from the
  * redesign's parts: the hero beside the portrait, the About bento (Phase 3),
- * the story and the career records (Phase 4, "#story"), then today's Now,
- * tech stack and operating model in the new tiles, the GitHub year, the FAQ
- * as disclosures and the "Next" card with the recruiter links. The h1
- * restates the page title, word for word. Every answer of the FAQPage
- * JSON-LD stays in the HTML. The ids that other pages link (#principles,
- * #now, #faq, #how-i-ship) and #stack stay.
+ * the story and the career records (Phase 4, "#story") with today's Now in
+ * the story's column, then the tech stack and operating model in the new
+ * tiles, the GitHub year, the FAQ as disclosures and the "Next" card with
+ * the recruiter links. The h1 restates the page title, word for word. Every
+ * answer of the FAQPage JSON-LD stays in the HTML. The ids that other pages
+ * link (#principles, #now, #faq, #how-i-ship) and #stack stay.
  *
  * Outside the FAQ and the footer, each thing is said once (UX sweep
  * 21-11-26): the parts borrowed from Home and Contact give way to this
  * page's own. The bento leaves its principle tiles to "How I ship", whose
- * stage list is "#principles"; the story leaves its now block to the Now
- * section; the Next card leaves the availability line to Now and keeps the
- * time zone. Styles: `.pf-about-page*` in src/styles/profile/cutover.css.
+ * stage list is "#principles"; the story's now slot takes this page's Now,
+ * and the story leaves out its closing sentence on the latest role, which
+ * Now tells in full (owner decision 21-11-26); the Next card leaves the
+ * availability line to Now and keeps the time zone. Styles:
+ * `.pf-about-page*` in src/styles/profile/cutover.css.
  */
 
 const SOCIAL_ICONS = {
@@ -167,6 +169,23 @@ function AboutHero() {
 }
 
 /**
+ * Now, in the story's column (owner decision 21-11-26): from 1024 px that
+ * column used to end far above the records card beside it. Its heading is an
+ * h3 under the story's h2 and is "#now", the anchor Learn links.
+ */
+function NowBlock() {
+  const { now } = aboutPage;
+  return (
+    <>
+      <h3 id={now.id} className="t-h3 pf-story__now">
+        {now.heading}
+      </h3>
+      <RichParagraphs paragraphs={now.paragraphs} />
+    </>
+  );
+}
+
+/**
  * The story's header over Phase 4's story and records card. The section is
  * "#story", heading included: the hero's "Read my story" lands on the header,
  * below the bar, not on the paragraphs under it.
@@ -187,28 +206,7 @@ function StorySection() {
           titleMaxWidth={16}
         />
       </div>
-      <Story anchor={false} now={false} />
-    </section>
-  );
-}
-
-function NowSection() {
-  const { now } = aboutPage;
-  return (
-    <section
-      id={now.id}
-      aria-labelledby="now-title"
-      className="ds-wrap pf-about-page__section"
-    >
-      <SectionHeader
-        eyebrow={now.eyebrow}
-        title={now.heading}
-        titleId="now-title"
-        titleMaxWidth={16}
-      />
-      <div className="t-body pf-about-page__prose">
-        <RichParagraphs paragraphs={now.paragraphs} />
-      </div>
+      <Story anchor={false} latest={false} now={<NowBlock />} />
     </section>
   );
 }
@@ -393,7 +391,6 @@ export default function AboutPage() {
       <AboutHero />
       <AboutBento principles={false} />
       <StorySection />
-      <NowSection />
       <StackSection />
       <OperatingModelSection />
       <div className="ds-wrap pf-about-page__activity">
