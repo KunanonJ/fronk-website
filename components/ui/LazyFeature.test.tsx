@@ -19,7 +19,8 @@ import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 
 /*
  * A feature loaded on first use whose code fails to load is left out and
- * the page stays; a real error in a loaded feature still reaches the
+ * the page stays, and its next mount asks for the code again; a real error
+ * in a loaded feature, or in a module as it initialises, still reaches the
  * route's error boundary.
  */
 
@@ -34,6 +35,10 @@ const missing = () =>
   new TypeError(
     "Failed to fetch dynamically imported module: /assets/Hello-x1.js",
   );
+
+/** Vite's preload helper, when the feature's stylesheet fails to load. */
+const cssMissing = () =>
+  new Error("Unable to preload CSS for /assets/Hello-x1.css");
 
 /** Lets a test settle the load when it chooses. */
 function deferred() {
@@ -68,9 +73,11 @@ class RouteBoundary extends Component<
 function Page({
   feature: Feature,
   fallback,
+  onFail,
 }: {
   feature: (props: { name: string }) => ReactNode;
   fallback?: ReactNode;
+  onFail?: () => void;
 }) {
   const [open, setOpen] = useState(true);
   return (
@@ -81,7 +88,7 @@ function Page({
           toggle
         </button>
         {open ? (
-          <FeatureBoundary fallback={fallback}>
+          <FeatureBoundary fallback={fallback} onFail={onFail}>
             <Feature name="Ada" />
           </FeatureBoundary>
         ) : null}
@@ -106,6 +113,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("lazyFeature in a FeatureBoundary", () => {
@@ -148,18 +156,166 @@ describe("lazyFeature in a FeatureBoundary", () => {
     pageStays();
   });
 
-  it("stays out quietly on later mounts, and asks for nothing more", async () => {
-    const load = vi.fn((): Promise<Module> => Promise.reject(missing()));
-    render(<Page feature={lazyFeature(load)} />);
+  it("a stylesheet that fails to preload is a failed load too", async () => {
+    const load = deferred();
+    render(<Page feature={lazyFeature(() => load.promise)} />);
+    await act(async () => load.reject(cssMissing()));
     await waitFor(() => expect(logged).toHaveBeenCalled());
-    for (let open = 0; open < 2; open += 1) {
+    expect(screen.queryByText(/Hello/)).toBeNull();
+    pageStays();
+  });
+
+  it("an import that resolves empty is a failed load, and quiet", async () => {
+    // Vite's preload helper resolves undefined once a vite:preloadError
+    // listener cancels the event (src/lib/staleChunk.ts, while a
+    // navigation loads).
+    const load = vi.fn(async () => undefined as unknown as Module);
+    const failed = vi.fn();
+    render(
+      <Page
+        feature={lazyFeature(load)}
+        fallback={<p>The still</p>}
+        onFail={failed}
+      />,
+    );
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    expect(screen.getByText("The still")).toBeInTheDocument();
+    expect(screen.queryByText(/Hello/)).toBeNull();
+    pageStays();
+    expect(logged).not.toHaveBeenCalled();
+  });
+
+  it("a later mount asks for the code again, and shows it once it loads", async () => {
+    const load = vi
+      .fn((): Promise<Module> => Promise.reject(missing()))
+      .mockImplementationOnce(() => Promise.reject(missing()))
+      .mockImplementationOnce(async () => undefined as unknown as Module)
+      .mockImplementationOnce(async () => ({ default: Hello }));
+    const failed = vi.fn();
+    render(<Page feature={lazyFeature(load)} onFail={failed} />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    expect(load).toHaveBeenCalledTimes(1);
+    // Again: an empty import, then the code.
+    for (const tries of [2, 3]) {
       fireEvent.click(screen.getByRole("button", { name: "toggle" }));
       fireEvent.click(screen.getByRole("button", { name: "toggle" }));
-      await act(() => new Promise((done) => setTimeout(done, 0)));
+      await waitFor(() => expect(load).toHaveBeenCalledTimes(tries));
+      pageStays();
+      if (tries === 2) {
+        await waitFor(() => expect(failed).toHaveBeenCalledTimes(2));
+      }
+    }
+    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
+    expect(failed).toHaveBeenCalledTimes(2);
+    pageStays();
+  });
+
+  it("a chunk that keeps failing is asked for once per mount", async () => {
+    const load = vi.fn((): Promise<Module> => Promise.reject(missing()));
+    const failed = vi.fn();
+    render(<Page feature={lazyFeature(load)} onFail={failed} />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    expect(load).toHaveBeenCalledTimes(1);
+    for (let open = 2; open <= 3; open += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+      fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+      await waitFor(() => expect(failed).toHaveBeenCalledTimes(open));
       expect(screen.queryByText(/Hello/)).toBeNull();
       pageStays();
+      expect(load).toHaveBeenCalledTimes(open);
     }
+  });
+
+  it("asks again for the files whose links failed, past the caches, before the code", async () => {
+    // WebKit gives a failed file's answer to the next import without asking
+    // the server; Vite's preload helper links each stylesheet once.
+    const fetched = vi.fn(async () => new Response(""));
+    vi.stubGlobal("fetch", fetched);
+    const link = (rel: string, href: string) => {
+      const element = document.createElement("link");
+      element.rel = rel;
+      element.href = href;
+      document.head.append(element);
+      element.dispatchEvent(new Event("error"));
+      return element;
+    };
+    link("modulepreload", "/assets/Hello-x1.js");
+    const sheet = link("stylesheet", "/assets/Hello-x1.css");
+    link("stylesheet", "https://elsewhere.example/assets/font.css");
+    const load = vi
+      .fn((): Promise<Module> => Promise.reject(missing()))
+      .mockImplementationOnce(() => Promise.reject(missing()))
+      .mockImplementationOnce(async () => ({ default: Hello }));
+    const failed = vi.fn();
+    render(<Page feature={lazyFeature(load)} onFail={failed} />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    expect(fetched).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+    await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2));
+    expect(fetched.mock.calls).toEqual([
+      [`${location.origin}/assets/Hello-x1.js`, { cache: "reload" }],
+      [`${location.origin}/assets/Hello-x1.css`, { cache: "reload" }],
+    ]);
+    // The stylesheet is linked anew, and the code asked for once it loads.
+    const fresh = await waitFor(() => {
+      const found = document.head.querySelector<HTMLLinkElement>(
+        'link[rel="stylesheet"][href$="/assets/Hello-x1.css"]',
+      );
+      expect(found).not.toBeNull();
+      expect(found).not.toBe(sheet);
+      return found!;
+    });
+    expect(sheet.isConnected).toBe(false);
     expect(load).toHaveBeenCalledTimes(1);
+    act(() => {
+      fresh.dispatchEvent(new Event("load"));
+    });
+    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
+    expect(load).toHaveBeenCalledTimes(2);
+    pageStays();
+  });
+
+  it("tells onFail, so what opened it can open it again", async () => {
+    const load = vi
+      .fn((): Promise<Module> => Promise.reject(missing()))
+      .mockImplementationOnce(() => Promise.reject(missing()))
+      .mockImplementationOnce(async () => ({ default: Hello }));
+    const Feature = lazyFeature(load);
+    const failed = vi.fn();
+    /** As SearchTrigger holds the search dialog. */
+    function Opener() {
+      const [open, setOpen] = useState(false);
+      return (
+        <RouteBoundary>
+          <h1>The page</h1>
+          <button type="button" onClick={() => setOpen(true)}>
+            open
+          </button>
+          {open ? (
+            <FeatureBoundary
+              onFail={() => {
+                failed();
+                setOpen(false);
+              }}
+            >
+              <Feature name="Ada" />
+            </FeatureBoundary>
+          ) : null}
+        </RouteBoundary>
+      );
+    }
+    render(<Opener />);
+    fireEvent.click(screen.getByRole("button", { name: "open" }));
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/Hello/)).toBeNull();
+    pageStays();
+    fireEvent.click(screen.getByRole("button", { name: "open" }));
+    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(failed).toHaveBeenCalledTimes(1);
+    pageStays();
   });
 
   it("a real error in a loaded feature reaches the route's boundary", async () => {
@@ -167,6 +323,14 @@ describe("lazyFeature in a FeatureBoundary", () => {
       throw new Error(`A bug for ${name}`);
     }
     const Feature = lazyFeature(async () => ({ default: Broken }));
+    render(<Page feature={Feature} />);
+    expect(await screen.findByText("Something went wrong")).toBeInTheDocument();
+  });
+
+  it("so does an error a module throws as it initialises", async () => {
+    const Feature = lazyFeature((): Promise<Module> =>
+      Promise.reject(new ReferenceError("hello is not defined")),
+    );
     render(<Page feature={Feature} />);
     expect(await screen.findByText("Something went wrong")).toBeInTheDocument();
   });

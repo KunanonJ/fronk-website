@@ -8,7 +8,8 @@ import { searchCopy } from "@/lib/content/profileChrome";
  * the same dialog with `openSearch`. The dialog's code and stylesheet load
  * on first use (SearchDialog), so the first load carries only this button.
  * If they fail to load, nothing opens and the page stays
- * (components/ui/LazyFeature.tsx).
+ * (components/ui/LazyFeature.tsx); the search closes again, so the next
+ * press, ⌘K or the menu's Search asks for them once more.
  * No single-key shortcut: one would need an off switch (WCAG 2.1.4).
  */
 
@@ -92,7 +93,7 @@ export function SearchTrigger() {
         <SearchIcon />
       </button>
       {open ? (
-        <FeatureBoundary>
+        <FeatureBoundary onFail={() => setOpen(false)}>
           <SearchDialog onClose={() => setOpen(false)} />
         </FeatureBoundary>
       ) : null}

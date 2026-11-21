@@ -1615,21 +1615,27 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
    * The dialog's code fails to load (a deploy took its chunk away, or the
    * network dropped it): nothing opens, and the page in use stays, rather
    * than the route's error page taking it, with no reload either
-   * (components/ui/LazyFeature.tsx).
+   * (components/ui/LazyFeature.tsx). Search closes again, so once the code
+   * answers, the button and ⌘K ask for it once more and open the dialog.
    */
-  test("its code fails to load: the page stays, with no error page and no reload", async ({
+  test("its code fails to load: the page stays, with no error page and no reload; the next open loads it", async ({
     page,
   }) => {
     let asked = 0;
+    let failing = true;
     await page.route(/\/assets\/SearchDialog-[\w-]+\.js$/, (route) => {
       asked += 1;
-      return route.fulfill({ status: 404, body: "Not found" });
+      return failing
+        ? route.fulfill({ status: 404, body: "Not found" })
+        : route.continue();
     });
     let documents = 0;
     page.on("request", (request) => {
       if (request.isNavigationRequest() && request.frame() === page.mainFrame())
         documents += 1;
     });
+    // The nav's button, pressed once the code answers, shows from 810 px.
+    await page.setViewportSize({ width: 1440, height: 900 });
     await visit(page, "/about");
     const heading = page.locator("h1").first();
     const title = (await heading.textContent()) ?? "";
@@ -1648,6 +1654,20 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(heading).toHaveText(title);
     await expect(page.getByText(/Something\s+went\s+wrong/)).toHaveCount(0);
     expect(new URL(page.url()).pathname).toBe("/about");
+    expect(documents).toBe(1);
+
+    // The code answers again: the button asks once more and opens it, and
+    // so does ⌘K after Esc.
+    failing = false;
+    const before = asked;
+    await page.getByRole("button", { name: "Search the site" }).click();
+    await expect(page.locator(dialog)).toBeVisible();
+    expect(asked).toBeGreaterThan(before);
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(heading).toHaveText(title);
     expect(documents).toBe(1);
   });
 
