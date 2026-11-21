@@ -5,6 +5,15 @@
  * panels from 810 px, and sits beside the copy from 1180 px. Every rule is in
  * @layer components except the marquee's hover pause at the end, which must
  * beat an unlayered rule and says why.
+ *
+ * Its own sheet since UX sweep 21-11-26: the hero links it (Hero.tsx,
+ * `precedence`), so it is in the server-rendered HTML of Home and in no other
+ * page's first load. The layer order is profile.css's. Loaded after it, these
+ * rules now follow the other partials in @layer components; none of those
+ * styles the hero's parts, and `.pf-hero ~ *` gives the sections after the
+ * hero the values home-work-about.css gives Work and About, so the order
+ * changes nothing.
+ * kj-file-in, which the orbit uses too, lives in home-journey.css.
  */
 
 @layer components {
@@ -891,13 +900,6 @@
   from {
     opacity: 0;
     transform: translateY(12px);
-  }
-}
-
-@keyframes kj-file-in {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.96);
   }
 }
 

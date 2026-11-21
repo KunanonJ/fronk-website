@@ -16,6 +16,7 @@ import {
 } from "@/components/profile/home/IntroGate";
 import { LogoStrip } from "@/components/profile/home/LogoStrip";
 import { homeHero } from "@/lib/content/home";
+import heroCss from "@/src/styles/profile/home-hero.css?url";
 
 /*
  * The Home hero (profile redesign, Phase 2; design spec 8.1 to 8.3, 10 and
@@ -27,7 +28,8 @@ import { homeHero } from "@/lib/content/home";
  * browser scrolls a focused control into view where it really is (WCAG
  * 2.4.11). The first facts (the h1, "Currently building", Contact me,
  * Résumé) are at the top of the copy, above the fold at 375 x 812 and
- * 1440 x 900.
+ * 1440 x 900. Its stylesheet (src/styles/profile/home-hero.css) is linked
+ * here, so no other page loads it.
  */
 
 /** The stage's height, for the sticky offset in home-hero.css. */
@@ -76,38 +78,41 @@ export default function Hero() {
   };
 
   return (
-    <section
-      ref={stage}
-      className="pf-hero"
-      aria-labelledby="hero-title"
-      onFocus={onFocus}
-      onBlur={onBlur}
-    >
-      <IntroPendingScript />
-      <div className="pf-hero__sheet" aria-hidden="true">
-        <DitherField className="pf-hero__sky" />
-      </div>
-      <div className="pf-hero__grid ds-wrap">
-        <div className="pf-hero__copy">
-          <p className="pf-hero__chips">
-            <Badge>{homeHero.badge}</Badge>
-            <span className="sr-only">, </span>
-            <Chip>{homeHero.chip}</Chip>
-          </p>
-          <Headline ready={ready} paused={!playing || focusInside} />
-          <p className="t-lead pf-hero__lead">{homeHero.lead}</p>
-          <div className="pf-hero__actions">
-            <Pill href={homeHero.primaryCta.href} size="hero" arrow="swap">
-              {homeHero.primaryCta.label}
-            </Pill>
-            <Pill href={homeHero.resumeCta.href} size="hero" variant="ghost">
-              {homeHero.resumeCta.label}
-            </Pill>
-          </div>
+    <>
+      <link rel="stylesheet" href={heroCss} precedence="pf-home-hero" />
+      <section
+        ref={stage}
+        className="pf-hero"
+        aria-labelledby="hero-title"
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        <IntroPendingScript />
+        <div className="pf-hero__sheet" aria-hidden="true">
+          <DitherField className="pf-hero__sky" />
         </div>
-        <CanvasMock ready={ready} paused={!playing} />
-      </div>
-      <LogoStrip playing={playing} onPlayingChange={setPlaying} />
-    </section>
+        <div className="pf-hero__grid ds-wrap">
+          <div className="pf-hero__copy">
+            <p className="pf-hero__chips">
+              <Badge>{homeHero.badge}</Badge>
+              <span className="sr-only">, </span>
+              <Chip>{homeHero.chip}</Chip>
+            </p>
+            <Headline ready={ready} paused={!playing || focusInside} />
+            <p className="t-lead pf-hero__lead">{homeHero.lead}</p>
+            <div className="pf-hero__actions">
+              <Pill href={homeHero.primaryCta.href} size="hero" arrow="swap">
+                {homeHero.primaryCta.label}
+              </Pill>
+              <Pill href={homeHero.resumeCta.href} size="hero" variant="ghost">
+                {homeHero.resumeCta.label}
+              </Pill>
+            </div>
+          </div>
+          <CanvasMock ready={ready} paused={!playing} />
+        </div>
+        <LogoStrip playing={playing} onPlayingChange={setPlaying} />
+      </section>
+    </>
   );
 }

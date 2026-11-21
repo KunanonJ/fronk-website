@@ -394,7 +394,6 @@ describe("profile stylesheet", () => {
     ].map((m) => m[1]);
     expect(imports).toEqual([
       "profile/shell.css",
-      "profile/home-hero.css",
       "profile/home-work-about.css",
       "profile/home-journey.css",
       "profile/case.css",
@@ -402,6 +401,22 @@ describe("profile stylesheet", () => {
       "profile/pages-hubs.css",
       "profile/pages-catalog.css",
     ]);
+  });
+
+  it("leaves the Home hero's partial to the hero, so no other page loads it", () => {
+    // UX sweep 21-11-26: home-hero.css was 2.9 KB gzip of every page's
+    // first load. Hero.tsx links it (`precedence`), as ResumePage links
+    // resume.css; the import list above keeps profile.css from taking it back.
+    const hero = readFileSync(
+      join(process.cwd(), "components/profile/home/Hero.tsx"),
+      "utf8",
+    );
+    expect(hero).toContain(
+      'import heroCss from "@/src/styles/profile/home-hero.css?url";',
+    );
+    expect(hero).toContain(
+      '<link rel="stylesheet" href={heroCss} precedence="pf-home-hero" />',
+    );
   });
 
   it("names its phase in each partial's first line, so a lane edits only its own", () => {
