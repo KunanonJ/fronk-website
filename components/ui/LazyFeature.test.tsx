@@ -318,6 +318,68 @@ describe("lazyFeature in a FeatureBoundary", () => {
     pageStays();
   });
 
+  it("tells onFail once, however often the page re-renders while it fails", async () => {
+    const Feature = lazyFeature((): Promise<Module> =>
+      Promise.reject(missing()),
+    );
+    const failed = vi.fn();
+    /** A parent that re-renders, and hands a new onFail every time. */
+    function Busy() {
+      const [count, setCount] = useState(0);
+      return (
+        <RouteBoundary>
+          <h1>The page</h1>
+          <button type="button" onClick={() => setCount(count + 1)}>
+            render {count}
+          </button>
+          <FeatureBoundary onFail={() => failed()}>
+            <Feature name="Ada" />
+          </FeatureBoundary>
+        </RouteBoundary>
+      );
+    }
+    render(<Busy />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    for (let i = 0; i < 3; i += 1)
+      fireEvent.click(screen.getByRole("button", { name: /render/ }));
+    await act(async () => new Promise((done) => setTimeout(done, 20)));
+    expect(failed).toHaveBeenCalledTimes(1);
+    pageStays();
+  });
+
+  it("leaves React's precedence stylesheets to React when it asks again", async () => {
+    const fetched = vi.fn(async () => new Response(""));
+    vi.stubGlobal("fetch", fetched);
+    // A feature's own stylesheet, as React links it (`precedence`).
+    const own = document.createElement("link");
+    own.rel = "stylesheet";
+    own.href = "/assets/Search-x1.css";
+    own.setAttribute("data-precedence", "pf-search");
+    document.head.append(own);
+    own.dispatchEvent(new Event("error"));
+    const load = vi
+      .fn((): Promise<Module> => Promise.reject(missing()))
+      .mockImplementationOnce(() => Promise.reject(missing()))
+      .mockImplementationOnce(async () => ({ default: Hello }));
+    const failed = vi.fn();
+    render(<Page feature={lazyFeature(load)} onFail={failed} />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
+    // Asked for past the caches, but the same element stays where it was.
+    expect(fetched).toHaveBeenCalledWith(
+      `${location.origin}/assets/Search-x1.css`,
+      { cache: "reload" },
+    );
+    expect(own.isConnected).toBe(true);
+    expect(
+      document.head.querySelectorAll('link[href$="/assets/Search-x1.css"]'),
+    ).toHaveLength(1);
+    own.remove();
+    pageStays();
+  });
+
   it("a real error in a loaded feature reaches the route's boundary", async () => {
     function Broken({ name }: { name: string }): ReactNode {
       throw new Error(`A bug for ${name}`);

@@ -4,6 +4,7 @@ import {
   Suspense,
   useContext,
   useEffect,
+  useEffectEvent,
   type ComponentType,
   type ReactNode,
 } from "react";
@@ -18,8 +19,11 @@ import { CatchBoundary } from "@tanstack/react-router";
  *
  * A failed load is what the import rejects with when a chunk cannot be
  * fetched: a TypeError (a missing chunk's, in every engine), or the Error
- * "Unable to preload CSS for ..." of Vite's preload helper when the
- * feature's stylesheet does not load. An import that resolves empty is one
+ * "Unable to preload CSS for ..." of Vite's preload helper when a
+ * stylesheet Vite links with the chunk does not load. Today's features link
+ * their own stylesheet instead (React's `precedence`), which no import
+ * waits for: if only that one fails, the feature shows unstyled, and it is
+ * not asked for again (as before). An import that resolves empty is one
  * too, a quiet one (nothing is thrown, so nothing is logged): the helper
  * resolves undefined when a `vite:preloadError` listener cancels the event,
  * as src/lib/staleChunk.ts does while a navigation loads. Anything else the
@@ -34,9 +38,11 @@ import { CatchBoundary } from "@tanstack/react-router";
  * failed stays as it is; the feature's next mount asks for its code again
  * (the next press of Search, the next link preview). Before it does, the
  * site's files whose links failed are asked for past the caches: Vite links
- * a chunk (and its stylesheet) before it imports it, WebKit keeps the
- * failed answer and gives it to the next import without asking the server,
- * and the helper links each stylesheet once, so a failed one is linked anew.
+ * a chunk (and any stylesheet of its own) before it imports it, WebKit
+ * keeps the failed answer and gives it to the next import without asking
+ * the server, and the helper links each stylesheet once, so a failed one of
+ * Vite's is linked anew. React's `precedence` stylesheets are React's to
+ * manage and are left alone.
  *
  * The boundary is the router's CatchBoundary, already in the entry chunk
  * (the entry carries every page): an error its error component throws goes
@@ -74,7 +80,13 @@ function refetchFailed() {
   return Promise.all(
     links.map(async (link) => {
       await fetch(link.href, { cache: "reload" }).catch(() => undefined);
-      if (link.rel !== "stylesheet" || !link.isConnected) return;
+      // Vite's stylesheet links only: React tracks its `precedence` ones.
+      if (
+        link.rel !== "stylesheet" ||
+        link.hasAttribute("data-precedence") ||
+        !link.isConnected
+      )
+        return;
       const fresh = link.cloneNode() as HTMLLinkElement;
       await new Promise((done) => {
         fresh.onload = fresh.onerror = done;
@@ -102,11 +114,25 @@ const Failure = createContext<{ fallback?: ReactNode; onFail?: () => void }>(
  */
 function Failed({ again }: { again: () => void }) {
   const { fallback, onFail } = useContext(Failure);
+  // The caller's latest onFail, without a new onFail (an inline arrow, a
+  // re-render) making the effect run again: once per failure.
+  const fail = useEffectEvent(() => onFail?.());
   useEffect(() => {
     again();
-    onFail?.();
-  }, [again, onFail]);
+    fail();
+  }, [again]);
   return fallback;
+}
+
+/**
+ * The boundary's error component, the same one on every render, so a
+ * re-render of the page does not mount Failed anew.
+ */
+function FailedOrRethrow({ error }: { error: unknown }) {
+  const again = failedLoads.get(error as object);
+  // Not a failed load: a bug, for the route's error boundary to show.
+  if (!again) throw error;
+  return <Failed again={again} />;
 }
 
 /** The boundary never resets: a feature that failed stays out. */
@@ -161,15 +187,7 @@ export function FeatureBoundary({
 }) {
   return (
     <Failure.Provider value={{ fallback, onFail }}>
-      <CatchBoundary
-        getResetKey={noReset}
-        errorComponent={({ error }) => {
-          const again = failedLoads.get(error as object);
-          // Not a failed load: a bug, for the route's error boundary to show.
-          if (!again) throw error;
-          return <Failed again={again} />;
-        }}
-      >
+      <CatchBoundary getResetKey={noReset} errorComponent={FailedOrRethrow}>
         <Suspense fallback={fallback}>{children}</Suspense>
       </CatchBoundary>
     </Failure.Provider>
