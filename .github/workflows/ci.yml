@@ -85,9 +85,8 @@ jobs:
       # Reuses dist/ from the Build step above (same job, repo-root cwd), and
       # serves it with `vite preview` to measure the pages rendered on request
       # (/resume, /learn) as well. Fails if any page's first-load JS,
-      # stylesheets or preloaded fonts exceed their budgets (165 KB, 200 KB
-      # for marketing pages or 216 KB for the skills pages; 36 KB; 52 KB:
-      # scripts/check-first-load-budget.mjs).
+      # stylesheets or preloaded fonts exceed their budgets (165 KB, or 200 KB
+      # for marketing pages; 36 KB; 52 KB: scripts/check-first-load-budget.mjs).
       - name: Perf budget
         run: pnpm perf:budget
 

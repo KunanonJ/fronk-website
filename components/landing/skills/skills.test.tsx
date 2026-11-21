@@ -4,6 +4,7 @@ import { ChromeProvider } from "@/components/bento/ChromeContext";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
 import SkillsCatalog from "@/components/landing/skills/SkillsCatalog";
 import SkillsIndexPage from "@/components/landing/skills/SkillsIndexPage";
+import { loadSkillMd } from "@/lib/content/skillMd";
 import {
   SKILL_STAGES,
   USER_INVOKED_COUNT,
@@ -19,10 +20,12 @@ function skill(slug: string): Skill {
   return found;
 }
 
-function renderDetail(slug: string) {
+/** The page as the route renders it, with the SKILL.md its loader reads. */
+async function renderDetail(slug: string) {
+  const skillMd = await loadSkillMd(slug);
   return render(
     <ChromeProvider>
-      <SkillDetailPage skill={skill(slug)} />
+      <SkillDetailPage skill={skill(slug)} skillMd={skillMd} />
     </ChromeProvider>,
   );
 }
@@ -126,8 +129,8 @@ describe("SkillsIndexPage", () => {
 });
 
 describe("SkillDetailPage", () => {
-  it("draws verify-loop as the canvas does: original, automatic, with scripts", () => {
-    renderDetail("verify-loop");
+  it("draws verify-loop as the canvas does: original, automatic, with scripts", async () => {
+    await renderDetail("verify-loop");
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       /^verify-loop$/,
     );
@@ -150,8 +153,8 @@ describe("SkillDetailPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("gives an adapted skill its upstream, pinned commit and patches", () => {
-    renderDetail("code-review");
+  it("gives an adapted skill its upstream, pinned commit and patches", async () => {
+    await renderDetail("code-review");
     const origin = screen.getByRole("article", { name: "Origin" });
     expect(origin).toHaveTextContent("Adapted");
     expect(origin).toHaveTextContent(/From mattpocock\/skills/i);
@@ -167,15 +170,15 @@ describe("SkillDetailPage", () => {
     expect(within(files).getAllByRole("listitem")).toHaveLength(1);
   });
 
-  it("credits the excerpt inside pr", () => {
-    renderDetail("pr");
+  it("credits the excerpt inside pr", async () => {
+    await renderDetail("pr");
     expect(screen.getByRole("article", { name: "Origin" })).toHaveTextContent(
       /credited excerpt from show-me \(humanlayer\/skills\)/,
     );
   });
 
-  it("tells you to invoke a user-invoked skill by name", () => {
-    renderDetail("gardening");
+  it("tells you to invoke a user-invoked skill by name", async () => {
+    await renderDetail("gardening");
     const runs = screen.getByRole("article", { name: "How it runs" });
     expect(runs).toHaveTextContent("You invoke it.");
     expect(runs).toHaveTextContent("disable-model-invocation: true");
@@ -183,10 +186,10 @@ describe("SkillDetailPage", () => {
     expect(about).toHaveTextContent("You invoke");
   });
 
-  it("folds a long SKILL.md and keeps the rest in the page", () => {
-    renderDetail("verify-loop");
-    const total = skill("verify-loop")
-      .content.replace(/\n+$/, "")
+  it("folds a long SKILL.md and keeps the rest in the page", async () => {
+    await renderDetail("verify-loop");
+    const total = (await loadSkillMd("verify-loop"))
+      .replace(/\n+$/, "")
       .split("\n").length;
     const toggle = screen.getByRole("button", {
       name: `Show all ${total} lines`,
@@ -202,11 +205,11 @@ describe("SkillDetailPage", () => {
     expect(rest).toBeVisible();
   });
 
-  it("shows a short SKILL.md whole, with no toggle", () => {
-    renderDetail("grill-with-docs");
+  it("shows a short SKILL.md whole, with no toggle", async () => {
+    await renderDetail("grill-with-docs");
     expect(screen.queryByRole("button", { name: /^Show all/ })).toBeNull();
     expect(document.getElementById("skill-md")!.textContent).toBe(
-      skill("grill-with-docs").content.replace(/\n+$/, ""),
+      (await loadSkillMd("grill-with-docs")).replace(/\n+$/, ""),
     );
   });
 });

@@ -2,8 +2,8 @@
  * Skills hub: the agent skills in the public `KunanonJ/superstacks` plugin.
  *
  * Data: `skills.generated.json` is a committed snapshot written by
- * `scripts/sync-skills.mjs` (`pnpm skills:sync`). The build reads only that
- * file and never calls GitHub. Re-run the sync after cutting a release.
+ * `scripts/sync-skills.mjs` (`pnpm skills:sync`). The build reads only the
+ * snapshot and never calls GitHub. Re-run the sync after cutting a release.
  *
  * This module is the editorial overlay on top of the snapshot: page copy, the
  * stage grouping, the pipeline order, and every install command template.
@@ -15,8 +15,10 @@
  * only what the snapshot proves (version, file sizes, license). A skill is
  * "Original" only when `sources.lock.json` attributes it to no upstream.
  *
- * Server-only in practice: the snapshot carries every SKILL.md, so do not
- * import this module from a client component (pass strings as props instead).
+ * Every skills page imports this module, so it carries no SKILL.md: the sync
+ * writes each one to `lib/content/skill-md/`, and a skill page's loader reads
+ * only its own through `loadSkillMd` (lib/content/skillMd.ts). Keep bodies
+ * and other large text out of this module and its snapshot.
  */
 
 import snapshot from "@/lib/content/skills.generated.json";
@@ -83,8 +85,6 @@ export interface Skill {
   zip: SkillAsset;
   /** `<skill>-flat.zip`: `SKILL.md` at the zip root (claude.ai / ChatGPT upload). */
   flatZip: SkillAsset;
-  /** The full SKILL.md, frontmatter included. */
-  content: string;
   /** Path of the skill folder in the repo. */
   repoPath: string;
   folderUrl: string;
@@ -275,7 +275,6 @@ function toSkill(raw: SnapshotSkill): Skill {
     })),
     zip: raw.zip,
     flatZip: raw.flatZip,
-    content: raw.content,
     repoPath,
     folderUrl: tree(repoPath),
     skillMdUrl: blob(`${repoPath}/SKILL.md`),

@@ -5,7 +5,7 @@
  * shows it. Rendered on /about and exported as /operating-model.md so other
  * projects can reuse it.
  *
- * Kept free of lib/content/skills.ts (which bundles every SKILL.md): stage
+ * Kept free of lib/content/skills.ts (which bundles the skills snapshot): stage
  * labels, blurbs and members are copied here, and operatingModel.test.ts
  * checks them against the skills data so they can't drift.
  */

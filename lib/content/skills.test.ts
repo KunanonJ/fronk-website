@@ -1,6 +1,8 @@
+import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { primaryNav } from "@/lib/content/landing";
 import { PAGE_META } from "@/lib/content/pageMeta";
+import { loadSkillMd } from "@/lib/content/skillMd";
 import snapshot from "@/lib/content/skills.generated.json";
 import {
   ADAPTED_COUNT,
@@ -56,17 +58,30 @@ describe("skills snapshot", () => {
       expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
   });
 
-  it("gives every skill a description, a license and a SKILL.md", () => {
+  it("gives every skill a description, a license and a SKILL.md", async () => {
     for (const s of skills) {
       expect(s.description.trim(), s.slug).not.toBe("");
       expect(s.license, s.slug).toBe("MIT");
-      expect(s.content.startsWith("---\n"), s.slug).toBe(true);
-      expect(s.content, s.slug).toContain(`name: ${s.name}`);
+      const skillMd = await loadSkillMd(s.slug);
+      expect(skillMd.startsWith("---\n"), s.slug).toBe(true);
+      expect(skillMd, s.slug).toContain(`name: ${s.name}`);
       expect(
         s.files.some((f) => f.path === "SKILL.md"),
         s.slug,
       ).toBe(true);
     }
+  });
+
+  it("keeps every SKILL.md out of the snapshot, one file per skill beside it", async () => {
+    // Every skills page imports the snapshot; a body in it would ship to all.
+    for (const raw of snapshot.skills)
+      expect(raw).not.toHaveProperty("content");
+    expect(readdirSync("lib/content/skill-md").sort()).toEqual(
+      snapshot.skills.map((s) => `${s.name}.md`).sort(),
+    );
+    await expect(loadSkillMd("no-such-skill")).rejects.toThrow(
+      /No SKILL\.md for no-such-skill/,
+    );
   });
 });
 

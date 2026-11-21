@@ -450,6 +450,98 @@ test.describe("skills > the catalog filter is a typed search param", () => {
   });
 });
 
+test.describe("skills > each skill page loads its own SKILL.md and no other", () => {
+  /** A SKILL.md's opening lines, as a script carries them (escaped or not). */
+  const FRONTMATTER = /---(?:\\n|\n)name: ([a-z-]+)(?:\\n|\n)description: /g;
+
+  /** The SKILL.md the sync wrote, as the page shows it. */
+  const skillMd = (slug: string) =>
+    readFileSync(`lib/content/skill-md/${slug}.md`, "utf8").replace(/\n+$/, "");
+
+  /** The SKILL.md card's text: its one or two blocks, a line apart. */
+  async function shownSkillMd(page: Page) {
+    const blocks = await page.locator("#skill-md pre").allTextContents();
+    return blocks.join("\n");
+  }
+
+  /** Every script the page fetches, and the skills whose SKILL.md each holds. */
+  function watchScripts(page: Page) {
+    const bodies: Promise<string>[] = [];
+    page.on("response", (res) => {
+      if (res.request().resourceType() === "script")
+        bodies.push(res.text().catch(() => ""));
+    });
+    return async () => {
+      const names = (await Promise.all(bodies)).flatMap((body) =>
+        [...body.matchAll(FRONTMATTER)].map((m) => m[1]!),
+      );
+      return [...new Set(names)].sort();
+    };
+  }
+
+  test("/skills loads none; a skill, its next one and Back each show their own", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+    const loaded = watchScripts(page);
+
+    await page.goto("/skills", { waitUntil: "networkidle" });
+    expect(await loaded(), "SKILL.md bodies loaded by /skills").toEqual([]);
+
+    // Client-side navigations: each fetches only the skill it opens.
+    await page
+      .getByRole("article", { name: "ama", exact: true })
+      .getByRole("link", { name: "ama", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/skills\/ama$/);
+    await expect(page.locator("h1")).toHaveText("ama");
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("ama"));
+
+    await page
+      .getByRole("navigation", { name: "More skills" })
+      .getByRole("link", { name: /^Next/ })
+      .click();
+    await expect(page).toHaveURL(/\/skills\/how$/);
+    await expect(page.locator("h1")).toHaveText("how");
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("how"));
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/skills\/ama$/);
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("ama"));
+    expect(await loaded()).toEqual(["ama", "how"]);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("a skill page loaded directly shows its SKILL.md from the page itself", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+    const loaded = watchScripts(page);
+
+    await page.goto("/skills/ama", { waitUntil: "networkidle" });
+    expect(await shownSkillMd(page)).toBe(skillMd("ama"));
+    // The prerendered page carries the text in its loader data, so hydration
+    // fetches no SKILL.md, and Show all works once it has run.
+    expect(await loaded()).toEqual([]);
+    const toggle = page.locator('button[aria-controls="skill-md"]');
+    await expect(toggle).toHaveText(/^Show all \d+ lines$/);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator("#skill-md pre").last()).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
+
 test.describe("portfolio > the category filter is a typed search param", () => {
   test("?category=ai-agents narrows the projects, All brings back a clean URL", async ({
     page,

@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  OUTPUT_PATH,
+  SKILL_MD_DIR,
   buildSnapshot,
   parseFrontmatter,
   serializeSnapshot,
+  snapshotFiles,
 } from "./sync-skills.mjs";
 
 describe("parseFrontmatter", () => {
@@ -210,6 +213,24 @@ describe("buildSnapshot", () => {
     expect(serializeSnapshot(buildSnapshot(fixture()))).toBe(first);
     expect(first.endsWith("}\n")).toBe(true);
     expect(first).not.toMatch(/generatedAt|"date"/);
+  });
+
+  it("writes each SKILL.md to a file of its own and keeps the JSON free of them", () => {
+    const raw = fixture();
+    raw.skillFiles.alpha = skillMd("alpha").replace(/\n/g, "\r\n");
+    const files = snapshotFiles(buildSnapshot(raw));
+    expect([...files.keys()]).toEqual([
+      OUTPUT_PATH,
+      `${SKILL_MD_DIR}/alpha.md`,
+      `${SKILL_MD_DIR}/zeta.md`,
+    ]);
+    // The SKILL.md as the tag has it, newlines normalised.
+    expect(files.get(`${SKILL_MD_DIR}/alpha.md`)).toBe(skillMd("alpha"));
+    expect(files.get(`${SKILL_MD_DIR}/zeta.md`)).toBe(skillMd("zeta"));
+    const json = files.get(OUTPUT_PATH)!;
+    expect(json).toBe(serializeSnapshot(buildSnapshot(raw)));
+    expect(json).not.toContain('"content"');
+    expect(json).not.toContain("# alpha");
   });
 
   it("fails loudly when the release or the lock disagrees with the repo", () => {
