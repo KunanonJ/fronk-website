@@ -129,12 +129,13 @@ test.describe("assets > a site file that fails to load reloads the page once", (
 /**
  * A tab left open across a deploy (src/lib/staleChunk.ts): the deploy took
  * the old build's files away, so a link followed inside the site asks for a
- * chunk that answers 404. The page asked for loads fresh, once; files that
- * keep failing on the fresh page end on the error page; a feature's chunk
- * that fails on the page in use never reloads it.
+ * chunk that answers 404. The page asked for loads fresh, at the top, once
+ * per page and build; that page failing again in the same build ends on
+ * the error page; a feature's chunk that fails on the page in use never
+ * reloads it.
  */
 test.describe("assets > a navigation whose chunk a deploy removed loads its page fresh, once", () => {
-  // Up to two page loads and a few seconds of waiting for a reload that
+  // Up to three page loads and a few seconds of waiting for a reload that
   // must not come: under a full parallel run, 30 s ran out.
   test.describe.configure({ timeout: 60_000 });
   const FLAG = "pf-chunk-reload";
@@ -178,16 +179,67 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
     );
   };
 
-  /** The session flag and the build of the page showing. */
-  const flagAndBuild = (page: Page) =>
+  /** The session flag, and the flag a reload to the page showing sets. */
+  const flagAndPage = (page: Page) =>
     page.evaluate((key) => {
       return [
         sessionStorage.getItem(key),
-        document.documentElement.dataset.build,
+        `${document.documentElement.dataset.build} ${location.pathname}`,
       ];
     }, FLAG);
 
   const clock = (page: Page) => page.locator("time[data-clock]");
+
+  /** How far the page showing is scrolled. */
+  const offset = (page: Page) =>
+    page.evaluate(() => Math.round(window.scrollY));
+
+  const MODES = "pf-test-scroll-modes";
+  /**
+   * Every value a page gives `history.scrollRestoration`, the last page's
+   * kept for the next (session storage outlives the reload). The last one
+   * the old page gave decides where the browser reopens the fresh page:
+   * "auto" puts it at the old page's offset. The offset alone shows that
+   * only when the reload comes before the error page scrolls to the top,
+   * a race; the modes show it every time.
+   */
+  const recordScrollModes = (page: Page) =>
+    page.addInitScript((key) => {
+      try {
+        sessionStorage.setItem(
+          `${key}-before`,
+          sessionStorage.getItem(key) ?? "",
+        );
+        sessionStorage.setItem(key, "");
+      } catch {
+        return;
+      }
+      const own = Object.getOwnPropertyDescriptor(
+        History.prototype,
+        "scrollRestoration",
+      );
+      if (!own?.set) return;
+      const set = own.set;
+      Object.defineProperty(History.prototype, "scrollRestoration", {
+        ...own,
+        set(this: History, mode: ScrollRestoration) {
+          try {
+            const modes = sessionStorage.getItem(key);
+            sessionStorage.setItem(key, modes ? `${modes} ${mode}` : mode);
+          } catch {
+            // Recording only; the page goes on as it would.
+          }
+          set.call(this, mode);
+        },
+      });
+    }, MODES);
+
+  /** The last value the page before this one gave `scrollRestoration`. */
+  const lastModeBefore = (page: Page) =>
+    page.evaluate(
+      (key) => sessionStorage.getItem(`${key}-before`)?.split(" ").pop(),
+      MODES,
+    );
 
   for (const { name, from, link } of [
     // The skill route's loader imports its chunk: the router alone shows
@@ -195,18 +247,23 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
     { name: "a skill", from: "/skills", link: ".pf-skill-card__link" },
     // About's chunk is its component only, which TanStack's lazy route
     // component would reload on its own: still one load.
-    { name: "About", from: "/", link: 'a[href="/about"]' },
+    { name: "About", from: "/", link: 'footer a[href="/about"]' },
   ]) {
-    test(`${name}: the page asked for loads fresh, after one document load`, async ({
+    test(`${name}: the page asked for loads fresh at the top, after one document load`, async ({
       page,
     }) => {
       const loads = documents(page);
       const asked = requests(page);
+      await recordScrollModes(page);
       await page.goto(from, { waitUntil: "networkidle" });
       await expect(clock(page)).toBeAttached();
       await deploy(page, asked, { recovers: true });
 
-      const target = page.locator(link).first();
+      // A link far down the page: the fresh page once opened at the old
+      // page's offset, mid-page or at its footer, in every engine.
+      const target = page.locator(link).last();
+      await target.scrollIntoViewIfNeeded();
+      expect(await offset(page)).toBeGreaterThan(0);
       const href = await target.getAttribute("href");
       const words = (await target.textContent())?.trim() ?? "";
       const fresh = page.waitForEvent("load");
@@ -219,29 +276,79 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
       // Long enough for a second load, were there one.
       await page.waitForTimeout(1_000);
       expect(loads.count).toBe(2);
-      const [flag, build] = await flagAndBuild(page);
-      expect(flag).toBe(build);
+      expect(await lastModeBefore(page)).toBe("manual");
+      expect(await offset(page)).toBe(0);
+      const [flag, here] = await flagAndPage(page);
+      expect(flag).toBe(here);
     });
   }
 
-  test("files that keep failing on the fresh page: the error page, never a second reload", async ({
+  test("one failed answer and no deploy, then a deploy: each page loads fresh once", async ({
     page,
   }) => {
     const loads = documents(page);
     const asked = requests(page);
     await page.goto("/skills", { waitUntil: "networkidle" });
     await expect(clock(page)).toBeAttached();
-    await deploy(page, asked, { recovers: true });
-    const fresh = page.waitForEvent("load");
-    await page.locator(".pf-skill-card__link").first().click();
+
+    // A blip (a 502), not a deploy: the skill's chunk fails until the page
+    // loads again, and the fresh page is the same build.
+    let blip = true;
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        blip = false;
+    });
+    await page.route(/\/assets\/_slug-[\w-]+\.js$/, (route) =>
+      blip
+        ? route.fulfill({ status: 502, body: "Bad gateway" })
+        : route.fallback(),
+    );
+    const skill = page.locator(".pf-skill-card__link").first();
+    const skillHref = await skill.getAttribute("href");
+    let fresh = page.waitForEvent("load");
+    await skill.click();
     await fresh;
+    expect(new URL(page.url()).pathname).toBe(skillHref);
     await expect(clock(page)).toBeAttached();
     await page.waitForLoadState("networkidle");
     expect(loads.count).toBe(2);
 
-    // The fresh page is the same build, and its files are still missing:
-    // the next page's chunk fails too. About, a page this tab has never
-    // loaded (WebKit's memory cache keeps the chunks of earlier pages).
+    // A deploy later, with that page open: the reload the blip used was
+    // the skill's, and About still loads fresh.
+    await deploy(page, asked, { recovers: true });
+    const about = page.locator('a[href="/about"]').first();
+    const words = (await about.textContent())?.trim() ?? "";
+    fresh = page.waitForEvent("load");
+    await about.click();
+    await fresh;
+    expect(new URL(page.url()).pathname).toBe("/about");
+    await expect(clock(page)).toBeAttached();
+    await expect(page.locator("h1").first()).toContainText(words);
+    // Long enough for a fourth load, were there one.
+    await page.waitForTimeout(1_000);
+    expect(loads.count).toBe(3);
+    const [flag, here] = await flagAndPage(page);
+    expect(flag).toBe(here);
+  });
+
+  test("the same page failing again in the build that reloaded it: the error page, never a second reload", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    const asked = requests(page);
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(clock(page)).toBeAttached();
+    // The flag a reload to About left earlier in this tab and build. Set
+    // here, not by a reload: WebKit's memory cache keeps the chunks of
+    // earlier pages, so About's would never fail again.
+    await page.evaluate(
+      (key) =>
+        sessionStorage.setItem(
+          key,
+          `${document.documentElement.dataset.build} /about`,
+        ),
+      FLAG,
+    );
     await deploy(page, asked, { recovers: false });
     await page.locator('a[href="/about"]').first().click();
     await expect(page.locator("h1").first()).toHaveText(
@@ -250,9 +357,9 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
     expect(new URL(page.url()).pathname).toBe("/about");
     // Longer than a reload may wait for its files (3 s), were there one.
     await page.waitForTimeout(3_500);
-    expect(loads.count).toBe(2);
-    const [flag, build] = await flagAndBuild(page);
-    expect(flag).toBe(build);
+    expect(loads.count).toBe(1);
+    const [flag, here] = await flagAndPage(page);
+    expect(flag).toBe(here);
   });
 
   test("a feature's chunk that fails on the page in use never reloads it", async ({
@@ -282,7 +389,7 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
     await page.waitForTimeout(3_500);
     expect(loads.count).toBe(1);
     expect(new URL(page.url()).pathname).toBe("/about");
-    const [flag] = await flagAndBuild(page);
+    const [flag] = await flagAndPage(page);
     expect(flag).toBeNull();
   });
 });

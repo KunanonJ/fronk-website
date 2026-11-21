@@ -5,9 +5,9 @@ import { reloadOnStaleChunk } from "@/src/lib/staleChunk";
  * A navigation whose chunk a deploy removed (src/lib/staleChunk.ts): while
  * the router is loading a page, a chunk that fails asks for the files
  * linked since hydration that have not loaded once more past the caches,
- * then reloads the page asked for, once per build, and its event is
- * canceled; while it is idle (a feature's chunk on the page in use) nothing
- * happens. The browser's globals are handed in.
+ * then reloads the page asked for, at the top, once per page and build,
+ * and its event is canceled; while it is idle (a feature's chunk on the
+ * page in use) nothing happens. The browser's globals are handed in.
  */
 
 const ORIGIN = "https://kunanonj.com";
@@ -15,6 +15,8 @@ const KEY = "pf-chunk-reload";
 // Unit tests have no build define (src/lib/buildId.ts).
 const BUILD = "dev";
 const asset = (name: string) => `${ORIGIN}/assets/${name}`;
+/** The page a navigation asked for: the router has committed its address. */
+const PAGE = "/skills/how";
 
 type Listener = (event: {
   target?: unknown;
@@ -23,6 +25,7 @@ type Listener = (event: {
 
 function run({
   status = "pending",
+  path = PAGE,
   flag = null as string | null,
   storage = true,
   answer = () => Promise.resolve() as Promise<unknown>,
@@ -50,14 +53,23 @@ function run({
         setItem: (key: string, value: string) => store.set(key, value),
       }
     : { getItem: blocked, setItem: blocked };
-  const reload = vi.fn();
+  // The router's scrolling: "manual" while the page is in use, handed back
+  // to the browser as it goes (its pagehide listener, added at startup).
+  const history = { scrollRestoration: "manual" };
+  listen("pagehide", () => {
+    history.scrollRestoration = "auto";
+  });
+  /** The reader leaves the page, or a reload replaces it. */
+  const leave = () => emit("pagehide", {});
+  const reload = vi.fn(leave);
   const fetch = vi.fn((...[, init]: [string, RequestInit]) => {
     expect(init).toEqual({ cache: "reload" });
     return answer();
   });
   const timers: (() => void)[] = [];
   const win = {
-    location: { origin: ORIGIN, reload },
+    location: { origin: ORIGIN, pathname: path, reload },
+    history,
     document: {
       querySelectorAll: (selector: string) => {
         expect(selector).toBe("link");
@@ -101,6 +113,8 @@ function run({
   const settle = () => new Promise((done) => setTimeout(done, 0));
   return {
     router,
+    history,
+    leave,
     store,
     reload,
     fetch,
@@ -119,7 +133,7 @@ describe("a navigation whose chunk a deploy removed", () => {
     page.navigate("_slug-C.js", "arrow-D.js");
     page.loaded("arrow-D.js");
     expect(page.chunkFails()).toBe(true);
-    expect(page.store.get(KEY)).toBe(BUILD);
+    expect(page.store.get(KEY)).toBe(`${BUILD} ${PAGE}`);
     expect(page.fetch.mock.calls.map(([url]) => url)).toEqual([
       asset("_slug-C.js"),
     ]);
@@ -129,6 +143,16 @@ describe("a navigation whose chunk a deploy removed", () => {
     // The 3 s fallback finds the reload asked for.
     page.timers.forEach((callback) => callback());
     expect(page.reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens the fresh page at the top: its entry stays manual after the router's pagehide", async () => {
+    const page = run();
+    page.navigate("_slug-C.js");
+    page.chunkFails();
+    await page.settle();
+    expect(page.reload).toHaveBeenCalledTimes(1);
+    // Left "auto", the browser reopens the page at the old page's offset.
+    expect(page.history.scrollRestoration).toBe("manual");
   });
 
   it("cancels every later failure on the way out, and reloads no more", async () => {
@@ -179,10 +203,13 @@ describe("a navigation whose chunk a deploy removed", () => {
     expect(page.fetch).not.toHaveBeenCalled();
     expect(page.reload).not.toHaveBeenCalled();
     expect(page.store.has(KEY)).toBe(false);
+    // A reader leaving keeps the router's way: the browser's scrolling.
+    page.leave();
+    expect(page.history.scrollRestoration).toBe("auto");
   });
 
-  it("reloads once per build: a page of the build that reloaded shows the error", async () => {
-    const page = run({ flag: BUILD });
+  it("reloads a page once per build: the same page failing again shows the error", async () => {
+    const page = run({ flag: `${BUILD} ${PAGE}` });
     page.navigate("_slug-C.js");
     // Canceled all the same: TanStack's lazy route component would reload.
     expect(page.chunkFails()).toBe(true);
@@ -191,13 +218,23 @@ describe("a navigation whose chunk a deploy removed", () => {
     expect(page.reload).not.toHaveBeenCalled();
   });
 
+  it("reloads another page of the same build: one failed answer uses up no other page's reload", async () => {
+    // A 502 on a skill's chunk reloaded that skill; a deploy came later.
+    const page = run({ path: "/about", flag: `${BUILD} ${PAGE}` });
+    page.navigate("about-F.js");
+    expect(page.chunkFails()).toBe(true);
+    await page.settle();
+    expect(page.reload).toHaveBeenCalledTimes(1);
+    expect(page.store.get(KEY)).toBe(`${BUILD} /about`);
+  });
+
   it("reloads a newer build once more after a later deploy", async () => {
-    const page = run({ flag: "mwpxq4kz" });
+    const page = run({ flag: `mwpxq4kz ${PAGE}` });
     page.navigate("_slug-C.js");
     expect(page.chunkFails()).toBe(true);
     await page.settle();
     expect(page.reload).toHaveBeenCalledTimes(1);
-    expect(page.store.get(KEY)).toBe(BUILD);
+    expect(page.store.get(KEY)).toBe(`${BUILD} ${PAGE}`);
   });
 
   it("never reloads without session storage", async () => {

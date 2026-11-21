@@ -36,11 +36,24 @@ import { BUILD_ID } from "@/src/lib/buildId";
  * them even when its link's error comes after the import's, as it can in
  * every engine. The reload waits for the answers, or 3 s at most.
  *
- * Once per build: the session flag holds the id of the build that reloaded
- * (src/lib/buildId.ts), set before the reload. The fresh page is a newer
- * build, which may reload once in turn after a later deploy; a page of the
- * same build (files that keep failing) never reloads again and shows the
- * error page. Without session storage it never reloads.
+ * At the top: the router hands scrolling back to the browser as the page
+ * goes ("auto" on pagehide, router-core scroll-restoration.js). The
+ * destination's history entry is already the current one, so the browser
+ * stores the old page's offset in it and reopens the fresh page there,
+ * often mid-page or at its footer (src/lib/scrollRestoration.ts leaves a
+ * page that opens scrolled where it is). A pagehide listener added just
+ * before the reload runs after the router's and sets "manual" again: the
+ * fresh page opens at the top, or at its hash, as the link would have.
+ *
+ * Once per page and build: the session flag holds the id of the build that
+ * reloaded (src/lib/buildId.ts) and the path it reloaded, set before the
+ * reload. That page of that build failing again (files that keep failing)
+ * shows the error page, never a second reload, so no page can reload
+ * itself in a loop. Any other page may reload once, and so may a newer
+ * build after a later deploy: a flag for the build alone let one failed
+ * answer with no deploy (a 502) use up the reload, and a deploy later in
+ * the same tab then ended on the error page. Without session storage it
+ * never reloads.
  *
  * A navigation's failure is this file's alone: its event is canceled, so
  * the import resolves empty and the route fails with a plain error, not a
@@ -75,9 +88,10 @@ export function reloadOnStaleChunk(router: Router, win: Window = window) {
     if (!reloading && router.state.status !== "pending") return;
     event.preventDefault();
     if (reloading) return;
+    const tried = `${BUILD_ID} ${win.location.pathname}`;
     try {
-      if (win.sessionStorage.getItem(FLAG) === BUILD_ID) return;
-      win.sessionStorage.setItem(FLAG, BUILD_ID);
+      if (win.sessionStorage.getItem(FLAG) === tried) return;
+      win.sessionStorage.setItem(FLAG, tried);
     } catch {
       return;
     }
@@ -86,6 +100,10 @@ export function reloadOnStaleChunk(router: Router, win: Window = window) {
     const reload = () => {
       if (asked) return;
       asked = true;
+      // After the router's own listener, which sets "auto": at the top.
+      win.addEventListener("pagehide", () => {
+        win.history.scrollRestoration = "manual";
+      });
       win.location.reload();
     };
     const again = [...linked()]
