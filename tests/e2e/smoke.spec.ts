@@ -42,6 +42,16 @@ test.describe("smoke > every route renders without JS errors", () => {
   }
 });
 
+/** The page's own document loads, counted as they start. */
+function documents(page: Page) {
+  const seen = { count: 0 };
+  page.on("request", (request) => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+      seen.count += 1;
+  });
+  return seen;
+}
+
 /**
  * The asset retry (src/lib/assetRetry.ts; UX sweep 21-11-26): a page whose
  * own script or stylesheet fails to load (one load in 600 got a 502 on the
@@ -49,15 +59,6 @@ test.describe("smoke > every route renders without JS errors", () => {
  * failing reloads it once and no more.
  */
 test.describe("assets > a site file that fails to load reloads the page once", () => {
-  /** The page's own document loads, counted as they start. */
-  const documents = (page: Page) => {
-    const seen = { count: 0 };
-    page.on("request", (request) => {
-      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
-        seen.count += 1;
-    });
-    return seen;
-  };
   const ENTRY = /\/assets\/index-[\w-]+\.js$/;
 
   test("a 502 on the main bundle: one reload, then the page runs and the flag is gone", async ({
@@ -122,6 +123,167 @@ test.describe("assets > a site file that fails to load reloads the page once", (
     expect(
       await page.evaluate(() => sessionStorage.getItem("pf-asset-retry")),
     ).toBe("1");
+  });
+});
+
+/**
+ * A tab left open across a deploy (src/lib/staleChunk.ts): the deploy took
+ * the old build's files away, so a link followed inside the site asks for a
+ * chunk that answers 404. The page asked for loads fresh, once; files that
+ * keep failing on the fresh page end on the error page; a feature's chunk
+ * that fails on the page in use never reloads it.
+ */
+test.describe("assets > a navigation whose chunk a deploy removed loads its page fresh, once", () => {
+  // Up to two page loads and a few seconds of waiting for a reload that
+  // must not come: under a full parallel run, 30 s ran out.
+  test.describe.configure({ timeout: 60_000 });
+  const FLAG = "pf-chunk-reload";
+
+  /** Every file the page showing has asked for. */
+  const requests = (page: Page) => {
+    const asked = new Set<string>();
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        asked.clear();
+      asked.add(request.url());
+    });
+    return asked;
+  };
+
+  /**
+   * The deploy, with the page open: from now on every file under /assets/
+   * the page has not asked for answers 404, until the next document load
+   * (the fresh page, as the new build would be; here the same files) or
+   * for good.
+   */
+  const deploy = async (
+    page: Page,
+    asked: Set<string>,
+    { recovers }: { recovers: boolean },
+  ) => {
+    const kept = new Set(asked);
+    let gone = true;
+    if (recovers)
+      page.on("request", (request) => {
+        if (
+          request.isNavigationRequest() &&
+          request.frame() === page.mainFrame()
+        )
+          gone = false;
+      });
+    await page.route(/\/assets\//, (route) =>
+      gone && !kept.has(route.request().url())
+        ? route.fulfill({ status: 404, body: "Not found" })
+        : route.fallback(),
+    );
+  };
+
+  /** The session flag and the build of the page showing. */
+  const flagAndBuild = (page: Page) =>
+    page.evaluate((key) => {
+      return [
+        sessionStorage.getItem(key),
+        document.documentElement.dataset.build,
+      ];
+    }, FLAG);
+
+  const clock = (page: Page) => page.locator("time[data-clock]");
+
+  for (const { name, from, link } of [
+    // The skill route's loader imports its chunk: the router alone shows
+    // its error page.
+    { name: "a skill", from: "/skills", link: ".pf-skill-card__link" },
+    // About's chunk is its component only, which TanStack's lazy route
+    // component would reload on its own: still one load.
+    { name: "About", from: "/", link: 'a[href="/about"]' },
+  ]) {
+    test(`${name}: the page asked for loads fresh, after one document load`, async ({
+      page,
+    }) => {
+      const loads = documents(page);
+      const asked = requests(page);
+      await page.goto(from, { waitUntil: "networkidle" });
+      await expect(clock(page)).toBeAttached();
+      await deploy(page, asked, { recovers: true });
+
+      const target = page.locator(link).first();
+      const href = await target.getAttribute("href");
+      const words = (await target.textContent())?.trim() ?? "";
+      const fresh = page.waitForEvent("load");
+      await target.click();
+      await fresh;
+
+      expect(new URL(page.url()).pathname).toBe(href);
+      await expect(clock(page)).toBeAttached();
+      await expect(page.locator("h1").first()).toContainText(words);
+      // Long enough for a second load, were there one.
+      await page.waitForTimeout(1_000);
+      expect(loads.count).toBe(2);
+      const [flag, build] = await flagAndBuild(page);
+      expect(flag).toBe(build);
+    });
+  }
+
+  test("files that keep failing on the fresh page: the error page, never a second reload", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    const asked = requests(page);
+    await page.goto("/skills", { waitUntil: "networkidle" });
+    await expect(clock(page)).toBeAttached();
+    await deploy(page, asked, { recovers: true });
+    const fresh = page.waitForEvent("load");
+    await page.locator(".pf-skill-card__link").first().click();
+    await fresh;
+    await expect(clock(page)).toBeAttached();
+    await page.waitForLoadState("networkidle");
+    expect(loads.count).toBe(2);
+
+    // The fresh page is the same build, and its files are still missing:
+    // the next page's chunk fails too. About, a page this tab has never
+    // loaded (WebKit's memory cache keeps the chunks of earlier pages).
+    await deploy(page, asked, { recovers: false });
+    await page.locator('a[href="/about"]').first().click();
+    await expect(page.locator("h1").first()).toHaveText(
+      /Something\s+went\s+wrong/,
+    );
+    expect(new URL(page.url()).pathname).toBe("/about");
+    // Longer than a reload may wait for its files (3 s), were there one.
+    await page.waitForTimeout(3_500);
+    expect(loads.count).toBe(2);
+    const [flag, build] = await flagAndBuild(page);
+    expect(flag).toBe(build);
+  });
+
+  test("a feature's chunk that fails on the page in use never reloads it", async ({
+    page,
+  }) => {
+    const loads = documents(page);
+    const asked = requests(page);
+    await page.addInitScript(() => {
+      const seen = window as unknown as { __chunkErrors: number };
+      seen.__chunkErrors = 0;
+      addEventListener("vite:preloadError", () => (seen.__chunkErrors += 1));
+    });
+    await page.goto("/about", { waitUntil: "networkidle" });
+    await expect(clock(page)).toBeAttached();
+    await deploy(page, asked, { recovers: false });
+
+    // The search dialog's code loads on first use.
+    await page.locator(".pf-search-toggle").click();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as unknown as { __chunkErrors: number }).__chunkErrors,
+        ),
+      )
+      .toBeGreaterThan(0);
+    // Longer than a reload may wait for its files (3 s), were there one.
+    await page.waitForTimeout(3_500);
+    expect(loads.count).toBe(1);
+    expect(new URL(page.url()).pathname).toBe("/about");
+    const [flag] = await flagAndBuild(page);
+    expect(flag).toBeNull();
   });
 });
 
