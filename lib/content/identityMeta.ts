@@ -5,5 +5,5 @@
  * re-exports it.
  */
 export const PERSON_META_DESCRIPTION =
-  // DRAFT (owner direction 20-11-26): the ventures now, the role that ended.
+  // Owner direction 20-11-26: the ventures now, the role that ended.
   "Kunanon Jarat (Fronk): solopreneur in Bangkok. Founder of GoGoCash, builder of Manut AI, previously AI Engineering Lead at The Binary Holdings.";

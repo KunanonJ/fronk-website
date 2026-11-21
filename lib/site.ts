@@ -24,7 +24,7 @@ export function siteUrl(path: string): string {
 export const siteConfig = {
   name: "Fronk Kunanon Jarat",
   shortName: "KunanonJ",
-  // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+  // Owner direction 20-11-26: the Binary Holdings role ended.
   tagline: "Solopreneur in Bangkok building GoGoCash and Manut AI.",
   description: PERSON_META_DESCRIPTION,
   url: SITE_ORIGIN,

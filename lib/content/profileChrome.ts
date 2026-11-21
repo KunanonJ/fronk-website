@@ -15,8 +15,8 @@ import {
 /*
  * Copy and links of the profile redesign's chrome (Phase 1, design spec 7).
  * Components read from here and from the modules above; nothing is retyped
- * from the site's own content. Lines marked DRAFT wait for the owner's
- * approval (umbrella input R3) and are not final copy until he gives it.
+ * from the site's own content. The owner approved this copy as is on
+ * 21-11-26 (umbrella input R3).
  */
 
 /** The Home page, or one of its sections: `homeHref("work")`. */
@@ -156,8 +156,8 @@ export const availability = {
  * two together), then the time in Bangkok.
  */
 export const nowLine = {
-  label: "Now:", // DRAFT
-  doing: "building GoGoCash and Manut AI", // DRAFT (owner direction 20-11-26)
+  label: "Now:",
+  doing: "building GoGoCash and Manut AI", // Owner direction 20-11-26.
 };
 
 /** The copyright line, with the year passed in (spec 7.7). */
@@ -166,18 +166,17 @@ export function copyright(year: number): string {
 }
 
 /*
- * DRAFT, awaiting the owner's approval (umbrella R3). Drafted from cleared
- * copy: place.body, and AVAILABILITY.sentence and workWith in lib/content
- * (owner direction 20-11-26). First person, with no figure or claim that
- * the content does not already carry.
+ * The owner approved this copy as is on 21-11-26 (umbrella R3). Drafted
+ * from cleared copy: place.body, and AVAILABILITY.sentence and workWith in
+ * lib/content (owner direction 20-11-26). First person, with no figure or
+ * claim that the content does not already carry.
  */
 export const footerCopy = {
-  eyebrow: "Get in touch", // DRAFT
-  headline: "Building something in AI or ops? Let’s talk.", // DRAFT
+  eyebrow: "Get in touch",
+  headline: "Building something in AI or ops? Let’s talk.",
   paragraphs: [
-    // DRAFT
     "I build fintech and AI operator systems from Bangkok, for Thailand and SEA: AI transformation, ERP/CRM, internal systems and tech startups.",
-    // DRAFT (owner direction 20-11-26), the emphasised last line; the name
+    // Owner direction 20-11-26: the emphasised last line; the name
     // unbroken on phones (keepWhole.ts).
     keepNamesWhole(
       "I’m building GoGoCash and Manut AI and not looking for a full-time role right now. I’m open to partnerships, freelance and consulting projects, advisory, talks and workshops.",
@@ -196,7 +195,6 @@ export const footerLinks = {
 /** The Say hello popover (spec 7.4). Strings are the repo's where it has them. */
 export const sayHello = {
   label: place.cta.label,
-  // DRAFT, awaiting the owner's approval (umbrella R3, plan step 1c).
   eyebrow: "Email",
   address: site.email,
   name: `Email ${PERSON_NAME}`,
@@ -225,23 +223,23 @@ export const themeCopy = {
 /** The phone menu's trigger and its names (spec 7.1, 7.6). */
 /** The search dialog and its buttons (premium interactions, item 8). */
 export const searchCopy = {
-  open: "Search the site", // DRAFT
-  shortcut: "⌘K", // DRAFT
-  menu: "Search", // DRAFT
-  placeholder: "Pages, cases, skills", // DRAFT
-  close: "Close search", // DRAFT
-  closeKey: "esc", // DRAFT
+  open: "Search the site",
+  shortcut: "⌘K",
+  menu: "Search",
+  placeholder: "Pages, cases, skills",
+  close: "Close search",
+  closeKey: "esc",
   groups: {
     page: "Pages",
     case: "Case studies",
     topic: "Topics",
     skill: "Agent skills",
-  }, // DRAFT
-  loading: "Loading the index…", // DRAFT
-  failed: "Search could not load. Try again in a moment.", // DRAFT
-  empty: (query: string) => `Nothing matches “${query}”.`, // DRAFT
-  hints: ["↑ ↓ to move", "↵ to open", "esc to close", "Type / for commands"], // DRAFT
-  count: (n: number) => `${n} ${n === 1 ? "result" : "results"}`, // DRAFT
+  },
+  loading: "Loading the index…",
+  failed: "Search could not load. Try again in a moment.",
+  empty: (query: string) => `Nothing matches “${query}”.`,
+  hints: ["↑ ↓ to move", "↵ to open", "esc to close", "Type / for commands"],
+  count: (n: number) => `${n} ${n === 1 ? "result" : "results"}`,
 } as const;
 
 export const menuCopy = {

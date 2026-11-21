@@ -8,9 +8,9 @@ import { contactPage } from "@/lib/content/contact";
  */
 
 /**
- * The topics, in the order the owner directed on 20-11-26: the work he is
- * open to first, a future role near the end (he is not looking now, but
- * recruiters may write for later). DRAFT (owner direction 20-11-26).
+ * The topics, in the order the owner directed on 20-11-26: the work the
+ * owner is open to first, a future role near the end (they are not looking
+ * now, but recruiters may write for later).
  */
 export const CONTACT_TOPICS = [
   "Freelance or consulting",
@@ -38,7 +38,7 @@ export const INTENT_TOPICS = {
 
 /**
  * The message label while one of these topics is chosen (the first chosen
- * wins): what that visitor should say. DRAFT (owner direction 20-11-26).
+ * wins): what that visitor should say (owner direction 20-11-26).
  */
 export const TOPIC_PROMPTS = {
   "Freelance or consulting": "What are you building, and where could I help?",

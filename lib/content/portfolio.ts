@@ -168,7 +168,7 @@ export const portfolioPage = {
   author: { name: "Kunanon Jarat", href: "/about" },
   /**
    * The card that closes each project page: where a reader who wants work
-   * like this goes next. DRAFT (owner direction 20-11-26: it was "Hiring").
+   * like this goes next. Owner direction 20-11-26: it was "Hiring".
    */
   work: {
     kicker: "Work together",

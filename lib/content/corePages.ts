@@ -83,24 +83,24 @@ export const aboutPageCopy = {
   /** The pixel portrait over the photo (PortraitPlay). */
   portrait: {
     tryTrait: (found: number, total: number) =>
-      `Try a trait · ${found}/${total}`, // DRAFT
-    showPhoto: "Photo", // DRAFT
-    showPixels: "Pixels", // DRAFT
-    toPhoto: "Show the photo", // DRAFT
-    toPixels: "Show the pixels", // DRAFT
-    gold: (total: number) => `Gold edition · ${total}/${total}`, // DRAFT
+      `Try a trait · ${found}/${total}`,
+    showPhoto: "Photo",
+    showPixels: "Pixels",
+    toPhoto: "Show the photo",
+    toPixels: "Show the pixels",
+    gold: (total: number) => `Gold edition · ${total}/${total}`,
     found: (label: string, found: number, total: number) =>
-      `${label}. ${found} of ${total} traits found.`, // DRAFT
-    goldFound: "All six traits found: the gold edition.", // DRAFT
+      `${label}. ${found} of ${total} traits found.`,
+    goldFound: "All six traits found: the gold edition.",
     /** Save my edition: the button, by what it does on this device. */
-    save: "Save my edition", // DRAFT
-    share: "Share my edition", // DRAFT
+    save: "Save my edition",
+    share: "Share my edition",
     /** The PNG's stamp. */
     stamp: (found: number, total: number) =>
-      `KunanonJ · edition ${found}/${total}`, // DRAFT
+      `KunanonJ · edition ${found}/${total}`,
     saved: (found: number, total: number) =>
-      `Saved your edition, ${found} of ${total}, as a PNG.`, // DRAFT
-    shared: "Shared your edition.", // DRAFT
-    saveFailed: "Could not save the edition on this device.", // DRAFT
+      `Saved your edition, ${found} of ${total}, as a PNG.`,
+    shared: "Shared your edition.",
+    saveFailed: "Could not save the edition on this device.",
   },
 } as const;

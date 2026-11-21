@@ -16,10 +16,9 @@ import { getVentureBySlug } from "@/lib/content/ventures";
 /*
  * Copy of the redesigned Home's top (profile redesign, Phase 2; design spec
  * 8.1 to 8.3 and 15.2): the hero, its canvas mock and the logo strip. The
- * hero's own lines are read from the site's cleared content. Lines marked
- * DRAFT (the strip's eyebrow, the mock's interface labels and the link and
- * pager wording) wait for the owner's approval, as profileChrome.ts marks
- * its own, and are not final copy until he gives it. Nothing here holds a
+ * hero's own lines are read from the site's cleared content. The owner
+ * approved the rest (the strip's eyebrow, the mock's interface labels and
+ * the link and pager wording) as is on 21-11-26. Nothing here holds a
  * figure.
  */
 
@@ -91,7 +90,7 @@ function logoNames(): readonly string[] {
 }
 
 export const logoStrip = {
-  label: "Where I’ve worked", // DRAFT (R6: the strip's eyebrow)
+  label: "Where I’ve worked", // R6: the strip's eyebrow.
   names: logoNames(),
 } as const;
 
@@ -122,20 +121,20 @@ export interface MockFrame {
 /** The canvas mock (spec 8.2, owner decision 3): the three featured projects. */
 export const canvasMock = {
   /** The group that holds the frame links. */
-  label: "Featured projects", // DRAFT
+  label: "Featured projects",
   breadcrumb: { owner: firstName, file: portfolioPage.title },
-  share: "Share", // DRAFT
-  layersTabs: ["Layers", "Assets"], // DRAFT
+  share: "Share",
+  layersTabs: ["Layers", "Assets"],
   layersGroup: portfolioPage.title,
-  inspectorTabs: ["Design", "Prototype"], // DRAFT
-  area: "Area", // DRAFT
-  period: "Period", // DRAFT
-  open: "Open project", // DRAFT
+  inspectorTabs: ["Design", "Prototype"],
+  area: "Area",
+  period: "Period",
+  open: "Open project",
   /** On every code-drawn picture (owner decision 4 of 18-11-26). */
   illustration: "Illustration",
   comment: {
     initial: firstName.charAt(0),
-    who: `${firstName} · just now`, // DRAFT
+    who: `${firstName} · just now`,
     line: commentLine,
   },
   cursor: firstName,
@@ -149,26 +148,26 @@ export const canvasMock = {
     mockup: project.mockup?.kind,
   })),
   /** A frame link's name: its visible label first (WCAG 2.5.3). */
-  frameName: (name: string) => `${name}: open the case study`, // DRAFT
+  frameName: (name: string) => `${name}: open the case study`,
   /** A pager button's name, on phones. */
-  showName: (name: string) => `Show ${name}`, // DRAFT
+  showName: (name: string) => `Show ${name}`,
   /** What the pager says once a reader turns to a frame. */
   shown: (name: string, index: number, count: number) =>
-    `${name}, ${index + 1} of ${count}`, // DRAFT
+    `${name}, ${index + 1} of ${count}`,
   /**
    * The canvas toolbar's buttons, from 810 px with a mouse
    * (now-building-and-genz Phase 4). The tools' own words, which load with
    * them, are in ./canvasTools.
    */
   tools: {
-    label: "Canvas tools", // DRAFT
-    move: "Move", // DRAFT
-    stickers: "Stickers", // DRAFT
+    label: "Canvas tools",
+    move: "Move",
+    stickers: "Stickers",
     /** The Stickers button's tooltip and description once it is on. */
-    stamp: "press again to stamp one", // DRAFT
-    pen: "Pen", // DRAFT
-    ink: (colour: string) => `Ink: ${colour}`, // DRAFT
-    inks: { violet: "violet", coral: "coral" }, // DRAFT
-    clear: "Clear the canvas", // DRAFT
+    stamp: "press again to stamp one",
+    pen: "Pen",
+    ink: (colour: string) => `Ink: ${colour}`,
+    inks: { violet: "violet", coral: "coral" },
+    clear: "Clear the canvas",
   },
 } as const;

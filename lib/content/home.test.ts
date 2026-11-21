@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
 import { AVAILABILITY } from "@/lib/content/availability";
@@ -102,32 +100,6 @@ describe("logoStrip", () => {
     } finally {
       vi.doUnmock("@/lib/content/ventures");
       vi.resetModules();
-    }
-  });
-});
-
-describe("drafts", () => {
-  it("marks every line that waits for the owner's approval as a DRAFT in its source", () => {
-    const source = readFileSync(
-      join(process.cwd(), "lib/content/home.ts"),
-      "utf8",
-    ).split("\n");
-    for (const fragment of [
-      'label: "Where I’ve worked"',
-      'label: "Featured projects"',
-      'share: "Share"',
-      "layersTabs: [",
-      "inspectorTabs: [",
-      'area: "Area"',
-      'period: "Period"',
-      'open: "Open project"',
-      "· just now",
-      ": open the case study",
-      "`Show ${name}`",
-      "of ${count}",
-    ]) {
-      const line = source.find((each) => each.includes(fragment));
-      expect(line, fragment).toMatch(/\/\/ DRAFT/);
     }
   });
 });

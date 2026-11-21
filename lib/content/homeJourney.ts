@@ -7,8 +7,8 @@ import { STACK_GROUPS, stackItems } from "@/lib/content/stack";
  * and 15.5): the stage's copy, the tool orbit, the story and the records
  * card's labels.
  *
- * Lines marked DRAFT wait for the owner's approval, line by line (umbrella
- * input R9). The story is drafted from the résumé
+ * The owner approved this copy as is on 21-11-26 (umbrella input R9). The
+ * story is drafted from the résumé
  * (lib/content/resumeTimeline.fallback.ts): every organisation it names is an
  * employer or the university there, and it states no figure. The "now"
  * paragraph and chips are the availability (availability.ts), the
@@ -35,21 +35,21 @@ const groupLabel = new Map(
 export const journeyCopy = {
   /** The nav's label for the section. */
   eyebrow: "Journey",
-  heading: "From smart contracts to AI engineering.", // DRAFT
-  lead: "Engineering first, then the delivery around it.", // DRAFT
+  heading: "From smart contracts to AI engineering.",
+  lead: "Engineering first, then the delivery around it.",
   /** The ghost pill to #story. */
-  storyLink: "Read the story", // DRAFT (plan step 4a)
+  storyLink: "Read the story",
 } as const;
 
 export const orbitCopy = {
   /** The tool list's name for assistive technology. */
-  label: "Tools I use", // DRAFT
+  label: "Tools I use",
   /** Our own decorative file tiles (spec 15.5; plan step 4b). */
   files: [".ts", ".md", ".json", ".csv"],
-  previous: "Turn the tools left", // DRAFT
-  next: "Turn the tools right", // DRAFT
-  pause: "Pause the orbit", // DRAFT
-  play: "Play the orbit", // DRAFT
+  previous: "Turn the tools left",
+  next: "Turn the tools right",
+  pause: "Pause the orbit",
+  play: "Play the orbit",
 } as const;
 
 /** Every tool on /stack, in its order, with its group as the kind. */
@@ -61,27 +61,26 @@ export const orbitTools: readonly OrbitTool[] = stackItems.map((item) => ({
 
 export const storyCopy = {
   /**
-   * DRAFT, from the résumé: the university, then each employer in order;
-   * no figure.
+   * From the résumé: the university, then each employer in order; no figure.
    */
   paragraphs: [
     [
-      "I studied ", // DRAFT
-      { strong: "electrical engineering at Kasetsart University" }, // DRAFT
-      ", then started on smart contracts at Bitkub and blockchain development at KK Venture Global.", // DRAFT
+      "I studied ",
+      { strong: "electrical engineering at Kasetsart University" },
+      ", then started on smart contracts at Bitkub and blockchain development at KK Venture Global.",
     ],
     [
-      "From there I moved into delivery: ", // DRAFT
-      { strong: "business systems" }, // DRAFT
-      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Most recently I led ", // DRAFT (owner direction 20-11-26)
-      // DRAFT; the name unbroken on phones (keepWhole.ts).
+      "From there I moved into delivery: ",
+      { strong: "business systems" },
+      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Most recently I led ", // Owner direction 20-11-26.
+      // The name unbroken on phones (keepWhole.ts).
       {
         strong: keepNamesWhole("IT and AI engineering at The Binary Holdings"),
       },
       ".",
     ],
   ] as const satisfies readonly (readonly StoryRun[])[],
-  nowHeading: "What I’m building now", // DRAFT (owner direction 20-11-26)
+  nowHeading: "What I’m building now", // Owner direction 20-11-26.
   /**
    * The availability the owner directed on 20-11-26 (availability.ts), its
    * names unbroken.
@@ -92,11 +91,11 @@ export const storyCopy = {
 
 export const recordsCopy = {
   /** The card's name for assistive technology. */
-  label: "Career records", // DRAFT
-  employment: "Employment", // DRAFT (plan step 4c)
+  label: "Career records",
+  employment: "Employment",
   /** The résumé's own section name. */
   education: "Education",
-  resume: { label: "Full résumé", href: RESUME_HREF }, // DRAFT label
+  resume: { label: "Full résumé", href: RESUME_HREF },
   /** How many roles the card lists, newest first (spec 15.5: default 4). */
   roles: 4,
 } as const;

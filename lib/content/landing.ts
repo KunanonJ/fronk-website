@@ -6,7 +6,7 @@ import { PERSON_META_DESCRIPTION } from "@/lib/content/identityMeta";
 export const site = {
   wordmark: "KunanonJ",
   contextLabel: "Bangkok 🇹🇭 · Founder",
-  // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+  // Owner direction 20-11-26: the Binary Holdings role ended.
   title: "Kunanon Jarat: Founder of GoGoCash and Manut AI, Bangkok",
   description: PERSON_META_DESCRIPTION,
   email: "fronk.kunanon@gmail.com",

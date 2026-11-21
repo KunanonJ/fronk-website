@@ -30,13 +30,13 @@ import { writeClipboard } from "@/lib/utils/clipboard";
  * `.pf-resume-card*` in src/styles/resume.css.
  */
 
-/** New wording on this card, for the owner's review. */
+/** New wording on this card, approved as is by the owner on 21-11-26. */
 const COPY = {
-  label: "At a glance", // DRAFT
-  building: "Building", // DRAFT
-  based: "Based", // DRAFT
-  contact: "Contact", // DRAFT
-  copied: "Email copied", // DRAFT
+  label: "At a glance",
+  building: "Building",
+  based: "Based",
+  contact: "Contact",
+  copied: "Email copied",
 } as const;
 
 type CopyStatus = "idle" | "copied" | "failed";

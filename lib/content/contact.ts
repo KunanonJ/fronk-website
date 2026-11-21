@@ -115,7 +115,7 @@ export const contactRecruiterLinks: readonly RecruiterLink[] = [
  * 20-11-26).
  */
 export const aboutRecruiterLinks: readonly RecruiterLink[] = [
-  { label: "Get in touch for later", href: FUTURE_ROLE_CONTACT_HREF }, // DRAFT
+  { label: "Get in touch for later", href: FUTURE_ROLE_CONTACT_HREF },
   RESUME_FILE,
   LINKEDIN,
 ];

@@ -19,7 +19,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
     answer: PERSON_SUMMARY,
   },
   {
-    // DRAFT (owner direction 20-11-26): not looking for a full-time role.
+    // Owner direction 20-11-26: not looking for a full-time role.
     question: "Is Kunanon Jarat open to new roles or projects?",
     answer: `Not to full-time roles right now: he is building ${AVAILABILITY.ventures.join(" and ")}. He is open to partnerships, freelance and consulting projects, advisory, talks and workshops, and recruiters are welcome to get in touch for later. ${PERSON_CUSTOMER_WORK} Email ${siteConfig.email} or use the contact page.`,
   },
