@@ -230,6 +230,17 @@ test.describe("Thai typography (plan step 7b)", () => {
       "en",
     );
   });
+  test("a Thai path typed in another case still says Thai", async ({
+    page,
+  }) => {
+    only(BEHAVIOUR, "desktop Chromium and the WebKit phone");
+    await prepare(page);
+    // The router matches paths in any case; <html lang> must agree (WCAG 3.1.1).
+    await page.goto(FDE_TH.toUpperCase().replace("/TOPICS/", "/Topics/"), {
+      waitUntil: "networkidle",
+    });
+    await expect(page.locator("html")).toHaveAttribute("lang", "th");
+  });
 
   test("Thai text sets loose and upright, its labels without capitals or tracking", async ({
     page,
