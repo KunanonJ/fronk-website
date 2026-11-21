@@ -1694,15 +1694,21 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       })
       .toBeGreaterThan(0);
     // From 1024 px the email and the form share the first row, the email on
-    // the left, and Elsewhere sits under the email.
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await expect
-      .poll(async () => Math.abs((await box(email)).y - (await box(form)).y))
-      .toBeLessThan(2);
-    const left = await box(email);
-    expect((await box(form)).x).toBeGreaterThan(left.x + left.width);
-    expect(Math.abs((await box(elsewhere)).x - left.x)).toBeLessThan(2);
-    expect((await box(elsewhere)).y).toBeGreaterThan(left.y + left.height);
+    // the left, and Elsewhere sits under the email: at the breakpoint and
+    // on a wide screen.
+    for (const size of [
+      { width: 1024, height: 768 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(size);
+      await expect
+        .poll(async () => Math.abs((await box(email)).y - (await box(form)).y))
+        .toBeLessThan(2);
+      const left = await box(email);
+      expect((await box(form)).x).toBeGreaterThan(left.x + left.width);
+      expect(Math.abs((await box(elsewhere)).x - left.x)).toBeLessThan(2);
+      expect((await box(elsewhere)).y).toBeGreaterThan(left.y + left.height);
+    }
     // The page is the call to action: the footer keeps its card, not its own.
     const footer = page.locator("footer[data-site-chrome]");
     await expect(footer.getByRole("heading")).toHaveCount(0);

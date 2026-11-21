@@ -73,12 +73,16 @@ function stubClipboard(writeText: (text: string) => Promise<void>) {
 }
 
 describe("ContactPage", () => {
-  // jsdom has no scrollIntoView of its own: note which element asked.
-  let scrolled: Element[] = [];
+  // jsdom has no scrollIntoView of its own: note which element asked, and
+  // how.
+  let scrolled: [Element, ScrollIntoViewOptions | boolean | undefined][] = [];
   beforeEach(() => {
     scrolled = [];
-    Element.prototype.scrollIntoView = function (this: Element) {
-      scrolled.push(this);
+    Element.prototype.scrollIntoView = function (
+      this: Element,
+      options?: ScrollIntoViewOptions | boolean,
+    ) {
+      scrolled.push([this, options]);
     };
   });
   afterEach(() => {
@@ -362,9 +366,14 @@ describe("ContactPage", () => {
     expect(status).toHaveTextContent(contactPage.readyTitle);
     expect(status).toHaveTextContent(contactPage.email);
     expect(document.activeElement).toBe(status);
-    // The card comes up under the bar with its panel (UX sweep 21-11-26).
+    // The card comes up under the bar with its panel (UX sweep 21-11-26):
+    // its top, not its centre, which left the email tile's links under the
+    // found-trait toast on phones.
     expect(scrolled).toEqual([
-      screen.getByRole("article", { name: contactPage.cardTitle }),
+      [
+        screen.getByRole("article", { name: contactPage.cardTitle }),
+        expect.objectContaining({ block: "start" }),
+      ],
     ]);
     expect(opened).toHaveLength(1);
     // The topics lead the subject so the owner can sort the inbox; the
