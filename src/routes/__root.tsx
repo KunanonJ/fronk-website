@@ -22,7 +22,6 @@ import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
 import { ASSET_RETRY_SCRIPT } from "@/src/lib/assetRetry";
 import { BUILD_ID } from "@/src/lib/buildId";
-import { reloadOnStaleChunk } from "@/src/lib/staleChunk";
 import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
 import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -82,9 +81,33 @@ function RootDocument({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
   // A navigation whose chunk a deploy removed loads its page fresh, once
-  // (src/lib/staleChunk.ts). Client only, from hydration on.
+  // (src/lib/staleChunk.ts). Client only, from hydration on, and a chunk of
+  // its own rather than part of the entry chunk, which every page loads
+  // (the topic hubs sit at their 165 KB budget).
   const router = useRouter();
-  useEffect(() => reloadOnStaleChunk(router), [router]);
+  useEffect(() => {
+    let stop: (() => void) | undefined;
+    let left = false;
+    // After the load event: until then a failed file is the asset retry's
+    // (src/lib/assetRetry.ts), so the two never act on the same failure;
+    // this one is for the navigations that follow.
+    const start = () => {
+      import("@/src/lib/staleChunk")
+        .then(({ reloadOnStaleChunk }) => {
+          if (!left) stop = reloadOnStaleChunk(router);
+        })
+        // Its own chunk missing means this document's build is gone
+        // already: nothing to recover with, and nothing worth an error.
+        .catch(() => {});
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      left = true;
+      window.removeEventListener("load", start);
+      stop?.();
+    };
+  }, [router]);
   return (
     <html
       lang={lang}
