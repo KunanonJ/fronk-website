@@ -6,5 +6,6 @@
     "tests/e2e/screenshot-no-dither.css",
     "tests/e2e/screenshot-no-clock.css"
   ],
+  "ignoreBinaries": ["ffmpeg"],
   "ignoreExportsUsedInFile": false
 }

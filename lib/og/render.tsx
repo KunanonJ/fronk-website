@@ -4,8 +4,17 @@ import { loadOgFonts } from "@/lib/og/fonts";
 import { OG_SIZE, OgCard, type OgCardProps } from "@/lib/og/card";
 import { ProfileCard, type ProfileCardProps } from "@/lib/og/profileCard";
 
+/**
+ * What every share card renders with: its size and faces. Home's og:video
+ * (lib/og/homeVideoFrames.ts) renders its frames with the same, so its first
+ * frame is the og:image.
+ */
+export function ogRenderOptions() {
+  return { ...OG_SIZE, fonts: loadOgFonts() };
+}
+
 function render(element: ReactElement): ImageResponse {
-  return new ImageResponse(element, { ...OG_SIZE, fonts: loadOgFonts() });
+  return new ImageResponse(element, ogRenderOptions());
 }
 
 /**

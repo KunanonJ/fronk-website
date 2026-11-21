@@ -1,7 +1,7 @@
 import { brand } from "@/lib/brand/tokens";
 import { DitherBand, seedFrom } from "@/lib/og/card";
 import { SITE_DOMAIN } from "@/lib/site";
-import portrait from "./portrait.jpg?inline";
+import photo from "./portrait.jpg?inline";
 
 /** A headline word or phrase; `muted` ones take the secondary text colour. */
 type HeadlineSegment = string | { muted: string };
@@ -15,9 +15,26 @@ export interface ProfileCardProps {
   accent: string;
   /** Under the headline: who he is, in a sentence or two. */
   lead: string;
+  /**
+   * The portrait as a data URL, the photo by default. Home's og:video
+   * (lib/og/homeVideoFrames.ts) swaps in the pixel portrait for its minted
+   * frames; no share image does.
+   */
+  portrait?: string;
 }
 
-const PORTRAIT = { width: 320, height: 400 };
+/**
+ * The portrait's box on the card: its size, its distance from the card's
+ * top and right edges, and its corner radius. Home's og:video mints its
+ * pixel portrait in this box.
+ */
+export const PORTRAIT_BOX = {
+  top: 64,
+  right: 72,
+  width: 320,
+  height: 400,
+  radius: 28,
+} as const;
 /** Instrument Serif at this size fits four lines beside the portrait. */
 const HEADLINE_SIZE = 60;
 
@@ -27,7 +44,13 @@ const HEADLINE_SIZE = 60;
  * into the Worker), over the dither band every share card carries. The
  * other pages use OgCard.
  */
-export function ProfileCard({ pill, lines, accent, lead }: ProfileCardProps) {
+export function ProfileCard({
+  pill,
+  lines,
+  accent,
+  lead,
+  portrait = photo,
+}: ProfileCardProps) {
   return (
     <div
       style={{
@@ -46,8 +69,8 @@ export function ProfileCard({ pill, lines, accent, lead }: ProfileCardProps) {
       <div
         style={{
           position: "absolute",
-          top: 64,
-          right: 72,
+          top: PORTRAIT_BOX.top,
+          right: PORTRAIT_BOX.right,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-end",
@@ -57,9 +80,9 @@ export function ProfileCard({ pill, lines, accent, lead }: ProfileCardProps) {
         <img
           src={portrait}
           alt=""
-          width={PORTRAIT.width}
-          height={PORTRAIT.height}
-          style={{ borderRadius: 28 }}
+          width={PORTRAIT_BOX.width}
+          height={PORTRAIT_BOX.height}
+          style={{ borderRadius: PORTRAIT_BOX.radius }}
         />
         <div
           style={{
