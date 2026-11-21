@@ -85,7 +85,7 @@ function RootDocument({ children }: { children: ReactNode }) {
   // A navigation whose chunk a deploy removed loads its page fresh, once
   // (src/lib/staleChunk.ts). Client only, from hydration on, and a chunk of
   // its own rather than part of the entry chunk, which every page loads
-  // (the topic hubs sit at their 165 KB budget).
+  // (the 165 KB default first-load budget binds on the topic hubs).
   const router = useRouter();
   useEffect(() => {
     let stop: (() => void) | undefined;
