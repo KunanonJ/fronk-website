@@ -55,7 +55,7 @@ describe("profile chrome links", () => {
     expect(footerPages.map((page) => page.href)).toEqual(
       expected.map((item) => item.href),
     );
-    expect(footerPages).toHaveLength(13);
+    expect(footerPages).toHaveLength(14);
     const hrefs = footerPages.map((page) => page.href);
     expect(hrefs).not.toContain("/blog");
     expect(hrefs).not.toContain("/press");
