@@ -46,6 +46,73 @@ function useStageHeight(stage: RefObject<HTMLElement | null>) {
   }, [stage]);
 }
 
+/** Where Work's empty top passes over the strip undrawn: home-work-about.css's query. */
+const WORK_TOP_QUERY =
+  "(min-width: 50.625rem) and (prefers-reduced-motion: no-preference)";
+
+/**
+ * Work's empty top over the logo strip, where the browser has no
+ * scroll-driven animations (Firefox 157): Work's share of it drawn, as
+ * home-work-about.css's kj-work-top draws it where they run (from Work's top
+ * 150 px up the screen to 200 px), and data-top="clear" while under half,
+ * when it takes no press (home-hero.css). Only where the query holds, and
+ * nothing at all where the animations run. Read again on every scroll, on a
+ * resize, and when the stage's height moves Work with no scroll, as a view
+ * timeline follows it.
+ */
+function useWorkTop(stage: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = stage.current;
+    const work = el?.parentElement?.querySelector<HTMLElement>(
+      ":scope > .pf-hero ~ .pf-work",
+    );
+    if (
+      !el ||
+      !work ||
+      typeof CSS === "undefined" ||
+      typeof CSS.supports !== "function" ||
+      CSS.supports("animation-timeline: view()")
+    ) {
+      return;
+    }
+    const query = window.matchMedia(WORK_TOP_QUERY);
+    const clear = () => {
+      work.style.removeProperty("--pf-work-top");
+      delete work.dataset.top;
+    };
+    let last = "";
+    const update = () => {
+      let shown = "";
+      if (query.matches) {
+        // How far Work's top is up the screen (the root's scrollport).
+        const up =
+          document.documentElement.clientHeight -
+          work.getBoundingClientRect().top;
+        shown = String(Math.min(1, Math.max(0, (up - 150) / 50)));
+      }
+      if (shown === last) return;
+      last = shown;
+      if (!shown) return clear();
+      work.style.setProperty("--pf-work-top", shown);
+      work.dataset.top = Number(shown) < 0.5 ? "clear" : "drawn";
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    query.addEventListener("change", update);
+    const observer =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    observer?.observe(el);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      query.removeEventListener("change", update);
+      observer?.disconnect();
+      clear();
+    };
+  }, [stage]);
+}
+
 /**
  * Focus that holds the headline still: keyboard focus (`:focus-visible`),
  * so a reader moving through the hero is not chased by a changing line, but
@@ -67,6 +134,7 @@ export default function Hero() {
   const [playing, setPlaying] = useState(true);
   const [focusInside, setFocusInside] = useState(false);
   useStageHeight(stage);
+  useWorkTop(stage);
 
   const onFocus = (event: FocusEvent<HTMLElement>) => {
     setFocusInside(holdsHeadline(event.target));
