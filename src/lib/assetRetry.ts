@@ -11,11 +11,13 @@
  * preload from this site's /assets/ (an image, a font or analytics never
  * reloads the page), and only until the window's load event: a lazy file
  * failing later (a tab left open across a deploy) never reloads a page the
- * reader is using. The stylesheets above it have loaded or failed by the
- * time it runs (an inline script waits for them), so their failures came
- * before it listened: it checks them once, and a failed one has no rules
- * (Chromium keeps an empty sheet, WebKit none). A module preload that failed
- * before it ran fails the module script that imports it, which it hears.
+ * reader is using. A navigation's own chunk failing later is not a page in
+ * use: src/lib/staleChunk.ts loads the page asked for, once. The
+ * stylesheets above it have loaded or failed by the time it runs (an
+ * inline script waits for them), so their failures came before it
+ * listened: it checks them once, and a failed one has no rules (Chromium
+ * keeps an empty sheet, WebKit none). A module preload that failed before
+ * it ran fails the module script that imports it, which it hears.
  *
  * Before the reload it asks for the failed file again, past the browser's
  * caches (`cache: "reload"`): WebKit keeps a failed module script and serves

@@ -1,10 +1,11 @@
 /// <reference types="vite/client" />
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import {
   HeadContent,
   Scripts,
   ScriptOnce,
   createRootRouteWithContext,
+  useRouter,
   useRouterState,
 } from "@tanstack/react-router";
 import type { RouterContext } from "../router";
@@ -21,6 +22,7 @@ import { rootViewport } from "@/lib/seo/rootMetadata";
 import { site as landingSite } from "@/lib/content/landing";
 import { ASSET_RETRY_SCRIPT } from "@/src/lib/assetRetry";
 import { BUILD_ID } from "@/src/lib/buildId";
+import { reloadOnStaleChunk } from "@/src/lib/staleChunk";
 import instrumentSerifLatin from "../fonts/instrument-serif-latin.woff2?url";
 import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
@@ -79,6 +81,10 @@ function RootDocument({ children }: { children: ReactNode }) {
   // Thai pages declare Thai on <html> (Next only set it on <main>).
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
+  // A navigation whose chunk a deploy removed loads its page fresh, once
+  // (src/lib/staleChunk.ts). Client only, from hydration on.
+  const router = useRouter();
+  useEffect(() => reloadOnStaleChunk(router), [router]);
   return (
     <html
       lang={lang}
