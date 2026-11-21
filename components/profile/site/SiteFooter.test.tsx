@@ -13,6 +13,21 @@ vi.mock("next-themes", () => ({
   useTheme: () => ({ resolvedTheme: "light", setTheme: () => {} }),
 }));
 
+/** The page the footer is drawn on: "/" unless a test says otherwise. */
+const ROUTE = vi.hoisted(() => ({ pathname: "/" }));
+
+vi.mock("@/lib/router/navigation", () => ({
+  usePathname: () => ROUTE.pathname,
+  useLocationKey: () => ROUTE.pathname,
+  useChromeLinkProps: (href: string) => ({ href }),
+  useReplaceNavigate: () => () => {},
+  useAfterNavigation: () => {},
+  useNavigationPending: () => false,
+  notFound: () => {
+    throw new Error("notFound");
+  },
+}));
+
 function navBlock(html: string, label: string): string {
   const start = html.indexOf(`aria-label="${label}"`);
   expect(start, label).toBeGreaterThan(-1);
@@ -153,5 +168,37 @@ describe("SiteFooter, its links", () => {
     // Every list was rendered: the pages, the agent files and the profiles.
     expect(hrefs.length).toBeGreaterThanOrEqual(20);
     expect(hrefs.filter((href) => /^\/(blog|press)/.test(href))).toEqual([]);
+  });
+});
+
+/*
+ * /contact asks once (UX sweep 21-11-26): the page is the call to action,
+ * so the footer leaves out its own and the drawings that flank it, and
+ * keeps the card.
+ */
+describe("SiteFooter on /contact", () => {
+  afterEach(() => {
+    ROUTE.pathname = "/";
+  });
+
+  it("draws no invitation, no Say hello and no drawings, and keeps the card", () => {
+    ROUTE.pathname = "/contact";
+    const html = renderToString(<SiteFooter />);
+    expect(html).toMatch(/<footer[^>]*class="pf-footer pf-footer--plain"/);
+    expect(html).not.toContain("pf-footer__intro");
+    expect(html).not.toContain(footerCopy.headline);
+    expect(html).not.toContain('id="say-hello-footer"');
+    expect(html).not.toContain("pf-footer__art");
+    expect(navBlock(html, "Pages").match(/<a /g)).toHaveLength(13);
+    expect(html).toContain("Bangkok, GMT+7");
+    expect(html).toMatch(/© \d{4} Kunanon Jarat · Bangkok/);
+  });
+
+  it("still invites on every other page", () => {
+    ROUTE.pathname = "/about";
+    const html = renderToString(<SiteFooter />);
+    expect(html).toMatch(/<footer[^>]*class="pf-footer"/);
+    expect(html).toContain(footerCopy.headline);
+    expect(html).toContain('id="say-hello-footer"');
   });
 });

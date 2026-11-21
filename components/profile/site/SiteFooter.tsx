@@ -13,10 +13,12 @@ import {
   brand,
   copyright,
   footerCopy,
+  footerInvites,
   footerLinks,
   footerPages,
   nowLine,
 } from "@/lib/content/profileChrome";
+import { usePathname } from "@/lib/router/navigation";
 
 /*
  * The footer (profile redesign, design spec 7.7): the sheet and its dither
@@ -24,7 +26,10 @@ import {
  * the Pages list (every page the old menu linked), Elsewhere and For agents.
  * The name block ends with the "Now" line: what he is doing, then the place
  * with its time once the page runs (LocalTime).
- * Identical on every page. The two pixel drawings are code-drawn and shown from
+ * Identical on every page but /contact, which is the call to action itself:
+ * there the footer leaves out the intro and the two drawings that flank it,
+ * and the card leads (`pf-footer--plain`, shell.css; UX sweep 21-11-26).
+ * The two pixel drawings are code-drawn and shown from
  * 1280 px only; each plays once as it comes into view (PixelArt `play`), and
  * the dither field prints in (DitherField).
  *
@@ -40,33 +45,42 @@ const Living = lazy(() => import("@/components/profile/site/living/Living"));
 
 export default function SiteFooter() {
   const hydrated = useHydrated();
+  const pathname = usePathname();
+  // Asked once: on /contact the page itself is the call to action.
+  const invite = footerInvites(pathname);
   return (
-    <footer data-site-chrome lang="en" className="pf-footer">
+    <footer
+      data-site-chrome
+      lang="en"
+      className={invite ? "pf-footer" : "pf-footer pf-footer--plain"}
+    >
       <div className="pf-footer__sheet" aria-hidden="true">
         <DitherField className="pf-footer__dither" fade="up" cell={10} />
       </div>
       <div className="ds-wrap pf-footer__wrap">
-        <div className="pf-footer__intro">
-          <Reveal rise={12}>
-            <EyebrowRow centred>{footerCopy.eyebrow}</EyebrowRow>
-          </Reveal>
-          <Reveal rise={12}>
-            <h2 className="t-footer pf-footer__headline">
-              {footerCopy.headline}
-            </h2>
-          </Reveal>
-          <Reveal rise={12}>
-            <div className="pf-footer__lead">
-              <p>{footerCopy.paragraphs[0]}</p>
-              <p className="pf-footer__last">{footerCopy.paragraphs[1]}</p>
-            </div>
-          </Reveal>
-          <Reveal rise={12}>
-            <div className="pf-footer__cta">
-              <SayHello id={POPOVER_IDS.footer} placement="footer" />
-            </div>
-          </Reveal>
-        </div>
+        {invite && (
+          <div className="pf-footer__intro">
+            <Reveal rise={12}>
+              <EyebrowRow centred>{footerCopy.eyebrow}</EyebrowRow>
+            </Reveal>
+            <Reveal rise={12}>
+              <h2 className="t-footer pf-footer__headline">
+                {footerCopy.headline}
+              </h2>
+            </Reveal>
+            <Reveal rise={12}>
+              <div className="pf-footer__lead">
+                <p>{footerCopy.paragraphs[0]}</p>
+                <p className="pf-footer__last">{footerCopy.paragraphs[1]}</p>
+              </div>
+            </Reveal>
+            <Reveal rise={12}>
+              <div className="pf-footer__cta">
+                <SayHello id={POPOVER_IDS.footer} placement="footer" />
+              </div>
+            </Reveal>
+          </div>
+        )}
         <Reveal rise={12}>
           <div className="pf-footer__card">
             <div className="pf-footer__name-block">
@@ -167,16 +181,20 @@ export default function SiteFooter() {
         <p className="t-meta pf-footer__copyright" suppressHydrationWarning>
           {copyright(new Date().getFullYear())}
         </p>
-        <PixelArt
-          className="pf-footer__art pf-footer__art--browser"
-          rows={BROWSER_ART}
-          play
-        />
-        <PixelArt
-          className="pf-footer__art pf-footer__art--phone"
-          rows={PHONE_ART}
-          play
-        />
+        {invite && (
+          <>
+            <PixelArt
+              className="pf-footer__art pf-footer__art--browser"
+              rows={BROWSER_ART}
+              play
+            />
+            <PixelArt
+              className="pf-footer__art pf-footer__art--phone"
+              rows={PHONE_ART}
+              play
+            />
+          </>
+        )}
       </div>
     </footer>
   );

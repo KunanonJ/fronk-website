@@ -184,6 +184,16 @@ export const footerCopy = {
   ],
 } as const;
 
+/**
+ * Whether the footer opens with its call to action, footerCopy and Say
+ * hello (spec 7.7): on every page but /contact, which is that call to
+ * action itself (UX sweep 21-11-26). A trailing slash is the same page.
+ */
+export function footerInvites(pathname: string): boolean {
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return path !== navCta.href;
+}
+
 /** The footer's social links and its agent files, as lib/content gives them. */
 export const footerLinks = {
   pages: "Pages",

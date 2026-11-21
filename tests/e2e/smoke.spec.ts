@@ -1661,6 +1661,57 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       .toBeLessThan(2);
   });
 
+  test("Contact offers the email first, then the form that says Or write it here, then Elsewhere, and asks once (UX sweep 21-11-26)", async ({
+    page,
+  }) => {
+    // Cards rise into place as they enter; measure them at rest.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/contact", { waitUntil: "networkidle" });
+    const card = (name: string) =>
+      page.getByRole("article", { name, exact: true });
+    const email = card("Email me directly");
+    const form = card("Say hello");
+    const elsewhere = card("Elsewhere");
+    const box = async (target: Locator) => {
+      const found = await target.boundingBox();
+      if (!found) throw new Error("a card has no box");
+      return found;
+    };
+    // One order for the eye, Tab and a screen reader: the page's own.
+    expect(
+      await page
+        .locator(".pf-contact__top > article")
+        .evaluateAll((cards) =>
+          cards.map((c) => c.getAttribute("aria-labelledby")),
+        ),
+    ).toEqual(["card-email", "card-form", "card-elsewhere"]);
+    // A phone stacks them, the email above the form.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect
+      .poll(async () => {
+        const above = await box(email);
+        return (await box(form)).y - (above.y + above.height);
+      })
+      .toBeGreaterThan(0);
+    // From 1024 px the email and the form share the first row, the email on
+    // the left, and Elsewhere sits under the email.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect
+      .poll(async () => Math.abs((await box(email)).y - (await box(form)).y))
+      .toBeLessThan(2);
+    const left = await box(email);
+    expect((await box(form)).x).toBeGreaterThan(left.x + left.width);
+    expect(Math.abs((await box(elsewhere)).x - left.x)).toBeLessThan(2);
+    expect((await box(elsewhere)).y).toBeGreaterThan(left.y + left.height);
+    // The page is the call to action: the footer keeps its card, not its own.
+    const footer = page.locator("footer[data-site-chrome]");
+    await expect(footer.getByRole("heading")).toHaveCount(0);
+    await expect(footer.locator(".pf-say__trigger--footer")).toHaveCount(0);
+    await expect(
+      footer.getByRole("navigation", { name: "Pages" }),
+    ).toBeVisible();
+  });
+
   test("an unknown contact topic falls back to the general form without an error", async ({
     page,
   }) => {

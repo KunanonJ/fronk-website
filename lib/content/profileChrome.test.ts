@@ -7,6 +7,7 @@ import {
   copyright,
   currentOf,
   footerCopy,
+  footerInvites,
   footerPages,
   homeHref,
   isCurrentLink,
@@ -182,5 +183,20 @@ describe("the footer's Now line", () => {
       new RegExp(`^${nowLine.doing.toLowerCase()}\\b`),
     );
     expect(nowLine.doing).toBe("building GoGoCash and Manut AI");
+  });
+});
+
+describe("footerInvites (UX sweep 21-11-26)", () => {
+  it("opens the footer with its call to action on every page but /contact", () => {
+    for (const path of [
+      "/",
+      "/about",
+      "/portfolio/tbh-intranet",
+      "/th/topics/ai-transformation-thailand",
+    ])
+      expect(footerInvites(path), path).toBe(true);
+    // A trailing slash is the same page.
+    for (const path of ["/contact", "/contact/"])
+      expect(footerInvites(path), path).toBe(false);
   });
 });
