@@ -1,10 +1,11 @@
 /// <reference types="vite/client" />
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import {
   HeadContent,
   Scripts,
   ScriptOnce,
   createRootRouteWithContext,
+  useRouter,
   useRouterState,
 } from "@tanstack/react-router";
 import type { RouterContext } from "../router";
@@ -79,6 +80,27 @@ function RootDocument({ children }: { children: ReactNode }) {
   // Thai pages declare Thai on <html> (Next only set it on <main>).
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const lang = pathname === "/th" || pathname.startsWith("/th/") ? "th" : "en";
+  // A navigation whose chunk a deploy removed loads its page fresh, once
+  // (src/lib/staleChunk.ts). Client only, from hydration on, and a chunk of
+  // its own rather than part of the entry chunk, which every page loads
+  // (the topic hubs sit at their 165 KB budget).
+  const router = useRouter();
+  useEffect(() => {
+    let stop: (() => void) | undefined;
+    let left = false;
+    import("@/src/lib/staleChunk").then(
+      (chunk) => {
+        if (!left) stop = chunk.reloadOnStaleChunkAfterLoad(router);
+      },
+      // Its own chunk missing means this document's build is gone already:
+      // nothing to recover with, and nothing worth an error.
+      () => {},
+    );
+    return () => {
+      left = true;
+      stop?.();
+    };
+  }, [router]);
   return (
     <html
       lang={lang}
