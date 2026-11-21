@@ -1,7 +1,9 @@
 import { ProfileLink } from "@/components/profile/site/ProfileLink";
-import { Search } from "lucide-react";
 import { ThemeSwitch } from "@/components/profile/site/ThemeSwitch";
-import { openSearch } from "@/components/profile/site/search/SearchTrigger";
+import {
+  SearchIcon,
+  openSearch,
+} from "@/components/profile/site/search/SearchTrigger";
 import {
   POPOVER_IDS,
   closePopover,
@@ -79,7 +81,7 @@ export function PhoneMenu() {
             openSearch();
           }}
         >
-          <Search size={18} strokeWidth={1.8} aria-hidden="true" />
+          <SearchIcon />
           {searchCopy.menu}
         </button>
       </div>

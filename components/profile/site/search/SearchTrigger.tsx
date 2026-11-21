@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
 import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { searchCopy } from "@/lib/content/profileChrome";
 
@@ -23,6 +22,33 @@ const OPEN_SEARCH = "pf:open-search";
 /** Opens the search dialog from anywhere on the page. */
 export function openSearch(): void {
   window.dispatchEvent(new Event(OPEN_SEARCH));
+}
+
+/**
+ * The magnifier of the nav's button and the phone menu's Search: lucide's
+ * Search at 18 px, drawn here in the markup lucide gives it. It was the
+ * entry chunk's only lucide icon, and it brought lucide's icon runtime
+ * into the chunk every page loads.
+ */
+export function SearchIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-search"
+      aria-hidden="true"
+    >
+      <path d="m21 21-4.34-4.34" />
+      <circle cx="11" cy="11" r="8" />
+    </svg>
+  );
 }
 
 export function SearchTrigger() {
@@ -63,7 +89,7 @@ export function SearchTrigger() {
         onPointerEnter={SearchDialog.preload}
         onFocus={SearchDialog.preload}
       >
-        <Search size={18} strokeWidth={1.8} aria-hidden="true" />
+        <SearchIcon />
       </button>
       {open ? (
         <FeatureBoundary>

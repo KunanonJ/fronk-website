@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
-import { loadSearchIndex, type SearchEntry } from "@/lib/search/match";
+import { loadSearchIndex } from "@/lib/search/loadIndex";
+import type { SearchEntry } from "@/lib/search/match";
 
 /*
  * Link previews (premium interactions, item 6): a case study's text link

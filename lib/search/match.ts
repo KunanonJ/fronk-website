@@ -70,17 +70,3 @@ export function groupResults(
     entries: results.filter((entry) => entry.kind === kind),
   }));
 }
-
-let index: Promise<SearchEntry[]> | null = null;
-
-/** The index, fetched once per page load and shared by its users. */
-export function loadSearchIndex(): Promise<SearchEntry[]> {
-  index ??= fetch("/search.json").then((response) => {
-    if (!response.ok) throw new Error(`search.json: ${response.status}`);
-    return response.json() as Promise<SearchEntry[]>;
-  });
-  index.catch(() => {
-    index = null;
-  });
-  return index;
-}
