@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { aboutPage } from "@/lib/content/aboutPage";
 import {
@@ -200,5 +202,57 @@ describe("footerInvites (UX sweep 21-11-26)", () => {
     // A trailing slash is the same page.
     for (const path of ["/contact", "/contact/"])
       expect(footerInvites(path), path).toBe(false);
+  });
+
+  it("leaves it out on /contact in any case: the router serves /Contact as that page", () => {
+    for (const path of ["/Contact", "/CONTACT", "/cOnTaCt", "/Contact/"])
+      expect(footerInvites(path), path).toBe(false);
+    for (const path of ["/contacts", "/Contact-me", "/th/Contact"])
+      expect(footerInvites(path), path).toBe(true);
+  });
+});
+
+describe("the chrome reads a path as the router does (contact-case 21-11-26)", () => {
+  /** The labels of the menu's links current on `path`. */
+  const marked = (path: string) =>
+    profileMenu
+      .filter((link) => isCurrentLink(link, path))
+      .map((link) => link.label);
+
+  it("matches a page's fixed words in any case, as the router does", () => {
+    expect(marked("/About")).toEqual(["About"]);
+    expect(marked("/ABOUT/")).toEqual(["About"]);
+    expect(marked("/Portfolio")).toEqual(["Work"]);
+    expect(marked("/PORTFOLIO/tbh-intranet")).toEqual(["Work"]);
+    expect(marked("/Ventures/gogocash")).toEqual(["Work"]);
+    expect(marked("/Resume")).toEqual(["Résumé"]);
+    expect(marked("/Contact")).toEqual(["Contact"]);
+    const fde = "forward-deployed-ai-engineering";
+    expect(marked(`/Topics/${fde}`)).toEqual(["AI engineering"]);
+    expect(marked(`/TH/Topics/${fde}`)).toEqual(["AI engineering"]);
+  });
+
+  it("keeps a slug's case: the pages look it up as written, so it is a not-found page", () => {
+    expect(marked("/topics/Forward-Deployed-AI-Engineering")).toEqual([]);
+    expect(marked("/TH/topics/Forward-Deployed-AI-Engineering")).toEqual([]);
+    expect(marked("/TH/Resume")).toEqual([]);
+  });
+
+  it("holds to the routes: every page two or more words deep ends in its slug", () => {
+    // The page routes (src/routes/_landing and _system) by full path.
+    const tree = readFileSync(
+      join(process.cwd(), "src/routeTree.gen.ts"),
+      "utf8",
+    );
+    const block = /interface FileRoutesByFullPath \{(.*?)\n\}/s.exec(tree)![1]!;
+    const pages = [
+      ...block.matchAll(/'([^']+)': typeof (?:Landing|System)\w*Route\b/g),
+    ].map((match) => match[1]!);
+    expect(pages).toContain("/contact");
+    expect(pages).toContain("/th/topics/$slug");
+    for (const page of pages) {
+      const words = page.replace(/\/$/, "").split("/").slice(1);
+      if (words.length > 1) expect(words.at(-1), page).toBe("$slug");
+    }
   });
 });

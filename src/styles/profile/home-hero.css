@@ -886,6 +886,47 @@
     }
   }
 
+  /* Work's empty top over the strip, where the browser has no
+     scroll-driven animations (Firefox 157 has none). Where it has them,
+     home-work-about.css ties that top to scrolling (kj-work-top); here the
+     hero's script (useWorkTop, Hero.tsx) gives Work the same share drawn,
+     `--pf-work-top`: 0 until Work's top is 150 px up the screen, 1 from
+     200 px, and data-top="clear" while under half, when the top takes no
+     press. So the strip's pause shows and can be pressed until Work's
+     content reaches it, as it can there. Without the script, Work is drawn
+     whole, as before. Home only, so in this sheet. */
+  @media (min-width: 50.625rem) and (prefers-reduced-motion: no-preference) {
+    @supports not (animation-timeline: view()) {
+      .pf-hero ~ .pf-work[data-top] {
+        background: none;
+        pointer-events: none;
+      }
+      .pf-hero ~ .pf-work[data-top] > * {
+        pointer-events: auto;
+      }
+      .pf-hero ~ .pf-work[data-top]::before,
+      .pf-hero ~ .pf-work[data-top]::after {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        z-index: -1;
+        background: var(--paper);
+        pointer-events: auto;
+      }
+      .pf-hero ~ .pf-work[data-top]::before {
+        inset-block: 0 auto;
+        block-size: 112px;
+        opacity: var(--pf-work-top);
+      }
+      .pf-hero ~ .pf-work[data-top="clear"]::before {
+        pointer-events: none;
+      }
+      .pf-hero ~ .pf-work[data-top]::after {
+        inset-block: 112px 0;
+      }
+    }
+  }
+
   /* Forced colours: the rings vanish, so ringed parts take system borders
      (spec 12, item 26). The pager's dots are drawn by background, which
      forced colours remove, so they keep system colours of their own. */

@@ -172,6 +172,124 @@ describe("Hero", () => {
   });
 });
 
+describe("Work's empty top over the strip, without scroll-driven animations", () => {
+  const SCREEN = 768;
+  /** Work's top on the screen, which the stubbed layout reports. */
+  let workTop = SCREEN;
+
+  function stubLayout(scrollDriven: boolean, { wideAndMoving = true } = {}) {
+    vi.stubGlobal("CSS", {
+      supports: (test: string) =>
+        scrollDriven && test === "animation-timeline: view()",
+    });
+    // From 810 px with motion allowed (home-work-about.css's query).
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) =>
+        ({
+          matches:
+            wideAndMoving &&
+            query ===
+              "(min-width: 50.625rem) and (prefers-reduced-motion: no-preference)",
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+        }) as unknown as MediaQueryList,
+    );
+    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(
+      SCREEN,
+    );
+    const rect = Element.prototype.getBoundingClientRect;
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: Element) {
+        return this.classList.contains("pf-work")
+          ? ({ top: workTop } as DOMRect)
+          : rect.call(this);
+      },
+    );
+  }
+
+  /** The hero, then Work, as Home puts them. */
+  function renderHome() {
+    const view = render(
+      withRouter(
+        <>
+          <Hero />
+          <article className="pf-work" />
+        </>,
+      ),
+    );
+    return { ...view, work: view.container.querySelector("article")! };
+  }
+
+  function scrollTo(up: number) {
+    workTop = SCREEN - up;
+    fireEvent.scroll(window);
+  }
+
+  const state = (work: HTMLElement) => [
+    work.dataset.top,
+    work.style.getPropertyValue("--pf-work-top"),
+  ];
+
+  afterEach(() => {
+    workTop = SCREEN;
+    vi.unstubAllGlobals();
+  });
+
+  it("draws none of it for Work's first 150 px up the screen, then all of it by 200 px, as kj-work-top does", () => {
+    stubLayout(false);
+    const { work, unmount } = renderHome();
+    expect(state(work)).toEqual(["clear", "0"]);
+    scrollTo(150);
+    expect(state(work)).toEqual(["clear", "0"]);
+    scrollTo(160);
+    expect(state(work)).toEqual(["clear", "0.2"]);
+    // From half drawn, it takes presses (a discrete property's flip).
+    scrollTo(175);
+    expect(state(work)).toEqual(["drawn", "0.5"]);
+    scrollTo(200);
+    expect(state(work)).toEqual(["drawn", "1"]);
+    scrollTo(600);
+    expect(state(work)).toEqual(["drawn", "1"]);
+    unmount();
+    expect(state(work)).toEqual([undefined, ""]);
+  });
+
+  it("follows Work when the stage's height moves it with no scroll, as a view timeline does", () => {
+    const resized: (() => void)[] = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resized.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    stubLayout(false);
+    const { work } = renderHome();
+    workTop = SCREEN - 190;
+    expect(state(work)).toEqual(["clear", "0"]);
+    for (const callback of resized) callback();
+    expect(state(work)).toEqual(["drawn", "0.8"]);
+  });
+
+  it("leaves Work alone where the browser ties animations to scrolling", () => {
+    stubLayout(true);
+    const { work } = renderHome();
+    scrollTo(100);
+    expect(state(work)).toEqual([undefined, ""]);
+  });
+
+  it("leaves Work alone under 810 px or with reduced motion, where Work is drawn whole", () => {
+    stubLayout(false, { wideAndMoving: false });
+    const { work } = renderHome();
+    scrollTo(100);
+    expect(state(work)).toEqual([undefined, ""]);
+  });
+});
+
 describe("holdsHeadline", () => {
   function controls() {
     render(
