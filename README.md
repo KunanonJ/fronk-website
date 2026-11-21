@@ -117,25 +117,25 @@ App boots at http://localhost:3000.
 
 ## Scripts
 
-| Command                        | Purpose                                                     |
-| ------------------------------ | ----------------------------------------------------------- |
-| `pnpm dev`                     | Vite dev server (Workers runtime via the Cloudflare plugin) |
-| `pnpm build`                   | Production build: Sanity manifest, `vite build`, prerender  |
-| `pnpm build:cloudflare`        | Same as `pnpm build` (the Workers Builds build command)     |
-| `pnpm start`                   | Serve the production build in workerd (port 3000)           |
-| `pnpm preview`                 | Build and preview the app in the Cloudflare Workers runtime |
-| `pnpm run deploy`              | Build and deploy the app to Cloudflare Workers              |
-| `pnpm upload`                  | Build and upload a Worker version without immediate deploy  |
-| `pnpm deploy:staging`          | Build and deploy the staging Worker (`fronk-website-start`) |
-| `pnpm typecheck`               | `tsc --noEmit` with TypeScript 7 (see Toolchain below)      |
-| `pnpm lint`                    | ESLint, failing on any warning                              |
-| `pnpm format` / `format:check` | Prettier write / verify                                     |
-| `pnpm knip`                    | Unused files, exports and dependencies                      |
-| `pnpm test`                    | Vitest (unit + integration)                                 |
-| `pnpm test:watch`              | Vitest watch mode                                           |
-| `pnpm test:coverage`           | Vitest with V8 coverage                                     |
-| `pnpm test:e2e`                | Playwright (configure first; see `tests/e2e/`)              |
-| `pnpm perf:budget`             | First-load JS gzip budget (route-aware)                     |
+| Command                        | Purpose                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `pnpm dev`                     | Vite dev server (Workers runtime via the Cloudflare plugin)             |
+| `pnpm build`                   | Production build: Sanity manifest, `vite build`, prerender              |
+| `pnpm build:cloudflare`        | Same as `pnpm build` (the Workers Builds build command)                 |
+| `pnpm start`                   | Serve the production build in workerd (port 3000)                       |
+| `pnpm preview`                 | Build and preview the app in the Cloudflare Workers runtime             |
+| `pnpm run deploy`              | Build and deploy the app to Cloudflare Workers                          |
+| `pnpm upload`                  | Build and upload a Worker version without immediate deploy              |
+| `pnpm deploy:staging`          | Build and deploy the staging Worker (`fronk-website-start`)             |
+| `pnpm typecheck`               | `tsc --noEmit` with TypeScript 7 (see Toolchain below)                  |
+| `pnpm lint`                    | ESLint, failing on any warning                                          |
+| `pnpm format` / `format:check` | Prettier write / verify                                                 |
+| `pnpm knip`                    | Unused files, exports and dependencies                                  |
+| `pnpm test`                    | Vitest (unit + integration)                                             |
+| `pnpm test:watch`              | Vitest watch mode                                                       |
+| `pnpm test:coverage`           | Vitest with V8 coverage                                                 |
+| `pnpm test:e2e`                | Playwright (configure first; see `tests/e2e/`)                          |
+| `pnpm perf:budget`             | First-load JS, CSS and font budgets (route-aware, on-request pages too) |
 
 > Note: use `pnpm run deploy` — bare `pnpm deploy` is a pnpm CLI command, not
 > this repo’s script.
@@ -317,10 +317,11 @@ node scripts/start-gates.mjs   # parity crawl + Playwright smoke and axe on the 
 ```
 
 CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint (no
-warnings), Prettier, knip, unit tests, the production build, the first-load JS
-budget (165 KB gzip by default, 200 KB on marketing routes, 120 KB for the shared entry chunk), Playwright smoke
-and axe checks, the visual baselines (in the Playwright container) and the
-parity crawl.
+warnings), Prettier, knip, unit tests, the production build, the first-load
+budgets (JS 165 KB gzip by default, 200 KB on marketing routes, 120 KB for the
+shared entry chunk; 36 KB of stylesheets; 52 KB of preloaded fonts; /resume
+and /learn rendered by vite preview), Playwright smoke and axe checks, the
+visual baselines (in the Playwright container) and the parity crawl.
 
 ### Parity reference
 

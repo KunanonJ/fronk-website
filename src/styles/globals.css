@@ -6,7 +6,14 @@
  * ratchets in lib/design/.
  * ─────────────────────────────────────────────────────────────────────────── */
 
-@import "tailwindcss";
+/* Utilities come from the app's code only (UX sweep 21-11-26). Automatic
+ * source detection also read process/, docs/, public/ and scripts/, so every
+ * class name a plan or a report mentioned shipped as a utility on every page:
+ * 83 unused utilities, 1.5 KB gzip of each page's first load. */
+@import "tailwindcss" source(none);
+@source "../../components";
+@source "../../lib";
+@source "../../src";
 
 @variant dark (&:where(.dark, .dark *));
 

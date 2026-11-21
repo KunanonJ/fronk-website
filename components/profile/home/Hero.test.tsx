@@ -12,6 +12,11 @@ import { withRouter } from "@/tests/routerContext";
  * be watched; the site ships one until the owner approves alternates (R5).
  */
 
+// Vitest resolves a `?url` import to an empty string; the build's is hashed.
+vi.mock("@/src/styles/profile/home-hero.css?url", () => ({
+  default: "/assets/home-hero.css",
+}));
+
 const { ALTERNATE } = vi.hoisted(() => ({
   ALTERNATE: "Stay close to the work.",
 }));
@@ -79,6 +84,15 @@ afterEach(() => {
 });
 
 describe("Hero", () => {
+  it("links its own stylesheet, so no other page loads it", () => {
+    render(withRouter(<Hero />));
+    expect(
+      document.head.querySelector(
+        'link[rel="stylesheet"][data-precedence="pf-home-hero"]',
+      ),
+    ).toHaveAttribute("href", "/assets/home-hero.css");
+  });
+
   it("is a region named by its one h1, with the first facts", () => {
     render(withRouter(<Hero />));
     const region = screen.getByRole("region", { name: homeHero.title });

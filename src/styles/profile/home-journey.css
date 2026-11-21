@@ -880,7 +880,17 @@
   }
 }
 
-/* Keyframes: inert until a no-preference rule above uses them. */
+/* Keyframes: inert until a no-preference rule above uses them. The hero's
+   canvas mock rises in with kj-file-in too (home-hero.css): it moved here on
+   21-11-26, when the hero's sheet left profile.css, so the orbit's tiles do
+   not depend on a sheet only Home links. */
+@keyframes kj-file-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+}
+
 @keyframes kj-orbit-spin {
   to {
     --orbit-spin: 360deg;

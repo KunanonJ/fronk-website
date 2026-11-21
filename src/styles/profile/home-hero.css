@@ -2,9 +2,19 @@
 /*
  * Design spec 8.1 to 8.3, 10 and 10.1. Plain CSS on the tokens in
  * globals.css, phones first: the canvas mock swipes under 810 px, shows its
- * panels from 810 px, and sits beside the copy from 1180 px. Every rule is in
- * @layer components except the marquee's hover pause at the end, which must
- * beat an unlayered rule and says why.
+ * panels from 810 px, and sits beside the copy from 1180 px, or from 1024 px
+ * on a landscape screen. Every rule is in @layer components except the
+ * marquee's hover pause at the end, which must beat an unlayered rule and
+ * says why.
+ *
+ * Its own sheet since UX sweep 21-11-26: the hero links it (Hero.tsx,
+ * `precedence`), so it is in the server-rendered HTML of Home and in no other
+ * page's first load. The layer order is profile.css's. Loaded after it, these
+ * rules now follow the other partials in @layer components; none of those
+ * styles the hero's parts, and `.pf-hero ~ *` gives the sections after the
+ * hero the values home-work-about.css gives Work and About, so the order
+ * changes nothing.
+ * kj-file-in, which the orbit uses too, lives in home-journey.css.
  */
 
 @layer components {
@@ -812,6 +822,29 @@
     }
   }
 
+  /* From 1024 px on a landscape screen, side by side as well (UX sweep
+     21-11-26). Stacked at 1024 x 768, the copy left about 40% of the row
+     empty beside the h1, and the canvas and the logo strip's pause sat
+     below the fold (the stage was 1,272 px tall); side by side, the whole
+     stage fits the first screen. The copy takes 5 parts to the canvas's 6,
+     but the canvas keeps 500 px, about its 503 px at 1180, so its comment
+     still clears its toolbar (49vw where a smaller default text size
+     brings this range under 1024 px). The h1 runs from 52.8 px at 1024 to
+     64.4 px at 1179, its first line unbroken, and shrinks on short screens
+     as --type-hero does. A portrait screen (1024 x 1366) keeps the stack,
+     which already fills it, and a spanned dual screen keeps the hinge
+     rule's columns. A layout rule, it is first-load CSS (a lazy one would
+     paint the stack, then jump), but only Home pays for it: this sheet is
+     Home's own. */
+  @media (64rem <= width < 73.75rem) and (orientation: landscape) {
+    .pf-hero__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(min(500px, 49vw), 6fr);
+    }
+    .pf-hero__title {
+      font-size: clamp(3rem, min(7.5vw - 1.5rem, 8.4svh + 0.25rem), 4.5rem);
+    }
+  }
+
   /* From 1180 px: copy and canvas side by side (spec 4.2). */
   @media (min-width: 73.75rem) {
     .pf-hero__grid {
@@ -891,13 +924,6 @@
   from {
     opacity: 0;
     transform: translateY(12px);
-  }
-}
-
-@keyframes kj-file-in {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.96);
   }
 }
 
