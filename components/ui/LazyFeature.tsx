@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useEffectEvent,
+  useState,
   type ComponentType,
   type ReactNode,
 } from "react";
@@ -22,9 +23,9 @@ import { CatchBoundary } from "@tanstack/react-router";
  * "Unable to preload CSS for ..." of Vite's preload helper when a
  * stylesheet Vite links with the chunk does not load. Today's features link
  * their own stylesheet instead (React's `precedence`), which no import
- * waits for: if only that one fails, the feature shows unstyled, and it is
- * not asked for again (as before). An import that resolves empty is one
- * too, a quiet one (nothing is thrown, so nothing is logged): the helper
+ * waits for: if only that one fails, the feature shows unstyled (until its
+ * next mount, below). An import that resolves empty is a failed load too,
+ * a quiet one (nothing is thrown, so nothing is logged): the helper
  * resolves undefined when a `vite:preloadError` listener cancels the event,
  * as src/lib/staleChunk.ts does while a navigation loads. Anything else the
  * import rejects with, such as an error a module throws while it
@@ -41,8 +42,28 @@ import { CatchBoundary } from "@tanstack/react-router";
  * a chunk (and any stylesheet of its own) before it imports it, WebKit
  * keeps the failed answer and gives it to the next import without asking
  * the server, and the helper links each stylesheet once, so a failed one of
- * Vite's is linked anew. React's `precedence` stylesheets are React's to
- * manage and are left alone.
+ * Vite's is linked anew. The mount waits for those answers 3 s at most, as
+ * src/lib/assetRetry.ts does before its reload: a request that stalls goes
+ * on without it.
+ *
+ * A feature's own stylesheet (React's `precedence` link) that failed, a
+ * deploy or a blip, is asked for again the same way on the next mount of
+ * any feature (so one that stays mounted, as the footer's living status,
+ * gets it too), and that mount waits for it to load or fail, 3 s at most,
+ * as React holds a feature until its stylesheet has loaded: the feature
+ * comes in styled once the file can be had, or plain after 3 s if the
+ * request stalls, styled once it answers. The boundary's whole subtree
+ * waits, not just the feature. React keeps the element it made for a
+ * `precedence` stylesheet for the page's life and never links it again
+ * (react-dom's getResource looks for a stylesheet by its href once, the
+ * first time it is rendered; an unmount only counts it down). So that
+ * element stays, and a fresh <link> with the same href goes right after
+ * it, in its place in the cascade; React neither looks for it nor removes
+ * it, and a fresh one that fails too is replaced by the next. Once per
+ * mount, as for the code: a stylesheet that keeps failing is asked for once
+ * each time a feature mounts, never on a re-render, never in a loop. Once
+ * its fresh link has failed too (a tab left open across the deploy that
+ * took the file away), mounts ask for it without waiting.
  *
  * The boundary is the router's CatchBoundary, already in the entry chunk
  * (the entry carries every page): an error its error component throws goes
@@ -73,27 +94,52 @@ if (typeof document !== "undefined") {
   );
 }
 
-/** Asks again, past the caches, for the files whose links failed. */
-function refetchFailed() {
-  const links = [...failedLinks];
-  failedLinks.clear();
+/** A feature's own stylesheet: React's `precedence` link, or one made here. */
+const isOwnSheet = (link: Element) => link.hasAttribute("data-precedence");
+
+/** The stylesheet links made here, which React does not know. */
+const relinked = new WeakSet<Element>();
+
+/**
+ * Asks again, past the caches, for the files whose links failed (with
+ * `own`, the features' own stylesheets only), and links each stylesheet
+ * anew; settles once the new links have loaded or failed.
+ */
+function refetchFailed(own?: boolean) {
+  const links = [...failedLinks].filter((link) => !own || isOwnSheet(link));
+  for (const link of links) failedLinks.delete(link);
   return Promise.all(
     links.map(async (link) => {
       await fetch(link.href, { cache: "reload" }).catch(() => undefined);
-      // Vite's stylesheet links only: React tracks its `precedence` ones.
-      if (
-        link.rel !== "stylesheet" ||
-        link.hasAttribute("data-precedence") ||
-        !link.isConnected
-      )
-        return;
+      if (link.rel !== "stylesheet" || !link.isConnected) return;
       const fresh = link.cloneNode() as HTMLLinkElement;
+      relinked.add(fresh);
       await new Promise((done) => {
         fresh.onload = fresh.onerror = done;
-        link.replaceWith(fresh);
+        // React's own element stays (Vite's, or one made here, is replaced).
+        if (isOwnSheet(link) && !relinked.has(link)) link.after(fresh);
+        else link.replaceWith(fresh);
       });
     }),
   );
+}
+
+/**
+ * How long a mount waits for the files it asks for again: as long as the
+ * reload of src/lib/assetRetry.ts waits for its file.
+ */
+const RETRY_WAIT_MS = 3000;
+
+/** Settles once `retry` has, or after RETRY_WAIT_MS; the retry goes on. */
+function awhile(retry: Promise<unknown>) {
+  return new Promise<void>((done) => {
+    const timer = setTimeout(done, RETRY_WAIT_MS);
+    const settle = () => {
+      clearTimeout(timer);
+      done();
+    };
+    retry.then(settle, settle);
+  });
 }
 
 const isFailedLoad = (error: unknown) =>
@@ -144,7 +190,7 @@ export function lazyFeature<P extends object>(
 ) {
   const attempt = (retry?: boolean) => {
     const feature = lazy(() =>
-      (retry ? refetchFailed().then(load) : load()).then(
+      (retry ? awhile(refetchFailed()).then(load) : load()).then(
         (module: { default: ComponentType<P> } | undefined) =>
           module ?? { default: () => <Failed again={again} /> },
         (error: unknown) => {
@@ -173,7 +219,14 @@ export function lazyFeature<P extends object>(
   });
 }
 
-/** Holds a lazyFeature: nothing, or `fallback`, if its code fails to load. */
+const Nothing = () => null;
+
+/**
+ * Holds a lazyFeature: nothing, or `fallback`, if its code fails to load.
+ * The rest of `children` waits with it (while its code loads, and while a
+ * failed stylesheet is asked for again, 3 s at most) and goes with it if it
+ * fails, so what should show at once belongs outside.
+ */
 export function FeatureBoundary({
   children,
   fallback,
@@ -185,10 +238,25 @@ export function FeatureBoundary({
   /** Called once the code has failed to load, as the fallback stays. */
   onFail?: () => void;
 }) {
+  // Once per mount (the boundary stays while its children wait): the
+  // features' stylesheets whose links failed, asked for again, and the
+  // feature after them, 3 s at most; without the wait when each of them
+  // was asked for again already and its fresh link failed too.
+  const [Sheets] = useState(() => {
+    const own = [...failedLinks].filter(isOwnSheet);
+    if (own.length === 0) return Nothing;
+    const retried = awhile(refetchFailed(true));
+    return own.every((link) => relinked.has(link))
+      ? Nothing
+      : lazy(() => retried.then(() => ({ default: Nothing })));
+  });
   return (
     <Failure.Provider value={{ fallback, onFail }}>
       <CatchBoundary getResetKey={noReset} errorComponent={FailedOrRethrow}>
-        <Suspense fallback={fallback}>{children}</Suspense>
+        <Suspense fallback={fallback}>
+          <Sheets />
+          {children}
+        </Suspense>
       </CatchBoundary>
     </Failure.Provider>
   );

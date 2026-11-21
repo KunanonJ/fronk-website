@@ -7,9 +7,11 @@ import { searchCopy } from "@/lib/content/profileChrome";
  * beside the theme toggle, and ⌘K or Ctrl+K anywhere. The phone menu opens
  * the same dialog with `openSearch`. The dialog's code and stylesheet load
  * on first use (SearchDialog), so the first load carries only this button.
- * If they fail to load, nothing opens and the page stays
+ * If its code fails to load, nothing opens and the page stays
  * (components/ui/LazyFeature.tsx); the search closes again, so the next
- * press, ⌘K or the menu's Search asks for them once more.
+ * press, ⌘K or the menu's Search asks for it once more. If only the
+ * stylesheet fails, the dialog opens plain, and the next open asks for the
+ * stylesheet again and waits for it, 3 s at most.
  * No single-key shortcut: one would need an off switch (WCAG 2.1.4).
  */
 
