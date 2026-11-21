@@ -34,8 +34,9 @@ import zlib from "node:zlib";
 //
 // /open-source (21-11-26) stays here too, though it uses /stack's reading
 // shell: 162.0 KB at build. The default keeps it from taking in
-// lib/content/skills or SkillParts (the skills snapshot, about 43 KB), which
-// the marketing cap would let through.
+// lib/content/skills or SkillParts (the skills snapshot, about 10 KB gzip
+// since its SKILL.md bodies left it in #173), which the marketing cap would
+// let through.
 const DEFAULT_BUDGET_KB = 165;
 
 // Marketing: pages with heavier islands (forms, filters, skill sources, the
