@@ -250,7 +250,7 @@ describe("AboutPage: Now in the story's column (owner decision 21-11-26)", () =>
   const drawn = (el: Element) => {
     const copy = el.cloneNode(true) as Element;
     for (const hidden of copy.querySelectorAll(".sr-only")) hidden.remove();
-    return copy.textContent!.replaceAll(" ", " ");
+    return copy.textContent!.replaceAll("\u00a0", " ");
   };
 
   it("makes #now Now's heading, an h3 in the story's column before the records card", () => {
@@ -294,7 +294,7 @@ describe("AboutPage: Now in the story's column (owner decision 21-11-26)", () =>
     const latest = storyCopy.latest
       .map((run) => (typeof run === "string" ? run : run.strong))
       .join("")
-      .replaceAll(" ", " ")
+      .replaceAll("\u00a0", " ")
       .trim();
     expect(column).not.toHaveTextContent(latest);
     // The story still ends a paragraph, on its last employer before.
@@ -304,7 +304,7 @@ describe("AboutPage: Now in the story's column (owner decision 21-11-26)", () =>
     );
     // The Binary Holdings role, once in the column: Now's sentence.
     expect(
-      column.textContent!.replaceAll(" ", " ").match(/Binary Holdings/g),
+      column.textContent!.replaceAll("\u00a0", " ").match(/Binary Holdings/g),
     ).toHaveLength(1);
   });
 });
