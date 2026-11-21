@@ -11,7 +11,7 @@ import { searchCopy } from "@/lib/content/profileChrome";
  * (components/ui/LazyFeature.tsx); the search closes again, so the next
  * press, ⌘K or the menu's Search asks for it once more. If only the
  * stylesheet fails, the dialog opens plain, and the next open asks for the
- * stylesheet again and waits for it.
+ * stylesheet again and waits for it, 3 s at most.
  * No single-key shortcut: one would need an off switch (WCAG 2.1.4).
  */
 

@@ -128,9 +128,26 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+/**
+ * Fakes the timers LazyFeature sets (its 3 s wait) and no others: React
+ * keeps the setTimeout it found as it loaded, so its own timers stay real.
+ */
+const fakeTheWait = () =>
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+
+/** Moves the faked clock on by `ms`, and lets React act on what settled. */
+const pass = (ms: number) =>
+  act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+
+/** A request that never answers: a stalled network. */
+const stalled = () => new Promise<Response>(() => undefined);
 
 describe("lazyFeature in a FeatureBoundary", () => {
   it("shows the fallback while the code loads, then the feature", async () => {
@@ -279,6 +296,29 @@ describe("lazyFeature in a FeatureBoundary", () => {
     act(() => {
       fresh.dispatchEvent(new Event("load"));
     });
+    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
+    expect(load).toHaveBeenCalledTimes(2);
+    pageStays();
+  });
+
+  it("waits 3 s at most for those files: a request that stalls goes on without it", async () => {
+    vi.stubGlobal("fetch", vi.fn(stalled));
+    failLink("modulepreload", "/assets/Hello-x2.js");
+    const load = vi
+      .fn((): Promise<Module> => Promise.reject(missing()))
+      .mockImplementationOnce(() => Promise.reject(missing()))
+      .mockImplementationOnce(async () => ({ default: Hello }));
+    const failed = vi.fn();
+    render(<Page feature={lazyFeature(load)} onFail={failed} />);
+    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
+
+    fakeTheWait();
+    toggle();
+    expect(fetch).toHaveBeenCalledOnce();
+    await pass(2999);
+    expect(load).toHaveBeenCalledTimes(1);
+    await pass(1);
+    vi.useRealTimers();
     expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
     expect(load).toHaveBeenCalledTimes(2);
     pageStays();
@@ -437,7 +477,38 @@ describe("lazyFeature in a FeatureBoundary", () => {
       pageStays();
     });
 
-    it("one that keeps failing is asked for once per mount, never on a re-render, and linked anew in one place", async () => {
+    it("a request that stalls is waited for 3 s at most: the feature shows, and the fresh link goes in once it answers", async () => {
+      const href = "/assets/Own-x4.css";
+      let answer!: (response: Response) => void;
+      const fetched = vi.fn(
+        () =>
+          new Promise<Response>((done) => {
+            answer = done;
+          }),
+      );
+      vi.stubGlobal("fetch", fetched);
+      const { own } = await mountFailing(href, styled(href));
+
+      fakeTheWait();
+      toggle();
+      expect(fetched).toHaveBeenCalledOnce();
+      await pass(2999);
+      expect(screen.queryByText(/Styled/)).toBeNull();
+      await pass(1);
+      vi.useRealTimers();
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      expect(sheets(href)).toEqual([own]);
+
+      // The request answers late: the fresh link goes in then, beside
+      // React's own, and nothing more is asked for.
+      await act(async () => answer(new Response("")));
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      expect(sheets(href)[0]).toBe(own);
+      expect(fetched).toHaveBeenCalledOnce();
+      pageStays();
+    });
+
+    it("one that keeps failing is asked for once per mount, never on a re-render, linked anew in one place, and not waited for once its fresh link failed", async () => {
       const href = "/assets/Own-x2.css";
       const fetched = vi.fn(async () => new Response(""));
       vi.stubGlobal("fetch", fetched);
@@ -457,9 +528,12 @@ describe("lazyFeature in a FeatureBoundary", () => {
       expect(fetched).toHaveBeenCalledTimes(1);
       expect(screen.getByText("Styled Ada")).toBeInTheDocument();
 
-      // The next mount asks once more, and its link takes the failed one's
-      // place: React's, and one of ours.
+      // The next mount asks once more, and no longer waits for it (a tab
+      // left open across the deploy that took the file away): the feature
+      // shows at once. Its link takes the failed one's place: React's, and
+      // one of ours.
       toggle();
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
       await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2));
       const again = await waitFor(() => {
         const found = sheets(href);
@@ -472,7 +546,7 @@ describe("lazyFeature in a FeatureBoundary", () => {
       act(() => {
         again[1]!.dispatchEvent(new Event("load"));
       });
-      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
       pageStays();
     });
 

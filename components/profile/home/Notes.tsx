@@ -20,7 +20,9 @@ import {
  * section's server HTML. While it loads, its place is held at the book's
  * least height, so the footer does not jump. If it fails to load (a stale
  * chunk after a deploy), the section goes and the rest of the Home stays
- * (components/ui/LazyFeature.tsx).
+ * (components/ui/LazyFeature.tsx). So the boundary holds the whole section,
+ * heading too, and the section also waits with it (3 s at most) when a
+ * feature's stylesheet failed earlier in the tab and is asked for again.
  */
 const Notebook = lazyFeature(async () => ({
   default: (await import("@/components/profile/home/Notebook")).Notebook,
