@@ -66,8 +66,8 @@ const ENTRY_BUDGET_KB = 120;
 // UX sweep 21-11-26: /resume, measured from then on (ON_REQUEST_ROUTES), was
 // 37.9 KB. Tailwind now reads only the app's code (1.5 KB off every page)
 // and the Home hero's partial is a sheet of Home's own (2.9 KB off every
-// other page): 34.8 KB on Home, the worst page, 33.5 KB on /resume and
-// 31.0 KB on the rest.
+// other page): 34.9 KB on Home (with the hero's 1024 px rule), the worst
+// page, 33.5 KB on /resume and 31.0 KB on the rest.
 const CSS_BUDGET_KB = 36;
 const FONT_PRELOAD_BUDGET_KB = 52;
 
@@ -101,7 +101,8 @@ const MARKETING_EXACT = new Set([
 // does) and held to the same budgets (UX sweep 21-11-26: /resume's
 // stylesheets had grown to 37.9 KB unmeasured). Each must answer 200 with
 // the same stylesheets and chunks whatever Sanity says: /resume falls back
-// to the repo's résumé when Sanity cannot be read, and /learn reads no
+// to the repo's résumé when Sanity fails (a hang past the fetch timeout
+// below fails the step instead), and /learn reads no
 // Sanity while the blog is hidden (lib/content/blogVisibility.ts). /blog is
 // left out: a failed Sanity read renders its error state instead.
 const ON_REQUEST_ROUTES = ["/resume", "/learn"];
@@ -162,6 +163,11 @@ function findRouteHtml() {
   return out;
 }
 
+/** The build id a page carries (`<html data-build>`, src/lib/buildId.ts). */
+function buildMark(html) {
+  return /<html[^>]*\sdata-build="([^"]+)"/.exec(html)?.[1] ?? null;
+}
+
 /**
  * The on-request pages' HTML as the Worker sends it, from `vite preview` on
  * this build. Run directly (no pnpm wrapper) in its own process group, which
@@ -193,29 +199,45 @@ async function renderOnRequest(routes) {
   };
   process.on("exit", stop);
   try {
-    let up = false;
-    for (let i = 0; i < 120 && !up; i += 1) {
+    let served = null;
+    for (let i = 0; i < 120 && served === null; i += 1) {
       // Our preview died (the port is taken, say): never measure another server.
       if (preview.exitCode !== null) break;
       try {
         const res = await fetch(`${base}/`, {
           signal: AbortSignal.timeout(3000),
         });
-        up = res.status < 500;
+        if (res.status < 500) served = await res.text();
       } catch {
         // not up yet
       }
-      if (!up) await new Promise((r) => setTimeout(r, 500));
+      if (served === null) await new Promise((r) => setTimeout(r, 500));
     }
-    if (!up) {
+    if (served === null) {
       console.error(log);
       throw new Error(`[perf] vite preview did not start on ${base}`);
     }
+    // Whatever answered must be this build: a server already on the port
+    // answers before our preview has failed to bind it (--strictPort), and
+    // its pages would be measured instead.
+    const mark = buildMark(
+      fs.readFileSync(path.join(APP_DIR, "index.html"), "utf8"),
+    );
+    if (mark !== buildMark(served)) {
+      console.error(log);
+      throw new Error(
+        `[perf] ${base} is not serving this build (data-build ${buildMark(served) ?? "missing"}, expected ${mark ?? "missing"}): set PERF_PORT to a free port`,
+      );
+    }
     const pages = [];
     for (const route of routes) {
+      // Longer than the Worker's Sanity reads can take before /resume falls
+      // back to the repo's résumé (three tries of 10 s; lib/sanity/client.ts):
+      // a Sanity error still measures the fallback, and only a longer hang
+      // fails the step.
       const res = await fetch(`${base}${route}`, {
         headers: { accept: "text/html" },
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(90_000),
       });
       if (res.status !== 200) {
         console.error(log);
