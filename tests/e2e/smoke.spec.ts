@@ -1672,6 +1672,74 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     expect(documents).toBe(1);
   });
 
+  /*
+   * The dialog's own stylesheet (React's `precedence` link) fails to load,
+   * a deploy or a blip: the dialog opens without it, the browser's plain
+   * dialog. Once the file answers again, the next open asks for it past the
+   * caches and links it anew beside React's own element, and the dialog
+   * waits for it (components/ui/LazyFeature.tsx): it comes in styled, with
+   * no reload, and the page in use stays.
+   */
+  test("its stylesheet fails to load: once it answers, the next open is styled; the page stays, with no reload", async ({
+    page,
+  }) => {
+    let asked = 0;
+    let failing = true;
+    await page.route(/\/assets\/search-[\w-]+\.css$/, (route) => {
+      asked += 1;
+      return failing
+        ? route.fulfill({ status: 404, body: "Not found" })
+        : route.continue();
+    });
+    let documents = 0;
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        documents += 1;
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    const heading = page.locator("h1").first();
+    const title = (await heading.textContent()) ?? "";
+    expect(title).not.toBe("");
+
+    await page.keyboard.press("ControlOrMeta+k");
+    const opened = page.locator(dialog);
+    await expect(opened).toBeVisible();
+    expect(asked).toBeGreaterThan(0);
+    // search.css rounds it (24 px); the browser's own dialog is square.
+    await expect(opened).toHaveCSS("border-radius", "0px");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+
+    // The file answers again. The radius the dialog has as it first enters
+    // the page, before any paint: styled from the start, not restyled.
+    failing = false;
+    const before = asked;
+    await page.evaluate(() => {
+      const seen = window as unknown as { __radius?: string };
+      new MutationObserver((_, observer) => {
+        const entered = document.querySelector("dialog.pf-search");
+        if (!entered) return;
+        seen.__radius = getComputedStyle(entered).borderRadius;
+        observer.disconnect();
+      }).observe(document.body, { childList: true, subtree: true });
+    });
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(opened).toBeVisible();
+    await expect(opened).toHaveCSS("border-radius", "24px");
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __radius?: string }).__radius,
+      ),
+    ).toBe("24px");
+    expect(asked).toBeGreaterThan(before);
+    await expect(page.getByRole("option").first()).toBeVisible();
+    await expect(heading).toHaveText(title);
+    await expect(page.getByText(/Something\s+went\s+wrong/)).toHaveCount(0);
+    expect(new URL(page.url()).pathname).toBe("/about");
+    expect(documents).toBe(1);
+  });
+
   test("on a phone, the menu's Search opens it", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await visit(page, "/");
