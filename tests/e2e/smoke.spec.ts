@@ -19,6 +19,15 @@ function isRealError(text: string): boolean {
   return !/Failed to load resource|net::ERR_|404 \(\)/.test(text);
 }
 
+/**
+ * The key that moves focus through a page's links and buttons (`back` for
+ * the reverse). WebKit on macOS, as Safari does by default (full keyboard
+ * access off), moves Tab between text fields only; Option+Tab moves through
+ * every link and button, as Tab does in Chromium and Firefox.
+ */
+const tabKey = (browserName: string, back = false) =>
+  `${browserName === "webkit" ? "Alt+" : ""}${back ? "Shift+" : ""}Tab`;
+
 test.describe("smoke > every route renders without JS errors", () => {
   for (const route of ROUTES) {
     test(`${route.name} renders an <h1> and throws no JS errors`, async ({
@@ -365,6 +374,8 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
   test("a feature's chunk that fails on the page in use never reloads it", async ({
     page,
   }) => {
+    // The nav's Search button shows from 810 px.
+    await page.setViewportSize({ width: 1440, height: 900 });
     const loads = documents(page);
     const asked = requests(page);
     await page.addInitScript(() => {
@@ -1303,6 +1314,9 @@ test.describe("footer > the dither prints in and the drawings play once in view"
   const art = ".pf-footer__art";
 
   test("/about at 1440 px: wait, play once, end still", async ({ page }) => {
+    // The drawings show from 1280 px only (shell.css), so a project at phone
+    // width measures them at this width too.
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/about", { waitUntil: "networkidle" });
     await expect(page.locator(field)).toHaveAttribute("data-print", "wait");
@@ -1446,7 +1460,10 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
       };
     });
 
-  test("/about: a prose link and a footer link", async ({ page }) => {
+  test("/about: a prose link and a footer link", async ({
+    page,
+    browserName,
+  }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/about", { waitUntil: "load" });
     await expect(page.locator("time[data-clock]")).toBeAttached();
@@ -1467,8 +1484,8 @@ test.describe("links > underlines draw in under the pointer and the keyboard", (
     expect((await decoration(prose)).thickness).toBe("auto");
     // Reached with the keyboard: Tab back to it from the control before.
     await prose.focus();
-    await page.keyboard.press("Shift+Tab");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(browserName, true));
+    await page.keyboard.press(tabKey(browserName));
     expect((await decoration(prose)).thickness).toBe("2px");
 
     const footer = page.locator(".pf-footer__link").first();
@@ -1507,6 +1524,9 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
   }) => {
     const errors: string[] = [];
     page.on("pageerror", (err) => errors.push(err.message));
+    // The nav's button shows from 810 px; phones open search from the menu
+    // (the phone test below).
+    await page.setViewportSize({ width: 1440, height: 900 });
     await visit(page, "/about");
     await expect(page.locator(".pf-search-toggle")).toBeVisible();
     expect(await searchSheet(page)).toBe(false);
@@ -1548,12 +1568,35 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
 
   test("the button opens it; Esc closes it and gives focus back; no serious axe violations", async ({
     page,
+    browserName,
   }) => {
+    // The nav's button shows from 810 px.
+    await page.setViewportSize({ width: 1440, height: 900 });
     await visit(page, "/contact");
     const button = page.getByRole("button", { name: "Search the site" });
-    await button.click();
+    // Safari does not focus a button on a mouse click, so the dialog gives
+    // focus back to the page there; a keyboard press on the button (Option+
+    // Tab to it) is what it returns focus from.
+    if (browserName === "webkit") {
+      await button.focus();
+      await page.keyboard.press("Enter");
+    } else {
+      await button.click();
+    }
     await expect(page.locator(dialog)).toBeVisible();
     await expect(page.getByRole("option").first()).toBeVisible();
+    // Scan the dialog once it has finished opening: mid-fade, its text is
+    // part-transparent and axe measured it below 4.5:1 now and then.
+    await page.locator(dialog).evaluate((el) =>
+      Promise.all(
+        el
+          .getAnimations({ subtree: true })
+          .filter(
+            (motion) => motion.effect?.getTiming().iterations !== Infinity,
+          )
+          .map((motion) => motion.finished),
+      ),
+    );
     const results = await new AxeBuilder({ page })
       .include("dialog.pf-search")
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
@@ -1672,14 +1715,15 @@ test.describe("link previews > a case's text link shows its card", () => {
 
   test("/about: on keyboard focus, gone when focus leaves", async ({
     page,
+    browserName,
   }) => {
     await visit(page, "/about");
     const link = page
       .locator('main a.ds-prose-link[href="/ventures/manut"]')
       .first();
     await link.focus();
-    await page.keyboard.press("Shift+Tab");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(browserName, true));
+    await page.keyboard.press(tabKey(browserName));
     await expect(page.getByRole("tooltip")).toContainText("Manut");
     await page.locator("body").press("Escape");
     await expect(page.locator(card)).toHaveCount(0);
@@ -2976,7 +3020,12 @@ test.describe("share panel > the copy row shows the address (UX sweep 21-11-26)"
 test.describe("share panel > focus that leaves it closes it", () => {
   test("Tab past the last row on /skills at 390 px closes the panel", async ({
     page,
+    browserName,
   }) => {
+    test.skip(
+      browserName === "firefox",
+      "Playwright's Firefox keeps focus on a page's last element when Tab goes past it (no browser UI to hand it to), so focus never comes round to the skip link",
+    );
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/skills", { waitUntil: "networkidle" });
     const share = page
@@ -2998,7 +3047,8 @@ test.describe("share panel > focus that leaves it closes it", () => {
     // by then the panel must be gone.
     const rows = await panel.locator("button, a[href]").count();
     expect(rows).toBeGreaterThanOrEqual(4);
-    for (let row = 0; row <= rows; row += 1) await page.keyboard.press("Tab");
+    for (let row = 0; row <= rows; row += 1)
+      await page.keyboard.press(tabKey(browserName));
     const skip = page.getByRole("link", { name: "Skip to content" });
     await expect(skip).toBeFocused();
     await expect(panel).toHaveCount(0);
@@ -3018,6 +3068,7 @@ test.describe("share panel > focus that leaves it closes it", () => {
 
   test("Escape from a row closes it and returns focus to the pill", async ({
     page,
+    browserName,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/skills", { waitUntil: "networkidle" });
@@ -3028,7 +3079,7 @@ test.describe("share panel > focus that leaves it closes it", () => {
     await page.keyboard.press("Enter");
     const panel = page.getByRole("region", { name: "Share this page" });
     await expect(panel).toBeVisible();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(browserName));
     await page.keyboard.press("Escape");
     await expect(panel).toHaveCount(0);
     await expect(share).toBeFocused();
@@ -3139,13 +3190,14 @@ test.describe("404 > the page you fix (Phase 6)", () => {
 
   test("fixed by keyboard: each gap in turn, then the cap", async ({
     page,
+    browserName,
   }) => {
     await visitNotFound(page);
     const first = page.getByRole("button", { name: "Patch pixel 1 of 7" });
     // Tab in from the top, as a keyboard reader does.
     for (let presses = 0; presses < 60; presses += 1) {
       if (await first.evaluate((el) => el === document.activeElement)) break;
-      await page.keyboard.press("Tab");
+      await page.keyboard.press(tabKey(browserName));
     }
     await expect(first).toBeFocused();
     for (let left = 7; left > 0; left -= 1) {
