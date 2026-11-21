@@ -1,6 +1,4 @@
 import {
-  lazy,
-  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -23,6 +21,7 @@ import {
   type CanvasInkColour,
   type CanvasTool,
 } from "@/components/profile/home/CanvasToolbar";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { canvasMock, type MockFrame } from "@/lib/content/home";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -67,7 +66,9 @@ const PANELS_QUERY = "(min-width: 50.625rem)";
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 
 /** The drawing layer, loaded when the toolbar is first reached for. */
-const CanvasInk = lazy(() => import("@/components/profile/home/CanvasInk"));
+const CanvasInk = lazyFeature(
+  () => import("@/components/profile/home/CanvasInk"),
+);
 
 function subscribeTools(onChange: () => void): () => void {
   const lists = [PANELS_QUERY, FINE_POINTER_QUERY].map((query) =>
@@ -391,7 +392,7 @@ export function CanvasMock({
         <div ref={canvas} className="pf-mock__canvas" onClick={onCanvasClick}>
           {/* First, so the panels after it (at its z-index) lie over it. */}
           {inking && toolsAllowed ? (
-            <Suspense fallback={null}>
+            <FeatureBoundary>
               <CanvasInk
                 tool={tool}
                 ink={ink}
@@ -400,7 +401,7 @@ export function CanvasMock({
                 onReady={onInkReady}
                 say={say}
               />
-            </Suspense>
+            </FeatureBoundary>
           ) : null}
           <div className="pf-mock__panel pf-mock__layers" aria-hidden="true">
             <p className="pf-mock__tabs">

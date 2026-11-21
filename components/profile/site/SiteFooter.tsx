@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import Link from "@/components/navigation/Link";
 import { DitherField } from "@/components/ds/DitherField";
 import { EyebrowRow, StatusDot } from "@/components/ds/labels";
@@ -8,6 +7,7 @@ import { PixelArt } from "@/components/profile/site/PixelArt";
 import { BROWSER_ART, PHONE_ART } from "@/components/profile/site/footerArt";
 import { SayHello } from "@/components/profile/site/SayHello";
 import { POPOVER_IDS, useHydrated } from "@/components/profile/site/popover";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import {
   availability,
   brand,
@@ -41,7 +41,9 @@ import { usePathname } from "@/lib/router/navigation";
  * hydration draw neither, so a page's HTML and first load are as they were.
  */
 
-const Living = lazy(() => import("@/components/profile/site/living/Living"));
+const Living = lazyFeature(
+  () => import("@/components/profile/site/living/Living"),
+);
 
 export default function SiteFooter() {
   const hydrated = useHydrated();
@@ -102,16 +104,16 @@ export default function SiteFooter() {
                   className="pf-footer__time"
                 >
                   {(hour) => (
-                    <Suspense>
+                    <FeatureBoundary>
                       <Living hour={hour} />
-                    </Suspense>
+                    </FeatureBoundary>
                   )}
                 </LocalTime>
               </p>
               {hydrated && (
-                <Suspense>
+                <FeatureBoundary>
                   <Living at="name" />
-                </Suspense>
+                </FeatureBoundary>
               )}
             </div>
             <nav
@@ -172,9 +174,9 @@ export default function SiteFooter() {
               </nav>
             </div>
             {hydrated && (
-              <Suspense>
+              <FeatureBoundary>
                 <Living at="end" />
-              </Suspense>
+              </FeatureBoundary>
             )}
           </div>
         </Reveal>

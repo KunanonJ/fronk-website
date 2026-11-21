@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
 import { ProfileLink } from "@/components/profile/site/ProfileLink";
 import { PORTRAIT_SMALL } from "@/lib/brand/pixelPortrait";
@@ -14,7 +15,7 @@ import { KONAMI_LENGTH, konamiStep } from "@/lib/secrets/konami";
  * already has, so its lazy chunk adds no new ties to the shared chunks.
  */
 
-const TraitToast = lazy(
+const TraitToast = lazyFeature(
   () => import("@/components/profile/site/secrets/TraitToast"),
 );
 
@@ -46,15 +47,14 @@ export function Secrets() {
   }, []);
 
   return news ? (
-    <Suspense fallback={null}>
+    <FeatureBoundary key={news.at}>
       <TraitToast
-        key={news.at}
         news={news.said}
         base={PORTRAIT_SMALL}
         Portrait={PixelPortrait}
         Link={ProfileLink}
         onClose={() => setNews(null)}
       />
-    </Suspense>
+    </FeatureBoundary>
   ) : null;
 }
