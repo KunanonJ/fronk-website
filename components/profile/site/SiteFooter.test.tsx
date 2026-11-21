@@ -43,7 +43,7 @@ describe("SiteFooter", () => {
 
   it("lists the thirteen pages of the old menu under Pages", () => {
     const pages = navBlock(html, "Pages");
-    expect(pages.match(/<a /g)).toHaveLength(13);
+    expect(pages.match(/<a /g)).toHaveLength(14);
     for (const href of [
       "/",
       "/about",
@@ -189,7 +189,7 @@ describe("SiteFooter on /contact", () => {
     expect(html).not.toContain(footerCopy.headline);
     expect(html).not.toContain('id="say-hello-footer"');
     expect(html).not.toContain("pf-footer__art");
-    expect(navBlock(html, "Pages").match(/<a /g)).toHaveLength(13);
+    expect(navBlock(html, "Pages").match(/<a /g)).toHaveLength(14);
     expect(html).toContain("Bangkok, GMT+7");
     expect(html).toMatch(/© \d{4} Kunanon Jarat · Bangkok/);
   });

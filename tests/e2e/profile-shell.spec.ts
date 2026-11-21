@@ -1013,7 +1013,7 @@ test.describe("chrome: with JavaScript off", () => {
         const pages = footer
           .getByRole("navigation", { name: "Pages" })
           .getByRole("link");
-        await expect(pages).toHaveCount(13);
+        await expect(pages).toHaveCount(14);
         for (const href of [
           "/",
           "/about",

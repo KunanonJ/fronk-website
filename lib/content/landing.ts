@@ -61,6 +61,9 @@ export const primaryNav: readonly NavItem[] = [
   { type: "link", label: "Portfolio", href: "/portfolio", icon: "portfolio" },
   { type: "link", label: "Résumé", href: "/resume" },
   { type: "link", label: "Agent skills", href: "/skills", icon: "skills" },
+  // The owner's MIT projects on GitHub (21-11-26): a site-wide, crawlable
+  // link beside the skills they build with.
+  { type: "link", label: "Open source", href: "/open-source" }, // DRAFT
   // The FDE positioning hub: a site-wide, crawlable link to it (EO review).
   {
     type: "link",
