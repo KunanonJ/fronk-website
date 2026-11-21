@@ -104,6 +104,22 @@ const pageStays = () => {
   expect(screen.queryByText("Something went wrong")).toBeNull();
 };
 
+/** Closes the feature and mounts it again. */
+const toggle = () => {
+  fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+  fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+};
+
+/** A <link> in <head> whose file fails to load. */
+const failLink = (rel: string, href: string) => {
+  const element = document.createElement("link");
+  element.rel = rel;
+  element.href = href;
+  document.head.append(element);
+  element.dispatchEvent(new Event("error"));
+  return element;
+};
+
 let logged: MockInstance<typeof console.error>;
 
 beforeEach(() => {
@@ -231,17 +247,9 @@ describe("lazyFeature in a FeatureBoundary", () => {
     // the server; Vite's preload helper links each stylesheet once.
     const fetched = vi.fn(async () => new Response(""));
     vi.stubGlobal("fetch", fetched);
-    const link = (rel: string, href: string) => {
-      const element = document.createElement("link");
-      element.rel = rel;
-      element.href = href;
-      document.head.append(element);
-      element.dispatchEvent(new Event("error"));
-      return element;
-    };
-    link("modulepreload", "/assets/Hello-x1.js");
-    const sheet = link("stylesheet", "/assets/Hello-x1.css");
-    link("stylesheet", "https://elsewhere.example/assets/font.css");
+    failLink("modulepreload", "/assets/Hello-x1.js");
+    const sheet = failLink("stylesheet", "/assets/Hello-x1.css");
+    failLink("stylesheet", "https://elsewhere.example/assets/font.css");
     const load = vi
       .fn((): Promise<Module> => Promise.reject(missing()))
       .mockImplementationOnce(() => Promise.reject(missing()))
@@ -251,8 +259,7 @@ describe("lazyFeature in a FeatureBoundary", () => {
     await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
     expect(fetched).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
-    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
+    toggle();
     await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2));
     expect(fetched.mock.calls).toEqual([
       [`${location.origin}/assets/Hello-x1.js`, { cache: "reload" }],
@@ -347,37 +354,151 @@ describe("lazyFeature in a FeatureBoundary", () => {
     pageStays();
   });
 
-  it("leaves React's precedence stylesheets to React when it asks again", async () => {
-    const fetched = vi.fn(async () => new Response(""));
-    vi.stubGlobal("fetch", fetched);
-    // A feature's own stylesheet, as React links it (`precedence`).
-    const own = document.createElement("link");
-    own.rel = "stylesheet";
-    own.href = "/assets/Search-x1.css";
-    own.setAttribute("data-precedence", "pf-search");
-    document.head.append(own);
-    own.dispatchEvent(new Event("error"));
-    const load = vi
-      .fn((): Promise<Module> => Promise.reject(missing()))
-      .mockImplementationOnce(() => Promise.reject(missing()))
-      .mockImplementationOnce(async () => ({ default: Hello }));
-    const failed = vi.fn();
-    render(<Page feature={lazyFeature(load)} onFail={failed} />);
-    await waitFor(() => expect(failed).toHaveBeenCalledTimes(1));
-    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
-    fireEvent.click(screen.getByRole("button", { name: "toggle" }));
-    expect(await screen.findByText("Hello Ada")).toBeInTheDocument();
-    // Asked for past the caches, but the same element stays where it was.
-    expect(fetched).toHaveBeenCalledWith(
-      `${location.origin}/assets/Search-x1.css`,
-      { cache: "reload" },
-    );
-    expect(own.isConnected).toBe(true);
-    expect(
-      document.head.querySelectorAll('link[href$="/assets/Search-x1.css"]'),
-    ).toHaveLength(1);
-    own.remove();
-    pageStays();
+  describe("a feature's own stylesheet (React's `precedence`) that fails", () => {
+    /** A feature that links its own stylesheet, as the site's do. */
+    const styled = (href: string) =>
+      lazyFeature(async () => ({
+        default: ({ name }: { name: string }) => (
+          <>
+            <link rel="stylesheet" href={href} precedence="pf-styled" />
+            <p>Styled {name}</p>
+          </>
+        ),
+      }));
+
+    /** The stylesheet links with this href, in document order. */
+    const sheets = (href: string) => [
+      ...document.head.querySelectorAll<HTMLLinkElement>(
+        `link[rel="stylesheet"][href="${href}"]`,
+      ),
+    ];
+
+    /**
+     * Mounts the feature and fails the stylesheet React links for it (its
+     * preload is let through: React holds the feature until it settles).
+     * Returns React's element, once the feature shows without it.
+     */
+    async function mountFailing(
+      href: string,
+      Feature: ReturnType<typeof styled>,
+    ) {
+      const page = render(<Page feature={Feature} />);
+      const own = await waitFor(() => {
+        for (const preload of document.head.querySelectorAll(
+          `link[rel="preload"][href="${href}"]`,
+        ))
+          preload.dispatchEvent(new Event("load"));
+        const [found] = sheets(href);
+        expect(found).toBeDefined();
+        return found!;
+      });
+      // React keeps a promise on its element (react-dom's acquireResource)
+      // that rejects with the error, and nothing waits on it here; a browser
+      // reports it as uncaught. The run would fail on it.
+      (own as { _p?: Promise<unknown> })._p?.catch(() => undefined);
+      act(() => {
+        own.dispatchEvent(new Event("error"));
+      });
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      return { own, page };
+    }
+
+    it("its next mount asks for it past the caches, links it anew beside React's own, and shows the feature once it loads", async () => {
+      const href = "/assets/Own-x1.css";
+      const fetched = vi.fn(async () => new Response(""));
+      vi.stubGlobal("fetch", fetched);
+      const { own } = await mountFailing(href, styled(href));
+      expect(fetched).not.toHaveBeenCalled();
+
+      toggle();
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      expect(fetched).toHaveBeenCalledExactlyOnceWith(
+        `${location.origin}${href}`,
+        { cache: "reload" },
+      );
+      // React's element stays; the fresh one follows it, in its place in
+      // the cascade, and the feature waits for it.
+      const [first, fresh] = sheets(href);
+      expect(first).toBe(own);
+      expect(own.nextElementSibling).toBe(fresh);
+      expect(fresh!.dataset.precedence).toBe("pf-styled");
+      expect(screen.queryByText(/Styled/)).toBeNull();
+      act(() => {
+        fresh!.dispatchEvent(new Event("load"));
+      });
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+
+      // React neither removes the fresh link nor links its own again, as
+      // the feature unmounts and mounts; nothing more is asked for.
+      toggle();
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      expect(sheets(href)).toEqual([own, fresh]);
+      expect(fetched).toHaveBeenCalledTimes(1);
+      pageStays();
+    });
+
+    it("one that keeps failing is asked for once per mount, never on a re-render, and linked anew in one place", async () => {
+      const href = "/assets/Own-x2.css";
+      const fetched = vi.fn(async () => new Response(""));
+      vi.stubGlobal("fetch", fetched);
+      const Feature = styled(href);
+      const { own, page } = await mountFailing(href, Feature);
+
+      toggle();
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      const [, fresh] = sheets(href);
+      act(() => {
+        fresh!.dispatchEvent(new Event("error"));
+      });
+      // It failed again: the feature shows without it, and stays so.
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      page.rerender(<Page feature={Feature} />);
+      await act(() => new Promise((done) => setTimeout(done, 20)));
+      expect(fetched).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
+
+      // The next mount asks once more, and its link takes the failed one's
+      // place: React's, and one of ours.
+      toggle();
+      await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2));
+      const again = await waitFor(() => {
+        const found = sheets(href);
+        expect(found).toHaveLength(2);
+        expect(found[1]).not.toBe(fresh);
+        return found;
+      });
+      expect(again[0]).toBe(own);
+      expect(fresh!.isConnected).toBe(false);
+      act(() => {
+        again[1]!.dispatchEvent(new Event("load"));
+      });
+      expect(await screen.findByText("Styled Ada")).toBeInTheDocument();
+      pageStays();
+    });
+
+    it("any feature's mount asks for it: one that stays mounted gets its styles too", async () => {
+      const href = "/assets/Own-x3.css";
+      const fetched = vi.fn(async () => new Response(""));
+      vi.stubGlobal("fetch", fetched);
+      await mountFailing(href, styled(href));
+      // Another feature (the search dialog, a preview card) mounts.
+      const Other = lazyFeature(async () => ({ default: Hello }));
+      render(
+        <FeatureBoundary>
+          <Other name="Grace" />
+        </FeatureBoundary>,
+      );
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      expect(fetched).toHaveBeenCalledExactlyOnceWith(
+        `${location.origin}${href}`,
+        { cache: "reload" },
+      );
+      act(() => {
+        sheets(href)[1]!.dispatchEvent(new Event("load"));
+      });
+      expect(await screen.findByText("Hello Grace")).toBeInTheDocument();
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
+    });
   });
 
   it("a real error in a loaded feature reaches the route's boundary", async () => {
