@@ -191,6 +191,10 @@ describe("Journey", () => {
     ).toBeInTheDocument();
     // toHaveTextContent reads the page's no-break spaces as spaces.
     expect(story).toHaveTextContent(storyCopy.now.replaceAll("\u00a0", " "));
+    // Home keeps the closing sentence /about leaves out (21-11-26).
+    expect(story.querySelectorAll("p")[1]).toHaveTextContent(
+      /Aiden Labs\. Most recently I led IT and AI engineering at The Binary Holdings\.$/,
+    );
     for (const chip of storyCopy.chips)
       expect(within(story as HTMLElement).getByText(chip)).toHaveClass(
         "ds-chip",

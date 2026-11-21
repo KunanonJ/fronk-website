@@ -176,7 +176,9 @@ describe("the topic hubs in the chrome (Phase 6 review, finding 3)", () => {
 });
 
 describe("the footer's Now line", () => {
-  it("says what he is doing in the words that open /about's Now section", () => {
+  // Now sits in /about's story since 21-11-26 (owner decision), under
+  // "#now"; AboutPage.test.tsx checks the page draws this paragraph there.
+  it("says what the owner is doing in the words that open /about's Now", () => {
     // The paragraph's text as read, links included (they name the ventures).
     const opening = aboutPage.now.paragraphs[0]!.spans.map(
       (span) => span.text,

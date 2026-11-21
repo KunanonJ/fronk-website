@@ -25,7 +25,10 @@ const text = (runs: readonly StoryRun[]) =>
     .join("")
     .replaceAll("\u00a0", " ");
 
-const story = storyCopy.paragraphs.map(text);
+/** The story as Home tells it: the last paragraph closes with `latest`. */
+const story = storyCopy.paragraphs.map((runs, index, all) =>
+  text(index === all.length - 1 ? [...runs, ...storyCopy.latest] : runs),
+);
 
 /** Every employer and school the résumé names, before its first " · ". */
 const organisations = new Set(
@@ -92,6 +95,14 @@ describe("the Journey's story", () => {
       "I led IT and AI engineering at The Binary Holdings",
     );
     expect(last).not.toMatch(/Today|I lead\b/);
+  });
+
+  it("keeps that role a whole sentence of its own, so /about can leave it out", () => {
+    // /about's Now tells the role in full right after (21-11-26); without
+    // the sentence, the paragraph still ends on a full stop.
+    expect(text(storyCopy.latest)).toMatch(/^ Most recently [^.]+\.$/);
+    expect(text(storyCopy.paragraphs.at(-1)!)).toMatch(/\.$/);
+    expect(text(storyCopy.paragraphs.at(-1)!)).not.toContain("Binary");
   });
 });
 

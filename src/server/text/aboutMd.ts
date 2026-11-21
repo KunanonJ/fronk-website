@@ -19,7 +19,9 @@ const PAGE = "/about";
  * from the same lib/content modules as the page, in the page's order. It
  * also keeps what the page leaves out: the short arc, and the principles
  * with their lines (the page states them once, in "How I ship"; UX sweep
- * 21-11-26).
+ * 21-11-26). Now stays a section of its own here: the page sets it in the
+ * story's column, beside the records card, which text does not have
+ * (owner decision 21-11-26).
  */
 export function buildAboutMd(): string {
   const { hero, story, now, path, principles, stack, cta } = aboutPage;
@@ -29,7 +31,7 @@ export function buildAboutMd(): string {
   push(`# About ${PERSON_NAME} (${hero.nickname})`, "");
   push(`Source: ${SITE_ORIGIN}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
   push(`${hero.role} ${hero.location}.`, "");
-  // The page's hero pill says this in short, its Now section in full.
+  // The page's hero pill says this in short, its Now ("#now") in full.
   push(AVAILABILITY.sentence, "");
 
   push(`## ${story.heading}`, "", story.whoIs, "");
