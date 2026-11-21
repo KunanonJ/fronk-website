@@ -166,7 +166,23 @@ const OVERLAY: Record<string, Overlay> = {
     // No link to the running app: the repository's homepage on GitHub
     // (chameleon-finance-c4y.pages.dev, which its README calls Production)
     // did not resolve on 21-11-26. Link one only once the owner gives an
-    // address that loads; the card ends with its GitHub link until then.
+    // address that loads. Until then the card offers what the README does:
+    // running it locally.
+    install: [
+      {
+        label: "Run it locally", // DRAFT
+        // The README's "Local Development" block, word for word.
+        command: [
+          "git clone https://github.com/KunanonJ/OpenFinance.git",
+          "cd OpenFinance",
+          "npm install",
+          "npm run dev",
+        ].join("\n"),
+        copyLabel: "Copy the commands that run OpenFinance locally", // DRAFT
+        announcement: "Copied the commands", // DRAFT
+        fence: "sh",
+      },
+    ],
   },
 };
 

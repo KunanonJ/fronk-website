@@ -168,7 +168,7 @@ describe("open-source.md", () => {
 
   it("keeps each install step whole under its label, fenced by where it is typed", () => {
     const steps = OPEN_SOURCE_PROJECTS.flatMap((p) => p.install ?? []);
-    expect(steps.length).toBe(3);
+    expect(steps.length).toBe(4);
     for (const step of steps)
       expect(md).toContain(
         `${step.label}:\n\n\`\`\`${step.fence}\n${step.command}\n\`\`\``,

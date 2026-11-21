@@ -2554,7 +2554,7 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/th/topics/ai-transformation-thailand",
     "/stack",
     "/proof",
-    // The open-source cards: three Copy pills and the foot links.
+    // The open-source cards: four Copy pills and the foot links.
     "/open-source",
   ];
 

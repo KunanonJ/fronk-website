@@ -531,14 +531,22 @@ describe("OpenSourcePage", () => {
     ).toHaveAttribute("href", "/skills");
   });
 
-  it("copies Superstacks' two steps, and the Thai install as its README's three lines", () => {
+  it("copies Superstacks' two steps, the Thai install as its README's three lines, and OpenFinance's local run", () => {
     render(<OpenSourcePage />);
     const copies = screen.getAllByRole("button", { name: /^Copy / });
     expect(copies.map((b) => b.getAttribute("aria-label"))).toEqual([
       "Copy the Superstacks marketplace command",
       "Copy the Superstacks plugin install command",
       "Copy the commands that add the Thai tax skill to Claude Code",
+      "Copy the commands that run OpenFinance locally",
     ]);
+    // OpenFinance: its README's "Local Development" block, one line each.
+    const openFinance = project("KunanonJ/OpenFinance");
+    expect(
+      [...card(openFinance.name).querySelectorAll(".pf-cat-command__line")].map(
+        (line) => line.textContent,
+      ),
+    ).toEqual(openFinance.install![0]!.command.split("\n"));
     // Superstacks: both Claude Code steps, numbered as on /skills, each a
     // one-line row with Copy beside it.
     const superstacks = card("Superstacks");

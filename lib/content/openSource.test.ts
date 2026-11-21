@@ -75,7 +75,7 @@ describe("the open-source projects", () => {
     );
   });
 
-  it("links GitHub and this site only: no app for OpenFinance until one loads", () => {
+  it("links GitHub and this site only: no app for OpenFinance until one loads, but its README's local run", () => {
     // OpenFinance's homepage on GitHub did not resolve on 21-11-26
     // (openSource.ts): an address off GitHub is linked only once checked.
     for (const { facts: _facts, ...overlay } of OPEN_SOURCE_PROJECTS) {
@@ -84,8 +84,20 @@ describe("the open-source projects", () => {
         expect(url, overlay.name).toMatch(/^https:\/\/github\.com\//);
     }
     const openFinance = byRepo("KunanonJ/OpenFinance");
-    expect(openFinance.install).toBeUndefined();
     expect(openFinance.more).toBeUndefined();
+    // The README's "Local Development" block, word for word.
+    expect(openFinance.install).toEqual([
+      expect.objectContaining({
+        label: "Run it locally",
+        fence: "sh",
+        command: [
+          "git clone https://github.com/KunanonJ/OpenFinance.git",
+          "cd OpenFinance",
+          "npm install",
+          "npm run dev",
+        ].join("\n"),
+      }),
+    ]);
   });
 
   it("dates the snapshot on a UTC day that is not in the future", () => {
