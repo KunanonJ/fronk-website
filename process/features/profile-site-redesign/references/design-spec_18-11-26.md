@@ -317,7 +317,7 @@ Units (ours, best-practices audit section 2): this table gives px at the default
 | 1536 | `2xl` | `2xl` |
 | 720 | case cover bleeds under 720 (`max-width: 719px`) | arbitrary |
 | 1100 | case rail appears | arbitrary |
-| 1180 | notebook arrows move beside the book; the hero's two columns start here (ours, section 10.1) | arbitrary |
+| 1180 | notebook arrows move beside the book; the hero's two columns start here, or at 1024 on a landscape screen (ours, section 10.1; UX sweep 21-11-26) | arbitrary |
 | 600 (ours) | large phones and foldables opened in portrait: two-column About grid, More projects, showcase, steps and footer card (section 10.1) | arbitrary |
 | 639 / 809 | showcase grid one column at 639 and under; tile zoom cursor and Enlarge button off at 809 and under | arbitrary |
 | 370 (ours) | under 370 the nav's Say hello becomes a 48 px round icon button that keeps its accessible name (360 px phones and the Galaxy Z Fold cover screen at 344; measured, the full nav needs about 359 px) | arbitrary |
@@ -328,7 +328,7 @@ Hover effects are gated by `@media (hover: hover) and (pointer: fine)`. Tailwind
 
 | Block | Rule |
 |---|---|
-| Hero copy | grid `6fr 6fr`, gap `28px 56px`, vertically centred; columns 548 px each at 1280 (620 at 1440). One column under 1180 (ours): the canvas mock needs about 560 px, which the 6fr column only gives from 1180; under it the copy comes first and the mock follows at up to 760 px wide (section 10.1) |
+| Hero copy | grid `6fr 6fr`, gap `28px 56px`, vertically centred; columns 548 px each at 1280 (620 at 1440). One column under 1180 (ours), except on a landscape screen from 1024 (UX sweep 21-11-26): `minmax(0, 5fr) minmax(min(500px, 49vw), 6fr)`, gap 40, so 381.6 and 500 px at 1024 and 5:6 from 1063 (464 and 557 at 1179), with the h1 at `clamp(3rem, min(7.5vw - 1.5rem, 8.4svh + 0.25rem), 4.5rem)` (52.8 px at 1024, 64.4 at 1179); the canvas keeps 500 px, about its 503 at 1180, so its comment clears its toolbar. Otherwise, under 1180, the copy comes first and the mock follows at up to 760 px wide (section 10.1) |
 | Work stack list | `ul` grid, gap 24 |
 | Stack card | grid `minmax(0, 5fr) minmax(0, 7fr)`, gap 32, padding 36 |
 | About bento | 12 columns, gap 16; tiles span 7 + 5, 7 + 5, then 3 + 3 + 3 + 3. One column under 640 (measured at 390), gap 12. Ours, resolved 18-11-26: one column under 600; 600 to 809 two columns (Brief, mess, stats and motion tiles full width, the four principles two by two); 810 to 1023 twelve columns with every tile at span 6; 12-column spans from 1024 (section 10.1) |
@@ -996,7 +996,7 @@ Rules by range (everything not listed follows the phone rules of section 10 unde
 | Under 370 | The nav's Say hello is a 48 px round icon with its label kept for screen readers; the mess chips scatter at a quarter of their offsets (`--spread: .25`, so they stay inside the tile); the Outcome figures drop to 30 px and the footer headline to 34 px. Tap areas stay 24 px or more (the tap-area test runs at 344 too) |
 | 370 to 809 | Phone rules; the tighter nav of section 10; mess chips at `--spread: .4` |
 | 600 to 809 | The canvas carousel is 380 px tall with frames at 58 % width; the About grid has two columns (Brief, mess, stats and motion full width, the principles two by two); the records card puts Employment and Education side by side; showcase, steps, More projects and the footer card use two columns |
-| 810 to 1179 | The hero stacks: copy first (max 680 px), then the full canvas mock (max 760 px) with its panels; the headline is `clamp(48px, 5.4cqi + 10px, 72px)`; stack cards pad 28 with 30 px titles and a 520 px minimum height; the notebook's arrows sit under the book beside the pause button |
+| 810 to 1179 | The hero stacks (from 1024 on a landscape screen it is side by side, section 4.2): copy first (max 680 px), then the full canvas mock (max 760 px) with its panels; the headline is `clamp(48px, 5.4cqi + 10px, 72px)`; stack cards pad 28 with 30 px titles and a 520 px minimum height; the notebook's arrows sit under the book beside the pause button |
 | 810 to 1023 | About tiles all span 6 (pairs, the principles two by two); the story stacks with the records card full width in two columns; the case meta row and the approval steps use two columns; the rail stays hidden (under 1100) |
 | Under 1280 | The footer's pixel illustrations are hidden (they would cover the centred call to action) |
 | Dual screen, spanned across a vertical hinge (`@media (horizontal-viewport-segments: 2)`) | The hinge becomes the gap: the hero puts the copy on the first screen and the canvas on the second, with `column-gap` set to the hinge width plus twice `--pad` (from `env(viewport-segment-left 1 0)` minus `env(viewport-segment-right 0 0)`); the notebook opens as a two-page spread across the hinge, which replaces the spiral as its spine |

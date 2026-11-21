@@ -82,9 +82,11 @@ jobs:
           NEXT_PUBLIC_SANITY_API_VERSION: "2025-01-01"
         run: pnpm build
 
-      # Reuses dist/ from the Build step above (same job, repo-root cwd).
-      # Fails if any route's first-load JS exceeds its budget (200 KB default;
-      # 255 KB marketing; see scripts/check-first-load-budget.mjs).
+      # Reuses dist/ from the Build step above (same job, repo-root cwd), and
+      # serves it with `vite preview` to measure the pages rendered on request
+      # (/resume, /learn) as well. Fails if any page's first-load JS,
+      # stylesheets or preloaded fonts exceed their budgets (165 KB, or 200 KB
+      # for marketing pages; 36 KB; 52 KB: scripts/check-first-load-budget.mjs).
       - name: Perf budget
         run: pnpm perf:budget
 
