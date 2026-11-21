@@ -197,6 +197,22 @@ function assetFor(assetsByName, name, skill) {
   };
 }
 
+/** Asia/Bangkok is UTC+7 all year (Thailand keeps no daylight saving time). */
+const BANGKOK_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+/**
+ * The release's day in Bangkok, where the owner cuts releases, so the site
+ * dates a release as the pack's CHANGELOG and tag do: `2026-11-16T21:38:16Z`
+ * -> `2026-11-17`. GitHub's `published_at` is UTC.
+ */
+export function bangkokDate(publishedAt) {
+  const ms = Date.parse(publishedAt);
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(String(publishedAt)) || Number.isNaN(ms)) {
+    throw new Error(`Release has no valid published_at: ${publishedAt}`);
+  }
+  return new Date(ms + BANGKOK_OFFSET_MS).toISOString().slice(0, 10);
+}
+
 /** `how-v6.1.patch` -> `how`; file patches map back through sources.lock `copied`. */
 function skillForPatch(patchFile, skillNames, copied) {
   const base = path.posix
@@ -384,6 +400,7 @@ export function buildSnapshot(raw) {
     version: String(sourcesLock.version),
     releaseUrl: release.html_url,
     publishedAt: release.published_at,
+    releaseDate: bangkokDate(release.published_at),
     skillsRoot: SKILLS_ROOT,
     pluginZip: assetFor(assetsByName, PLUGIN_ZIP, null),
     sources,

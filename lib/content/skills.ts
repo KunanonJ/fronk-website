@@ -98,14 +98,17 @@ export const SKILLS_REPO_URL = snapshot.repoUrl;
 export const SKILLS_TAG = snapshot.tag;
 export const SKILLS_VERSION = snapshot.version;
 export const SKILLS_RELEASE_URL = snapshot.releaseUrl;
-/** Release day, e.g. `2026-11-16` (UTC, from the GitHub release). */
-export const SKILLS_RELEASE_DATE = snapshot.publishedAt.slice(0, 10);
-/** Release month for the hero pill, e.g. `Nov 2026`. */
+/**
+ * Release day in Bangkok, e.g. `2026-11-17`: the date the pack's CHANGELOG
+ * and tag give. The sync reads GitHub's UTC `published_at` in Asia/Bangkok.
+ */
+export const SKILLS_RELEASE_DATE = snapshot.releaseDate;
+/** Release month for the hero pill, e.g. `Nov 2026`, from the same day. */
 export const SKILLS_RELEASE_MONTH = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "numeric",
   timeZone: "UTC",
-}).format(new Date(snapshot.publishedAt));
+}).format(new Date(`${snapshot.releaseDate}T00:00:00Z`));
 const SKILLS_ROOT = snapshot.skillsRoot;
 export const SKILLS_LICENSE = "MIT";
 export const PLUGIN_ZIP: SkillAsset = snapshot.pluginZip;

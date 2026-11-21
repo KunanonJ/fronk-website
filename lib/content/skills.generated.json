@@ -6,6 +6,7 @@
   "version": "6.7.0",
   "releaseUrl": "https://github.com/KunanonJ/superstacks/releases/tag/v6.7.0",
   "publishedAt": "2026-11-16T21:38:16Z",
+  "releaseDate": "2026-11-17",
   "skillsRoot": "plugins/superstacks/skills",
   "pluginZip": {
     "name": "superstacks-plugin.zip",

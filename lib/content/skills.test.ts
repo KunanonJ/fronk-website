@@ -291,10 +291,16 @@ describe("skills page copy", () => {
     expect(`${muted} ${rest} ${accent}`).toBe(skillsPage.title);
   });
 
-  it("dates the release from the snapshot", () => {
-    expect(SKILLS_RELEASE_DATE).toBe(snapshot.publishedAt.slice(0, 10));
+  it("dates the release from the snapshot, on the day in Bangkok", () => {
+    expect(SKILLS_RELEASE_DATE).toBe(snapshot.releaseDate);
     expect(SKILLS_RELEASE_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(SKILLS_RELEASE_MONTH).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
+    // v6.7.0 went out at 21:38 UTC on 16 Nov, 04:38 on 17 Nov in Bangkok:
+    // the pack's CHANGELOG and tag say 2026-11-17.
+    expect(snapshot.tag).toBe("v6.7.0");
+    expect(snapshot.publishedAt).toBe("2026-11-16T21:38:16Z");
+    expect(SKILLS_RELEASE_DATE).toBe("2026-11-17");
+    expect(SKILLS_RELEASE_MONTH).toBe("Nov 2026");
   });
 
   it("spells out the skill count the snapshot holds", () => {
