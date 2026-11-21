@@ -859,11 +859,19 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
     test(`at ${width} x ${height} the logo strip's pause stays in view and pressable while #work's empty top passes over it (WCAG 2.2.2)`, async ({
       page,
     }) => {
-      only(["desktop"]);
+      // Firefox (157) has no scroll-driven animations: there the hero's
+      // script draws Work's top in their place (useWorkTop, Hero.tsx);
+      // without it Work covered the pause 50 px past the hold.
+      only(["desktop", "webkit", "firefox"]);
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.setViewportSize({ width, height });
       await prepare(page);
       await visit(page);
+      // The strip's entrance over: a press while it still rises finds the
+      // pause unstable, and the retry scrolls the page until Work covers it.
+      await page.locator(".pf-logos").evaluate(async (el) => {
+        await Promise.all(el.getAnimations().map((motion) => motion.finished));
+      });
       const stage = (await page.locator(HERO).boundingBox())!.height;
       const pause = page
         .locator(HERO)
@@ -871,7 +879,8 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
       // The stage holds once its last line shows; from there #work slides
       // over it. While its empty first 112 px pass over the strip they
       // draw nothing and take no press (the pause was pressable for 50 px
-      // at 1024 x 768; UX sweep 21-11-26).
+      // at 1024 x 768; UX sweep 21-11-26), until Work's content reaches
+      // the pause, about 160 px past the hold in all three engines.
       const hold = Math.max(0, stage - height);
       const workTop = () =>
         page.evaluate(() => {
@@ -886,7 +895,7 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
             drawn: !!hit && work.contains(hit),
           };
         });
-      for (const past of [0, 40, 80, 120]) {
+      for (const past of [0, 30, 60, 90, 120, 150]) {
         await page.evaluate(
           (y) => window.scrollTo({ top: y, behavior: "instant" }),
           hold + past,
@@ -914,7 +923,7 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
         (y) => window.scrollTo({ top: y, behavior: "instant" }),
         hold + 300,
       );
-      // (A scroll timeline moves on with the next frame.)
+      // (A scroll timeline, or the script, moves on with the next frame.)
       await expect.poll(workTop).toEqual({ opacity: "1", drawn: true });
       // A press on the pause, back where it shows, pauses the row.
       await page.evaluate(
@@ -931,6 +940,46 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
       );
     });
   }
+
+  test("with reduced motion, #work's top is drawn whole as it rises over the still strip, as before", async ({
+    page,
+  }) => {
+    only(["desktop", "webkit", "firefox"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await prepare(page);
+    await visit(page);
+    const stage = (await page.locator(HERO).boundingBox())!.height;
+    await page.evaluate(
+      (y) => window.scrollTo({ top: y, behavior: "instant" }),
+      Math.max(0, stage - 768) + 60,
+    );
+    // Work's own paper and no pseudo-element, in every engine (the hero's
+    // script stays out), and what is drawn just under its top is Work.
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const work = document.getElementById("work")!;
+          const box = work.getBoundingClientRect();
+          const hit = document.elementFromPoint(
+            box.left + box.width / 2,
+            box.top + 20,
+          );
+          return {
+            paper:
+              getComputedStyle(work).backgroundColor !== "rgba(0, 0, 0, 0)",
+            top: getComputedStyle(work, "::before").content,
+            script: work.hasAttribute("data-top"),
+            drawn: !!hit && work.contains(hit),
+          };
+        }),
+      )
+      .toEqual({ paper: true, top: "none", script: false, drawn: true });
+    // The strip stands still, with no pause to keep in reach.
+    await expect(
+      page.locator(HERO).getByRole("button", { name: /motion/ }),
+    ).toHaveCount(0);
+  });
 
   test("at 1024 x 768, Shift+Tab from the stack back onto a frame link leaves each stop in view and uncovered (WCAG 2.4.11)", async ({
     page,
