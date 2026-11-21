@@ -507,7 +507,7 @@ export default function SkillDetailPage({
           <FilesCard skill={skill} />
           <OriginCard skill={skill} />
           <MoreCard skill={skill} stage={stage} />
-          <SkillSourceCard skill={skill} skillMd={skillMd} />
+          <SkillSourceCard key={skill.slug} skill={skill} skillMd={skillMd} />
         </div>
         <SkillPager skill={skill} />
       </div>

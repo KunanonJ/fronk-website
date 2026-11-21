@@ -76,9 +76,12 @@ describe("skills snapshot", () => {
     // Every skills page imports the snapshot; a body in it would ship to all.
     for (const raw of snapshot.skills)
       expect(raw).not.toHaveProperty("content");
-    expect(readdirSync("lib/content/skill-md").sort()).toEqual(
-      snapshot.skills.map((s) => `${s.name}.md`).sort(),
-    );
+    // The .md bodies only: Finder's .DS_Store is not a skill.
+    expect(
+      readdirSync("lib/content/skill-md")
+        .filter((name) => name.endsWith(".md"))
+        .sort(),
+    ).toEqual(snapshot.skills.map((s) => `${s.name}.md`).sort());
     await expect(loadSkillMd("no-such-skill")).rejects.toThrow(
       /No SKILL\.md for no-such-skill/,
     );
@@ -295,12 +298,17 @@ describe("skills page copy", () => {
     expect(SKILLS_RELEASE_DATE).toBe(snapshot.releaseDate);
     expect(SKILLS_RELEASE_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(SKILLS_RELEASE_MONTH).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
-    // v6.7.0 went out at 21:38 UTC on 16 Nov, 04:38 on 17 Nov in Bangkok:
-    // the pack's CHANGELOG and tag say 2026-11-17.
-    expect(snapshot.tag).toBe("v6.7.0");
-    expect(snapshot.publishedAt).toBe("2026-11-16T21:38:16Z");
-    expect(SKILLS_RELEASE_DATE).toBe("2026-11-17");
-    expect(SKILLS_RELEASE_MONTH).toBe("Nov 2026");
+    // The day in Bangkok (UTC+7, no DST) of the release, whatever the tag:
+    // v6.7.0 went out at 21:38 UTC on 16 Nov, which the pack's CHANGELOG
+    // dates 17 Nov (sync-skills.test.ts pins that case).
+    const bangkok = new Date(Date.parse(snapshot.publishedAt) + 7 * 3_600_000)
+      .toISOString()
+      .slice(0, 10);
+    expect(SKILLS_RELEASE_DATE).toBe(bangkok);
+    const [year, month] = bangkok.split("-");
+    expect(SKILLS_RELEASE_MONTH).toBe(
+      `${new Date(Date.UTC(Number(year), Number(month) - 1, 1)).toLocaleString("en-US", { month: "short", timeZone: "UTC" })} ${year}`,
+    );
   });
 
   it("spells out the skill count the snapshot holds", () => {

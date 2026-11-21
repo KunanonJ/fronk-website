@@ -537,7 +537,9 @@ async function main() {
   const changed = [...files].filter(([rel, text]) => read(rel) !== text);
   // A body left behind by a skill the tag no longer has.
   const mdDir = path.join(root, SKILL_MD_DIR);
+  // Only the .md bodies count: a .DS_Store or other dotfile is not a skill.
   const stale = (fs.existsSync(mdDir) ? fs.readdirSync(mdDir) : [])
+    .filter((name) => name.endsWith(".md"))
     .map((name) => `${SKILL_MD_DIR}/${name}`)
     .filter((rel) => !files.has(rel));
   const summary = `${snapshot.skills.length} skills at ${REPO}@${tag}`;
