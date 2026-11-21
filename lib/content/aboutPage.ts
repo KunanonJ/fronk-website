@@ -80,7 +80,7 @@ export const aboutPage = {
     },
     nickname: "Fronk",
     location: "Bangkok, Thailand",
-    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    // Owner direction 20-11-26: the Binary Holdings role ended.
     role: `Founder of GoGoCash and Manut AI. Previously ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
     /** 480x480 WebP crop of /profile.jpg for the round frame. */
     portraitSrc: "/profile-portrait.webp",
@@ -94,7 +94,7 @@ export const aboutPage = {
   story: {
     id: "story",
     eyebrow: "Story",
-    heading: "Founder and builder, Bangkok.", // DRAFT (owner direction 20-11-26)
+    heading: "Founder and builder, Bangkok.", // Owner direction 20-11-26.
     /** ~50-word answer block for name queries / AEO (matches FAQ + llms.txt). */
     whoIs: PERSON_SUMMARY,
     paragraphs: [
@@ -122,7 +122,7 @@ export const aboutPage = {
           },
           {
             type: "text",
-            // DRAFT (owner direction 20-11-26): the role ended.
+            // Owner direction 20-11-26: the role ended.
             text: `, an ERP/CRM workspace with Intelligence AI for automotive SMEs. Until ${LATEST_ROLE.until} I led IT and AI engineering at `,
           },
           {
@@ -208,7 +208,7 @@ export const aboutPage = {
     paragraphs: [
       {
         spans: [
-          // DRAFT (owner direction 20-11-26): the ventures now, then the
+          // Owner direction 20-11-26: the ventures now, then the
           // role that ended. The footer's Now line restates the opening.
           { type: "text", text: "Building " },
           {
@@ -265,7 +265,7 @@ export const aboutPage = {
         spans: [
           {
             type: "text",
-            // DRAFT (owner direction 20-11-26): no hiring invitation.
+            // Owner direction 20-11-26: no hiring invitation.
             text: "If you're a founder, builder, or operator with an interesting problem in fintech, AI, or Web3 — especially in Southeast Asia — or you have a project, a partnership, a talk or a workshop in mind, ",
           },
           { type: "link", text: "say hello", href: "/contact" },
@@ -429,7 +429,7 @@ export const aboutPage = {
   cta: {
     eyebrow: "Next",
     heading: "Let's talk.",
-    // DRAFT (owner direction 20-11-26): partners and projects, not roles.
+    // Owner direction 20-11-26: partners and projects, not roles.
     body: "Founders, operators and partners in Southeast Asia: for partnerships, freelance and consulting projects, advisory, talks or workshops, reach out.",
     links: [
       { label: "Contact", href: "/contact" },

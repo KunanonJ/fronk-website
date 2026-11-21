@@ -4,20 +4,20 @@
  * chunk (components/profile/site/living/Living.tsx, which also says where
  * the log stands) imports it, so no page's first load carries it.
  *
- * DRAFT, all of it, awaiting the owner's approval. Each hour's words are a
- * guess and say so ("probably"); none says when he answers or whether he is
- * free, so none is a claim about availability.
+ * The owner approved all of it as is on 21-11-26. Each hour's words are a
+ * guess and say so ("probably"); none says when the owner answers or
+ * whether they are free, so none is a claim about availability.
  */
 
 /** From each hour in Bangkok (0 to 23) until the next: the guess. */
 const HOUR_GUESSES: readonly (readonly [from: number, guess: string])[] = [
-  [0, "probably asleep"], // DRAFT
-  [6, "probably having coffee"], // DRAFT
-  [9, "probably shipping"], // DRAFT
-  [12, "probably at lunch"], // DRAFT
-  [13, "probably shipping"], // DRAFT
-  [18, "probably still shipping"], // DRAFT
-  [23, "probably asleep"], // DRAFT
+  [0, "probably asleep"],
+  [6, "probably having coffee"],
+  [9, "probably shipping"],
+  [12, "probably at lunch"],
+  [13, "probably shipping"],
+  [18, "probably still shipping"],
+  [23, "probably asleep"],
 ];
 
 /** The guess for an hour in Bangkok, 0 to 23. */
@@ -29,7 +29,7 @@ export function hourGuess(hour: number): string {
 
 /** The ship log: "Shipped 3h ago:", then the commit's subject as its link. */
 export const shippedCopy = {
-  lead: "Shipped", // DRAFT
+  lead: "Shipped",
   /** After the commit's subject, for screen readers. */
-  opens: "(commit on GitHub, opens in a new tab)", // DRAFT
+  opens: "(commit on GitHub, opens in a new tab)",
 } as const;

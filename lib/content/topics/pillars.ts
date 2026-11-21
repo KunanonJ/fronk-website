@@ -87,7 +87,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is Kunanon Jarat in this space?",
         answer:
-          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          // Owner direction 20-11-26: the Binary Holdings role ended.
           "Kunanon Jarat (Fronk) is a Bangkok-based solopreneur: founder of GoGoCash (fintech cashback) and builder of Manut AI (ERP/CRM with Intelligence AI for automotive SMEs), and previously AI Engineering Lead at The Binary Holdings.",
       },
       {
@@ -217,7 +217,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       {
         question: "Who is the founder behind KunanonJ?",
         answer:
-          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          // Owner direction 20-11-26: the Binary Holdings role ended.
           "Kunanon Jarat (Fronk) — Bangkok-based founder of GoGoCash and builder of Manut AI, previously AI Engineering Lead at The Binary Holdings.",
       },
       {
@@ -258,7 +258,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       ["AI engineering "],
       [{ muted: "from" }, " Bangkok"],
     ],
-    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    // Owner direction 20-11-26: the Binary Holdings role ended.
     lede: `A forward deployed engineer builds inside the business that will use the software: next to the people doing the work, against the systems they already run, until the tool is part of the daily routine. Kunanon Jarat works this way as a solopreneur on GoGoCash and Manut AI, and worked this way as ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
     sections: [
       {
@@ -296,7 +296,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       },
       {
         question: "Does Kunanon Jarat work as a forward deployed engineer?",
-        // DRAFT (owner direction 20-11-26): past tense for the role.
+        // Owner direction 20-11-26: past tense for the role.
         answer: `He worked this way as ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}, where he led internal AI agents, automations and the intranet's AI assistant. ${AVAILABILITY.sentence} ${AVAILABILITY.workWith}`,
       },
       {
@@ -312,7 +312,7 @@ const EN_PILLARS: readonly TopicPillar[] = [
       { label: "Agent skills", href: "/skills" },
       { label: "About", href: "/about" },
     ],
-    // DRAFT label (owner direction 20-11-26): the button opens the contact
+    // Owner direction 20-11-26: the button opens the contact
     // form with "Freelance or consulting" chosen.
     ctaLabel: "Work with me",
     ctaHref: WORK_CONTACT_HREF,
@@ -359,7 +359,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
       {
         question: "Kunanon Jarat คือใคร?",
         answer:
-          // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+          // Owner direction 20-11-26: the Binary Holdings role ended.
           "ผู้ก่อตั้ง GoGoCash และผู้สร้าง Manut AI จากกรุงเทพฯ อดีต IT Manager & AI Engineering Lead ที่ The Binary Holdings (KunanonJ / Fronk)",
       },
     ],
@@ -453,7 +453,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
       [{ muted: "แบบ" }, " Forward Deployed "],
       [{ muted: "จาก" }, "กรุงเทพฯ"],
     ],
-    // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+    // Owner direction 20-11-26: the Binary Holdings role ended.
     lede: `Forward deployed engineer คือวิศวกรที่ลงไปสร้างระบบในธุรกิจที่จะใช้งานจริง ทำงานใกล้ชิดกับคนหน้างาน เชื่อมกับระบบที่ใช้อยู่ และอยู่จนเครื่องมือกลายเป็นส่วนหนึ่งของงานประจำวัน Kunanon Jarat ทำงานแบบนี้ในฐานะ solopreneur ของ GoGoCash และ Manut AI และเคยทำงานแบบนี้ในตำแหน่ง ${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization}`,
     sections: [
       {
@@ -475,7 +475,7 @@ const TH_PILLARS: readonly TopicPillar[] = [
     faqs: [
       {
         question: "Kunanon Jarat ทำงานแบบ forward deployed engineer หรือไม่?",
-        // DRAFT (owner direction 20-11-26): past tense for the role.
+        // Owner direction 20-11-26: past tense for the role.
         answer: `เคยทำงานแบบนี้ในตำแหน่ง ${LATEST_ROLE.title} ที่ ${LATEST_ROLE.organization} ดูแล AI agents ภายใน งานอัตโนมัติ และผู้ช่วย AI ของ intranet ปัจจุบัน${AVAILABILITY.th.sentence}`,
       },
     ],

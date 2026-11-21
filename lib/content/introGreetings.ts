@@ -21,8 +21,8 @@ export const INTRO_SESSION_KEY = "fronk-intro-seen";
 /** The intro's few words besides the greetings. */
 export const INTRO_COPY = {
   skip: "Skip intro",
-  minting: "Minting", // DRAFT
-  minted: "Minted", // DRAFT
+  minting: "Minting",
+  minted: "Minted",
 } as const;
 
 /** Hard ceiling for the full intro, the hand-over included. */

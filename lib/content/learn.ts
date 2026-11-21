@@ -82,7 +82,7 @@ export const learnOperatorNotes: readonly LearnLink[] = [
   {
     title: "What I’m doing now",
     description:
-      // DRAFT (owner direction 20-11-26): the Binary Holdings role ended.
+      // Owner direction 20-11-26: the Binary Holdings role ended.
       "Building GoGoCash and Manut AI as a solopreneur, from Bangkok.",
     href: "/about#now",
   },

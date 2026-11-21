@@ -37,8 +37,8 @@ import { pad2 } from "@/lib/utils/pad2";
  * figure, a claim or a case's own words. Every line is read from the content
  * modules, so the claim audits that hold those modules hold the case pages
  * too. The template's labels are in `caseCopy`: most are today's labels on the
- * live case pages, and the few that are new with the redesign are marked
- * DRAFT for the owner's approval.
+ * live case pages, and the few that are new with the redesign are copy the
+ * owner approved as is on 21-11-26.
  */
 
 type CaseKind = "project" | "venture";
@@ -238,7 +238,7 @@ export const caseCopy = {
   interface: "Interface",
   illustration: workCopy.illustration,
   /** Spec 9.4, keeping the live caption's honesty wording. */
-  coverCaption: "Illustration, not real data.", // DRAFT (spec 9.4, ours)
+  coverCaption: "Illustration, not real data.",
   byline: "By",
   meta: {
     role: "Role",
@@ -252,12 +252,12 @@ export const caseCopy = {
   /** A venture's status; "Live" is the live venture pages' word. */
   status: {
     active: "Live",
-    acquired: "Acquired", // DRAFT (no venture has it)
-    "shut-down": "Shut down", // DRAFT (no venture has it)
-    paused: "Paused", // DRAFT (no venture has it)
+    acquired: "Acquired", // No venture has it.
+    "shut-down": "Shut down", // No venture has it.
+    paused: "Paused", // No venture has it.
   } satisfies Record<Venture["status"], string>,
   /** The rail and the phone contents (spec 9.6). */
-  contents: "On this page", // DRAFT (spec 9.6)
+  contents: "On this page",
   /**
    * The eyebrow's last part (reading aids, lib/content/readingTime.ts), with
    * its separator: no-break spaces, so on a narrow screen it moves to the
@@ -283,15 +283,15 @@ export const caseCopy = {
    */
   art: {
     venture: (name: string, steps: readonly string[]) =>
-      `Illustration of ${name}: ${steps.join(", ")}`, // DRAFT
+      `Illustration of ${name}: ${steps.join(", ")}`,
     flow: (title: string, steps: readonly string[]) =>
-      `Illustration of ${title}: ${steps.join(", ")}`, // DRAFT
+      `Illustration of ${title}: ${steps.join(", ")}`,
     layers: (layers: readonly string[]) =>
-      `Illustration of the architecture: ${layers.join(", ")}`, // DRAFT
+      `Illustration of the architecture: ${layers.join(", ")}`,
   },
   /** The showcase's tile buttons and viewer (spec 9.9, 9.10). */
-  enlarge: "Enlarge", // DRAFT (spec 9.9, ours)
-  close: "Close", // DRAFT
+  enlarge: "Enlarge",
+  close: "Close",
   pause: aboutCopy.motion.pause,
   play: aboutCopy.motion.play,
   /** The end of the page (spec 9.11, 9.12). */

@@ -12,7 +12,7 @@
 export const AVAILABILITY = {
   ventures: ["GoGoCash", "Manut AI"],
   location: "Bangkok",
-  // DRAFT (owner direction 20-11-26): the sentence, the pill and workWith.
+  // Owner direction 20-11-26: the sentence, the pill and workWith.
   sentence:
     "Currently building GoGoCash and Manut AI from Bangkok, and not looking for a full-time role right now.",
   /** What he is open to: shown where the hiring call to action used to explain itself. */

@@ -15,10 +15,9 @@ import {
  * (portfolioOutcomes.test.ts, ventureCase.test.ts) hold them where they are
  * cleared. This module only points at them.
  *
- * Lines marked DRAFT wait for the owner's approval (umbrella inputs R8 and
- * R9) and are not final copy until he gives it. The About story itself is
- * today's /about copy (R13: recruiter-fit Phase 4 rewrites it there, and the
- * tile follows).
+ * The owner approved this copy as is on 21-11-26 (umbrella inputs R8 and
+ * R9). The About story itself is today's /about copy (R13: recruiter-fit
+ * Phase 4 rewrites it there, and the tile follows).
  *
  * Named for its two sections rather than `home.ts`: the hero lane (Phase 2)
  * adds lib/content/home.ts at the same time, and the merge may fold the two.
@@ -51,16 +50,16 @@ export const STACK_ENTRIES: readonly StackEntry[] = [
 export const workCopy = {
   /** The article's name: a smoke test reads "Selected work" (spec 13, item 26). */
   eyebrow: portfolioPage.title,
-  heading: "Projects and ventures, from problem to outcome.", // DRAFT
-  lead: "Internal tools and AI agents at The Binary Holdings, and two ventures of my own.", // DRAFT
+  heading: "Projects and ventures, from problem to outcome.",
+  lead: "Internal tools and AI agents at The Binary Holdings, and two ventures of my own.",
   /**
    * The card's call to action. The link's name is this label, then the
    * case's name, in an aria-label ("Read the case study: TBH Intranet").
    */
-  cta: "Read the case study", // DRAFT (plan step 3c, the design system's card)
+  cta: "Read the case study", // Plan step 3c, the design system's card.
   /** A venture's first chip (spec 8.4); its second is "Since" and its year. */
-  venture: "Venture", // DRAFT
-  since: "Since", // DRAFT
+  venture: "Venture",
+  since: "Since",
   /** On every code-drawn picture (owner decision 4 of 18-11-26). */
   illustration: "Illustration",
 } as const;
@@ -76,17 +75,17 @@ export type StatSource =
 
 /** The About bento's copy (spec 8.5 and 15.4). */
 export const aboutCopy = {
-  eyebrow: "About", // DRAFT (the nav's label)
-  heading: "AI engineering, close to the work.", // DRAFT
-  lead: "How I work, and the results so far.", // DRAFT
+  eyebrow: "About", // The nav's label.
+  heading: "AI engineering, close to the work.",
+  lead: "How I work, and the results so far.",
   /** The "In short" tile's h3, shown in the meta style. */
-  briefLabel: "In short", // DRAFT
+  briefLabel: "In short",
   /** Today's About story, as /about prints it. */
   brief: aboutPage.story.paragraphs,
   mess: {
     /** The tile's h3, for assistive technology only (WCAG 1.3.1). */
-    heading: "What one system has to hold", // DRAFT
-    // DRAFT: the mess a system has to hold, each in the case copy's words:
+    heading: "What one system has to hold",
+    // The mess a system has to hold, each in the case copy's words:
     // TBH Intranet's "The problem" (portfolio.ts) for the first three, Manut
     // AI's description and "What it is" (ventures.ts) for the last two.
     chips: [
@@ -96,11 +95,11 @@ export const aboutCopy = {
       "A dozen disconnected tools",
       "Spreadsheets and five tabs",
     ],
-    line: "Then one system holds it.", // DRAFT
+    line: "Then one system holds it.",
   },
   stats: {
     /** The tile's h3, for assistive technology only; it names the list. */
-    heading: "Results so far", // DRAFT
+    heading: "Results so far",
     figures: [
       { project: "tbh-intranet", outcome: "Adoption" },
       { venture: "gogocash", metric: "Registered users" },
@@ -112,14 +111,14 @@ export const aboutCopy = {
      * "From the TBH Intranet and GoGoCash case studies."
      */
     footnote: {
-      lead: "From the", // DRAFT
-      one: "case study.", // DRAFT
-      many: "case studies.", // DRAFT
+      lead: "From the",
+      one: "case study.",
+      many: "case studies.",
     },
   },
   motion: {
     /** The tile's h3, shown as its chip. */
-    caption: "The mess, then the system", // DRAFT
+    caption: "The mess, then the system",
     pause: "Pause the animation",
     play: "Play the animation",
   },

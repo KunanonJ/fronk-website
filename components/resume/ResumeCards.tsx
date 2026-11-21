@@ -35,11 +35,11 @@ import { cn } from "@/lib/utils/cn";
  * print uses ResumePrint. Styles: `.pf-resume*` in src/styles/resume.css.
  */
 
-/** New wording on these cards, for the owner's review. */
+/** New wording on these cards, approved as is by the owner on 21-11-26. */
 const COPY = {
-  now: "Building now", // DRAFT
-  live: "Live", // DRAFT
-  entries: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`, // DRAFT
+  now: "Building now",
+  live: "Live",
+  entries: (count: number) => `${count} ${count === 1 ? "entry" : "entries"}`,
 } as const;
 
 function Logo({

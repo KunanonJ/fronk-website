@@ -370,7 +370,7 @@ export const RESUME_SKILLS_FALLBACK = skills;
 
 /**
  * The résumé summary. The first two sentences are the identity headline
- * (PERSON_HEADLINE in lib/content/identity.ts; DRAFT, owner direction
+ * (PERSON_HEADLINE in lib/content/identity.ts; owner direction
  * 20-11-26); the rest is the CV's own summary.
  */
 export const RESUME_SUMMARY_FALLBACK =

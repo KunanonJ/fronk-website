@@ -20,7 +20,7 @@ export type { ResolvedTimelineItem, ResolvedTimelineSection, ResumeSkillGroup };
  * The header when Sanity holds no résumé document (the state on 11-11-26;
  * `pnpm seed` or Studio can create one). The headline keeps the approved
  * identity wording but no longer leads with the role at The Binary
- * Holdings, which ended in November 2026: DRAFT (owner direction 20-11-26).
+ * Holdings, which ended in November 2026 (owner direction 20-11-26).
  */
 export const DEFAULT_RESUME_PROFILE = {
   name: "Kunanon Jarat",

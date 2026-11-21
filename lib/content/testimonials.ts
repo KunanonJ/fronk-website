@@ -79,22 +79,22 @@ export function roleLine(entry: Testimonial): string {
 }
 
 /**
- * The notebook's words (spec 15.6, owner input). Every line is a DRAFT until
- * the owner approves it; nothing renders on the Home before 3 quotes exist.
+ * The notebook's words (spec 15.6, owner input), which the owner approved as
+ * is on 21-11-26; nothing renders on the Home before 3 quotes exist.
  */
 export const notesCopy = {
-  eyebrow: "Recommendations", // DRAFT
-  heading: "What it is like to work with me.", // DRAFT
+  eyebrow: "Recommendations",
+  heading: "What it is like to work with me.",
   /** The carousel's accessible name. */
-  label: "Recommendations", // DRAFT
-  coverLabel: "Notes", // DRAFT
-  coverLine: "Notes from people I have worked with.", // DRAFT
+  label: "Recommendations",
+  coverLabel: "Notes",
+  coverLine: "Notes from people I have worked with.",
   /** "3 notes", on the cover. */
-  countSuffix: "notes", // DRAFT
+  countSuffix: "notes",
   /** A page's name for assistive technology: "Note 2 of 3". */
-  pageLabel: "Note", // DRAFT
+  pageLabel: "Note",
   previous: "Previous page", // spec 8.7
   next: "Next page", // spec 8.7
-  pause: "Pause notes", // DRAFT (plan step 4e)
-  play: "Play notes", // DRAFT (plan step 4e)
+  pause: "Pause notes",
+  play: "Play notes",
 } as const;

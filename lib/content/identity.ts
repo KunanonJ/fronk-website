@@ -28,8 +28,8 @@ export const PERSON_ALTERNATE_NAMES = [
 ] as const;
 
 /**
- * Short headline for profile cards and agent docs. DRAFT (owner direction
- * 20-11-26): the ventures now, then the role that ended.
+ * Short headline for profile cards and agent docs. Owner direction
+ * 20-11-26: the ventures now, then the role that ended.
  */
 export const PERSON_HEADLINE =
   "Solopreneur in Bangkok building GoGoCash and Manut AI. Previously AI Engineering Lead at The Binary Holdings.";
