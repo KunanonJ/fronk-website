@@ -110,7 +110,7 @@ describe("skills stages", () => {
     }
   });
 
-  it("keeps the README's pipeline order, ama first", () => {
+  it("pins the pipeline order copied from the Superstacks v6.7.0 README, ama first", () => {
     expect(SKILL_PIPELINE.map((step) => step.slug)).toEqual([
       "ama",
       "how",
