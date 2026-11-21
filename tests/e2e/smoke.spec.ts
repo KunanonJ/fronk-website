@@ -3022,6 +3022,36 @@ const openSource = JSON.parse(
 ) as OpenSourceSnapshot;
 
 test.describe("open source > the owner's projects, from the GitHub snapshot", () => {
+  test("Home's strip follows the story and a tile opens its card under the bar", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript(() => {
+      try {
+        sessionStorage.setItem("fronk-intro-seen", "1");
+      } catch {
+        // Storage can be unavailable; the intro then plays and ends.
+      }
+    });
+    await page.goto("/", { waitUntil: "networkidle" });
+    expect(
+      await page
+        .locator("#open-source")
+        .evaluate((el) => el.previousElementSibling?.id),
+    ).toBe("journey");
+    const strip = page.getByRole("region", { name: "Built in the open." });
+    const tiles = strip.getByRole("list").getByRole("link");
+    await expect(tiles).toHaveCount(openSource.projects.length);
+    await tiles.first().click();
+    await expect(page).toHaveURL(/\/open-source#superstacks$/);
+    const card = page.locator("#superstacks");
+    await expect(card).toBeInViewport();
+    // Clear of the floating bar (the root's 96 px scroll padding).
+    await expect
+      .poll(async () => (await card.boundingBox())?.y ?? -1)
+      .toBeGreaterThanOrEqual(90);
+  });
+
   test("each card links its repository in a new tab and names its latest release", async ({
     page,
   }) => {

@@ -813,7 +813,8 @@ test.describe("the Home's notebook: hidden below three cleared quotes", () => {
       page.getByRole("group", { name: "Recommendations" }),
     ).toHaveCount(0);
     await expect(page.locator("a[href*='#notes']")).toHaveCount(0);
-    // The story ends the page, so its padding no longer adds to the footer's.
+    // No notebook follows the story (the open-source strip does, since
+    // 21-11-26), so its padding, set for the notebook, stays 48 px.
     expect(
       await page
         .locator("#story")

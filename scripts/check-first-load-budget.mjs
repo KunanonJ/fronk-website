@@ -88,7 +88,7 @@ const MARKETING_EXACT = new Set([
   // Skills (2026-11): landing nav + small tabs/copy-button islands.
   "/skills",
   // Open source (21-11-26): /stack's reading shell plus the catalog's
-  // Copy islands; measured 161.7 KB at build, under the 165 KB default
+  // Copy islands; measured 162.0 KB at build, under the 165 KB default
   // too, and held to the reading pages' cap like /stack and /proof.
   "/open-source",
   // Résumé (phase 7b): moved into the site layout with the header, footer

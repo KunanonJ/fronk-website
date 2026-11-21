@@ -7,6 +7,7 @@ import {
   OPEN_SOURCE_SYNCED_ON,
   STARS_SHOWN_FROM,
   openSourcePage,
+  openSourceStrip,
   shownStars,
 } from "@/lib/content/openSource";
 // The test only: the page and its content module never load the skills snapshot.
@@ -95,6 +96,7 @@ describe("the open-source projects", () => {
     const words = JSON.stringify([
       OPEN_SOURCE_PROJECTS.map(({ facts: _facts, ...overlay }) => overlay),
       openSourcePage,
+      openSourceStrip,
     ]);
     expect(words).not.toContain("\u2014");
     expect(words).not.toMatch(/\p{Extended_Pictographic}/u);
@@ -104,6 +106,7 @@ describe("the open-source projects", () => {
   it("never imports the skills snapshot", () => {
     for (const file of [
       "lib/content/openSource.ts",
+      "components/profile/home/OpenSourceStrip.tsx",
       "components/profile/pages/library/OpenSourcePage.tsx",
     ]) {
       // Import specifiers only: a comment may name what the file avoids.

@@ -5,7 +5,7 @@ import { formatDay } from "@/lib/utils/relativeDay";
 /*
  * The owner's open-source projects (owner request 21-11-26: Superstacks,
  * thai-accounting-tax-law and OpenFinance, and no other repository), for
- * /open-source, its Markdown twin and the agent docs.
+ * /open-source, its Markdown twin, the agent docs and Home's strip.
  *
  * Facts (license, release, last commit, stars) come from the committed
  * GitHub snapshot, lib/content/openSource.generated.json, which
@@ -15,8 +15,9 @@ import { formatDay } from "@/lib/utils/relativeDay";
  * marked `// DRAFT`. Install commands are copied from each README, never
  * written here. Stars show only from STARS_SHOWN_FROM.
  *
- * Kept light: it imports neither lib/content/skills nor SkillParts, whose
- * snapshot carries every SKILL.md (openSource.test.ts checks).
+ * Kept light, since Home imports it: it imports neither lib/content/skills
+ * nor SkillParts, whose snapshot carries every SKILL.md (openSource.test.ts
+ * checks).
  */
 
 type ProjectFacts = (typeof snapshot.projects)[number];
@@ -196,4 +197,13 @@ export const openSourcePage = {
     stars: "Stars", // DRAFT
     stack: "Stack", // DRAFT
   },
+} as const;
+
+/** Home's strip (OpenSourceStrip.tsx), after the Journey's story. */
+export const openSourceStrip = {
+  eyebrow: "Open source", // DRAFT
+  heading: "Built in the open.", // DRAFT
+  lead: "The agent skills I build with, a Thai SME tax handbook and a personal finance app. All MIT, all on GitHub.", // DRAFT
+  cta: "All open source", // DRAFT
+  updated: "updated", // DRAFT
 } as const;

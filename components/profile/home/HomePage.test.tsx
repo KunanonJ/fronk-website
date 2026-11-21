@@ -38,6 +38,23 @@ describe("HomePage", () => {
     expect(html).toContain('id="ventures"');
   });
 
+  it("puts the open-source strip after the Journey and before the notebook, linking the page and each project", () => {
+    const journey = html.indexOf('id="journey"');
+    const strip = html.indexOf('id="open-source"');
+    expect(journey).toBeGreaterThan(0);
+    expect(strip).toBeGreaterThan(journey);
+    // The notebook renders only with three cleared quotes; when it does, it follows.
+    const notes = html.indexOf('id="notes-title"');
+    if (notes !== -1) expect(notes).toBeGreaterThan(strip);
+    expect(html).toContain('href="/open-source"');
+    for (const slug of [
+      "superstacks",
+      "thai-accounting-tax-law",
+      "openfinance",
+    ])
+      expect(html).toContain(`href="/open-source#${slug}"`);
+  });
+
   it("links the cases at their live addresses, never under /preview", () => {
     expect(html).toContain('href="/portfolio/tbh-intranet"');
     expect(html).toContain('href="/ventures/gogocash"');

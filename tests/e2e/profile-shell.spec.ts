@@ -490,6 +490,23 @@ test.describe("chrome: anchors, the scrollspy and focus (desktop)", () => {
     await expect(aboutLink).not.toHaveAttribute("aria-current");
   });
 
+  test("over the open-source strip the nav marks no Home section", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page);
+    const strip = await sectionBox(page, "open-source");
+    // The story's end is above the band's top, and the strip fills the band.
+    await scrollPage(page, strip.pageTop - 120);
+    for (const name of ["Work", "About", "Journey"]) {
+      await expect(
+        primary(page).getByRole("link", { name, exact: true }),
+        name,
+      ).not.toHaveAttribute("aria-current");
+    }
+  });
+
   test("a click on Journey moves the address to it, and marks it", async ({
     page,
   }) => {

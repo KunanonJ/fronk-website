@@ -9,7 +9,9 @@
  *
  * Its own sheet since UX sweep 21-11-26: the hero links it (Hero.tsx,
  * `precedence`), so it is in the server-rendered HTML of Home and in no other
- * page's first load. The layer order is profile.css's. Loaded after it, these
+ * page's first load. Since 21-11-26 it also holds the open-source strip
+ * near the end of Home (OpenSourceStrip.tsx), which no other page shows.
+ * The layer order is profile.css's. Loaded after it, these
  * rules now follow the other partials in @layer components; none of those
  * styles the hero's parts, and `.pf-hero ~ *` gives the sections after the
  * hero the values home-work-about.css gives Work and About, so the order
@@ -1039,6 +1041,73 @@
       transition:
         background-color 0.15s var(--ease-smooth),
         color 0.15s var(--ease-smooth);
+    }
+  }
+}
+
+/*
+ * The open-source strip (OpenSourceStrip.tsx), after the Journey's story:
+ * a smaller h2 (a strip, not a chapter), then a tile per project, stacked
+ * under 1024 px and three across from it. Nothing in it moves, so reduced
+ * motion needs no rule; forced colors keep the tiles' edge (`.ds-tile`,
+ * globals.css) and drop the tag mark (pages-catalog.css).
+ */
+@layer components {
+  .pf-oss {
+    padding-block: clamp(48px, 6vw, 80px) 0;
+  }
+  .pf-section-head__title.pf-oss__title {
+    font-size: var(--type-statement);
+    line-height: 1.05;
+  }
+  .pf-oss__list {
+    display: grid;
+    gap: 12px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-oss__list > li {
+    display: flex;
+    min-inline-size: 0;
+  }
+  .pf-oss__tile {
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+    gap: 16px;
+    min-inline-size: 0;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pf-oss__badge {
+    flex: none;
+    inline-size: 48px;
+    block-size: 48px;
+  }
+  .pf-oss__text {
+    display: grid;
+    gap: 4px;
+    min-inline-size: 0;
+  }
+  .pf-oss__name {
+    overflow-wrap: anywhere;
+  }
+  .pf-oss__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin-top: 6px;
+  }
+  @media (min-width: 64rem) {
+    .pf-oss__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pf-oss__tile:hover .pf-oss__name {
+      color: var(--accent-ink);
     }
   }
 }

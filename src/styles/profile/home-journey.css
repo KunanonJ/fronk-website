@@ -252,11 +252,12 @@
     gap: 56px;
     padding-block: 40px 128px;
   }
-  /* Home without the notebook (fewer than three cleared quotes, Notes.tsx):
-     the Journey ends the page, and the story's padding, set for the
-     notebook's section below, would add 128 to 176 px to the footer's own.
-     It beats the 1024 px rule by specificity. */
-  .pf-journey:last-child .pf-story {
+  /* Home without the notebook right after the Journey (fewer than three
+     cleared quotes, Notes.tsx; and since 21-11-26 the open-source strip
+     follows the story): the story's padding, set for the notebook's section
+     below, would add 128 to 176 px to what follows. It beats the 1024 px
+     rule by specificity, as before. */
+  .pf-journey:not(:has(+ .pf-notes)) .pf-story {
     padding-block-end: 48px;
   }
   .pf-story__text {
