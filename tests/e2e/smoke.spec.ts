@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { parseAttributes } from "../../lib/parity/parity.mjs";
 import { ROUTES } from "./routes";
 
 /**
@@ -1837,6 +1838,59 @@ test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
     await expect(page.locator(".pf-about-page__photo")).toBeVisible();
     await page.getByRole("button", { name: "Show the pixels" }).click();
     await expect(pixels).toBeVisible();
+  });
+});
+
+/**
+ * Home's og:video (lib/og/homeVideo.ts, owner 21-11-26): Messages and
+ * Discord play Home's share card as a loop; the other apps keep the
+ * og:image. Apple's players ask for `bytes=0-1` first and play only on a
+ * 206 (src/server/http.ts, withByteRanges). Home only: Messages would show
+ * Home's card for any page that named it.
+ */
+test.describe("share > Home's card plays as a looping og:video", () => {
+  test("home: the og:video is an MP4 served in byte ranges, and no other page names one", async ({
+    request,
+  }) => {
+    const videoTags = (html: string) =>
+      [...html.matchAll(/<meta\b([^>]*)>/gi)]
+        .map((m) => parseAttributes(m[1]!) as Record<string, string>)
+        .filter((attrs) => attrs.property?.startsWith("og:video"))
+        .map((attrs) => [attrs.property, attrs.content]);
+
+    const home = await (await request.get("/")).text();
+    const tags = videoTags(home);
+    const url = tags[0]?.[1] ?? "";
+    expect(url).toMatch(/^https:\/\/kunanonj\.com\/og\/home-[0-9a-f]{8}\.mp4$/);
+    expect(tags).toEqual([
+      ["og:video", url],
+      ["og:video:secure_url", url],
+      ["og:video:type", "video/mp4"],
+      ["og:video:width", "1200"],
+      ["og:video:height", "630"],
+    ]);
+    // The still stays for the apps that show one: the video's first frame.
+    expect(home).toContain(
+      '<meta property="og:image" content="https://kunanonj.com/opengraph-image"',
+    );
+
+    const path = new URL(url).pathname;
+    const whole = await request.get(path);
+    expect(whole.status()).toBe(200);
+    expect(whole.headers()["content-type"]).toBe("video/mp4");
+    expect(whole.headers()["accept-ranges"]).toBe("bytes");
+    const bytes = await whole.body();
+    expect(bytes.toString("latin1", 4, 8)).toBe("ftyp");
+    expect(bytes.length).toBeLessThan(2 * 1024 * 1024);
+    const probe = await request.get(path, { headers: { Range: "bytes=0-1" } });
+    expect(probe.status()).toBe(206);
+    expect(probe.headers()["content-range"]).toBe(`bytes 0-1/${bytes.length}`);
+    expect([...(await probe.body())]).toEqual([...bytes.subarray(0, 2)]);
+
+    for (const route of ROUTES.filter((r) => r.path !== "/")) {
+      const html = await (await request.get(route.path)).text();
+      expect(videoTags(html), route.path).toEqual([]);
+    }
   });
 });
 

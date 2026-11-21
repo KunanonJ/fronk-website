@@ -136,6 +136,100 @@ export async function readBodyText(
   return text + decoder.decode();
 }
 
+/**
+ * The share videos (public/og, made by scripts/og-video.mjs). Each is named
+ * by its content, so a file never changes under its name and keeps for a
+ * year; a new video is a new URL in the page's og:video.
+ */
+export const SHARE_MEDIA_PATH = "/og/";
+export const SHARE_MEDIA_CACHE = "public, max-age=31536000, immutable";
+
+/**
+ * A share video's 304 (a conditional request whose copy is current). The
+ * assets binding answers it with Cache-Control: max-age=0, and a client
+ * that revalidates takes a 304's headers as the file's, so it would stop
+ * treating the file as immutable: the 304 keeps the 200's lifetime and
+ * says ranges are served.
+ */
+export function shareMediaNotModified(file: Response): Response {
+  const headers = new Headers(file.headers);
+  headers.set("Cache-Control", SHARE_MEDIA_CACHE);
+  headers.set("Accept-Ranges", "bytes");
+  return new Response(null, { status: 304, headers });
+}
+
+/** A single `bytes=` range as [start, end], "unsatisfiable", or null to ignore. */
+function parseRange(
+  header: string,
+  size: number,
+): [number, number] | "unsatisfiable" | null {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(header.trim());
+  // Several ranges, another unit or a malformed one: the whole file, which
+  // a server may always send instead (RFC 9110, 14.2).
+  if (!match || (match[1] === "" && match[2] === "")) return null;
+  if (match[1] === "") {
+    const suffix = Number(match[2]);
+    return suffix === 0 || size === 0
+      ? "unsatisfiable"
+      : [Math.max(0, size - suffix), size - 1];
+  }
+  const start = Number(match[1]);
+  if (start >= size) return "unsatisfiable";
+  const end = match[2] === "" ? size - 1 : Number(match[2]);
+  if (end < start) return null;
+  return [start, Math.min(end, size - 1)];
+}
+
+/**
+ * A static file's whole answer (a 200 from ASSETS) as the request asked for
+ * it: one byte range as a 206, an unsatisfiable range as a 416, and anything
+ * else whole, each with `Accept-Ranges: bytes` and the `cacheControl` given.
+ *
+ * Players fetch video in pieces: Apple's (Messages' link previews, Safari)
+ * ask for `Range: bytes=0-1` first and play only on a 206
+ * (github.com/hubeiqiao/og-video-preview, "Server"), and static assets on
+ * Workers answer a Range with the whole file as a 200 (seen on this site:
+ * /resume.pdf and /profile.jpg, 21-11-26). In production the Worker cache
+ * strips Range before the Worker runs and cuts the range from the whole 200
+ * it keeps (developers.cloudflare.com/workers/cache/configuration/, "Range
+ * requests"); this answers it wherever the Worker sees one itself: a cache
+ * bypass, and `vite preview`.
+ */
+export async function withByteRanges(
+  request: Request,
+  file: Response,
+  cacheControl: string,
+): Promise<Response> {
+  const head = request.method === "HEAD";
+  const headers = new Headers(file.headers);
+  headers.set("Accept-Ranges", "bytes");
+  headers.set("Cache-Control", cacheControl);
+  const range = request.headers.get("Range");
+  const ifRange = request.headers.get("If-Range");
+  // If-Range names the copy the client holds: a different one gets it whole.
+  if (!range || (ifRange !== null && ifRange !== headers.get("ETag"))) {
+    return new Response(head ? null : file.body, { status: 200, headers });
+  }
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const size = bytes.byteLength;
+  headers.set("Content-Length", String(size));
+  const wanted = parseRange(range, size);
+  if (wanted === null)
+    return new Response(head ? null : bytes, { status: 200, headers });
+  if (wanted === "unsatisfiable") {
+    headers.set("Content-Range", `bytes */${size}`);
+    headers.set("Content-Length", "0");
+    return new Response(null, { status: 416, headers });
+  }
+  const [start, end] = wanted;
+  headers.set("Content-Range", `bytes ${start}-${end}/${size}`);
+  headers.set("Content-Length", String(end - start + 1));
+  return new Response(head ? null : bytes.subarray(start, end + 1), {
+    status: 206,
+    headers,
+  });
+}
+
 /** 405 for a route that only answers `allow`. */
 export function methodNotAllowed(allow: string): Response {
   return new Response(null, { status: 405, headers: { Allow: allow } });

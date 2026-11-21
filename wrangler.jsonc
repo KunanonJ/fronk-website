@@ -26,6 +26,9 @@
   // that would catch the cover images. And not with a "!" pattern: what it
   // matches goes to the static files without the Worker (the build's
   // prerender step got a 404 for /portfolio/<slug>/ instead of its 308).
+  // The share videos (/og/*) run it first too: static assets answer a Range
+  // request with the whole file, and Messages plays a video only on a 206
+  // (src/server/http.ts, withByteRanges).
   // lib/cloudflare/cacheConfig.test.ts keeps the list equal to the projects.
   "assets": {
     "binding": "ASSETS",
@@ -39,6 +42,7 @@
       "/portfolio/kunanonj-com",
       "/portfolio/node-validator-automation",
       "/portfolio/tbh-intranet",
+      "/og/*",
     ],
   },
   // Worker cache: Sanity-backed responses carry Cache-Tag and a one-hour edge

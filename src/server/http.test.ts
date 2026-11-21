@@ -8,8 +8,11 @@ import {
   REPORTING_ENDPOINTS,
   SECURITY_HEADERS,
   SERVER_FN_PATH,
+  SHARE_MEDIA_CACHE,
+  shareMediaNotModified,
   methodNotAllowed,
   readBodyText,
+  withByteRanges,
   withSecurityHeaders,
   withServerFnNoStore,
 } from "./http";
@@ -184,5 +187,107 @@ describe("methodNotAllowed", () => {
     const res = methodNotAllowed("POST");
     expect(res.status).toBe(405);
     expect(res.headers.get("allow")).toBe("POST");
+  });
+});
+
+describe("withByteRanges (the share videos, public/og)", () => {
+  const BYTES = Uint8Array.from({ length: 100 }, (_, i) => i);
+  /** ASSETS' answer for the whole file. */
+  const file = () =>
+    new Response(BYTES, {
+      headers: {
+        "Content-Type": "video/mp4",
+        "Content-Length": "100",
+        ETag: '"abc"',
+      },
+    });
+  const ask = (headers: Record<string, string> = {}, method = "GET") =>
+    withByteRanges(
+      new Request("https://kunanonj.com/og/home-0123abcd.mp4", {
+        method,
+        headers,
+      }),
+      file(),
+      SHARE_MEDIA_CACHE,
+    );
+  const body = async (res: Response) =>
+    Array.from(new Uint8Array(await res.arrayBuffer()));
+
+  it("sends the whole file, ranges offered and kept a year, with no Range", async () => {
+    const res = await ask();
+    expect(res.status).toBe(200);
+    expect(res.headers.get("accept-ranges")).toBe("bytes");
+    expect(res.headers.get("cache-control")).toBe(
+      "public, max-age=31536000, immutable",
+    );
+    expect(res.headers.get("content-type")).toBe("video/mp4");
+    expect(await body(res)).toHaveLength(100);
+  });
+
+  it("answers Apple's first probe, bytes=0-1, with a 206 of two bytes", async () => {
+    const res = await ask({ Range: "bytes=0-1" });
+    expect(res.status).toBe(206);
+    expect(res.headers.get("content-range")).toBe("bytes 0-1/100");
+    expect(res.headers.get("content-length")).toBe("2");
+    expect(res.headers.get("content-type")).toBe("video/mp4");
+    expect(await body(res)).toEqual([0, 1]);
+  });
+
+  it("answers open and suffix ranges, and clips an end past the file", async () => {
+    const open = await ask({ Range: "bytes=95-" });
+    expect(open.headers.get("content-range")).toBe("bytes 95-99/100");
+    expect(await body(open)).toEqual([95, 96, 97, 98, 99]);
+    const suffix = await ask({ Range: "bytes=-3" });
+    expect(suffix.headers.get("content-range")).toBe("bytes 97-99/100");
+    expect(await body(suffix)).toEqual([97, 98, 99]);
+    const past = await ask({ Range: "bytes=98-500" });
+    expect(past.status).toBe(206);
+    expect(await body(past)).toEqual([98, 99]);
+  });
+
+  it("answers a range past the end with 416 and the file's size", async () => {
+    const res = await ask({ Range: "bytes=100-" });
+    expect(res.status).toBe(416);
+    expect(res.headers.get("content-range")).toBe("bytes */100");
+    expect(await body(res)).toEqual([]);
+  });
+
+  it("sends the whole file for several ranges, another unit or a stale If-Range", async () => {
+    for (const headers of [
+      { Range: "bytes=0-1, 5-6" } as Record<string, string>,
+      { Range: "items=0-1" },
+      { Range: "bytes=5-1" },
+      { Range: "bytes=0-1", "If-Range": '"old"' },
+    ]) {
+      const res = await ask(headers);
+      expect(res.status, JSON.stringify(headers)).toBe(200);
+      expect(await body(res)).toHaveLength(100);
+    }
+    const current = await ask({ Range: "bytes=0-1", "If-Range": '"abc"' });
+    expect(current.status).toBe(206);
+  });
+
+  it("answers HEAD with the headers and no body", async () => {
+    const res = await ask({ Range: "bytes=0-1" }, "HEAD");
+    expect(res.status).toBe(206);
+    expect(res.headers.get("content-length")).toBe("2");
+    expect(res.body).toBeNull();
+  });
+});
+
+describe("shareMediaNotModified", () => {
+  it("keeps the share video's year-long lifetime on a 304", () => {
+    const fromAssets = new Response(null, {
+      status: 304,
+      headers: {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        ETag: '"abc"',
+      },
+    });
+    const answer = shareMediaNotModified(fromAssets);
+    expect(answer.status).toBe(304);
+    expect(answer.headers.get("Cache-Control")).toBe(SHARE_MEDIA_CACHE);
+    expect(answer.headers.get("Accept-Ranges")).toBe("bytes");
+    expect(answer.headers.get("ETag")).toBe('"abc"');
   });
 });

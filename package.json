@@ -63,7 +63,8 @@
     "skills:sync": "node scripts/sync-skills.mjs",
     "oss:sync": "node scripts/sync-open-source.mjs",
     "seed": "node scripts/seed-content.mjs",
-    "pdf": "node scripts/generate-resume-pdf.mjs"
+    "pdf": "node scripts/generate-resume-pdf.mjs",
+    "og:video": "node scripts/og-video.mjs"
   },
   "dependencies": {
     "@cf-wasm/og": "0.5.0",
