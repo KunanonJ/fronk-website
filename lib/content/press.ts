@@ -1,7 +1,7 @@
 import { PAGE_META } from "@/lib/content/pageMeta";
-/** Coverage types, in filter order (bento canvas Press, design spec 4.19). */
-export const PRESS_TYPES = ["Feature", "Product", "Profile"] as const;
-export type PressType = (typeof PRESS_TYPES)[number];
+import type { PressType } from "@/lib/content/pressTypes";
+
+export { PRESS_TYPES } from "@/lib/content/pressTypes";
 
 export type PressItem = {
   id: string;

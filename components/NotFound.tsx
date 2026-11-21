@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import LandingLayout from "@/components/landing/LandingLayout";
 import StatusPage, {
   type StatusPageCopy,
@@ -10,6 +9,7 @@ import {
   pixelCells,
   playBeats,
 } from "@/components/profile/site/PixelArt";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { siteConfig } from "@/lib/site";
 
 const COPY: StatusPageCopy = {
@@ -25,13 +25,14 @@ const COPY: StatusPageCopy = {
 };
 
 /** The 404 you fix (now-building-and-genz Phase 6): only this page loads it. */
-const PatchArt = lazy(() => import("@/components/landing/PatchArt"));
+const PatchArt = lazyFeature(() => import("@/components/landing/PatchArt"));
 
 /**
  * 404 (profile redesign Phase 7f; design spec 13 item 18). The root renders
  * it outside the `_landing` layout for every unknown path, so it brings the
  * site's nav and footer itself. The response status stays 404. Its drawing
- * is the game (PatchArt), drawn whole until that loads.
+ * is the game (PatchArt), drawn whole until that loads, or for good if it
+ * fails to.
  */
 export default function NotFound() {
   return (
@@ -39,7 +40,7 @@ export default function NotFound() {
       <StatusPage
         copy={COPY}
         art={
-          <Suspense
+          <FeatureBoundary
             fallback={
               <PixelArt rows={NOT_FOUND_ART} className="pf-status__art" />
             }
@@ -50,7 +51,7 @@ export default function NotFound() {
               beats={pixelBeats}
               play={playBeats}
             />
-          </Suspense>
+          </FeatureBoundary>
         }
       />
     </LandingLayout>

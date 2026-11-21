@@ -18,9 +18,9 @@ import {
   randomCase,
   type SearchCommand,
 } from "@/lib/search/commands";
+import { loadSearchIndex } from "@/lib/search/loadIndex";
 import {
   groupResults,
-  loadSearchIndex,
   searchEntries,
   type SearchEntry,
 } from "@/lib/search/match";

@@ -1,5 +1,7 @@
-import { lazy, Suspense, useEffect, useId, useState } from "react";
-import { loadSearchIndex, type SearchEntry } from "@/lib/search/match";
+import { useEffect, useId, useState } from "react";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
+import { loadSearchIndex } from "@/lib/search/loadIndex";
+import type { SearchEntry } from "@/lib/search/match";
 
 /*
  * Link previews (premium interactions, item 6): a case study's text link
@@ -12,7 +14,7 @@ import { loadSearchIndex, type SearchEntry } from "@/lib/search/match";
  * and the index (/search.json) load on first use, while the delay runs.
  */
 
-const PreviewCard = lazy(
+const PreviewCard = lazyFeature(
   () => import("@/components/profile/site/preview/PreviewCard"),
 );
 
@@ -67,7 +69,7 @@ export function LinkPreviews() {
       pending = link;
       const mine = ++turn;
       // Warm the card and the index while the delay runs.
-      void import("@/components/profile/site/preview/PreviewCard");
+      PreviewCard.preload();
       void loadSearchIndex().catch(() => undefined);
       showTimer = window.setTimeout(() => {
         void entryFor(link)
@@ -146,8 +148,8 @@ export function LinkPreviews() {
   }, []);
 
   return preview ? (
-    <Suspense fallback={null}>
-      <PreviewCard key={preview.entry.path} preview={preview} id={id} />
-    </Suspense>
+    <FeatureBoundary key={preview.entry.path}>
+      <PreviewCard preview={preview} id={id} />
+    </FeatureBoundary>
   ) : null;
 }

@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { lazy, Suspense, useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import {
   HeadContent,
   Scripts,
@@ -27,7 +27,9 @@ import onestLatin from "../fonts/onest-latin.woff2?url";
 import fontsCss from "../styles/fonts.css?url";
 import profileCss from "../styles/profile.css?url";
 
-const siteJsonLd = buildSiteJsonLd();
+// The site-wide JSON-LD graph (Person, WebSite, the ventures), built on the
+// server only: the browser takes the text the server wrote (ServedJsonLd).
+const siteJsonLd = import.meta.env.SSR ? buildSiteJsonLd() : null;
 const global = rootHead(rootViewport);
 // Router head() keeps one meta per name, so the two media-scoped theme
 // colours are rendered straight into <head> instead.
@@ -83,7 +85,7 @@ function RootDocument({ children }: { children: ReactNode }) {
   // A navigation whose chunk a deploy removed loads its page fresh, once
   // (src/lib/staleChunk.ts). Client only, from hydration on, and a chunk of
   // its own rather than part of the entry chunk, which every page loads
-  // (the topic hubs sit at their 165 KB budget).
+  // (the 165 KB default first-load budget binds on the topic hubs).
   const router = useRouter();
   useEffect(() => {
     let stop: (() => void) | undefined;
@@ -128,7 +130,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         ))}
       </head>
       <body className="flex min-h-full flex-col bg-page text-ink">
-        <JsonLd data={siteJsonLd} />
+        {siteJsonLd ? <JsonLd data={siteJsonLd} /> : <ServedJsonLd />}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -145,5 +147,26 @@ function RootDocument({ children }: { children: ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+/**
+ * The site graph in the browser: the text the server wrote into the first
+ * JSON-LD script directly in <body> (the one above), read once. Hydration
+ * meets the script it would have built, and the entry chunk every page loads
+ * carries neither the graph's builder (lib/seo/jsonLd.ts) nor the venture
+ * data it reads (lib/content/ventures.ts).
+ */
+function ServedJsonLd() {
+  const [served] = useState(
+    () =>
+      document.body.querySelector(':scope > script[type="application/ld+json"]')
+        ?.textContent ?? "",
+  );
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: served }}
+    />
   );
 }

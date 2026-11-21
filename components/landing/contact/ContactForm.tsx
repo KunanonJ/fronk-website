@@ -1,6 +1,4 @@
 import {
-  lazy,
-  Suspense,
   useCallback,
   useEffect,
   useRef,
@@ -10,6 +8,7 @@ import {
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { CheckIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import type { ContactIntent } from "@/lib/contact/search";
 import { CONTACT_LIMITS, contactPage } from "@/lib/content/contact";
 import {
@@ -37,7 +36,7 @@ const EMPTY: ContactFormValues = { name: "", message: "", topics: [] };
 const COPY_RESET_MS = 2000;
 
 /** The Ready moment's burst and stamp, loaded when the email is ready. */
-const DraftReady = lazy(
+const DraftReady = lazyFeature(
   () => import("@/components/landing/contact/DraftReady"),
 );
 
@@ -262,9 +261,9 @@ export default function ContactForm({
               className="pf-ready-mark mb-2 inline-flex size-14 items-center justify-center rounded-full bg-surface-tint text-mark"
             >
               <CheckIcon size={24} />
-              <Suspense fallback={null}>
+              <FeatureBoundary>
                 <DraftReady />
-              </Suspense>
+              </FeatureBoundary>
             </span>
             <p className="m-0 text-[28px] leading-[1.2] font-semibold tracking-[-0.02em]">
               {ready.complete ? contactPage.readyTitle : contactPage.longTitle}

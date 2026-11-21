@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { searchCopy } from "@/lib/content/profileChrome";
 
 /*
@@ -7,10 +7,13 @@ import { searchCopy } from "@/lib/content/profileChrome";
  * beside the theme toggle, and ⌘K or Ctrl+K anywhere. The phone menu opens
  * the same dialog with `openSearch`. The dialog's code and stylesheet load
  * on first use (SearchDialog), so the first load carries only this button.
+ * If they fail to load, nothing opens and the page stays
+ * (components/ui/LazyFeature.tsx); the search closes again, so the next
+ * press, ⌘K or the menu's Search asks for them once more.
  * No single-key shortcut: one would need an off switch (WCAG 2.1.4).
  */
 
-const SearchDialog = lazy(
+const SearchDialog = lazyFeature(
   () => import("@/components/profile/site/search/SearchDialog"),
 );
 
@@ -22,9 +25,31 @@ export function openSearch(): void {
   window.dispatchEvent(new Event(OPEN_SEARCH));
 }
 
-/** Starts loading the dialog before it is asked for (hover, focus). */
-function preload(): void {
-  void import("@/components/profile/site/search/SearchDialog");
+/**
+ * The magnifier of the nav's button and the phone menu's Search: lucide's
+ * Search at 18 px, drawn here in the markup lucide gives it. It was the
+ * entry chunk's only lucide icon, and it brought lucide's icon runtime
+ * into the chunk every page loads.
+ */
+export function SearchIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="lucide lucide-search"
+      aria-hidden="true"
+    >
+      <path d="m21 21-4.34-4.34" />
+      <circle cx="11" cy="11" r="8" />
+    </svg>
+  );
 }
 
 export function SearchTrigger() {
@@ -61,15 +86,16 @@ export function SearchTrigger() {
         aria-keyshortcuts="Meta+K Control+K"
         title={`${searchCopy.open} (${searchCopy.shortcut})`}
         onClick={() => setOpen(true)}
-        onPointerEnter={preload}
-        onFocus={preload}
+        // Starts loading the dialog before it is asked for.
+        onPointerEnter={SearchDialog.preload}
+        onFocus={SearchDialog.preload}
       >
-        <Search size={18} strokeWidth={1.8} aria-hidden="true" />
+        <SearchIcon />
       </button>
       {open ? (
-        <Suspense fallback={null}>
+        <FeatureBoundary onFail={() => setOpen(false)}>
           <SearchDialog onClose={() => setOpen(false)} />
-        </Suspense>
+        </FeatureBoundary>
       ) : null}
     </>
   );

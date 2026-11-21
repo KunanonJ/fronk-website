@@ -1,10 +1,11 @@
 import * as v from "valibot";
 import { enumParam } from "@/lib/search/enumParam";
-import { PRESS_TYPES, type PressType } from "@/lib/content/press";
+import { PRESS_TYPES, type PressType } from "@/lib/content/pressTypes";
 
 /*
  * /press route options that run on every navigation (so they ship in the
- * entry bundle). lib/content/press has no imports, so it stays light.
+ * entry bundle). They take the coverage types from lib/content/pressTypes,
+ * not lib/content/press, so the coverage itself stays with /press.
  */
 
 /** URL values: `all` plus each coverage type in lower case. */

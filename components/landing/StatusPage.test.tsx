@@ -2,9 +2,13 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 const invalidate = vi.hoisted(() => vi.fn(() => Promise.resolve()));
-vi.mock("@tanstack/react-router", () => ({
-  useRouter: () => ({ invalidate }),
-}));
+// NotFound's game is a lazy feature, held by the router's own CatchBoundary
+// (components/ui/LazyFeature.tsx).
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const { CatchBoundary } =
+    await importOriginal<typeof import("@tanstack/react-router")>();
+  return { CatchBoundary, useRouter: () => ({ invalidate }) };
+});
 vi.mock("@/lib/utils/clipboard", () => ({
   writeClipboard: () => Promise.resolve(true),
 }));

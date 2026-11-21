@@ -1,6 +1,4 @@
 import {
-  lazy,
-  Suspense,
   useEffect,
   useRef,
   useState,
@@ -9,6 +7,7 @@ import {
 } from "react";
 import { pillClass } from "@/components/ds/Pill";
 import { PixelPortrait } from "@/components/profile/site/PixelPortrait";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { PORTRAIT, PORTRAIT_COLOURS } from "@/lib/brand/pixelPortrait";
 import { PORTRAIT_TRAITS, wornPortrait } from "@/lib/brand/portraitTraits";
 import {
@@ -50,7 +49,7 @@ const TOTAL = PORTRAIT_TRAITS.length;
 /** The dissolve: 8 frames of 45 ms, two ranks a frame. */
 const FRAME_MS = 45;
 
-const PortraitHolo = lazy(
+const PortraitHolo = lazyFeature(
   () => import("@/components/profile/pages/PortraitHolo"),
 );
 const loadEdition = () => import("@/components/profile/pages/portraitEdition");
@@ -223,9 +222,9 @@ export function PortraitPlay() {
         <PixelPortrait rows={rows} shown={shown} />
       </div>
       {holo ? (
-        <Suspense fallback={null}>
+        <FeatureBoundary>
           <PortraitHolo />
-        </Suspense>
+        </FeatureBoundary>
       ) : null}
       <div className="pf-about-page__portrait-bar">
         <button

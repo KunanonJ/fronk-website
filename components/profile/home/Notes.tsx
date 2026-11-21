@@ -1,5 +1,6 @@
-import { Component, lazy, Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 import { SectionHeader } from "@/components/profile/home/SectionHeader";
+import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import {
   notebookEntries,
   notesCopy,
@@ -18,29 +19,12 @@ import {
  * enough quotes never downloads it, and one with them streams it in with the
  * section's server HTML. While it loads, its place is held at the book's
  * least height, so the footer does not jump. If it fails to load (a stale
- * chunk after a deploy), the section goes and the rest of the Home stays.
+ * chunk after a deploy), the section goes and the rest of the Home stays
+ * (components/ui/LazyFeature.tsx).
  */
-const Notebook = lazy(() =>
-  import("@/components/profile/home/Notebook").then((module) => ({
-    default: module.Notebook,
-  })),
-);
-
-/** Renders nothing once anything inside has thrown: the notebook only. */
-class WithoutNotebookOnError extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  override state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  override render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
+const Notebook = lazyFeature(async () => ({
+  default: (await import("@/components/profile/home/Notebook")).Notebook,
+}));
 
 export default function Notes({
   entries = TESTIMONIALS,
@@ -51,7 +35,7 @@ export default function Notes({
   const shown = notebookEntries(entries);
   if (shown.length === 0) return null;
   return (
-    <WithoutNotebookOnError>
+    <FeatureBoundary>
       <section aria-labelledby="notes-title" className="pf-notes">
         <div className="ds-wrap">
           <SectionHeader
@@ -75,6 +59,6 @@ export default function Notes({
           </Suspense>
         </div>
       </section>
-    </WithoutNotebookOnError>
+    </FeatureBoundary>
   );
 }

@@ -10,9 +10,16 @@ import { notesCopy, type Testimonial } from "@/lib/content/testimonials";
  * finding 5).
  */
 
-vi.mock("@/components/profile/home/Notebook", async () => {
-  throw new Error("Failed to fetch dynamically imported module");
-});
+// A missing chunk rejects with a TypeError in every engine. Vitest wraps an
+// error its mock factory throws in an Error of its own, so the mock loads,
+// and Notes' loader, reading Notebook from it, gets the TypeError.
+vi.mock("@/components/profile/home/Notebook", () => ({
+  get Notebook(): never {
+    throw new TypeError(
+      "Failed to fetch dynamically imported module: /assets/Notebook-x1.js",
+    );
+  },
+}));
 
 const cleared = (name: string): Testimonial => ({
   quote: `Words ${name} agreed to publish.`,
