@@ -593,6 +593,17 @@
     justify-content: center;
     margin-block-start: 40px;
   }
+  /* On /contact the page is the call to action, so the footer leaves out
+     its own and the drawings that flank it (SiteFooter, UX sweep
+     21-11-26): no screen-tall stage to hold them, and the card leads, the
+     footer's 40 px into the sheet. */
+  .pf-footer--plain .pf-footer__wrap {
+    min-block-size: 0;
+    padding-block-start: 0;
+  }
+  .pf-footer--plain .pf-footer__card {
+    margin-block-start: 0;
+  }
   .pf-footer__card {
     position: relative;
     z-index: 1;

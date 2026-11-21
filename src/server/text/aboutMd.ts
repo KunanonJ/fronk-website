@@ -16,7 +16,10 @@ const PAGE = "/about";
 /**
  * /about.md: the About page as Markdown, for agents that prefer text to HTML
  * (linked from the page head as rel="alternate" type="text/markdown"). Built
- * from the same lib/content modules as the page, in the page's order.
+ * from the same lib/content modules as the page, in the page's order. It
+ * also keeps what the page leaves out: the short arc, and the principles
+ * with their lines (the page states them once, in "How I ship"; UX sweep
+ * 21-11-26).
  */
 export function buildAboutMd(): string {
   const { hero, story, now, path, principles, stack, cta } = aboutPage;
@@ -26,7 +29,7 @@ export function buildAboutMd(): string {
   push(`# About ${PERSON_NAME} (${hero.nickname})`, "");
   push(`Source: ${SITE_ORIGIN}${PAGE}  `, `Updated: ${SITE_UPDATED}`, "");
   push(`${hero.role} ${hero.location}.`, "");
-  // The page shows this in its hero pill and in "Let's talk".
+  // The page's hero pill says this in short, its Now section in full.
   push(AVAILABILITY.sentence, "");
 
   push(`## ${story.heading}`, "", story.whoIs, "");

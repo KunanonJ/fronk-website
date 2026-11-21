@@ -5,6 +5,7 @@ import { aboutPage } from "@/lib/content/aboutPage";
 import { AVAILABILITY } from "@/lib/content/availability";
 import { aboutRecruiterLinks } from "@/lib/content/contact";
 import { FAQ_ITEMS } from "@/lib/content/faq";
+import { storyCopy } from "@/lib/content/homeJourney";
 import { aboutCopy } from "@/lib/content/homeWorkAbout";
 import { socials } from "@/lib/content/landing";
 import { learnOperatorNotes } from "@/lib/content/learn";
@@ -122,9 +123,7 @@ describe("AboutPage: the sections", () => {
 
   it("reuses the redesign's parts: the About bento, the story and the career records", () => {
     const { container } = render(<AboutPage />);
-    expect(
-      container.querySelector("section.pf-about#principles"),
-    ).not.toBeNull();
+    expect(container.querySelector("section.pf-about#about")).not.toBeNull();
     expect(container.querySelector("#story .pf-story")).not.toBeNull();
     expect(container.querySelector("aside.pf-records")).not.toBeNull();
   });
@@ -150,8 +149,8 @@ describe("AboutPage: the sections", () => {
     const named = [
       // The hero, by the h1.
       "About Kunanon Jarat: AI, ERP/CRM and startups in Bangkok.",
-      // Home's About bento, reused under #principles, keeps Home's name: its
-      // eyebrow, the nav's label (AboutBento.test.tsx pins it).
+      // Home's About bento, reused without its principles, keeps Home's
+      // name: its eyebrow, the nav's label (AboutBento.test.tsx pins it).
       aboutCopy.eyebrow,
       aboutPage.story.heading,
       aboutPage.now.heading,
@@ -198,6 +197,43 @@ describe("AboutPage: the sections", () => {
   });
 });
 
+describe("AboutPage: each thing once (UX sweep 21-11-26)", () => {
+  it("heads How I ship's stages with the four principles, under #principles, and nowhere else", () => {
+    const { container } = render(<AboutPage />);
+    expect(container.querySelector(".pf-principle")).toBeNull();
+    const stages = container.querySelector<HTMLElement>(
+      "#how-i-ship ol#principles",
+    )!;
+    expect(stages).not.toBeNull();
+    for (const { title } of aboutPage.principles.items) {
+      // The FAQ's closed answer names them too, for the FAQPage JSON-LD;
+      // as headings they appear once.
+      expect(
+        screen.getAllByRole("heading", { level: 3, name: title }),
+      ).toHaveLength(1);
+      expect(
+        within(stages).getByRole("heading", { level: 3, name: title }),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it("says once, in Now, that the owner is not looking for a full-time role", () => {
+    const { container } = render(<AboutPage />);
+    // The FAQ keeps its answer for the FAQPage JSON-LD.
+    const lines = [...container.querySelectorAll("p")].filter(
+      (p) =>
+        !p.closest(`#${aboutPage.faq.id}`) &&
+        /not looking for a full-time role/.test(p.textContent ?? ""),
+    );
+    expect(lines).toHaveLength(1);
+    expect(lines[0]!.closest(`#${aboutPage.now.id}`)).not.toBeNull();
+    // The story's own now block is Home's.
+    expect(
+      screen.queryByRole("heading", { name: storyCopy.nowHeading }),
+    ).toBeNull();
+  });
+});
+
 describe("AboutPage: the Next card", () => {
   it("leads its buttons with a dark Contact pill, after the recruiter links", () => {
     render(<AboutPage />);
@@ -221,7 +257,9 @@ describe("AboutPage: the Next card", () => {
     expect(
       within(next).getByRole("heading", { name: "For recruiters" }),
     ).toBeInTheDocument();
-    expect(next).toHaveTextContent(AVAILABILITY.sentence);
+    // Now states the availability (UX sweep 21-11-26); the card keeps the
+    // time zone.
+    expect(next).not.toHaveTextContent(AVAILABILITY.sentence);
     expect(next).toHaveTextContent("Bangkok time, GMT+7.");
     // He is not looking now (owner direction 20-11-26), so the recruiter's
     // link is for later: the form with "A future role" chosen. The arrows

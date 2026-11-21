@@ -125,7 +125,7 @@ describe("AboutBento", () => {
     ).toHaveClass("pf-stats");
   });
 
-  it("lists the four principles as /about prints them, each with an icon", () => {
+  it("lists the four principles from aboutPage, each with an icon", () => {
     const { container } = render(<AboutBento />);
     for (const principle of aboutPage.principles.items) {
       expect(
@@ -134,6 +134,13 @@ describe("AboutBento", () => {
       expect(container).toHaveTextContent(principle.body);
     }
     expect(container.querySelectorAll(".pf-principle .pf-art")).toHaveLength(4);
+  });
+
+  it("leaves the principles out where How I ship states them (/about)", () => {
+    const { container } = render(<AboutBento principles={false} />);
+    expect(container.querySelectorAll(".pf-bento__tile")).toHaveLength(4);
+    expect(container.querySelector(".pf-principle")).toBeNull();
+    expect(container.querySelector(".pf-bento__brief")).not.toBeNull();
   });
 });
 

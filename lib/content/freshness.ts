@@ -20,5 +20,9 @@
  * 2026-11-20: availability and career facts (owner direction 20-11-26): the
  * Binary Holdings role ended in November 2026; he is building GoGoCash and
  * Manut AI and is not looking for a full-time role.
+ *
+ * 2026-11-21: /about says each thing once (UX sweep), and its Now section
+ * calls the owner a Protocol Camp cohort 2025 alum (the cohort ended in
+ * January 2026).
  */
-export const SITE_UPDATED = "2026-11-20";
+export const SITE_UPDATED = "2026-11-21";

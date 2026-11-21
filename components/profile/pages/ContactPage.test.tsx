@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   fireEvent,
   render,
@@ -73,9 +73,22 @@ function stubClipboard(writeText: (text: string) => Promise<void>) {
 }
 
 describe("ContactPage", () => {
+  // jsdom has no scrollIntoView of its own: note which element asked, and
+  // how.
+  let scrolled: [Element, ScrollIntoViewOptions | boolean | undefined][] = [];
+  beforeEach(() => {
+    scrolled = [];
+    Element.prototype.scrollIntoView = function (
+      this: Element,
+      options?: ScrollIntoViewOptions | boolean,
+    ) {
+      scrolled.push([this, options]);
+    };
+  });
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    delete (Element.prototype as Partial<Element>).scrollIntoView;
   });
 
   it("leads with the h1, word for word the live page's, and the founder-voice lead", () => {
@@ -137,6 +150,31 @@ describe("ContactPage", () => {
     expect(form).toHaveAttribute("id", contactPage.formId);
     for (const link of screen.getAllByRole("link", { name: /say hello/i }))
       expect(link).toHaveAttribute("href", `#${contactPage.formId}`);
+  });
+
+  it("offers the email first, then the form that says Or write it here, then Elsewhere (UX sweep 21-11-26)", () => {
+    render(<ContactPage />);
+    const email = screen.getByRole("article", {
+      name: contactPage.directLabel,
+    });
+    const form = screen.getByRole("article", { name: contactPage.cardTitle });
+    const elsewhere = screen.getByRole("article", {
+      name: contactPage.elsewhereTitle,
+    });
+    // One parent, one order: the eye, Tab and a screen reader meet them
+    // alike, and the desktop grid places them without reordering
+    // (cutover.css).
+    expect(email.parentElement).toHaveClass("pf-contact__top");
+    expect([...email.parentElement!.children]).toEqual([
+      email,
+      form,
+      elsewhere,
+    ]);
+    // "Or" comes after the option it offers another way to.
+    const or = within(form).getByText(contactPage.formLabel);
+    expect(
+      email.compareDocumentPosition(or) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("copies the email address and says so", async () => {
@@ -328,6 +366,15 @@ describe("ContactPage", () => {
     expect(status).toHaveTextContent(contactPage.readyTitle);
     expect(status).toHaveTextContent(contactPage.email);
     expect(document.activeElement).toBe(status);
+    // The card comes up under the bar with its panel (UX sweep 21-11-26):
+    // its top, not its centre, which left the email tile's links under the
+    // found-trait toast on phones.
+    expect(scrolled).toEqual([
+      [
+        screen.getByRole("article", { name: contactPage.cardTitle }),
+        expect.objectContaining({ block: "start" }),
+      ],
+    ]);
     expect(opened).toHaveLength(1);
     // The topics lead the subject so the owner can sort the inbox; the
     // body is the message signed with the name, in CRLF lines (RFC 6068).

@@ -24,6 +24,7 @@ import {
 } from "@/lib/contact/schema";
 import { composeContactEmail, type ContactEmail } from "@/lib/contact/compose";
 import { onContactDraft } from "@/lib/agents/contactDraft";
+import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
 import { writeClipboard } from "@/lib/utils/clipboard";
 import { cn } from "@/lib/utils/cn";
 
@@ -118,9 +119,10 @@ function invalidProps(id: string, error?: string) {
  *   the first invalid field takes focus.
  * - Ready: after the button, a status panel says the email is in the
  *   visitor's app, offers to open it again or copy it (a browser with no
- *   email app opens nothing), and focus moves to it. Its check mark bursts
- *   into pixels beside a "Draft ready" stamp, and the Lapel pin trait is
- *   found (DraftReady, loaded then; no burst under reduced motion).
+ *   email app opens nothing), and focus moves to it as the card comes up
+ *   under the bar. Its check mark bursts into pixels beside a "Draft ready"
+ *   stamp, and the Lapel pin trait is found (DraftReady, loaded then; no
+ *   burst under reduced motion).
  * - Intent: `project` (from `/contact?topic=project`) chooses "Freelance or
  *   consulting" and `hiring` (from `/contact?topic=hiring`) "A future role"
  *   on arrival and again after "Write another message". It only ever adds
@@ -142,10 +144,19 @@ export default function ContactForm({
   const copyTimer = useRef<number | undefined>(undefined);
 
   // The form gives way to the ready panel, so focus follows it; after
-  // "Write another message" it returns to the first field.
+  // "Write another message" it returns to the first field. The card comes
+  // up under the bar with the panel: the email tile above it (first on the
+  // page since the UX sweep, 21-11-26) leaves the screen, so the found-trait
+  // toast under the bar lies over none of its links (TraitToast). Centring
+  // the panel, as a plain focus does, left them under the toast on phones.
   useEffect(() => {
-    if (ready) readyRef.current?.focus();
-    else if (focusNameNext.current) {
+    if (ready) {
+      document.getElementById(contactPage.formId)?.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
+      readyRef.current?.focus({ preventScroll: true });
+    } else if (focusNameNext.current) {
       focusNameNext.current = false;
       document.getElementById("contact-name")?.focus();
     }

@@ -23,8 +23,13 @@ import { writeClipboard } from "@/lib/utils/clipboard";
 
 /*
  * /contact (profile redesign, Phase 6 cutover; plan step 6d): the hero in the
- * new style, the form beside "Email me directly" (with the Say hello
- * actions) and "Elsewhere", then "Who should write" beside "For recruiters".
+ * new style, then "Email me directly" (with the Say hello actions), the form,
+ * whose "Or write it here" offers the other way, and "Elsewhere"; then "Who
+ * should write" beside "For recruiters". The first three keep that order at
+ * every width, for the eye, Tab and a screen reader alike: a phone stacks
+ * them, and from 1024 px the email and Elsewhere share the narrow column on
+ * the left of the form (UX sweep 21-11-26; cutover.css). The page is the call
+ * to action, so the footer leaves out its own here (SiteFooter).
  * The Bangkok card is retired (umbrella input R14): the footer carries
  * "Bangkok, GMT+7". The form keeps its labels, autocomplete, aria-invalid and
  * aria-describedby, 16 px inputs, focus on the first invalid field, and
@@ -196,11 +201,9 @@ export default function ContactPage({
       />
       <div className="ds-wrap pf-contact">
         <div className="pf-contact__top">
+          <EmailTile />
           <ContactForm intent={intent} />
-          <div className="pf-contact__side">
-            <EmailTile />
-            <ElsewhereTile />
-          </div>
+          <ElsewhereTile />
         </div>
         <div className="pf-contact__row">
           <WhoTile />

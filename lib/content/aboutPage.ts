@@ -233,7 +233,8 @@ export const aboutPage = {
             text: "AI engineering",
             href: "/topics/forward-deployed-ai-engineering",
           },
-          { type: "text", text: ". Participating in " },
+          // Owner direction 21-11-26: the cohort ran Sep 2025 to Jan 2026.
+          { type: "text", text: ". " },
           {
             type: "link",
             text: "Protocol Camp",
@@ -245,7 +246,7 @@ export const aboutPage = {
             ? ([
                 {
                   type: "text",
-                  text: " cohort 2025 and the Bangkok Startup Association. Writing the occasional note in the ",
+                  text: " cohort 2025 alum, and a member of the Bangkok Startup Association. Writing the occasional note in the ",
                 },
                 { type: "link", text: "blog", href: "/blog" },
                 {
@@ -256,7 +257,7 @@ export const aboutPage = {
             : ([
                 {
                   type: "text",
-                  text: " cohort 2025 and the Bangkok Startup Association.",
+                  text: " cohort 2025 alum, and a member of the Bangkok Startup Association.",
                 },
               ] as const)),
         ],

@@ -462,11 +462,6 @@
     display: grid;
     gap: 16px;
   }
-  .pf-contact__side {
-    display: grid;
-    gap: 16px;
-    align-content: start;
-  }
   .pf-contact__form {
     display: flex;
     flex-direction: column;
@@ -585,9 +580,20 @@
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
       align-items: start;
     }
+    /* The email, the form and Elsewhere keep the page's order row by row,
+       as a phone stacks them: the email and the form share the first row,
+       the email first, and Elsewhere takes the second, under the email,
+       while the form spans both. So the eye, Tab and a screen reader meet
+       "Or write it here" after the email at every width (UX sweep
+       21-11-26). The second row takes what the form leaves over, so
+       Elsewhere sits right under the email. */
     .pf-contact__top {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      grid-template-rows: auto 1fr;
       align-items: start;
+    }
+    .pf-contact__form {
+      grid-area: 1 / 2 / span 2;
     }
     /* "Who should write" beside "For recruiters": one row, no empty cell. */
     .pf-contact__row {
