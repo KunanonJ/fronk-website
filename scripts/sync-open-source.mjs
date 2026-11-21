@@ -18,6 +18,11 @@
  * "Updated" (`pushed_at` also moves for pushes to other branches).
  * `GITHUB_TOKEN` is used when set.
  *
+ * `homepage` is GitHub's field as the owner set it, and nothing here checks
+ * that it loads: before the site links one (lib/content/openSource.ts),
+ * open it. OpenFinance's did not resolve on 21-11-26, so the site links no
+ * app for it.
+ *
  * Output is stable: projects in REPOS order, keys in a fixed order, and no
  * timestamp but the facts themselves and `syncedOn`, the UTC day they were
  * read. A run that finds the same facts leaves the file as it is, so

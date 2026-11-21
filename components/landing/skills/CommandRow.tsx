@@ -29,10 +29,28 @@ export function SlashBreaks({ text }: { text: string }) {
 }
 
 /**
+ * A word with slashes as one box per part, each ending at its slashes
+ * ("https://", "github.com/"), with a <wbr> between them: the word wraps
+ * only after a slash, never after the hyphen in "thai-accounting"
+ * (`.pf-cat-command__part`). A part longer than the row still wraps inside
+ * its own box. The text is unchanged.
+ */
+function SlashParts({ word }: { word: string }) {
+  const parts = word.match(/\/*[^/]+\/*|\/+/g) ?? [word];
+  return parts.map((part, i) => (
+    <Fragment key={i}>
+      {i > 0 ? <wbr /> : null}
+      <span className="pf-cat-command__part">{part}</span>
+    </Fragment>
+  ));
+}
+
+/**
  * A command's words, each kept whole: a line breaks only at a space, never
  * inside a flag ("--copy") or a name ("verify-loop"). A word longer than
- * the row still wraps inside its own box (`.pf-cat-command__word`), after a
- * slash when `breakAfterSlash` is set.
+ * the row still wraps inside its own box (`.pf-cat-command__word`). With
+ * `breakAfterSlash`, a word with slashes is its parts instead (SlashParts),
+ * so a row ends after a slash, never after a hyphen.
  */
 function CommandWords({
   command,
@@ -41,15 +59,17 @@ function CommandWords({
   command: string;
   breakAfterSlash: boolean;
 }) {
-  return command.split(/(\s+)/).map((part, i) =>
-    /^\s*$/.test(part) ? (
-      part
-    ) : (
+  return command.split(/(\s+)/).map((part, i) => {
+    if (/^\s*$/.test(part)) return part;
+    // Its parts are the boxes, so the row can end after any of its slashes.
+    if (breakAfterSlash && part.includes("/"))
+      return <SlashParts key={i} word={part} />;
+    return (
       <span key={i} className="pf-cat-command__word">
-        {breakAfterSlash ? <SlashBreaks text={part} /> : part}
+        {part}
       </span>
-    ),
-  );
+    );
+  });
 }
 
 /**
@@ -63,6 +83,7 @@ export function CommandRow({
   accessibleLabel,
   announcement,
   label,
+  lines = false,
 }: {
   command: string;
   /** "Copy ..." naming what is copied, e.g. "Copy install command for verify-loop". */
@@ -70,17 +91,29 @@ export function CommandRow({
   announcement: string;
   /** Optional caption above the row. */
   label?: ReactNode;
+  /**
+   * Several commands, one per line (a README's steps, on /open-source):
+   * each line is its own block, its wrapped rows indented under its start,
+   * a long word breaks only after a slash, and Copy sits under them
+   * (`.pf-cat-command--lines`). Off by default: /skills/$slug's Full pack
+   * panel passes two lines and keeps the plain layout, Copy beside them.
+   */
+  lines?: boolean;
 }) {
-  // A README's steps, one per line (/open-source): the lines keep their
-  // breaks (pre-wrap), a long word breaks after a slash, and Copy sits under
-  // them (`.pf-cat-command--lines`). No /skills command has a newline.
-  const lines = command.includes("\n");
   return (
     <div className="pf-cat-stack">
       {label ? <p className="t-small pf-cat-note">{label}</p> : null}
       <div className={cn("pf-cat-command", lines && "pf-cat-command--lines")}>
         <code className="pf-cat-command__text">
-          <CommandWords command={command} breakAfterSlash={lines} />
+          {lines ? (
+            command.split("\n").map((line, i) => (
+              <span key={i} className="pf-cat-command__line">
+                <CommandWords command={line} breakAfterSlash />
+              </span>
+            ))
+          ) : (
+            <CommandWords command={command} breakAfterSlash={false} />
+          )}
         </code>
         <CopyButton
           text={command}

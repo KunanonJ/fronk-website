@@ -205,6 +205,23 @@ describe("SkillDetailPage", () => {
     expect(rest).toBeVisible();
   });
 
+  it("keeps the Full pack panel's two commands in one plain row, Copy beside them", async () => {
+    await renderDetail("verify-loop");
+    // The panel is hidden until its tab is picked.
+    const copy = screen.getByRole("button", {
+      name: "Copy the Claude Code plugin commands",
+      hidden: true,
+    });
+    const row = copy.closest(".pf-cat-command")!;
+    // /open-source's several-commands layout is opt-in (CommandRow `lines`).
+    expect(row).not.toHaveClass("pf-cat-command--lines");
+    expect(row.querySelector(".pf-cat-command__line")).toBeNull();
+    expect(row.querySelector("wbr")).toBeNull();
+    expect(row.querySelector("code")!.textContent).toBe(
+      "/plugin marketplace add KunanonJ/superstacks\n/plugin install superstacks@superstacks",
+    );
+  });
+
   it("shows a short SKILL.md whole, with no toggle", async () => {
     await renderDetail("grill-with-docs");
     expect(screen.queryByRole("button", { name: /^Show all/ })).toBeNull();

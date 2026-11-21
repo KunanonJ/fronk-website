@@ -20,17 +20,17 @@ import { cn } from "@/lib/utils/cn";
 /*
  * /open-source (21-11-26, owner request): the reading hero, then one card per
  * project built like Proof's venture cards (BlockHead, the badge and name,
- * the summary, facts, stack chips, one action, a foot). Superstacks takes the
+ * the summary, facts, stack chips, the install steps, a foot). Superstacks takes the
  * full row (`pf-read-wide`) and the others sit side by side from 810 px
  * (`pf-read-pair`). Facts come from the GitHub snapshot
  * (lib/content/openSource.ts); "Updated" is the newest commit on the default
  * branch, put into words in the browser (DaysAgo). The command rows come
  * from CommandRow.tsx, never from SkillParts, whose module loads the skills
- * snapshot. No new CSS: `.pf-read-*` in pages-hubs.css and `.pf-cat-*` in
- * pages-catalog.css.
+ * snapshot; a step of several commands takes its `lines` layout. Styles:
+ * `.pf-read-*` in pages-hubs.css and `.pf-cat-*` in pages-catalog.css.
  */
 
-/** Opens on GitHub (or the demo's site): a new tab, no opener. */
+/** Opens on GitHub: a new tab, no opener. */
 const EXTERNAL = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 /** The card's second link: a page on this site, or a page in another language. */
@@ -113,30 +113,17 @@ function ProjectCard({ project }: { project: OpenSourceProject }) {
           ))}
         </ul>
         {project.install ? (
-          <CommandRow
-            label={project.install.label}
-            command={project.install.command}
-            accessibleLabel={project.install.copyLabel}
-            announcement={project.install.announcement}
-          />
-        ) : null}
-        {project.demo ? (
-          <div className="pf-cat-stack pf-cat-stack--start">
-            <p className="t-small pf-cat-note">{project.demo.note}</p>
-            <a
-              href={project.demo.href}
-              {...EXTERNAL}
-              className={pillClass({ variant: "ghost" })}
-            >
-              <span aria-hidden="true" className="pf-read-live" />
-              <span>
-                {project.demo.label}{" "}
-                <span className="sr-only">(opens in a new tab)</span>
-              </span>
-              <span className="ds-pill__icon" aria-hidden="true">
-                <ArrowUpRightIcon size={16} />
-              </span>
-            </a>
+          <div className="pf-cat-stack">
+            {project.install.map((step) => (
+              <CommandRow
+                key={step.command}
+                label={step.label}
+                command={step.command}
+                accessibleLabel={step.copyLabel}
+                announcement={step.announcement}
+                lines={step.command.includes("\n")}
+              />
+            ))}
           </div>
         ) : null}
         <div className="pf-read-foot">

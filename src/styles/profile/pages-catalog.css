@@ -87,10 +87,28 @@
   .pf-cat-command .ds-pill {
     margin-inline-start: auto;
   }
-  /* A command of several lines (a README's steps; CommandRow): its lines
-     take the row and Copy goes under them. */
+  /* Several commands, one per line (CommandRow's `lines`, /open-source
+     only): the lines take the row and Copy goes under them. Each line is a
+     block whose wrapped rows hang 2ch in, so a reader sees where a command
+     starts; its boxes keep no indent of their own (text-indent inherits
+     into inline-blocks). A word with slashes is a box per part
+     (SlashParts), so an address breaks after a slash, never after a
+     hyphen. */
   .pf-cat-command--lines .pf-cat-command__text {
     flex-basis: 100%;
+  }
+  .pf-cat-command__line {
+    display: block;
+    padding-inline-start: 2ch;
+    text-indent: -2ch;
+  }
+  .pf-cat-command__line .pf-cat-command__word,
+  .pf-cat-command__part {
+    text-indent: 0;
+  }
+  .pf-cat-command__part {
+    display: inline-block;
+    max-inline-size: 100%;
   }
   /* A copy button holds every word it can say in one cell, so it never
      changes width. */

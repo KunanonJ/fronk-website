@@ -29,31 +29,32 @@ export function projectMarkdown(
     "",
     p.summary,
     "",
-    `- **Repository:** ${facts.url}`,
-    `- **License:** ${facts.license}`,
+    `- **Repository:** ${facts.url}`, // DRAFT
+    `- **License:** ${facts.license}`, // DRAFT
   ];
   if (facts.release)
     lines.push(
-      `- **Latest release:** [${facts.release.tag}](${facts.release.url}), ${day(facts.release.publishedAt)}`,
+      `- **Latest release:** [${facts.release.tag}](${facts.release.url}), ${day(facts.release.publishedAt)}`, // DRAFT
     );
   lines.push(
-    `- **Last commit on ${facts.defaultBranch}:** ${day(facts.lastCommitAt)}`,
+    `- **Last commit on ${facts.defaultBranch}:** ${day(facts.lastCommitAt)}`, // DRAFT
   );
-  if (facts.language) lines.push(`- **GitHub language:** ${facts.language}`);
+  if (facts.language) lines.push(`- **GitHub language:** ${facts.language}`); // DRAFT
   lines.push(
-    `- **Stars and forks on GitHub:** ${facts.stars} and ${facts.forks}`,
-    `- **Stack:** ${p.stack.join(", ")}`,
+    `- **Stars and forks on GitHub:** ${facts.stars} and ${facts.forks}`, // DRAFT
+    `- **Stack:** ${p.stack.join(", ")}`, // DRAFT
   );
-  if (p.demo) lines.push(`- **Live demo:** ${p.demo.href}`);
   if (p.more)
     lines.push(`- **${p.more.mdLabel}:** ${absoluteUrl(p.more.href)}`);
-  if (p.install)
+  // Each step under its label, fenced as `text` when it is typed in Claude
+  // Code (a slash command, not a shell's) and `sh` when in a terminal.
+  for (const step of p.install ?? [])
     lines.push(
       "",
-      `${p.install.label}:`,
+      `${step.label}:`,
       "",
-      "```sh",
-      p.install.command,
+      `\`\`\`${step.fence}`,
+      step.command,
       "```",
     );
   return lines;
@@ -70,12 +71,12 @@ export function buildOpenSourceMd(): string {
     "",
     `Source: ${SITE_ORIGIN}${PAGE}  `,
     `Updated: ${SITE_UPDATED}  `,
-    `GitHub numbers as of: ${OPEN_SOURCE_SYNCED_ON}`,
+    `GitHub numbers as of: ${OPEN_SOURCE_SYNCED_ON}`, // DRAFT
     "",
     openSourcePage.lead,
     "",
     ...OPEN_SOURCE_PROJECTS.flatMap((p) => [...projectMarkdown(p, "##"), ""]),
-    `More on GitHub: ${openSourcePage.github.href}`,
+    `More on GitHub: ${openSourcePage.github.href}`, // DRAFT
     "",
   ].join("\n");
 }

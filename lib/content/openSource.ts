@@ -22,6 +22,19 @@ import { formatDay } from "@/lib/utils/relativeDay";
 
 type ProjectFacts = (typeof snapshot.projects)[number];
 
+interface InstallStep {
+  label: string;
+  /** As the README gives it; several commands keep one per line. */
+  command: string;
+  copyLabel: string;
+  announcement: string;
+  /**
+   * Where it is typed, which names the Markdown twin's fence: `text` for a
+   * Claude Code slash command, `sh` for a terminal.
+   */
+  fence: "text" | "sh";
+}
+
 interface Overlay {
   /** The card's anchor on /open-source, e.g. `/open-source#superstacks`. */
   slug: string;
@@ -37,14 +50,8 @@ interface Overlay {
   stack: readonly string[];
   /** The card takes the whole row. */
   wide?: boolean;
-  install?: {
-    label: string;
-    /** As the README gives it; a README's steps keep one per line. */
-    command: string;
-    copyLabel: string;
-    announcement: string;
-  };
-  demo?: { note: string; label: string; href: string };
+  /** The install, step by step, as the README gives it. */
+  install?: readonly InstallStep[];
   more?: {
     label: string;
     href: string;
@@ -75,14 +82,26 @@ const OVERLAY: Record<string, Overlay> = {
     // The profile README's "for Claude Code, Cursor, and Codex", and GitHub's language.
     stack: ["Claude Code", "Cursor", "Codex", "Python"],
     wide: true,
-    install: {
-      label: "Add it to Claude Code", // DRAFT
-      // The profile README's and the Quick start's command.
-      command: "/plugin marketplace add KunanonJ/superstacks",
-      copyLabel: "Copy the Superstacks marketplace command", // DRAFT
-      // /skills' words for the same copy.
-      announcement: "Copied the marketplace command",
-    },
+    // The README's Quick start for Claude Code, its two steps (the
+    // marketplace adds nothing until the plugin is installed), with /skills'
+    // labels and announcements for the same steps (SkillsIndexPage).
+    // openSource.test.ts checks the commands against PACK_INSTALL.
+    install: [
+      {
+        label: "1. Add the marketplace (type it in Claude Code)",
+        command: "/plugin marketplace add KunanonJ/superstacks",
+        copyLabel: "Copy the Superstacks marketplace command", // DRAFT
+        announcement: "Copied the marketplace command",
+        fence: "text",
+      },
+      {
+        label: "2. Install the plugin",
+        command: "/plugin install superstacks@superstacks",
+        copyLabel: "Copy the Superstacks plugin install command", // DRAFT
+        announcement: "Copied the plugin install command",
+        fence: "text",
+      },
+    ],
     more: {
       label: "Browse the skills", // DRAFT
       href: "/skills",
@@ -106,17 +125,21 @@ const OVERLAY: Record<string, Overlay> = {
       "Handbook and agent skill for Thai SME accounting, tax, and business law, in English and Thai, with a source on every rule.",
     // The description's "(CIT, WHT, VAT)" and the profile README's "in English and Thai".
     stack: ["CIT", "WHT", "VAT", "English and Thai"],
-    install: {
-      label: "Add the skill to Claude Code", // DRAFT
-      // The README's "Claude Code" block, word for word, one step per line.
-      command: [
-        "git clone https://github.com/KunanonJ/thai-accounting-tax-law.git",
-        "mkdir -p ~/.claude/skills",
-        "cp -r thai-accounting-tax-law/skills/thai-accounting-tax-law ~/.claude/skills/",
-      ].join("\n"),
-      copyLabel: "Copy the commands that add the Thai tax skill to Claude Code", // DRAFT
-      announcement: "Copied the Claude Code commands", // DRAFT
-    },
+    install: [
+      {
+        label: "Add the skill to Claude Code", // DRAFT
+        // The README's "Claude Code" block, word for word, one step per line.
+        command: [
+          "git clone https://github.com/KunanonJ/thai-accounting-tax-law.git",
+          "mkdir -p ~/.claude/skills",
+          "cp -r thai-accounting-tax-law/skills/thai-accounting-tax-law ~/.claude/skills/",
+        ].join("\n"),
+        copyLabel:
+          "Copy the commands that add the Thai tax skill to Claude Code", // DRAFT
+        announcement: "Copied the Claude Code commands", // DRAFT
+        fence: "sh",
+      },
+    ],
     more: {
       // The README's own link to its Thai version.
       label: "ภาษาไทย",
@@ -140,12 +163,10 @@ const OVERLAY: Record<string, Overlay> = {
       "Privacy-minded personal finance workspace for subscriptions, budgets, cash flow, and spending visualizations.",
     // The profile README's line, its stack.
     stack: ["React", "Vite", "Cloudflare", "Google Sheets"],
-    demo: {
-      note: "No install: it runs in the browser.", // DRAFT
-      label: "Open the live demo", // DRAFT
-      // The repository's homepage on GitHub (openSource.test.ts checks).
-      href: "https://chameleon-finance-c4y.pages.dev/",
-    },
+    // No link to the running app: the repository's homepage on GitHub
+    // (chameleon-finance-c4y.pages.dev, which its README calls Production)
+    // did not resolve on 21-11-26. Link one only once the owner gives an
+    // address that loads; the card ends with its GitHub link until then.
   },
 };
 
@@ -206,4 +227,8 @@ export const openSourceStrip = {
   lead: "The agent skills I build with, a Thai SME tax handbook and a personal finance app. All MIT, all on GitHub.", // DRAFT
   cta: "All open source", // DRAFT
   updated: "updated", // DRAFT
+  // The title of each "updated" once it reads "5 days ago": the words count
+  // from the visitor's clock, the date from the snapshot, so it says when
+  // GitHub was read.
+  asOf: `GitHub as of ${formatDay(OPEN_SOURCE_SYNCED_ON)}`, // DRAFT
 } as const;

@@ -53,26 +53,39 @@ describe("the open-source projects", () => {
     }
   });
 
-  it("agrees with the skills snapshot", () => {
+  it("agrees with the skills snapshot: both Claude Code steps, typed there", () => {
     const superstacks = byRepo("KunanonJ/superstacks");
     expect(superstacks.facts.release?.tag).toBe(SKILLS_TAG);
-    expect(superstacks.install?.command).toBe(PACK_INSTALL.claudeCode[0]);
+    // The marketplace alone installs nothing: the plugin step follows it.
+    expect(superstacks.install?.map((step) => step.command)).toEqual(
+      PACK_INSTALL.claudeCode,
+    );
+    for (const step of superstacks.install!) expect(step.fence).toBe("text");
     expect(superstacks.more?.href).toBe("/skills");
   });
 
-  it("links OpenFinance's demo where GitHub says it lives", () => {
-    const openFinance = byRepo("KunanonJ/OpenFinance");
-    expect(openFinance.demo?.href).toBe(openFinance.facts.homepage);
-  });
-
-  it("copies the Thai install from its README, one step per line", () => {
-    const lines = byRepo(
-      "KunanonJ/thai-accounting-tax-law",
-    ).install!.command.split("\n");
+  it("copies the Thai install from its README, one command per line, for a terminal", () => {
+    const [step, ...rest] = byRepo("KunanonJ/thai-accounting-tax-law").install!;
+    expect(rest).toEqual([]);
+    expect(step!.fence).toBe("sh");
+    const lines = step!.command.split("\n");
     expect(lines).toHaveLength(3);
     expect(lines[0]).toBe(
       "git clone https://github.com/KunanonJ/thai-accounting-tax-law.git",
     );
+  });
+
+  it("links GitHub and this site only: no app for OpenFinance until one loads", () => {
+    // OpenFinance's homepage on GitHub did not resolve on 21-11-26
+    // (openSource.ts): an address off GitHub is linked only once checked.
+    for (const { facts: _facts, ...overlay } of OPEN_SOURCE_PROJECTS) {
+      const urls = JSON.stringify(overlay).match(/https?:\/\/[^\s"\\]+/g) ?? [];
+      for (const url of urls)
+        expect(url, overlay.name).toMatch(/^https:\/\/github\.com\//);
+    }
+    const openFinance = byRepo("KunanonJ/OpenFinance");
+    expect(openFinance.install).toBeUndefined();
+    expect(openFinance.more).toBeUndefined();
   });
 
   it("dates the snapshot on a UTC day that is not in the future", () => {

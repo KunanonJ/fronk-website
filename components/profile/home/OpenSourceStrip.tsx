@@ -13,7 +13,9 @@ import {
  * after the Journey's story and before the notebook, a smaller section
  * header with a pill to /open-source, then a tile per project that opens its
  * card there. Not a nav section: over it the scrollspy marks nothing, as
- * over the hero. Styles: `.pf-oss*` in src/styles/profile/home-hero.css
+ * over the hero. "updated 5 days ago" counts from the visitor's clock to
+ * the snapshot's last commit, so its title names the day GitHub was read.
+ * Styles: `.pf-oss*` in src/styles/profile/home-hero.css
  * (Home's own sheet); the badge is the Journey's, the tag mark and code are
  * the catalog's.
  */
@@ -64,7 +66,10 @@ export default function OpenSourceStrip() {
                   ) : null}
                   <span className="t-small text-ink-2">
                     {openSourceStrip.updated}{" "}
-                    <DaysAgo iso={project.facts.lastCommitAt} />
+                    <DaysAgo
+                      iso={project.facts.lastCommitAt}
+                      note={openSourceStrip.asOf}
+                    />
                   </span>
                 </span>
               </span>

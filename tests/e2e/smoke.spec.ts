@@ -2554,7 +2554,7 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/th/topics/ai-transformation-thailand",
     "/stack",
     "/proof",
-    // The open-source cards: two Copy pills, a demo pill and the foot links.
+    // The open-source cards: three Copy pills and the foot links.
     "/open-source",
   ];
 
@@ -3070,7 +3070,7 @@ test.describe("open source > the owner's projects, from the GitHub snapshot", ()
     }
   });
 
-  test("Copy puts the Superstacks marketplace command on the clipboard", async ({
+  test("Copy puts each Superstacks step on the clipboard: the marketplace, then the plugin", async ({
     page,
     context,
     browserName,
@@ -3081,15 +3081,28 @@ test.describe("open source > the owner's projects, from the GitHub snapshot", ()
     const card = page.getByRole("article", { name: "Superstacks" });
     // The Updated words show once the page has hydrated.
     await expect(card.locator("time[title]")).toBeVisible();
-    await card
-      .getByRole("button", { name: "Copy the Superstacks marketplace command" })
-      .click();
-    await expect(card.getByRole("status")).toHaveText(
-      "Copied the marketplace command",
-    );
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-      "/plugin marketplace add KunanonJ/superstacks",
-    );
+    for (const [name, announcement, command] of [
+      [
+        "Copy the Superstacks marketplace command",
+        "Copied the marketplace command",
+        "/plugin marketplace add KunanonJ/superstacks",
+      ],
+      [
+        "Copy the Superstacks plugin install command",
+        "Copied the plugin install command",
+        "/plugin install superstacks@superstacks",
+      ],
+    ]) {
+      // Each row has its own live region, beside its button.
+      const row = card
+        .locator(".pf-cat-command")
+        .filter({ has: page.getByRole("button", { name }) });
+      await row.getByRole("button", { name }).click();
+      await expect(row.getByRole("status")).toHaveText(announcement!);
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        command,
+      );
+    }
   });
 
   test("Updated is a date in the HTML and words after hydration, with no warning", async ({

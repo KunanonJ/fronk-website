@@ -220,7 +220,7 @@ describe("the open-source page in the agent docs", () => {
     for (const p of OPEN_SOURCE_PROJECTS) {
       expect(text).toContain(`### ${p.name}`);
       expect(text).toContain(p.facts.url);
-      if (p.install) expect(text).toContain(p.install.command);
+      for (const step of p.install ?? []) expect(text).toContain(step.command);
     }
   });
 

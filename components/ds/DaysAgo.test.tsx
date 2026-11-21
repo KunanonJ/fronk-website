@@ -31,6 +31,20 @@ describe("DaysAgo", () => {
     expect(time).toHaveAttribute("datetime", "2026-11-16");
   });
 
+  it("adds a note to the title, and only once the words show", () => {
+    const note = "GitHub as of 21 Nov 2026";
+    expect(renderToString(<DaysAgo iso={COMMIT} note={note} />)).toBe(
+      '<time dateTime="2026-11-16">16 Nov 2026</time>',
+    );
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-11-21T09:00:00Z"));
+    const { container } = render(<DaysAgo iso={COMMIT} note={note} />);
+    expect(container.querySelector("time")).toHaveAttribute(
+      "title",
+      "16 Nov 2026 (GitHub as of 21 Nov 2026)",
+    );
+  });
+
   it("keeps the date, untitled, when the visitor's clock is behind it", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-11-09T03:30:00Z"));

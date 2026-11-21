@@ -13,7 +13,7 @@ import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildBoard } from "@/lib/content/buildBoard";
 import { examplesByPersona } from "@/lib/content/examples";
-import { OPEN_SOURCE_PROJECTS } from "@/lib/content/openSource";
+import { OPEN_SOURCE_PROJECTS, shownStars } from "@/lib/content/openSource";
 import { stackItems } from "@/lib/content/stack";
 import { orbitRing } from "@/lib/landing/journey";
 import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
@@ -531,37 +531,64 @@ describe("OpenSourcePage", () => {
     ).toHaveAttribute("href", "/skills");
   });
 
-  it("copies the two installs, the Thai one as its README's three lines", () => {
+  it("copies Superstacks' two steps, and the Thai install as its README's three lines", () => {
     render(<OpenSourcePage />);
     const copies = screen.getAllByRole("button", { name: /^Copy / });
     expect(copies.map((b) => b.getAttribute("aria-label"))).toEqual([
       "Copy the Superstacks marketplace command",
+      "Copy the Superstacks plugin install command",
       "Copy the commands that add the Thai tax skill to Claude Code",
     ]);
+    // Superstacks: both Claude Code steps, numbered as on /skills, each a
+    // one-line row with Copy beside it.
+    const superstacks = card("Superstacks");
+    expect(
+      [...superstacks.querySelectorAll(".pf-cat-command__text")].map(
+        (code) => code.textContent,
+      ),
+    ).toEqual(
+      project("KunanonJ/superstacks").install!.map((step) => step.command),
+    );
+    expect(superstacks).toHaveTextContent(
+      "1. Add the marketplace (type it in Claude Code)",
+    );
+    expect(superstacks).toHaveTextContent("2. Install the plugin");
+    for (const row of superstacks.querySelectorAll(".pf-cat-command"))
+      expect(row).not.toHaveClass("pf-cat-command--lines");
+    // Thai: one row of three lines, each its own block, Copy under them.
     const thai = project("KunanonJ/thai-accounting-tax-law");
     const code = card(thai.name).querySelector("code")!;
-    expect(code.textContent).toBe(thai.install!.command);
-    expect(code.textContent!.split("\n")).toHaveLength(3);
+    expect(
+      [...code.querySelectorAll(".pf-cat-command__line")].map(
+        (line) => line.textContent,
+      ),
+    ).toEqual(thai.install![0]!.command.split("\n"));
     expect(code.closest(".pf-cat-command")).toHaveClass(
       "pf-cat-command--lines",
     );
-    // A one-line command keeps the /skills layout.
+    // The clone address breaks after a slash only: one box per part.
     expect(
-      card("Superstacks").querySelector(".pf-cat-command"),
-    ).not.toHaveClass("pf-cat-command--lines");
+      [...code.querySelectorAll(".pf-cat-command__part")]
+        .slice(0, 4)
+        .map((part) => part.textContent),
+    ).toEqual([
+      "https://",
+      "github.com/",
+      "KunanonJ/",
+      "thai-accounting-tax-law.git",
+    ]);
   });
 
-  it("opens OpenFinance's live demo where GitHub says it lives", () => {
+  it("ends OpenFinance's card with its repository: no app link until one loads", () => {
     render(<OpenSourcePage />);
     const openFinance = project("KunanonJ/OpenFinance");
-    const demo = within(card("OpenFinance")).getByRole("link", {
-      name: "Open the live demo (opens in a new tab)",
-    });
-    expect(demo).toHaveAttribute("href", openFinance.facts.homepage);
-    expect(demo).toHaveAttribute("target", "_blank");
+    const links = within(card("OpenFinance")).getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      openFinance.facts.url,
+    ]);
   });
 
-  it("states the latest release and the last update, and no stars under 25", () => {
+  it("states the latest release and the last update, and stars only from STARS_SHOWN_FROM", () => {
     render(<OpenSourcePage />);
     for (const p of OPEN_SOURCE_PROJECTS) {
       const facts = within(card(p.name));
@@ -574,9 +601,15 @@ describe("OpenSourcePage", () => {
         "datetime",
         p.facts.lastCommitAt.slice(0, 10),
       );
-      expect(p.facts.stars).toBeLessThan(25);
+      // The behaviour, not today's counts: a sync past 25 stars shows them.
+      const stars = shownStars(p.facts.stars);
+      const label = facts.queryByText("Stars");
+      if (stars === null) expect(label, p.name).toBeNull();
+      else
+        expect(label?.nextElementSibling, p.name).toHaveTextContent(
+          String(stars),
+        );
     }
-    expect(screen.queryByText("Stars")).toBeNull();
   });
 
   it("names the Thai README's language and the link's", () => {

@@ -31,6 +31,11 @@ import zlib from "node:zlib";
 // content modules (every SKILL.md, topics, portfolio) into the entry chunk
 // through route head() options. An earlier raise to 210 KB blamed the bento
 // chrome; that leak was the real cause.
+//
+// /open-source (21-11-26) stays here too, though it uses /stack's reading
+// shell: 162.0 KB at build. The default keeps it from taking in
+// lib/content/skills or SkillParts (the skills snapshot, about 43 KB), which
+// the marketing cap would let through.
 const DEFAULT_BUDGET_KB = 165;
 
 // Marketing: pages with heavier islands (forms, filters, skill sources, the
@@ -87,10 +92,6 @@ const MARKETING_EXACT = new Set([
   "/portfolio",
   // Skills (2026-11): landing nav + small tabs/copy-button islands.
   "/skills",
-  // Open source (21-11-26): /stack's reading shell plus the catalog's
-  // Copy islands; measured 162.0 KB at build, under the 165 KB default
-  // too, and held to the reading pages' cap like /stack and /proof.
-  "/open-source",
   // Résumé (phase 7b): moved into the site layout with the header, footer
   // and Share. Rendered on request (Sanity), and measured from `vite preview`
   // since 21-11-26 (ON_REQUEST_ROUTES); by hand before that, at 202.1 KB on

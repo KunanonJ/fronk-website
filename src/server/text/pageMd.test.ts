@@ -166,11 +166,22 @@ describe("open-source.md", () => {
     }
   });
 
-  it("keeps each install command whole in a sh fence", () => {
-    const installs = OPEN_SOURCE_PROJECTS.filter((p) => p.install);
-    expect(installs.length).toBe(2);
-    for (const p of installs)
-      expect(md).toContain(`\`\`\`sh\n${p.install!.command}\n\`\`\``);
+  it("keeps each install step whole under its label, fenced by where it is typed", () => {
+    const steps = OPEN_SOURCE_PROJECTS.flatMap((p) => p.install ?? []);
+    expect(steps.length).toBe(3);
+    for (const step of steps)
+      expect(md).toContain(
+        `${step.label}:\n\n\`\`\`${step.fence}\n${step.command}\n\`\`\``,
+      );
+    // Claude Code's slash commands are not shell commands.
+    expect(md).toContain(
+      "```text\n/plugin marketplace add KunanonJ/superstacks\n```",
+    );
+    expect(md).toContain(
+      "```text\n/plugin install superstacks@superstacks\n```",
+    );
+    expect(md).not.toMatch(/```sh\n\/plugin/);
+    expect(md).not.toContain("Live demo");
   });
 
   it("links absolutely only", () => {
