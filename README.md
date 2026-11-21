@@ -3,7 +3,7 @@
 [![CI](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml/badge.svg)](https://github.com/KunanonJ/fronk-website/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/live-kunanonj.com-111?style=flat&labelColor=111&color=34d399)](https://kunanonj.com)
 [![Cloudflare Workers](https://img.shields.io/badge/runtime-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
-[![Node](https://img.shields.io/badge/node-%3E%3D22.22-339933)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/node-%3E%3D26.13-339933)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Personal site of **Kunanon Jarat (Fronk)** — Bangkok founder building fintech
@@ -18,7 +18,7 @@ deployed on Cloudflare Workers.
 Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
 Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
-Runtime:   Node.js ≥22.22 · Cloudflare Workers (static assets, Worker cache)
+Runtime:   Node.js ≥26.13 (LTS) · Cloudflare Workers (static assets, Worker cache)
 Style:     Light by default; ink/paper/violet tokens, Instrument Serif + Onest + JetBrains Mono (profile redesign)
 ```
 
@@ -100,7 +100,7 @@ portfolio project needs its address in `run_worker_first`;
 
 ## Local development
 
-**Requirements:** Node.js **≥22.22.2** (see `.node-version`), pnpm **10.34+**.
+**Requirements:** Node.js **≥26.13.1** (Node 26 LTS, see `.node-version`), pnpm **10.34+**.
 
 ```bash
 # 1. Install dependencies
@@ -200,6 +200,13 @@ pnpm run deploy:staging  # build + deploy fronk-website-start (wrangler.start.js
 | ------- | -------- | ----- | ------ |
 | Deploy default branch | `main` | `pnpm run build:cloudflare` | `npx wrangler deploy` |
 | Deploy non-production branches | all except `main` | `pnpm run build:cloudflare` | `npx wrangler versions upload` |
+
+Workers Builds takes Node.js from `.node-version` and pnpm from
+`packageManager`. Cloudflare's
+[build image](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/)
+preinstalls Node 22.23.4 and 24.22.1, and any other version (26.13.1 here) is
+available as an override. Set it in `.node-version`, not in a `NODE_VERSION`
+build variable, so CI and the deploy run the same Node.
 
 **Merging** (`.github/workflows/automerge.yml`): a pull request merges itself,
 squashed, once every required check passes, and so deploys. That covers a
@@ -316,7 +323,7 @@ pnpm perf:budget
 node scripts/start-gates.mjs   # parity crawl + Playwright smoke and axe on the build
 ```
 
-CI pins Node **22.23.4** (`.node-version`) and runs typecheck, lint (no
+CI pins Node **26.13.1** (`.node-version`) and runs typecheck, lint (no
 warnings), Prettier, knip, unit tests, the production build, the first-load
 budgets (JS 165 KB gzip by default, 200 KB on marketing routes, 120 KB for the
 shared entry chunk; 36 KB of stylesheets; 52 KB of preloaded fonts; /resume
