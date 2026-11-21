@@ -6,28 +6,7 @@
   "engines": {
     "node": ">=26.13.1"
   },
-  "packageManager": "pnpm@10.34.9",
-  "pnpm": {
-    "overrides": {
-      "esbuild": "0.28.2",
-      "postcss": "8.5.33",
-      "@babel/core": "7.29.13",
-      "dompurify": "3.4.18",
-      "form-data": "4.0.6",
-      "js-yaml": "4.3.2",
-      "smol-toml": "1.9.1",
-      "tar": "7.5.23",
-      "undici@7": "7.30.2",
-      "ws": "8.23.0",
-      "adm-zip": "0.6.1",
-      "json-2-csv": "5.6.0",
-      "brace-expansion@5": "5.0.13",
-      "minimatch@10": "11.0.9"
-    },
-    "patchedDependencies": {
-      "eslint-plugin-react@7.37.5": "patches/eslint-plugin-react@7.37.5.patch"
-    }
-  },
+  "packageManager": "pnpm@12.21.0",
   "scripts": {
     "dev": "vite dev",
     "build": "pnpm sanity:manifest && vite build && pnpm sanity:schema:deploy",
