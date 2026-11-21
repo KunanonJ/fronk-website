@@ -52,6 +52,9 @@ describe("parity helpers", () => {
       normaliseUrl("https://kunanonj.com/x/opengraph-image-abc12?deadbeef"),
     ).toBe("https://kunanonj.com/x/opengraph-image");
     expect(normaliseUrl("/apple-icon?123")).toBe("/apple-icon");
+    expect(normaliseUrl("https://kunanonj.com/og/home-d4ddf2a2.mp4")).toBe(
+      "https://kunanonj.com/og/home.mp4",
+    );
   });
 
   it("drops framework plumbing and ignores tag order", () => {

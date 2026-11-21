@@ -3,6 +3,9 @@ import { queryFreeRedirect, redirectFor } from "./lib/redirects";
 import { handleCspReport } from "./server/cspReport";
 import {
   CSP_REPORT_PATH,
+  SHARE_MEDIA_CACHE,
+  SHARE_MEDIA_PATH,
+  withByteRanges,
   withSecurityHeaders,
   withServerFnNoStore,
 } from "./server/http";
@@ -15,7 +18,9 @@ import { handleSanityWebhook, type CachePurger } from "./server/revalidate";
  * not pass to routes: redirects, the Sanity webhook purge, and the choice
  * between a page's HTML and its Markdown for the pages that run the Worker
  * first. It also takes the Content Security Policy's violation reports,
- * which need no page framework. Everything else goes to Start. Every response it returns carries
+ * which need no page framework, and serves the share videos (public/og) in
+ * byte ranges, as video players fetch them. Everything else goes to Start.
+ * Every response it returns carries
  * the security headers (public/_headers covers static files), and a server
  * function's answer that sets no Cache-Control is marked no-store.
  *
@@ -59,6 +64,20 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     );
   }
   if (url.pathname === CSP_REPORT_PATH) return handleCspReport(request);
+  if (
+    url.pathname.startsWith(SHARE_MEDIA_PATH) &&
+    (request.method === "GET" || request.method === "HEAD")
+  ) {
+    // The whole file, whatever was asked; withByteRanges cuts the range.
+    const headers = new Headers(request.headers);
+    headers.delete("Range");
+    headers.delete("If-Range");
+    const file = await env.ASSETS.fetch(new Request(url, { headers }));
+    if (file.status === 200)
+      return withByteRanges(request, file, SHARE_MEDIA_CACHE);
+    if (file.status === 304) return file;
+    // No such file: Start's 404 page, as for any unknown path.
+  }
   const markdownPath = markdownPathFor(url.pathname);
   if (markdownPath && (request.method === "GET" || request.method === "HEAD")) {
     return negotiate(

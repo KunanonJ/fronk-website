@@ -50,7 +50,7 @@ describe("production Worker config (TanStack Start)", () => {
     expect(staging.triggers).toEqual({ crons: [] });
   });
 
-  it("runs the Worker first for trailing slashes and every page with a Markdown version", () => {
+  it("runs the Worker first for trailing slashes, every page with a Markdown version and the share videos", () => {
     // Named one by one: a "*" would catch the portfolio cover images, and a
     // "!" pattern skips the Worker entirely for what it matches.
     const expected = [
@@ -59,6 +59,8 @@ describe("production Worker config (TanStack Start)", () => {
       "/about",
       "/open-source",
       ...[...getAllPortfolioSlugs()].sort().map((slug) => `/portfolio/${slug}`),
+      // Byte ranges for the og:video (src/server/http.ts, withByteRanges).
+      "/og/*",
     ];
     for (const config of [wrangler, staging]) {
       expect(config.assets?.binding).toBe("ASSETS");
