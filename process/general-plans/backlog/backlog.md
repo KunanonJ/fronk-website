@@ -39,7 +39,7 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Root cause:** upstream release cadence. (The lint warnings listed here earlier were fixed in visual-redesign Phase 6a: lint is at 0.)
 - **Why deferred:** each is a separate, testable change outside the upgrade's scope.
 - **Fix options:**
-  1. Done 21-11-26 (Node 26.13.1, branch `node-26-lts`); the next move is Node 28 LTS before Node 26 leaves support on 2029-04-30.
+  1. Done 21-11-26 (Node 26.13.1, branch `node-26-lts`); the next move is Node 27, Active LTS from 2027-10-20, before Node 26 leaves support on 2029-04-30.
   2. Evaluate pnpm 12 (lockfile and settings migration) as its own plan.
   3. Bump the `typescript` alias once `@typescript/typescript6` publishes 6.0.3.
 
