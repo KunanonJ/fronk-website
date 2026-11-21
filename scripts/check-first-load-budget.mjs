@@ -87,6 +87,10 @@ const MARKETING_EXACT = new Set([
   "/portfolio",
   // Skills (2026-11): landing nav + small tabs/copy-button islands.
   "/skills",
+  // Open source (21-11-26): /stack's reading shell plus the catalog's
+  // Copy islands; measured 161.7 KB at build, under the 165 KB default
+  // too, and held to the reading pages' cap like /stack and /proof.
+  "/open-source",
   // Résumé (phase 7b): moved into the site layout with the header, footer
   // and Share. Rendered on request (Sanity), and measured from `vite preview`
   // since 21-11-26 (ON_REQUEST_ROUTES); by hand before that, at 202.1 KB on

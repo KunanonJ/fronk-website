@@ -38,6 +38,7 @@ const STATIC_ROUTES: readonly {
     changeFrequency: "monthly" as const,
     priority: 0.6,
   })),
+  { path: "/open-source", changeFrequency: "monthly", priority: 0.8 },
   ...TOPIC_SLUGS.map((slug) => ({
     path: `/topics/${slug}`,
     changeFrequency: "monthly" as const,

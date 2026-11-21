@@ -32,7 +32,14 @@ describe("the search index", () => {
     for (const skill of getAllSkills()) {
       expect(paths).toContain(`/skills/${skill.slug}`);
     }
-    for (const page of ["/", "/about", "/portfolio", "/resume", "/contact"]) {
+    for (const page of [
+      "/",
+      "/about",
+      "/portfolio",
+      "/resume",
+      "/contact",
+      "/open-source",
+    ]) {
       expect(paths).toContain(page);
     }
   });

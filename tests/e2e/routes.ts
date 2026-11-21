@@ -77,6 +77,12 @@ export const ROUTES: readonly RouteUnderTest[] = [
     expectsHeadingPattern: /verify-loop|Install this skill|SKILL\.md/i,
   },
   {
+    // The owner's three MIT projects, from the GitHub snapshot (21-11-26).
+    path: "/open-source",
+    name: "open-source",
+    expectsHeadingPattern: /Built in the open|Superstacks|OpenFinance/i,
+  },
+  {
     path: "/blog",
     name: "blog",
     expectsHeadingPattern: /Blog|Search posts|Read|GoGoCash|Manut|Bangkok/i,

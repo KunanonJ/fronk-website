@@ -6,12 +6,14 @@ import { describe, expect, it, vi } from "vitest";
 import BuildPage from "@/components/profile/pages/library/BuildPage";
 import ExamplesPage from "@/components/profile/pages/library/ExamplesPage";
 import LearnPage from "@/components/profile/pages/library/LearnPage";
+import OpenSourcePage from "@/components/profile/pages/library/OpenSourcePage";
 import ProofPage from "@/components/profile/pages/library/ProofPage";
 import StackPage from "@/components/profile/pages/library/StackPage";
 import { FALLBACK_BLOG_POSTS } from "@/lib/content/blog";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { buildBoard } from "@/lib/content/buildBoard";
 import { examplesByPersona } from "@/lib/content/examples";
+import { OPEN_SOURCE_PROJECTS } from "@/lib/content/openSource";
 import { stackItems } from "@/lib/content/stack";
 import { orbitRing } from "@/lib/landing/journey";
 import { TOPIC_SLUGS, getTopicPillar } from "@/lib/content/topics/pillars";
@@ -63,6 +65,7 @@ describe("the reading pages' h1s", () => {
       "/build",
       <BuildPage key="build" venture="all" onVentureChange={() => {}} />,
     ],
+    ["/open-source", <OpenSourcePage key="oss" />],
   ] as [string, ReactElement][])(
     "%s reads as the parity reference, in the hero's sky",
     (path, page) => {
@@ -472,5 +475,120 @@ describe("BuildPage", () => {
     render(<BuildPage venture="all" onVentureChange={onVentureChange} />);
     fireEvent.click(screen.getByRole("button", { name: /^GoGoCash/ }));
     expect(onVentureChange).toHaveBeenCalledWith("gogocash");
+  });
+});
+
+describe("OpenSourcePage", () => {
+  const project = (repo: string) =>
+    OPEN_SOURCE_PROJECTS.find((p) => p.facts.repo === repo)!;
+  const card = (name: string) => screen.getByRole("article", { name });
+
+  it("shows a card per project, in the owner's order, named by its h3", () => {
+    const { container } = render(<OpenSourcePage />);
+    expect(
+      screen
+        .getAllByRole("article")
+        .map((a) => a.getAttribute("aria-labelledby")),
+    ).toEqual(OPEN_SOURCE_PROJECTS.map((p) => `oss-${p.slug}`));
+    expect(
+      screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent),
+    ).toEqual([
+      "Superstacks",
+      "Thai Accounting, Tax & Business Law",
+      "OpenFinance",
+    ]);
+    // Each card is a list item with the project's anchor (/open-source#slug).
+    for (const p of OPEN_SOURCE_PROJECTS)
+      expect(container.querySelector(`li#${p.slug}`)).toContainElement(
+        card(p.name),
+      );
+    // Superstacks takes the whole row.
+    expect(container.querySelector("li#superstacks")).toHaveClass(
+      "pf-read-wide",
+    );
+    expectNoHiddenLinks(container);
+  });
+
+  it("links each repository in a new tab, and says so", () => {
+    render(<OpenSourcePage />);
+    for (const p of OPEN_SOURCE_PROJECTS) {
+      const link = within(card(p.name)).getByRole("link", {
+        name: new RegExp(`^${p.facts.url.replace("https://", "")}`),
+      });
+      expect(link).toHaveAttribute("href", p.facts.url);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link.getAttribute("rel")).toContain("noopener");
+      expect(link).toHaveAccessibleName(/\(opens in a new tab\)$/);
+    }
+  });
+
+  it("links Superstacks to the skills on this site", () => {
+    render(<OpenSourcePage />);
+    expect(
+      within(card("Superstacks")).getByRole("link", {
+        name: "Browse the skills",
+      }),
+    ).toHaveAttribute("href", "/skills");
+  });
+
+  it("copies the two installs, the Thai one as its README's three lines", () => {
+    render(<OpenSourcePage />);
+    const copies = screen.getAllByRole("button", { name: /^Copy / });
+    expect(copies.map((b) => b.getAttribute("aria-label"))).toEqual([
+      "Copy the Superstacks marketplace command",
+      "Copy the commands that add the Thai tax skill to Claude Code",
+    ]);
+    const thai = project("KunanonJ/thai-accounting-tax-law");
+    const code = card(thai.name).querySelector("code")!;
+    expect(code.textContent).toBe(thai.install!.command);
+    expect(code.textContent!.split("\n")).toHaveLength(3);
+    expect(code.closest(".pf-cat-command")).toHaveClass(
+      "pf-cat-command--lines",
+    );
+    // A one-line command keeps the /skills layout.
+    expect(
+      card("Superstacks").querySelector(".pf-cat-command"),
+    ).not.toHaveClass("pf-cat-command--lines");
+  });
+
+  it("opens OpenFinance's live demo where GitHub says it lives", () => {
+    render(<OpenSourcePage />);
+    const openFinance = project("KunanonJ/OpenFinance");
+    const demo = within(card("OpenFinance")).getByRole("link", {
+      name: "Open the live demo (opens in a new tab)",
+    });
+    expect(demo).toHaveAttribute("href", openFinance.facts.homepage);
+    expect(demo).toHaveAttribute("target", "_blank");
+  });
+
+  it("states the latest release and the last update, and no stars under 25", () => {
+    render(<OpenSourcePage />);
+    for (const p of OPEN_SOURCE_PROJECTS) {
+      const facts = within(card(p.name));
+      const release = facts.getByText("Latest release");
+      expect(release.nextElementSibling).toHaveTextContent(
+        p.facts.release!.tag,
+      );
+      const updated = facts.getByText("Updated").nextElementSibling!;
+      expect(updated.querySelector("time")).toHaveAttribute(
+        "datetime",
+        p.facts.lastCommitAt.slice(0, 10),
+      );
+      expect(p.facts.stars).toBeLessThan(25);
+    }
+    expect(screen.queryByText("Stars")).toBeNull();
+  });
+
+  it("names the Thai README's language and the link's", () => {
+    render(<OpenSourcePage />);
+    const thai = within(card("Thai Accounting, Tax & Business Law")).getByRole(
+      "link",
+      { name: /ภาษาไทย/ },
+    );
+    expect(thai).toHaveAttribute("hreflang", "th");
+    expect(thai.querySelector('span[lang="th"]')).toHaveTextContent("ภาษาไทย");
+    expect(thai).toHaveAccessibleName(
+      "ภาษาไทย (the README in Thai, opens in a new tab)",
+    );
   });
 });

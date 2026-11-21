@@ -141,6 +141,13 @@
     "seed": false
   },
   {
+    "path": "/open-source",
+    "test": "open-source"
+  },
+  {
+    "path": "/open-source.md"
+  },
+  {
     "path": "/opengraph-image",
     "seed": false
   },

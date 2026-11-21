@@ -1,0 +1,93 @@
+import { Fragment, type ReactNode } from "react";
+import CopyButton from "@/components/landing/skills/CopyButton";
+import { cn } from "@/lib/utils/cn";
+
+/*
+ * A command row and its parts (profile redesign Phase 7c; moved here from
+ * SkillParts.tsx on 21-11-26 for /open-source), so a page can show a
+ * command without importing lib/content/skills, whose snapshot carries every
+ * SKILL.md. SkillParts re-exports them for /skills and /skills/$slug.
+ * Styles: `.pf-cat-command*` in src/styles/profile/pages-catalog.css.
+ */
+
+/**
+ * Text that breaks only after a slash where a path or address runs long:
+ * a <wbr> after each "/", so "github.com/KunanonJ/superstacks" never splits
+ * inside a word. The text itself (and what Copy copies) is unchanged.
+ */
+export function SlashBreaks({ text }: { text: string }) {
+  return text.split("/").map((part, i, parts) => (
+    <Fragment key={i}>
+      {part}
+      {i < parts.length - 1 ? (
+        <>
+          /<wbr />
+        </>
+      ) : null}
+    </Fragment>
+  ));
+}
+
+/**
+ * A command's words, each kept whole: a line breaks only at a space, never
+ * inside a flag ("--copy") or a name ("verify-loop"). A word longer than
+ * the row still wraps inside its own box (`.pf-cat-command__word`), after a
+ * slash when `breakAfterSlash` is set.
+ */
+function CommandWords({
+  command,
+  breakAfterSlash,
+}: {
+  command: string;
+  breakAfterSlash: boolean;
+}) {
+  return command.split(/(\s+)/).map((part, i) =>
+    /^\s*$/.test(part) ? (
+      part
+    ) : (
+      <span key={i} className="pf-cat-command__word">
+        {breakAfterSlash ? <SlashBreaks text={part} /> : part}
+      </span>
+    ),
+  );
+}
+
+/**
+ * A command (or path) on the page colour with its Copy pill. The command
+ * wraps instead of scrolling, so the row never scrolls sideways on phones,
+ * and breaks only between its words; the pill drops under it when the row
+ * is narrow.
+ */
+export function CommandRow({
+  command,
+  accessibleLabel,
+  announcement,
+  label,
+}: {
+  command: string;
+  /** "Copy ..." naming what is copied, e.g. "Copy install command for verify-loop". */
+  accessibleLabel: string;
+  announcement: string;
+  /** Optional caption above the row. */
+  label?: ReactNode;
+}) {
+  // A README's steps, one per line (/open-source): the lines keep their
+  // breaks (pre-wrap), a long word breaks after a slash, and Copy sits under
+  // them (`.pf-cat-command--lines`). No /skills command has a newline.
+  const lines = command.includes("\n");
+  return (
+    <div className="pf-cat-stack">
+      {label ? <p className="t-small pf-cat-note">{label}</p> : null}
+      <div className={cn("pf-cat-command", lines && "pf-cat-command--lines")}>
+        <code className="pf-cat-command__text">
+          <CommandWords command={command} breakAfterSlash={lines} />
+        </code>
+        <CopyButton
+          text={command}
+          accessibleLabel={accessibleLabel}
+          announcement={announcement}
+        />
+      </div>
+    </div>
+  );
+}

@@ -77,7 +77,7 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  /* Each word of a command is one box (SkillParts' CommandWords), so a line
+  /* Each word of a command is one box (CommandRow's CommandWords), so a line
      breaks only at a space, never after the hyphen in "--copy"; a word
      longer than the row still wraps inside its box. */
   .pf-cat-command__word {
@@ -86,6 +86,11 @@
   }
   .pf-cat-command .ds-pill {
     margin-inline-start: auto;
+  }
+  /* A command of several lines (a README's steps; CommandRow): its lines
+     take the row and Copy goes under them. */
+  .pf-cat-command--lines .pf-cat-command__text {
+    flex-basis: 100%;
   }
   /* A copy button holds every word it can say in one cell, so it never
      changes width. */

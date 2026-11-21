@@ -7,6 +7,10 @@ import {
   PERSON_SOLOPRENEUR,
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
+import {
+  OPEN_SOURCE_PROJECTS,
+  OPEN_SOURCE_SYNCED_ON,
+} from "@/lib/content/openSource";
 import { operatingModel } from "@/lib/content/operatingModel";
 import { outcomeLine } from "@/lib/content/portfolio";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
@@ -19,6 +23,7 @@ import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
 import { SITE_ORIGIN } from "@/lib/site";
 import { textResponse } from "@/src/server/text/markdown";
+import { projectMarkdown } from "@/src/server/text/openSourceMd";
 import { portfolioGroups } from "@/src/server/text/portfolioGroups";
 
 /**
@@ -118,6 +123,14 @@ export function buildLlmsFull(): string {
     );
   }
   push("");
+
+  push(
+    `## Open source (as of ${OPEN_SOURCE_SYNCED_ON})`, // DRAFT
+    "",
+    `${SITE_ORIGIN}/open-source`,
+    "",
+  );
+  for (const p of OPEN_SOURCE_PROJECTS) push(...projectMarkdown(p, "###"), "");
 
   push("## FAQ", "");
   for (const f of FAQ_ITEMS) push(`Q: ${f.question}`, `A: ${f.answer}`, "");

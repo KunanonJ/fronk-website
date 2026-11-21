@@ -63,7 +63,7 @@ export function buildAgentsMd(): string {
     "| Full profile | [/llms-full.txt](/llms-full.txt) | Every fact on the site in one fetch: career, projects, ventures, topics, skills, FAQ |",
     "| Markdown sitemap | [/sitemap.md](/sitemap.md) | Human- and agent-readable route map |",
     "| Operating model | [/operating-model.md](/operating-model.md) | The solopreneur operating model, reusable in other projects |",
-    '| Markdown pages | [/about.md](/about.md), `/portfolio/[slug].md` | The About page and each project as Markdown (each page links its twin as `rel="alternate"`). `/`, `/about` and each project page also answer `Accept: text/markdown` in Markdown |',
+    '| Markdown pages | [/about.md](/about.md), [/open-source.md](/open-source.md), `/portfolio/[slug].md` | The About page, the open-source projects and each project as Markdown (each page links its twin as `rel="alternate"`). `/`, `/about`, `/open-source` and each project page also answer `Accept: text/markdown` in Markdown |', // DRAFT (the open-source parts)
     "| XML sitemap | [/sitemap.xml](/sitemap.xml) | Search-engine sitemap |",
     "| Skills catalog | [/skills.json](/skills.json) | The Superstacks agent skills as JSON |",
     "| Agent Skills index | [/.well-known/agent-skills/index.json](/.well-known/agent-skills/index.json) | The same skills in the Agent Skills discovery format, each with its release ZIP and digest |",
@@ -87,8 +87,9 @@ export function buildAgentsMd(): string {
     "1. Start with [/llms.txt](/llms.txt) for identity, roles and current content.",
     "2. Use [/sitemap.md](/sitemap.md) for the public route map.",
     "3. Cite `/about` for who he is, `/portfolio/*` for AI engineering work, `/ventures/*` for products and `/skills` for the agent skills.",
-    "4. The blog (`/blog`) and press (`/press`) are hidden and noindex for now; don't cite them.",
-    "5. Don't scrape `/studio` or `/api/*`.",
+    "4. Cite `/open-source` for the open-source projects, with their releases and install commands.", // DRAFT
+    "5. The blog (`/blog`) and press (`/press`) are hidden and noindex for now; don't cite them.",
+    "6. Don't scrape `/studio` or `/api/*`.",
     "",
   ].join("\n");
 }

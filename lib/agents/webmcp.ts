@@ -114,7 +114,7 @@ export function siteTools(deps: ToolDeps): SiteTool[] {
       name: "read_page",
       title: "Read a page",
       description:
-        "The Markdown version of a page: the Home (/), About (/about) or a project (/portfolio/<slug>). Other pages have none; get_full_profile covers them.",
+        "The Markdown version of a page: the Home (/), About (/about), Open source (/open-source) or a project (/portfolio/<slug>). Other pages have none; get_full_profile covers them.",
       inputSchema: {
         type: "object",
         properties: { path: PATH_PARAM },
@@ -126,7 +126,7 @@ export function siteTools(deps: ToolDeps): SiteTool[] {
         const markdown = page ? markdownPathFor(page) : null;
         if (!markdown) {
           return failure(
-            `No Markdown version of ${String(path)}. The Home (/), About (/about) and each project (/portfolio/<slug>) have one; get_full_profile covers the rest.`,
+            `No Markdown version of ${String(path)}. The Home (/), About (/about), Open source (/open-source) and each project (/portfolio/<slug>) have one; get_full_profile covers the rest.`,
           );
         }
         return text(await deps.fetchText(markdown));

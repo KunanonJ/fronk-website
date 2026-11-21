@@ -1,5 +1,6 @@
 import { SITE_UPDATED } from "@/lib/content/freshness";
 import { PERSON_NAME } from "@/lib/content/identity";
+import { OPEN_SOURCE_PROJECTS } from "@/lib/content/openSource";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { getAllSkills } from "@/lib/content/skills";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
@@ -63,6 +64,11 @@ export function buildSitemapMd(): string {
       "Skill",
       "One skill: install, SKILL.md source, files, origin",
     ],
+    [
+      "/open-source",
+      "Open source",
+      `${OPEN_SOURCE_PROJECTS.length} MIT projects on GitHub: ${OPEN_SOURCE_PROJECTS.map((p) => p.name).join("; ")}`, // DRAFT
+    ],
     ["/learn", "Learn", "Index of topic hubs and notes"],
     ["/examples", "Examples", "Scenarios by persona"],
     ["/stack", "Stack", "Tools by stage"],
@@ -104,6 +110,7 @@ export function buildSitemapMd(): string {
     "- Agents index: [/agents.md](/agents.md)",
     "- Solopreneur operating model: [/operating-model.md](/operating-model.md)",
     "- About as Markdown: [/about.md](/about.md); each portfolio project at `/portfolio/[slug].md`",
+    "- Open source as Markdown: [/open-source.md](/open-source.md)", // DRAFT
     "- Plain text for LLMs: [/llms.txt](/llms.txt)",
     "- Coding guide: [/skills.md](/skills.md)",
     "- Skills catalog (JSON): [/skills.json](/skills.json)",

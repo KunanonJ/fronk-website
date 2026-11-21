@@ -20,6 +20,7 @@ import { Route as IndexDotmdRouteImport } from './routes/index[.]md'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
+import { Route as OpenSourceDotmdRouteImport } from './routes/open-source[.]md'
 import { Route as OpengraphImageRouteImport } from './routes/opengraph-image'
 import { Route as OperatingModelDotmdRouteImport } from './routes/operating-model[.]md'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -35,6 +36,7 @@ import { Route as LandingBuildRouteImport } from './routes/_landing/build'
 import { Route as LandingContactRouteImport } from './routes/_landing/contact'
 import { Route as LandingExamplesRouteImport } from './routes/_landing/examples'
 import { Route as LandingLearnRouteImport } from './routes/_landing/learn'
+import { Route as LandingOpenSourceRouteImport } from './routes/_landing/open-source'
 import { Route as LandingPressRouteImport } from './routes/_landing/press'
 import { Route as LandingProofRouteImport } from './routes/_landing/proof'
 import { Route as LandingResumeRouteImport } from './routes/_landing/resume'
@@ -112,6 +114,11 @@ const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
   path: '/manifest.webmanifest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OpenSourceDotmdRoute = OpenSourceDotmdRouteImport.update({
+  id: '/open-source.md',
+  path: '/open-source.md',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OpengraphImageRoute = OpengraphImageRouteImport.update({
   id: '/opengraph-image',
   path: '/opengraph-image',
@@ -186,6 +193,11 @@ const LandingExamplesRoute = LandingExamplesRouteImport.update({
 const LandingLearnRoute = LandingLearnRouteImport.update({
   id: '/learn',
   path: '/learn',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingOpenSourceRoute = LandingOpenSourceRouteImport.update({
+  id: '/open-source',
+  path: '/open-source',
   getParentRoute: () => LandingRoute,
 } as any)
 const LandingPressRoute = LandingPressRouteImport.update({
@@ -321,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/open-source.md': typeof OpenSourceDotmdRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -335,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof LandingContactRoute
   '/examples': typeof LandingExamplesRoute
   '/learn': typeof LandingLearnRoute
+  '/open-source': typeof LandingOpenSourceRoute
   '/press': typeof LandingPressRoute
   '/proof': typeof LandingProofRoute
   '/resume': typeof LandingResumeRoute
@@ -370,6 +384,7 @@ export interface FileRoutesByTo {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/open-source.md': typeof OpenSourceDotmdRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -384,6 +399,7 @@ export interface FileRoutesByTo {
   '/contact': typeof LandingContactRoute
   '/examples': typeof LandingExamplesRoute
   '/learn': typeof LandingLearnRoute
+  '/open-source': typeof LandingOpenSourceRoute
   '/press': typeof LandingPressRoute
   '/proof': typeof LandingProofRoute
   '/resume': typeof LandingResumeRoute
@@ -421,6 +437,7 @@ export interface FileRoutesById {
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
+  '/open-source.md': typeof OpenSourceDotmdRoute
   '/opengraph-image': typeof OpengraphImageRoute
   '/operating-model.md': typeof OperatingModelDotmdRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -435,6 +452,7 @@ export interface FileRoutesById {
   '/_landing/contact': typeof LandingContactRoute
   '/_landing/examples': typeof LandingExamplesRoute
   '/_landing/learn': typeof LandingLearnRoute
+  '/_landing/open-source': typeof LandingOpenSourceRoute
   '/_landing/press': typeof LandingPressRoute
   '/_landing/proof': typeof LandingProofRoute
   '/_landing/resume': typeof LandingResumeRoute
@@ -473,6 +491,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
+    | '/open-source.md'
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
@@ -487,6 +506,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/examples'
     | '/learn'
+    | '/open-source'
     | '/press'
     | '/proof'
     | '/resume'
@@ -522,6 +542,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
+    | '/open-source.md'
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
@@ -536,6 +557,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/examples'
     | '/learn'
+    | '/open-source'
     | '/press'
     | '/proof'
     | '/resume'
@@ -572,6 +594,7 @@ export interface FileRouteTypes {
     | '/llms-full.txt'
     | '/llms.txt'
     | '/manifest.webmanifest'
+    | '/open-source.md'
     | '/opengraph-image'
     | '/operating-model.md'
     | '/robots.txt'
@@ -586,6 +609,7 @@ export interface FileRouteTypes {
     | '/_landing/contact'
     | '/_landing/examples'
     | '/_landing/learn'
+    | '/_landing/open-source'
     | '/_landing/press'
     | '/_landing/proof'
     | '/_landing/resume'
@@ -624,6 +648,7 @@ export interface RootRouteChildren {
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
+  OpenSourceDotmdRoute: typeof OpenSourceDotmdRoute
   OpengraphImageRoute: typeof OpengraphImageRoute
   OperatingModelDotmdRoute: typeof OperatingModelDotmdRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -721,6 +746,13 @@ declare module '@tanstack/react-router' {
       path: '/manifest.webmanifest'
       fullPath: '/manifest.webmanifest'
       preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/open-source.md': {
+      id: '/open-source.md'
+      path: '/open-source.md'
+      fullPath: '/open-source.md'
+      preLoaderRoute: typeof OpenSourceDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/opengraph-image': {
@@ -826,6 +858,13 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LandingLearnRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/open-source': {
+      id: '/_landing/open-source'
+      path: '/open-source'
+      fullPath: '/open-source'
+      preLoaderRoute: typeof LandingOpenSourceRouteImport
       parentRoute: typeof LandingRoute
     }
     '/_landing/press': {
@@ -998,6 +1037,7 @@ interface LandingRouteChildren {
   LandingContactRoute: typeof LandingContactRoute
   LandingExamplesRoute: typeof LandingExamplesRoute
   LandingLearnRoute: typeof LandingLearnRoute
+  LandingOpenSourceRoute: typeof LandingOpenSourceRoute
   LandingPressRoute: typeof LandingPressRoute
   LandingProofRoute: typeof LandingProofRoute
   LandingResumeRoute: typeof LandingResumeRoute
@@ -1020,6 +1060,7 @@ const LandingRouteChildren: LandingRouteChildren = {
   LandingContactRoute: LandingContactRoute,
   LandingExamplesRoute: LandingExamplesRoute,
   LandingLearnRoute: LandingLearnRoute,
+  LandingOpenSourceRoute: LandingOpenSourceRoute,
   LandingPressRoute: LandingPressRoute,
   LandingProofRoute: LandingProofRoute,
   LandingResumeRoute: LandingResumeRoute,
@@ -1062,6 +1103,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
+  OpenSourceDotmdRoute: OpenSourceDotmdRoute,
   OpengraphImageRoute: OpengraphImageRoute,
   OperatingModelDotmdRoute: OperatingModelDotmdRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
