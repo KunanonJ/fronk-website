@@ -1787,19 +1787,45 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       .toBeGreaterThan(0);
     // From 1024 px the email and the form share the first row, the email on
     // the left, and Elsewhere sits under the email: at the breakpoint and
-    // on a wide screen.
+    // on a wide screen. Every check polls: the columns settle over a few
+    // frames after a resize, and a single read of Elsewhere straight after
+    // the row check once caught it 31 px off under load.
     for (const size of [
       { width: 1024, height: 768 },
       { width: 1440, height: 900 },
     ]) {
+      const at = `at ${size.width} px`;
       await page.setViewportSize(size);
       await expect
-        .poll(async () => Math.abs((await box(email)).y - (await box(form)).y))
+        .poll(
+          async () => Math.abs((await box(email)).y - (await box(form)).y),
+          { message: `the email and the form share a row ${at}` },
+        )
         .toBeLessThan(2);
-      const left = await box(email);
-      expect((await box(form)).x).toBeGreaterThan(left.x + left.width);
-      expect(Math.abs((await box(elsewhere)).x - left.x)).toBeLessThan(2);
-      expect((await box(elsewhere)).y).toBeGreaterThan(left.y + left.height);
+      await expect
+        .poll(
+          async () => {
+            const left = await box(email);
+            return (await box(form)).x - (left.x + left.width);
+          },
+          { message: `the form starts right of the email ${at}` },
+        )
+        .toBeGreaterThan(0);
+      await expect
+        .poll(
+          async () => Math.abs((await box(elsewhere)).x - (await box(email)).x),
+          { message: `Elsewhere lines up with the email ${at}` },
+        )
+        .toBeLessThan(2);
+      await expect
+        .poll(
+          async () => {
+            const above = await box(email);
+            return (await box(elsewhere)).y - (above.y + above.height);
+          },
+          { message: `Elsewhere starts below the email ${at}` },
+        )
+        .toBeGreaterThan(0);
     }
     // The page is the call to action: the footer keeps its card, not its own.
     const footer = page.locator("footer[data-site-chrome]");
