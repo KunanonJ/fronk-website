@@ -16,7 +16,7 @@ import {
  * The name is the card's one link to the skill's page, named by the name
  * alone; its ::after (`.ds-stretch`) covers the card, so the whole card
  * opens the page, and "Details →" only says so. Copy and ZIP sit above the
- * cover and name their skill for screen readers, so twenty "Copy install"
+ * cover and name their skill for screen readers, so the many "Copy install"
  * and "ZIP" never collide.
  */
 export default function SkillCard({ skill }: { skill: Skill }) {

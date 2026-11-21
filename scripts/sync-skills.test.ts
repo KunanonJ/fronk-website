@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  OUTPUT_PATH,
+  SKILL_MD_DIR,
+  bangkokDate,
   buildSnapshot,
   parseFrontmatter,
   serializeSnapshot,
+  snapshotFiles,
 } from "./sync-skills.mjs";
 
 describe("parseFrontmatter", () => {
@@ -210,6 +214,37 @@ describe("buildSnapshot", () => {
     expect(serializeSnapshot(buildSnapshot(fixture()))).toBe(first);
     expect(first.endsWith("}\n")).toBe(true);
     expect(first).not.toMatch(/generatedAt|"date"/);
+  });
+
+  it("writes each SKILL.md to a file of its own and keeps the JSON free of them", () => {
+    const raw = fixture();
+    raw.skillFiles.alpha = skillMd("alpha").replace(/\n/g, "\r\n");
+    const files = snapshotFiles(buildSnapshot(raw));
+    expect([...files.keys()]).toEqual([
+      OUTPUT_PATH,
+      `${SKILL_MD_DIR}/alpha.md`,
+      `${SKILL_MD_DIR}/zeta.md`,
+    ]);
+    // The SKILL.md as the tag has it, newlines normalised.
+    expect(files.get(`${SKILL_MD_DIR}/alpha.md`)).toBe(skillMd("alpha"));
+    expect(files.get(`${SKILL_MD_DIR}/zeta.md`)).toBe(skillMd("zeta"));
+    const json = files.get(OUTPUT_PATH)!;
+    expect(json).toBe(serializeSnapshot(buildSnapshot(raw)));
+    expect(json).not.toContain('"content"');
+    expect(json).not.toContain("# alpha");
+  });
+
+  it("dates the release on its day in Bangkok (UTC+7), not in UTC", () => {
+    expect(buildSnapshot(fixture()).releaseDate).toBe("2026-01-01");
+    const late = fixture();
+    late.release.published_at = "2026-11-16T21:38:16Z";
+    const snap = buildSnapshot(late);
+    expect(snap.publishedAt).toBe("2026-11-16T21:38:16Z");
+    expect(snap.releaseDate).toBe("2026-11-17");
+    // Midnight in Bangkok is 17:00 UTC the day before.
+    expect(bangkokDate("2026-12-31T16:59:59Z")).toBe("2026-12-31");
+    expect(bangkokDate("2026-12-31T17:00:00Z")).toBe("2027-01-01");
+    expect(() => bangkokDate("not a date")).toThrow(/published_at/);
   });
 
   it("fails loudly when the release or the lock disagrees with the repo", () => {

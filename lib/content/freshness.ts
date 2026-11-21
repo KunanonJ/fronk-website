@@ -23,6 +23,7 @@
  *
  * 2026-11-21: /about says each thing once (UX sweep), and its Now section
  * calls the owner a Protocol Camp cohort 2025 alum (the cohort ended in
- * January 2026).
+ * January 2026). Same day: the skills hub moved to Superstacks v6.7.0 (22
+ * skills, with `ama` and `owner-decisions` new).
  */
 export const SITE_UPDATED = "2026-11-21";

@@ -1,5 +1,8 @@
+import { readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { primaryNav } from "@/lib/content/landing";
+import { PAGE_META } from "@/lib/content/pageMeta";
+import { loadSkillMd } from "@/lib/content/skillMd";
 import snapshot from "@/lib/content/skills.generated.json";
 import {
   ADAPTED_COUNT,
@@ -35,9 +38,9 @@ const assetNames = new Set<string>([
 const releaseDownload = `${SKILLS_REPO_URL}/releases/download/${SKILLS_TAG}`;
 
 describe("skills snapshot", () => {
-  it("has the 20 superstacks skills", () => {
-    expect(snapshot.skills).toHaveLength(20);
-    expect(skills).toHaveLength(20);
+  it("has the 22 superstacks skills", () => {
+    expect(snapshot.skills).toHaveLength(22);
+    expect(skills).toHaveLength(22);
   });
 
   it("is pinned to one release tag", () => {
@@ -55,17 +58,33 @@ describe("skills snapshot", () => {
       expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
   });
 
-  it("gives every skill a description, a license and a SKILL.md", () => {
+  it("gives every skill a description, a license and a SKILL.md", async () => {
     for (const s of skills) {
       expect(s.description.trim(), s.slug).not.toBe("");
       expect(s.license, s.slug).toBe("MIT");
-      expect(s.content.startsWith("---\n"), s.slug).toBe(true);
-      expect(s.content, s.slug).toContain(`name: ${s.name}`);
+      const skillMd = await loadSkillMd(s.slug);
+      expect(skillMd.startsWith("---\n"), s.slug).toBe(true);
+      expect(skillMd, s.slug).toContain(`name: ${s.name}`);
       expect(
         s.files.some((f) => f.path === "SKILL.md"),
         s.slug,
       ).toBe(true);
     }
+  });
+
+  it("keeps every SKILL.md out of the snapshot, one file per skill beside it", async () => {
+    // Every skills page imports the snapshot; a body in it would ship to all.
+    for (const raw of snapshot.skills)
+      expect(raw).not.toHaveProperty("content");
+    // The .md bodies only: Finder's .DS_Store is not a skill.
+    expect(
+      readdirSync("lib/content/skill-md")
+        .filter((name) => name.endsWith(".md"))
+        .sort(),
+    ).toEqual(snapshot.skills.map((s) => `${s.name}.md`).sort());
+    await expect(loadSkillMd("no-such-skill")).rejects.toThrow(
+      /No SKILL\.md for no-such-skill/,
+    );
   });
 });
 
@@ -93,12 +112,26 @@ describe("skills stages", () => {
       expect(getSkillBySlug(step.slug), step.slug).not.toBeNull();
     }
   });
+
+  it("pins the pipeline order copied from the Superstacks v6.7.0 README, ama first", () => {
+    expect(SKILL_PIPELINE.map((step) => step.slug)).toEqual([
+      "ama",
+      "how",
+      "writing-plans",
+      "verify-loop",
+      "test-driven-development",
+      "verification-before-completion",
+      "code-review",
+      "interrogate",
+      "pr",
+    ]);
+  });
 });
 
 describe("skills attribution", () => {
-  it("marks 12 skills adapted and 8 original", () => {
+  it("marks 12 skills adapted and 10 original", () => {
     expect(ADAPTED_COUNT).toBe(12);
-    expect(ORIGINAL_COUNT).toBe(8);
+    expect(ORIGINAL_COUNT).toBe(10);
   });
 
   it("gives every adapted skill its source, pinned SHA, license and copyright", () => {
@@ -261,9 +294,46 @@ describe("skills page copy", () => {
     expect(`${muted} ${rest} ${accent}`).toBe(skillsPage.title);
   });
 
-  it("dates the release from the snapshot", () => {
-    expect(SKILLS_RELEASE_DATE).toBe(snapshot.publishedAt.slice(0, 10));
+  it("dates the release from the snapshot, on the day in Bangkok", () => {
+    expect(SKILLS_RELEASE_DATE).toBe(snapshot.releaseDate);
     expect(SKILLS_RELEASE_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(SKILLS_RELEASE_MONTH).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
+    // The day in Bangkok (UTC+7, no DST) of the release, whatever the tag:
+    // v6.7.0 went out at 21:38 UTC on 16 Nov, which the pack's CHANGELOG
+    // dates 17 Nov (sync-skills.test.ts pins that case).
+    const bangkok = new Date(Date.parse(snapshot.publishedAt) + 7 * 3_600_000)
+      .toISOString()
+      .slice(0, 10);
+    expect(SKILLS_RELEASE_DATE).toBe(bangkok);
+    const [year, month] = bangkok.split("-");
+    expect(SKILLS_RELEASE_MONTH).toBe(
+      `${new Date(Date.UTC(Number(year), Number(month) - 1, 1)).toLocaleString("en-US", { month: "short", timeZone: "UTC" })} ${year}`,
+    );
+  });
+
+  it("spells out the skill count the snapshot holds", () => {
+    const ones = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+    ];
+    const tens = ["", "", "twenty", "thirty", "forty"];
+    const n = skills.length;
+    // Covers 20 to 49, as far as the pack is likely to grow between syncs.
+    expect(n).toBeGreaterThanOrEqual(20);
+    expect(n).toBeLessThan(50);
+    const tensWord = tens[Math.floor(n / 10)]!;
+    const word = n % 10 ? `${tensWord}-${ones[n % 10]}` : tensWord;
+    expect(skillsPage.description).toContain(`These are the ${word} I use`);
+    expect(PAGE_META.skills.description).toMatch(
+      new RegExp(`^${word} MIT-licensed agent skills`, "i"),
+    );
   });
 });

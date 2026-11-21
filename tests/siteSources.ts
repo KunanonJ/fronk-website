@@ -2,10 +2,14 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /**
- * Third-party text copied in by `pnpm skills:sync`. The site shows it, but it
- * is not the owner's wording, so the audits of his claims leave it out.
+ * Third-party text copied in by `pnpm skills:sync`: the snapshot and the
+ * folder of SKILL.md files. The site shows it, but it is not the owner's
+ * wording, so the audits of the owner's claims leave it out.
  */
-const THIRD_PARTY = new Set(["lib/content/skills.generated.json"]);
+const THIRD_PARTY = new Set([
+  "lib/content/skills.generated.json",
+  "lib/content/skill-md",
+]);
 
 export type SiteSource = { file: string; text: string };
 
@@ -28,11 +32,11 @@ export function siteSources(): readonly SiteSource[] {
   const walk = (dir: string) => {
     for (const name of readdirSync(dir)) {
       const file = join(dir, name);
+      if (THIRD_PARTY.has(file)) continue;
       if (statSync(file).isDirectory()) walk(file);
       else if (
         /\.(ts|tsx|json|md|mdx|mjs)$/.test(name) &&
-        !/\.test\.tsx?$/.test(name) &&
-        !THIRD_PARTY.has(file)
+        !/\.test\.tsx?$/.test(name)
       )
         out.push({ file, text: readFileSync(file, "utf8") });
     }

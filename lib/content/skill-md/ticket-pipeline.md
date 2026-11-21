@@ -1,0 +1,47 @@
+---
+name: ticket-pipeline
+description: Use when running a ticket from discovery through a draft PR. Sequences how, plans, verify-loop, TDD, verification, review, optional interrogate, then pr.
+license: MIT
+disable-model-invocation: true
+---
+
+# Ticket pipeline
+
+Run a ticket from discovery through a **draft** pull request. `safety-overrides` beat every step.
+
+Put evidence in the PR body under the headings this skill names. Then run the status script. Do not argue in prose about which steps are done:
+
+```text
+python <this-skill>/scripts/pipeline_status.py --pr-body BODY.md
+```
+
+Re-run until the script prints `missing: 0`.
+
+## Sequence
+
+1. **ama** — make the assignment clear: look first, ask the owner only what is unclear. No heading needed.
+2. **how** — build a mental model before changing code. Heading: `## How`.
+3. **writing-plans** — plan in the pull request body. Heading: `## Plan`.
+4. **verify-loop** — define the deterministic check, run it red (`VERIFY_FAIL`), then iterate.
+5. **test-driven-development** — if the check is a test: failing test, then minimal code. Heading: `## TDD` (include `red-green`).
+6. **verification-before-completion** — paste fresh `verify-loop` runner output. Heading: `## Evidence`.
+7. **code-review** — Standards and Spec axes on the branch diff. Heading: `## Code review`.
+8. **interrogate** — required for one-way doors (money movement, schema or data migrations, auth, data deletion, infra or prod config, licences). Heading: `## Interrogate`, or write `N/A (two-way door)`.
+9. **pr** — draft pull request body. Run `pr/scripts/check_pr_body.py`. Ticket links are `Refs #N` only.
+
+## Hard rules (also in safety-overrides)
+
+- Draft PRs. Never mark ready. Merge only as `trust_level` in safety-overrides allows. Read the owner's recorded decisions through `owner-decisions` first; with none, a human merges.
+- Push only this branch. Rewrite with `--force-with-lease` only.
+- No production credentials, live infrastructure, runtime package installs, or secret-using CI jobs.
+- No tracker or chat writes from a ticket.
+- Skip a blocking approval gate only with `Ruling: what / why` in the PR body.
+
+## Stacked pull requests
+
+When one ticket is too large for a single reviewable PR, split it into layers:
+
+- One concern per layer. Dependencies belong in the same layer or a lower one.
+- Open the next layer while the lower one is still in review.
+- Merge bottom-up. When merging through the API, use the asynchronous merge endpoint for stacks.
+- Prefer `gh stack` for cascading rebases. If stacks are unavailable, chain pull requests with plain base-branch targeting.

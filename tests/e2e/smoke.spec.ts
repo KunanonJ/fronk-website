@@ -423,7 +423,7 @@ test.describe("skills > the catalog filter is a typed search param", () => {
     await expect(
       group.getByRole("button", { name: /^You invoke/ }),
     ).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/^Showing \d+ of 20 skills$/)).toBeVisible();
+    await expect(page.getByText(/^Showing \d+ of 22 skills$/)).toBeVisible();
     // Verify and ship holds only skills the agent loads on its own.
     const ship = page.getByRole("article", { name: "Verify and ship" });
     await expect(ship).toHaveCount(0);
@@ -447,6 +447,98 @@ test.describe("skills > the catalog filter is a typed search param", () => {
         .getByRole("group", { name: "Show" })
         .getByRole("button", { name: /^All/ }),
     ).toHaveAttribute("aria-pressed", "true");
+  });
+});
+
+test.describe("skills > each skill page loads its own SKILL.md and no other", () => {
+  /** A SKILL.md's opening lines, as a script carries them (escaped or not). */
+  const FRONTMATTER = /---(?:\\n|\n)name: ([a-z-]+)(?:\\n|\n)description: /g;
+
+  /** The SKILL.md the sync wrote, as the page shows it. */
+  const skillMd = (slug: string) =>
+    readFileSync(`lib/content/skill-md/${slug}.md`, "utf8").replace(/\n+$/, "");
+
+  /** The SKILL.md card's text: its one or two blocks, a line apart. */
+  async function shownSkillMd(page: Page) {
+    const blocks = await page.locator("#skill-md pre").allTextContents();
+    return blocks.join("\n");
+  }
+
+  /** Every script the page fetches, and the skills whose SKILL.md each holds. */
+  function watchScripts(page: Page) {
+    const bodies: Promise<string>[] = [];
+    page.on("response", (res) => {
+      if (res.request().resourceType() === "script")
+        bodies.push(res.text().catch(() => ""));
+    });
+    return async () => {
+      const names = (await Promise.all(bodies)).flatMap((body) =>
+        [...body.matchAll(FRONTMATTER)].map((m) => m[1]!),
+      );
+      return [...new Set(names)].sort();
+    };
+  }
+
+  test("/skills loads none; a skill, its next one and Back each show their own", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+    const loaded = watchScripts(page);
+
+    await page.goto("/skills", { waitUntil: "networkidle" });
+    expect(await loaded(), "SKILL.md bodies loaded by /skills").toEqual([]);
+
+    // Client-side navigations: each fetches only the skill it opens.
+    await page
+      .getByRole("article", { name: "ama", exact: true })
+      .getByRole("link", { name: "ama", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/skills\/ama$/);
+    await expect(page.locator("h1")).toHaveText("ama");
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("ama"));
+
+    await page
+      .getByRole("navigation", { name: "More skills" })
+      .getByRole("link", { name: /^Next/ })
+      .click();
+    await expect(page).toHaveURL(/\/skills\/how$/);
+    await expect(page.locator("h1")).toHaveText("how");
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("how"));
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/skills\/ama$/);
+    await expect.poll(() => shownSkillMd(page)).toBe(skillMd("ama"));
+    expect(await loaded()).toEqual(["ama", "how"]);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("a skill page loaded directly shows its SKILL.md from the page itself", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && isRealError(msg.text()))
+        errors.push(msg.text());
+    });
+    const loaded = watchScripts(page);
+
+    await page.goto("/skills/ama", { waitUntil: "networkidle" });
+    expect(await shownSkillMd(page)).toBe(skillMd("ama"));
+    // The prerendered page carries the text in its loader data, so hydration
+    // fetches no SKILL.md, and Show all works once it has run.
+    expect(await loaded()).toEqual([]);
+    const toggle = page.locator('button[aria-controls="skill-md"]');
+    await expect(toggle).toHaveText(/^Show all \d+ lines$/);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator("#skill-md pre").last()).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
   });
 });
 
@@ -1695,19 +1787,45 @@ test.describe("recruiter path > the role, the availability and the résumé are 
       .toBeGreaterThan(0);
     // From 1024 px the email and the form share the first row, the email on
     // the left, and Elsewhere sits under the email: at the breakpoint and
-    // on a wide screen.
+    // on a wide screen. Every check polls: the columns settle over a few
+    // frames after a resize, and a single read of Elsewhere straight after
+    // the row check once caught it 31 px off under load.
     for (const size of [
       { width: 1024, height: 768 },
       { width: 1440, height: 900 },
     ]) {
+      const at = `at ${size.width} px`;
       await page.setViewportSize(size);
       await expect
-        .poll(async () => Math.abs((await box(email)).y - (await box(form)).y))
+        .poll(
+          async () => Math.abs((await box(email)).y - (await box(form)).y),
+          { message: `the email and the form share a row ${at}` },
+        )
         .toBeLessThan(2);
-      const left = await box(email);
-      expect((await box(form)).x).toBeGreaterThan(left.x + left.width);
-      expect(Math.abs((await box(elsewhere)).x - left.x)).toBeLessThan(2);
-      expect((await box(elsewhere)).y).toBeGreaterThan(left.y + left.height);
+      await expect
+        .poll(
+          async () => {
+            const left = await box(email);
+            return (await box(form)).x - (left.x + left.width);
+          },
+          { message: `the form starts right of the email ${at}` },
+        )
+        .toBeGreaterThan(0);
+      await expect
+        .poll(
+          async () => Math.abs((await box(elsewhere)).x - (await box(email)).x),
+          { message: `Elsewhere lines up with the email ${at}` },
+        )
+        .toBeLessThan(2);
+      await expect
+        .poll(
+          async () => {
+            const above = await box(email);
+            return (await box(elsewhere)).y - (above.y + above.height);
+          },
+          { message: `Elsewhere starts below the email ${at}` },
+        )
+        .toBeGreaterThan(0);
     }
     // The page is the call to action: the footer keeps its card, not its own.
     const footer = page.locator("footer[data-site-chrome]");
@@ -2275,7 +2393,7 @@ test.describe("agent readiness", () => {
     expect(index.$schema).toBe(
       "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
     );
-    expect(index.skills).toHaveLength(20);
+    expect(index.skills).toHaveLength(22);
     for (const skill of index.skills) {
       expect(skill.type, skill.name).toBe("archive");
       expect(skill.url, skill.name).toMatch(/-flat\.zip$/);

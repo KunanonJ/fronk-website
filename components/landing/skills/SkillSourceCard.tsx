@@ -16,9 +16,15 @@ const HEAD_LINES = 15;
  * disclosure for the rest; the rest is in the HTML either way (`hidden`), so
  * crawlers and Copy always get the whole file. Short files show in full.
  */
-export default function SkillSourceCard({ skill }: { skill: Skill }) {
+export default function SkillSourceCard({
+  skill,
+  skillMd,
+}: {
+  skill: Skill;
+  skillMd: string;
+}) {
   const [open, setOpen] = useState(false);
-  const lines = skill.content.replace(/\n+$/, "").split("\n");
+  const lines = skillMd.replace(/\n+$/, "").split("\n");
   const long = lines.length > HEAD_LINES;
   const head = long ? lines.slice(0, HEAD_LINES) : lines;
 
@@ -34,7 +40,7 @@ export default function SkillSourceCard({ skill }: { skill: Skill }) {
         </h2>
         <div className="pf-skill-source__actions">
           <CopyButton
-            text={skill.content}
+            text={skillMd}
             accessibleLabel={`Copy the SKILL.md of ${skill.name}`}
             announcement={`Copied the SKILL.md of ${skill.name}`}
           />

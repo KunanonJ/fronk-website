@@ -998,8 +998,14 @@
 
   /* Breakpoints (spec 4.1 and 10.1). */
   @media (width >= 37.5rem) {
+    /* The pipeline's nine steps fill three rows of three from here up, so
+       no step sits alone on a row (two or four columns left one); phones
+       keep one column. A new step count needs a new column count:
+       profile-pages-catalog.spec.ts checks every row from 320 to 1920 px. */
+    .pf-skill-steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .pf-status__grid,
-    .pf-skill-steps,
     .pf-skill-stage__grid,
     .pf-skill-grid,
     .pf-skill-pager {
@@ -1025,9 +1031,6 @@
     }
     .pf-skill-tile--wide {
       grid-column: 1 / -1;
-    }
-    .pf-skill-steps {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
     .pf-skill-stage__grid,
     .pf-skill-grid {

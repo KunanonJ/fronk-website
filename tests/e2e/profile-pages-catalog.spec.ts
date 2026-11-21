@@ -414,7 +414,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     }
   });
 
-  test("the skills pipeline: eight steps in order, each a link to its skill", async ({
+  test("the skills pipeline: nine steps in order, each a link to its skill", async ({
     page,
   }) => {
     await prepare(page);
@@ -422,7 +422,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     const steps = page
       .getByRole("article", { name: "The pipeline" })
       .getByRole("listitem");
-    await expect(steps).toHaveCount(8);
+    await expect(steps).toHaveCount(9);
     for (const step of await steps.all()) {
       await expect(step.getByRole("link")).toHaveAttribute(
         "href",
@@ -439,5 +439,47 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     const codex = tabs.getByRole("tab", { name: "Codex" });
     await expect(codex).toHaveAttribute("aria-selected", "true");
     await expect(codex).toBeFocused();
+  });
+
+  test("the skills pipeline leaves no step alone on a row, 320 to 1920 px", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await open(page, PAGES.skills);
+    const steps = page
+      .getByRole("article", { name: "The pipeline" })
+      .getByRole("listitem");
+    await expect(steps).toHaveCount(9);
+    /** How many steps sit on each row, top to bottom. */
+    const rows = () =>
+      steps.evaluateAll((items) => {
+        const counts = new Map<number, number>();
+        for (const item of items) {
+          const top = Math.round(item.getBoundingClientRect().top);
+          counts.set(top, (counts.get(top) ?? 0) + 1);
+        }
+        return [...counts.entries()]
+          .sort(([a], [b]) => a - b)
+          .map(([, n]) => n);
+      });
+    // One column on phones; three rows of three from 600 px (two or four
+    // columns left the ninth step alone).
+    const oneColumn = Array<number>(9).fill(1);
+    for (const [width, expected] of [
+      [320, oneColumn],
+      [390, oneColumn],
+      [599, oneColumn],
+      [600, [3, 3, 3]],
+      [768, [3, 3, 3]],
+      [1023, [3, 3, 3]],
+      [1024, [3, 3, 3]],
+      [1440, [3, 3, 3]],
+      [1920, [3, 3, 3]],
+    ] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect
+        .poll(rows, { message: `steps per row at ${width} px` })
+        .toEqual(expected);
+    }
   });
 });

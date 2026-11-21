@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { JsonLd } from "@/components/JsonLd";
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import SkillDetailPage from "@/components/landing/skills/SkillDetailPage";
+import { loadSkillMd } from "@/lib/content/skillMd";
 import {
   getSkillBySlug,
   skillMetaDescription,
@@ -16,6 +17,7 @@ import { routeShareMeta } from "@/lib/seo/routeMeta";
 /** One skill's page: its breadcrumb and skill JSON-LD, then the skill. */
 function SkillRoute() {
   const { slug } = Route.useParams();
+  const { skillMd } = Route.useLoaderData();
   const skill = getSkillBySlug(slug);
   if (!skill) throw notFound();
 
@@ -29,13 +31,13 @@ function SkillRoute() {
         ])}
       />
       <JsonLd data={buildSkillJsonLd(skill)} />
-      <SkillDetailPage skill={skill} />
+      <SkillDetailPage skill={skill} skillMd={skillMd} />
     </ProfileMain>
   );
 }
 
 export const Route = createFileRoute("/_landing/skills/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const skill = getSkillBySlug(params.slug);
     if (!skill) throw notFound();
     return {
@@ -48,6 +50,10 @@ export const Route = createFileRoute("/_landing/skills/$slug")({
         }),
         { fileOgImage: fileOg(`/skills/${params.slug}`, "Agent skill") },
       ),
+      // This skill's SKILL.md only (lib/content/skillMd.ts): read at build
+      // time for the prerendered page, fetched as its own chunk on a
+      // client-side navigation.
+      skillMd: await loadSkillMd(skill.slug),
     };
   },
   head: ({ loaderData }) => loaderData?.head ?? {},

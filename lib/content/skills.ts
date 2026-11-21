@@ -2,8 +2,8 @@
  * Skills hub: the agent skills in the public `KunanonJ/superstacks` plugin.
  *
  * Data: `skills.generated.json` is a committed snapshot written by
- * `scripts/sync-skills.mjs` (`pnpm skills:sync`). The build reads only that
- * file and never calls GitHub. Re-run the sync after cutting a release.
+ * `scripts/sync-skills.mjs` (`pnpm skills:sync`). The build reads only the
+ * snapshot and never calls GitHub. Re-run the sync after cutting a release.
  *
  * This module is the editorial overlay on top of the snapshot: page copy, the
  * stage grouping, the pipeline order, and every install command template.
@@ -15,8 +15,10 @@
  * only what the snapshot proves (version, file sizes, license). A skill is
  * "Original" only when `sources.lock.json` attributes it to no upstream.
  *
- * Server-only in practice: the snapshot carries every SKILL.md, so do not
- * import this module from a client component (pass strings as props instead).
+ * Every skills page imports this module, so it carries no SKILL.md: the sync
+ * writes each one to `lib/content/skill-md/`, and a skill page's loader reads
+ * only its own through `loadSkillMd` (lib/content/skillMd.ts). Keep bodies
+ * and other large text out of this module and its snapshot.
  */
 
 import snapshot from "@/lib/content/skills.generated.json";
@@ -83,8 +85,6 @@ export interface Skill {
   zip: SkillAsset;
   /** `<skill>-flat.zip`: `SKILL.md` at the zip root (claude.ai / ChatGPT upload). */
   flatZip: SkillAsset;
-  /** The full SKILL.md, frontmatter included. */
-  content: string;
   /** Path of the skill folder in the repo. */
   repoPath: string;
   folderUrl: string;
@@ -98,14 +98,17 @@ export const SKILLS_REPO_URL = snapshot.repoUrl;
 export const SKILLS_TAG = snapshot.tag;
 export const SKILLS_VERSION = snapshot.version;
 export const SKILLS_RELEASE_URL = snapshot.releaseUrl;
-/** Release day, `2026-10-06` (UTC, from the GitHub release). */
-export const SKILLS_RELEASE_DATE = snapshot.publishedAt.slice(0, 10);
-/** Release month for the hero pill, e.g. `Oct 2026`. */
+/**
+ * Release day in Bangkok, e.g. `2026-11-17`: the date the pack's CHANGELOG
+ * and tag give. The sync reads GitHub's UTC `published_at` in Asia/Bangkok.
+ */
+export const SKILLS_RELEASE_DATE = snapshot.releaseDate;
+/** Release month for the hero pill, e.g. `Nov 2026`, from the same day. */
 export const SKILLS_RELEASE_MONTH = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "numeric",
   timeZone: "UTC",
-}).format(new Date(snapshot.publishedAt));
+}).format(new Date(`${snapshot.releaseDate}T00:00:00Z`));
 const SKILLS_ROOT = snapshot.skillsRoot;
 export const SKILLS_LICENSE = "MIT";
 export const PLUGIN_ZIP: SkillAsset = snapshot.pluginZip;
@@ -131,7 +134,7 @@ export const skillsPage = {
   /** The h1 as the canvas sets it: a muted word, then two lines of `title`. */
   headline: { muted: "The", rest: "agent skills", accent: "I build with" },
   description:
-    "A skill is a folder of instructions an AI coding agent loads when the task calls for it: how to plan, test, review, or open a pull request. These are the twenty I use, packed as Superstacks, free under the MIT license.",
+    "A skill is a folder of instructions an AI coding agent loads when the task calls for it: how to plan, test, review, or open a pull request. These are the twenty-two I use, packed as Superstacks, free under the MIT license.",
   metaDescription: PAGE_META.skills.description,
   askAgentPrompt: `Install the Superstacks skills from github.com/${SKILLS_REPO} using the steps in its README.`,
   /** Named on /skills and every skill page so engines tie the pack to him. */
@@ -161,11 +164,17 @@ export const SKILL_STAGES: readonly SkillStage[] = [
   },
 ];
 
-/** Editorial grouping (owner reviews). Every skill sits in exactly one stage. */
+/**
+ * Editorial grouping (owner reviews). Every skill sits in exactly one stage.
+ * v6.7.0 added `ama` (first in the README's pipeline, so first in Plan) and
+ * `owner-decisions` (merge and ready authority from the owner's record, next
+ * to `workflow-profile` in Operate).
+ */
 export const SKILL_STAGE_MEMBERS: Readonly<
   Record<SkillStageId, readonly string[]>
 > = {
   plan: [
+    "ama",
     "how",
     "writing-plans",
     "grilling",
@@ -178,6 +187,7 @@ export const SKILL_STAGE_MEMBERS: Readonly<
   operate: [
     "ticket-pipeline",
     "workflow-profile",
+    "owner-decisions",
     "intake-triage",
     "gardening",
     "sample-review",
@@ -189,6 +199,7 @@ export const SKILL_STAGE_MEMBERS: Readonly<
 
 /** The README's pipeline flow, in order. `interrogate` only for one-way doors. */
 export const SKILL_PIPELINE: readonly { slug: string; note?: string }[] = [
+  { slug: "ama" },
   { slug: "how" },
   { slug: "writing-plans" },
   { slug: "verify-loop" },
@@ -267,7 +278,6 @@ function toSkill(raw: SnapshotSkill): Skill {
     })),
     zip: raw.zip,
     flatZip: raw.flatZip,
-    content: raw.content,
     repoPath,
     folderUrl: tree(repoPath),
     skillMdUrl: blob(`${repoPath}/SKILL.md`),

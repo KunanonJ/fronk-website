@@ -488,7 +488,14 @@ function SkillPager({ skill }: { skill: Skill }) {
   );
 }
 
-export default function SkillDetailPage({ skill }: { skill: Skill }) {
+/** `skillMd` is the skill's SKILL.md, from the route's loader (loadSkillMd). */
+export default function SkillDetailPage({
+  skill,
+  skillMd,
+}: {
+  skill: Skill;
+  skillMd: string;
+}) {
   const stage = getSkillStage(skill.stage);
   return (
     <>
@@ -500,7 +507,7 @@ export default function SkillDetailPage({ skill }: { skill: Skill }) {
           <FilesCard skill={skill} />
           <OriginCard skill={skill} />
           <MoreCard skill={skill} stage={stage} />
-          <SkillSourceCard skill={skill} />
+          <SkillSourceCard key={skill.slug} skill={skill} skillMd={skillMd} />
         </div>
         <SkillPager skill={skill} />
       </div>

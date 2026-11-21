@@ -35,7 +35,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     question: "What is Superstacks?",
     answer:
-      "Superstacks is Kunanon Jarat's MIT-licensed pack of 20 agent skills for Claude Code, Codex and Cursor, covering planning, test-driven development, verify loops, code review and draft pull requests. Eight are original and twelve are adapted, with credit, from other MIT-licensed packs.",
+      "Superstacks is Kunanon Jarat's MIT-licensed pack of 22 agent skills for Claude Code, Codex and Cursor, covering planning, test-driven development, verify loops, code review and draft pull requests. Ten are original and twelve are adapted, with credit, from other MIT-licensed packs.",
   },
   {
     question: "What is GoGoCash?",

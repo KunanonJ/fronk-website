@@ -28,7 +28,7 @@ describe("/.well-known/agent-skills/index.json", () => {
     const names = index.skills.map((s) => s.name);
     expect(names).toEqual(getAllSkills().map((s) => s.name));
     expect(new Set(names).size).toBe(names.length);
-    expect(names.length).toBe(20);
+    expect(names.length).toBe(22);
   });
 
   it("gives each entry the fields and formats the draft requires", () => {
