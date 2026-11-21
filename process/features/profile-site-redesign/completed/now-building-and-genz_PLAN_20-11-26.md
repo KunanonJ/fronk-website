@@ -135,25 +135,51 @@ Each phase is one PR, opened as a draft until it is ready (since #154, a ready P
 - **Contrast:** axe leaves text over the gradients and dither as "incomplete", so it was measured from pixels: every visible first-screen text run on 11 routes and the 404, both themes, 1440 and 390 px, is at or above AA (closest 4.55:1, the résumé's category note). The logo row's fade-in dips below for a moment while it animates.
 - **Seen after both deploys:** the first phone check of the footer found no ship log, and every later load had it. The footer shows nothing when `/api/github/shipped` cannot reach GitHub, and each deploy starts the endpoint's edge copy afresh. If the Worker has no `GITHUB_TOKEN`, unauthenticated calls share GitHub's 60-an-hour limit; adding the token would make it steadier. Not confirmed (no Worker logs read).
 
-## For the owner (decisions, not changed)
+## Phase 8: the follow-ups and the owner's decisions (21-11-26)
 
-- **/about repeats itself:** the four principles appear twice (bento tiles and "How I ship"), and the availability line about five times; the page is 14,023 px tall at 390. Suggest one of each.
-- **/contact on phones:** "Or write it here" comes before the email option it refers to, and the page ends with the global "Get in touch" block, a second call to action. Suggest email first and no footer call to action on /contact.
-- **Home at 1024 x 768:** one column, about 40% empty beside the headline, the canvas below the fold. Suggest the two-column hero from 1024 px (a 5:6 split, h1 about 52 to 72 px), then recheck 1024 x 768 and 1180 x 820.
-- **/resume's first-load CSS** was measured at 37.1 KB (20-11-26), over the 36 KB the prerendered pages are held to. CI cannot measure it (rendered on request). Suggest measuring it in CI against the preview and trimming.
-- **DRAFT copy to confirm:** the Home title ("Founder of GoGoCash and Manut AI"), the résumé headline ("Solopreneur in Bangkok building ..."), the hour guesses, the secrets and toast copy, the canvas tool labels, the 404 game's lines, and the story lines marked DRAFT.
-- **Thai:** the Thai hubs have the availability sentence but no "open to partnerships, freelance ..." line.
-- **/about:** "Participating in Protocol Camp cohort 2025" reads as current in November 2026.
+- **Design pass:** four specs, each prototyped on production in Chrome, WebKit and Firefox before any code: /contact's order, /about's repeats, Home at 1024 px, and /resume's stylesheets. Each was implemented in its own worktree, reviewed independently (no important findings; the useful nits were applied), and shipped with a zero-tolerance visual run.
+- **The owner's decisions (21-11-26):**
+  - Protocol Camp: "Protocol Camp cohort 2025 alum, and a member of the Bangkok Startup Association." The cohort ran Sep 2025 to Jan 2026.
+  - The Thai hubs keep only the availability sentence, with no Thai "open to ..." line.
+  - Every line marked DRAFT is approved as is.
+  - No `GITHUB_TOKEN` for the Worker. Its secrets, read by name only, include none, so the ship log and the GitHub year share GitHub's 60 unauthenticated requests an hour, and the ship log can be blank for a while after a deploy.
+  - The design questions in the specs took their recommended options: /contact mirrors its top row from 1024 px; /about keeps the principles in "How I ship" and the availability in the hero pill and Now; the hero goes side by side on landscape screens only; /resume and /learn are measured on request; the stylesheet budget stays at 36 KB.
+- **DRAFT sign-off: shipped as #169, squash 6c1595a.** The markers are gone from 30 files; the comments keep their owner-direction notes. No visible text changed: comment-free sources match main, and with one pinned build id all 127 client assets are byte-identical.
+- **/resume's stylesheets and Home at 1024 px: shipped as #170, squash 85f180b.**
+  - Tailwind reads only `components/`, `lib/` and `src/` (83 utilities that only plans and reports named, 1.5 KB off every page).
+  - `home-hero.css` is Home's own sheet, linked by `Hero.tsx` with `precedence` (2.9 KB off every other page).
+  - `pnpm perf:budget` serves the build with `vite preview` and measures /resume and /learn too. It refuses a server that is not this build (`data-build`) and gives Sanity 90 s.
+  - From 1024 px on a landscape screen the hero is side by side (5:6, the canvas at least 500 px, h1 `clamp(3rem, min(7.5vw - 1.5rem, 8.4svh + 0.25rem), 4.5rem)`).
+  - Zero tolerance: no baseline moved.
+  - Live (build `mwprof59`), first-load CSS: Home 34.88 KB, /resume 33.48 KB (was 37.87), every other page 30.95 KB (was 35.35).
+  - At 1024 x 768 in Chrome, WebKit and Firefox: two columns, h1 52.8 px, the canvas ends at 557 px and the pause at 732 px. 1024 x 1366 and 900 px stay stacked.
+  - Going from /resume to Home in the app, the hero is sticky when it is inserted (no unstyled flash).
+- **/contact and /about: shipped as #171, squash 63ddba8.**
+  - /contact: the email tile comes first in the DOM, so the eye, Tab and a screen reader meet email, then the form ("Or write it here"), then Elsewhere at every width. From 1024 px the email and Elsewhere share the narrow left column.
+  - The footer leaves out its call to action and drawings on /contact (`footerInvites()`).
+  - After a submit, the form card scrolls to the top under the bar (`block: "start"`, now pinned by a unit test), so the found-trait toast covers none of its links.
+  - /about states the principles once (How I ship's stage list is `#principles`) and the availability in the hero pill and in Now. The FAQ keeps its answers for the FAQPage JSON-LD.
+  - `SITE_UPDATED` is 2026-11-21. The parity reference took the new date; all 139 records match once the date is swapped.
+  - Baselines: the 8 `contact-*` and `about-*` captures from CI at zero tolerance (attempt equal to retry by md5). The other 88 visual captures and 728 profile-matrix tests passed unchanged.
+  - Live (build `mwps75nx`) in Chrome, WebKit and Firefox at 320, 390, 768, 1024 and 1440 (30 checks, all pass):
+    - /contact's DOM, visual and Tab order is email, form, Elsewhere, Who, Recruiters, and the email sits left of the form from 1024. The footer has no intro there and keeps it on /about.
+    - /about is 12,674 px at 390 (was 14,002) and 8,883 at 1440 (was 9,229) in Chrome, each principle is one H3, and `/about#principles` lands the stage list at 96 px.
+    - No sideways scroll anywhere. The phone toast test passes 6 of 6 against production, and the Protocol Camp line is live on /about and /about.md.
+- **Left as they are (possible next changes):**
+  - From 1024 px, /about's story text column now ends about 490 px above the records card beside it. The spec's option (b) folds the Now section into that slot (no new words; Now becomes an h3 and the page loses a region).
+  - `footerInvites` is case-sensitive, so /Contact keeps the footer's call to action, as `isCurrentLink` does.
+  - A webkit-phone test ('/#ventures ... rests at 146 px') is flaky on macOS WebKit on main as well.
+  - Firefox has no scroll-driven animations, so Work covers Home's pause about 50 px after the hold, as before.
 
 ## Closeout (21-11-26)
 
-- Phases 1 to 7 shipped: #158, #159, #160, #161 and #162, #164, #163, the cache fix #165, and the bug hunt #167 and #166. All live and checked in real browsers.
-- Archive-readiness: implementation complete and verified; kept in `active/` until the owner rules on the decisions above (each becomes its own change, or the list moves to a follow-up plan), then archive to `completed/`.
+- Phases 1 to 8 shipped: #158, #159, #160, #161 and #162, #164, #163, the cache fix #165, the bug hunt #167 and #166, and the follow-ups #169, #170 and #171. All live and checked in real browsers.
+- Every owner decision is ruled (Phase 8). Archived to `completed/`.
 
 ## Constraints in every phase
 
 - Reduced motion, and WCAG 2.2: 2.2.2, 2.3.1, 2.5.8, 1.4.13, and keyboard parity.
-- Budgets: the worst page's first-load CSS stays at or under 36 KB, so new CSS is lazy. The entry chunk stays at or under 120 KB.
+- Budgets: the worst page's first-load CSS stays at or under 36 KB, so new CSS is lazy or page-scoped (as `home-hero.css` and `resume.css` are). /resume and /learn are measured too (since #170). The entry chunk stays at or under 120 KB.
 - No new heavy dependencies.
 - Claims stay owner-cleared, and new copy is marked DRAFT.
 - Facts come first: playful features are opt-in or found by the visitor.
