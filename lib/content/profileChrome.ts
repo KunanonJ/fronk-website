@@ -88,6 +88,22 @@ export const profileMenu: readonly ChromeLink[] = [
 ];
 
 /**
+ * A path as the router reads it, so the chrome compares the page it serves:
+ * no trailing slash (the same page), and its fixed words in lower case, as
+ * the router matches them in any case (TanStack Router's default,
+ * `caseSensitive: false`): /Contact and /CONTACT are the contact page. A
+ * slug keeps its case, as the pages look it up as written:
+ * /topics/Forward-Deployed-AI-Engineering is a not-found page. Every page
+ * two or more words deep ends in its slug (a test holds the routes to that).
+ */
+function routePath(pathname: string): string {
+  const words = (pathname.replace(/\/+$/, "") || "/").split("/");
+  const slug = words.length > 2 ? words.pop() : undefined;
+  const fixed = words.join("/").toLowerCase();
+  return slug === undefined ? fixed : `${fixed}/${slug}`;
+}
+
+/**
  * Whether a link is the page the reader is on, or that page's section parent
  * (spec 7.2). A Thai hub (/th/topics/...) counts as its English twin, as the
  * old site menu's rows did: no chrome link goes to /th, so the Thai FDE hub
@@ -100,9 +116,7 @@ export const profileMenu: readonly ChromeLink[] = [
  * page (spec 7.7), so it marks only the exact page, through the router.
  */
 export function isCurrentLink(link: ChromeLink, pathname: string): boolean {
-  const path = (
-    pathname.length > 1 ? pathname.replace(/\/+$/, "") || "/" : pathname
-  ).replace(/^\/th(?=\/topics\/)/, "");
+  const path = routePath(pathname).replace(/^\/th(?=\/topics\/)/, "");
   return link.current.some((prefix) =>
     prefix.endsWith("/") ? path.startsWith(prefix) : path === prefix,
   );
@@ -187,11 +201,11 @@ export const footerCopy = {
 /**
  * Whether the footer opens with its call to action, footerCopy and Say
  * hello (spec 7.7): on every page but /contact, which is that call to
- * action itself (UX sweep 21-11-26). A trailing slash is the same page.
+ * action itself (UX sweep 21-11-26), however its address is written:
+ * /contact/ and /Contact are that page too (routePath).
  */
 export function footerInvites(pathname: string): boolean {
-  const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return path !== navCta.href;
+  return routePath(pathname) !== navCta.href;
 }
 
 /** The footer's social links and its agent files, as lib/content gives them. */
