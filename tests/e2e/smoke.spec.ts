@@ -374,6 +374,8 @@ test.describe("assets > a navigation whose chunk a deploy removed loads its page
   test("a feature's chunk that fails on the page in use never reloads it", async ({
     page,
   }) => {
+    // The nav's Search button shows from 810 px.
+    await page.setViewportSize({ width: 1440, height: 900 });
     const loads = documents(page);
     const asked = requests(page);
     await page.addInitScript(() => {
@@ -1583,6 +1585,18 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     }
     await expect(page.locator(dialog)).toBeVisible();
     await expect(page.getByRole("option").first()).toBeVisible();
+    // Scan the dialog once it has finished opening: mid-fade, its text is
+    // part-transparent and axe measured it below 4.5:1 now and then.
+    await page.locator(dialog).evaluate((el) =>
+      Promise.all(
+        el
+          .getAnimations({ subtree: true })
+          .filter(
+            (motion) => motion.effect?.getTiming().iterations !== Infinity,
+          )
+          .map((motion) => motion.finished),
+      ),
+    );
     const results = await new AxeBuilder({ page })
       .include("dialog.pf-search")
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
