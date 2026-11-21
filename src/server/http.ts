@@ -144,6 +144,20 @@ export async function readBodyText(
 export const SHARE_MEDIA_PATH = "/og/";
 export const SHARE_MEDIA_CACHE = "public, max-age=31536000, immutable";
 
+/**
+ * A share video's 304 (a conditional request whose copy is current). The
+ * assets binding answers it with Cache-Control: max-age=0, and a client
+ * that revalidates takes a 304's headers as the file's, so it would stop
+ * treating the file as immutable: the 304 keeps the 200's lifetime and
+ * says ranges are served.
+ */
+export function shareMediaNotModified(file: Response): Response {
+  const headers = new Headers(file.headers);
+  headers.set("Cache-Control", SHARE_MEDIA_CACHE);
+  headers.set("Accept-Ranges", "bytes");
+  return new Response(null, { status: 304, headers });
+}
+
 /** A single `bytes=` range as [start, end], "unsatisfiable", or null to ignore. */
 function parseRange(
   header: string,

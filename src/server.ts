@@ -4,6 +4,7 @@ import { handleCspReport } from "./server/cspReport";
 import {
   CSP_REPORT_PATH,
   SHARE_MEDIA_CACHE,
+  shareMediaNotModified,
   SHARE_MEDIA_PATH,
   withByteRanges,
   withSecurityHeaders,
@@ -75,7 +76,7 @@ async function route(request: Request, env: Env, ctx: Ctx): Promise<Response> {
     const file = await env.ASSETS.fetch(new Request(url, { headers }));
     if (file.status === 200)
       return withByteRanges(request, file, SHARE_MEDIA_CACHE);
-    if (file.status === 304) return file;
+    if (file.status === 304) return shareMediaNotModified(file);
     // No such file: Start's 404 page, as for any unknown path.
   }
   const markdownPath = markdownPathFor(url.pathname);

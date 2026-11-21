@@ -8,6 +8,10 @@
  *
  *   pnpm og:video           render, encode and check the video (needs ffmpeg
  *                           and ffprobe on PATH; CI has neither)
+ * Colour is checked where it is seen: ffmpeg's decode ignores the transfer
+ * tag, and Apple's players (Messages) do not, so a wrong tag passes the
+ * frame check here and shows lighter in Messages (UX review 21-11-26).
+ *
  *   pnpm og:video --check   exit 1 when the committed video is stale: the
  *                           card, the pixel portrait, the timeline or the
  *                           encoder changed since it was made (no ffmpeg)

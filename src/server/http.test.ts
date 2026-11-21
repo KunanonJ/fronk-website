@@ -9,6 +9,7 @@ import {
   SECURITY_HEADERS,
   SERVER_FN_PATH,
   SHARE_MEDIA_CACHE,
+  shareMediaNotModified,
   methodNotAllowed,
   readBodyText,
   withByteRanges,
@@ -271,5 +272,22 @@ describe("withByteRanges (the share videos, public/og)", () => {
     expect(res.status).toBe(206);
     expect(res.headers.get("content-length")).toBe("2");
     expect(res.body).toBeNull();
+  });
+});
+
+describe("shareMediaNotModified", () => {
+  it("keeps the share video's year-long lifetime on a 304", () => {
+    const fromAssets = new Response(null, {
+      status: 304,
+      headers: {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        ETag: '"abc"',
+      },
+    });
+    const answer = shareMediaNotModified(fromAssets);
+    expect(answer.status).toBe(304);
+    expect(answer.headers.get("Cache-Control")).toBe(SHARE_MEDIA_CACHE);
+    expect(answer.headers.get("Accept-Ranges")).toBe("bytes");
+    expect(answer.headers.get("ETag")).toBe('"abc"');
   });
 });

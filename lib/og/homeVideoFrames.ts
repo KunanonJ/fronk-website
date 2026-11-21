@@ -55,9 +55,18 @@ const HOME_VIDEO_ENCODER: readonly string[] = [
   [
     "scale=out_color_matrix=bt709:out_range=tv",
     "format=yuv420p",
-    // The tags travel on the frames: raw RGB in has none to carry.
-    "setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=tv",
+    // The tags travel on the frames: raw RGB in has none to carry. The
+    // transfer is sRGB's (iec61966-2-1), as the frames were drawn: tagged
+    // bt709, Apple's players (Messages, Safari) rendered every frame lighter
+    // than the og:image (a mean of 2.4 levels, 7% of pixels more than 8
+    // off), while Chrome and ffmpeg ignore the tag either way.
+    "setparams=colorspace=bt709:color_primaries=bt709:color_trc=iec61966-2-1:range=tv",
   ].join(","),
+  // One thread: libx264 splits the work by core count, so the bytes (and
+  // the file's name) would otherwise depend on the machine. A different
+  // ffmpeg or x264 build can still rename it.
+  "-threads",
+  "1",
   "-c:v",
   "libx264",
   "-preset",
