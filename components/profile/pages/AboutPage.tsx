@@ -31,15 +31,20 @@ import { pad2 } from "@/lib/utils/pad2";
 
 /*
  * /about (profile redesign, Phase 6 cutover; plan step 6d), built from the
- * redesign's parts: the hero beside the portrait, the About bento (Phase 3,
- * under the "principles" anchor /learn links), the story and the career
- * records (Phase 4, "#story"), then today's Now, tech stack and operating
- * model in the new tiles, the GitHub year, the FAQ as disclosures and the
- * "Next" card with the recruiter links. The h1 restates the page title, word
- * for word. Every answer of the FAQPage JSON-LD stays in the HTML. The
- * section ids that other pages link (#principles, #now, #faq, #how-i-ship)
- * and #stack stay. Styles: `.pf-about-page*` in
- * src/styles/profile/cutover.css.
+ * redesign's parts: the hero beside the portrait, the About bento (Phase 3),
+ * the story and the career records (Phase 4, "#story"), then today's Now,
+ * tech stack and operating model in the new tiles, the GitHub year, the FAQ
+ * as disclosures and the "Next" card with the recruiter links. The h1
+ * restates the page title, word for word. Every answer of the FAQPage
+ * JSON-LD stays in the HTML. The ids that other pages link (#principles,
+ * #now, #faq, #how-i-ship) and #stack stay.
+ *
+ * Outside the FAQ and the footer, each thing is said once (UX sweep
+ * 21-11-26): the parts borrowed from Home and Contact give way to this
+ * page's own. The bento leaves its principle tiles to "How I ship", whose
+ * stage list is "#principles"; the story leaves its now block to the Now
+ * section; the Next card leaves the availability line to Now and keeps the
+ * time zone. Styles: `.pf-about-page*` in src/styles/profile/cutover.css.
  */
 
 const SOCIAL_ICONS = {
@@ -182,7 +187,7 @@ function StorySection() {
           titleMaxWidth={16}
         />
       </div>
-      <Story anchor={false} />
+      <Story anchor={false} now={false} />
     </section>
   );
 }
@@ -249,7 +254,11 @@ function StackSection() {
   );
 }
 
-/** The solopreneur operating model: four stages ("#how-i-ship"). */
+/**
+ * The solopreneur operating model: four stages ("#how-i-ship"), each headed
+ * by one of the four principles. The stage list is "#principles", the
+ * anchor /learn links for them (UX sweep 21-11-26).
+ */
 function OperatingModelSection() {
   const model = operatingModel;
   return (
@@ -265,7 +274,7 @@ function OperatingModelSection() {
         lead={model.intro}
         titleMaxWidth={16}
       />
-      <ol className="pf-about-page__grid">
+      <ol id="principles" className="pf-about-page__grid">
         {model.stages.map((stage, index) => (
           <li key={stage.id} className="ds-tile pf-about-page__tile">
             <p className="t-meta pf-about-page__label">
@@ -339,7 +348,8 @@ function FaqTile() {
 
 /**
  * Next: where to go from here, Contact first, and what a recruiter asks first
- * (recruiter-fit phase 2; since 20-11-26, that he is not looking now).
+ * (recruiter-fit phase 2): the time zone and the links. That the owner is not
+ * looking now (20-11-26) is the Now section's to say (UX sweep 21-11-26).
  */
 function NextTile() {
   const { cta } = aboutPage;
@@ -358,7 +368,7 @@ function NextTile() {
         <h3 className="t-meta pf-about-page__label">
           {contactPage.recruiterTitle}
         </h3>
-        <RecruiterLines />
+        <RecruiterLines availability={false} />
         <RecruiterLinks links={aboutRecruiterLinks} />
       </div>
       <div className="pf-about-page__next-actions">
@@ -381,7 +391,7 @@ export default function AboutPage() {
   return (
     <>
       <AboutHero />
-      <AboutBento id="principles" />
+      <AboutBento principles={false} />
       <StorySection />
       <NowSection />
       <StackSection />

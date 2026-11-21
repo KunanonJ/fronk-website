@@ -122,6 +122,9 @@ export const aboutCopy = {
     pause: "Pause the animation",
     play: "Play the animation",
   },
-  /** The four operating principles, as /about prints them. */
+  /**
+   * The four operating principles, from aboutPage. /about heads its "How I
+   * ship" stages with them instead of these tiles (UX sweep 21-11-26).
+   */
   principles: aboutPage.principles.items,
 } as const;

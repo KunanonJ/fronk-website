@@ -8,7 +8,9 @@ import { storyCopy, type StoryRun } from "@/lib/content/homeJourney";
  * with the availability and its chips, and the records card beside them
  * (under them below 1024 px). The "Read the story" pill on the stage links
  * here. /about puts the anchor on its own section instead (`anchor={false}`),
- * so "Read my story" lands with the section's heading in view.
+ * so "Read my story" lands with the section's heading in view, and leaves
+ * the now block out (`now={false}`): its Now section, next, says it in full
+ * (UX sweep 21-11-26).
  */
 
 function Runs({ runs }: { runs: readonly StoryRun[] }) {
@@ -23,7 +25,13 @@ function Runs({ runs }: { runs: readonly StoryRun[] }) {
   );
 }
 
-export function Story({ anchor = true }: { anchor?: boolean }) {
+export function Story({
+  anchor = true,
+  now = true,
+}: {
+  anchor?: boolean;
+  now?: boolean;
+}) {
   return (
     <div id={anchor ? "story" : undefined} className="ds-wrap pf-story">
       <div className="t-body pf-story__text">
@@ -32,15 +40,19 @@ export function Story({ anchor = true }: { anchor?: boolean }) {
             <Runs runs={runs} />
           </p>
         ))}
-        <h3 className="t-h3 pf-story__now">{storyCopy.nowHeading}</h3>
-        <p>{storyCopy.now}</p>
-        <ul className="pf-story__chips">
-          {storyCopy.chips.map((chip) => (
-            <li key={chip}>
-              <Chip>{chip}</Chip>
-            </li>
-          ))}
-        </ul>
+        {now ? (
+          <>
+            <h3 className="t-h3 pf-story__now">{storyCopy.nowHeading}</h3>
+            <p>{storyCopy.now}</p>
+            <ul className="pf-story__chips">
+              {storyCopy.chips.map((chip) => (
+                <li key={chip}>
+                  <Chip>{chip}</Chip>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
       </div>
       <RecordsCard />
     </div>

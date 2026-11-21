@@ -74,10 +74,19 @@ function BriefTile() {
 }
 
 /**
- * `id` is "about" on Home (the nav's section). /about renders the same bento
- * under "principles", the anchor /learn links for the four principles.
+ * `id` is "about", Home's section for the nav. /about renders the bento
+ * without the four principles (`principles={false}`): its "How I ship"
+ * heads each stage with one, beside its skills and the work that shows it,
+ * and that stage list carries the "principles" anchor /learn links (UX
+ * sweep 21-11-26).
  */
-export default function AboutBento({ id = "about" }: { id?: string }) {
+export default function AboutBento({
+  id = "about",
+  principles = true,
+}: {
+  id?: string;
+  principles?: boolean;
+}) {
   return (
     <section
       id={id}
@@ -111,14 +120,16 @@ export default function AboutBento({ id = "about" }: { id?: string }) {
             play: aboutCopy.motion.play,
           }}
         />
-        {aboutCopy.principles.map((principle, index) => (
-          <PrincipleTile
-            key={principle.title}
-            index={index}
-            title={principle.title}
-            body={principle.body}
-          />
-        ))}
+        {principles
+          ? aboutCopy.principles.map((principle, index) => (
+              <PrincipleTile
+                key={principle.title}
+                index={index}
+                title={principle.title}
+                body={principle.body}
+              />
+            ))
+          : null}
       </div>
     </section>
   );

@@ -5,17 +5,27 @@ import { place } from "@/lib/content/landing";
 
 /*
  * What a recruiter asks first, answered before they write (recruiter-fit
- * phase 2), in the profile redesign's style since the Phase 6 cutover: About
- * shows it in its "Next" card, Contact in "For recruiters". Only what the
- * owner directed appears: the availability line (20-11-26: not looking for
- * a full-time role now) and where he is.
+ * phase 2), in the profile redesign's style since the Phase 6 cutover:
+ * Contact shows it in "For recruiters", About in its "Next" card without
+ * the availability line, which About's Now section states (UX sweep
+ * 21-11-26). Only what the owner directed appears: the availability line
+ * (20-11-26: not looking for a full-time role now) and where the owner is.
  */
 
-/** What he is doing and whether he is looking, then his time zone. */
-export function RecruiterLines() {
+/**
+ * What the owner is doing and whether they are looking, then their time
+ * zone; with `availability={false}`, the time zone only (About's Next card).
+ */
+export function RecruiterLines({
+  availability = true,
+}: {
+  availability?: boolean;
+}) {
   return (
     <>
-      <p className="t-body pf-recruit__line">{AVAILABILITY.sentence}</p>
+      {availability ? (
+        <p className="t-body pf-recruit__line">{AVAILABILITY.sentence}</p>
+      ) : null}
       <p className="t-small pf-recruit__time">
         {place.city} time, {place.utcLabel}.
       </p>
