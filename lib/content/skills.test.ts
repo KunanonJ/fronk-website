@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { primaryNav } from "@/lib/content/landing";
+import { PAGE_META } from "@/lib/content/pageMeta";
 import snapshot from "@/lib/content/skills.generated.json";
 import {
   ADAPTED_COUNT,
@@ -35,9 +36,9 @@ const assetNames = new Set<string>([
 const releaseDownload = `${SKILLS_REPO_URL}/releases/download/${SKILLS_TAG}`;
 
 describe("skills snapshot", () => {
-  it("has the 20 superstacks skills", () => {
-    expect(snapshot.skills).toHaveLength(20);
-    expect(skills).toHaveLength(20);
+  it("has the 22 superstacks skills", () => {
+    expect(snapshot.skills).toHaveLength(22);
+    expect(skills).toHaveLength(22);
   });
 
   it("is pinned to one release tag", () => {
@@ -93,12 +94,26 @@ describe("skills stages", () => {
       expect(getSkillBySlug(step.slug), step.slug).not.toBeNull();
     }
   });
+
+  it("keeps the README's pipeline order, ama first", () => {
+    expect(SKILL_PIPELINE.map((step) => step.slug)).toEqual([
+      "ama",
+      "how",
+      "writing-plans",
+      "verify-loop",
+      "test-driven-development",
+      "verification-before-completion",
+      "code-review",
+      "interrogate",
+      "pr",
+    ]);
+  });
 });
 
 describe("skills attribution", () => {
-  it("marks 12 skills adapted and 8 original", () => {
+  it("marks 12 skills adapted and 10 original", () => {
     expect(ADAPTED_COUNT).toBe(12);
-    expect(ORIGINAL_COUNT).toBe(8);
+    expect(ORIGINAL_COUNT).toBe(10);
   });
 
   it("gives every adapted skill its source, pinned SHA, license and copyright", () => {
@@ -265,5 +280,31 @@ describe("skills page copy", () => {
     expect(SKILLS_RELEASE_DATE).toBe(snapshot.publishedAt.slice(0, 10));
     expect(SKILLS_RELEASE_DATE).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(SKILLS_RELEASE_MONTH).toMatch(/^[A-Z][a-z]{2} \d{4}$/);
+  });
+
+  it("spells out the skill count the snapshot holds", () => {
+    const ones = [
+      "zero",
+      "one",
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+    ];
+    const tens = ["", "", "twenty", "thirty", "forty"];
+    const n = skills.length;
+    // Covers 20 to 49, as far as the pack is likely to grow between syncs.
+    expect(n).toBeGreaterThanOrEqual(20);
+    expect(n).toBeLessThan(50);
+    const tensWord = tens[Math.floor(n / 10)]!;
+    const word = n % 10 ? `${tensWord}-${ones[n % 10]}` : tensWord;
+    expect(skillsPage.description).toContain(`These are the ${word} I use`);
+    expect(PAGE_META.skills.description).toMatch(
+      new RegExp(`^${word} MIT-licensed agent skills`, "i"),
+    );
   });
 });

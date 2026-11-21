@@ -39,7 +39,7 @@ describe("SkillsCatalog", () => {
     for (const s of getAllSkills()) {
       expect(screen.getByRole("article", { name: s.name })).toBeVisible();
     }
-    expect(screen.getByText("Showing all 20 skills")).toBeInTheDocument();
+    expect(screen.getByText("Showing all 22 skills")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^All/ })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -53,7 +53,7 @@ describe("SkillsCatalog", () => {
       shown.length,
     );
     expect(
-      screen.getByText(`Showing ${USER_INVOKED_COUNT} of 20 skills`),
+      screen.getByText(`Showing ${USER_INVOKED_COUNT} of 22 skills`),
     ).toBeInTheDocument();
     // Verify and ship holds only skills the agent loads on its own.
     expect(
@@ -119,7 +119,8 @@ describe("SkillsIndexPage", () => {
     );
     const pipeline = screen.getByRole("article", { name: "The pipeline" });
     const steps = within(pipeline).getAllByRole("listitem");
-    expect(steps).toHaveLength(8);
+    expect(steps).toHaveLength(9);
+    expect(steps[0]).toHaveTextContent(/^01ama$/);
     expect(steps.at(-1)).toHaveTextContent("pr(draft)");
   });
 });

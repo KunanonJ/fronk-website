@@ -55,7 +55,7 @@ export const PAGE_META = {
   skills: {
     title: "Skills",
     description:
-      "Twenty MIT-licensed agent skills for Claude Code, Codex and Cursor: planning, TDD, verify loops, code review and draft PRs. Install the whole pack or one skill.",
+      "Twenty-two MIT-licensed agent skills for Claude Code, Codex and Cursor: planning, TDD, verify loops, code review and draft PRs. Install the whole pack or one skill.",
   },
   stack: {
     title: "Stack",

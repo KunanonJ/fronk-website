@@ -37,6 +37,7 @@ export const operatingModel = {
         "Understand the code and pressure-test the plan before writing any.",
       principle: "Ship the smallest thing that proves the bet.",
       skills: [
+        "ama",
         "how",
         "writing-plans",
         "grilling",
@@ -80,6 +81,7 @@ export const operatingModel = {
       skills: [
         "ticket-pipeline",
         "workflow-profile",
+        "owner-decisions",
         "intake-triage",
         "gardening",
         "sample-review",

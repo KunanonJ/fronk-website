@@ -414,7 +414,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     }
   });
 
-  test("the skills pipeline: eight steps in order, each a link to its skill", async ({
+  test("the skills pipeline: nine steps in order, each a link to its skill", async ({
     page,
   }) => {
     await prepare(page);
@@ -422,7 +422,7 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     const steps = page
       .getByRole("article", { name: "The pipeline" })
       .getByRole("listitem");
-    await expect(steps).toHaveCount(8);
+    await expect(steps).toHaveCount(9);
     for (const step of await steps.all()) {
       await expect(step.getByRole("link")).toHaveAttribute(
         "href",

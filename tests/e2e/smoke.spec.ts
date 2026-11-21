@@ -423,7 +423,7 @@ test.describe("skills > the catalog filter is a typed search param", () => {
     await expect(
       group.getByRole("button", { name: /^You invoke/ }),
     ).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/^Showing \d+ of 20 skills$/)).toBeVisible();
+    await expect(page.getByText(/^Showing \d+ of 22 skills$/)).toBeVisible();
     // Verify and ship holds only skills the agent loads on its own.
     const ship = page.getByRole("article", { name: "Verify and ship" });
     await expect(ship).toHaveCount(0);
@@ -2275,7 +2275,7 @@ test.describe("agent readiness", () => {
     expect(index.$schema).toBe(
       "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
     );
-    expect(index.skills).toHaveLength(20);
+    expect(index.skills).toHaveLength(22);
     for (const skill of index.skills) {
       expect(skill.type, skill.name).toBe("archive");
       expect(skill.url, skill.name).toMatch(/-flat\.zip$/);

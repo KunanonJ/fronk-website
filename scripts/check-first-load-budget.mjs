@@ -38,6 +38,17 @@ const DEFAULT_BUDGET_KB = 165;
 // their SKILL.md) on 10-11-26.
 const MARKETING_BUDGET_KB = 200;
 
+// Skills (/skills and /skills/<slug>): split from marketing on 21-11-26 and
+// raised deliberately. Both pages load the skills snapshot
+// (lib/content/skills.generated.json, every SKILL.md) in one chunk, so they
+// grow with each Superstacks release, not with app code. The v6.1.1 to
+// v6.7.0 sync (22 skills, longer SKILL.md files) grew the snapshot file from
+// 35.7 KB to 43.4 KB gzip, and the skill pages from 198.2 KB (CI on main at
+// 63ddba8) to 205.8 KB (/skills 205.6 KB). Measured worst plus 5%. Shipping only the open skill's
+// SKILL.md would take most of that chunk off; until then, this keeps the
+// other marketing pages at 200 KB.
+const SKILLS_BUDGET_KB = 216;
+
 // The entry chunk every page loads (React, the router, the shell). 113.7 KB on
 // 10-11-26. A content module imported from a route's head() or the root route
 // lands here and costs every page, so it gets its own cap.
@@ -85,8 +96,6 @@ const MARKETING_EXACT = new Set([
   // Portfolio (2026-11) uses LibraryPageShell like /stack and /proof: landing
   // nav + next/image card chrome on top of the marketing floor.
   "/portfolio",
-  // Skills (2026-11): landing nav + small tabs/copy-button islands.
-  "/skills",
   // Résumé (phase 7b): moved into the site layout with the header, footer
   // and Share. Rendered on request (Sanity), and measured from `vite preview`
   // since 21-11-26 (ON_REQUEST_ROUTES); by hand before that, at 202.1 KB on
@@ -118,11 +127,16 @@ function isMarketingRoute(route) {
   // 176.1 KB on 18-11-26, as the project pages (176.2 KB). The budgets
   // themselves are unchanged.
   if (route.startsWith("/ventures/")) return true;
-  if (route.startsWith("/skills/")) return true;
   return false;
 }
 
+/** /skills and every /skills/<slug>: landing nav, small tabs and copy islands, and the snapshot. */
+function isSkillsRoute(route) {
+  return route === "/skills" || route.startsWith("/skills/");
+}
+
 function budgetKbForRoute(route) {
+  if (isSkillsRoute(route)) return SKILLS_BUDGET_KB;
   return isMarketingRoute(route) ? MARKETING_BUDGET_KB : DEFAULT_BUDGET_KB;
 }
 const APP_DIR = "dist/client";
@@ -286,7 +300,7 @@ const routes = pages
   .sort((a, b) => b.kb - a.kb);
 
 console.log(
-  `Landing-JS first-load budget: ${DEFAULT_BUDGET_KB} KB gzip (default); marketing routes up to ${MARKETING_BUDGET_KB} KB\n`,
+  `Landing-JS first-load budget: ${DEFAULT_BUDGET_KB} KB gzip (default); marketing routes up to ${MARKETING_BUDGET_KB} KB; skills pages up to ${SKILLS_BUDGET_KB} KB\n`,
 );
 let worstOver = 0;
 let worstOverRoute = "";

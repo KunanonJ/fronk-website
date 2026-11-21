@@ -256,6 +256,13 @@
     "seed": false
   },
   {
+    "path": "/skills/ama"
+  },
+  {
+    "path": "/skills/ama/opengraph-image",
+    "seed": false
+  },
+  {
     "path": "/skills/code-review"
   },
   {
@@ -327,6 +334,13 @@
   },
   {
     "path": "/skills/not-a-skill",
+    "seed": false
+  },
+  {
+    "path": "/skills/owner-decisions"
+  },
+  {
+    "path": "/skills/owner-decisions/opengraph-image",
     "seed": false
   },
   {

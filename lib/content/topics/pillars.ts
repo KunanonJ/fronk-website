@@ -7,7 +7,7 @@ import {
 } from "@/lib/content/identity";
 
 /** Skills in the Superstacks pack (pillars.test.ts checks it against the snapshot). */
-export const SUPERSTACKS_SKILL_COUNT = 20;
+export const SUPERSTACKS_SKILL_COUNT = 22;
 
 export type TopicLocale = "en" | "th";
 

@@ -25,7 +25,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 export const REPO = "KunanonJ/superstacks";
 export const REPO_URL = `https://github.com/${REPO}`;
 export const SKILLS_ROOT = "plugins/superstacks/skills";
-export const DEFAULT_TAG = "v6.1.1";
+export const DEFAULT_TAG = "v6.7.0";
 export const OUTPUT_PATH = "lib/content/skills.generated.json";
 export const PLUGIN_ZIP = "superstacks-plugin.zip";
 
