@@ -31,6 +31,12 @@ import zlib from "node:zlib";
 // content modules (every SKILL.md, topics, portfolio) into the entry chunk
 // through route head() options. An earlier raise to 210 KB blamed the bento
 // chrome; that leak was the real cause.
+//
+// /open-source (21-11-26) stays here too, though it uses /stack's reading
+// shell: 162.0 KB at build. The default keeps it from taking in
+// lib/content/skills or SkillParts (the skills snapshot, about 10 KB gzip
+// since its SKILL.md bodies left it in #173), which the marketing cap would
+// let through.
 const DEFAULT_BUDGET_KB = 165;
 
 // Marketing: pages with heavier islands (forms, filters, skill sources, the

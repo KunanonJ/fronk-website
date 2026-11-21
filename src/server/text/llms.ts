@@ -16,6 +16,10 @@ import {
   PERSON_SOLOPRENEUR,
   PERSON_SUMMARY,
 } from "@/lib/content/identity";
+import {
+  OPEN_SOURCE_PROJECTS,
+  OPEN_SOURCE_SYNCED_ON,
+} from "@/lib/content/openSource";
 import { RESUME_TIMELINE_FALLBACK } from "@/lib/content/resumeTimeline.fallback";
 import { fetchAllPosts } from "@/lib/sanity/fetch";
 import { portfolioGroups } from "@/src/server/text/portfolioGroups";
@@ -97,6 +101,7 @@ export async function GET() {
     `- Portfolio projects: ${SITE_ORIGIN}/portfolio/[slug]`,
     `- Skills: ${SITE_ORIGIN}/skills`,
     `- Skill pages: ${SITE_ORIGIN}/skills/[slug]`,
+    `- Open source: ${SITE_ORIGIN}/open-source`, // DRAFT
     `- Topic hubs (EN): ${SITE_ORIGIN}/topics/[slug]`,
     `- Topic hubs (TH): ${SITE_ORIGIN}/th/topics/[slug]`,
   );
@@ -175,6 +180,18 @@ export async function GET() {
   push("");
 
   push(
+    "## Open source (MIT, on GitHub)", // DRAFT
+    "",
+    `The projects on ${SITE_ORIGIN}/open-source (Markdown: ${SITE_ORIGIN}/open-source.md), as of ${OPEN_SOURCE_SYNCED_ON}:`, // DRAFT
+    "",
+  );
+  for (const p of OPEN_SOURCE_PROJECTS)
+    push(
+      `- [${p.name}](${p.facts.url}) (${p.facts.license}${p.facts.release ? `, ${p.facts.release.tag}` : ""}): ${p.summary}`,
+    );
+  push("");
+
+  push(
     "## Agent & index surfaces",
     `- Agents: ${SITE_ORIGIN}/agents.md`,
     `- Markdown sitemap: ${SITE_ORIGIN}/sitemap.md`,
@@ -188,7 +205,7 @@ export async function GET() {
     `- This file: ${SITE_ORIGIN}/llms.txt`,
     `- Full profile (one fetch): ${SITE_ORIGIN}/llms-full.txt`,
     `- Solopreneur operating model: ${SITE_ORIGIN}/operating-model.md`,
-    `- Markdown versions of pages: ${SITE_ORIGIN}/about.md and ${SITE_ORIGIN}/portfolio/[slug].md (also linked from each page as rel="alternate" type="text/markdown"). The home page, /about and each project page also answer a request sent with Accept: text/markdown in Markdown.`,
+    `- Markdown versions of pages: ${SITE_ORIGIN}/about.md, ${SITE_ORIGIN}/open-source.md and ${SITE_ORIGIN}/portfolio/[slug].md (also linked from each page as rel="alternate" type="text/markdown"). The home page, /about, /open-source and each project page also answer a request sent with Accept: text/markdown in Markdown.`,
     "",
   );
 

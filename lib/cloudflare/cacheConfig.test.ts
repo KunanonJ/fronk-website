@@ -57,6 +57,7 @@ describe("production Worker config (TanStack Start)", () => {
       "/*/",
       "/",
       "/about",
+      "/open-source",
       ...[...getAllPortfolioSlugs()].sort().map((slug) => `/portfolio/${slug}`),
     ];
     for (const config of [wrangler, staging]) {

@@ -9,10 +9,13 @@ import {
   getAllPortfolioProjects,
   isPersonalProject,
 } from "@/lib/content/portfolio";
+import { OPEN_SOURCE_PROJECTS } from "@/lib/content/openSource";
 import { getAllTopicPillars } from "@/lib/content/topics/pillars";
 import { getAllVentures } from "@/lib/content/ventures";
+import { SITE_ORIGIN } from "@/lib/site";
 import { buildAgentsMd } from "./agentsMd";
 import { GET as llmsTxt } from "./llms";
+import { buildLlmsFull } from "./llmsFull";
 import { buildSitemapMd } from "./sitemapMd";
 
 describe("agent docs", () => {
@@ -193,5 +196,37 @@ describe("agent readiness in the agent docs", () => {
     );
     expect(md).toContain("`Accept: text/markdown`");
     expect(md).toContain("content signals");
+  });
+});
+
+describe("the open-source page in the agent docs", () => {
+  it("sitemap.md lists the page and its Markdown", () => {
+    const md = buildSitemapMd();
+    expect(md).toContain("`/open-source` | Open source");
+    expect(md).toContain("[/open-source.md](/open-source.md)");
+  });
+
+  it("llms.txt links the page and every repository", async () => {
+    const text = await (await llmsTxt()).text();
+    expect(text).toContain(`- Open source: ${SITE_ORIGIN}/open-source`);
+    expect(text).toContain("## Open source (MIT, on GitHub)");
+    expect(text).toContain(`${SITE_ORIGIN}/open-source.md`);
+    for (const p of OPEN_SOURCE_PROJECTS) expect(text).toContain(p.facts.url);
+  });
+
+  it("llms-full.txt holds every project with its repository and install", () => {
+    const text = buildLlmsFull();
+    expect(text).toContain("## Open source");
+    for (const p of OPEN_SOURCE_PROJECTS) {
+      expect(text).toContain(`### ${p.name}`);
+      expect(text).toContain(p.facts.url);
+      for (const step of p.install ?? []) expect(text).toContain(step.command);
+    }
+  });
+
+  it("agents.md names the page and its Markdown", () => {
+    const md = buildAgentsMd();
+    expect(md).toContain("[/open-source.md](/open-source.md)");
+    expect(md).toContain("`/open-source`");
   });
 });

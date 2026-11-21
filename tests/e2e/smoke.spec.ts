@@ -2327,6 +2327,7 @@ test.describe("agent readiness", () => {
     for (const [path, markdown] of [
       ["/", "/index.md"],
       ["/about", "/about.md"],
+      ["/open-source", "/open-source.md"],
       ["/portfolio/kunanonj-com", "/portfolio/kunanonj-com.md"],
     ]) {
       const md = await request.get(path, {
@@ -2553,6 +2554,8 @@ test.describe("tap areas > at phone widths, 24 px or more, apart and uncovered",
     "/th/topics/ai-transformation-thailand",
     "/stack",
     "/proof",
+    // The open-source cards: four Copy pills and the foot links.
+    "/open-source",
   ];
 
   test.beforeEach(async ({ page }) => {
@@ -3003,5 +3006,145 @@ test.describe("about > Save my edition and the holo card (Phase 6)", () => {
     await page.waitForTimeout(400);
     await expect(page.locator(".pf-holo")).toHaveCount(0);
     expect(await transformOf(page)).toBe("none");
+  });
+});
+
+/** The committed GitHub snapshot the open-source page is built from. */
+type OpenSourceSnapshot = {
+  projects: {
+    url: string;
+    lastCommitAt: string;
+    release: { tag: string } | null;
+  }[];
+};
+const openSource = JSON.parse(
+  readFileSync("lib/content/openSource.generated.json", "utf8"),
+) as OpenSourceSnapshot;
+
+test.describe("open source > the owner's projects, from the GitHub snapshot", () => {
+  test("Home's strip follows the story and a tile opens its card under the bar", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript(() => {
+      try {
+        sessionStorage.setItem("fronk-intro-seen", "1");
+      } catch {
+        // Storage can be unavailable; the intro then plays and ends.
+      }
+    });
+    await page.goto("/", { waitUntil: "networkidle" });
+    expect(
+      await page
+        .locator("#open-source")
+        .evaluate((el) => el.previousElementSibling?.id),
+    ).toBe("journey");
+    const strip = page.getByRole("region", { name: "Built in the open." });
+    const tiles = strip.getByRole("list").getByRole("link");
+    await expect(tiles).toHaveCount(openSource.projects.length);
+    await tiles.first().click();
+    await expect(page).toHaveURL(/\/open-source#superstacks$/);
+    const card = page.locator("#superstacks");
+    await expect(card).toBeInViewport();
+    // Clear of the floating bar (the root's 96 px scroll padding).
+    await expect
+      .poll(async () => (await card.boundingBox())?.y ?? -1)
+      .toBeGreaterThanOrEqual(90);
+  });
+
+  test("each card links its repository in a new tab and names its latest release", async ({
+    page,
+  }) => {
+    await page.goto("/open-source", { waitUntil: "networkidle" });
+    const cards = page.locator("main article");
+    await expect(cards).toHaveCount(openSource.projects.length);
+    for (const [index, project] of openSource.projects.entries()) {
+      const card = cards.nth(index);
+      const repo = card.locator(`a[href="${project.url}"]`);
+      await expect(repo).toHaveAttribute("target", "_blank");
+      await expect(repo).toHaveAttribute("rel", /noopener/);
+      if (project.release)
+        await expect(
+          card.getByText(project.release.tag, { exact: true }),
+        ).toBeVisible();
+    }
+  });
+
+  test("Copy puts each Superstacks step on the clipboard: the marketplace, then the plugin", async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    test.skip(browserName !== "chromium", "only Chromium reads the clipboard");
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/open-source", { waitUntil: "networkidle" });
+    const card = page.getByRole("article", { name: "Superstacks" });
+    // The Updated words show once the page has hydrated.
+    await expect(card.locator("time[title]")).toBeVisible();
+    for (const [name, announcement, command] of [
+      [
+        "Copy the Superstacks marketplace command",
+        "Copied the marketplace command",
+        "/plugin marketplace add KunanonJ/superstacks",
+      ],
+      [
+        "Copy the Superstacks plugin install command",
+        "Copied the plugin install command",
+        "/plugin install superstacks@superstacks",
+      ],
+    ]) {
+      // Each row has its own live region, beside its button.
+      const row = card
+        .locator(".pf-cat-command")
+        .filter({ has: page.getByRole("button", { name }) });
+      await row.getByRole("button", { name }).click();
+      await expect(row.getByRole("status")).toHaveText(announcement!);
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        command,
+      );
+    }
+  });
+
+  test("Updated is a date in the HTML and words after hydration, with no warning", async ({
+    page,
+  }) => {
+    const [superstacks] = openSource.projects;
+    const committed = new Date(superstacks!.lastCommitAt);
+    const errors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error" || /hydrat/i.test(message.text()))
+        errors.push(message.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    // A crawler, or a visitor before the script runs, reads the date.
+    const html = await (await page.request.get("/open-source")).text();
+    expect(html).toMatch(
+      new RegExp(
+        `<time [^>]*dateTime="${superstacks!.lastCommitAt.slice(0, 10)}"[^>]*>\\d{1,2} \\w{3} \\d{4}</time>`,
+        "i",
+      ),
+    );
+    expect(html).not.toMatch(/<time [^>]*>[^<]*(ago|today|yesterday)</);
+
+    // Five UTC days after the commit, the browser says so.
+    await page.clock.setFixedTime(
+      new Date(committed.getTime() + 5 * 86_400_000),
+    );
+    await page.goto("/open-source", { waitUntil: "networkidle" });
+    const updated = page
+      .getByRole("article", { name: "Superstacks" })
+      .locator("dd time");
+    await expect(updated).toHaveText("5 days ago");
+    await expect(updated).toHaveAttribute(
+      "title",
+      new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(committed),
+    );
+    expect(errors.filter(isRealError)).toEqual([]);
   });
 });

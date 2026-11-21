@@ -35,6 +35,11 @@ export const PAGE_META = {
     title: "Learn",
     description: `How I think about AI transformation, internal systems, and shipping from Bangkok — hubs, ${BLOG_PUBLIC ? "writing, " : ""}and operator notes.`,
   },
+  "open-source": {
+    title: "Open source", // DRAFT
+    description:
+      "Superstacks, the agent skills I build with; a Thai SME accounting, tax and business law handbook with an AI skill; and OpenFinance. All MIT, all on GitHub.", // DRAFT
+  },
   portfolio: {
     title: "Portfolio",
     description:

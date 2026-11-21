@@ -4,10 +4,15 @@ import { AVAILABILITY } from "@/lib/content/availability";
 import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { FAQ_ITEMS } from "@/lib/content/faq";
 import { SITE_UPDATED } from "@/lib/content/freshness";
+import {
+  OPEN_SOURCE_PROJECTS,
+  OPEN_SOURCE_SYNCED_ON,
+} from "@/lib/content/openSource";
 import { getAllPortfolioProjects } from "@/lib/content/portfolio";
 import { buildAboutMd, GET as aboutMd } from "./aboutMd";
 import { SITE_ORIGIN } from "@/lib/site";
 import { absoluteUrl } from "./markdown";
+import { buildOpenSourceMd, GET as openSourceMd } from "./openSourceMd";
 import { buildPortfolioProjectMd, GET as portfolioMd } from "./portfolioMd";
 
 /** Every Markdown link target must be absolute: agents read these out of context. */
@@ -134,5 +139,62 @@ describe("portfolio/<slug>.md", () => {
     const res = portfolioMd("not-a-project");
     expect(res.status).toBe(404);
     expect(await res.text()).toContain("Not found");
+  });
+});
+
+describe("open-source.md", () => {
+  const md = buildOpenSourceMd();
+
+  it("is dated twice: the site's day and the day GitHub was read", () => {
+    expect(
+      md.startsWith("# Open source: Kunanon Jarat (Fronk / KunanonJ)\n"),
+    ).toBe(true);
+    expect(md).toContain(`Source: ${SITE_ORIGIN}/open-source  `);
+    expect(md).toContain(`Updated: ${SITE_UPDATED}  `);
+    expect(md).toContain(`GitHub numbers as of: ${OPEN_SOURCE_SYNCED_ON}`);
+  });
+
+  it("carries every project in the page's order, with its repository and counts", () => {
+    const headings = [...md.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+    expect(headings).toEqual(OPEN_SOURCE_PROJECTS.map((p) => p.name));
+    for (const p of OPEN_SOURCE_PROJECTS) {
+      expect(md).toContain(`- **Repository:** ${p.facts.url}`);
+      // Agents get the counts the page keeps under STARS_SHOWN_FROM.
+      expect(md).toContain(
+        `- **Stars and forks on GitHub:** ${p.facts.stars} and ${p.facts.forks}`,
+      );
+    }
+  });
+
+  it("keeps each install step whole under its label, fenced by where it is typed", () => {
+    const steps = OPEN_SOURCE_PROJECTS.flatMap((p) => p.install ?? []);
+    expect(steps.length).toBe(4);
+    for (const step of steps)
+      expect(md).toContain(
+        `${step.label}:\n\n\`\`\`${step.fence}\n${step.command}\n\`\`\``,
+      );
+    // Claude Code's slash commands are not shell commands.
+    expect(md).toContain(
+      "```text\n/plugin marketplace add KunanonJ/superstacks\n```",
+    );
+    expect(md).toContain(
+      "```text\n/plugin install superstacks@superstacks\n```",
+    );
+    expect(md).not.toMatch(/```sh\n\/plugin/);
+    expect(md).not.toContain("Live demo");
+  });
+
+  it("links absolutely only", () => {
+    expect(md).not.toContain("](/");
+    expect(relativeLinks(md)).toEqual([]);
+    expect(md).toContain(`- **On this site:** ${SITE_ORIGIN}/skills`);
+  });
+
+  it("is served as Markdown", async () => {
+    const res = openSourceMd();
+    expect(res.headers.get("content-type")).toBe(
+      "text/markdown; charset=utf-8",
+    );
+    expect(await res.text()).toBe(md);
   });
 });

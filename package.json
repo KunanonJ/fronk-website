@@ -61,6 +61,7 @@
     "perf:budget": "node scripts/check-first-load-budget.mjs",
     "probe": "node scripts/ux-probe.mjs",
     "skills:sync": "node scripts/sync-skills.mjs",
+    "oss:sync": "node scripts/sync-open-source.mjs",
     "seed": "node scripts/seed-content.mjs",
     "pdf": "node scripts/generate-resume-pdf.mjs"
   },

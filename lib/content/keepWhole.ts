@@ -20,3 +20,8 @@ export function keepNamesWhole(text: string): string {
 export function keepLastWordsTogether(text: string): string {
   return text.replace(/ (?=\S+$)/, NBSP);
 }
+
+/** `text` on one line: every space no-break (a short date, "21 Nov 2026"). */
+export function keepWhole(text: string): string {
+  return text.replaceAll(" ", NBSP);
+}

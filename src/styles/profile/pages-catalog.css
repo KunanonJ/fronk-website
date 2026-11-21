@@ -77,7 +77,7 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  /* Each word of a command is one box (SkillParts' CommandWords), so a line
+  /* Each word of a command is one box (CommandRow's CommandWords), so a line
      breaks only at a space, never after the hyphen in "--copy"; a word
      longer than the row still wraps inside its box. */
   .pf-cat-command__word {
@@ -86,6 +86,29 @@
   }
   .pf-cat-command .ds-pill {
     margin-inline-start: auto;
+  }
+  /* Several commands, one per line (CommandRow's `lines`, /open-source
+     only): the lines take the row and Copy goes under them. Each line is a
+     block whose wrapped rows hang 2ch in, so a reader sees where a command
+     starts; its boxes keep no indent of their own (text-indent inherits
+     into inline-blocks). A word with slashes is a box per part
+     (SlashParts), so an address breaks after a slash, never after a
+     hyphen. */
+  .pf-cat-command--lines .pf-cat-command__text {
+    flex-basis: 100%;
+  }
+  .pf-cat-command__line {
+    display: block;
+    padding-inline-start: 2ch;
+    text-indent: -2ch;
+  }
+  .pf-cat-command__line .pf-cat-command__word,
+  .pf-cat-command__part {
+    text-indent: 0;
+  }
+  .pf-cat-command__part {
+    display: inline-block;
+    max-inline-size: 100%;
   }
   /* A copy button holds every word it can say in one cell, so it never
      changes width. */

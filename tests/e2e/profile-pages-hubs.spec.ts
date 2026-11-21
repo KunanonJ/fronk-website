@@ -45,7 +45,14 @@ const HUBS = [
   "/th/topics/tech-startup-thailand-sea",
   "/th/topics/forward-deployed-ai-engineering",
 ] as const;
-const READING = ["/learn", "/examples", "/stack", "/proof", "/build"] as const;
+const READING = [
+  "/learn",
+  "/examples",
+  "/stack",
+  "/proof",
+  "/build",
+  "/open-source",
+] as const;
 const PAGES = [...HUBS, ...READING];
 const FDE = "/topics/forward-deployed-ai-engineering";
 const FDE_TH = "/th/topics/forward-deployed-ai-engineering";
@@ -56,6 +63,7 @@ const BEST_PRACTICE_PAGES = [
   "/th/topics/tech-startup-thailand-sea",
   "/stack",
   "/proof",
+  "/open-source",
 ] as const;
 
 /**

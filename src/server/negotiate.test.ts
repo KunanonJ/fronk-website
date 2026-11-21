@@ -46,12 +46,15 @@ describe("markdownPathFor", () => {
   it.each([
     ["/", "/index.md"],
     ["/about", "/about.md"],
+    ["/open-source", "/open-source.md"],
     ["/portfolio/kunanonj-com", "/portfolio/kunanonj-com.md"],
     ["/portfolio", null],
     ["/portfolio/kunanonj-com/cover.webp", null],
     ["/portfolio/kunanonj-com.md", null],
     ["/resume", null],
     ["/about.md", null],
+    ["/open-source.md", null],
+    ["/open-source/", null],
   ])("%s → %s", (pathname, expected) => {
     expect(markdownPathFor(pathname)).toBe(expected);
   });

@@ -43,6 +43,7 @@ const PAGES: readonly SearchEntry[] = [
   ...(
     [
       "skills",
+      "open-source",
       "learn",
       "proof",
       "stack",
