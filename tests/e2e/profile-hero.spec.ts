@@ -634,7 +634,7 @@ test.describe("hero: the device matrix and the tap areas (spec 10.1, plan gates 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
     await visit(page);
-    for (const width of [344, 390, 820, 882, 1180, 1440]) {
+    for (const width of [344, 390, 820, 882, 1024, 1180, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.evaluate(
         () => new Promise((done) => requestAnimationFrame(() => done(null))),
@@ -661,7 +661,9 @@ test.describe("hero: the device matrix and the tap areas (spec 10.1, plan gates 
       });
       expect(layout.sideways, `sideways at ${width}`).toBeLessThanOrEqual(1);
       expect(layout.stacked, `copy in order at ${width}`).toBe(true);
-      if (width >= 1180) {
+      // Side by side from 1180, and from 1024 on a landscape screen such
+      // as this loop's 1024 x 900 (UX sweep 21-11-26).
+      if (width >= 1024) {
         expect(layout.mock.left, `beside at ${width}`).toBeGreaterThanOrEqual(
           layout.copy.right,
         );
@@ -746,6 +748,72 @@ test.describe("hero: the device matrix and the tap areas (spec 10.1, plan gates 
       const box = (await page.locator(part).boundingBox())!;
       expect(box.x + box.width, part).toBeLessThanOrEqual(540);
     }
+  });
+});
+
+test.describe("hero: side by side from 1024 px on a landscape screen (UX sweep 21-11-26)", () => {
+  test("at 1024 x 768 the copy, the canvas and the strip's pause share the first screen", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await prepare(page);
+    await visit(page);
+    const hero = page.locator(HERO);
+    // Two columns; the canvas about as wide as at 1180 (503 px). Read from
+    // the grid, not the boxes, which the entrance still scales.
+    const columns = await page
+      .locator(".pf-hero__grid")
+      .evaluate((grid) =>
+        getComputedStyle(grid).gridTemplateColumns.split(" ").map(parseFloat),
+      );
+    expect(columns).toHaveLength(2);
+    expect(columns[1]).toBeGreaterThanOrEqual(500);
+    const h1 = hero.getByRole("heading", { level: 1 });
+    const size = await h1.evaluate((el) =>
+      parseFloat(getComputedStyle(el).fontSize),
+    );
+    expect(size).toBeGreaterThanOrEqual(52);
+    expect(size).toBeLessThanOrEqual(72);
+    // Line 1, "Hi, I’m Kunanon Jarat.", stays one line.
+    const lineOne = await page
+      .locator(".pf-hero__line")
+      .first()
+      .evaluate(
+        (line) =>
+          line.getBoundingClientRect().height /
+          parseFloat(getComputedStyle(line).lineHeight),
+      );
+    expect(lineOne).toBeLessThan(1.5);
+    for (const part of [
+      h1,
+      hero.getByText("Currently building"),
+      hero.getByRole("link", { name: "Contact me", exact: true }),
+      hero.getByRole("link", { name: "Résumé", exact: true }),
+      page.locator(".pf-mock"),
+      hero.getByRole("button", { name: "Pause motion" }),
+    ]) {
+      await expect(part).toBeInViewport({ ratio: 1 });
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+  });
+
+  test("a 1024 x 1366 portrait screen keeps the stack, the canvas under the copy", async ({
+    page,
+  }) => {
+    only(["desktop"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1024, height: 1366 });
+    await prepare(page);
+    await visit(page);
+    const copy = (await page.locator(".pf-hero__copy").boundingBox())!;
+    const mock = (await page.locator(".pf-mock-wrap").boundingBox())!;
+    expect(mock.y).toBeGreaterThanOrEqual(copy.y + copy.height);
   });
 });
 
@@ -872,10 +940,11 @@ test.describe("hero: the sticky stage (plan step 2a, spec 12 item 9)", () => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await prepare(page);
     await visit(page);
-    // The stage is taller than the screen and stuck under #work, which
-    // covers its lower part.
+    // The stage fills the screen (side by side from 1024 px on a landscape
+    // screen; UX sweep 21-11-26) and is stuck under #work, which covers
+    // its lower part.
     const height = (await page.locator(HERO).boundingBox())!.height;
-    expect(height).toBeGreaterThan(768);
+    expect(height).toBeGreaterThanOrEqual(768);
     await page.evaluate(
       (y) => window.scrollTo({ top: y, behavior: "instant" }),
       height - 768 + 400,
