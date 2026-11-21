@@ -62,6 +62,7 @@ export const orbitTools: readonly OrbitTool[] = stackItems.map((item) => ({
 export const storyCopy = {
   /**
    * From the résumé: the university, then each employer in order; no figure.
+   * The last paragraph closes with `latest`.
    */
   paragraphs: [
     [
@@ -72,14 +73,22 @@ export const storyCopy = {
     [
       "From there I moved into delivery: ",
       { strong: "business systems" },
-      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs. Most recently I led ", // Owner direction 20-11-26.
-      // The name unbroken on phones (keepWhole.ts).
-      {
-        strong: keepNamesWhole("IT and AI engineering at The Binary Holdings"),
-      },
-      ".",
+      " at KK Venture Global, IT projects at Coins.co.th, product launches at Playbux, then AI projects at Aiden Labs.",
     ],
   ] as const satisfies readonly (readonly StoryRun[])[],
+  /**
+   * The last paragraph's closing sentence, the role that ended, kept apart
+   * so /about can leave it out: its Now, right under the story, tells the
+   * same role in full (owner decision 21-11-26).
+   */
+  latest: [
+    " Most recently I led ", // Owner direction 20-11-26.
+    // The name unbroken on phones (keepWhole.ts).
+    {
+      strong: keepNamesWhole("IT and AI engineering at The Binary Holdings"),
+    },
+    ".",
+  ] as const satisfies readonly StoryRun[],
   nowHeading: "What I’m building now", // Owner direction 20-11-26.
   /**
    * The availability the owner directed on 20-11-26 (availability.ts), its

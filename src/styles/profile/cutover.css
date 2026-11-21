@@ -270,14 +270,6 @@
   .pf-about-page__section {
     padding-top: 112px;
   }
-  .pf-about-page__prose {
-    max-inline-size: var(--measure);
-    margin-top: 32px;
-    color: var(--ink-80);
-  }
-  .pf-about-page__prose > * + * {
-    margin-top: 1em;
-  }
   .pf-about-page__grid {
     display: grid;
     gap: 12px;

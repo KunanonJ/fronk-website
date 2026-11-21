@@ -201,9 +201,12 @@ export const aboutPage = {
     ] satisfies readonly AboutPrinciple[],
   },
 
+  /**
+   * /about sets this in the story's column, beside the records card: the
+   * heading is an h3 there and carries the id (owner decision 21-11-26).
+   */
   now: {
     id: "now",
-    eyebrow: "Now",
     heading: "What I'm doing now.",
     paragraphs: [
       {
