@@ -35,7 +35,7 @@ export function SlashBreaks({ text }: { text: string }) {
  * (`.pf-cat-command__part`). A part longer than the row still wraps inside
  * its own box. The text is unchanged.
  */
-function SlashParts({ word }: { word: string }) {
+export function SlashParts({ word }: { word: string }) {
   const parts = word.match(/\/*[^/]+\/*|\/+/g) ?? [word];
   return parts.map((part, i) => (
     <Fragment key={i}>

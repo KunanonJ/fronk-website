@@ -1,6 +1,7 @@
 import snapshot from "@/lib/content/openSource.generated.json";
 import type { PixelTone } from "@/lib/landing/journey";
 import { formatDay } from "@/lib/utils/relativeDay";
+import { keepWhole } from "@/lib/content/keepWhole";
 
 /*
  * The owner's open-source projects (owner request 21-11-26: Superstacks,
@@ -226,7 +227,7 @@ export const openSourcePage = {
     href: "https://github.com/KunanonJ",
     handle: "KunanonJ",
   },
-  meta: `${OPEN_SOURCE_PROJECTS.length} projects · ${LICENSES.length === 1 ? `${LICENSES[0]} license` : "open-source licenses"} · GitHub numbers as of ${formatDay(OPEN_SOURCE_SYNCED_ON)}`, // DRAFT
+  meta: `${OPEN_SOURCE_PROJECTS.length} projects · ${LICENSES.length === 1 ? `${LICENSES[0]} license` : "open-source licenses"} · GitHub numbers as of ${keepWhole(formatDay(OPEN_SOURCE_SYNCED_ON))}`, // DRAFT
   labels: {
     projects: "Projects", // DRAFT
     release: "Latest release", // DRAFT

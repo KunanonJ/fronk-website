@@ -2,7 +2,7 @@ import { ArrowUpRightIcon } from "@/components/bento/icons";
 import { DaysAgo } from "@/components/ds/DaysAgo";
 import { Chip } from "@/components/ds/labels";
 import { pillClass } from "@/components/ds/Pill";
-import { CommandRow } from "@/components/landing/skills/CommandRow";
+import { CommandRow, SlashParts } from "@/components/landing/skills/CommandRow";
 import { PixelBadge } from "@/components/profile/home/PixelIcon";
 import { ArrowLink, BlockHead } from "@/components/profile/pages/library/parts";
 import {
@@ -133,7 +133,8 @@ function ProjectCard({ project }: { project: OpenSourceProject }) {
             className="ds-text-link pf-read-link"
           >
             <span className="t-meta pf-read-path">
-              {facts.url.replace(/^https:\/\//, "")}
+              {/* Breaks only after a slash, never inside "thai-accounting-tax-law". */}
+              <SlashParts word={facts.url.replace(/^https:\/\//, "")} />
               <span className="sr-only"> (opens in a new tab)</span>
             </span>
           </a>
