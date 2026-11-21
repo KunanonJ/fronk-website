@@ -120,3 +120,26 @@ export function reloadOnStaleChunk(router: Router, win: Window = window) {
     win.removeEventListener("vite:preloadError", onChunkError);
   };
 }
+
+/**
+ * What the root route starts once hydrated (it loads this module as a chunk
+ * of its own, so the entry chunk every page loads carries only the import):
+ * the listener above, from the window's load event on. Until then a failed
+ * file is the asset retry's (src/lib/assetRetry.ts), so the two never act
+ * on the same failure. Returns the unsubscribe.
+ */
+export function reloadOnStaleChunkAfterLoad(
+  router: Router,
+  win: Window = window,
+) {
+  let stop: (() => void) | undefined;
+  const start = () => {
+    stop = reloadOnStaleChunk(router, win);
+  };
+  if (win.document.readyState === "complete") start();
+  else win.addEventListener("load", start, { once: true });
+  return () => {
+    win.removeEventListener("load", start);
+    stop?.();
+  };
+}

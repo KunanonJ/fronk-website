@@ -88,23 +88,16 @@ function RootDocument({ children }: { children: ReactNode }) {
   useEffect(() => {
     let stop: (() => void) | undefined;
     let left = false;
-    // After the load event: until then a failed file is the asset retry's
-    // (src/lib/assetRetry.ts), so the two never act on the same failure;
-    // this one is for the navigations that follow.
-    const start = () => {
-      import("@/src/lib/staleChunk")
-        .then(({ reloadOnStaleChunk }) => {
-          if (!left) stop = reloadOnStaleChunk(router);
-        })
-        // Its own chunk missing means this document's build is gone
-        // already: nothing to recover with, and nothing worth an error.
-        .catch(() => {});
-    };
-    if (document.readyState === "complete") start();
-    else window.addEventListener("load", start, { once: true });
+    import("@/src/lib/staleChunk").then(
+      (chunk) => {
+        if (!left) stop = chunk.reloadOnStaleChunkAfterLoad(router);
+      },
+      // Its own chunk missing means this document's build is gone already:
+      // nothing to recover with, and nothing worth an error.
+      () => {},
+    );
     return () => {
       left = true;
-      window.removeEventListener("load", start);
       stop?.();
     };
   }, [router]);

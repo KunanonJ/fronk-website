@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { reloadOnStaleChunk } from "@/src/lib/staleChunk";
+import {
+  reloadOnStaleChunk,
+  reloadOnStaleChunkAfterLoad,
+} from "@/src/lib/staleChunk";
 
 /*
  * A navigation whose chunk a deploy removed (src/lib/staleChunk.ts): while
@@ -253,5 +256,59 @@ describe("a navigation whose chunk a deploy removed", () => {
     expect(page.chunkFails()).toBe(false);
     await page.settle();
     expect(page.reload).not.toHaveBeenCalled();
+  });
+});
+
+/*
+ * The root route starts it after the window's load event (until then a
+ * failed file is the asset retry's), or at once when the page has loaded.
+ */
+describe("reloadOnStaleChunkAfterLoad", () => {
+  function fakeWindow(readyState: "loading" | "complete") {
+    const on = new Map<string, Set<() => void>>();
+    const add = (type: string, listener: () => void) =>
+      on.set(type, (on.get(type) ?? new Set()).add(listener));
+    const remove = (type: string, listener: () => void) =>
+      on.get(type)?.delete(listener);
+    const win = {
+      location: { origin: ORIGIN, pathname: PAGE },
+      document: {
+        readyState,
+        querySelectorAll: () => [],
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      },
+      addEventListener: add,
+      removeEventListener: remove,
+    } as unknown as Window;
+    const listening = () => (on.get("vite:preloadError")?.size ?? 0) > 0;
+    const load = () => [...(on.get("load") ?? [])].forEach((fn) => fn());
+    return { win, listening, load };
+  }
+  const router = { state: { status: "idle" } };
+
+  it("listens from the load event on", () => {
+    const { win, listening, load } = fakeWindow("loading");
+    const stop = reloadOnStaleChunkAfterLoad(router, win);
+    expect(listening()).toBe(false);
+    load();
+    expect(listening()).toBe(true);
+    stop();
+    expect(listening()).toBe(false);
+  });
+
+  it("listens at once when the page has loaded", () => {
+    const { win, listening } = fakeWindow("complete");
+    const stop = reloadOnStaleChunkAfterLoad(router, win);
+    expect(listening()).toBe(true);
+    stop();
+    expect(listening()).toBe(false);
+  });
+
+  it("never starts when left before the load event", () => {
+    const { win, listening, load } = fakeWindow("loading");
+    reloadOnStaleChunkAfterLoad(router, win)();
+    load();
+    expect(listening()).toBe(false);
   });
 });
