@@ -235,6 +235,12 @@ describe("CasePage, the cover (spec 9.4)", () => {
     expect(img).toHaveAttribute("width", "1440");
     expect(img).toHaveAttribute("height", "900");
     expect(img).toHaveAttribute("sizes", "(max-width: 1360px) 100vw, 1360px");
+    // Its capture at twice the pixels for a 2x screen (UX hunt 22-11-26,
+    // U26); a 1x screen keeps the 1440 file.
+    expect(img).toHaveAttribute(
+      "srcset",
+      "/portfolio/kunanonj-com/cover.webp 1440w, /portfolio/kunanonj-com/cover-2880.webp 2880w",
+    );
     expect(img).not.toHaveAttribute("fetchpriority");
     expect(cover.querySelector("figcaption")).toBeNull();
   });

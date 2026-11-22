@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { primaryNav } from "@/lib/content/landing";
 import {
@@ -9,6 +9,7 @@ import {
   getFeaturedPortfolioProjects,
   getPortfolioProjectBySlug,
 } from "@/lib/content/portfolio";
+import { webpSize } from "@/tests/webpSize";
 
 const projects = getAllPortfolioProjects();
 
@@ -65,6 +66,32 @@ describe("portfolio content", () => {
           existsSync(join(process.cwd(), "public", image.src)),
           `missing file public${image.src}`,
         ).toBe(true);
+      }
+    }
+  });
+
+  // UX hunt 22-11-26, U26: a 2x screen takes a larger file of the cover.
+  it("registers each WebP at its pixel size, and larger files of the same picture beside it", () => {
+    const images = projects.flatMap((p) => [
+      ...(p.cover ? [p.cover] : []),
+      ...(p.gallery ?? []),
+    ]);
+    expect(images.some((image) => image.larger?.length)).toBe(true);
+    for (const image of images) {
+      const file = (src: string) => join(process.cwd(), "public", src);
+      if (image.src.endsWith(".webp"))
+        expect(webpSize(file(image.src)), image.src).toEqual({
+          width: image.width,
+          height: image.height,
+        });
+      for (const larger of image.larger ?? []) {
+        expect(dirname(larger.src), larger.src).toBe(dirname(image.src));
+        expect(larger.src, larger.src).toMatch(/\.webp$/);
+        expect(larger.width, larger.src).toBeGreaterThan(image.width);
+        expect(webpSize(file(larger.src)), larger.src).toEqual({
+          width: larger.width,
+          height: (larger.width * image.height) / image.width,
+        });
       }
     }
   });

@@ -84,6 +84,13 @@ export const aboutPage = {
     role: `Founder of GoGoCash and Manut AI. Previously ${LATEST_ROLE.title} at ${LATEST_ROLE.organization}.`,
     /** 480x480 WebP crop of /profile.jpg for the round frame. */
     portraitSrc: "/profile-portrait.webp",
+    /**
+     * The same crop at its full 800 px (800 x 800 at 217, 20 in
+     * /profile.jpg, WebP quality 80 as the 480), for 2x and 3x screens,
+     * where the frame draws 280 to 420 px (UX hunt 22-11-26, U26). The
+     * photo holds no more than that, so no larger file.
+     */
+    portraitLarge: { src: "/profile-portrait-800.webp", width: 800 },
     portraitAlt: "Kunanon Jarat (Fronk), headshot",
     primaryCta: { label: "Contact me", href: "/contact" },
     secondaryCta: { label: "See my work", href: "/portfolio" },

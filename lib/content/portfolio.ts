@@ -33,6 +33,12 @@ export interface PortfolioImage {
   alt: string;
   width: number;
   height: number;
+  /**
+   * The same picture with more pixels, for screens that draw more of them
+   * (a 2x desktop): each file with its pixel width, wider than `width`, in
+   * the same proportions. The case cover lists them beside `src`.
+   */
+  larger?: readonly { src: string; width: number }[];
 }
 
 /**
@@ -779,13 +785,16 @@ const PORTFOLIO_PROJECTS: readonly PortfolioProject[] = [
     // A real screenshot, not a mockup: the site is public, and the app-shell
     // mockup (a sidebar dashboard) looks nothing like it. Home at 1440 x 900
     // in the light theme with reduced motion, after the intro, from a
-    // production build, saved as WebP (quality 85; captured again 21-11-26).
-    // Capture it again when Home changes.
+    // production build, saved as WebP (quality 85; captured again 21-11-26),
+    // and the same capture at device scale 2 (2880 x 1800, 22-11-26): the
+    // cover draws 1296 px wide at 1440, which a 2x screen fills with 2592
+    // pixels (UX hunt 22-11-26, U26). Capture both again when Home changes.
     cover: {
       src: "/portfolio/kunanonj-com/cover.webp",
       alt: "The Home page of kunanonj.com: the headline Hi, I’m Kunanon Jarat. Forward deployed AI engineering from Bangkok, the Currently building and GoGoCash and Manut AI chips, the Contact me and Résumé buttons, a design canvas showing three selected projects, and the row of places he has worked",
       width: 1440,
       height: 900,
+      larger: [{ src: "/portfolio/kunanonj-com/cover-2880.webp", width: 2880 }],
     },
     workflow: {
       title: "From change to production",
