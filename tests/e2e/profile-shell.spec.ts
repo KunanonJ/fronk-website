@@ -1466,3 +1466,95 @@ test.describe("router: a scroll made before hydration", () => {
     expect(Math.abs(top - 112)).toBeLessThanOrEqual(3);
   });
 });
+
+/**
+ * A link to a Home section from another page, before Home has rendered in
+ * the visit (UX hunt 2, U01). Home's stylesheet comes with Home, and React
+ * held Home back for it while the router looked for the section, so Home
+ * opened at the top; now Home's loader waits for the sheet. The anchor
+ * tests above start on Home, so the sheet is in before they navigate. In
+ * Chromium, WebKit and Firefox at 1440 px through the bar's links, and on
+ * the WebKit phone through the menu.
+ */
+test.describe("router: a Home section from another page, Home not yet rendered", () => {
+  /** Where each section lands at 390 px, where the scroll margins differ. */
+  const PHONE_LANDING: typeof LANDING = { work: 176, about: -32, journey: 0 };
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox", "webkit-phone"].includes(
+        testInfo.project.name,
+      ),
+      "Chromium, WebKit and Firefox at 1440 px, and the WebKit phone",
+    );
+  });
+
+  /** Follows the chrome's link to `label`: the bar's, or the phone menu's. */
+  async function follow(page: Page, label: string, phone: boolean) {
+    if (phone) {
+      await page.getByRole("button", { name: "Open menu" }).click();
+      await page
+        .getByRole("navigation", { name: "Site" })
+        .getByRole("link", { name: label, exact: true })
+        .click();
+    } else {
+      await primary(page)
+        .getByRole("link", { name: label, exact: true })
+        .click();
+    }
+  }
+
+  /** Waits until `section` has landed where its scroll margin puts it. */
+  async function landsOn(
+    page: Page,
+    section: keyof typeof LANDING,
+    phone: boolean,
+  ) {
+    const landing = (phone ? PHONE_LANDING : LANDING)[section];
+    // Home is not there until the navigation has rendered it.
+    const off = () =>
+      page.evaluate(
+        ([id, at]) => {
+          const el = document.getElementById(id);
+          return el ? Math.abs(el.getBoundingClientRect().top - at) : Infinity;
+        },
+        [section, landing] as const,
+      );
+    await expect
+      .poll(off, {
+        timeout: 10_000,
+        message: `#${section} reaches ${landing} px`,
+      })
+      .toBeLessThanOrEqual(3);
+    // And stays there once the page has stopped moving.
+    await settle(page);
+    expect(await off(), `#${section} after settling`).toBeLessThanOrEqual(3);
+  }
+
+  for (const [from, section, label] of [
+    ["/about", "journey", "Journey"],
+    ["/open-source", "about", "About"],
+    ["/skills/verify-loop", "work", "Work"],
+  ] as const) {
+    test(`from ${from}, ${label} lands on its section`, async ({
+      page,
+    }, testInfo) => {
+      const phone = testInfo.project.name === "webkit-phone";
+      await prepare(page);
+      await visit(page, from);
+      await follow(page, label, phone);
+      await expect(page).toHaveURL(new RegExp(`/#${section}$`));
+      await landsOn(page, section, phone);
+    });
+  }
+
+  test("under reduced motion too", async ({ page }, testInfo) => {
+    const phone = testInfo.project.name === "webkit-phone";
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/about");
+    await follow(page, "Journey", phone);
+    await expect(page).toHaveURL(/\/#journey$/);
+    await landsOn(page, "journey", phone);
+  });
+});

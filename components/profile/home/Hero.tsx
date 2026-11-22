@@ -16,6 +16,7 @@ import {
 } from "@/components/profile/home/IntroGate";
 import { LogoStrip } from "@/components/profile/home/LogoStrip";
 import { homeHero } from "@/lib/content/home";
+import { stylesheetReady } from "@/lib/router/stylesheet";
 import heroCss from "@/src/styles/profile/home-hero.css?url";
 
 /*
@@ -31,6 +32,18 @@ import heroCss from "@/src/styles/profile/home-hero.css?url";
  * 1440 x 900. Its stylesheet (src/styles/profile/home-hero.css) is linked
  * here, so no other page loads it.
  */
+
+/** The hero's stylesheet's precedence: its <link> below, and the loader's. */
+const PRECEDENCE = "pf-home-hero";
+
+/**
+ * Home's route loader (src/routes/_landing/index.tsx): the hero's stylesheet,
+ * in and loaded before a client navigation commits Home, so the router's
+ * scroll to /#work, /#about or /#journey finds its section (UX hunt 2, U01).
+ */
+export function heroStylesheetReady(): Promise<void> {
+  return stylesheetReady(heroCss, PRECEDENCE);
+}
 
 /** The stage's height, for the sticky offset in home-hero.css. */
 function useStageHeight(stage: RefObject<HTMLElement | null>) {
@@ -147,7 +160,7 @@ export default function Hero() {
 
   return (
     <>
-      <link rel="stylesheet" href={heroCss} precedence="pf-home-hero" />
+      <link rel="stylesheet" href={heroCss} precedence={PRECEDENCE} />
       <section
         ref={stage}
         className="pf-hero"

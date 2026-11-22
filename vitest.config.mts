@@ -11,6 +11,7 @@ const DOM_TS_TESTS = [
   "lib/hooks/useFinePointer.test.ts",
   "lib/motion/motionRuntime.test.ts",
   "src/lib/scrollRestoration.test.ts",
+  "lib/router/stylesheet.test.ts",
   "lib/brand/traitStore.test.ts",
   "lib/secrets/konami.test.ts",
   "components/profile/site/secrets/pixelParty.test.ts",
