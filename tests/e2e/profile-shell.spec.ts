@@ -1211,6 +1211,63 @@ test.describe("chrome: reduced motion", () => {
       ),
     ).toBe(0);
   });
+
+  /*
+   * The global reduced-motion rule (globals.css) gives every element a
+   * 0.01 ms transition of `all`. On a smooth curve, `visibility` and the
+   * registered custom properties kept their old value for the frame each
+   * transition began, so a control shown from `visibility: hidden` could
+   * not take focus in that frame (UX hunt 22-11-26, U06: the case viewer's
+   * Enlarge button as the viewer closed) and WebKit held the Journey ring's
+   * old turn (#186). They change at once now, and transitionend still fires.
+   */
+  test("a change lands at once: a control shown takes focus, a registered property reads its new value, transitionend fires", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox"].includes(testInfo.project.name),
+      "the desktop engines",
+    );
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const result = await page.evaluate(async () => {
+      // A box hidden as the viewer hides the page's tile, with a control
+      // inside that inherits it, as the tile's Enlarge button does.
+      const box = document.createElement("div");
+      box.style.visibility = "hidden";
+      const control = document.createElement("button");
+      control.textContent = "Probe";
+      box.append(control);
+      document.body.append(box);
+      const before = getComputedStyle(control).visibility;
+      box.style.visibility = "";
+      control.focus();
+      const focused = document.activeElement === control;
+      // --turn, registered in globals.css, as the Notebook's pages use it.
+      box.style.setProperty("--turn", "1");
+      const turn = getComputedStyle(box).getPropertyValue("--turn").trim();
+      // A transition still runs, and ends, for code that waits on it.
+      const ended = new Promise<string>((done) => {
+        box.addEventListener("transitionend", (event) => {
+          if (event.propertyName === "opacity") done(event.propertyName);
+        });
+        setTimeout(() => done("none"), 2000);
+      });
+      box.style.opacity = "0.5";
+      const opacity = getComputedStyle(box).opacity;
+      const end = await ended;
+      box.remove();
+      return { before, focused, turn, opacity, end };
+    });
+    expect(result).toEqual({
+      before: "hidden",
+      focused: true,
+      turn: "1",
+      opacity: "0.5",
+      end: "opacity",
+    });
+  });
 });
 
 test.describe("chrome: with JavaScript off", () => {
@@ -1464,5 +1521,97 @@ test.describe("router: a scroll made before hydration", () => {
       () => document.getElementById("ch-03")!.getBoundingClientRect().top,
     );
     expect(Math.abs(top - 112)).toBeLessThanOrEqual(3);
+  });
+});
+
+/**
+ * A link to a Home section from another page, before Home has rendered in
+ * the visit (UX hunt 2, U01). Home's stylesheet comes with Home, and React
+ * held Home back for it while the router looked for the section, so Home
+ * opened at the top; now Home's loader waits for the sheet. The anchor
+ * tests above start on Home, so the sheet is in before they navigate. In
+ * Chromium, WebKit and Firefox at 1440 px through the bar's links, and on
+ * the WebKit phone through the menu.
+ */
+test.describe("router: a Home section from another page, Home not yet rendered", () => {
+  /** Where each section lands at 390 px, where the scroll margins differ. */
+  const PHONE_LANDING: typeof LANDING = { work: 176, about: -32, journey: 0 };
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox", "webkit-phone"].includes(
+        testInfo.project.name,
+      ),
+      "Chromium, WebKit and Firefox at 1440 px, and the WebKit phone",
+    );
+  });
+
+  /** Follows the chrome's link to `label`: the bar's, or the phone menu's. */
+  async function follow(page: Page, label: string, phone: boolean) {
+    if (phone) {
+      await page.getByRole("button", { name: "Open menu" }).click();
+      await page
+        .getByRole("navigation", { name: "Site" })
+        .getByRole("link", { name: label, exact: true })
+        .click();
+    } else {
+      await primary(page)
+        .getByRole("link", { name: label, exact: true })
+        .click();
+    }
+  }
+
+  /** Waits until `section` has landed where its scroll margin puts it. */
+  async function landsOn(
+    page: Page,
+    section: keyof typeof LANDING,
+    phone: boolean,
+  ) {
+    const landing = (phone ? PHONE_LANDING : LANDING)[section];
+    // Home is not there until the navigation has rendered it.
+    const off = () =>
+      page.evaluate(
+        ([id, at]) => {
+          const el = document.getElementById(id);
+          return el ? Math.abs(el.getBoundingClientRect().top - at) : Infinity;
+        },
+        [section, landing] as const,
+      );
+    await expect
+      .poll(off, {
+        timeout: 10_000,
+        message: `#${section} reaches ${landing} px`,
+      })
+      .toBeLessThanOrEqual(3);
+    // And stays there once the page has stopped moving.
+    await settle(page);
+    expect(await off(), `#${section} after settling`).toBeLessThanOrEqual(3);
+  }
+
+  for (const [from, section, label] of [
+    ["/about", "journey", "Journey"],
+    ["/open-source", "about", "About"],
+    ["/skills/verify-loop", "work", "Work"],
+  ] as const) {
+    test(`from ${from}, ${label} lands on its section`, async ({
+      page,
+    }, testInfo) => {
+      const phone = testInfo.project.name === "webkit-phone";
+      await prepare(page);
+      await visit(page, from);
+      await follow(page, label, phone);
+      await expect(page).toHaveURL(new RegExp(`/#${section}$`));
+      await landsOn(page, section, phone);
+    });
+  }
+
+  test("under reduced motion too", async ({ page }, testInfo) => {
+    const phone = testInfo.project.name === "webkit-phone";
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page, "/about");
+    await follow(page, "Journey", phone);
+    await expect(page).toHaveURL(/\/#journey$/);
+    await landsOn(page, "journey", phone);
   });
 });

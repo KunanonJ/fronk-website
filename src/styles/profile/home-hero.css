@@ -892,9 +892,19 @@
     /* At most 90 px: the copy's column stops growing at 652 px, where
        "Hi, I'm Kunanon Jarat." needs 636 px at 90 px, so the first line
        stays one line on a 1920 x 1080 or larger screen (UX hunt 22-11-26;
-       --type-hero reached 94.7 px there and broke it). */
+       --type-hero reached 94.7 px there and broke it). And at most the
+       column over 7.2: line 1 is 7.07em wide in Chromium, WebKit and
+       Firefox, and --type-hero, which follows the window, outgrew the
+       column from 1180 px, where it is 503 px: 72.9 px at 1180 x 820 took
+       515 px, so the line broke at "Jarat." (and from 1200 px on screens
+       taller than about 850 px, up to 1440 x 1200). Where line 1 already
+       fit with 2% to spare, the size is the same. The copy is the column,
+       so it is the container; nothing in it is positioned against it. */
+    .pf-hero__copy {
+      container-type: inline-size;
+    }
     .pf-hero__title {
-      font-size: min(var(--type-hero), 5.625rem);
+      font-size: min(var(--type-hero), 5.625rem, 100cqi / 7.2);
     }
   }
 

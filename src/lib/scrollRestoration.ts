@@ -1,3 +1,5 @@
+import { onVisitorScroll } from "@/lib/router/visitorScroll";
+
 /*
  * The router's scroll restoration (createRouter's `scrollRestoration`, which
  * may be a function the router asks before each restore).
@@ -18,17 +20,6 @@
  * HTML.
  */
 
-/** Keys that scroll the page. */
-const SCROLL_KEYS = new Set([
-  "ArrowUp",
-  "ArrowDown",
-  "PageUp",
-  "PageDown",
-  "Home",
-  "End",
-  " ",
-]);
-
 type RestoreQuestion = { location: { hash: string } };
 
 export function restoreScrollAfterHydration(): (
@@ -37,22 +28,13 @@ export function restoreScrollAfterHydration(): (
   if (typeof window === "undefined") return () => true;
   let first = true;
   let moved = false;
-  const listen = { capture: true, passive: true } as const;
-  const onInput = () => {
+  const stop = onVisitorScroll(() => {
     moved = true;
-  };
-  const onKey = (event: KeyboardEvent) => {
-    if (SCROLL_KEYS.has(event.key)) moved = true;
-  };
-  window.addEventListener("wheel", onInput, listen);
-  window.addEventListener("touchmove", onInput, listen);
-  window.addEventListener("keydown", onKey, listen);
+  });
   return ({ location }) => {
     if (!first) return true;
     first = false;
-    window.removeEventListener("wheel", onInput, listen);
-    window.removeEventListener("touchmove", onInput, listen);
-    window.removeEventListener("keydown", onKey, listen);
+    stop();
     // A page without a hash opens at the top, or where a reload left it,
     // which is where the restore would put it anyway.
     const scrolled = moved || (!location.hash && window.scrollY !== 0);

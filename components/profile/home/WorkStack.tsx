@@ -8,7 +8,8 @@ import {
 import { workCopy } from "@/lib/content/homeWorkAbout";
 import { stackCards } from "@/lib/landing/stackCards";
 import { prefersReducedMotion } from "@/lib/motion/motionRuntime";
-import { useAfterNavigation } from "@/lib/router/navigation";
+import { returnedTo, useAfterNavigation } from "@/lib/router/navigation";
+import { onVisitorScroll } from "@/lib/router/visitorScroll";
 
 /*
  * The work stack (profile redesign Phase 3, design spec 8.4): an article
@@ -25,7 +26,8 @@ import { useAfterNavigation } from "@/lib/router/navigation";
  *   screen, scrolls the page until its card rests uncovered.
  * - Anchors: a jump to #ventures (the GoGoCash card) lands where the list
  *   says the card rests. The browser and the router measure a stuck card
- *   where it is stuck, so from inside or below the stack they miss.
+ *   where it is stuck, so from inside or below the stack they miss. Back,
+ *   Forward and a reload keep the place the router puts back.
  * Stacking itself is CSS, and only on screens tall enough to show a whole
  * card below the nav (`.pf-stack__item` in home-work-about.css).
  */
@@ -160,29 +162,40 @@ export default function WorkStack() {
     };
   }, []);
 
-  // A page opened at /#ventures: the browser has jumped already, measured
-  // before the fonts settled (and in WebKit, smoothly, maybe not all the
-  // way), so the card is placed again once they have.
+  // A page opened at /#ventures, fresh or by a link from another page: the
+  // browser or the router has jumped already, measured before the fonts
+  // settled (and in WebKit, smoothly, maybe not all the way), so the card
+  // is placed again once they have. Not when Back, Forward or a reload
+  // brought the visitor back, where the router has put the page back where
+  // it was, and not once the visitor has scrolled.
   useEffect(() => {
     const list = listRef.current;
-    if (!list || window.location.hash !== `#${VENTURES}`) return;
+    if (!list || window.location.hash !== `#${VENTURES}` || returnedTo()) {
+      return;
+    }
     let live = true;
+    const stop = onVisitorScroll(() => {
+      live = false;
+    });
     const fonts = (document as { fonts?: FontFaceSet }).fonts;
     void (fonts?.ready ?? Promise.resolve()).then(() => {
+      stop();
       if (live && window.location.hash === `#${VENTURES}`) {
         landOn(list, VENTURES);
       }
     });
     return () => {
       live = false;
+      stop();
     };
   }, []);
 
-  // A navigation in the app to #ventures (a link, Back or Forward): the
-  // router has just scrolled to the card as it stands; place it again.
+  // A link in the app to #ventures, on Home: the router has just scrolled
+  // to the card as it stands; place it again. Back and Forward keep the
+  // place the router put back.
   const onNavigated = useCallback((hash: string) => {
     const list = listRef.current;
-    if (list && hash === VENTURES) landOn(list, VENTURES);
+    if (list && hash === VENTURES && !returnedTo()) landOn(list, VENTURES);
   }, []);
   useAfterNavigation(onNavigated);
 

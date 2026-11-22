@@ -205,6 +205,36 @@ describe("SkillDetailPage", () => {
     expect(rest).toBeVisible();
   });
 
+  it("keeps the toggle where it was on screen when the rest folds away, and leaves it focused", async () => {
+    await renderDetail("verify-loop");
+    const toggle = screen.getByRole("button", { name: /^Show all/ });
+    const rest = document
+      .getElementById("skill-md")!
+      .querySelectorAll("pre")[1]!;
+    // jsdom lays nothing out: the toggle sits 1,400 px lower while the rest
+    // is shown.
+    vi.spyOn(toggle, "getBoundingClientRect").mockImplementation(
+      () => ({ top: rest.hidden ? 400 : 1800 }) as DOMRect,
+    );
+    const scrollBy = vi.spyOn(window, "scrollBy").mockImplementation(() => {});
+    try {
+      // Expanding grows the page below the toggle: nothing scrolls.
+      fireEvent.click(toggle);
+      expect(scrollBy).not.toHaveBeenCalled();
+      toggle.focus();
+      fireEvent.click(toggle);
+      expect(toggle).toHaveAttribute("aria-expanded", "false");
+      expect(scrollBy).toHaveBeenCalledTimes(1);
+      expect(scrollBy).toHaveBeenCalledWith({
+        top: -1400,
+        behavior: "instant",
+      });
+      expect(toggle).toHaveFocus();
+    } finally {
+      scrollBy.mockRestore();
+    }
+  });
+
   it("keeps the Full pack panel's two commands in one plain row, Copy beside them", async () => {
     await renderDetail("verify-loop");
     // The panel is hidden until its tab is picked.

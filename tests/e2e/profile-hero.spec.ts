@@ -582,6 +582,50 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
     ).toBeInViewport({ ratio: 0.9 });
     await expect(page.getByText(`${FRAMES[2]}, 3 of 3`)).toBeAttached();
   });
+
+  for (const size of [
+    { width: 768, height: 1024 },
+    { width: 640, height: 450 },
+  ]) {
+    test(`at ${size.width} x ${size.height}, Tab onto each frame brings all of it and its ring into the row`, async ({
+      page,
+      browserName,
+    }) => {
+      // Browsers scroll a focused frame into the row only when none of it
+      // shows, so one partly past the edge kept focus there (UX hunt 2, U22).
+      only(["desktop", "webkit", "firefox"]);
+      await page.setViewportSize(size);
+      await prepare(page);
+      await visit(page);
+      const row = page.locator(".pf-mock__frames");
+      const links = row.locator("a.pf-mock__frame");
+      // Room the ring (2 px, 3 px out) lacks at the row's edges.
+      const clipped = () =>
+        row.evaluate((el) => {
+          const link = document.activeElement as HTMLElement;
+          const box = el.getBoundingClientRect();
+          const at = link.getBoundingClientRect();
+          return Math.max(
+            0,
+            box.left - (at.left - 5),
+            at.right + 5 - box.right,
+          );
+        });
+      await links.first().focus();
+      for (let i = 1; i < FRAMES.length; i += 1) {
+        await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+        await expect(links.nth(i)).toBeFocused();
+        await expect
+          .poll(clipped, { message: `${FRAMES[i]} at ${size.width} px` })
+          .toBeLessThanOrEqual(0.5);
+        // Focus names the frame; the pager's "n of 3" is for its buttons.
+        await expect(page.getByText(`${FRAMES[i]}, ${i + 1} of 3`)).toHaveCount(
+          0,
+        );
+      }
+      expect(await page.evaluate(() => window.scrollX)).toBe(0);
+    });
+  }
 });
 
 test.describe("hero: the logo strip (plan step 2e)", () => {
@@ -917,6 +961,51 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
       const at = `at ${size.width} x ${size.height}`;
       expect(rows, at).toBe(1);
       expect(fontSize, at).toBeLessThanOrEqual(90);
+    }
+  });
+
+  /*
+   * From 1180 px the copy's column is 503 px and grows with the window,
+   * but --type-hero grows faster: at 1180 x 820 the h1 was 72.9 px and its
+   * first line, 7.07em wide, broke at "Jarat." in every engine, as it did
+   * on 58 of 161 sizes from 1100 to 1280 px wide and 720 to 1000 tall (and
+   * at 1366 x 1024 and 1440 x 1200). The h1 is now at most the column over
+   * 7.2. Line 2 keeps its three lines.
+   */
+  test("around 1180 px, and on taller screens up to 1440 px, the h1's first line stays one line", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const sizes = [
+      { width: 1366, height: 1024 },
+      { width: 1440, height: 1200 },
+    ];
+    for (let width = 1100; width <= 1280; width += 20) {
+      for (const height of [720, 820, 1000]) sizes.push({ width, height });
+    }
+    sizes.push({ width: 1180, height: 820 });
+    for (const size of sizes) {
+      await resize(page, size);
+      // The rows each line's text takes (line 2's text is its phrase).
+      const [first, second] = await page
+        .locator(".pf-hero__line:first-child, .pf-hero__phrase")
+        .evaluateAll((lines) =>
+          lines.map((line) => {
+            const range = document.createRange();
+            range.selectNodeContents(line);
+            return new Set(
+              [...range.getClientRects()]
+                .filter((rect) => rect.width > 0)
+                .map((rect) => Math.round(rect.top)),
+            ).size;
+          }),
+        );
+      const at = `at ${size.width} x ${size.height}`;
+      expect(first, `line 1 ${at}`).toBe(1);
+      expect(second, `line 2 ${at}`).toBe(3);
     }
   });
 

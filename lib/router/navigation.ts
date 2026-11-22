@@ -1,6 +1,7 @@
 import { useCallback, useEffect, type ComponentPropsWithRef } from "react";
 import {
   notFound as routerNotFound,
+  type RouterHistory,
   useLinkProps,
   useLocation,
   useNavigate,
@@ -64,6 +65,34 @@ export function useAfterNavigation(callback: (hash: string) => void): void {
       callback(event.toLocation.hash),
     );
   }, [router, callback]);
+}
+
+/** The history's last action in this document; none before the first. */
+let lastAction: string | undefined;
+
+/**
+ * Follows the router's history (src/router.tsx, on the client, before the
+ * router's own listener), so that returnedTo() knows how the visitor came
+ * to the current entry.
+ */
+export function followHistory(history: Pick<RouterHistory, "subscribe">) {
+  history.subscribe(({ action }) => {
+    lastAction = action.type;
+  });
+}
+
+/**
+ * True when Back, Forward or a reload brought the visitor to the current
+ * entry: the router has put the page back where it was, and a script that
+ * lands on the hash would move it. False when a link in the app or a fresh
+ * load did.
+ */
+export function returnedTo(): boolean {
+  if (lastAction) return lastAction !== "PUSH" && lastAction !== "REPLACE";
+  const [load] = performance.getEntriesByType(
+    "navigation",
+  ) as PerformanceNavigationTiming[];
+  return load?.type === "reload" || load?.type === "back_forward";
 }
 
 /** Navigates within the app and replaces the current history entry. */

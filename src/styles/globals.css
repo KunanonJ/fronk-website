@@ -381,6 +381,19 @@ a {
   }
 }
 
+/*
+ * Reduced motion: animations and transitions end at once. Transitions keep
+ * a 0.01 ms duration, so transitionend still fires for code that waits on
+ * it, and jump to their end value as they start (step-start). Every element
+ * takes a transition of `all` here, the initial transition-property, so
+ * with a smooth curve a change to `visibility`, or to a registered custom
+ * property, showed its old value for the frame the transition began: a
+ * control shown from `visibility: hidden` could not take focus then (the
+ * case viewer's Enlarge button, as the viewer closed; UX hunt 22-11-26,
+ * U06), and WebKit read a registered property's old value (the Journey
+ * ring's turn, pull request 186). `display` and `overlay`, where a rule
+ * lets them transition, leave at once too.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -389,6 +402,7 @@ a {
     animation-iteration-count: 1 !important;
     animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
+    transition-timing-function: step-start !important;
     scroll-behavior: auto !important;
   }
 }

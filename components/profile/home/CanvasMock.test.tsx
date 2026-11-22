@@ -304,6 +304,45 @@ describe("CanvasMock", () => {
       "polite",
     );
   });
+
+  it("brings a frame the keyboard focuses on the phone row to its middle, silently, and leaves a clicked one where it is", () => {
+    stubMedia({ wide: false });
+    const { container } = render(<CanvasMock ready={false} />);
+    const row = container.querySelector<HTMLElement>(".pf-mock__frames")!;
+    const links = [
+      ...container.querySelectorAll<HTMLElement>("a.pf-mock__frame"),
+    ];
+    // A 300 px row, the second frame (200 px) from 280 px: 20 px of it shows.
+    Object.defineProperty(row, "scrollWidth", { value: 700 });
+    Object.defineProperty(row, "clientWidth", { value: 300 });
+    vi.spyOn(row, "getBoundingClientRect").mockReturnValue({
+      left: 0,
+      right: 300,
+      width: 300,
+    } as DOMRect);
+    vi.spyOn(links[1]!.parentElement!, "getBoundingClientRect").mockReturnValue(
+      { left: 280, right: 480, width: 200 } as DOMRect,
+    );
+    const scrollBy = vi.fn();
+    row.scrollBy = scrollBy;
+    const keyboard = vi.spyOn(links[1]!, "matches");
+
+    // A click focuses it too, but is no keyboard focus: nothing scrolls.
+    keyboard.mockReturnValue(false);
+    act(() => links[1]!.focus());
+    advance(20);
+    expect(scrollBy).not.toHaveBeenCalled();
+    act(() => links[0]!.focus());
+
+    keyboard.mockReturnValue(true);
+    act(() => links[1]!.focus());
+    advance(20);
+    // Its middle (380 px) to the row's (150 px): the row alone moves.
+    expect(scrollBy).toHaveBeenCalledWith({ left: 230, behavior: "smooth" });
+    expect(links[1]).toHaveAttribute("data-selected");
+    // The pager's "2 of 3" is for its buttons; focus names the frame itself.
+    expect(screen.queryByText(`${FRAMES[1]!.name}, 2 of 3`)).toBeNull();
+  });
 });
 
 describe("CanvasMock's tools, from 810 px with a mouse", () => {
