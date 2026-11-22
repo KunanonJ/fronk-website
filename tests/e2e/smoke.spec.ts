@@ -760,6 +760,38 @@ test.describe("skills > each skill page loads its own SKILL.md and no other", ()
     };
   }
 
+  /**
+   * Clicks a link with the pointer coming from off the page and going back
+   * there. The router preloads a link the pointer rests on (preload
+   * "intent", after 50 ms), and a pointer left where the last click was
+   * preloads any link that slides under it: Previous (writing-for-agents),
+   * as Playwright scrolled Next into view, whenever load kept the pointer
+   * there past 50 ms.
+   */
+  async function clickFromOffPage(page: Page, link: Locator) {
+    await page.mouse.move(-1, -1);
+    await link.click();
+    await page.mouse.move(-1, -1);
+  }
+
+  /**
+   * Waits until the page transition of a navigation that has rendered has
+   * ended (its new page is in the DOM before the transition is ready). A
+   * navigation started before then skips it, and the router leaves the
+   * skipped transition's `ready` rejection unhandled: a page error,
+   * "Transition was skipped. New ViewTransition started", under load.
+   */
+  function transitionEnded(page: Page) {
+    return page.waitForFunction(() => {
+      try {
+        return !document.documentElement.matches(":active-view-transition");
+      } catch {
+        // No view transitions in this engine.
+        return true;
+      }
+    });
+  }
+
   test("/skills loads none; a skill, its next one and Back each show their own", async ({
     page,
   }) => {
@@ -775,21 +807,27 @@ test.describe("skills > each skill page loads its own SKILL.md and no other", ()
     expect(await loaded(), "SKILL.md bodies loaded by /skills").toEqual([]);
 
     // Client-side navigations: each fetches only the skill it opens.
-    await page
-      .getByRole("article", { name: "ama", exact: true })
-      .getByRole("link", { name: "ama", exact: true })
-      .click();
+    await clickFromOffPage(
+      page,
+      page
+        .getByRole("article", { name: "ama", exact: true })
+        .getByRole("link", { name: "ama", exact: true }),
+    );
     await expect(page).toHaveURL(/\/skills\/ama$/);
     await expect(page.locator("h1")).toHaveText("ama");
     await expect.poll(() => shownSkillMd(page)).toBe(skillMd("ama"));
+    await transitionEnded(page);
 
-    await page
-      .getByRole("navigation", { name: "More skills" })
-      .getByRole("link", { name: /^Next/ })
-      .click();
+    await clickFromOffPage(
+      page,
+      page
+        .getByRole("navigation", { name: "More skills" })
+        .getByRole("link", { name: /^Next/ }),
+    );
     await expect(page).toHaveURL(/\/skills\/how$/);
     await expect(page.locator("h1")).toHaveText("how");
     await expect.poll(() => shownSkillMd(page)).toBe(skillMd("how"));
+    await transitionEnded(page);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/skills\/ama$/);
