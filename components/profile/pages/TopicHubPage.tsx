@@ -11,6 +11,7 @@ import {
 import { ProfileMain } from "@/components/profile/site/ProfileMain";
 import { withoutHiddenBlogLinks } from "@/lib/content/blogVisibility";
 import { keepNamesWhole } from "@/lib/content/keepWhole";
+import { keepThaiWordsWhole } from "@/lib/content/keepThaiWhole";
 import { siteConfig } from "@/lib/site";
 import { pad2 } from "@/lib/utils/pad2";
 import { notFound } from "@tanstack/react-router";
@@ -106,7 +107,7 @@ function HubHero({ pillar }: { pillar: TopicPillar }) {
     <ReadingHero
       eyebrow={COPY[pillar.locale].eyebrow}
       title={<SegmentHeadline lines={pillar.h1Lines} joiner="" />}
-      lead={pillar.lede}
+      lead={keepThaiWordsWhole(keepNamesWhole(pillar.lede))}
       aside={<LanguageNav pillar={pillar} />}
     >
       {pillar.availability ? (
@@ -156,9 +157,11 @@ function Chapter({
         <PixelMark />
         <span>{pad2(index)}</span>
       </p>
-      <h2 className="t-h3 pf-case-chapter__headline">{section.heading}</h2>
+      <h2 className="t-h3 pf-case-chapter__headline">
+        {keepThaiWordsWhole(section.heading)}
+      </h2>
       <div className="t-prose pf-case-prose">
-        <p>{section.body}</p>
+        <p>{keepThaiWordsWhole(section.body)}</p>
       </div>
     </section>
   );
@@ -175,7 +178,7 @@ function Proof({ pillar }: { pillar: TopicPillar }) {
       <ul className="pf-hub-facts">
         {pillar.proof.map((item) => (
           <li key={item} className="pf-hub-facts__item">
-            {keepNamesWhole(item)}
+            {keepThaiWordsWhole(keepNamesWhole(item))}
           </li>
         ))}
       </ul>
@@ -243,7 +246,9 @@ function Contact({ pillar }: { pillar: TopicPillar }) {
         <h2 id="card-cta" className="t-meta pf-case-work__kicker">
           {COPY[pillar.locale].contact}
         </h2>
-        <p className="t-body pf-hub-contact__text">{pillar.description}</p>
+        <p className="t-body pf-hub-contact__text">
+          {keepThaiWordsWhole(pillar.description)}
+        </p>
       </div>
       <div className="pf-case-work__actions">
         <Pill href={pillar.ctaHref} arrow="swap">

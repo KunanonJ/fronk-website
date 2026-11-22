@@ -333,6 +333,99 @@ test.describe("Thai typography (plan step 7b)", () => {
   });
 });
 
+/*
+ * UX hunt 22-11-26. A browser breaks Thai with a dictionary, which split
+ * compounds such as ลงทะเบียน (ลง|ทะเบียน) and the h1's การเปลี่ยนผ่าน
+ * across lines, differently in each engine; the hubs keep them whole
+ * (lib/content/keepThaiWhole.tsx, and the h1's lines). The words here are
+ * the ones the hunt saw split, and two that split inside a syllable.
+ */
+const THAI_WORDS = [
+  "การเปลี่ยนผ่าน",
+  "สตาร์ทอัพ",
+  "สต็อก",
+  "ตัดสินใจ",
+  "ลงทะเบียน",
+  "กระจัดกระจาย",
+  "แชทบอท",
+  "ฟินเทค",
+];
+const THAI_HUBS = HUBS.filter((path) => path.startsWith("/th/"));
+
+test.describe("Thai words stay whole (UX hunt 22-11-26)", () => {
+  for (const path of THAI_HUBS) {
+    test(`${path}, 320 to 1920 px`, async ({ page }) => {
+      only(new Set(["desktop", "webkit", "firefox"]), "each engine");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await prepare(page);
+      await page.goto(path, { waitUntil: "networkidle" });
+      await page.evaluate(() => document.fonts.ready);
+      for (const width of [320, 390, 768, 1024, 1280, 1440, 1920]) {
+        await page.setViewportSize({ width, height: 900 });
+        // Let vw units and the layout settle at the new width (WebKit and
+        // Chromium can measure a frame at the old one).
+        await page.evaluate(
+          () =>
+            new Promise<void>((done) =>
+              requestAnimationFrame(() => requestAnimationFrame(() => done())),
+            ),
+        );
+        const split = await page.evaluate((words) => {
+          const out: string[] = [];
+          const blocks = document.querySelectorAll(
+            "main :is(h1, h2, h3, p, li, dd, summary)",
+          );
+          for (const block of blocks) {
+            // The innermost block that holds the text, once.
+            if (block.querySelector("p, li, h2, h3, dd")) continue;
+            const text = block.textContent ?? "";
+            for (const word of words) {
+              for (
+                let at = text.indexOf(word);
+                at >= 0;
+                at = text.indexOf(word, at + 1)
+              ) {
+                const tops: number[] = [];
+                const walker = document.createTreeWalker(
+                  block,
+                  NodeFilter.SHOW_TEXT,
+                );
+                let seen = 0;
+                for (let node = walker.nextNode(); node;) {
+                  const length = node.textContent!.length;
+                  const from = Math.max(at, seen);
+                  const to = Math.min(at + word.length, seen + length);
+                  if (from < to) {
+                    const range = document.createRange();
+                    range.setStart(node, from - seen);
+                    range.setEnd(node, to - seen);
+                    for (const rect of range.getClientRects()) {
+                      if (rect.width > 0) tops.push(rect.top);
+                    }
+                  }
+                  seen += length;
+                  node = walker.nextNode();
+                }
+                if (tops.length && Math.max(...tops) - Math.min(...tops) > 8) {
+                  out.push(`${word} in ${block.tagName.toLowerCase()}`);
+                }
+              }
+            }
+          }
+          return out;
+        }, THAI_WORDS);
+        expect(split, `${path} at ${width} px`).toEqual([]);
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - window.innerWidth,
+        ),
+        "no sideways scroll",
+      ).toBeLessThanOrEqual(1);
+    });
+  }
+});
+
 test.describe("the hubs by keyboard", () => {
   test("Tab reaches the FAQ's questions; Space and Enter open and close them", async ({
     page,
