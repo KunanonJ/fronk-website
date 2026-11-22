@@ -1271,28 +1271,29 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
       await expect(
         link.locator("xpath=ancestor::article[1]").locator(".pf-lift__mat"),
       ).toHaveCSS("outline-style", "solid");
-      // The ring is where the focus is: the pill is on screen, uncovered,
-      // both polled while the browser scrolls it in. From the control before
-      // it, a pill below the fold comes in until its link's bottom edge meets
-      // the screen's; scroll offsets are whole pixels, so the pill can end a
-      // fraction of a pixel past that edge (0.42 px on the WebKit phone;
-      // Chromium does the same at that width), which `ratio: 1` counted as
-      // off screen.
+      // The ring is where the focus is: the whole ring is on screen and the
+      // pill uncovered, both polled while the browser scrolls it in. From
+      // the control before it, a pill below the fold comes in until its
+      // link's bottom (and scroll margin) meets the screen's edge; without
+      // the margin the ring's lower 5 px ended off screen on the WebKit phone.
       await expect
         .poll(() =>
           pill.evaluate((el) => {
             const r = el.getBoundingClientRect();
-            // How far it reaches past the screen's edges, in px.
+            const style = getComputedStyle(el);
+            const out =
+              parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset);
+            // How far the ring reaches past the screen's edges, in px.
             return Math.max(
               0,
-              -r.top,
-              -r.left,
-              r.right - window.innerWidth,
-              r.bottom - window.innerHeight,
+              out - r.top,
+              out - r.left,
+              r.right + out - window.innerWidth,
+              r.bottom + out - window.innerHeight,
             );
           }),
         )
-        .toBeLessThan(1);
+        .toBe(0);
       await expect
         .poll(() =>
           pill.evaluate((el) => {
@@ -1302,6 +1303,25 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
               r.top + r.height / 2,
             );
             return !!hit && el.closest("a")!.contains(hit);
+          }),
+        )
+        .toBe(true);
+      // On a case, reaching its end found the glasses: their toast, placed
+      // low on the phone as it showed, lay over this pill once Tab brought it
+      // in. While it shows, it stands clear of the focused link.
+      await expect
+        .poll(() =>
+          link.evaluate((el) => {
+            const toast = document.querySelector(".pf-toast");
+            if (!toast) return true;
+            const t = toast.getBoundingClientRect();
+            const r = el.getBoundingClientRect();
+            return !(
+              r.left < t.right &&
+              r.right > t.left &&
+              r.top < t.bottom &&
+              r.bottom > t.top
+            );
           }),
         )
         .toBe(true);

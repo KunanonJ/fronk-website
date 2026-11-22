@@ -1048,6 +1048,10 @@
     align-self: flex-start;
     margin-top: auto;
     padding-top: 12px;
+    /* Focus scrolls the link in until its bottom meets the screen's, and the
+       pill's ring sits 5 px outside it (.ds-stretch in globals.css): 8 px
+       keeps the whole ring on screen (WebKit phone, 21-11-26). */
+    scroll-margin-block-end: 8px;
   }
   /* Focus shows on the picture (spec 6.10), the card's whole target, and on
      the pill itself with the site's ring (.ds-stretch in globals.css): the
