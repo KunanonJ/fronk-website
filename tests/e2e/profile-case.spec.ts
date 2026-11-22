@@ -1233,12 +1233,26 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
       await visit(page, path);
       const link = page.locator("a.pf-lift__link").first();
       // From the control before it, as a keyboard reader arrives (Safari
-      // moves to links with Option+Tab).
-      await link.evaluate((el) => {
+      // moves to links with Option+Tab): focused, on screen, and the page at
+      // rest. Focus scrolls it in smoothly, and a Tab during that scroll
+      // started a second focus scroll over the first: WebKit then left the
+      // pill centred, past the fold or out of view (CI), by timing.
+      await link.evaluate(async (el) => {
         const all = [
           ...document.querySelectorAll<HTMLElement>("a[href], button"),
         ].filter((n) => n.getClientRects().length > 0 && n.tabIndex >= 0);
-        all[all.indexOf(el as HTMLElement) - 1]!.focus();
+        const before = all[all.indexOf(el as HTMLElement) - 1]!;
+        before.focus();
+        // Eight frames at one place, with it on screen.
+        let still = 0;
+        let last = Number.NaN;
+        while (still < 8) {
+          await new Promise((done) => requestAnimationFrame(done));
+          const { top, bottom } = before.getBoundingClientRect();
+          const shown = bottom > 0 && top < window.innerHeight;
+          still = shown && window.scrollY === last ? still + 1 : 0;
+          last = window.scrollY;
+        }
       });
       await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
       await expect(link).toBeFocused();
@@ -1249,10 +1263,28 @@ test.describe("lift cards: the focus ring (UX sweep 21-11-26)", () => {
       await expect(
         link.locator("xpath=ancestor::article[1]").locator(".pf-lift__mat"),
       ).toHaveCSS("outline-style", "solid");
-      // The ring is where the focus is: the pill is on screen, uncovered.
-      // WebKit may still be scrolling it in (CI once read it 44 px below
-      // the fold), so both are polled.
-      await expect(pill).toBeInViewport({ ratio: 1 });
+      // The ring is where the focus is: the pill is on screen, uncovered,
+      // both polled while the browser scrolls it in. From the control before
+      // it, a pill below the fold comes in until its link's bottom edge meets
+      // the screen's; scroll offsets are whole pixels, so the pill can end a
+      // fraction of a pixel past that edge (0.42 px on the WebKit phone;
+      // Chromium does the same at that width), which `ratio: 1` counted as
+      // off screen.
+      await expect
+        .poll(() =>
+          pill.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            // How far it reaches past the screen's edges, in px.
+            return Math.max(
+              0,
+              -r.top,
+              -r.left,
+              r.right - window.innerWidth,
+              r.bottom - window.innerHeight,
+            );
+          }),
+        )
+        .toBeLessThan(1);
       await expect
         .poll(() =>
           pill.evaluate((el) => {
