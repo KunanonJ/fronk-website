@@ -313,9 +313,18 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     expect(await animationOf(page, ".pf-hero__chips")).toBe("none");
     expect(await animationOf(page, ".pf-mock-wrap")).toBe("none");
     // The cursor waits too. By the fourth greeting (1.2 s in) a tour that
-    // had started at once would have made its first stop (0.9 s).
-    // Read once, not polled: the tour itself ends on frame 0.
-    await expect(overlay).toContainText("こんにちは");
+    // had started at once would have made its first stop (0.9 s). The
+    // greeting is on screen for a moment only, so it is watched on every
+    // frame (expect's back-off polls could step over it on a slow machine),
+    // and the cursor is read at once: the tour itself ends on frame 0.
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[data-testid="intro-overlay"]')
+          ?.textContent?.includes("こんにちは") ?? false,
+      null,
+      { polling: "raf", timeout: 5_000 },
+    );
     expect(
       await page.locator(".pf-mock__cursor").getAttribute("data-frame"),
     ).toBe("0");

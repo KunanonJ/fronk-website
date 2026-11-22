@@ -862,18 +862,19 @@
   }
 
   /* A canvas of 500 to 600 px, side by side with the copy (1024 px on a
-     landscape screen, and 1180 to 1399 px): the second frame moves 4% left
-     and the first is 4% narrower, so the second frame's label ("# AI
-     Automation") ends 5 px or more clear of the inspector, not under it,
-     and the frames keep their 10 px apart (UX hunt 22-11-26). From 1400 px
-     the canvas is wide enough for the spec's places. */
+     landscape screen, and 1180 to 1399 px): the second frame moves 4.5%
+     left and the first is 4.5% narrower, so the second frame's label ("#
+     AI Automation") ends clear of the inspector, not under it (5 px or
+     more on macOS, 4 on Linux, whose text sets a little wider), and the
+     frames keep their 10 px apart (UX hunt 22-11-26). From 1400 px the
+     canvas is wide enough for the spec's places. */
   @media (64rem <= width < 73.75rem) and (orientation: landscape),
     (73.75rem <= width < 87.5rem) {
     .pf-mock__item:nth-child(1) {
-      --fw: 27%;
+      --fw: 26.5%;
     }
     .pf-mock__item:nth-child(2) {
-      --fx: 54%;
+      --fx: 53.5%;
     }
   }
 
