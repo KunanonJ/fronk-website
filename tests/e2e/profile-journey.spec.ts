@@ -391,9 +391,9 @@ test.describe("journey: the stage and its orbit", () => {
     const first = page.locator(".pf-orbit__item").first();
     const before = (await first.boundingBox())!;
     await page.getByRole("button", { name: "Turn the tools right" }).click();
-    // At once: within a frame or two (the global reduced-motion rule leaves
-    // a 0.01 ms transition, which WebKit ends on a later frame); the 0.7 s
-    // turn of the motion layout would still be under way after 300 ms.
+    // At once: under reduced motion the ring has no transition at all (not
+    // even the global rule's 0.01 ms one); the 0.7 s turn of the motion
+    // layout would still be under way after 300 ms.
     await expect
       .poll(() => orbitValue(page, "--orbit-offset"), { timeout: 300 })
       .toBe(-18);

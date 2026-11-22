@@ -866,6 +866,17 @@
     }
   }
 
+  /* Under reduced motion the ring and the pages move at once. The global
+     reduced-motion rule would still give --orbit-offset and --turn a
+     0.01 ms transition, and WebKit can hold a registered property's old
+     value for frames before it ends one. */
+  @media (prefers-reduced-motion: reduce) {
+    .pf-orbit,
+    .pf-page {
+      transition-property: none;
+    }
+  }
+
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .pf-journey__stage[data-running]:not([data-play]):hover .pf-orbit {
       animation-play-state: paused;
