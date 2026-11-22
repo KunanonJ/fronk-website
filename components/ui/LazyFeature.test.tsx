@@ -15,7 +15,11 @@ import {
   vi,
   type MockInstance,
 } from "vitest";
-import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
+import {
+  FeatureBoundary,
+  lazyFeature,
+  retryFailedSheets,
+} from "@/components/ui/LazyFeature";
 
 /*
  * A feature loaded on first use whose code fails to load is left out and
@@ -572,6 +576,74 @@ describe("lazyFeature in a FeatureBoundary", () => {
       });
       expect(await screen.findByText("Hello Grace")).toBeInTheDocument();
       expect(screen.getByText("Styled Ada")).toBeInTheDocument();
+    });
+
+    /*
+     * A feature that stays mounted from page to page (the footer's living
+     * status) has no next mount of its own: what holds it calls
+     * retryFailedSheets on each navigation (UX hunt 22-11-26, U27).
+     */
+    it("retryFailedSheets asks for it as a mount does, and holds nothing: the feature stays and takes its styles", async () => {
+      const href = "/assets/Own-x5.css";
+      const fetched = vi.fn(async () => new Response(""));
+      vi.stubGlobal("fetch", fetched);
+      const { own } = await mountFailing(href, styled(href));
+
+      act(() => retryFailedSheets());
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      expect(fetched).toHaveBeenCalledExactlyOnceWith(
+        `${location.origin}${href}`,
+        { cache: "reload" },
+      );
+      const [first, fresh] = sheets(href);
+      expect(first).toBe(own);
+      expect(own.nextElementSibling).toBe(fresh);
+      expect(fresh!.dataset.precedence).toBe("pf-styled");
+      // Nothing waits for it: the feature stays shown.
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
+      act(() => {
+        fresh!.dispatchEvent(new Event("load"));
+      });
+
+      // Nothing has failed since: the next call asks for nothing.
+      act(() => retryFailedSheets());
+      await act(() => new Promise((done) => setTimeout(done, 20)));
+      expect(fetched).toHaveBeenCalledTimes(1);
+      expect(sheets(href)).toEqual([own, fresh]);
+      pageStays();
+    });
+
+    it("retryFailedSheets: one that keeps failing is asked for once per call, never by itself, linked anew in one place", async () => {
+      const href = "/assets/Own-x6.css";
+      const fetched = vi.fn(async () => new Response(""));
+      vi.stubGlobal("fetch", fetched);
+      const { own } = await mountFailing(href, styled(href));
+
+      act(() => retryFailedSheets());
+      await waitFor(() => expect(sheets(href)).toHaveLength(2));
+      const [, fresh] = sheets(href);
+      act(() => {
+        fresh!.dispatchEvent(new Event("error"));
+      });
+      // It failed again: nothing asks for it until the next call.
+      await act(() => new Promise((done) => setTimeout(done, 20)));
+      expect(fetched).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Styled Ada")).toBeInTheDocument();
+
+      act(() => retryFailedSheets());
+      await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2));
+      const again = await waitFor(() => {
+        const found = sheets(href);
+        expect(found).toHaveLength(2);
+        expect(found[1]).not.toBe(fresh);
+        return found;
+      });
+      expect(again[0]).toBe(own);
+      expect(fresh!.isConnected).toBe(false);
+      act(() => {
+        again[1]!.dispatchEvent(new Event("load"));
+      });
+      pageStays();
     });
   });
 

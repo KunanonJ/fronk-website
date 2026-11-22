@@ -15,10 +15,15 @@ import { JsonLd } from "@/components/JsonLd";
 import appCss from "@/src/styles/globals.css?url";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { WebMcpTools } from "@/components/agents/WebMcpTools";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { buildSiteJsonLd } from "@/lib/seo/jsonLd";
 import { isNamedMeta, rootHead } from "@/lib/seo/metadataToHead";
 import { rootViewport } from "@/lib/seo/rootMetadata";
+import {
+  THEME_COLOR_SCRIPT,
+  THEME_COLORS,
+  themeColorFor,
+} from "@/lib/seo/themeColor";
 import { site as landingSite } from "@/lib/content/landing";
 import { ASSET_RETRY_SCRIPT } from "@/src/lib/assetRetry";
 import { BUILD_ID } from "@/src/lib/buildId";
@@ -31,9 +36,8 @@ import profileCss from "../styles/profile.css?url";
 // server only: the browser takes the text the server wrote (ServedJsonLd).
 const siteJsonLd = import.meta.env.SSR ? buildSiteJsonLd() : null;
 const global = rootHead(rootViewport);
-// Router head() keeps one meta per name, so the two media-scoped theme
-// colours are rendered straight into <head> instead.
-const themeColors = global.meta.filter((m) => isNamedMeta(m, "theme-color"));
+// The theme-color meta is the document's own (RootDocument): its colour
+// follows the theme, which a route's head() cannot see.
 const globalMeta = global.meta.filter((m) => !isNamedMeta(m, "theme-color"));
 
 // Router + Query devtools in development only; the import is dropped from builds.
@@ -84,6 +88,13 @@ function RootDocument({ children }: { children: ReactNode }) {
   // The router matches paths in any case (/TH/topics/... is the Thai hub).
   const path = pathname.toLowerCase();
   const lang = path === "/th" || path.startsWith("/th/") ? "th" : "en";
+  // The browser's toolbar colour (lib/seo/themeColor.ts), from hydration
+  // on the colour the page already holds: the server's, or the dark one
+  // the head script gave it. React finds a <meta> it hydrates by its
+  // content, so starting from any other colour would add a second meta
+  // after this one, which the browser would never read. ThemeColor then
+  // keeps it on the theme.
+  const [themeColor, setThemeColor] = useState(servedThemeColor);
   // A navigation whose chunk a deploy removed loads its page fresh, once
   // (src/lib/staleChunk.ts). Client only, from hydration on, and a chunk of
   // its own rather than part of the entry chunk, which every page loads
@@ -122,14 +133,12 @@ function RootDocument({ children }: { children: ReactNode }) {
           <ScriptOnce>{ASSET_RETRY_SCRIPT}</ScriptOnce>
         ) : null}
         <HeadContent />
-        {themeColors.map((m) => (
-          <meta
-            key={m.media}
-            name="theme-color"
-            media={m.media}
-            content={m.content}
-          />
-        ))}
+        <meta name="theme-color" content={themeColor} />
+        {/* The dark colour before the first paint when the stored theme is
+            dark; React writes it after the meta. Server only, as above. */}
+        {import.meta.env.SSR ? (
+          <ScriptOnce>{THEME_COLOR_SCRIPT}</ScriptOnce>
+        ) : null}
       </head>
       <body className="flex min-h-full flex-col bg-page text-ink">
         {siteJsonLd ? <JsonLd data={siteJsonLd} /> : <ServedJsonLd />}
@@ -139,6 +148,7 @@ function RootDocument({ children }: { children: ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
+          <ThemeColor onChange={setThemeColor} />
           {children}
           {pathname.startsWith("/studio") ? null : <WebMcpTools />}
         </ThemeProvider>
@@ -150,6 +160,31 @@ function RootDocument({ children }: { children: ReactNode }) {
       </body>
     </html>
   );
+}
+
+/** The toolbar colour the page holds: the server's, or the head script's. */
+function servedThemeColor(): string {
+  if (import.meta.env.SSR) return THEME_COLORS.light;
+  return (
+    document.head
+      .querySelector('meta[name="theme-color"]')
+      ?.getAttribute("content") ?? THEME_COLORS.light
+  );
+}
+
+/**
+ * Keeps the toolbar colour on the theme the page shows, as the reader (or
+ * an agent's tool) switches it. It reads `theme`, not `resolvedTheme`: with
+ * no system theme, next-themes puts `theme` itself on <html> as its class,
+ * while `resolvedTheme` would name the OS's scheme for a stored "system",
+ * which paints nothing.
+ */
+function ThemeColor({ onChange }: { onChange: (color: string) => void }) {
+  const { theme } = useTheme();
+  useEffect(() => {
+    onChange(themeColorFor(theme));
+  }, [theme, onChange]);
+  return null;
 }
 
 /**

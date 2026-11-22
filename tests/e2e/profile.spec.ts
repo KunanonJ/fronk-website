@@ -318,6 +318,65 @@ test.describe("About's Read my story (review finding 9)", () => {
   });
 });
 
+/*
+ * The raster pictures are sharp on 2x screens (UX hunt 22-11-26, U26): the
+ * kunanonj.com cover and About's photo each list a larger file, which a 2x
+ * screen takes (the cover drew its 1440 file 1.8 times up at 1440 px, the
+ * photo its 480 file 1.67 times); a 1x screen keeps the file it had, so it
+ * loads no more than before.
+ */
+test.describe("the cover and About's photo on 1x and 2x screens (UX hunt 22-11-26)", () => {
+  const ENGINES = new Set(["desktop", "webkit", "firefox"]);
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !ENGINES.has(testInfo.project.name),
+      "Chromium, WebKit and Firefox",
+    );
+  });
+
+  /** The address of the file an image shows, once it has chosen one. */
+  const shown = (page: Page, selector: string) =>
+    expect.poll(() =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((img: HTMLImageElement) =>
+          img.currentSrc ? new URL(img.currentSrc).pathname : "",
+        ),
+    );
+
+  for (const [scale, cover, photo] of [
+    [1, "/portfolio/kunanonj-com/cover.webp", "/profile-portrait.webp"],
+    [
+      2,
+      "/portfolio/kunanonj-com/cover-2880.webp",
+      "/profile-portrait-800.webp",
+    ],
+  ] as const) {
+    test.describe(`at ${scale}x`, () => {
+      test.use({ deviceScaleFactor: scale });
+
+      test(`1440 px wide: the cover and the photo show ${cover.split("/").pop()} and ${photo.slice(1)}`, async ({
+        page,
+        browserName,
+      }) => {
+        test.skip(
+          scale > 1 && browserName === "firefox",
+          "Playwright's Firefox draws at 1x whatever deviceScaleFactor says",
+        );
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await prepare(page, "light");
+        await page.goto("/portfolio/kunanonj-com", { waitUntil: "load" });
+        expect(await page.evaluate(() => devicePixelRatio)).toBe(scale);
+        await shown(page, ".pf-case-art__shot").toBe(cover);
+        await page.goto("/about", { waitUntil: "load" });
+        await shown(page, ".pf-about-page__photo").toBe(photo);
+      });
+    });
+  }
+});
+
 /**
  * /about#now, which Learn links, is Now's heading since Now moved into the
  * story's column (owner decision 21-11-26): an h3 that must land in view,

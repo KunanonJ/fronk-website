@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AboutPage from "@/components/profile/pages/AboutPage";
@@ -11,6 +12,7 @@ import { socials } from "@/lib/content/landing";
 import { learnOperatorNotes } from "@/lib/content/learn";
 import { operatingModel } from "@/lib/content/operatingModel";
 import { nowLine } from "@/lib/content/profileChrome";
+import { webpSize } from "@/tests/webpSize";
 
 /*
  * /about after the Phase 6 cutover (plan step 6d), the same intents as the
@@ -69,6 +71,25 @@ describe("AboutPage: the hero", () => {
     });
     expect(portrait.getAttribute("src")).toContain("/profile-portrait.webp");
     expect(portrait).toHaveAttribute("fetchpriority", "high");
+    // The 800 px crop for 2x and 3x screens (UX hunt 22-11-26, U26), sized
+    // as the frame draws it: 400 px from 64rem, 420 px above, the column
+    // on a phone.
+    expect(portrait).toHaveAttribute(
+      "srcset",
+      "/profile-portrait.webp 480w, /profile-portrait-800.webp 800w",
+    );
+    expect(portrait).toHaveAttribute(
+      "sizes",
+      "(min-width: 64rem) 400px, (min-width: 460px) 420px, calc(100vw - 40px)",
+    );
+    for (const [src, width] of [
+      [aboutPage.hero.portraitSrc, 480],
+      [aboutPage.hero.portraitLarge.src, 800],
+    ] as const)
+      expect(webpSize(join(process.cwd(), "public", src)), src).toEqual({
+        width,
+        height: width,
+      });
   });
 
   it("offers a dark Contact pill, the work and a jump to the story", () => {

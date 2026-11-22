@@ -103,6 +103,10 @@ function Portrait() {
     <div id="portrait" className="pf-about-page__portrait">
       <img
         src={hero.portraitSrc}
+        // The frame: 400 px beside the copy from 64rem, up to 420 px above
+        // it, the column less its gutters on a phone.
+        srcSet={`${hero.portraitSrc} 480w, ${hero.portraitLarge.src} ${hero.portraitLarge.width}w`}
+        sizes="(min-width: 64rem) 400px, (min-width: 460px) 420px, calc(100vw - 40px)"
         alt={hero.portraitAlt}
         width={480}
         height={480}

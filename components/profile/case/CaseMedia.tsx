@@ -81,8 +81,14 @@ export function CaseMediaView({
       <img
         className="pf-case-art__shot"
         src={image.src}
-        // One registered width today; more join the list as they are added.
-        srcSet={cover ? `${image.src} ${image.width}w` : undefined}
+        // Every registered width: a 2x screen takes the larger file.
+        srcSet={
+          cover
+            ? [image, ...(image.larger ?? [])]
+                .map((file) => `${file.src} ${file.width}w`)
+                .join(", ")
+            : undefined
+        }
         sizes={cover ? "(max-width: 1360px) 100vw, 1360px" : undefined}
         alt={cover ? image.alt : ""}
         width={image.width}
