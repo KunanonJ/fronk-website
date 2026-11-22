@@ -537,7 +537,21 @@ test.describe("the reading pages' h1 keeps its lines when its face arrives (UX h
           document.fonts.check('400 48px "Instrument Serif"', "Build"),
         );
       expect(await loaded(), "the face is held").toBe(false);
-      const before = (await h1.boundingBox())!.height;
+      // The fallback face is Times New Roman sized to the serif; where it
+      // is not installed (most Linux), the system serif differs in width
+      // whatever the measure, so only the measure is held to account there.
+      const sized = await page.evaluate(() =>
+        new FontFace("probe", 'local("Times New Roman")').load().then(
+          () => true,
+          () => false,
+        ),
+      );
+      const read = () =>
+        h1.evaluate((el) => ({
+          measure: getComputedStyle(el).maxInlineSize,
+          height: el.getBoundingClientRect().height,
+        }));
+      const before = await read();
       release();
       await expect.poll(loaded).toBe(true);
       await page.evaluate(
@@ -546,8 +560,14 @@ test.describe("the reading pages' h1 keeps its lines when its face arrives (UX h
             requestAnimationFrame(() => requestAnimationFrame(() => done())),
           ),
       );
-      const after = (await h1.boundingBox())!.height;
-      expect(Math.abs(after - before), `at ${width} px`).toBeLessThan(2);
+      const after = await read();
+      expect(after.measure, `the measure at ${width} px`).toBe(before.measure);
+      if (sized) {
+        expect(
+          Math.abs(after.height - before.height),
+          `the h1's height at ${width} px`,
+        ).toBeLessThan(2);
+      }
       await page.unrouteAll({ behavior: "ignoreErrors" });
     }
   });

@@ -827,6 +827,20 @@ test.describe("hero: side by side from 1024 px on a landscape screen (UX sweep 2
 test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
   const ENGINES = ["desktop", "webkit", "firefox"];
 
+  /**
+   * One visit, then each size by resizing: the parts measured here are laid
+   * out by CSS alone. Two frames let vw units and the layout settle.
+   */
+  async function resize(page: Page, size: { width: number; height: number }) {
+    await page.setViewportSize(size);
+    await page.evaluate(
+      () =>
+        new Promise<void>((done) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => done())),
+        ),
+    );
+  }
+
   test("the canvas's drawn screens stay inside their frames", async ({
     page,
   }) => {
@@ -841,9 +855,9 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
             { width: 1024, height: 768 },
             { width: 834, height: 1112 },
           ];
+    await visit(page);
     for (const size of sizes) {
-      await page.setViewportSize(size);
-      await visit(page);
+      await resize(page, size);
       const overflow = await page.evaluate(() =>
         [...document.querySelectorAll(".pf-thumb")]
           .filter((thumb) => thumb.getBoundingClientRect().width > 0)
@@ -868,13 +882,13 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
     only(ENGINES);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
+    await visit(page);
     for (const size of [
       { width: 1680, height: 1050 },
       { width: 1920, height: 1080 },
       { width: 2560, height: 1440 },
     ]) {
-      await page.setViewportSize(size);
-      await visit(page);
+      await resize(page, size);
       const { fontSize, rows } = await page
         .locator(".pf-hero__line")
         .first()
@@ -903,6 +917,7 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
     only(ENGINES);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
+    await visit(page);
     for (const size of [
       { width: 1024, height: 768 },
       { width: 1180, height: 820 },
@@ -910,8 +925,7 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
       { width: 1366, height: 768 },
       { width: 1440, height: 900 },
     ]) {
-      await page.setViewportSize(size);
-      await visit(page);
+      await resize(page, size);
       const room = await page.evaluate(() => {
         const inspector = document
           .querySelector(".pf-mock__inspector")!
@@ -966,14 +980,13 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
     only(ENGINES);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
+    await visit(page);
     for (const size of [
       { width: 320, height: 568 },
       { width: 1024, height: 768 },
       { width: 1440, height: 900 },
     ]) {
-      await page.setViewportSize(size);
-      await visit(page);
-      await page.locator("#open-source").scrollIntoViewIfNeeded();
+      await resize(page, size);
       const marks = await page.evaluate(() =>
         [...document.querySelectorAll(".pf-oss__release")].map((release) => {
           const mark = release
