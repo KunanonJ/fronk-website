@@ -867,9 +867,12 @@
   }
 
   /* Under reduced motion the ring and the pages move at once. The global
-     reduced-motion rule would still give --orbit-offset and --turn a
-     0.01 ms transition, and WebKit can hold a registered property's old
-     value for frames before it ends one. */
+     reduced-motion rule gives --orbit-offset and --turn a 0.01 ms
+     transition, and WebKit once held the ring's old value past 300 ms on
+     CI (pull request 186). That rule now starts each transition at its
+     end value (step-start), which covers this as well; the ring and the
+     pages still take no transition at all, since that failure was seen
+     only on CI. */
   @media (prefers-reduced-motion: reduce) {
     .pf-orbit,
     .pf-page {

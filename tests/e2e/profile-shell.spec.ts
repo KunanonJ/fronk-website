@@ -1211,6 +1211,63 @@ test.describe("chrome: reduced motion", () => {
       ),
     ).toBe(0);
   });
+
+  /*
+   * The global reduced-motion rule (globals.css) gives every element a
+   * 0.01 ms transition of `all`. On a smooth curve, `visibility` and the
+   * registered custom properties kept their old value for the frame each
+   * transition began, so a control shown from `visibility: hidden` could
+   * not take focus in that frame (UX hunt 22-11-26, U06: the case viewer's
+   * Enlarge button as the viewer closed) and WebKit held the Journey ring's
+   * old turn (#186). They change at once now, and transitionend still fires.
+   */
+  test("a change lands at once: a control shown takes focus, a registered property reads its new value, transitionend fires", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox"].includes(testInfo.project.name),
+      "the desktop engines",
+    );
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const result = await page.evaluate(async () => {
+      // A box hidden as the viewer hides the page's tile, with a control
+      // inside that inherits it, as the tile's Enlarge button does.
+      const box = document.createElement("div");
+      box.style.visibility = "hidden";
+      const control = document.createElement("button");
+      control.textContent = "Probe";
+      box.append(control);
+      document.body.append(box);
+      const before = getComputedStyle(control).visibility;
+      box.style.visibility = "";
+      control.focus();
+      const focused = document.activeElement === control;
+      // --turn, registered in globals.css, as the Notebook's pages use it.
+      box.style.setProperty("--turn", "1");
+      const turn = getComputedStyle(box).getPropertyValue("--turn").trim();
+      // A transition still runs, and ends, for code that waits on it.
+      const ended = new Promise<string>((done) => {
+        box.addEventListener("transitionend", (event) => {
+          if (event.propertyName === "opacity") done(event.propertyName);
+        });
+        setTimeout(() => done("none"), 2000);
+      });
+      box.style.opacity = "0.5";
+      const opacity = getComputedStyle(box).opacity;
+      const end = await ended;
+      box.remove();
+      return { before, focused, turn, opacity, end };
+    });
+    expect(result).toEqual({
+      before: "hidden",
+      focused: true,
+      turn: "1",
+      opacity: "0.5",
+      end: "opacity",
+    });
+  });
 });
 
 test.describe("chrome: with JavaScript off", () => {
