@@ -21,10 +21,13 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 ## P3: Owner decisions left open by the dependency upgrade
 
 - **Added:** 02-11-26
-- **Problem:** three choices need the owner's call:
-  1. **Override style:** keep exact pins in `pnpm.overrides` (reproducible, but they go stale) or switch to `^` floors. pnpm accepts ranges as override values, so `pnpm update` would then pull in patches.
+- **Problem:** six choices need the owner's call:
+  1. **Override style:** keep exact pins in `overrides` (`pnpm-workspace.yaml`; reproducible, but they go stale) or switch to `^` floors. pnpm accepts ranges as override values, so `pnpm update` would then pull in patches.
   2. **Sanity CLI telemetry:** the upgraded CLI collects usage and error telemetry. Its notice says to opt out with `npx sanity telemetry disable` (details: https://www.sanity.io/telemetry).
-  3. **Ignored build scripts:** pnpm 10 skips the `esbuild` and `workerd` install scripts and warns on every install. Both work through their platform packages today. Decide with `pnpm approve-builds`, or add them to `ignoredBuiltDependencies` in `pnpm-workspace.yaml` to silence the warning.
+  3. **Build scripts:** pnpm 12 fails an install when a dependency's build script has no `allowBuilds` entry in `pnpm-workspace.yaml`. The pnpm 12 move (22-11-26) set `esbuild`, `sharp`, `unrs-resolver` and `workerd` to `false`, which keeps pnpm 10's behavior (no script runs; esbuild and workerd work through their platform packages) and ends the warning. Set one to `true` to run its script.
+  4. **Agent skills (pnpm 12.11+):** every install prints `Agent skills awaiting approval: @tanstack/react-router, @tanstack/react-start.` A pending approval never fails an install. `pnpm approve` records a `permissions` entry in `pnpm-workspace.yaml` and links the approved skills into the agent skill folders that exist (`.agents/skills` is a link to `.claude/skills`); `skills: { dirs: [] }` turns the feature off.
+  5. **`pmOnFail: ignore`:** keeps `pnpm-lock.yaml` one YAML document. Without it, pnpm 12 writes its own pinned version into a leading second document, and GitHub's dependency graph then sees no dependencies: Dependabot alerts and security updates stop and open alerts can close (GitHub's "Dependabot supported ecosystems" page, pnpm section). The cost: pnpm 11 and 12 no longer switch to the pinned version on a developer machine. CI and Workers Builds still install exactly 12.21.0. Remove the line once GitHub reads two-document lockfiles.
+  6. **`minimumReleaseAge`:** pnpm 12 keeps its 1-day default (pnpm 10's was 0). A Dependabot security update to a release less than a day old fails `pnpm install --frozen-lockfile` (`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`) in CI and Workers Builds until the release is a day old. Keep it, or list a package under `minimumReleaseAgeExclude`, or set `minimumReleaseAge: 0` to return to pnpm 10's behavior.
 - **Root cause:** policy decisions, not technical blockers.
 - **Why deferred:** waiting on the owner.
 - **Fix options:** each is a one-line config change once decided.
@@ -34,13 +37,13 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Added:** 02-11-26
 - **Problem:**
   - **Node 22 end of life:** 2027-04-30. Done 21-11-26: `.node-version` and `engines` moved to Node 26.13.1, the Active LTS line (end of life 2029-04-30).
-  - **pnpm 12:** out (12.16.1); the repo stays on pnpm 10 (10.34.9).
+  - **pnpm 12:** done 22-11-26 (pnpm 10.34.9 to 12.21.0, branch `pnpm-12`).
   - **TypeScript peer warning:** `@sanity/workflow-blueprint` (through the Sanity CLI) wants `typescript@^6.0.3 || ^7.0.0`. The `typescript` alias points to `@typescript/typescript6@6.0.2`, the newest release of that package.
 - **Root cause:** upstream release cadence. (The lint warnings listed here earlier were fixed in visual-redesign Phase 6a: lint is at 0.)
 - **Why deferred:** each is a separate, testable change outside the upgrade's scope.
 - **Fix options:**
   1. Done 21-11-26 (Node 26.13.1, branch `node-26-lts`); the next move is Node 27, Active LTS from 2027-10-20, before Node 26 leaves support on 2029-04-30.
-  2. Evaluate pnpm 12 (lockfile and settings migration) as its own plan.
+  2. pnpm 12: done (settings moved to `pnpm-workspace.yaml`; `pnpm-lock.yaml` unchanged byte for byte).
   3. Bump the `typescript` alias once `@typescript/typescript6` publishes 6.0.3.
 
 ## P3: Cloudflare suite leftovers

@@ -17,7 +17,7 @@ deployed on Cloudflare Workers.
 ```
 Tech:      TanStack Start + Router + Query + Form · React 19.3 · Vite 8 · TypeScript · Tailwind v4 (CSS-only motion)
 Content:   Static landing copy (`lib/content/landing.ts`); Sanity for studio/resume
-Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 10
+Tooling:   ESLint 10 · Vitest 5 · Playwright · pnpm 12
 Runtime:   Node.js ≥26.13 (LTS) · Cloudflare Workers (static assets, Worker cache)
 Style:     Light by default; ink/paper/violet tokens, Instrument Serif + Onest + JetBrains Mono (profile redesign)
 ```
@@ -100,7 +100,12 @@ portfolio project needs its address in `run_worker_first`;
 
 ## Local development
 
-**Requirements:** Node.js **≥26.13.1** (Node 26 LTS, see `.node-version`), pnpm **10.34+**.
+**Requirements:** Node.js **≥26.13.1** (Node 26 LTS, see `.node-version`), pnpm **12**
+(`packageManager` pins 12.21.0). Install pnpm 12 itself, for example with
+`npm install -g pnpm@12.21.0`: an older global pnpm cannot switch to it (pnpm 10
+fails with `ENOEXEC` on macOS), and `pmOnFail: ignore` in `pnpm-workspace.yaml`
+stops pnpm 11 and 12 from switching. pnpm reads its settings (`overrides`,
+`allowBuilds`, `patchedDependencies`) only from `pnpm-workspace.yaml`.
 
 ```bash
 # 1. Install dependencies
@@ -137,8 +142,9 @@ App boots at http://localhost:3000.
 | `pnpm test:e2e`                | Playwright (configure first; see `tests/e2e/`)                          |
 | `pnpm perf:budget`             | First-load JS, CSS and font budgets (route-aware, on-request pages too) |
 
-> Note: use `pnpm run deploy` — bare `pnpm deploy` is a pnpm CLI command, not
-> this repo’s script.
+> Note: since pnpm 11, bare `pnpm deploy` runs this repo's `deploy` script, the
+> same as `pnpm run deploy`: it deploys production. pnpm's own deploy command
+> is `pnpm pm deploy`.
 
 ## Editing content
 
@@ -353,11 +359,15 @@ Review the diff of the JSON before committing it.
 - **Pins:** test and build tooling is pinned to exact versions. `@playwright/test`
   must match the Playwright container image in `.github/workflows/ci.yml`; bump
   both together (Dependabot skips it).
-- **Overrides:** `pnpm.overrides` holds exact pins for transitive security fixes.
-  After any upgrade, run `pnpm audit` and drop overrides the parents no longer need.
+- **Overrides:** `overrides` in `pnpm-workspace.yaml` holds exact pins for
+  transitive security fixes. After any upgrade, run `pnpm audit` and drop
+  overrides the parents no longer need.
 - **Updates:** Dependabot opens grouped weekly PRs after a 7-day cooldown
   (`.github/dependabot.yml`). Every merge to `main` deploys production, so merge
-  them only on a green CI.
+  them only on a green CI. pnpm 12 also refuses versions published less than a
+  day ago (`minimumReleaseAge`, 1440 minutes by default): a security update to a
+  release younger than that fails `pnpm install --frozen-lockfile` with
+  `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` until the release is a day old.
 - **Build guard:** `vite build` fails when `NEXT_PUBLIC_SITE_URL` or the Sanity
   project/dataset are missing (they come from the wrangler `vars`).
 

@@ -1,3 +1,46 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# pnpm settings. Since pnpm 11, pnpm reads them only from this file (not from
+# the `pnpm` field of package.json), and pnpm 12 fails on a key it does not
+# recognize here.
+
+# Dependency build scripts pnpm may run. Every entry is false: none of them
+# runs, as under pnpm 10 (esbuild and workerd ship their binaries in platform
+# packages). With strictDepBuilds on by default, a new dependency with a build
+# script fails the install until it is listed here.
+allowBuilds:
+  esbuild: false
+  sharp: false
+  unrs-resolver: false
+  workerd: false
+
+# Exact pins for transitive security fixes (some scoped to one major, such as
+# minimatch@10). After any upgrade, run `pnpm audit` and drop the pins the parents
+# no longer need.
+overrides:
+  esbuild: 0.28.2
+  postcss: 8.5.33
+  "@babel/core": 7.29.13
+  dompurify: 3.4.18
+  form-data: 4.0.6
+  js-yaml: 4.3.2
+  smol-toml: 1.9.1
+  tar: 7.5.23
+  undici@7: 7.30.2
+  ws: 8.23.0
+  adm-zip: 0.6.1
+  json-2-csv: 5.6.0
+  brace-expansion@5: 5.0.13
+  minimatch@10: 11.0.9
+
+# See patches/README.md.
+patchedDependencies:
+  eslint-plugin-react@7.37.5: patches/eslint-plugin-react@7.37.5.patch
+
+# Keeps pnpm-lock.yaml one YAML document. With the default (`download`), pnpm 12
+# records its own version from `packageManager` in a second, leading document,
+# and GitHub's dependency graph does not read a two-document lockfile: Dependabot
+# alerts and security updates stop for every dependency. `ignore` only skips
+# pnpm's own version check; CI (pnpm/action-setup) and Workers Builds (Corepack)
+# still install the exact pnpm that `packageManager` names. Remove this line
+# once GitHub reads two-document lockfiles (see "pnpm" in Dependabot's
+# supported ecosystems docs).
+pmOnFail: ignore
