@@ -1907,6 +1907,60 @@ test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
     await page.getByRole("button", { name: "Show the pixels" }).click();
     await expect(pixels).toBeVisible();
   });
+
+  test("/about: the pills on the portrait ring in ink and paper, which read on the violet", async ({
+    page,
+    browserName,
+  }) => {
+    // The site's violet ring vanished on the violet pixel portrait (UX hunt
+    // 22-11-26, WCAG 2.4.7): ink against the pill, paper outside it.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((value) => {
+        try {
+          localStorage.setItem("theme", value);
+        } catch {
+          // Storage can be unavailable; the site then uses its default theme.
+        }
+      }, theme);
+      await page.goto("/about", { waitUntil: "load" });
+      await expect(page.locator("time[data-clock]")).toBeAttached();
+      const pills = [
+        page.getByRole("button", { name: "Show the photo" }),
+        page.getByRole("button", { name: /^Try a trait/ }),
+      ];
+      // Save appears once a trait is found; Tab goes on to it.
+      await pills[1]!.focus();
+      await page.keyboard.press("Enter");
+      await page.keyboard.press(tabKey(browserName));
+      pills.push(page.getByRole("button", { name: /my edition$/ }));
+      await expect(pills[2]!).toBeFocused();
+      for (const pill of pills) {
+        await pill.focus();
+        // Polled: reduced motion still gives every change a 0.01 ms
+        // transition (globals.css), so the first read can be the old value.
+        const ring = () =>
+          pill.evaluate((el) => {
+            const probe = document.createElement("i");
+            probe.style.cssText = "color: var(--paper); background: var(--ink)";
+            document.body.append(probe);
+            const tokens = getComputedStyle(probe);
+            const paper = tokens.color;
+            const ink = tokens.backgroundColor;
+            probe.remove();
+            const style = getComputedStyle(el);
+            return {
+              shown: el.matches(":focus-visible"),
+              outside: style.outlineColor === paper,
+              inside: style.boxShadow === `${ink} 0px 0px 0px 5px`,
+            };
+          });
+        await expect
+          .poll(ring, `${theme}: ${await pill.textContent()}`)
+          .toEqual({ shown: true, outside: true, inside: true });
+      }
+    }
+  });
 });
 
 /**
