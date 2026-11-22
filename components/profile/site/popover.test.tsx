@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  POPOVER_IDS,
   closePopover,
+  closePopoversForModal,
   isPopoverOpen,
   usePopover,
 } from "@/components/profile/site/popover";
@@ -16,11 +18,12 @@ import {
 function Fixture({
   onClose,
   native = true,
+  id = "panel-under-test",
 }: {
   onClose?: () => void;
   native?: boolean;
+  id?: string;
 }) {
-  const id = "panel-under-test";
   usePopover(id, {
     names: { open: "Close it", closed: "Open it" },
     onClose,
@@ -160,6 +163,22 @@ describe("usePopover, native branch", () => {
     expect(hide).not.toHaveBeenCalled();
   });
 
+  it("closePopoversForModal sends focus from inside an open panel to its invoker, then closes it", () => {
+    stubNative();
+    render(<Fixture id={POPOVER_IDS.nav} />);
+    const panel = document.getElementById(POPOVER_IDS.nav)!;
+    fireToggle(panel, "open");
+    const invoker = screen.getByRole("button", { name: "Close it" });
+    const hide = openNatively(panel);
+    // Where focus is as the panel closes: on the invoker already.
+    hide.mockImplementation(() => {
+      expect(document.activeElement).toBe(invoker);
+    });
+    act(() => closePopoversForModal());
+    expect(hide).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(invoker);
+  });
+
   it("closePopover hides an open native popover", () => {
     stubNative();
     render(<Fixture />);
@@ -261,5 +280,22 @@ describe("usePopover, fallback branch (no Popover API)", () => {
     expect(panel).not.toHaveAttribute("data-open");
     expect(invoker).toHaveAttribute("aria-expanded", "false");
     expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it("closePopoversForModal closes every open chrome panel, focus to its invoker, and the bookkeeping follows", () => {
+    const onClose = vi.fn();
+    render(<Fixture native={false} id={POPOVER_IDS.menu} onClose={onClose} />);
+    const invoker = screen.getByRole("button", { name: "Open it" });
+    const panel = document.getElementById(POPOVER_IDS.menu)!;
+    fireEvent.click(invoker);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "First" }),
+    );
+
+    act(() => closePopoversForModal());
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
+    expect(document.activeElement).toBe(invoker);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

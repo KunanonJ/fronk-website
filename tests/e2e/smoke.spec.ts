@@ -1750,6 +1750,98 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
   });
 
+  /*
+   * ⌘K over an open Say hello (UX hunt 22-11-26): the dialog gave focus
+   * back, on Esc, to Say hello's Copy email, inside the panel it had closed,
+   * so focus fell to the page; and WebKit closed the panel without a toggle
+   * event, so its trigger kept aria-expanded="true".
+   */
+  test("⌘K over an open Say hello closes it, and Esc gives focus back to its trigger", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    const trigger = page.getByRole("button", { name: "Say hello" }).first();
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const panel = page.locator(".pf-say__panel--nav");
+    await expect(
+      page.getByRole("button", { name: "Copy email" }),
+    ).toBeFocused();
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(panel).toBeHidden();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  /*
+   * A drag selecting the field's text that ends outside the dialog clicks
+   * the dialog itself, as a press on the backdrop does, and closed it with
+   * the query in Chromium and WebKit (UX hunt 22-11-26).
+   */
+  test("a drag from the field that ends outside keeps it open; a press outside closes it", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    const field = page.getByRole("combobox", { name: "Search the site" });
+    await field.fill("automation");
+    const box = (await field.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.3, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(8, 8, { steps: 6 });
+    await page.mouse.up();
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(field).toHaveValue("automation");
+    await page.mouse.click(8, 8);
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+  });
+
+  /** The page's scroll position, read at the call. */
+  const scrollY = (page: Page) => page.evaluate(() => window.scrollY);
+
+  test("the page behind it holds still while it is open", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    // Over the backdrop, beside the dialog.
+    await page.mouse.move(100, 450);
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(400);
+    expect(await scrollY(page)).toBe(0);
+    // The control: closed, the same wheel scrolls.
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await page.mouse.wheel(0, 700);
+    await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+  });
+
+  test("on a phone, the page under the open menu holds still", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await visit(page, "/");
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("navigation", { name: "Site" });
+    await expect(menu).toBeVisible();
+    const card = (await menu.boundingBox())!;
+    // Below the card, on the page.
+    await page.mouse.move(195, Math.min(card.y + card.height + 120, 820));
+    await page.mouse.wheel(0, 500);
+    await page.waitForTimeout(400);
+    expect(await scrollY(page)).toBe(0);
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await page.mouse.wheel(0, 500);
+    await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+  });
+
   for (const [width, most] of [
     [390, 2],
     [1440, 1],

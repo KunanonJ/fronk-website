@@ -10,6 +10,7 @@ import {
 import { createPortal } from "react-dom";
 import { useRouter } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
+import { closePopoversForModal } from "@/components/profile/site/popover";
 import { award } from "@/lib/brand/traitStore";
 import { sayHello, searchCopy } from "@/lib/content/profileChrome";
 import { secretsCopy } from "@/lib/content/secretsCopy";
@@ -30,7 +31,11 @@ import searchCss from "@/src/styles/search.css?url";
 /*
  * The search dialog (premium interactions, item 8), loaded on first use by
  * SearchTrigger. A native modal <dialog>: it holds focus, Esc closes it, a
- * press on the backdrop closes it, and closing returns focus where it was.
+ * press on the backdrop closes it (one that starts in the dialog, as a drag
+ * selecting the field's text, does not), and closing returns focus where it
+ * was. The chrome's popovers close as it opens, focus inside one going to
+ * its invoker first, so that is where focus comes back to. The page behind
+ * does not scroll (search.css).
  * Inside, an ARIA combobox: the field keeps focus, the arrows move through
  * the results (aria-activedescendant), Enter opens one, and a polite line
  * says how many there are. The index (/search.json) is fetched on first
@@ -97,8 +102,22 @@ function SearchOption({
   );
 }
 
+/** Whether a press is on the backdrop: the dialog itself, outside its box. */
+function isBackdrop(event: MouseEvent<HTMLDialogElement>): boolean {
+  if (event.target !== event.currentTarget) return false;
+  const box = event.currentTarget.getBoundingClientRect();
+  return (
+    event.clientX < box.left ||
+    event.clientX > box.right ||
+    event.clientY < box.top ||
+    event.clientY > box.bottom
+  );
+}
+
 export default function SearchDialog({ onClose }: { onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  /** Whether the press now ending began on the backdrop. */
+  const pressed = useRef(false);
   const router = useRouter();
   const id = useId();
   const [entries, setEntries] = useState<SearchEntry[] | null>(null);
@@ -109,7 +128,9 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     const el = dialog.current;
-    if (el && !el.open) el.showModal();
+    if (!el || el.open) return;
+    closePopoversForModal();
+    el.showModal();
   }, []);
 
   useEffect(() => {
@@ -227,8 +248,17 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const onBackdrop = (event: MouseEvent<HTMLDialogElement>) => {
-    if (event.target === event.currentTarget) event.currentTarget.close();
+  // A press on the backdrop closes the dialog. A drag that selects the
+  // field's text and ends outside it clicks the dialog too (the nearest
+  // element both ends share), and kept it open only in Firefox: so the
+  // press must also begin there (UX hunt 22-11-26).
+  const onPress = (event: MouseEvent<HTMLDialogElement>) => {
+    pressed.current = isBackdrop(event);
+  };
+  const onClick = (event: MouseEvent<HTMLDialogElement>) => {
+    const began = pressed.current;
+    pressed.current = false;
+    if (began && isBackdrop(event)) event.currentTarget.close();
   };
 
   const note = commands
@@ -271,7 +301,8 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
         className="pf-search"
         aria-labelledby={`${id}-label`}
         onClose={onClose}
-        onClick={onBackdrop}
+        onPointerDown={onPress}
+        onClick={onClick}
       >
         <div className="pf-search__field">
           <Search

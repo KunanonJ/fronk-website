@@ -6,7 +6,8 @@ import { useEffect, useSyncExternalStore } from "react";
  * invokers carry `popovertarget`. Script adds what the native element cannot do
  * alone: the invoker's aria-expanded and names, focus on open and back on close,
  * closing when focus moves on to the page (where the panel would cover it,
- * WCAG 2.4.11), and closing on a route change.
+ * WCAG 2.4.11), closing before the search dialog opens over them, and closing
+ * on a route change.
  *
  * Where the engine has no Popover API, the panel is hidden by CSS until the
  * script sets `data-open` on it, and the invoker toggles it. Both paths report
@@ -89,6 +90,23 @@ export function closePopover(panelId: string): void {
 /** The element whose `popovertarget` names the panel `panelId`. */
 function invokerOf(panelId: string): HTMLElement | null {
   return document.querySelector<HTMLElement>(`[popovertarget="${panelId}"]`);
+}
+
+/**
+ * Closes the chrome's open popovers before a modal dialog opens over them
+ * (the search dialog). Focus inside one goes to its invoker first: the
+ * dialog gives focus back, as it closes, to what had it as it opened, and a
+ * control in a closed panel cannot take it, so it fell to the page. Closed
+ * here rather than by `showModal`, which in WebKit closes them without a
+ * toggle event, so the invoker kept aria-expanded="true" (UX hunt 22-11-26).
+ */
+export function closePopoversForModal(): void {
+  for (const panelId of Object.values(POPOVER_IDS)) {
+    const panel = document.getElementById(panelId);
+    if (!panel || !isPopoverOpen(panel)) continue;
+    if (panel.contains(document.activeElement)) invokerOf(panelId)?.focus();
+    closePopover(panelId);
+  }
 }
 
 export interface PopoverOptions {
