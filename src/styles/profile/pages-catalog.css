@@ -23,8 +23,12 @@
     gap: 10px 12px;
     margin-top: 32px;
   }
+  /* 40rem, wider than a paragraph's measure: a meta line is facts, not
+     prose, and /skills' (its count, licence, split and maintainer) fits one
+     line from 768 px rather than leaving the maintainer's name alone on a
+     second (UX hunt 22-11-26). */
   .pf-cat-hero__meta {
-    max-inline-size: var(--measure);
+    max-inline-size: 40rem;
     margin-top: 24px;
     color: var(--ink-80);
   }
@@ -206,10 +210,18 @@
   .pf-skill-chips__item {
     max-inline-size: 100%;
   }
+  /* A tag may wrap (at 320 px, "Adapted from pstack (cursor/plugins)"
+     takes two lines): its lines take 1.25 and 3 px above and below, and its
+     corners 14 px, so two lines sit inside a rounded box rather than past
+     the ends of a pill. One line keeps the 26 px pill, fully round
+     (UX hunt 22-11-26). */
   .pf-skill-tag {
     block-size: auto;
     min-block-size: 26px;
+    padding-block: 3px;
+    border-radius: 14px;
     color: var(--ink-60);
+    line-height: 1.25;
     white-space: normal;
   }
   .pf-skill-tag--original {

@@ -483,3 +483,111 @@ test.describe("what jsdom cannot see (desktop Chromium)", () => {
     }
   });
 });
+
+/*
+ * UX hunt 22-11-26, /skills in each engine: the hero's meta line keeps the
+ * maintainer's name whole and on the line of "maintained by" (from 768 px
+ * it sat alone on a second line, and Firefox split it), and a tag that
+ * wraps at 320 px keeps its two lines inside its box.
+ */
+test.describe("/skills' hero meta and tags in every engine (UX hunt 22-11-26)", () => {
+  test.beforeEach(() => {
+    test.skip(
+      !["desktop", "webkit", "firefox"].includes(test.info().project.name),
+      "runs in desktop Chromium, WebKit and Firefox",
+    );
+  });
+
+  test("the maintainer's name stays whole, on the line of 'maintained by'", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await open(page, PAGES.skills);
+    const meta = page.locator(".pf-page-hero .pf-cat-hero__meta");
+    for (const width of [390, 768, 1024, 1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 });
+      // Let vw units and the layout settle at the new width (WebKit and
+      // Chromium can measure a frame at the old one).
+      await page.evaluate(
+        () =>
+          new Promise<void>((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => done())),
+          ),
+      );
+      const lines = await meta.evaluate((p) => {
+        const link = p.querySelector("a")!;
+        const name = document.createRange();
+        name.selectNodeContents(link);
+        const nameTops = [
+          ...new Set(
+            [...name.getClientRects()]
+              .filter((rect) => rect.width > 0)
+              .map((rect) => Math.round(rect.top)),
+          ),
+        ];
+        // The text before the name, "... maintained by ", ends on this line.
+        const before = document.createRange();
+        before.setStart(p, 0);
+        before.setEndBefore(link);
+        const rects = [...before.getClientRects()].filter(
+          (rect) => rect.width > 0,
+        );
+        const byTop = rects[rects.length - 1]!.top;
+        return {
+          nameRows: nameTops.length,
+          sameLine: Math.abs(byTop - nameTops[0]!) < 4,
+        };
+      });
+      expect(lines, `at ${width} px`).toEqual({
+        nameRows: 1,
+        sameLine: true,
+      });
+    }
+  });
+
+  test("at 320 px a tag that wraps keeps its lines inside its box", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize({ width: 320, height: 700 });
+    await open(page, PAGES.skills);
+    const tags = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>(".pf-skill-tag")]
+        .filter((tag) => tag.getBoundingClientRect().width > 0)
+        .map((tag) => {
+          const box = tag.getBoundingClientRect();
+          // The text's lines only, not the "Original" tag's drawn mark.
+          const rects = [...tag.childNodes]
+            .filter((node) => node.nodeType === Node.TEXT_NODE)
+            .flatMap((node) => {
+              const range = document.createRange();
+              range.selectNodeContents(node);
+              return [...range.getClientRects()];
+            })
+            .filter((rect) => rect.width > 0);
+          return {
+            text: tag.textContent ?? "",
+            rows: new Set(rects.map((rect) => Math.round(rect.top))).size,
+            inside:
+              Math.min(...rects.map((rect) => rect.top)) >= box.top + 1 &&
+              Math.max(...rects.map((rect) => rect.bottom)) <= box.bottom - 1,
+            radius: parseFloat(getComputedStyle(tag).borderTopLeftRadius),
+            height: box.height,
+          };
+        }),
+    );
+    const wrapped = tags.filter((tag) => tag.rows > 1);
+    // "Adapted from pstack (cursor/plugins)" wraps at this width.
+    expect(wrapped.length).toBeGreaterThan(0);
+    for (const tag of wrapped) {
+      expect(tag.inside, tag.text).toBe(true);
+      // A rounded box's corners, not a pill's ends past the text.
+      expect(tag.radius, tag.text).toBeLessThanOrEqual(14);
+    }
+    // A one-line tag stays a 26 px pill, fully round.
+    for (const tag of tags.filter((t) => t.rows === 1)) {
+      expect(Math.round(tag.height), tag.text).toBe(26);
+      expect(tag.radius * 2, tag.text).toBeGreaterThanOrEqual(tag.height - 1);
+    }
+  });
+});

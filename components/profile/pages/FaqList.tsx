@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { keepNamesWhole } from "@/lib/content/keepWhole";
+import { keepThaiWordsWhole } from "@/lib/content/keepThaiWhole";
 import type { FaqItem } from "@/lib/seo/jsonLd";
 import { pad2 } from "@/lib/utils/pad2";
 
@@ -12,7 +13,8 @@ import { pad2 } from "@/lib/utils/pad2";
  * stylesheet shows them too (src/styles/profile/pages-hubs.css). `numbered`
  * draws each question's number before it, hidden from assistive technology.
  * An answer keeps its names unbroken with no-break spaces, the JSON-LD's
- * words with only those spaces changed (keepWhole.ts).
+ * words with only those spaces changed (keepWhole.ts), and its Thai
+ * compounds in spans that do not wrap (keepThaiWhole.tsx).
  * Styles: `.pf-faq*` in cutover.css, the number in pages-hubs.css.
  */
 export function FaqList({
@@ -65,7 +67,9 @@ export function FaqList({
             <h3 className="pf-faq__heading">{item.question}</h3>
             <span className="pf-faq__mark" aria-hidden="true" />
           </summary>
-          <p className="t-body pf-faq__answer">{keepNamesWhole(item.answer)}</p>
+          <p className="t-body pf-faq__answer">
+            {keepThaiWordsWhole(keepNamesWhole(item.answer))}
+          </p>
         </details>
       ))}
     </div>

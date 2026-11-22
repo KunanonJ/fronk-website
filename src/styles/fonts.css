@@ -44,6 +44,45 @@
   line-gap-override: 0%;
   size-adjust: 106.33%;
 }
+/*
+ * Thai while Noto Sans Thai loads (UX hunt 22-11-26). Arial has no Thai, so
+ * a browser drew it in a system face of its own choosing, about 6% wider
+ * than Noto, and a Thai hub's h1 lost a line when Noto arrived (a layout
+ * shift of 0.02 to 0.2 in Chromium). These faces, for Thai only, are system
+ * Thai faces sized to Noto's width and given its lines. The last face is
+ * tried first: Noto Sans Thai itself where it is installed (Android, most
+ * Linux), then Thonburi (Apple systems), then Tahoma (Windows, and macOS);
+ * with none, the Arial face above passes Thai on as before. Each size-adjust
+ * is Noto's width of the hubs' Thai over the face's, the same in Chromium,
+ * WebKit and Firefox; each override is Noto's (106.1% up, 45% down) over
+ * it, as next/font computes the Arial face's. Measured with Noto held back:
+ * Chromium's shift falls to 0.002 or less, WebKit keeps a line only where
+ * one is within 2% of full; Firefox skips every later web-font family while
+ * one loads, so it draws the system face until Noto arrives, as before.
+ */
+@font-face {
+  font-family: Noto Sans Thai Fallback;
+  src: local(Tahoma);
+  unicode-range: U+E01-E5B;
+  ascent-override: 112.48%;
+  descent-override: 47.71%;
+  line-gap-override: 0%;
+  size-adjust: 94.33%;
+}
+@font-face {
+  font-family: Noto Sans Thai Fallback;
+  src: local(Thonburi);
+  unicode-range: U+E01-E5B;
+  ascent-override: 113.33%;
+  descent-override: 48.07%;
+  line-gap-override: 0%;
+  size-adjust: 93.62%;
+}
+@font-face {
+  font-family: Noto Sans Thai Fallback;
+  src: local("Noto Sans Thai Regular"), local(NotoSansThai-Regular);
+  unicode-range: U+E01-E5B;
+}
 
 /*
  * Profile redesign (Phase 0, 18-11-26): Instrument Serif, Onest, JetBrains Mono

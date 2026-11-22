@@ -10,13 +10,14 @@ import { cn } from "@/lib/utils/cn";
 /*
  * The case hero's pills (profile redesign Phase 5, design spec 9.2 and 13
  * item 27): the public site or the source in a new tab, then the existing
- * Share pill. SharePill is reused as it is: it opens the share panel through
- * the bento chrome's state, which the live header provides and the preview
- * chrome does not, so this row provides it, and draws the same panel under
- * itself. Escape closes it and returns focus to the pill; a press outside the
- * row closes it, and so does focus that moves out of the row (Tab past the
- * panel), which leaves focus where it went: the panel would cover it there
- * (WCAG 2.4.11). Styles: `.pf-case-actions*` in src/styles/profile/case.css.
+ * Share pill, at the link's 52 px (`lg`). SharePill opens the share panel
+ * through the bento chrome's state, which the live header provides and the
+ * preview chrome does not, so this row provides it, and draws the same panel
+ * under itself. Escape closes it and returns focus to the pill; a press
+ * outside the row closes it, and so does focus that moves out of the row
+ * (Tab past the panel), which leaves focus where it went: the panel would
+ * cover it there (WCAG 2.4.11). Styles: `.pf-case-actions*` in
+ * src/styles/profile/case.css.
  */
 
 function ShareRow({ external }: { external?: CaseLink }) {
@@ -76,7 +77,7 @@ function ShareRow({ external }: { external?: CaseLink }) {
           </span>
         </a>
       ) : null}
-      <SharePill />
+      <SharePill size="lg" />
       {panel === "share" ? (
         <div className="pf-case-actions__panel">
           <SharePanel />

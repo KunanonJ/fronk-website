@@ -329,9 +329,12 @@ const TH_PILLARS: readonly TopicPillar[] = [
     description:
       "แนวทาง AI transformation สำหรับสตาร์ทอัพและ SME ในไทยและ SEA — จากระบบภายในถึง ERP/CRM พร้อม Intelligence AI โดย Kunanon Jarat กรุงเทพฯ",
     h1: "การเปลี่ยนผ่านด้วย AI ในประเทศไทยและ SEA",
+    // "การเปลี่ยนผ่าน" (transition) alone on the first line: with "ด้วย AI"
+    // after it, the line was too long and broke the word as
+    // "การเปลี่ยน | ผ่าน" at every width (UX hunt 22-11-26).
     h1Lines: [
-      [{ muted: "การเปลี่ยนผ่านด้วย" }, " AI "],
-      [{ muted: "ใน" }, "ประเทศไทย"],
+      [{ muted: "การเปลี่ยนผ่าน" }],
+      [{ muted: "ด้วย" }, " AI ", { muted: "ใน" }, "ประเทศไทย"],
       ["และ SEA"],
     ],
     lede: "AI transformation ไม่ใช่สไลด์พรีเซนต์ แต่คือการเปลี่ยนงานจริง — ลดเครื่องมือกระจัดกระจาย และใส่ระบบที่ทำงานได้จริงสำหรับ SME และสตาร์ทอัพในไทย",

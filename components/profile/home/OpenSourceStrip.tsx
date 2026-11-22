@@ -57,12 +57,12 @@ export default function OpenSourceStrip() {
                 <span className="t-small text-ink-2">{project.kind}</span>
                 <span className="pf-oss__meta">
                   {project.facts.release ? (
-                    <>
+                    <span className="pf-oss__release">
                       <span aria-hidden="true" className="pf-skill-tag__mark" />
                       <span className="pf-cat-code">
                         {project.facts.release.tag}
                       </span>
-                    </>
+                    </span>
                   ) : null}
                   <span className="t-small text-ink-2">
                     {openSourceStrip.updated}{" "}

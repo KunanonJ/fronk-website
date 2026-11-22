@@ -313,9 +313,18 @@ test.describe("hero: the entrance and the intro (plan step 2f)", () => {
     expect(await animationOf(page, ".pf-hero__chips")).toBe("none");
     expect(await animationOf(page, ".pf-mock-wrap")).toBe("none");
     // The cursor waits too. By the fourth greeting (1.2 s in) a tour that
-    // had started at once would have made its first stop (0.9 s).
-    // Read once, not polled: the tour itself ends on frame 0.
-    await expect(overlay).toContainText("こんにちは");
+    // had started at once would have made its first stop (0.9 s). The
+    // greeting is on screen for a moment only, so it is watched on every
+    // frame (expect's back-off polls could step over it on a slow machine),
+    // and the cursor is read at once: the tour itself ends on frame 0.
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[data-testid="intro-overlay"]')
+          ?.textContent?.includes("こんにちは") ?? false,
+      null,
+      { polling: "raf", timeout: 5_000 },
+    );
     expect(
       await page.locator(".pf-mock__cursor").getAttribute("data-frame"),
     ).toBe("0");
@@ -814,6 +823,205 @@ test.describe("hero: side by side from 1024 px on a landscape screen (UX sweep 2
     const copy = (await page.locator(".pf-hero__copy").boundingBox())!;
     const mock = (await page.locator(".pf-mock-wrap").boundingBox())!;
     expect(mock.y).toBeGreaterThanOrEqual(copy.y + copy.height);
+  });
+});
+
+/*
+ * UX hunt 22-11-26, Home's hero and open-source strip in each engine: the
+ * canvas's drawn screens inside their frames (WebKit ran them 13 to 19 px
+ * past the foot), the h1's first line whole on large screens, the canvas
+ * uncramped from 1024 px, its title clear of Share at 320 px, and each
+ * release mark beside its tag.
+ */
+test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
+  const ENGINES = ["desktop", "webkit", "firefox"];
+
+  /**
+   * One visit, then each size by resizing: the parts measured here are laid
+   * out by CSS alone. Two frames let vw units and the layout settle.
+   */
+  async function resize(page: Page, size: { width: number; height: number }) {
+    await page.setViewportSize(size);
+    await page.evaluate(
+      () =>
+        new Promise<void>((done) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => done())),
+        ),
+    );
+  }
+
+  test("the canvas's drawn screens stay inside their frames", async ({
+    page,
+  }) => {
+    only([...ENGINES, "webkit-phone"]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    const sizes =
+      test.info().project.name === "webkit-phone"
+        ? [{ width: 390, height: 844 }]
+        : [
+            { width: 1440, height: 900 },
+            { width: 1024, height: 768 },
+            { width: 834, height: 1112 },
+          ];
+    await visit(page);
+    for (const size of sizes) {
+      await resize(page, size);
+      const overflow = await page.evaluate(() =>
+        [...document.querySelectorAll(".pf-thumb")]
+          .filter((thumb) => thumb.getBoundingClientRect().width > 0)
+          .map((thumb) => {
+            const frame = thumb.getBoundingClientRect();
+            const screen = thumb
+              .querySelector(".pf-thumb__screen")!
+              .getBoundingClientRect();
+            return Math.round((screen.bottom - frame.bottom) * 10) / 10;
+          }),
+      );
+      expect(overflow, `at ${size.width} px`).toHaveLength(3);
+      for (const past of overflow) {
+        expect(past, `at ${size.width} px`).toBeLessThanOrEqual(0.5);
+      }
+    }
+  });
+
+  test("on large screens the h1's first line stays one line, at most 90 px", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    for (const size of [
+      { width: 1680, height: 1050 },
+      { width: 1920, height: 1080 },
+      { width: 2560, height: 1440 },
+    ]) {
+      await resize(page, size);
+      const { fontSize, rows } = await page
+        .locator(".pf-hero__line")
+        .first()
+        .evaluate((line) => {
+          const range = document.createRange();
+          range.selectNodeContents(line);
+          const tops = new Set(
+            [...range.getClientRects()]
+              .filter((rect) => rect.width > 0)
+              .map((rect) => Math.round(rect.top)),
+          );
+          return {
+            fontSize: parseFloat(getComputedStyle(line).fontSize),
+            rows: tops.size,
+          };
+        });
+      const at = `at ${size.width} x ${size.height}`;
+      expect(rows, at).toBe(1);
+      expect(fontSize, at).toBeLessThanOrEqual(90);
+    }
+  });
+
+  test("from 1024 px the canvas's tabs fit their panel and the second frame's label clears the inspector", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    for (const size of [
+      { width: 1024, height: 768 },
+      { width: 1180, height: 820 },
+      { width: 1280, height: 800 },
+      { width: 1366, height: 768 },
+      { width: 1440, height: 900 },
+    ]) {
+      await resize(page, size);
+      const room = await page.evaluate(() => {
+        const inspector = document
+          .querySelector(".pf-mock__inspector")!
+          .getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(
+          document.querySelector(".pf-mock__inspector .pf-mock__tabs")!,
+        );
+        const tabs = range.getBoundingClientRect();
+        const items = [...document.querySelectorAll(".pf-mock__item")];
+        const thumb = (i: number) =>
+          items[i]!.querySelector(".pf-thumb")!.getBoundingClientRect();
+        const label = items[1]!
+          .querySelector(".pf-mock__label")!
+          .getBoundingClientRect();
+        return {
+          tabsToEdge: inspector.right - tabs.right,
+          labelToInspector: inspector.left - label.right,
+          framesApart: thumb(1).left - thumb(0).right,
+        };
+      });
+      const at = `at ${size.width} x ${size.height}`;
+      expect(room.tabsToEdge, `tabs ${at}`).toBeGreaterThanOrEqual(6);
+      expect(room.labelToInspector, `label ${at}`).toBeGreaterThanOrEqual(2);
+      expect(room.framesApart, `frames ${at}`).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  test("at 320 px the canvas's title keeps clear of its Share pill", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 320, height: 568 });
+    await prepare(page);
+    await visit(page);
+    const gap = await page.evaluate(() => {
+      const title = document
+        .querySelector(".pf-mock__title")!
+        .getBoundingClientRect();
+      const share = document
+        .querySelector(".pf-mock__share")!
+        .getBoundingClientRect();
+      return share.left - title.right;
+    });
+    expect(gap).toBeGreaterThanOrEqual(4);
+  });
+
+  test("the open-source strip keeps each release mark beside its tag's first line", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    for (const size of [
+      { width: 320, height: 568 },
+      { width: 1024, height: 768 },
+      { width: 1440, height: 900 },
+    ]) {
+      await resize(page, size);
+      const marks = await page.evaluate(() =>
+        [...document.querySelectorAll(".pf-oss__release")].map((release) => {
+          const mark = release
+            .querySelector(".pf-skill-tag__mark")!
+            .getBoundingClientRect();
+          const range = document.createRange();
+          range.selectNodeContents(release.querySelector(".pf-cat-code")!);
+          const first = [...range.getClientRects()].find(
+            (rect) => rect.width > 0,
+          )!;
+          const middle = mark.top + mark.height / 2;
+          return {
+            tag: release.textContent,
+            before: mark.right <= first.left + 0.5,
+            onFirstLine: middle > first.top && middle < first.bottom,
+          };
+        }),
+      );
+      expect(marks.length, `at ${size.width} px`).toBeGreaterThan(0);
+      for (const mark of marks) {
+        expect(mark, `at ${size.width} px`).toMatchObject({
+          before: true,
+          onFirstLine: true,
+        });
+      }
+    }
   });
 });
 

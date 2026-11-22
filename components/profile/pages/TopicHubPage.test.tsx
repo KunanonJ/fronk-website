@@ -182,6 +182,38 @@ describe("TopicHubPage (Thai)", () => {
     ).toHaveAttribute("lang", "en");
   });
 
+  it("keeps Thai compounds whole where a line could split them, the text unchanged (UX hunt 22-11-26)", () => {
+    const { pillar, container } = renderTopic(
+      "ai-transformation-thailand",
+      "th",
+    );
+    const kept = (el: Element) =>
+      [...el.querySelectorAll<HTMLElement>("span")]
+        .filter((span) => span.style.whiteSpace === "nowrap")
+        .map((span) => span.textContent);
+    // The h1's first line is the word "transition" alone.
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1.firstElementChild!.textContent).toBe("การเปลี่ยนผ่าน");
+    const lede = container.querySelector(".pf-page-hero__lead")!;
+    expect(kept(lede)).toEqual(["พรีเซนต์", "เครื่องมือ", "กระจัดกระจาย", "สตาร์ทอัพ"]);
+    expect(lede.textContent).toBe(pillar.lede);
+    const body = container.querySelector(".pf-case-prose > p")!;
+    expect(body.textContent).toBe(pillar.sections[0]!.body);
+    expect(kept(body)).toEqual(["ตัดสินใจ", "สต็อก", "แชทบอท"]);
+    const proof = screen.getByRole("article", { name: "หลักฐานจากงานจริง" });
+    expect(kept(proof)).toEqual([
+      "ผู้ก่อตั้ง",
+      "ผลิตภัณฑ์",
+      "ยานยนต์",
+      "ช้อปปิ้ง",
+      "ลงทะเบียน",
+    ]);
+    const contact = screen.getByRole("article", { name: "ติดต่อ" });
+    expect(kept(contact)).toContain("สตาร์ทอัพ");
+    const answer = screen.getByRole("region", { name: "FAQ" });
+    expect(kept(answer)).toContain("กระจัดกระจาย");
+  });
+
   it("sets the one-section hub the same way", () => {
     const { pillar } = renderTopic("tech-startup-thailand-sea", "th");
     expect(pillar.sections).toHaveLength(1);

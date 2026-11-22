@@ -249,7 +249,7 @@ export default function ContactForm({
         {contactPage.cardTitle}
       </h2>
       {ready ? (
-        <div className="my-auto flex flex-col items-start gap-5 px-1 pb-6">
+        <div className="my-auto flex flex-col items-start gap-5 pb-6">
           <div
             ref={readyRef}
             tabIndex={-1}
@@ -344,7 +344,7 @@ export default function ContactForm({
         <form
           aria-labelledby="card-form"
           noValidate
-          className="m-0 flex flex-col gap-5 px-1 pt-1"
+          className="m-0 flex flex-col gap-5 pt-1"
           onSubmit={(e) => {
             e.preventDefault();
             void form.handleSubmit();
