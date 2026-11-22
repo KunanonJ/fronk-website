@@ -3353,15 +3353,54 @@ test.describe("share pill > a round icon on phones, the labelled pill from 640 p
       const label = share.getByText("Share", { exact: true });
       const labelBox = (await label.boundingBox())!;
       if (width < 640) {
-        // 56 px round, the label kept for screen readers only.
-        expect(Math.round(box.width)).toBe(56);
-        expect(Math.round(box.height)).toBe(56);
+        // 44 px round, the hero pills' height (UX hunt 22-11-26), the label
+        // kept for screen readers only.
+        expect(Math.round(box.width)).toBe(44);
+        expect(Math.round(box.height)).toBe(44);
         expect(labelBox.width).toBeLessThanOrEqual(1);
       } else {
         expect(box.width).toBeGreaterThan(box.height);
         expect(labelBox.width).toBeGreaterThan(20);
       }
     });
+  }
+});
+
+/*
+ * UX hunt 22-11-26: the Share pill is the height, text size and weight of
+ * the pill beside it, on phones (round) and on a desktop. It was a 56 px
+ * pill of 17 px semibold text beside 44 px pills of 16 px medium text (and
+ * 52 px on the case pages). The hero pills are 44 px, the case pages' link
+ * out 52 px.
+ */
+test.describe("share pill > as tall as the pill beside it, in the same type", () => {
+  const pages = [
+    { path: "/skills", beside: "View on GitHub" },
+    { path: "/topics/ai-transformation-thailand", beside: "Talk about" },
+    { path: "/th/topics/ai-transformation-thailand", beside: "ติดต่อ" },
+    { path: "/ventures/manut", beside: "Visit" },
+  ];
+  for (const width of [390, 1440]) {
+    for (const { path, beside } of pages) {
+      test(`${path} at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path, { waitUntil: "networkidle" });
+        const main = page.getByRole("main");
+        const share = main.getByRole("button", { name: "Share", exact: true });
+        const next = main.getByRole("link", { name: beside }).first();
+        const shareBox = (await share.boundingBox())!;
+        const nextBox = (await next.boundingBox())!;
+        expect(Math.round(shareBox.height)).toBe(Math.round(nextBox.height));
+        const type = (el: Element) => {
+          const style = getComputedStyle(el);
+          return `${style.fontSize} ${style.fontWeight}`;
+        };
+        expect(await share.evaluate(type)).toBe(await next.evaluate(type));
+        if (width < 640) {
+          expect(Math.round(shareBox.width)).toBe(Math.round(shareBox.height));
+        }
+      });
+    }
   }
 });
 
