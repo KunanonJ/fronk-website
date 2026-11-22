@@ -233,6 +233,61 @@ test.describe("living status > the footer", () => {
   });
 });
 
+/*
+ * The living status's stylesheet fails once (a deploy race, a blip): the
+ * status shows plain. The footer, and the status with it, stays from page
+ * to page, so no mount of its own asks for the file again, and before the
+ * fix it stayed plain until another lazy feature mounted (UX hunt
+ * 22-11-26, U27). The footer asks for it on the next page the reader
+ * opens: styled there, with no reload. Seen in Chromium and WebKit; run in
+ * all three engines.
+ */
+test.describe("living status > a stylesheet that failed", () => {
+  const ENGINES = new Set(["desktop", "webkit", "firefox", "webkit-phone"]);
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !ENGINES.has(testInfo.project.name),
+      "Chromium, WebKit and Firefox",
+    );
+  });
+
+  test("is asked for again on the next page, which shows the status styled, with no reload", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.route(SHIPPED_ROUTE, (route) => route.fulfill({ status: 503 }));
+    let asked = 0;
+    let failing = true;
+    await page.route(/\/assets\/living-[\w-]+\.css$/, (route) => {
+      asked += 1;
+      return failing
+        ? route.fulfill({ status: 404, body: "Not found" })
+        : route.continue();
+    });
+    let documents = 0;
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.frame() === page.mainFrame())
+        documents += 1;
+    });
+    await visit(page, "/about");
+    const guess = page.locator(".pf-footer__guess");
+    await expect(guess).toBeVisible();
+    expect(asked).toBeGreaterThan(0);
+    // Plain: living.css gives the chip its ground.
+    await expect(guess).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+
+    // The file answers again; the reader opens another page.
+    failing = false;
+    const before = asked;
+    await page.locator('footer nav a[href="/contact"]').click();
+    await expect(page).toHaveURL(/\/contact$/);
+    await expect(guess).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    expect(asked).toBeGreaterThan(before);
+    expect(documents).toBe(1);
+  });
+});
+
 /** Records each start of the wink's animation, from the first paint. */
 async function watchWinks(page: Page) {
   await page.addInitScript(() => {

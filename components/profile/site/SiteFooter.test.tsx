@@ -16,6 +16,14 @@ vi.mock("next-themes", () => ({
 /** The page the footer is drawn on: "/" unless a test says otherwise. */
 const ROUTE = vi.hoisted(() => ({ pathname: "/" }));
 
+/** Each time the footer asks again for a feature stylesheet that failed. */
+const retried = vi.hoisted(() => vi.fn());
+
+vi.mock("@/components/ui/LazyFeature", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/components/ui/LazyFeature")>()),
+  retryFailedSheets: retried,
+}));
+
 vi.mock("@/lib/router/navigation", () => ({
   usePathname: () => ROUTE.pathname,
   useLocationKey: () => ROUTE.pathname,
@@ -122,6 +130,42 @@ describe("SiteFooter, the living status", () => {
     expect(
       clock.compareDocumentPosition(guess) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+});
+
+/*
+ * The footer stays from page to page, and the living status with it, so a
+ * stylesheet of its own that failed is asked for again by the footer: on
+ * each page the reader opens and when the tab is shown again, not on a
+ * re-render (UX hunt 22-11-26, U27; LazyFeature.test.tsx covers the ask).
+ */
+describe("SiteFooter, a living stylesheet that failed", () => {
+  afterEach(() => {
+    ROUTE.pathname = "/";
+    vi.restoreAllMocks();
+  });
+
+  it("is asked for again on each page the reader opens, and when the tab is shown again", () => {
+    retried.mockClear();
+    const page = render(<SiteFooter />);
+    expect(retried).toHaveBeenCalledTimes(1);
+    page.rerender(<SiteFooter />);
+    expect(retried).toHaveBeenCalledTimes(1);
+    ROUTE.pathname = "/about";
+    page.rerender(<SiteFooter />);
+    expect(retried).toHaveBeenCalledTimes(2);
+
+    const visibility = vi.spyOn(document, "visibilityState", "get");
+    visibility.mockReturnValue("hidden");
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(retried).toHaveBeenCalledTimes(2);
+    visibility.mockReturnValue("visible");
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(retried).toHaveBeenCalledTimes(3);
+
+    page.unmount();
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(retried).toHaveBeenCalledTimes(3);
   });
 });
 

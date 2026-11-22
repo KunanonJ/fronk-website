@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Link from "@/components/navigation/Link";
 import { DitherField } from "@/components/ds/DitherField";
 import { EyebrowRow, StatusDot } from "@/components/ds/labels";
@@ -7,7 +8,11 @@ import { PixelArt } from "@/components/profile/site/PixelArt";
 import { BROWSER_ART, PHONE_ART } from "@/components/profile/site/footerArt";
 import { SayHello } from "@/components/profile/site/SayHello";
 import { POPOVER_IDS, useHydrated } from "@/components/profile/site/popover";
-import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
+import {
+  FeatureBoundary,
+  lazyFeature,
+  retryFailedSheets,
+} from "@/components/ui/LazyFeature";
 import {
   availability,
   brand,
@@ -39,6 +44,11 @@ import { usePathname } from "@/lib/router/navigation";
  * where it pushes nothing: under the place's line from 810 px, and under
  * the card, out of the flow, below that (Living.tsx). The server and
  * hydration draw neither, so a page's HTML and first load are as they were.
+ * The footer stays from page to page, and the living status with it, so no
+ * mount of its own asks again for its stylesheet if that failed (a deploy
+ * race, a blip): the footer does, on each page the reader opens and when
+ * the tab is shown again (LazyFeature's retryFailedSheets; UX hunt
+ * 22-11-26, U27).
  */
 
 const Living = lazyFeature(
@@ -48,6 +58,14 @@ const Living = lazyFeature(
 export default function SiteFooter() {
   const hydrated = useHydrated();
   const pathname = usePathname();
+  useEffect(() => {
+    retryFailedSheets();
+    const shown = () => {
+      if (document.visibilityState === "visible") retryFailedSheets();
+    };
+    document.addEventListener("visibilitychange", shown);
+    return () => document.removeEventListener("visibilitychange", shown);
+  }, [pathname]);
   // Asked once: on /contact the page itself is the call to action.
   const invite = footerInvites(pathname);
   return (

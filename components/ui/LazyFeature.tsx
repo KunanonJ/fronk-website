@@ -48,8 +48,7 @@ import { CatchBoundary } from "@tanstack/react-router";
  *
  * A feature's own stylesheet (React's `precedence` link) that failed, a
  * deploy or a blip, is asked for again the same way on the next mount of
- * any feature (so one that stays mounted, as the footer's living status,
- * gets it too), and that mount waits for it to load or fail, 3 s at most,
+ * any feature, and that mount waits for it to load or fail, 3 s at most,
  * as React holds a feature until its stylesheet has loaded: the feature
  * comes in styled once the file can be had, or plain after 3 s if the
  * request stalls, styled once it answers. The boundary's whole subtree
@@ -64,6 +63,14 @@ import { CatchBoundary } from "@tanstack/react-router";
  * each time a feature mounts, never on a re-render, never in a loop. Once
  * its fresh link has failed too (a tab left open across the deploy that
  * took the file away), mounts ask for it without waiting.
+ *
+ * A feature that stays mounted from page to page (the footer's living
+ * status) has no next mount of its own, and the next feature to mount may
+ * be pages away: whatever holds it calls retryFailedSheets on each
+ * navigation and when the tab is shown again (SiteFooter), which asks for
+ * the stylesheet the same way and holds nothing, so the feature takes its
+ * styles once the fresh link loads (UX hunt 22-11-26, U27). Once per call,
+ * as for a mount.
  *
  * The boundary is the router's CatchBoundary, already in the entry chunk
  * (the entry carries every page): an error its error component throws goes
@@ -122,6 +129,15 @@ function refetchFailed(own?: boolean) {
       });
     }),
   );
+}
+
+/**
+ * Asks again for the features' own stylesheets whose links failed, as a
+ * mount does, but holds nothing: for a feature that stays mounted (see the
+ * header). Nothing is asked for when none failed.
+ */
+export function retryFailedSheets() {
+  void refetchFailed(true);
 }
 
 /**
