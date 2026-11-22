@@ -33,13 +33,13 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 
 - **Added:** 02-11-26
 - **Problem:**
-  - **Node 22 end of life:** 2027-04-30. CI now pins 22.23.4; Node 24 is the current LTS (24.22.2 on 02-11-26).
+  - **Node 22 end of life:** 2027-04-30. Done 21-11-26: `.node-version` and `engines` moved to Node 26.13.1, the Active LTS line (end of life 2029-04-30).
   - **pnpm 12:** out (12.16.1); the repo stays on pnpm 10 (10.34.9).
   - **TypeScript peer warning:** `@sanity/workflow-blueprint` (through the Sanity CLI) wants `typescript@^6.0.3 || ^7.0.0`. The `typescript` alias points to `@typescript/typescript6@6.0.2`, the newest release of that package.
 - **Root cause:** upstream release cadence. (The lint warnings listed here earlier were fixed in visual-redesign Phase 6a: lint is at 0.)
 - **Why deferred:** each is a separate, testable change outside the upgrade's scope.
 - **Fix options:**
-  1. Plan the Node 24 move before 2027-04-30: bump `.node-version` and `engines`, then run CI.
+  1. Done 21-11-26 (Node 26.13.1, branch `node-26-lts`); the next move is Node 27, Active LTS from 2027-10-20, before Node 26 leaves support on 2029-04-30.
   2. Evaluate pnpm 12 (lockfile and settings migration) as its own plan.
   3. Bump the `typescript` alias once `@typescript/typescript6` publishes 6.0.3.
 

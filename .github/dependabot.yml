@@ -18,6 +18,10 @@ updates:
       # Must match the Playwright container image in .github/workflows/ci.yml;
       # bump both together by hand, with the image's new digest.
       - dependency-name: "@playwright/test"
+      # Its major follows the Node line in .node-version; bump it by hand
+      # together with Node. Minor and patch updates still come.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       tanstack:
         patterns: ["@tanstack/*"]
