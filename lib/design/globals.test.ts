@@ -172,16 +172,17 @@ describe("visual-redesign foundation", () => {
   it("defaults to light with the toggle unlocked and palette themeColors", () => {
     expect(layoutTsx).not.toContain("forcedTheme");
     expect(layoutTsx).toContain('defaultTheme="light"');
-    // Theme colours live in the metadata module both frameworks share. The
-    // profile redesign's cutover (Phase 6, design spec 2.1 and 13 item 23)
-    // moved them from the owner palette (#0b0d17, #f5f6fa) to the new one.
-    const rootMeta = readFileSync(
-      join(process.cwd(), "lib/seo/rootMetadata.ts"),
+    // Theme colours live in their own module, which the root metadata and
+    // the document read. The profile redesign's cutover (Phase 6, design
+    // spec 2.1 and 13 item 23) moved them from the owner palette (#0b0d17,
+    // #f5f6fa) to the new one.
+    const themeColor = readFileSync(
+      join(process.cwd(), "lib/seo/themeColor.ts"),
       "utf8",
     );
-    expect(rootMeta).toMatch(/#0f0c18/i);
-    expect(rootMeta).toMatch(/#f7f3ff/i);
-    expect(rootMeta).not.toMatch(/#0b0d17|#f5f6fa/i);
+    expect(themeColor).toMatch(/#0f0c18/i);
+    expect(themeColor).toMatch(/#f7f3ff/i);
+    expect(themeColor).not.toMatch(/#0b0d17|#f5f6fa/i);
   });
 
   it("keeps the landing shell wrapper and skip link", () => {

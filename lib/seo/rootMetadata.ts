@@ -3,6 +3,7 @@ import { BLOG_PUBLIC } from "@/lib/content/blogVisibility";
 import { site as landingSite } from "@/lib/content/landing";
 import { TITLE_SUFFIX } from "@/lib/seo/pageTitle";
 import { resolveGscVerification } from "@/lib/seo/searchConsole";
+import { THEME_COLORS } from "@/lib/seo/themeColor";
 import { siteConfig } from "@/lib/site";
 
 /*
@@ -51,11 +52,9 @@ export const rootMetadata: Metadata = {
 };
 
 export const rootViewport: Viewport = {
-  // The profile redesign's browser-chrome colours (design spec 2.1, Phase 6
-  // cutover): the dark paper and the light lavender wash, `--theme-color` in
-  // the scoped token block of globals.css (contrast.test.ts pins both).
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0f0c18" },
-    { media: "(prefers-color-scheme: light)", color: "#f7f3ff" },
-  ],
+  // The browser-chrome colour the server writes: the light theme's, the
+  // site's default. It follows the reader's theme, not the OS's, so it has
+  // no `media`; the document makes it the dark one for a dark page
+  // (lib/seo/themeColor.ts).
+  themeColor: THEME_COLORS.light,
 };

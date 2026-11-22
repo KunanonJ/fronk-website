@@ -944,6 +944,142 @@ test.describe("chrome: Say hello and the theme", () => {
   });
 });
 
+/*
+ * The browser's toolbar colour (theme-color, where Android Chrome and
+ * Safari tint their bars) follows the site's theme, not the OS's (UX hunt
+ * 22-11-26, U08; lib/seo/themeColor.ts): one meta with no media, the light
+ * colour from the server, the dark one before the first paint when the
+ * stored theme is dark, and the theme's from then on. Two media-scoped
+ * metas put a near-black bar over the light page on a dark OS. React finds
+ * a meta it hydrates by its content, so a page that starts dark must still
+ * have one meta once it runs.
+ */
+test.describe("chrome: the toolbar colour follows the site's theme", () => {
+  const LIGHT = "#f7f3ff";
+  const DARK = "#0f0c18";
+  const ENGINES = new Set(["desktop", "webkit", "firefox", "webkit-phone"]);
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !ENGINES.has(testInfo.project.name),
+      "Chromium, WebKit and Firefox",
+    );
+  });
+
+  /** Each theme-color meta in the document: its colour, and any media. */
+  function themeColors(page: Page) {
+    return page
+      .locator('meta[name="theme-color"]')
+      .evaluateAll((metas) =>
+        metas.map((meta) =>
+          [meta.getAttribute("content"), meta.getAttribute("media")]
+            .filter(Boolean)
+            .join(" "),
+        ),
+      );
+  }
+
+  const isDark = /(^|\s)dark(\s|$)/;
+
+  /** Uncaught errors and console errors: a hydration mismatch is either. */
+  function watchErrors(page: Page): string[] {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => {
+      if (
+        message.type() === "error" &&
+        !/Failed to load resource|net::ERR_/.test(message.text())
+      )
+        errors.push(message.text());
+    });
+    return errors;
+  }
+
+  test("the server writes one light colour with no media", async ({ page }) => {
+    for (const path of [
+      HOME,
+      "/about",
+      "/th/topics/ai-transformation-thailand",
+    ]) {
+      const html = await (await page.request.get(path)).text();
+      const metas = html.match(/<meta[^>]*name="theme-color"[^>]*>/g) ?? [];
+      expect(metas, path).toHaveLength(1);
+      expect(metas[0], path).toContain(`content="${LIGHT}"`);
+      expect(metas[0], path).not.toContain("media=");
+    }
+  });
+
+  test("a dark OS with no stored theme keeps the light page's colour", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.addInitScript(() => {
+      try {
+        sessionStorage.setItem("fronk-intro-seen", "1");
+      } catch {
+        // Storage can be unavailable.
+      }
+    });
+    await visit(page);
+    await expect(page.locator("html")).not.toHaveClass(isDark);
+    expect(await themeColors(page)).toEqual([LIGHT]);
+  });
+
+  test("a stored night mode on a light OS is dark before the page runs, and stays one meta once it has", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await prepare(page, "dark");
+    const errors = watchErrors(page);
+    const release = await holdScripts(page);
+    await page.goto(HOME, { waitUntil: "commit" });
+    await page.waitForFunction(() => document.readyState !== "loading");
+    // As the server sent it and the head script set it: not hydrated yet.
+    await expect(page.locator(".pf-say__copy")).toHaveCount(0);
+    await expect(page.locator("html")).toHaveClass(isDark);
+    expect(await themeColors(page)).toEqual([DARK]);
+    release();
+    await hydrated(page);
+    expect(await themeColors(page)).toEqual([DARK]);
+    // Hydration met the colour the head script wrote: no mismatch.
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+
+  test("the theme toggle changes it both ways, and a reload keeps the choice", async ({
+    page,
+  }) => {
+    await page.setViewportSize(DESKTOP);
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.addInitScript(() => {
+      try {
+        if (!sessionStorage.getItem("seeded")) {
+          localStorage.setItem("theme", "light");
+          sessionStorage.setItem("fronk-intro-seen", "1");
+          sessionStorage.setItem("seeded", "1");
+        }
+      } catch {
+        // Storage can be unavailable.
+      }
+    });
+    const errors = watchErrors(page);
+    await visit(page);
+    expect(await themeColors(page)).toEqual([LIGHT]);
+    await page.getByRole("button", { name: "Switch to night mode" }).click();
+    await expect(page.locator("html")).toHaveClass(isDark);
+    await expect.poll(() => themeColors(page)).toEqual([DARK]);
+
+    await page.reload({ waitUntil: "networkidle" });
+    await hydrated(page);
+    await expect(page.locator("html")).toHaveClass(isDark);
+    expect(await themeColors(page)).toEqual([DARK]);
+
+    await page.getByRole("button", { name: "Switch to day mode" }).click();
+    await expect(page.locator("html")).not.toHaveClass(isDark);
+    await expect.poll(() => themeColors(page)).toEqual([LIGHT]);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
+
 test.describe("chrome: reduced motion", () => {
   test("the bar fades without transform or blur, and the theme changes with no view transition", async ({
     page,
