@@ -648,6 +648,78 @@ test.describe("about bento: the mess, the stats and the motion", () => {
   });
 });
 
+/**
+ * The four principles line up row by row (UX hunt 22-11-26, U31): a title
+ * that wraps to one more line than its neighbours (Firefox at 1366 px wraps
+ * "Ship the smallest thing that proves the bet." to three, the other engines
+ * to two; every engine has uneven titles from 1024 to 1440 px) used to start
+ * its body lower than theirs. Each tile is a subgrid of the bento's rows, so
+ * a row's bodies start at one height, its tiles are one height, and from
+ * 810 px none is under the 330 px floor. Line breaks differ by engine, so
+ * all three run it.
+ */
+test.describe("about bento: the principles line up in every row", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox"].includes(testInfo.project.name),
+      "desktop Chromium, WebKit and Firefox; the test sets its widths",
+    );
+  });
+
+  test("a row's bodies start at one height and its tiles are one height", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const sizes: readonly (readonly [number, number])[] = [
+      [700, 900],
+      [900, 900],
+      [1024, 768],
+      [1280, 800],
+      [1366, 768],
+      [1440, 900],
+    ];
+    for (const [width, height] of sizes) {
+      await page.setViewportSize({ width, height });
+      await settle(page);
+      const rows = await page.evaluate(() => {
+        const byTop = new Map<number, { body: number; height: number }[]>();
+        for (const tile of document.querySelectorAll(".pf-principle")) {
+          const box = tile.getBoundingClientRect();
+          const body = tile
+            .querySelector(".pf-principle__body")!
+            .getBoundingClientRect();
+          const top = Math.round(box.top);
+          byTop.set(top, [
+            ...(byTop.get(top) ?? []),
+            { body: body.top - box.top, height: box.height },
+          ]);
+        }
+        return [...byTop.values()];
+      });
+      const at = `at ${width} px`;
+      expect(rows.length, `rows ${at}`).toBe(width < 1024 ? 2 : 1);
+      for (const row of rows) {
+        const bodies = row.map((tile) => tile.body);
+        const heights = row.map((tile) => tile.height);
+        expect(
+          Math.max(...bodies) - Math.min(...bodies),
+          `bodies in a row ${at}: ${bodies.map(Math.round).join(", ")}`,
+        ).toBeLessThanOrEqual(0.5);
+        expect(
+          Math.max(...heights) - Math.min(...heights),
+          `tiles in a row ${at}`,
+        ).toBeLessThanOrEqual(0.5);
+        if (width >= 810)
+          expect(Math.min(...heights), `the floor ${at}`).toBeGreaterThan(
+            329.5,
+          );
+      }
+    }
+  });
+});
+
 test.describe("work and about: the device matrix and the tap areas", () => {
   test.beforeEach(({ browserName: _browserName }, testInfo) => {
     test.skip(

@@ -469,9 +469,10 @@
 
   /* The About bento (spec 4.2, 8.5, 10.1). */
   .pf-bento {
+    --bento-gap: 12px;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: var(--bento-gap);
     margin-block-start: 56px;
   }
   .pf-bento__tile {
@@ -490,8 +491,8 @@
   }
   @media (min-width: 50.625rem) {
     .pf-bento {
+      --bento-gap: 16px;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 16px;
     }
     .pf-bento__tile {
       grid-column: span 6;
@@ -700,6 +701,48 @@
   .pf-principle__body {
     margin-block-start: 12px;
     color: var(--ink-60);
+  }
+  /* A row of principles lines up (UX hunt 22-11-26, U31): from 600 px each
+     tile takes four of the bento's rows as a subgrid (art, title, body and
+     an empty last row), so a title that wraps to one more line than its
+     neighbours, in any engine and with any copy, moves every body in its
+     row with it. A subgrid's own minimum height is dropped by some engines
+     and overflows its rows in others, so from 810 px the 330 px floor is
+     an empty item across all four rows, as tall as the tile (it reaches
+     over the tile's padding and border, .ds-tile in globals.css), and
+     only the empty row, which nothing else sizes, grows to meet it: the
+     space stays under the text. A row gap the subgrid does not use is
+     taken half by the item on each side of it; the empty row has no item,
+     so the body takes the other half. */
+  @supports (grid-template-rows: subgrid) {
+    @media (min-width: 37.5rem) {
+      .ds-tile.pf-bento__principle {
+        display: grid;
+        grid-row: span 4;
+        grid-template-rows: subgrid;
+        row-gap: 0;
+        min-block-size: 0;
+      }
+      .pf-principle__icon {
+        grid-area: 1 / 1;
+      }
+      .pf-principle__title {
+        grid-area: 2 / 1;
+      }
+      .pf-principle__body {
+        grid-area: 3 / 1;
+        margin-block-end: calc(var(--bento-gap) / -2);
+      }
+    }
+    @media (min-width: 50.625rem) {
+      .ds-tile.pf-bento__principle::after {
+        grid-area: 1 / 1 / -1;
+        min-block-size: 330px;
+        margin-block: calc(-1px - clamp(20px, 2.4vw, 36px));
+        content: "";
+        pointer-events: none;
+      }
+    }
   }
 
   /* Phones: the tiles take their content's height (spec 8.5). */
