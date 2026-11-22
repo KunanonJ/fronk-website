@@ -821,6 +821,45 @@ test.describe("skills > each skill page loads its own SKILL.md and no other", ()
     await expect(page.locator("#skill-md pre").last()).toBeVisible();
     expect(errors, errors.join("\n")).toEqual([]);
   });
+
+  test("Show fewer lines keeps the toggle, and focus, where they were on screen", async ({
+    page,
+  }) => {
+    // The rest folds away above the toggle; the page used to keep its
+    // scroll and drop the reader in the footer (UX hunt 2, U04).
+    await page.goto("/skills/ama", { waitUntil: "networkidle" });
+    // The code's mono font, in: a late swap rewraps the lines at 375 px.
+    await page.evaluate(() => document.fonts.ready);
+    const toggle = page.locator('button[aria-controls="skill-md"]');
+    await toggle.focus();
+    await page.keyboard.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    // The toggle 120 px above the screen's bottom, as a reader reaches it.
+    await toggle.evaluate((el) =>
+      window.scrollBy({
+        top: el.getBoundingClientRect().top - (window.innerHeight - 120),
+        behavior: "instant",
+      }),
+    );
+    const top = () => toggle.evaluate((el) => el.getBoundingClientRect().top);
+    const frames = () =>
+      page.evaluate(
+        () =>
+          new Promise((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(done)),
+          ),
+      );
+    await frames();
+    const before = await top();
+    await page.keyboard.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("#skill-md pre").last()).toBeHidden();
+    // Two frames, for any scroll anchoring the browser does after the fold.
+    await frames();
+    expect(Math.abs((await top()) - before)).toBeLessThanOrEqual(2);
+    await expect(toggle).toBeFocused();
+    await expect(toggle).toBeInViewport();
+  });
 });
 
 test.describe("portfolio > the category filter is a typed search param", () => {

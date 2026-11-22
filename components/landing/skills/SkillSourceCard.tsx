@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { ArrowUpRightIcon } from "@/components/bento/icons";
 import { pillClass } from "@/components/ds/Pill";
@@ -15,6 +15,12 @@ const HEAD_LINES = 15;
  * and GitHub. Long files show their first lines under a fade, with a
  * disclosure for the rest; the rest is in the HTML either way (`hidden`), so
  * crawlers and Copy always get the whole file. Short files show in full.
+ *
+ * Show fewer lines takes the rest out from above the toggle, so the page is
+ * scrolled back by as much at once: the toggle, which keeps focus, stays
+ * under the pointer and the reader's eye instead of the page dropping them
+ * in the footer (UX hunt 2, U04; scroll anchoring did not keep it in any
+ * engine). Expanding grows the page below the toggle, so nothing moves.
  */
 export default function SkillSourceCard({
   skill,
@@ -24,9 +30,23 @@ export default function SkillSourceCard({
   skillMd: string;
 }) {
   const [open, setOpen] = useState(false);
+  const toggle = useRef<HTMLButtonElement>(null);
+  /** The toggle's top on screen as Show fewer lines was pressed. */
+  const keptTop = useRef<number | null>(null);
   const lines = skillMd.replace(/\n+$/, "").split("\n");
   const long = lines.length > HEAD_LINES;
   const head = long ? lines.slice(0, HEAD_LINES) : lines;
+
+  // Instant under any motion setting: the page is put back as it was, not
+  // moved somewhere new.
+  useLayoutEffect(() => {
+    const top = keptTop.current;
+    keptTop.current = null;
+    const button = toggle.current;
+    if (top === null || !button) return;
+    const shift = button.getBoundingClientRect().top - top;
+    if (shift) window.scrollBy({ top: shift, behavior: "instant" });
+  }, [open]);
 
   return (
     <article
@@ -77,7 +97,13 @@ export default function SkillSourceCard({
           type="button"
           aria-expanded={open}
           aria-controls="skill-md"
-          onClick={() => setOpen((value) => !value)}
+          ref={toggle}
+          onClick={(event) => {
+            if (open) {
+              keptTop.current = event.currentTarget.getBoundingClientRect().top;
+            }
+            setOpen(!open);
+          }}
           className={cn(
             pillClass({ variant: "ghost" }),
             "pf-skill-source__toggle",
