@@ -37,7 +37,7 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Added:** 02-11-26
 - **Problem:**
   - **Node 22 end of life:** 2027-04-30. Done 21-11-26: `.node-version` and `engines` moved to Node 26.13.1, the Active LTS line (end of life 2029-04-30).
-  - **pnpm 12:** done 22-11-26 (pnpm 10.34.9 to 12.21.0, branch `pnpm-12`).
+  - **pnpm 12:** done 22-11-26 (pnpm 10.34.9 to 12.21.0, #194).
   - **TypeScript peer warning:** `@sanity/workflow-blueprint` (through the Sanity CLI) wants `typescript@^6.0.3 || ^7.0.0`. The `typescript` alias points to `@typescript/typescript6@6.0.2`, the newest release of that package.
 - **Root cause:** upstream release cadence. (The lint warnings listed here earlier were fixed in visual-redesign Phase 6a: lint is at 0.)
 - **Why deferred:** each is a separate, testable change outside the upgrade's scope.
@@ -103,3 +103,29 @@ Entry format: Priority, Added, Problem, Root cause, Why deferred, Fix options.
 - **Root cause:** the bento redesign moved every page to `components/bento/Buttons.tsx`.
 - **Why deferred:** deleting it means editing two ratchet tests, and it has no user-facing effect.
 - **Fix options:** delete `Button.tsx` and its test and drop "Button" from the two ratchet lists, or keep it if `/design` should show it again.
+
+## P3: Left open by the second UX/UI hunt (22-11-26)
+
+- **Added:** 22-11-26, from `process/features/profile-site-redesign/completed/lts-upgrades-and-ux-hunt-2_PLAN_22-11-26.md`
+- **Problem:**
+  1. **Home's first-load stylesheets** are 35.9 of their 36 KB budget (`scripts/check-first-load-budget.mjs`). The next CSS that Home loads first will fail the budget.
+  2. **Firefox moves Thai text after it lays it out** on the Thai hubs: a layout shift of 0.18 to 0.24 at 390 and 1024 px on the AI hub, with Noto Sans Thai already loaded.
+  3. **Safari can land a chapter address 7 px low** on a cold load when Onest swaps in late: two paragraphs above the chapter rewrap, and WebKit has no scroll anchoring (2 of 12 loads with a 150 ms font delay under load).
+  4. **TanStack Router leaves a skipped view transition's `ready` rejection unhandled:** navigating again while a page transition is starting logs "Transition was skipped. New ViewTransition started" as a page error, in all three engines. The page itself is fine.
+- **Root cause:** (1) Home's sections share one first-load sheet set; (2) Firefox's Thai font matching, not the site (a preload with its own 80 KB budget was measured and did not help); (3) fallback font metrics differ from Onest's; (4) upstream.
+- **Why deferred:** none breaks a page. (1) needs a trim pass of its own; (2) has no site-side fix found; (3) shows only on slow font loads; (4) needs an upstream fix.
+- **Fix options:**
+  1. Trim or move rules out of Home's first-load sheets before the next Home CSS change; re-run `pnpm build && node scripts/check-first-load-budget.mjs`.
+  2. Re-measure after the next Firefox release; try `font-display: optional` for the Thai face on the hubs only if a shift above 0.1 persists.
+  3. Size the Onest fallback face (`size-adjust`, `ascent-override`) to Onest's metrics, as the Thai fallback faces are sized.
+  4. Report it to TanStack Router with the reproduction (hold a transition open 300 ms, then go Back), or catch the rejection where the router starts the transition if it becomes noisy.
+
+## P3: `satori` moderate advisory through `@cf-wasm/og`
+
+- **Added:** 22-11-26
+- **Problem:** `pnpm audit --prod` reports GHSA-wx4j-mvgx-mqwp ("Satori-generated SVG has improper escaping", satori before 0.33.5). The path is `@cf-wasm/og` 0.5.0, then `@cf-wasm/satori` 0.4.2, then `satori` 0.32.0.
+- **Root cause:** `@cf-wasm/satori` 0.4.2, the latest, depends on satori 0.32.0.
+- **Why deferred:** the share images render only the site's own text and pictures, not visitor input, so the escaping flaw has no input to act on; and forcing satori through an override under a WASM wrapper risks breaking the share images.
+- **Fix options:**
+  1. When `@cf-wasm/og` or `@cf-wasm/satori` publishes a release on satori 0.33.5 or later, update and run `pnpm audit`.
+  2. If exposure ever matters, try an override to satori 0.33.5 behind CI and a check that every share image still renders.
