@@ -1750,6 +1750,164 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
   });
 
+  /** Holds the dialog's code back `ms`, as a slow first open does. */
+  const slowCode = (page: Page, ms: number) =>
+    page.route(/\/assets\/SearchDialog-[\w-]+\.js$/, async (route) => {
+      await new Promise((done) => setTimeout(done, ms));
+      await route.continue();
+    });
+
+  /*
+   * The keys typed after ⌘K while the dialog loads (UX hunt 22-11-26): its
+   * first open takes a third of a second or more, and the first letters of
+   * a quick "⌘K verify" were lost. They are kept for the field; Enter is
+   * held from the page (it would press whatever has focus there).
+   */
+  test("keys typed while it loads reach the field, and Enter presses nothing on the page", async ({
+    page,
+  }) => {
+    await slowCode(page, 1000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    // A link has focus: an Enter that reached it would leave the page.
+    await page.locator("main a[href^='/']").first().focus();
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("verifx", { delay: 50 });
+    await page.keyboard.press("Backspace");
+    await page.keyboard.type("y");
+    await page.keyboard.press("Enter");
+    const field = page.getByRole("combobox", { name: "Search the site" });
+    await expect(field).toBeFocused();
+    await expect(field).toHaveValue("verify");
+    expect(new URL(page.url()).pathname).toBe("/about");
+    // Keys after it opens go on into the field.
+    await page.keyboard.type(" loop");
+    await expect(field).toHaveValue("verify loop");
+  });
+
+  test("at 50 ms a key right after the first ⌘K, no key is lost", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("verify", { delay: 50 });
+    await expect(
+      page.getByRole("combobox", { name: "Search the site" }),
+    ).toHaveValue("verify");
+  });
+
+  test("Escape before it opens gives the opening up", async ({ page }) => {
+    let served = 0;
+    await page.route(/\/assets\/SearchDialog-[\w-]+\.js$/, async (route) => {
+      await new Promise((done) => setTimeout(done, 600));
+      await route.continue();
+      served += 1;
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.press("Escape");
+    await expect.poll(() => served).toBeGreaterThan(0);
+    // Time for the code to run, were the dialog still asked for.
+    await page.waitForTimeout(500);
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+  });
+
+  /*
+   * ⌘K over an open Say hello (UX hunt 22-11-26): the dialog gave focus
+   * back, on Esc, to Say hello's Copy email, inside the panel it had closed,
+   * so focus fell to the page; and WebKit closed the panel without a toggle
+   * event, so its trigger kept aria-expanded="true".
+   */
+  test("⌘K over an open Say hello closes it, and Esc gives focus back to its trigger", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    const trigger = page.getByRole("button", { name: "Say hello" }).first();
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const panel = page.locator(".pf-say__panel--nav");
+    await expect(
+      page.getByRole("button", { name: "Copy email" }),
+    ).toBeFocused();
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(panel).toBeHidden();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  /*
+   * A drag selecting the field's text that ends outside the dialog clicks
+   * the dialog itself, as a press on the backdrop does, and closed it with
+   * the query in Chromium and WebKit (UX hunt 22-11-26).
+   */
+  test("a drag from the field that ends outside keeps it open; a press outside closes it", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    const field = page.getByRole("combobox", { name: "Search the site" });
+    await field.fill("automation");
+    const box = (await field.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.3, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(8, 8, { steps: 6 });
+    await page.mouse.up();
+    await expect(page.locator(dialog)).toBeVisible();
+    await expect(field).toHaveValue("automation");
+    await page.mouse.click(8, 8);
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+  });
+
+  /** The page's scroll position, read at the call. */
+  const scrollY = (page: Page) => page.evaluate(() => window.scrollY);
+
+  test("the page behind it holds still while it is open", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+    // Over the backdrop, beside the dialog.
+    await page.mouse.move(100, 450);
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(400);
+    expect(await scrollY(page)).toBe(0);
+    // The control: closed, the same wheel scrolls.
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await page.mouse.wheel(0, 700);
+    await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+  });
+
+  test("on a phone, the page under the open menu holds still", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await visit(page, "/");
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("navigation", { name: "Site" });
+    await expect(menu).toBeVisible();
+    const card = (await menu.boundingBox())!;
+    // Below the card, on the page.
+    await page.mouse.move(195, Math.min(card.y + card.height + 120, 820));
+    await page.mouse.wheel(0, 500);
+    await page.waitForTimeout(400);
+    expect(await scrollY(page)).toBe(0);
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await page.mouse.wheel(0, 500);
+    await expect.poll(() => scrollY(page)).toBeGreaterThan(0);
+  });
+
   for (const [width, most] of [
     [390, 2],
     [1440, 1],
@@ -1906,6 +2064,60 @@ test.describe("pixel portrait > the nav avatar and /about's portrait", () => {
     await expect(page.locator(".pf-about-page__photo")).toBeVisible();
     await page.getByRole("button", { name: "Show the pixels" }).click();
     await expect(pixels).toBeVisible();
+  });
+
+  test("/about: the pills on the portrait ring in ink and paper, which read on the violet", async ({
+    page,
+    browserName,
+  }) => {
+    // The site's violet ring vanished on the violet pixel portrait (UX hunt
+    // 22-11-26, WCAG 2.4.7): ink against the pill, paper outside it.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const theme of ["light", "dark"] as const) {
+      await page.addInitScript((value) => {
+        try {
+          localStorage.setItem("theme", value);
+        } catch {
+          // Storage can be unavailable; the site then uses its default theme.
+        }
+      }, theme);
+      await page.goto("/about", { waitUntil: "load" });
+      await expect(page.locator("time[data-clock]")).toBeAttached();
+      const pills = [
+        page.getByRole("button", { name: "Show the photo" }),
+        page.getByRole("button", { name: /^Try a trait/ }),
+      ];
+      // Save appears once a trait is found; Tab goes on to it.
+      await pills[1]!.focus();
+      await page.keyboard.press("Enter");
+      await page.keyboard.press(tabKey(browserName));
+      pills.push(page.getByRole("button", { name: /my edition$/ }));
+      await expect(pills[2]!).toBeFocused();
+      for (const pill of pills) {
+        await pill.focus();
+        // Polled: reduced motion still gives every change a 0.01 ms
+        // transition (globals.css), so the first read can be the old value.
+        const ring = () =>
+          pill.evaluate((el) => {
+            const probe = document.createElement("i");
+            probe.style.cssText = "color: var(--paper); background: var(--ink)";
+            document.body.append(probe);
+            const tokens = getComputedStyle(probe);
+            const paper = tokens.color;
+            const ink = tokens.backgroundColor;
+            probe.remove();
+            const style = getComputedStyle(el);
+            return {
+              shown: el.matches(":focus-visible"),
+              outside: style.outlineColor === paper,
+              inside: style.boxShadow === `${ink} 0px 0px 0px 5px`,
+            };
+          });
+        await expect
+          .poll(ring, `${theme}: ${await pill.textContent()}`)
+          .toEqual({ shown: true, outside: true, inside: true });
+      }
+    }
   });
 });
 

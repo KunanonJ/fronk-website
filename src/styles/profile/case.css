@@ -666,6 +666,18 @@
   .pf-sc__tile[data-viewing] {
     visibility: hidden;
   }
+  /* Under reduced motion the global rule (globals.css) gives every element
+     a 0.01 ms transition of `all`, visibility included: the tile and the
+     Enlarge button in it (which inherits the change and starts its own)
+     were still hidden when the viewer, closing, gave focus back, so focus
+     fell to the page (UX hunt 22-11-26). Nothing here moves under reduced
+     motion anyway. */
+  @media (prefers-reduced-motion: reduce) {
+    .pf-sc__tile,
+    .pf-sc__tile * {
+      transition-property: none !important;
+    }
+  }
   .pf-sc__shot {
     display: block;
     inline-size: 100%;

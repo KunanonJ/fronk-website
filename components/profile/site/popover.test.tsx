@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  POPOVER_IDS,
   closePopover,
+  closePopoversForModal,
   isPopoverOpen,
   usePopover,
 } from "@/components/profile/site/popover";
@@ -16,26 +18,39 @@ import {
 function Fixture({
   onClose,
   native = true,
+  id = "panel-under-test",
 }: {
   onClose?: () => void;
   native?: boolean;
+  id?: string;
 }) {
-  usePopover("panel-under-test", {
+  usePopover(id, {
     names: { open: "Close it", closed: "Open it" },
     onClose,
   });
   const popover = native ? { popover: "auto" as const } : {};
   return (
     <>
-      <button type="button" popoverTarget="panel-under-test">
+      <button type="button" popoverTarget={id}>
         Open it
       </button>
-      <div id="panel-under-test" {...popover}>
+      <div id={id} {...popover}>
         <button type="button">First</button>
         <a href="/x">Second</a>
       </div>
     </>
   );
+}
+
+/** Stubs `:popover-open` on the panel, open until `hidePopover` runs. */
+function openNatively(panel: HTMLElement) {
+  let open = true;
+  vi.spyOn(panel, "matches").mockImplementation(
+    (selector: string) => open && selector === ":popover-open",
+  );
+  return vi.spyOn(panel, "hidePopover").mockImplementation(() => {
+    open = false;
+  });
 }
 
 function fireToggle(panel: HTMLElement, newState: "open" | "closed") {
@@ -118,6 +133,52 @@ describe("usePopover, native branch", () => {
     );
   });
 
+  it("closes when focus moves on to the page, and leaves focus there", () => {
+    stubNative();
+    render(
+      <>
+        <Fixture />
+        <input aria-label="Elsewhere" />
+      </>,
+    );
+    const panel = document.getElementById("panel-under-test")!;
+    fireToggle(panel, "open");
+    const hide = openNatively(panel);
+    const elsewhere = screen.getByRole("textbox", { name: "Elsewhere" });
+    elsewhere.focus();
+    expect(hide).toHaveBeenCalledTimes(1);
+    fireToggle(panel, "closed");
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it("stays open while focus moves between the panel and its invoker", () => {
+    stubNative();
+    render(<Fixture />);
+    const panel = document.getElementById("panel-under-test")!;
+    fireToggle(panel, "open");
+    const hide = openNatively(panel);
+    screen.getByRole("link", { name: "Second", hidden: true }).focus();
+    screen.getByRole("button", { name: "Close it" }).focus();
+    screen.getByRole("button", { name: "First", hidden: true }).focus();
+    expect(hide).not.toHaveBeenCalled();
+  });
+
+  it("closePopoversForModal sends focus from inside an open panel to its invoker, then closes it", () => {
+    stubNative();
+    render(<Fixture id={POPOVER_IDS.nav} />);
+    const panel = document.getElementById(POPOVER_IDS.nav)!;
+    fireToggle(panel, "open");
+    const invoker = screen.getByRole("button", { name: "Close it" });
+    const hide = openNatively(panel);
+    // Where focus is as the panel closes: on the invoker already.
+    hide.mockImplementation(() => {
+      expect(document.activeElement).toBe(invoker);
+    });
+    act(() => closePopoversForModal());
+    expect(hide).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(invoker);
+  });
+
   it("closePopover hides an open native popover", () => {
     stubNative();
     render(<Fixture />);
@@ -198,5 +259,43 @@ describe("usePopover, fallback branch (no Popover API)", () => {
     render(<Fixture native={false} onClose={onClose} />);
     act(() => closePopover("panel-under-test"));
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("closes when focus moves on to the page, and keeps it open between panel and invoker", () => {
+    render(
+      <>
+        <Fixture native={false} />
+        <input aria-label="Elsewhere" />
+      </>,
+    );
+    const invoker = screen.getByRole("button", { name: "Open it" });
+    const panel = document.getElementById("panel-under-test")!;
+    fireEvent.click(invoker);
+    act(() => invoker.focus());
+    act(() => screen.getByRole("link", { name: "Second" }).focus());
+    expect(panel).toHaveAttribute("data-open");
+
+    const elsewhere = screen.getByRole("textbox", { name: "Elsewhere" });
+    act(() => elsewhere.focus());
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it("closePopoversForModal closes every open chrome panel, focus to its invoker, and the bookkeeping follows", () => {
+    const onClose = vi.fn();
+    render(<Fixture native={false} id={POPOVER_IDS.menu} onClose={onClose} />);
+    const invoker = screen.getByRole("button", { name: "Open it" });
+    const panel = document.getElementById(POPOVER_IDS.menu)!;
+    fireEvent.click(invoker);
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "First" }),
+    );
+
+    act(() => closePopoversForModal());
+    expect(panel).not.toHaveAttribute("data-open");
+    expect(invoker).toHaveAttribute("aria-expanded", "false");
+    expect(document.activeElement).toBe(invoker);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

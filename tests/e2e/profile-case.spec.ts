@@ -818,6 +818,43 @@ test.describe("the viewer (plan gate 5)", () => {
   });
 });
 
+/*
+ * The viewer under reduced motion (UX hunt 22-11-26): the global rule gave
+ * the page's tile and its Enlarge button a 0.01 ms visibility transition,
+ * so both were still hidden as the viewer closed and gave focus back, and
+ * focus fell to the page, in every engine. CI runs this in Chromium; WebKit
+ * and Firefox run it locally.
+ */
+test.describe("the viewer under reduced motion", () => {
+  test.beforeEach(() =>
+    only(
+      new Set(["desktop", "webkit", "firefox"]),
+      "the viewer is from 810 px, in every desktop engine",
+    ),
+  );
+
+  test("closes with focus back on Enlarge, by Escape and by its close button", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const enlarge = page.getByRole("button", {
+      name: "Enlarge: Approval flow",
+    });
+    const dialog = page.getByRole("dialog", { name: "Approval flow" });
+    for (const by of ["Escape", "the close button"] as const) {
+      await enlarge.focus();
+      await page.keyboard.press("Enter");
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByRole("button", { name: "Close" })).toBeFocused();
+      await page.keyboard.press(by === "Escape" ? "Escape" : "Enter");
+      await expect(dialog, by).toBeHidden();
+      await expect(enlarge, by).toBeFocused();
+    }
+  });
+});
+
 test.describe("the cover's labels (spec 12 item 5)", () => {
   test.beforeEach(() => only(new Set(["desktop"]), "desktop Chromium"));
 

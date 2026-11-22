@@ -224,6 +224,16 @@
     justify-content: space-between;
     gap: 8px;
   }
+  /* The pills on the portrait (Photo, Try a trait, Save): the site's violet
+     ring vanished on the violet pixel portrait (UX hunt 22-11-26, WCAG
+     2.4.7). Two tones read on any backdrop, the violet, the photo or the
+     dark pixels: ink against the pill, paper outside it. Forced colours
+     drop the shadow and keep the outline. */
+  .pf-about-page__portrait-bar :focus-visible,
+  .pf-about-page__portrait > button:focus-visible {
+    outline-color: var(--paper);
+    box-shadow: 0 0 0 5px var(--ink);
+  }
   .pf-about-page__socials {
     position: absolute;
     inset-block-end: 16px;

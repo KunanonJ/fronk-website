@@ -28,6 +28,13 @@
     background: color-mix(in srgb, var(--ink) 30%, transparent);
     backdrop-filter: blur(4px);
   }
+  /* The page behind holds still while it is open, as behind the case
+     viewer: a wheel over the backdrop scrolled it (UX hunt 22-11-26). The
+     gutter stays, so nothing shifts where scrollbars take room. */
+  html:has(.pf-search[open]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
   .pf-search__field {
     position: sticky;
     inset-block-start: 0;

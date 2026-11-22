@@ -224,3 +224,54 @@ describe("SearchDialog, commands", () => {
     );
   });
 });
+
+describe("SearchDialog, opening and closing (UX hunt 22-11-26)", () => {
+  it("starts with the keys typed while it loaded, and searches them", async () => {
+    const typedRef = { current: { keys: "gogo", keeping: false } };
+    render(<SearchDialog onClose={vi.fn()} typedRef={typedRef} />);
+    const field = screen.getByRole("combobox", { name: "Search the site" });
+    expect(field).toHaveValue("gogo");
+    expect(
+      await screen.findByRole("group", { name: "Case studies" }),
+    ).toHaveTextContent("GoGoCash");
+  });
+
+  it("closes the chrome's open popover first, focus to its invoker, so focus comes back there", () => {
+    const invoker = document.createElement("button");
+    invoker.setAttribute("popovertarget", "say-hello-nav");
+    const panel = document.createElement("div");
+    panel.id = "say-hello-nav";
+    panel.setAttribute("data-open", "");
+    const copy = document.createElement("button");
+    panel.append(copy);
+    document.body.append(invoker, panel);
+    copy.focus();
+    const opened = vi.fn(() => document.activeElement);
+    const showModal = HTMLDialogElement.prototype.showModal;
+    HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+      opened();
+      showModal.call(this);
+    };
+    render(<SearchDialog onClose={vi.fn()} />);
+    // As the dialog opened, focus was on the invoker, and the panel closed.
+    expect(opened).toHaveReturnedWith(invoker);
+    expect(panel).not.toHaveAttribute("data-open");
+    invoker.remove();
+    panel.remove();
+  });
+
+  it("closes on a press on the backdrop, but not after a drag from inside that ends there", async () => {
+    const { field, onClose } = await openDialog();
+    const dialog = document.querySelector("dialog")!;
+    // jsdom lays nothing out: the dialog's box is at 0, 0, so 5, 5 is outside.
+    const outside = { clientX: 5, clientY: 5 };
+    fireEvent.pointerDown(field, outside);
+    fireEvent.click(dialog, outside);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(dialog).toHaveAttribute("open");
+
+    fireEvent.pointerDown(dialog, outside);
+    fireEvent.click(dialog, outside);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
