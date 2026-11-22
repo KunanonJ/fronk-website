@@ -140,16 +140,43 @@
   }
   /* Phones: a filter group that does not fit keeps one row and scrolls
      sideways, rather than wrapping into rows inside its outline (UX sweep
-     21-11-26). Its options stay in the tab order and a focused one scrolls
-     into view; the pressed one is brought into view (usePressedInView.ts);
-     the scrollbar stays. Tabs keep wrapping, so every install method shows. */
+     21-11-26). Its options stay in the tab order; the pressed one comes to
+     the middle, and one the keyboard focuses comes wholly into view, ring
+     and all, 8 px clear of the edge (usePressedInView.ts and the scroll
+     padding here). Phones and macOS draw the
+     scrollbar only while it moves, so a shade at each edge with more
+     beyond it shows the row scrolls (UX hunt 2, U07): two shades that stay
+     at the row's edges, under two covers in the row's own colour that move
+     with the options and hide a shade at the end it has reached. All of it
+     is background, under the options, so it hides no option. Tabs keep
+     wrapping, so every install method shows. */
   @media (width < 37.5rem) {
     .pf-filter[role="group"] {
+      --pf-filter-shade: color-mix(in srgb, var(--ink) 18%, transparent);
       flex-wrap: nowrap;
       max-inline-size: 100%;
       overflow-x: auto;
       overscroll-behavior-inline: contain;
       scrollbar-width: thin;
+      scroll-padding-inline: 8px;
+      background:
+        linear-gradient(to right, var(--paper) 40%, transparent) left / 32px
+          100% no-repeat local,
+        linear-gradient(to left, var(--paper) 40%, transparent) right / 32px
+          100% no-repeat local,
+        radial-gradient(
+            farthest-side at 0 50%,
+            var(--pf-filter-shade),
+            transparent
+          )
+          left / 14px 100% no-repeat scroll,
+        radial-gradient(
+            farthest-side at 100% 50%,
+            var(--pf-filter-shade),
+            transparent
+          )
+          right / 14px 100% no-repeat scroll,
+        var(--paper);
     }
     .pf-filter[role="group"] > .pf-filter__option {
       flex: none;
@@ -627,6 +654,9 @@
     .pf-about-page__socials,
     .pf-contact__action {
       border-color: CanvasText;
+    }
+    .pf-filter {
+      background-image: none;
     }
     .pf-about-page__portrait {
       border: 1px solid CanvasText;

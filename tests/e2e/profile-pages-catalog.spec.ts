@@ -591,3 +591,104 @@ test.describe("/skills' hero meta and tags in every engine (UX hunt 22-11-26)", 
     }
   });
 });
+
+/**
+ * The filter rows on phones, one row that scrolls sideways (cutover.css,
+ * usePressedInView.ts; UX hunt 2, U07 and U12), in Chromium, WebKit and
+ * Firefox. Tab onto an option partly past the row's edge brings all of it
+ * and its focus ring (2 px, 3 px out) into the row, which alone moves; and
+ * a shade at the edge with more beyond it shows the row scrolls, where the
+ * scrollbar shows only while it moves.
+ */
+test.describe("filter rows on phones", () => {
+  const ROWS = ["/portfolio", "/skills", "/build", "/stack"] as const;
+  /** How far the focus ring reaches past an option: its outline and offset. */
+  const RING = 5;
+
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !["desktop", "webkit", "firefox"].includes(testInfo.project.name),
+      "Chromium, WebKit and Firefox, at the phone widths each test sets",
+    );
+  });
+
+  for (const path of ROWS) {
+    test(`${path}: Tab brings each option wholly into the row at 390 and 320 px`, async ({
+      page,
+      browserName,
+    }) => {
+      await prepare(page);
+      for (const size of [
+        { width: 390, height: 844 },
+        { width: 320, height: 640 },
+      ]) {
+        await page.setViewportSize(size);
+        // Not open(): the second visit may answer 304 from the cache.
+        await page.goto(path, { waitUntil: "networkidle" });
+        await page.evaluate(() => document.fonts.ready);
+        const row = page.locator('.pf-filter[role="group"]').first();
+        const options = row.locator(".pf-filter__option");
+        const count = await options.count();
+        expect(count).toBeGreaterThan(2);
+        // Room the ring lacks at the scrollport's edges (0 when it all shows).
+        const clipped = () =>
+          row.evaluate((el, ring) => {
+            const option = document.activeElement as HTMLElement;
+            const box = el.getBoundingClientRect();
+            const at = option.getBoundingClientRect();
+            const start = box.left + el.clientLeft;
+            const end = start + el.clientWidth;
+            return Math.max(0, start - (at.left - ring), at.right + ring - end);
+          }, RING);
+        const tab = browserName === "webkit" ? "Alt+Tab" : "Tab";
+        await options.first().focus();
+        // On along the row, then back: either edge.
+        for (const [i, key] of [
+          ...Array.from({ length: count - 1 }, (_, n) => [n + 1, tab] as const),
+          ...Array.from(
+            { length: count - 1 },
+            (_, n) => [count - 2 - n, `Shift+${tab}`] as const,
+          ),
+        ]) {
+          await page.keyboard.press(key);
+          await expect(options.nth(i)).toBeFocused();
+          await expect
+            .poll(clipped, {
+              message: `${path} option ${i + 1} at ${size.width} px (${key})`,
+            })
+            .toBeLessThanOrEqual(0.5);
+        }
+        // The row moved, never the page.
+        expect(await page.evaluate(() => window.scrollX)).toBe(0);
+      }
+    });
+  }
+
+  test("a phone row draws its edge shades as background, under its options", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await open(page, "/portfolio");
+    const row = page.getByRole("group", {
+      name: "Filter projects by category",
+    });
+    const style = () =>
+      row.evaluate((el) => {
+        const css = getComputedStyle(el);
+        return {
+          image: css.backgroundImage,
+          attachment: css.backgroundAttachment,
+        };
+      });
+    // Two covers that move with the options, over two shades that stay
+    // (and the row's colour, the last layer).
+    const { image, attachment } = await style();
+    expect(image.match(/linear-gradient/g)).toHaveLength(2);
+    expect(image.match(/radial-gradient/g)).toHaveLength(2);
+    expect(attachment.replace(/\s/g, "")).toMatch(/^local,local,scroll,scroll/);
+    // From 600 px the row wraps and draws no shade.
+    await page.setViewportSize({ width: 600, height: 844 });
+    expect((await style()).image).toBe("none");
+  });
+});

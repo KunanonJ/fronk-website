@@ -13,6 +13,7 @@ const DOM_TS_TESTS = [
   "src/lib/scrollRestoration.test.ts",
   "lib/router/stylesheet.test.ts",
   "lib/router/navigation.test.ts",
+  "lib/utils/revealInRow.test.ts",
   "lib/brand/traitStore.test.ts",
   "lib/secrets/konami.test.ts",
   "components/profile/site/secrets/pixelParty.test.ts",
