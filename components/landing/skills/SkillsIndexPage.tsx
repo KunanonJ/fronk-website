@@ -35,6 +35,7 @@ import {
   skillsPage,
   sourceLabel,
 } from "@/lib/content/skills";
+import { keepWhole } from "@/lib/content/keepWhole";
 import type { SkillFilter } from "@/lib/skills/search";
 import { cn } from "@/lib/utils/cn";
 import { pad2 } from "@/lib/utils/pad2";
@@ -99,7 +100,7 @@ function SkillsHero() {
           rel="author"
           className="ds-prose-link"
         >
-          {skillsPage.maintainer.name}
+          {keepWhole(skillsPage.maintainer.name)}
         </Link>
       </p>
     </PageHero>
