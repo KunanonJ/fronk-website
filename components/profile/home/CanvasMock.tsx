@@ -24,6 +24,7 @@ import {
 import { FeatureBoundary, lazyFeature } from "@/components/ui/LazyFeature";
 import { canvasMock, type MockFrame } from "@/lib/content/home";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { focusVisible, revealInRow } from "@/lib/utils/revealInRow";
 
 /*
  * The hero's design-tool canvas (profile redesign, owner decision 3; design
@@ -31,8 +32,10 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * dotted canvas, between a Layers panel and an inspector. Only the frames
  * are exposed, as named links; the window chrome, panels, comment, cursor
  * and toolbar are decoration. Hovering or focusing a frame selects it. Under
- * 810 px the panels go and the frames become a swipeable row with a pager.
- * Frames show a real screenshot where one is registered, else a textless
+ * 810 px the panels go and the frames become a swipeable row with a pager;
+ * a frame the keyboard focuses there comes to the row's middle, as the
+ * pager brings it, so all of it and its ring show (UX hunt 2, U22). Frames
+ * show a real screenshot where one is registered, else a textless
  * drawing labelled "Illustration".
  *
  * As in a design tool (owner, 20-11-26): hovering a row of the Layers panel
@@ -350,6 +353,25 @@ export function CanvasMock({
       ?.click();
   };
 
+  /**
+   * A frame the keyboard focuses on the swipeable row, partly past its
+   * edge: brought to the middle as show() brings one, but silently, since
+   * focus already says which it is. A frame later, after the browser's own
+   * scroll into view. A click or a tap moves nothing.
+   */
+  const centreFocused = (link: HTMLElement) => {
+    window.requestAnimationFrame(() => {
+      const el = row.current;
+      const item = link.parentElement;
+      if (!el || !item || document.activeElement !== link) return;
+      if (!focusVisible(link) || el.scrollWidth <= el.clientWidth) return;
+      revealInRow(el, item, {
+        centre: true,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    });
+  };
+
   const show = (index: number) => {
     const el = row.current;
     const item = el?.children[index] as HTMLElement | undefined;
@@ -442,7 +464,10 @@ export function CanvasMock({
                   }
                   aria-label={canvasMock.frameName(frame.name)}
                   onPointerEnter={() => pick(index)}
-                  onFocus={() => pick(index)}
+                  onFocus={(event) => {
+                    pick(index);
+                    centreFocused(event.currentTarget);
+                  }}
                 >
                   <span className="pf-mock__label" aria-hidden="true">
                     <span className="pf-mock__hash">#</span>

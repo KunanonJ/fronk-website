@@ -582,6 +582,50 @@ test.describe("hero: the canvas mock (plan step 2d, gate 6)", () => {
     ).toBeInViewport({ ratio: 0.9 });
     await expect(page.getByText(`${FRAMES[2]}, 3 of 3`)).toBeAttached();
   });
+
+  for (const size of [
+    { width: 768, height: 1024 },
+    { width: 640, height: 450 },
+  ]) {
+    test(`at ${size.width} x ${size.height}, Tab onto each frame brings all of it and its ring into the row`, async ({
+      page,
+      browserName,
+    }) => {
+      // Browsers scroll a focused frame into the row only when none of it
+      // shows, so one partly past the edge kept focus there (UX hunt 2, U22).
+      only(["desktop", "webkit", "firefox"]);
+      await page.setViewportSize(size);
+      await prepare(page);
+      await visit(page);
+      const row = page.locator(".pf-mock__frames");
+      const links = row.locator("a.pf-mock__frame");
+      // Room the ring (2 px, 3 px out) lacks at the row's edges.
+      const clipped = () =>
+        row.evaluate((el) => {
+          const link = document.activeElement as HTMLElement;
+          const box = el.getBoundingClientRect();
+          const at = link.getBoundingClientRect();
+          return Math.max(
+            0,
+            box.left - (at.left - 5),
+            at.right + 5 - box.right,
+          );
+        });
+      await links.first().focus();
+      for (let i = 1; i < FRAMES.length; i += 1) {
+        await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+        await expect(links.nth(i)).toBeFocused();
+        await expect
+          .poll(clipped, { message: `${FRAMES[i]} at ${size.width} px` })
+          .toBeLessThanOrEqual(0.5);
+        // Focus names the frame; the pager's "n of 3" is for its buttons.
+        await expect(page.getByText(`${FRAMES[i]}, ${i + 1} of 3`)).toHaveCount(
+          0,
+        );
+      }
+      expect(await page.evaluate(() => window.scrollX)).toBe(0);
+    });
+  }
 });
 
 test.describe("hero: the logo strip (plan step 2e)", () => {
