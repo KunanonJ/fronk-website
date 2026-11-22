@@ -597,6 +597,11 @@
     .pf-contact__form {
       grid-area: 1 / 2 / span 2;
     }
+    /* Elsewhere fills its row, so the column ends with the form, not 108
+       to 198 px above it (UX hunt 22-11-26). */
+    .pf-contact__top > :last-child {
+      align-self: stretch;
+    }
     /* "Who should write" beside "For recruiters": one row, no empty cell. */
     .pf-contact__row {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);

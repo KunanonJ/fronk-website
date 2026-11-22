@@ -2533,6 +2533,34 @@ test.describe("recruiter path > the role, the availability and the résumé are 
           { message: `Elsewhere starts below the email ${at}` },
         )
         .toBeGreaterThan(0);
+      // The column ends with the form: Elsewhere fills its row rather than
+      // stopping 108 to 198 px above the form's foot (UX hunt 22-11-26).
+      await expect
+        .poll(
+          async () => {
+            const left = await box(elsewhere);
+            const right = await box(form);
+            return Math.abs(left.y + left.height - (right.y + right.height));
+          },
+          { message: `Elsewhere ends with the form ${at}` },
+        )
+        .toBeLessThan(1);
+    }
+    // The form's body starts at its heading's left edge, not 4 px in.
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect
+        .poll(
+          async () => {
+            const heading = await box(page.locator("#card-form"));
+            const field = await box(page.locator("#contact-name"));
+            return Math.abs(field.x - heading.x);
+          },
+          {
+            message: `the form's fields line up with its heading at ${width} px`,
+          },
+        )
+        .toBeLessThan(0.5);
     }
     // The page is the call to action: the footer keeps its card, not its own.
     const footer = page.locator("footer[data-site-chrome]");
