@@ -964,6 +964,51 @@ test.describe("hero: in every engine and size (UX hunt 22-11-26)", () => {
     }
   });
 
+  /*
+   * From 1180 px the copy's column is 503 px and grows with the window,
+   * but --type-hero grows faster: at 1180 x 820 the h1 was 72.9 px and its
+   * first line, 7.07em wide, broke at "Jarat." in every engine, as it did
+   * on 58 of 161 sizes from 1100 to 1280 px wide and 720 to 1000 tall (and
+   * at 1366 x 1024 and 1440 x 1200). The h1 is now at most the column over
+   * 7.2. Line 2 keeps its three lines.
+   */
+  test("around 1180 px, and on taller screens up to 1440 px, the h1's first line stays one line", async ({
+    page,
+  }) => {
+    only(ENGINES);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    await visit(page);
+    const sizes = [
+      { width: 1366, height: 1024 },
+      { width: 1440, height: 1200 },
+    ];
+    for (let width = 1100; width <= 1280; width += 20) {
+      for (const height of [720, 820, 1000]) sizes.push({ width, height });
+    }
+    sizes.push({ width: 1180, height: 820 });
+    for (const size of sizes) {
+      await resize(page, size);
+      // The rows each line's text takes (line 2's text is its phrase).
+      const [first, second] = await page
+        .locator(".pf-hero__line:first-child, .pf-hero__phrase")
+        .evaluateAll((lines) =>
+          lines.map((line) => {
+            const range = document.createRange();
+            range.selectNodeContents(line);
+            return new Set(
+              [...range.getClientRects()]
+                .filter((rect) => rect.width > 0)
+                .map((rect) => Math.round(rect.top)),
+            ).size;
+          }),
+        );
+      const at = `at ${size.width} x ${size.height}`;
+      expect(first, `line 1 ${at}`).toBe(1);
+      expect(second, `line 2 ${at}`).toBe(3);
+    }
+  });
+
   test("from 1024 px the canvas's tabs fit their panel and the second frame's label clears the inspector", async ({
     page,
   }) => {
