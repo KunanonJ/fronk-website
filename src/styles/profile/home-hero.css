@@ -637,13 +637,14 @@
       inset-inline-end: 12px;
       inline-size: clamp(116px, 24%, 150px);
     }
-    /* 6 px apart and 8 px in: "Design Prototype" in a 120 px inspector
-       (the canvas at about 500 px, from 1024 px) ends 8 px from its edge,
-       not 2 (UX hunt 22-11-26). */
+    /* 5 px apart and 6 px in: "Design Prototype" in a 120 px inspector
+       (the canvas at about 500 px, from 1024 px) ends at least 6 px from
+       its edge, not 2, with Linux's slightly wider text too (UX hunt
+       22-11-26). */
     .pf-mock__tabs {
       display: flex;
-      gap: 6px;
-      padding: 2px 8px 6px;
+      gap: 5px;
+      padding: 2px 8px 6px 6px;
       border-block-end: 1px solid var(--line-soft);
       color: var(--ink-60);
     }
