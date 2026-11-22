@@ -5,7 +5,8 @@ import { useEffect, useSyncExternalStore } from "react";
  * the phone menu open, light-dismiss and close on Escape with no script: their
  * invokers carry `popovertarget`. Script adds what the native element cannot do
  * alone: the invoker's aria-expanded and names, focus on open and back on close,
- * and closing on a route change.
+ * closing when focus moves on to the page (where the panel would cover it,
+ * WCAG 2.4.11), and closing on a route change.
  *
  * Where the engine has no Popover API, the panel is hidden by CSS until the
  * script sets `data-open` on it, and the invoker toggles it. Both paths report
@@ -85,6 +86,11 @@ export function closePopover(panelId: string): void {
   else setFallbackOpen(panel, false);
 }
 
+/** The element whose `popovertarget` names the panel `panelId`. */
+function invokerOf(panelId: string): HTMLElement | null {
+  return document.querySelector<HTMLElement>(`[popovertarget="${panelId}"]`);
+}
+
 export interface PopoverOptions {
   /** The invoker's accessible name while the popover is open, and while it is closed. */
   readonly names?: { readonly open: string; readonly closed: string };
@@ -105,9 +111,7 @@ export function usePopover(
   const closedName = names?.closed;
   useEffect(() => {
     const panel = document.getElementById(panelId);
-    const invoker = document.querySelector<HTMLElement>(
-      `[popovertarget="${panelId}"]`,
-    );
+    const invoker = invokerOf(panelId);
     if (!panel || !invoker) return;
 
     // The invoker's attributes are written here, not rendered, so React never
@@ -130,11 +134,31 @@ export function usePopover(
       onClose?.();
     };
     const onToggle = (event: Event) => settle(openAfter(event, panel));
+    // Focus that lands on the page outside the panel and its invoker (Tab
+    // past the last row, a skip link, a script) closes the panel and stays
+    // where it went, as the share panel does (SharePanelHost): the panel
+    // would cover it there (WCAG 2.4.11; UX hunt 22-11-26). Heard once focus
+    // has moved, so the close never pulls it back; focus leaving the page
+    // (another window) keeps the panel open, and so does a press inside it.
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (
+        target instanceof Node &&
+        !panel.contains(target) &&
+        !invoker.contains(target)
+      ) {
+        closePopover(panelId);
+      }
+    };
     panel.addEventListener("toggle", onToggle);
+    document.addEventListener("focusin", onFocusIn);
     reflect(isPopoverOpen(panel));
 
     if (supportsPopover()) {
-      return () => panel.removeEventListener("toggle", onToggle);
+      return () => {
+        panel.removeEventListener("toggle", onToggle);
+        document.removeEventListener("focusin", onFocusIn);
+      };
     }
 
     // Without the Popover API: the invoker toggles the panel, and Escape or a
@@ -154,6 +178,7 @@ export function usePopover(
     document.addEventListener("pointerdown", onPointer);
     return () => {
       panel.removeEventListener("toggle", onToggle);
+      document.removeEventListener("focusin", onFocusIn);
       invoker.removeEventListener("click", onClick);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointer);

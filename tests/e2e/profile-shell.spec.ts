@@ -1080,6 +1080,95 @@ test.describe("chrome: the toolbar colour follows the site's theme", () => {
   });
 });
 
+/**
+ * Focus that moves on to the page closes Say hello and the phone menu, and
+ * stays where it went (UX hunt 22-11-26): the open panel covered what focus
+ * went to (WCAG 2.4.11), in every engine. Focus between a panel and its
+ * trigger, or between the menu's theme radios, keeps it open.
+ */
+test.describe("chrome: focus leaving a panel closes it", () => {
+  const ENGINES = new Set(["desktop", "webkit", "firefox"]);
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !ENGINES.has(testInfo.project.name),
+      "desktop Chromium, WebKit and Firefox",
+    );
+  });
+
+  /**
+   * Tab (`back`: Shift+Tab). WebKit, as Safari does by default, tabs past
+   * links; Option+Tab moves through them as Tab does elsewhere.
+   */
+  const tab = (page: Page, browserName: string, back = false) =>
+    page.keyboard.press(
+      `${browserName === "webkit" ? "Alt+" : ""}${back ? "Shift+" : ""}Tab`,
+    );
+
+  /** Whether focus is on the page: not lost to the body, not in a panel. */
+  const onThePage = (page: Page) =>
+    page.evaluate(() => {
+      const el = document.activeElement;
+      return el !== null && el !== document.body && !el.closest("[popover]");
+    });
+
+  test("Tab past Say hello's last row closes it; back to its trigger keeps it", async ({
+    page,
+    browserName,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(DESKTOP);
+    await visit(page, "/about");
+    const trigger = page.getByRole("button", { name: "Say hello" }).first();
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog", { name: "Email Kunanon Jarat" });
+    const copy = page.getByRole("button", { name: "Copy email" });
+    await expect(copy).toBeFocused();
+    await tab(page, browserName, true);
+    await expect(trigger).toBeFocused();
+    await expect(dialog).toBeVisible();
+    await tab(page, browserName);
+    await expect(copy).toBeFocused();
+    const last = dialog.getByRole("link", { name: "Use the contact form" });
+    for (let step = 0; step < 3; step += 1) await tab(page, browserName);
+    await expect(last).toBeFocused();
+    await expect(dialog).toBeVisible();
+
+    await tab(page, browserName);
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(await onThePage(page)).toBe(true);
+  });
+
+  test("Tab past the phone menu closes it; the arrows between its theme radios keep it", async ({
+    page,
+    browserName,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize(PHONE);
+    await visit(page);
+    const button = page.getByRole("button", { name: "Open menu" });
+    await button.focus();
+    await page.keyboard.press("Enter");
+    const menu = page.getByRole("navigation", { name: "Site" });
+    await expect(
+      menu.getByRole("link", { name: "Work", exact: true }),
+    ).toBeFocused();
+    const light = page.getByRole("radio", { name: "Light" });
+    await light.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByRole("radio", { name: "Dark" })).toBeFocused();
+    await expect(menu).toBeVisible();
+
+    await tab(page, browserName);
+    await expect(menu).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Open menu" }),
+    ).toHaveAttribute("aria-expanded", "false");
+    expect(await onThePage(page)).toBe(true);
+  });
+});
+
 test.describe("chrome: reduced motion", () => {
   test("the bar fades without transform or blur, and the theme changes with no view transition", async ({
     page,
