@@ -168,6 +168,11 @@
     .pf-hero__actions {
       margin-block-start: 24px;
     }
+    /* The canvas's centred title at 12 px, so at 320 px it keeps about
+       6 px from the Share pill rather than touching it (UX hunt 22-11-26). */
+    .pf-mock__title {
+      font-size: 0.75rem;
+    }
   }
 
   /* The canvas mock (spec 8.2): phones first, a swipeable row of frames. */
@@ -313,7 +318,13 @@
     object-fit: cover;
     object-position: top left;
   }
+  /* A grid of one track, so the screen fills the space the padding leaves.
+     As `block-size: 100%`, WebKit sized it to the whole box, ignoring the
+     top padding, and its foot ran 13 to 19 px past the frame (UX hunt
+     22-11-26); Chrome and Firefox drew it as this does. */
   .pf-thumb {
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     overflow: hidden;
     padding: 9% 8% 0;
     background: linear-gradient(160deg, var(--frame-a), var(--frame-b));
@@ -321,7 +332,6 @@
   /* Textless drawings of each kind of screen (no text under 12 px). */
   .pf-thumb__screen {
     display: grid;
-    block-size: 100%;
     gap: 7%;
     padding: 7%;
     border-radius: 4px 4px 0 0;
@@ -627,10 +637,13 @@
       inset-inline-end: 12px;
       inline-size: clamp(116px, 24%, 150px);
     }
+    /* 6 px apart and 8 px in: "Design Prototype" in a 120 px inspector
+       (the canvas at about 500 px, from 1024 px) ends 8 px from its edge,
+       not 2 (UX hunt 22-11-26). */
     .pf-mock__tabs {
       display: flex;
-      gap: 10px;
-      padding: 2px 10px 6px;
+      gap: 6px;
+      padding: 2px 8px 6px;
       border-block-end: 1px solid var(--line-soft);
       color: var(--ink-60);
     }
@@ -847,6 +860,22 @@
     }
   }
 
+  /* A canvas of 500 to 600 px, side by side with the copy (1024 px on a
+     landscape screen, and 1180 to 1399 px): the second frame moves 4% left
+     and the first is 4% narrower, so the second frame's label ("# AI
+     Automation") ends 5 px or more clear of the inspector, not under it,
+     and the frames keep their 10 px apart (UX hunt 22-11-26). From 1400 px
+     the canvas is wide enough for the spec's places. */
+  @media (64rem <= width < 73.75rem) and (orientation: landscape),
+    (73.75rem <= width < 87.5rem) {
+    .pf-mock__item:nth-child(1) {
+      --fw: 27%;
+    }
+    .pf-mock__item:nth-child(2) {
+      --fx: 54%;
+    }
+  }
+
   /* From 1180 px: copy and canvas side by side (spec 4.2). */
   @media (min-width: 73.75rem) {
     .pf-hero__grid {
@@ -858,8 +887,12 @@
     .pf-mock-wrap {
       max-inline-size: none;
     }
+    /* At most 90 px: the copy's column stops growing at 652 px, where
+       "Hi, I'm Kunanon Jarat." needs 636 px at 90 px, so the first line
+       stays one line on a 1920 x 1080 or larger screen (UX hunt 22-11-26;
+       --type-hero reached 94.7 px there and broke it). */
     .pf-hero__title {
-      font-size: var(--type-hero);
+      font-size: min(var(--type-hero), 5.625rem);
     }
   }
 
@@ -1140,6 +1173,20 @@
     align-items: center;
     gap: 4px 8px;
     margin-top: 6px;
+  }
+  /* The release's mark and tag wrap as one: apart, a long tag
+     (OpenFinance's, at 1024 px and 320 px) left the mark alone on the line
+     above it (UX hunt 22-11-26). A tag too long for the line wraps inside
+     itself, the mark beside its first line: on its baseline, then 1.5 px
+     up, where the figures' middle is (as centred on one line before). */
+  .pf-oss__release {
+    display: inline-flex;
+    align-items: first baseline;
+    gap: 8px;
+    min-inline-size: 0;
+  }
+  .pf-oss__release > .pf-skill-tag__mark {
+    translate: 0 -1.5px;
   }
   @media (min-width: 64rem) {
     .pf-oss__list {
