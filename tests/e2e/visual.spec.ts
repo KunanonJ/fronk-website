@@ -17,7 +17,7 @@ const STILL = [
  * Start migration.
  *
  * Baselines are Linux-only, captured in the official Playwright image
- * (mcr.microsoft.com/playwright:v1.64.1-noble) so CI and local runs render
+ * (mcr.microsoft.com/playwright:v1.65.1-noble) so CI and local runs render
  * identically (fonts are self-hosted). CI runs the same image (the `visual`
  * job): install, build, then
  *
