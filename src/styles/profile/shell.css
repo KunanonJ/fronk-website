@@ -701,6 +701,36 @@
     align-content: start;
     gap: 32px;
   }
+  /* Under 810 px the card is one column, and its lists stood in one long
+     column too, a footer of 1,167 px at 390 (UX hunt 22-11-26, U24). The
+     Pages list takes as many 6.5rem columns as fit (two at 320 px, five
+     at 768), in column order as from 1024 px: down the first column,
+     then the next, which is the source order, so the tab order and a
+     screen reader follow the eye. Elsewhere and For agents sit side by
+     side on the same tracks. A column is wider than the longest label,
+     and one that no longer fits, at a larger text size, drops a column
+     rather than break a label. Each link is a 44 px tap target here. */
+  @media (width < 50.625rem) {
+    .pf-footer__block--pages .pf-footer__list {
+      display: block;
+      columns: 6.5rem;
+      column-gap: 16px;
+    }
+    .pf-footer__block--pages .pf-footer__list li {
+      break-inside: avoid;
+    }
+    .pf-footer__side {
+      grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+      column-gap: 16px;
+    }
+    .pf-footer__list {
+      gap: 0;
+    }
+    .pf-footer__link {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+    }
+  }
   .pf-footer__copyright {
     margin-block-start: 40px;
     color: var(--ink-60);

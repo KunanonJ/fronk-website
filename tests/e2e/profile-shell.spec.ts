@@ -17,6 +17,8 @@ const HOME = "/";
 /** Home's address with nothing after the slash: no hash, no query. */
 const HOME_URL = /^https?:\/\/[^/]+\/$/;
 const BEHAVIOUR = new Set(["desktop", "webkit-phone"]);
+/** Desktop Chromium, WebKit and Firefox, for checks that set their own widths. */
+const ENGINES = new Set(["desktop", "webkit", "firefox"]);
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
 /** A short phone, where an open panel must scroll inside the screen. */
@@ -1422,6 +1424,148 @@ test.describe("chrome: the device matrix and the tap areas", () => {
         `popover at ${width}`,
       ).toEqual([]);
       await page.keyboard.press("Escape");
+    }
+  });
+});
+
+/**
+ * The footer's lists (UX hunt 22-11-26, U24). Under 810 px the card is one
+ * column, and its Pages list stood in one long column too: a footer of
+ * 1,167 px at 390. Now it takes as many columns as fit, in source order down
+ * each column (the order a keyboard and a screen reader take), with 44 px
+ * targets and no label broken, and Elsewhere and For agents sit side by
+ * side on the list's tracks. From 810 to 1023 px the list keeps one column
+ * in the card's middle column; from 1024 px it has two. Label widths differ
+ * by engine, so all three run it.
+ */
+test.describe("chrome: the footer's lists from 320 px to a desktop", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !ENGINES.has(testInfo.project.name),
+      "desktop Chromium, WebKit and Firefox; the test sets its widths",
+    );
+  });
+
+  test("the Pages list takes columns in source order, with whole labels and 44 px targets under 810 px", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await visit(page, "/contact");
+    // [width, the least columns, the most columns]
+    const widths: readonly (readonly [number, number, number])[] = [
+      [320, 2, 2],
+      [390, 2, 3],
+      [768, 4, 5],
+      [834, 1, 1],
+      [1024, 2, 2],
+      [1440, 2, 2],
+    ];
+    for (const [width, least, most] of widths) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(
+        () =>
+          new Promise((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(done)),
+          ),
+      );
+      const report = await page.evaluate(() => {
+        const card = document.querySelector(".pf-footer__card")!;
+        const list = card.querySelector(
+          ".pf-footer__block--pages .pf-footer__list",
+        )!;
+        const links = [
+          ...list.querySelectorAll<HTMLElement>(".pf-footer__link"),
+        ];
+        const boxes = links.map((link) => link.getBoundingClientRect());
+        const lefts = [
+          ...new Set(boxes.map((box) => Math.round(box.left))),
+        ].sort((a, b) => a - b);
+        const column = boxes.map((box) => lefts.indexOf(Math.round(box.left)));
+        // Source order down each column, then on to the next.
+        let inOrder = true;
+        for (let i = 1; i < boxes.length; i += 1) {
+          const back = column[i]! < column[i - 1]!;
+          const up =
+            column[i] === column[i - 1] && boxes[i]!.top <= boxes[i - 1]!.top;
+          if (back || up) inOrder = false;
+        }
+        // A label on one line: its text's line boxes share one top.
+        const lines = (link: Element) => {
+          const range = document.createRange();
+          range.selectNodeContents(link.firstChild ?? link);
+          return new Set(
+            [...range.getClientRects()].map((rect) => Math.round(rect.top)),
+          ).size;
+        };
+        const agents = [
+          ...card.querySelectorAll(".pf-footer__side .pf-footer__link"),
+        ];
+        const listBox = list.getBoundingClientRect();
+        const all = [...card.querySelectorAll(".pf-footer__link")].map((link) =>
+          link.getBoundingClientRect(),
+        );
+        const overlaps = all.filter((a, i) =>
+          all
+            .slice(i + 1)
+            .some(
+              (b) =>
+                Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.5 &&
+                Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0.5,
+            ),
+        ).length;
+        const blocks = [
+          ...card.querySelectorAll(".pf-footer__side > .pf-footer__block"),
+        ].map((block) => block.getBoundingClientRect());
+        return {
+          columns: lefts.length,
+          rows: Math.max(
+            ...lefts.map((_, c) => column.filter((x) => x === c).length),
+          ),
+          inOrder,
+          mostLines: Math.max(...[...links, ...agents].map(lines)),
+          outside: boxes.filter((box) => box.right > listBox.right + 0.5)
+            .length,
+          smallest: Math.min(
+            ...all.map((box) => Math.min(box.width, box.height)),
+          ),
+          overlaps,
+          listHeight: listBox.height,
+          sideBySide:
+            Math.abs(blocks[0]!.top - blocks[1]!.top) < 1 &&
+            blocks[1]!.left >= blocks[0]!.right,
+          sideLefts: blocks.map((block) => Math.round(block.left)),
+          pageLefts: lefts.slice(0, 2),
+        };
+      });
+      const at = `at ${width} px`;
+      expect(report.columns, `columns ${at}`).toBeGreaterThanOrEqual(least);
+      expect(report.columns, `columns ${at}`).toBeLessThanOrEqual(most);
+      expect(report.inOrder, `source order down each column ${at}`).toBe(true);
+      expect(report.mostLines, `a label on one line ${at}`).toBe(1);
+      expect(report.outside, `links past the list's edge ${at}`).toBe(0);
+      expect(report.overlaps, `overlapping links ${at}`).toBe(0);
+      if (width < 810) {
+        expect(report.smallest, `tap targets ${at}`).toBeGreaterThanOrEqual(44);
+        // Balanced columns of 44 px rows: seven rows at most, not fourteen.
+        expect(report.rows, `rows ${at}`).toBe(Math.ceil(14 / report.columns));
+        expect(
+          Math.abs(report.listHeight - report.rows * 44),
+          `list height ${at}`,
+        ).toBeLessThanOrEqual(1);
+        expect(report.sideBySide, `Elsewhere beside For agents ${at}`).toBe(
+          true,
+        );
+        for (const [index, left] of report.sideLefts.entries())
+          expect(
+            Math.abs(left - report.pageLefts[index]!),
+            `For agents and Elsewhere on the Pages tracks ${at}`,
+          ).toBeLessThanOrEqual(1);
+      } else {
+        expect(report.smallest, `targets ${at}`).toBeGreaterThanOrEqual(24);
+        expect(report.sideBySide, `Elsewhere above For agents ${at}`).toBe(
+          false,
+        );
+      }
     }
   });
 });
