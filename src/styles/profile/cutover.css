@@ -47,8 +47,13 @@
     gap: 10px;
     color: var(--ink-80);
   }
+  /* 8.28em is the 18ch Instrument Serif gives (its zero is 0.46em wide),
+     in a unit that does not depend on the face: before the web font
+     arrives, ch is measured on the fallback's zero, the measure was 9%
+     narrower, and /build's h1 took a line more, then lost it (a layout
+     shift of 0.12 to 0.14; UX hunt 22-11-26). */
   .pf-page-hero__title {
-    max-inline-size: 18ch;
+    max-inline-size: 8.28em;
     margin-top: 20px;
     color: var(--ink);
   }

@@ -426,6 +426,133 @@ test.describe("Thai words stay whole (UX hunt 22-11-26)", () => {
   }
 });
 
+/*
+ * UX hunt 22-11-26: while Noto Sans Thai loads, Thai is drawn in a system
+ * Thai face sized to Noto (src/styles/fonts.css), so the Thai hubs keep
+ * their lines when Noto arrives; the h1 lost one before (a layout shift of
+ * 0.02 to 0.2). Desktop Chromium: Firefox skips later web-font families
+ * while one loads, and WebKit keeps a line that is within 2% of full only
+ * with Noto. The system faces differ by machine, so the check runs where
+ * one of the faces the fallback names is installed.
+ */
+test.describe("the Thai hubs keep their lines when Noto Sans Thai arrives (UX hunt 22-11-26)", () => {
+  for (const path of [
+    "/th/topics/ai-transformation-thailand",
+    "/th/topics/tech-startup-thailand-sea",
+  ]) {
+    test(`${path} at 390, 1024 and 1440 px`, async ({ page }) => {
+      only(DESKTOP, "desktop Chromium");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await prepare(page);
+      for (const width of [390, 1024, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        let release: () => void = () => {};
+        const held = new Promise<void>((done) => (release = done));
+        await page.route(/noto-sans-thai-thai[^/]*\.woff2/, async (route) => {
+          await held;
+          await route.continue();
+        });
+        await page.goto(path, { waitUntil: "domcontentloaded" });
+        const installed = await page.evaluate(async () => {
+          const sources = [
+            'local("Noto Sans Thai Regular")',
+            "local(Thonburi)",
+            "local(Tahoma)",
+          ];
+          const found = await Promise.all(
+            sources.map((source) =>
+              new FontFace("probe", source).load().then(
+                () => true,
+                () => false,
+              ),
+            ),
+          );
+          return found.includes(true);
+        });
+        test.skip(!installed, "no system Thai face the fallback names");
+        const heights = () =>
+          page.evaluate(() =>
+            ["main h1", ".pf-page-hero__lead"].map(
+              (selector) =>
+                document.querySelector(selector)!.getBoundingClientRect()
+                  .height,
+            ),
+          );
+        const thaiLoaded = () =>
+          page.evaluate(() =>
+            document.fonts.check('16px "Noto Sans Thai"', "ไทย"),
+          );
+        await page.waitForTimeout(300);
+        expect(await thaiLoaded(), "Noto is held").toBe(false);
+        const before = await heights();
+        release();
+        await expect.poll(thaiLoaded).toBe(true);
+        await page.evaluate(
+          () =>
+            new Promise<void>((done) =>
+              requestAnimationFrame(() => requestAnimationFrame(() => done())),
+            ),
+        );
+        const after = await heights();
+        for (const [index, height] of after.entries()) {
+          expect(
+            Math.abs(height - before[index]!),
+            `${["h1", "lede"][index]} at ${width} px`,
+          ).toBeLessThan(2);
+        }
+        await page.unrouteAll({ behavior: "ignoreErrors" });
+      }
+    });
+  }
+});
+
+/*
+ * UX hunt 22-11-26: the reading pages' h1 measure was 18ch, and ch is
+ * measured on the face in use, so before Instrument Serif arrived the
+ * measure was 9% narrower and /build's h1 took a line more (a layout shift
+ * of 0.12 to 0.14 when it arrived). In em, the lines hold.
+ */
+test.describe("the reading pages' h1 keeps its lines when its face arrives (UX hunt 22-11-26)", () => {
+  test("/build at 390 and 1440 px", async ({ page }) => {
+    // Desktop Chromium, where the shift was measured. Firefox leaves the
+    // size-adjusted "Instrument Serif Fallback" unloaded while the face
+    // loads, so it draws the system serif until then, measure or not; and
+    // WebKit marks a font file held here as failed, so it cannot be held.
+    only(DESKTOP, "desktop Chromium");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await prepare(page);
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      let release: () => void = () => {};
+      const held = new Promise<void>((done) => (release = done));
+      await page.route(/instrument-serif-latin[^/]*\.woff2/, async (route) => {
+        await held;
+        await route.continue();
+      });
+      await page.goto("/build", { waitUntil: "domcontentloaded" });
+      const h1 = page.getByRole("heading", { level: 1 });
+      await expect(h1).toBeVisible();
+      const loaded = () =>
+        page.evaluate(() =>
+          document.fonts.check('400 48px "Instrument Serif"', "Build"),
+        );
+      expect(await loaded(), "the face is held").toBe(false);
+      const before = (await h1.boundingBox())!.height;
+      release();
+      await expect.poll(loaded).toBe(true);
+      await page.evaluate(
+        () =>
+          new Promise<void>((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => done())),
+          ),
+      );
+      const after = (await h1.boundingBox())!.height;
+      expect(Math.abs(after - before), `at ${width} px`).toBeLessThan(2);
+      await page.unrouteAll({ behavior: "ignoreErrors" });
+    }
+  });
+});
+
 test.describe("the hubs by keyboard", () => {
   test("Tab reaches the FAQ's questions; Space and Enter open and close them", async ({
     page,
