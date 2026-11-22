@@ -61,6 +61,7 @@ vi.mock("@/lib/router/navigation", () => ({
   useReplaceNavigate: () => () => {},
   // No router, so no navigation to follow, and none ever loading.
   useAfterNavigation: () => {},
+  returnedTo: () => false,
   useNavigationPending: () => false,
   notFound: () => {
     throw new Error("notFound");

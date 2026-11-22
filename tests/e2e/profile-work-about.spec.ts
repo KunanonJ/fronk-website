@@ -299,6 +299,59 @@ test.describe("work stack: sticking, depth and focus", () => {
     await venturesAtRest(page);
   });
 
+  test("a link to /#ventures from another page, before Home has rendered, lands the card at rest", async ({
+    page,
+  }) => {
+    // Home's stylesheet comes with Home: its loader waits for it, so Home
+    // renders whole and the card is there to land on (UX hunt 2, U01).
+    await prepare(page);
+    await visit(page, "/about");
+    await page.evaluate(() =>
+      (
+        window as unknown as {
+          __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
+        }
+      ).__TSR_ROUTER__.navigate({ to: "/", hash: "ventures" }),
+    );
+    await expect(page).toHaveURL(/\/#ventures$/);
+    await venturesAtRest(page);
+  });
+
+  test("Back to /#ventures, and a reload of it, keep the place the visitor scrolled to", async ({
+    page,
+  }) => {
+    const router = () =>
+      page.evaluate(() =>
+        (
+          window as unknown as {
+            __TSR_ROUTER__: { navigate: (to: object) => Promise<void> };
+          }
+        ).__TSR_ROUTER__.navigate({ to: "/about" }),
+      );
+    await prepare(page);
+    await visit(page, `${HOME}#ventures`);
+    await venturesAtRest(page);
+    // The visitor reads on, past the stack, then leaves and comes back: the
+    // router puts the page back, and the stack must not land on the card.
+    const strip = await page.evaluate(
+      () =>
+        document.getElementById("open-source")!.getBoundingClientRect().top +
+        window.scrollY,
+    );
+    await scrollToY(page, Math.round(strip));
+    const left = await scrollSettles(page);
+    await router();
+    await expect(page).toHaveURL(/\/about$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/#ventures$/);
+    await page.evaluate(() => document.fonts.ready);
+    near(await scrollSettles(page, 1000), left, "back on /#ventures");
+
+    await page.reload({ waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    near(await scrollSettles(page, 1000), left, "reloaded /#ventures");
+  });
+
   test("Tab from above into the first card, then on from card to card: each focused link rests uncovered (1440 x 900)", async ({
     page,
   }, testInfo) => {

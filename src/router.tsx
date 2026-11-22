@@ -3,6 +3,7 @@ import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import RouteError from "@/components/RouteError";
 import { createQueryClient } from "@/src/lib/queryClient";
+import { followHistory } from "@/lib/router/navigation";
 import { restoreScrollAfterHydration } from "@/src/lib/scrollRestoration";
 import { routeTree } from "./routeTree.gen";
 
@@ -36,6 +37,10 @@ export function getRouter() {
     },
   });
   setupRouterSsrQueryIntegration({ router, queryClient });
+  // How the visitor reached each entry: a link, or Back, Forward and reload
+  // (lib/router/navigation.ts). Before the router subscribes, so it is
+  // current by the time the new page renders.
+  if (typeof window !== "undefined") followHistory(router.history);
   return router;
 }
 
