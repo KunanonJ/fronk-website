@@ -288,6 +288,59 @@ test.describe("living status > a stylesheet that failed", () => {
   });
 });
 
+/*
+ * The ship log's focus ring under 810 px (UX hunt 22-11-26): the two-line
+ * clamp clips at the text's edges, and the site's ring, drawn 3 px outside
+ * the link, showed as a sliver at its left end, in every engine.
+ */
+test.describe("living status > the ship log's focus ring", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      !new Set(["desktop", "webkit", "firefox", "webkit-phone"]).has(
+        testInfo.project.name,
+      ),
+      "Chromium, WebKit and Firefox",
+    );
+  });
+
+  test("under 810 px the link draws its whole ring inside the two-line clamp", async ({
+    page,
+  }) => {
+    await prepare(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.route(SHIPPED_ROUTE, (route) =>
+      route.fulfill({ json: SHIPPED }),
+    );
+    await page.clock.setFixedTime(MORNING);
+    await visit(page, "/contact");
+    await page.locator(".pf-footer__card").scrollIntoViewIfNeeded();
+    const link = page.locator(".pf-footer__shipped a");
+    await link.focus();
+    const ring = await link.evaluate((el) => {
+      const clamp = el.parentElement!.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      const reach =
+        parseFloat(style.outlineOffset) + parseFloat(style.outlineWidth);
+      const lines = [...el.getClientRects()].filter(
+        (line) => line.top < clamp.bottom,
+      );
+      return {
+        shown: el.matches(":focus-visible"),
+        lines: lines.length,
+        inside: lines.every(
+          (line) =>
+            line.left - reach >= clamp.left - 0.5 &&
+            line.right + reach <= clamp.right + 0.5 &&
+            line.top - reach >= clamp.top - 0.5 &&
+            line.bottom + reach <= clamp.bottom + 0.5,
+        ),
+      };
+    });
+    expect(ring).toEqual({ shown: true, lines: ring.lines, inside: true });
+    expect(ring.lines).toBeGreaterThan(0);
+  });
+});
+
 /** Records each start of the wink's animation, from the first paint. */
 async function watchWinks(page: Page) {
   await page.addInitScript(() => {

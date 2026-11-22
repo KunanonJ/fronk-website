@@ -64,4 +64,10 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
   }
+  /* The clamp clips at the text's own edges, so the site's ring, drawn
+     outside the link, showed as a sliver (UX hunt 22-11-26): drawn inside
+     it here, it shows whole on every line. */
+  .pf-footer__card > .pf-footer__shipped a:focus-visible {
+    outline-offset: -2px;
+  }
 }
