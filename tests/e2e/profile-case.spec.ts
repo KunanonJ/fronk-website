@@ -617,6 +617,14 @@ test.describe("the contents (plan gate 4)", () => {
     only(BEHAVIOUR, "desktop and the WebKit phone");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
+    // The fonts first, from another case page in this tab (the same five
+    // faces, then in memory), so the text above the chapter is set in them
+    // when the browser lands the address. Loaded cold, Onest swaps in after
+    // the landing and rewraps two paragraphs above the chapter (7 px taller
+    // at 390 px). WebKit has no scroll anchoring: it kept the chapter in
+    // place through the swap when the swap came well before the load
+    // completed, and left it 6.8 px low when the swap came just before.
+    await visit(page, CASES[1].path);
     await visit(page, `${INTRANET}#ch-03`);
     await settle(page);
     const top = await chapterTop(page, "ch-03");
