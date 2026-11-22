@@ -1,16 +1,19 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
   type MouseEvent,
+  type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import { closePopoversForModal } from "@/components/profile/site/popover";
+import type { TypedKeys } from "@/components/profile/site/search/SearchTrigger";
 import { award } from "@/lib/brand/traitStore";
 import { sayHello, searchCopy } from "@/lib/content/profileChrome";
 import { secretsCopy } from "@/lib/content/secretsCopy";
@@ -35,7 +38,8 @@ import searchCss from "@/src/styles/search.css?url";
  * selecting the field's text, does not), and closing returns focus where it
  * was. The chrome's popovers close as it opens, focus inside one going to
  * its invoker first, so that is where focus comes back to. The page behind
- * does not scroll (search.css).
+ * does not scroll (search.css). The field starts with what was typed while
+ * the dialog loaded (SearchTrigger keeps it).
  * Inside, an ARIA combobox: the field keeps focus, the arrows move through
  * the results (aria-activedescendant), Enter opens one, and a polite line
  * says how many there are. The index (/search.json) is fetched on first
@@ -114,7 +118,17 @@ function isBackdrop(event: MouseEvent<HTMLDialogElement>): boolean {
   );
 }
 
-export default function SearchDialog({ onClose }: { onClose: () => void }) {
+export default function SearchDialog({
+  onClose,
+  onOpen,
+  typedRef,
+}: {
+  onClose: () => void;
+  /** Runs as the dialog opens: the keys typed from then on are the field's. */
+  onOpen?: () => void;
+  /** The keys typed while the dialog loaded, which the field starts with. */
+  typedRef?: RefObject<TypedKeys>;
+}) {
   const dialog = useRef<HTMLDialogElement>(null);
   /** Whether the press now ending began on the backdrop. */
   const pressed = useRef(false);
@@ -126,12 +140,18 @@ export default function SearchDialog({ onClose }: { onClose: () => void }) {
   const [active, setActive] = useState(0);
   const [answer, setAnswer] = useState<Answer | null>(null);
 
-  useEffect(() => {
+  // Opening, before the browser handles another key: SearchTrigger stops
+  // keeping keys, the ones it kept become the query, and every key after
+  // them reaches the field.
+  useLayoutEffect(() => {
     const el = dialog.current;
     if (!el || el.open) return;
     closePopoversForModal();
     el.showModal();
-  }, []);
+    onOpen?.();
+    const typed = typedRef?.current.keys;
+    if (typed) setQuery(typed);
+  }, [onOpen, typedRef]);
 
   useEffect(() => {
     let live = true;

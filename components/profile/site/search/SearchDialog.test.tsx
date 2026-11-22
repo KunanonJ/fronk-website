@@ -226,6 +226,16 @@ describe("SearchDialog, commands", () => {
 });
 
 describe("SearchDialog, opening and closing (UX hunt 22-11-26)", () => {
+  it("starts with the keys typed while it loaded, and searches them", async () => {
+    const typedRef = { current: { keys: "gogo", keeping: false } };
+    render(<SearchDialog onClose={vi.fn()} typedRef={typedRef} />);
+    const field = screen.getByRole("combobox", { name: "Search the site" });
+    expect(field).toHaveValue("gogo");
+    expect(
+      await screen.findByRole("group", { name: "Case studies" }),
+    ).toHaveTextContent("GoGoCash");
+  });
+
   it("closes the chrome's open popover first, focus to its invoker, so focus comes back there", () => {
     const invoker = document.createElement("button");
     invoker.setAttribute("popovertarget", "say-hello-nav");

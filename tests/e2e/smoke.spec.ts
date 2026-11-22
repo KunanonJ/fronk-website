@@ -1750,6 +1750,72 @@ test.describe("search > ⌘K opens a dialog that finds and opens pages", () => {
     await expect(page.locator("#site-menu:popover-open")).toHaveCount(0);
   });
 
+  /** Holds the dialog's code back `ms`, as a slow first open does. */
+  const slowCode = (page: Page, ms: number) =>
+    page.route(/\/assets\/SearchDialog-[\w-]+\.js$/, async (route) => {
+      await new Promise((done) => setTimeout(done, ms));
+      await route.continue();
+    });
+
+  /*
+   * The keys typed after ⌘K while the dialog loads (UX hunt 22-11-26): its
+   * first open takes a third of a second or more, and the first letters of
+   * a quick "⌘K verify" were lost. They are kept for the field; Enter is
+   * held from the page (it would press whatever has focus there).
+   */
+  test("keys typed while it loads reach the field, and Enter presses nothing on the page", async ({
+    page,
+  }) => {
+    await slowCode(page, 1000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/about");
+    // A link has focus: an Enter that reached it would leave the page.
+    await page.locator("main a[href^='/']").first().focus();
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("verifx", { delay: 50 });
+    await page.keyboard.press("Backspace");
+    await page.keyboard.type("y");
+    await page.keyboard.press("Enter");
+    const field = page.getByRole("combobox", { name: "Search the site" });
+    await expect(field).toBeFocused();
+    await expect(field).toHaveValue("verify");
+    expect(new URL(page.url()).pathname).toBe("/about");
+    // Keys after it opens go on into the field.
+    await page.keyboard.type(" loop");
+    await expect(field).toHaveValue("verify loop");
+  });
+
+  test("at 50 ms a key right after the first ⌘K, no key is lost", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("verify", { delay: 50 });
+    await expect(
+      page.getByRole("combobox", { name: "Search the site" }),
+    ).toHaveValue("verify");
+  });
+
+  test("Escape before it opens gives the opening up", async ({ page }) => {
+    let served = 0;
+    await page.route(/\/assets\/SearchDialog-[\w-]+\.js$/, async (route) => {
+      await new Promise((done) => setTimeout(done, 600));
+      await route.continue();
+      served += 1;
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await visit(page, "/contact");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.press("Escape");
+    await expect.poll(() => served).toBeGreaterThan(0);
+    // Time for the code to run, were the dialog still asked for.
+    await page.waitForTimeout(500);
+    await expect(page.locator("dialog.pf-search")).toHaveCount(0);
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect(page.locator(dialog)).toBeVisible();
+  });
+
   /*
    * ⌘K over an open Say hello (UX hunt 22-11-26): the dialog gave focus
    * back, on Esc, to Say hello's Copy email, inside the panel it had closed,
