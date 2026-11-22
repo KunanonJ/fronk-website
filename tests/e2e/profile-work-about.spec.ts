@@ -671,7 +671,6 @@ test.describe("about bento: the principles line up in every row", () => {
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await prepare(page);
-    await visit(page);
     const sizes: readonly (readonly [number, number])[] = [
       [700, 900],
       [900, 900],
@@ -681,8 +680,11 @@ test.describe("about bento: the principles line up in every row", () => {
       [1440, 900],
     ];
     for (const [width, height] of sizes) {
+      // A load at each width: after a resize Chromium at times keeps every
+      // tile's 2.4vw padding at the old width's value (seen 700 to 900 px),
+      // which moves the floor by a few pixels; the rows still line up.
       await page.setViewportSize({ width, height });
-      await settle(page);
+      await visit(page);
       const rows = await page.evaluate(() => {
         const byTop = new Map<number, { body: number; height: number }[]>();
         for (const tile of document.querySelectorAll(".pf-principle")) {

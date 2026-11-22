@@ -1619,6 +1619,11 @@ test.describe("chrome: every page ends as Home does", () => {
     }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await prepare(page);
+      // /about's activity card reads GitHub through the site; an empty year
+      // keeps the page from waiting on the network.
+      await page.route("**/api/github/contributions", (route) =>
+        route.fulfill({ json: { total: 0, weeks: [] } }),
+      );
       for (const size of [PHONE, DESKTOP]) {
         await page.setViewportSize(size);
         await page.goto(path, { waitUntil: "networkidle" });
