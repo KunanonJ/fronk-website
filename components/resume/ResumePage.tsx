@@ -89,10 +89,7 @@ export default function ResumePage({
         </p>
       </PageHero>
 
-      <div
-        data-print-hide
-        className="ds-wrap pf-cat-section pf-cat-end pf-resume-body"
-      >
+      <div data-print-hide className="ds-wrap pf-cat-section pf-resume-body">
         <div className="pf-resume">
           {layout.now ? (
             <Reveal>

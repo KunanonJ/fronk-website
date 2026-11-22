@@ -1570,6 +1570,107 @@ test.describe("chrome: the footer's lists from 320 px to a desktop", () => {
   });
 });
 
+/**
+ * The page end (UX hunt 22-11-26, U25): most pages padded their own end by
+ * 112 or 128 px on top of the footer's, about 290 px of nothing before "Get
+ * in touch", where Home has about 160. Now no page pads its end: the footer's
+ * top spacing, 40 px and --page-end (clamp(96px, 14vh, 160px), globals.css),
+ * is the one gap after a page's last content, on every page as on Home. On
+ * /contact the footer's card stands there; /design has no footer, so its
+ * last section's 48 px and --page-end end it. The gap runs from the lowest
+ * thing the page draws (text, a fill, a border, a shadow or an image) in
+ * <main> to the footer's first line.
+ */
+const PAGE_ENDS = [
+  "/",
+  "/about",
+  "/contact",
+  "/portfolio",
+  "/portfolio/tbh-intranet",
+  "/ventures/gogocash",
+  "/topics/ai-transformation-thailand",
+  "/th/topics/ai-transformation-thailand",
+  "/skills",
+  "/skills/verify-loop",
+  "/stack",
+  "/build",
+  "/open-source",
+  "/learn",
+  "/examples",
+  "/proof",
+  "/blog",
+  "/press",
+  "/resume",
+  "/does-not-exist",
+  "/design",
+];
+
+test.describe("chrome: every page ends as Home does", () => {
+  test.beforeEach(({ browserName: _browserName }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "one engine: the test sets its widths",
+    );
+  });
+
+  for (const path of PAGE_ENDS) {
+    test(`${path}: the footer's spacing alone follows the last content`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await prepare(page);
+      for (const size of [PHONE, DESKTOP]) {
+        await page.setViewportSize(size);
+        await page.goto(path, { waitUntil: "networkidle" });
+        await page.evaluate(() => document.fonts.ready);
+        const end = await page.evaluate(() => {
+          const main = document.querySelector("main")!;
+          let last = 0;
+          for (const el of main.querySelectorAll<HTMLElement>("*")) {
+            const style = getComputedStyle(el);
+            if (style.display === "none" || style.visibility === "hidden")
+              continue;
+            // Not drawn in the flow: the reading line, text for screen
+            // readers, and what a closed disclosure holds.
+            if (el.closest(".pf-reading, .sr-only, [hidden]")) continue;
+            if (
+              el.parentElement?.closest("details:not([open])") &&
+              !el.closest("summary")
+            )
+              continue;
+            const box = el.getBoundingClientRect();
+            if (box.width < 2 || box.height < 2) continue;
+            const draws =
+              [...el.childNodes].some(
+                (node) => node.nodeType === 3 && node.textContent!.trim(),
+              ) ||
+              style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+              style.boxShadow !== "none" ||
+              Number.parseFloat(style.borderBottomWidth) > 0 ||
+              ["IMG", "svg", "CANVAS", "VIDEO", "BUTTON"].includes(el.tagName);
+            if (draws) last = Math.max(last, box.bottom + window.scrollY);
+          }
+          const footer = document.querySelector("footer.pf-footer");
+          const first = footer?.querySelector(
+            ".pf-footer__intro > *, .pf-footer__card",
+          );
+          const next = first
+            ? first.getBoundingClientRect().top + window.scrollY
+            : document.documentElement.scrollHeight;
+          return { gap: next - last, footer: Boolean(footer) };
+        });
+        // 40 px, then --page-end; /design's last section pads 48 px.
+        const pageEnd = Math.min(160, Math.max(96, size.height * 0.14));
+        const expected = (end.footer ? 40 : 48) + pageEnd;
+        expect(
+          Math.abs(end.gap - expected),
+          `${path} at ${size.width} px: ${Math.round(end.gap)} px against ${Math.round(expected)}`,
+        ).toBeLessThanOrEqual(2);
+      }
+    });
+  }
+});
+
 test.describe("chrome: the layer order of the profile stylesheet", () => {
   test("component rules lose to Tailwind utilities and beat the base layer", async ({
     page,

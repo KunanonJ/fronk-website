@@ -168,7 +168,7 @@ export default function PressPage({
 
       <section
         aria-label="Coverage"
-        className="ds-wrap pf-cat-section pf-cat-end pf-press"
+        className="ds-wrap pf-cat-section pf-press"
       >
         <div className="pf-filter-bar pf-press__bar">
           <ToggleGroup

@@ -40,9 +40,6 @@
   .pf-cat-section > .ds-eyebrow {
     margin-bottom: 28px;
   }
-  .pf-cat-end {
-    padding-bottom: 128px;
-  }
 
   /* The filters, view switches and tabs use the shared filter bar
      (.pf-filter-bar, .pf-filter and .pf-filter__option in cutover.css); a
@@ -657,8 +654,11 @@
   .pf-design__bar .pf-theme {
     inline-size: 13.75rem;
   }
+  /* No footer here, so the body ends the page: --page-end after the last
+     section's 48 px, where the footer's 40 px and --page-end end every
+     other page (globals.css). */
   .pf-design__body {
-    padding-bottom: 128px;
+    padding-bottom: var(--page-end);
   }
   .pf-design__section {
     display: flex;
@@ -961,7 +961,7 @@
   .pf-status__grid {
     display: grid;
     gap: 16px;
-    padding-block: 8px 128px;
+    padding-block-start: 8px;
   }
   .pf-status__tile {
     display: flex;

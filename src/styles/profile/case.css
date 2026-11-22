@@ -962,7 +962,7 @@
 
   /* More projects (spec 9.12): lift cards, two from 600 px. */
   .pf-case-more {
-    padding-block: 128px;
+    padding-block-start: 128px;
   }
   .pf-case-more__inner {
     padding-top: 48px;

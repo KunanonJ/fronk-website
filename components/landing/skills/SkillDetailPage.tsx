@@ -500,7 +500,7 @@ export default function SkillDetailPage({
   return (
     <>
       <SkillHero skill={skill} stage={stage} />
-      <div className="ds-wrap pf-cat-section pf-cat-end pf-skill-body">
+      <div className="ds-wrap pf-cat-section pf-skill-body">
         <div className="pf-skill-grid">
           <InstallCard skill={skill} />
           <RunsCard skill={skill} />

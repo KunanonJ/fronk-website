@@ -304,10 +304,7 @@ const shortSha = (sha: string) => sha.slice(0, 7);
  */
 function CreditsCard() {
   return (
-    <article
-      aria-labelledby="card-credits"
-      className="ds-wrap pf-cat-section pf-cat-end"
-    >
+    <article aria-labelledby="card-credits" className="ds-wrap pf-cat-section">
       <EyebrowRow as="h2" id="card-credits">
         Credits
       </EyebrowRow>

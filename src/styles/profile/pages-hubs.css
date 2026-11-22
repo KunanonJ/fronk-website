@@ -50,7 +50,7 @@
 
   /* The hub's column (spec 9.6 and 9.7): chapters, proof, FAQ, the close. */
   .pf-hub-body {
-    padding-block: 64px 128px;
+    padding-block-start: 64px;
   }
   .pf-hub-column {
     display: flex;
@@ -148,7 +148,7 @@
   .pf-read-body {
     display: grid;
     gap: clamp(80px, 9vw, 112px);
-    padding-block: 24px 128px;
+    padding-block-start: 24px;
   }
   /* A block may be narrower than its widest row: a filter that scrolls
      sideways on phones (cutover.css) must not widen the page. */
