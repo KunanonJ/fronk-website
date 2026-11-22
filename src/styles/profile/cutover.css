@@ -93,7 +93,7 @@
      pf-work-index, not pf-work: Home's article#work owns .pf-work
      (home-work-about.css), and a second .pf-work rule reset its padding. */
   .pf-work-index {
-    padding-block: 24px 112px;
+    padding-block-start: 24px;
   }
   /* The filter bar, shared by every page that filters a list: the row
      (.pf-filter-bar, with its live count) and the segmented group
@@ -381,7 +381,7 @@
   .pf-about-page__close {
     display: grid;
     gap: 32px;
-    padding-block: 112px 128px;
+    padding-block-start: 112px;
   }
   .pf-faq {
     margin-top: 32px;
@@ -489,7 +489,7 @@
   .pf-contact {
     display: grid;
     gap: 16px;
-    padding-block: 24px 128px;
+    padding-block-start: 24px;
   }
   .pf-contact__top,
   .pf-contact__row {

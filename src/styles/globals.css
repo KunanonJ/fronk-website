@@ -781,6 +781,12 @@ html.kj-vt *::after {
   --bar-row: 48px;
   --nav-h: 92px;
   --screen: max(640px, 100svh);
+  /* The page end (UX hunt 22-11-26, U25): the room between a page's last
+     content and the footer's first line is the footer's own, 40 px and
+     this (shell.css), so every page ends as Home does: 136 px on a short
+     phone, about 160 on most screens, 200 at most. No page pads its own
+     end. */
+  --page-end: clamp(96px, 14vh, 160px);
   /* A reading measure of about 70 characters, in the text's own em: an
      average Onest character is 0.475em wide, but its zero (the ch unit) is
      0.665em, so a 64ch measure held about 90. */

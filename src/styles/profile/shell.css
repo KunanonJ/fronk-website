@@ -568,7 +568,7 @@
     flex-direction: column;
     justify-content: space-between;
     min-block-size: var(--screen);
-    padding-block: clamp(96px, 14vh, 160px) 32px;
+    padding-block: var(--page-end) 32px;
   }
   .pf-footer__intro {
     display: grid;
@@ -601,11 +601,11 @@
   }
   /* On /contact the page is the call to action, so the footer leaves out
      its own and the drawings that flank it (SiteFooter, UX sweep
-     21-11-26): no screen-tall stage to hold them, and the card leads, the
-     footer's 40 px into the sheet. */
+     21-11-26): no screen-tall stage to hold them, and the card leads,
+     where "Get in touch" stands on every other page (the page end,
+     globals.css). */
   .pf-footer--plain .pf-footer__wrap {
     min-block-size: 0;
-    padding-block-start: 0;
   }
   .pf-footer--plain .pf-footer__card {
     margin-block-start: 0;
@@ -700,6 +700,36 @@
     display: grid;
     align-content: start;
     gap: 32px;
+  }
+  /* Under 810 px the card is one column, and its lists stood in one long
+     column too, a footer of 1,167 px at 390 (UX hunt 22-11-26, U24). The
+     Pages list takes as many 6.5rem columns as fit (two at 320 px, five
+     at 768), in column order as from 1024 px: down the first column,
+     then the next, which is the source order, so the tab order and a
+     screen reader follow the eye. Elsewhere and For agents sit side by
+     side on the same tracks. A column is wider than the longest label,
+     and one that no longer fits, at a larger text size, drops a column
+     rather than break a label. Each link is a 44 px tap target here. */
+  @media (width < 50.625rem) {
+    .pf-footer__block--pages .pf-footer__list {
+      display: block;
+      columns: 6.5rem;
+      column-gap: 16px;
+    }
+    .pf-footer__block--pages .pf-footer__list li {
+      break-inside: avoid;
+    }
+    .pf-footer__side {
+      grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+      column-gap: 16px;
+    }
+    .pf-footer__list {
+      gap: 0;
+    }
+    .pf-footer__link {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+    }
   }
   .pf-footer__copyright {
     margin-block-start: 40px;

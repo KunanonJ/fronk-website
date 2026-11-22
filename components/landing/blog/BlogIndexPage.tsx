@@ -304,7 +304,7 @@ export default function BlogIndexPage({
   return (
     <>
       <BlogHero eyebrow={eyebrow} />
-      <div className="ds-wrap pf-cat-section pf-cat-end">
+      <div className="ds-wrap pf-cat-section">
         <div className="pf-blog-grid">
           {cornerstone ? <CornerstoneCard post={cornerstone} /> : null}
           <ArchiveCard posts={sorted} tagCount={tags.length} />

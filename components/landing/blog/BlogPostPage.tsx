@@ -268,7 +268,7 @@ export default function BlogPostPage({
   return (
     <>
       <PostHero post={post} />
-      <div className="ds-wrap pf-cat-section pf-cat-end pf-blog-post">
+      <div className="ds-wrap pf-cat-section pf-blog-post">
         <div className="pf-blog-post__top">
           <NoteCard post={post} body={body} paragraphs={paragraphs} />
           <div className="pf-blog-post__side">
