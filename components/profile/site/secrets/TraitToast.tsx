@@ -13,11 +13,11 @@ import secretsCss from "@/src/styles/secrets.css?url";
  * cut wearing it, "You found Shades · 2/6", and a link to /about's portrait.
  * Under the nav bar, clear of what the reader meets next where a trait is
  * found (the footer's links, the contact card's actions; secrets.css says
- * why). It goes by itself after 5 s, waits while the pointer or focus is on
- * it, and closes with its button or Esc. Its line is a polite status,
- * filled a frame after the region is in the page so it is read. While a
- * modal dialog is open (⌘K found the trait) it waits for the
- * dialog to close: everything else is inert until then. It slides in only
+ * why), and never over the focused control. It goes by itself after 5 s,
+ * waits while the pointer or focus is on it, and closes with its button or
+ * Esc. Its line is a polite status, filled a frame after the region is in
+ * the page so it is read. While a modal dialog is open (⌘K found the trait)
+ * it waits for the dialog to close: everything else is inert until then. It slides in only
  * with motion allowed and never flashes. Its stylesheet comes with it
  * (src/styles/secrets.css). The shell hands it the nav's drawing, the
  * portrait and the link component it already has.
@@ -30,30 +30,52 @@ export const TOAST_MS = 5000;
 const TARGETS =
   "a[href], button, input, select, textarea, summary, [role='button']";
 
+/** Whether `toast` lies over the drawn element `el`. */
+function over(toast: HTMLElement, el: Element): boolean {
+  const box = toast.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  if (r.width === 0 || r.height === 0) return false;
+  return (
+    r.left < box.right &&
+    r.right > box.left &&
+    r.top < box.bottom &&
+    r.bottom > box.top
+  );
+}
+
 /** How many of the page's drawn links and controls `toast` lies over. */
 function covered(toast: HTMLElement): number {
-  const box = toast.getBoundingClientRect();
   let count = 0;
   for (const el of document.querySelectorAll(TARGETS)) {
-    if (toast.contains(el)) continue;
-    const r = el.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) continue;
-    if (
-      r.left < box.right &&
-      r.right > box.left &&
-      r.top < box.bottom &&
-      r.bottom > box.top
-    ) {
-      count += 1;
-    }
+    if (!toast.contains(el) && over(toast, el)) count += 1;
   }
   return count;
 }
 
 /**
- * Where it stands, chosen once as it shows: under the bar, or at the foot of
- * the screen when the top would lie over a link or a control and the foot
- * over fewer (secrets.css).
+ * Keeps the focused link or control clear of it (WCAG 2.4.11): when it lies
+ * over it, it stands in its other place. False when that covers it too, and
+ * the toast must go.
+ */
+function clearFocus(toast: HTMLElement): boolean {
+  const focused = document.activeElement;
+  if (
+    !focused?.matches(TARGETS) ||
+    toast.contains(focused) ||
+    getComputedStyle(toast).position !== "fixed" ||
+    !over(toast, focused)
+  ) {
+    return true;
+  }
+  if (toast.dataset.place) delete toast.dataset.place;
+  else toast.dataset.place = "low";
+  return !over(toast, focused);
+}
+
+/**
+ * Where it stands as it shows: under the bar, or at the foot of the screen
+ * when the top would lie over a link or a control and the foot over fewer
+ * (secrets.css).
  */
 function place(toast: HTMLElement) {
   // Measured where it rests, not where its entrance starts.
@@ -134,6 +156,31 @@ export default function TraitToast({
     };
     settle();
     return () => cancelAnimationFrame(frame);
+  }, [shown]);
+
+  // Focus never ends under it: placed as it showed, it can lie over the
+  // control a reader Tabs to next, or one the page scrolls under it (the
+  // next card's link at the end of a case study, on a phone). Checked a
+  // frame after either, once focus has moved and the page has drawn.
+  useEffect(() => {
+    const toast = box.current;
+    if (!shown || !toast) return;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      if (!clearFocus(toast)) closeRef.current();
+    };
+    const soon = () => {
+      frame ||= requestAnimationFrame(check);
+    };
+    soon();
+    document.addEventListener("focusin", soon);
+    window.addEventListener("scroll", soon, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("focusin", soon);
+      window.removeEventListener("scroll", soon);
+    };
   }, [shown]);
 
   // The region is in the page first, its words a frame later, so they are read.

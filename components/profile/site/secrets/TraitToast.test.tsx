@@ -183,6 +183,69 @@ describe("TraitToast", () => {
       ).toBeVisible();
       undo();
     });
+
+    it("moves to its other place when focus or the page brings the focused link under it", () => {
+      const link = Object.assign(document.createElement("a"), {
+        href: "/stack",
+        textContent: "Stack",
+      });
+      document.body.append(link);
+      const box: [number, number] = [110, 28];
+      const undo = layout(link, box);
+      const { onClose } = show();
+      const toast = screen.getByTestId("trait-toast");
+      expect(toast).toHaveAttribute("data-place", "low");
+
+      // Tabbed to and scrolled in at the foot of the screen, under it.
+      box[0] = 780;
+      act(() => {
+        link.focus();
+        vi.advanceTimersToNextFrame();
+      });
+      expect(toast).not.toHaveAttribute("data-place");
+
+      // The page scrolls it under the top: back to the foot.
+      box[0] = 100;
+      act(() => {
+        window.dispatchEvent(new Event("scroll"));
+        vi.advanceTimersToNextFrame();
+      });
+      expect(toast).toHaveAttribute("data-place", "low");
+      expect(onClose).not.toHaveBeenCalled();
+      undo();
+    });
+
+    it("goes when both its places lie over the focused control", () => {
+      const button = Object.assign(document.createElement("button"), {
+        textContent: "Tall",
+      });
+      document.body.append(button);
+      const undo = layout(button, [0, 900]);
+      const { onClose } = show();
+      act(() => {
+        button.focus();
+        vi.advanceTimersToNextFrame();
+      });
+      expect(onClose).toHaveBeenCalledTimes(1);
+      undo();
+    });
+
+    it("stays put when focus lands under it on what is not a link or control", () => {
+      const main = Object.assign(document.createElement("main"), {
+        tabIndex: -1,
+      });
+      document.body.append(main);
+      const undo = layout(main, [0, 900]);
+      const { onClose } = show();
+      const toast = screen.getByTestId("trait-toast");
+      act(() => {
+        main.focus();
+        vi.advanceTimersToNextFrame();
+      });
+      expect(toast).not.toHaveAttribute("data-place");
+      expect(onClose).not.toHaveBeenCalled();
+      undo();
+    });
   });
 
   it("waits for an open dialog to close, and leaves Esc to it", () => {
